@@ -1,0 +1,62 @@
+<?php
+
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateReportsTable extends Migration {
+
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up() {
+        Schema::create('reports', function(Blueprint $table) {
+            $table->increments('id');
+            $table->string('merchant_id')->nullable();
+            $table->index('merchant_id');
+            $table->string('name');
+            $table->string('type');
+            $table->index('type');
+            $table->boolean('submitted');
+            $table->boolean('private');
+            $table->string('email')->nullable();
+            $table->string('hash')->nullable();
+            $table->string('telephone')->nullable();
+            $table->string('address')->nullable();
+            $table->text('description')->nullable();
+            $table->string('icon')->nullable();
+            $table->double('lat', 12, 9)->nullable();
+            $table->double('long', 12, 9)->nullable();
+            $table->index('lat');
+            $table->index('long');
+            $table->integer('city_id')->unsigned();
+            $table->foreign('city_id')->references('id')
+                    ->on('cities');
+            $table->integer('region_id')->unsigned();
+            $table->foreign('region_id')->references('id')
+                    ->on('regions');
+            $table->integer('country_id')->unsigned();
+            $table->foreign('country_id')->references('id')
+                    ->on('countries');
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')
+                    ->on('users');
+            $table->double('minimum', 15, 2)->nullable();
+            $table->string('delivery_time')->nullable();
+            $table->double('delivery_price', 15, 2)->nullable();
+            $table->string('status')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down() {
+        Schema::drop('reports');
+    }
+
+}
