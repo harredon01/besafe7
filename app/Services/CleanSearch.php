@@ -8,22 +8,6 @@ use App\Models\User;
 
 class CleanSearch {
 
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * Create a new filter instance.
-     *
-     * @param  Guard  $auth
-     * @return void
-     */
-    public function __construct(Guard $auth) {
-        $this->auth = $auth;
-    }
 
     public function handle(User $user, Request $request) {
         $mystring = $request->getRequestUri();
@@ -72,7 +56,7 @@ class CleanSearch {
     }
 
     public function handleLocation($request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
@@ -117,7 +101,7 @@ class CleanSearch {
     }
 
     public function handleHistoricLocation($request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
@@ -164,7 +148,7 @@ class CleanSearch {
     }
 
     public function handleContact($request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
@@ -196,7 +180,7 @@ class CleanSearch {
     }
 
     public function handleReport($request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";

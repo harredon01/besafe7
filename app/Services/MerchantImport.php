@@ -423,29 +423,27 @@ class MerchantImport {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $merchant1 = Merchant::create([
-                                'merchant_id' => $row['id'],
-                                'name' => $row['name'],
-                                'type' => $row['type'],
-                                'email' => $row['email'],
-                                'telephone' => $row['phone_number'],
-                                'address' => $row['address'] . ", " . $row['location'],
-                                'description' => $row['description'],
-                                'icon' => $row['category'],
-                                'lat' => $row['lat'],
-                                'long' => $row['long'],
-                                'minimum' => $row['minimum'],
-                                'city_id' => $row['city_id'],
-                                'region_id' => $row['region_id'],
-                                'country_id' => $row['country_id'],
-                                'delivery_time' => $row['schedule_search'],
-                                'delivery_price' => $row['delivery_price'],
-                                'status' => "active",
-                    ]);
-                }
+        foreach ($reader as $row) {
+            if ($row['id']) {
+                $merchant1 = Merchant::create([
+                            'merchant_id' => $row['id'],
+                            'name' => $row['name'],
+                            'type' => $row['type'],
+                            'email' => $row['email'],
+                            'telephone' => $row['phone_number'],
+                            'address' => $row['address'] . ", " . $row['location'],
+                            'description' => $row['description'],
+                            'icon' => $row['category'],
+                            'lat' => $row['lat'],
+                            'long' => $row['long'],
+                            'minimum' => $row['minimum'],
+                            'city_id' => $row['city_id'],
+                            'region_id' => $row['region_id'],
+                            'country_id' => $row['country_id'],
+                            'delivery_time' => $row['schedule_search'],
+                            'delivery_price' => $row['delivery_price'],
+                            'status' => "active",
+                ]);
             }
         }
     }
@@ -455,22 +453,20 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $code;
-                    if ($row['facebook_id'] == "NULL") {
-                        $code = null;
-                    } else {
-                        $code = $row['facebook_id'];
-                    }
-                    $country = Country::create([
-                                'id' => $row['id'],
-                                'name' => $row['name'],
-                                'area_code' => $row['area_code'],
-                                'code' => $row['code'],
-                                'facebook_id' => $code
-                    ]);
+            if ($sheet['id']) {
+                $code;
+                if ($sheet['facebook_id'] == "NULL") {
+                    $code = null;
+                } else {
+                    $code = $sheet['facebook_id'];
                 }
+                $country = Country::create([
+                            'id' => $sheet['id'],
+                            'name' => $sheet['name'],
+                            'area_code' => $sheet['area_code'],
+                            'code' => $sheet['code'],
+                            'facebook_id' => $code
+                ]);
             }
         }
     }
@@ -480,30 +476,28 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $code;
-                    if ($row['facebook_id'] == "NULL") {
-                        $code = null;
-                    } else {
+            if ($sheet['id']) {
+                $code;
+                if ($sheet['facebook_id'] == "NULL") {
+                    $code = null;
+                } else {
 
-                        $code = $row['facebook_id'];
-                    }
-                    $code2;
-                    if ($row['facebook_country_id'] == "NULL") {
-                        $code2 = null;
-                    } else {
-                        $code2 = $row['facebook_country_id'];
-                    }
-                    $region = Region::create([
-                                'id' => $row['id'],
-                                'name' => $row['name'],
-                                'country_id' => $row['country_id'],
-                                'code' => $row['code'],
-                                'facebook_id' => $code,
-                                'facebook_country_id' => $code2
-                    ]);
+                    $code = $sheet['facebook_id'];
                 }
+                $code2;
+                if ($sheet['facebook_country_id'] == "NULL") {
+                    $code2 = null;
+                } else {
+                    $code2 = $sheet['facebook_country_id'];
+                }
+                $region = Region::create([
+                            'id' => $sheet['id'],
+                            'name' => $sheet['name'],
+                            'country_id' => $sheet['country_id'],
+                            'code' => $sheet['code'],
+                            'facebook_id' => $code,
+                            'facebook_country_id' => $code2
+                ]);
             }
         }
     }
@@ -513,32 +507,33 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $code;
-                    if ($row['facebook_id'] == "NULL") {
-                        $code = null;
-                    } else {
-                        $code = $row['facebook_id'];
-                    }
-                    $code2;
-                    if ($row['facebook_country_id'] == "NULL") {
-                        $code2 = null;
-                    } else {
-                        $code2 = $row['facebook_country_id'];
-                    }
-                    $city = City::create([
-                                'id' => $row['id'],
-                                'name' => $row['name'],
-                                'code' => $row['code'],
-                                'facebook_id' => $code,
-                                'country_id' => $row['country_id'],
-                                'facebook_country_id' => $code2,
-                                'region_id' => $row['region_id'],
-                                'lat' => $row['lat'],
-                                'long' => $row['long'],
-                    ]);
+            if ($sheet['id']) {
+                $code;
+                if ($sheet['facebook_id'] == "NULL") {
+                    $code = null;
+                } else {
+                    $code = $sheet['facebook_id'];
                 }
+                $code2;
+                if ($sheet['facebook_country_id'] == "NULL") {
+                    $code2 = null;
+                } else {
+                    $code2 = $sheet['facebook_country_id'];
+                }
+//                if( $sheet['name'] =="BELMIRA"){
+//                    dd($sheet);
+//                }
+                $city = City::create([
+                            'id' => $sheet['id'],
+                            'name' => $sheet['name'],
+                            'code' => $sheet['code'],
+                            'facebook_id' => $code,
+                            'country_id' => $sheet['country_id'],
+                            'facebook_country_id' => $code2,
+                            'region_id' => $sheet['region_id'],
+                            'lat' => $sheet['lat'],
+                            'long' => $sheet['long'],
+                ]);
             }
         }
     }
@@ -547,23 +542,21 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $code;
-                    if ($row['merchant_id'] == "NULL") {
-                        $code = null;
-                    } else {
-                        $code = $row['merchant_id'];
-                    }
-                    $product = Product::create([
-                                'id' => $row['id'],
-                                'name' => $row['name'],
-                                'description' => $row['slug'],
-                                'merchant_id' => $code,
-                                'isActive' => $row['isactive'],
-                                'slug' => $row['slug'],
-                    ]);
+            if ($sheet['id']) {
+                $code;
+                if ($sheet['merchant_id'] == "NULL") {
+                    $code = null;
+                } else {
+                    $code = $sheet['merchant_id'];
                 }
+                $product = Product::create([
+                            'id' => $sheet['id'],
+                            'name' => $sheet['name'],
+                            'description' => $sheet['slug'],
+                            'merchant_id' => $code,
+                            'isActive' => $sheet['isactive'],
+                            'slug' => $sheet['slug'],
+                ]);
             }
         }
     }
@@ -573,20 +566,18 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $productVariant = ProductVariant::create([
-                                'id' => $row['id'],
-                                'product_id' => $row['product_id'],
-                                'sku' => $row['sku'],
-                                'ref2' => $row['ref2'],
-                                'isActive' => $row['isactive'],
-                                'price' => $row['price'],
-                                'sale' => $row['sale'],
-                                'quantity' => $row['quantity'],
-                                'attributes' => $row['attributes'],
-                    ]);
-                }
+            if ($sheet['id']) {
+                $productVariant = ProductVariant::create([
+                            'id' => $sheet['id'],
+                            'product_id' => $sheet['product_id'],
+                            'sku' => $sheet['sku'],
+                            'ref2' => $sheet['ref2'],
+                            'isActive' => $sheet['isactive'],
+                            'price' => $sheet['price'],
+                            'sale' => $sheet['sale'],
+                            'quantity' => $sheet['quantity'],
+                            'attributes' => $sheet['attributes'],
+                ]);
             }
         }
     }
@@ -596,38 +587,36 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $user = User::create([
-                                'id' => $row['id'],
-                                'firstName' => $row['firstName'],
-                                'emailNotifications' => $row['emailNotifications'],
-                                'pushNotifications' => $row['pushNotifications'],
-                                'green' => $row['green'],
-                                'red' => $row['red'],
-                                'is_alerting' => $row['is_alerting'],
-                                'is_tracking' => $row['is_tracking'],
-                                'alert_type' => $row['alert_type'],
-                                'notify_location' => $row['notify_location'],
-                                'lastName' => $row['lastName'],
-                                'cellphone' => $row['cellphone'],
-                                'area_code' => $row['area_code'],
-                                'hash' => $row['hash'],
-                                'trip' => $row['trip'],
-                                'token' => $row['token'],
-                                'platform' => $row['platform'],
-                                'name' => $row['name'],
-                                'docType' => $row['docType'],
-                                'docNum' => $row['docNum'],
-                                'email' => $row['email'],
-                                'username' => $row['username'],
-                                'avatar' => $row['avatar'],
-                                'gender' => $row['gender'],
-                                'birth' => $row['birth'],
-                                'weight' => $row['weight'],
-                                'blood_type' => $row['blood_type'],
-                    ]);
-                }
+            if ($sheet['id']) {
+                $user = User::create([
+                            'id' => $sheet['id'],
+                            'firstName' => $sheet['firstName'],
+                            'emailNotifications' => $sheet['emailNotifications'],
+                            'pushNotifications' => $sheet['pushNotifications'],
+                            'green' => $sheet['green'],
+                            'red' => $sheet['red'],
+                            'is_alerting' => $sheet['is_alerting'],
+                            'is_tracking' => $sheet['is_tracking'],
+                            'alert_type' => $sheet['alert_type'],
+                            'notify_location' => $sheet['notify_location'],
+                            'lastName' => $sheet['lastName'],
+                            'cellphone' => $sheet['cellphone'],
+                            'area_code' => $sheet['area_code'],
+                            'hash' => $sheet['hash'],
+                            'trip' => $sheet['trip'],
+                            'token' => $sheet['token'],
+                            'platform' => $sheet['platform'],
+                            'name' => $sheet['name'],
+                            'docType' => $sheet['docType'],
+                            'docNum' => $sheet['docNum'],
+                            'email' => $sheet['email'],
+                            'username' => $sheet['username'],
+                            'avatar' => $sheet['avatar'],
+                            'gender' => $sheet['gender'],
+                            'birth' => $sheet['birth'],
+                            'weight' => $sheet['weight'],
+                            'blood_type' => $sheet['blood_type'],
+                ]);
             }
         }
     }

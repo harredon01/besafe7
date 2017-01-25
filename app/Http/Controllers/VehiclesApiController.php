@@ -29,7 +29,7 @@ class VehiclesApiController extends Controller {
     public function __construct(Guard $auth, EditVehicle $editVehicles) {
         $this->editVehicles = $editVehicles;
         $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
 
     /**

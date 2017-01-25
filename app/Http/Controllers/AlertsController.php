@@ -31,7 +31,7 @@ class AlertsController extends Controller {
     public function __construct(Guard $auth, EditAlerts $editAlerts) {
         $this->editAlerts = $editAlerts;
         $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
     
     /**

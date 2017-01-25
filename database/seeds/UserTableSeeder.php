@@ -6,7 +6,7 @@ use App\Models\City;
 use App\Models\Region;
 use App\Models\Country;
 use App\Models\Group;
-use App\Services\Registrar;
+
 use App\Services\EditUserData;
 use App\Services\EditGroup;
 use App\Services\EditLocation;
@@ -38,18 +38,12 @@ class UserTableSeeder extends Seeder {
      */
     protected $editAlerts;
 
-    /**
-     * The edit profile implementation.
-     *
-     */
-    protected $registrar;
 
-    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, Registrar $registrar) {
+    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts) {
         $this->editGroup = $editGroup;
         $this->editLocation = $editLocation;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
-        $this->registrar = $registrar;
     }
 
     /**
@@ -68,9 +62,10 @@ class UserTableSeeder extends Seeder {
             'area_code' => "57",
             'docNum' => "1020716535",
             'email' => "harredon007@hotmail.com",
-            'password' => "123456",
+            'password' => bcrypt("123456"),
         );
-        $user = $this->registrar->create($data);
+        
+        $user = User::create($data);
 
         $data = array(
             'firstName' => "Rodrigo",
@@ -96,9 +91,9 @@ class UserTableSeeder extends Seeder {
             'area_code' => "57",
             'docNum' => "1020716536",
             'email' => "harredon01@gmail.com",
-            'password' => "123456",
+            'password' => bcrypt("123456"),
         );
-        $user = $this->registrar->create($data);
+        $user = User::create($data);
         $data = array(
             'firstName' => "Hoov",
             'lastName' => "Arre",
@@ -122,9 +117,9 @@ class UserTableSeeder extends Seeder {
             'cellphone' => "3103418432",
             'area_code' => "57",
             'email' => "cami_sandoval_@hotmail.com",
-            'password' => "123456",
+            'password' => bcrypt("123456"),
         );
-        $user = $this->registrar->create($data);
+        $user = User::create($data);
         $data = array(
             'firstName' => "Seb",
             'lastName' => "Jara",
@@ -148,9 +143,9 @@ class UserTableSeeder extends Seeder {
             'area_code' => "57",
             'docNum' => "80874422",
             'email' => "rondoncardenas@gmail.com",
-            'password' => "123456",
+            'password' => bcrypt("123456"),
         );
-        $user = $this->registrar->create($data);
+        $user = User::create($data);
         $data = array(
             'firstName' => "Cami",
             'lastName' => "Sand",

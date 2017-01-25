@@ -47,7 +47,7 @@ class LocationController extends Controller {
         $this->editLocation = $editLocation;
         $this->cleanSearch = $cleanSearch;
         $this->auth = $auth;
-        $this->middleware('jwt.auth', ['except' => ['moveHistoricLocations', 'moveOldLocations']]);
+        $this->middleware('auth:api', ['except' => ['moveHistoricLocations', 'moveOldLocations']]);
     }
 
     /**
@@ -65,8 +65,8 @@ class LocationController extends Controller {
      *
      * @return Response
      */
-    public function getUserHash() {
-        $user = $this->auth->user();
+    public function getUserHash(Request $request) {
+        $user = $request->user();
         $hash = $this->editLocation->getUserHash($user);
         return response()->json(compact('hash'));
     }
@@ -130,7 +130,7 @@ class LocationController extends Controller {
      */
     public function postLocation(Request $request) {
 
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editLocation->postLocation($request->all(), $user));
     }
     /**
@@ -139,7 +139,7 @@ class LocationController extends Controller {
      * @return Response
      */
     public function getCitiesFrom(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editLocation->getCitiesFrom($user, $request->all()));
     }
 

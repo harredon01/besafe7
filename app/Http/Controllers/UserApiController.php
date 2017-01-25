@@ -42,7 +42,7 @@ class UserApiController extends Controller {
         $this->cleanSearch = $cleanSearch;
         $this->editUserData = $editUserData;
         $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
 
     /**
@@ -52,7 +52,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function changePassword(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $data = $request->only('old_password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['old_password']])) {
             $validator = $this->editUserData->validatorPassword($request->all());
@@ -73,7 +73,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function registerToken(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editUserData->registerToken($user, $request->all()));
     }
 
@@ -83,22 +83,13 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function notificationMedical($id) {
-        $user = $this->auth->user();
+    public function notificationMedical($id, Request $request) {
+        $user = $request->user();
 
         return response()->json($this->editUserData->notificationMedical($user, $id));
     }
 
-    /**
-     * Get Registered addresses.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getAddress() {
-        $user = $this->auth->user();
-        $addresses = $this->editUserData->getAddresses($user);
-        return response()->json(array("user" => $user, "addresses" => $addresses));
-    }
+    
 
     /**
      * Get Registered addresses.
@@ -106,7 +97,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function importContactsId(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editUserData->importContactsId($user, $request->all()));
     }
 
@@ -116,7 +107,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function updateContactsLevel(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editUserData->updateContactsLevel($user, $request->all()));
     }
 
@@ -126,7 +117,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function checkContacts(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $contacts = $this->editUserData->checkContacts($user, $request->all());
         return response()->json(compact('contacts'));
     }
@@ -136,7 +127,7 @@ class UserApiController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function getContacts2(Request $request) {
+    public function getContacts(Request $request) {
         $request2 = $this->cleanSearch->handleContact($request);
         if ($request2) {
             $queryBuilder = new ContactQueryBuilder(new User, $request2);
@@ -160,38 +151,12 @@ class UserApiController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function deleteContact($contactId) {
-        $user = $this->auth->user();
+    public function deleteContact($contactId, Request $request) {
+        $user = $request->user();
         return response()->json($this->editUserData->deleteContact($user, $contactId));
     }
 
-    /**
-     * Get Registered addresses.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteGroup($groupId) {
-        $user = $this->auth->user();
-        return response()->json($this->editUserData->deleteGroup($user, $groupId));
-    }
-
-    /**
-     * creates or updates user address.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postAddress(Request $request) {
-        $user = $this->auth->user();
-        $validator = $this->editUserData->validatorAddress($request->all());
-
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
-    }
+    
 
     /**
      * creates or updates user address.
@@ -200,7 +165,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function importContacts(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
@@ -217,13 +182,13 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function addContact($contact_id) {
-        $user = $this->auth->user();
+    public function addContact($contact_id, Request $request) {
+        $user = $request->user();
         return response()->json($this->editUserData->addContact($user, $contact_id));
     }
 
-    public function deleteAddress($address_id) {
-        $user = $this->auth->user();
+    public function deleteAddress($address_id,Request $request) {
+        $user = $request->user();
         return response()->json($this->editUserData->deleteAddress($user, $address_id));
     }
 
@@ -232,11 +197,14 @@ class UserApiController extends Controller {
      *
      * @return Response
      */
-    public function index() {
-        $user = $this->auth->user();
+    public function index(Request $request) {
+        $data = [];
+        $user = $request->user();
         $user->addresses;
+        $data['current_time'] = date("Y-m-d H:i:s");
+        $data['user'] = $user;
         // the token is valid and we have found the user via the sub claim
-        return response()->json(compact('user'));
+        return response()->json($data);
     }
 
     /**
@@ -254,7 +222,7 @@ class UserApiController extends Controller {
      * @return Response
      */
     public function store(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editUserData->validator($request->all());
 
         if ($validator->fails()) {
@@ -272,7 +240,6 @@ class UserApiController extends Controller {
      * @return Response
      */
     public function show($id) {
-        $user = $this->auth->user();
         return response()->json($this->editUserData->getContact($id));
     }
 

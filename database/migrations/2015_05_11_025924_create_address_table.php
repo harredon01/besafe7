@@ -17,11 +17,11 @@ class CreateAddressTable extends Migration {
             $table->string('firstName');
             $table->string('lastName');
             $table->string('address');
-            $table->string('type');
+            $table->string('type')->nullable();
             $table->string('postal')->nullable();
             $table->string('phone')->nullable();
-            $table->double('lat', 12, 9);
-            $table->double('long', 12, 9);
+            $table->double('lat', 16, 13)->nullable();
+            $table->double('long', 16, 13)->nullable();
             $table->index('lat');
             $table->index('long');
             $table->integer('city_id')->unsigned()->nullable();

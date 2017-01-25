@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Services\EditFile;
-use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -16,21 +14,15 @@ class FileApiController extends Controller {
      */
     protected $editFile;
 
-    /**
-     * The edit alerts implementation.
-     *
-     */
-    protected $auth;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Guard $auth, EditFile $editFile) {
+    public function __construct(EditFile $editFile) {
         $this->editFile = $editFile;
-        $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
 
     /**
@@ -40,7 +32,7 @@ class FileApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postFile(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editFile->validatorFile($request->all());
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => "validation failed"), 401);
@@ -53,8 +45,8 @@ class FileApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function delete($file_id) {
-        $user = $this->auth->user();
+    public function delete($file_id,Request $request) {
+        $user = $request->user();
         return response()->json($this->editFile->delete($user, $file_id));
     }
 

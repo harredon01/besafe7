@@ -65,54 +65,6 @@ class EditMerchant {
      *
      * @return Response
      */
-    public function getUserReports(User $user, array $data) {
-        $page = $data['page'];
-        $perPage = $data['per_page'];
-        $values = ($page - 1) * $perPage;
-        $total = Report::where('user_id', $user->id)->count();
-        $reports = Report::where('user_id', $user->id)->orderBy('id', 'desc')->skip($values)->take($perPage)->get();
-        $data = [
-            "reports" => $reports,
-            "user" => $user,
-            "page" => $page,
-            "perpage" => $perPage,
-            "total" => $total
-        ];
-        return $data;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getReports(User $user, array $data) {
-        if ($user->email == "harredon01@gmail.com") {
-            $page = $data['page'];
-            $per_page = $data['per_page'];
-            $order_by = $data['order_by'];
-            $order_dir = $data['order_dir'];
-            $values = ($page - 1) * $per_page;
-            $total = Report::where('id', '>', 0)->count();
-            $reports = Report::where('id', '>', 0)->orderBy($order_by, $order_dir)->skip($values)->take($per_page)->get();
-            $data = [
-                "reports" => $reports,
-                "user" => $user,
-                "page" => $page,
-                "perpage" => $per_page,
-                "order_by" => $order_by,
-                "order_dir" => $order_dir,
-                "total" => $total
-            ];
-            return $data;
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function shareReport(User $user, array $data) {
         $page = $data['page'];
         $per_page = $data['per_page'];
@@ -139,8 +91,9 @@ class EditMerchant {
      * @return Response
      */
     public function deleteReport(User $user, $reportId) {
-        if ($user->email == "harredon01@gmail.com") {
-            Report::find($reportId)->delete();
+        $report = Report::find($reportId);
+        if ($user->id == $report->user_id) {
+            $report->delete();
         }
     }
 

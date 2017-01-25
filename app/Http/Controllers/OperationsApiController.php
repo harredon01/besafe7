@@ -39,7 +39,7 @@ class OperationsApiController extends Controller {
         $this->editVehicles = $editVehicles;
         $this->editOperations = $editOperations;
         $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
 
     /**

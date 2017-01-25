@@ -3,18 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Services\EditOrder;
 
 class OrderApiController extends Controller {
-
-     /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $auth;
 
     /**
      * The edit profile implementation.
@@ -27,10 +19,9 @@ class OrderApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(Guard $auth, EditOrder $editOrder) {
+    public function __construct(EditOrder $editOrder) {
         $this->editOrder = $editOrder;
-        $this->auth = $auth;
-        $this->middleware('jwt.auth', ['except' => ['confirmOrder','denyOrder']]);
+        $this->middleware('auth:api', ['except' => ['confirmOrder', 'denyOrder']]);
     }
 
     /**
@@ -40,7 +31,7 @@ class OrderApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function addCartItem(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editOrder->validatorAddCart($request->all());
 
         if ($validator->fails()) {
@@ -50,6 +41,7 @@ class OrderApiController extends Controller {
         }
         return response()->json($this->editOrder->addCartItem($user, $request->all()));
     }
+
     /**
      * Handle a login request to the application.
      *
@@ -57,7 +49,7 @@ class OrderApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function updateItem(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editOrder->validatorUpdate($request->all());
 
         if ($validator->fails()) {
@@ -67,7 +59,7 @@ class OrderApiController extends Controller {
         }
         return response()->json($this->editOrder->updateCartItem($user, $request->all()));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -75,10 +67,10 @@ class OrderApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function setOrderDetails(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editOrder->setOrderDetails($user, $request->all()));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -88,7 +80,7 @@ class OrderApiController extends Controller {
     public function confirmOrder($code) {
         return response()->json($this->editOrder->confirmOrder($code));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -98,29 +90,29 @@ class OrderApiController extends Controller {
     public function denyOrder($code) {
         return response()->json($this->editOrder->denyOrder($code));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function emailMerchant() {
-        $user = $this->auth->user();
+    public function emailMerchant(Request $request) {
+        $user = $request->user();
         return response()->json($this->editOrder->emailMerchant($user));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getCart() {
-        $user = $this->auth->user();
+    public function getCart(Request $request) {
+        $user = $request->user();
         return response()->json($this->editOrder->getCart($user));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -128,20 +120,21 @@ class OrderApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function setShippingAddress(Request $request) {
-        $user = $this->auth->user();
-        return response()->json($this->editOrder->setShippingAddress($user,$request->only("address_id")));
+        $user = $request->user();
+        return response()->json($this->editOrder->setShippingAddress($user, $request->only("address_id")));
     }
+
     /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function clearCart() {
-        $user = $this->auth->user();
+    public function clearCart(Request $request) {
+        $user = $request->user();
         return response()->json($this->editOrder->clearCart($user));
     }
-    
+
     /**
      * Display a listing of the resource.
      *

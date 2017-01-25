@@ -21,10 +21,10 @@ class CreateLocationsTable extends Migration {
                         $table->index('long');
                         $table->string('name');
                         $table->string('status');
-                        $table->string('speed');
-                        $table->string('activity');
-                        $table->string('battery');
-                        $table->string('islast');
+                        $table->string('speed')->nullable();
+                        $table->string('activity')->nullable();
+                        $table->string('battery')->nullable();
+                        $table->string('islast')->nullable();
                         $table->integer('trip')->unsigned()->default(0);
                         $table->index('trip');
                         $table->string('phone')->nullable();

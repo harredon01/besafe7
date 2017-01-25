@@ -66,19 +66,6 @@ class EditGroup {
      *
      * @return Response
      */
-    public function getGroupByCode($code) {
-        $group = Group::where('code', '=', $code)
-                        ->where('status', '=', 'active')->get();
-        $group->users;
-        $group->locations;
-        return $group;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function joinGroupByCode(User $user, $code) {
         $group = Group::where('id', '=', $code)
                         ->where('status', '=', 'active')->first();

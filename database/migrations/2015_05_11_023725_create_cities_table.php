@@ -13,8 +13,8 @@ class CreateCitiesTable extends Migration {
     public function up() {
         Schema::create('cities', function(Blueprint $table) {
             $table->increments('id');
-            $table->double('lat', 12, 9);
-            $table->double('long', 12, 9);
+            $table->double('lat', 18, 13);
+            $table->double('long', 18, 13);
             $table->index('lat');
             $table->index('long');
             $table->string('name');

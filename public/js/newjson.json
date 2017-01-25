@@ -1,0 +1,1 @@
+{"url":"/dash","views":{"tab-dash":{"templateUrl":"templates/tab-map.html","controller":"MapCtrl"}},"name":"tab.dash"}

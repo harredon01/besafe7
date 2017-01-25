@@ -36,7 +36,7 @@ class CartConditionsTable extends Migration {
                         $table->integer('country_id')->unsigned()->nullable();
                         $table->foreign('country_id')->references('id')
                                 ->on('countries');
-                        $table->text('attributes');
+                        $table->text('attributes')->nullable();
 			$table->timestamps();
 		});
 	}

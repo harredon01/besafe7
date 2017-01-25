@@ -820,8 +820,6 @@ class EditAlerts {
                 PushNotification::app('appNameAndroid')
                         ->to($user->token)
                         ->send($message);
-                $notification->subject = "11" . $notification->subject;
-                $notification->save();
             } elseif ($user->platform == "ios") {
                 PushNotification::app('appNameIOS')
                         ->to($user->token)

@@ -655,27 +655,6 @@ class EditUserData {
                         ->delete();
     }
 
-    public function deleteGroup(User $user, $groupId) {
-        $group = Group::where('id', '=', $groupId)->first();
-        if ($group) {
-            if ($group->admin_id == $user->id) {
-                //$group->delete();
-                DB::table('group_user')
-                        ->where('group_user.user_id', '=', $user->id)
-                        ->where('group_user.group_id', '=', $groupId)
-                        ->delete();
-                return array("status" => "success", "message" => "user removed from group");
-            } else {
-                DB::table('group_user')
-                        ->where('group_user.user_id', '=', $user->id)
-                        ->where('group_user.group_id', '=', $groupId)
-                        ->delete();
-                return array("status" => "success", "message" => "user removed from group");
-            }
-        }
-        return array("status" => "error", "message" => "group not found");
-    }
-
     public function getUserId($user_id) {
         $user = User::find($user_id);
         return $user;
@@ -698,5 +677,10 @@ class EditUserData {
         }
         return $addresses;
     }
+    
+    public function getAddress(User $user,$id) {
+        $address = $user->addresses()->where('id', $id)->get();
+        return $address;
+    }  
 
 }

@@ -40,7 +40,7 @@ class AlertsApiController extends Controller {
         $this->editAlerts = $editAlerts;
         $this->cleanSearch = $cleanSearch;
         $this->auth = $auth;
-        $this->middleware('jwt.auth');
+        $this->middleware('auth:api');
     }
 
     /**
@@ -49,7 +49,7 @@ class AlertsApiController extends Controller {
      * @return Response
      */
     public function postMarkAsDownloaded(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->markAsDownloaded($user,$request->all()));
     }
     /**
@@ -58,7 +58,7 @@ class AlertsApiController extends Controller {
      * @return Response
      */
     public function postAddFollower(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->addFollower($request->all(), $user));
     }
     /**
@@ -66,8 +66,8 @@ class AlertsApiController extends Controller {
      *
      * @return Response
      */
-    public function getRequestPing($pingee) {
-        $user = $this->auth->user();
+    public function getRequestPing($pingee,Request $request) {
+        $user = $request->user();
         return response()->json($this->editAlerts->requestPing($user,$pingee));
     }
     /**
@@ -76,7 +76,7 @@ class AlertsApiController extends Controller {
      * @return Response
      */
     public function postReplyPing(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->replyPing($user, $request->all()));
     }
     /**
@@ -84,13 +84,13 @@ class AlertsApiController extends Controller {
      *
      * @return Response
      */
-    public function getCountNotificationsUnread() {
-        $user = $this->auth->user();
+    public function getCountNotificationsUnread(Request $request) {
+        $user = $request->user();
         return response()->json($this->editAlerts->countNotificationsUnread($user));
     }
 
     public function getNotifications(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $request2 = $this->cleanSearch->handle($user,$request);
         if ($request2) {
             $queryBuilder = new NotificationQueryBuilder(new Notification, $request2);
@@ -116,7 +116,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function getChat(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editAlerts->validatorGetMessage($request->all());
         if ($validator->fails()) {
             $this->throwValidationException(
@@ -134,7 +134,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postMessage(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $validator = $this->editAlerts->validatorMessage($request->all());
         if ($validator->fails()) {
             $this->throwValidationException(
@@ -151,7 +151,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function openNotifications(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->readNotifications($user, $request->all(), "open"));
     }
 
@@ -162,7 +162,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postEmergency(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->postEmergency($user, $request->only("type"),false));
     }
 
@@ -173,7 +173,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postStopEmergency(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->postStopEmergency($user, $request->only("code")));
     }
 
@@ -184,7 +184,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postNotification(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         /* $validator = $this->editAlerts->validatorMessage($request->all());
           if ($validator->fails()) {
           $this->throwValidationException(
@@ -200,8 +200,8 @@ class AlertsApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getMessagesUser($id) {
-        $user = $this->auth->user();
+    public function getMessagesUser($id, Request $request) {
+        $user = $request->user();
         $data['to_id'] = $id;
         $data["type"] = "user";
         return response()->json($this->editAlerts->getChat($user, $data));
@@ -213,8 +213,8 @@ class AlertsApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getMessagesGroup($id) {
-        $user = $this->auth->user();
+    public function getMessagesGroup($id, Request $request) {
+        $user = $request->user();
         $data['recipient_id'] = $id;
         $data["type"] = "group";
         return response()->json($this->editAlerts->getChat($user, $data));
@@ -227,7 +227,7 @@ class AlertsApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function getChats(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         return response()->json($this->editAlerts->getChats($user));
     }
 
@@ -285,8 +285,8 @@ class AlertsApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function deleteNotification($id) {
-        $user = $this->auth->user();
+    public function deleteNotification($id, Request $request) {
+        $user = $request->user();
         return $this->editAlerts->deleteNotification($user, $id);
     }
 
