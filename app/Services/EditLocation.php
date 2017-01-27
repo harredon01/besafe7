@@ -112,9 +112,9 @@ class EditLocation {
      *
      * @return Location
      */
-    public function getCitiesFrom(User $user, array $data) {
+    public function getCitiesFrom(array $data) {
         return DB::select("SELECT id,name,country_id,region_id,ABS(lat - ? ) + ABS(`long`  - ? ) as diff "
-                        . " FROM skynet.cities where name like '%{$data['name']}%' order by diff asc;", [$data['latitude'], $data['longitude']]);
+                        . " FROM cities where name like '%{$data['name']}%' order by diff asc;", [$data['latitude'], $data['longitude']]);
     }
 
     /**

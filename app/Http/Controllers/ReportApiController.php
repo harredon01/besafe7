@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Services\EditMerchant;
 use App\Services\MerchantImport;
 use App\Services\CleanSearch;
+use App\Querybuilders\ReportQueryBuilder;
+use App\Models\Report;
 
 class ReportApiController extends Controller {
 

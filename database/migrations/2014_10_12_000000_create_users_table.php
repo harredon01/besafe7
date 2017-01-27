@@ -33,6 +33,7 @@ class CreateUsersTable extends Migration
 	    $table->integer('trip')->unsigned()->nullable();
             $table->index('trip');
 	    $table->string('token')->nullable();
+            $table->string('avatar')->default("");
 	    $table->string('platform')->nullable();
 	    $table->string('name')->nullable();
 	    $table->string('docType')->nullable();

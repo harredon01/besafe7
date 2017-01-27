@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\EditMerchant;
 use App\Services\MerchantImport;
 use App\Services\CleanSearch;
-use App\Querybuilders\ReportQueryBuilder;
 use Unlu\Laravel\Api\QueryBuilder;
-use App\Models\Report;
 use App\Models\Merchant;
 
 class MerchantApiController extends Controller {

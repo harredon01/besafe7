@@ -199,8 +199,7 @@ class UserApiController extends Controller {
      */
     public function index(Request $request) {
         $data = [];
-        $user = $request->user();
-        $user->addresses;
+        $user = $request->user(); 
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
         // the token is valid and we have found the user via the sub claim

@@ -139,8 +139,7 @@ class LocationController extends Controller {
      * @return Response
      */
     public function getCitiesFrom(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editLocation->getCitiesFrom($user, $request->all()));
+        return response()->json($this->editLocation->getCitiesFrom($request->all()));
     }
 
 
