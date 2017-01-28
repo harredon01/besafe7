@@ -35,7 +35,6 @@ class GroupController extends Controller {
         $this->cleanSearch = $cleanSearch;
         $this->middleware('auth:api');
         $this->middleware('location.group', ['only' => 'show']);
-        $this->middleware('group', ['only' => 'store']);
     }
 
     public function index(Request $request) {

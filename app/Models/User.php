@@ -15,7 +15,7 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = ['firstName','lastName','name','gender', 'area_code', 'cellphone','is_alerting','is_tracking','alert_type',
+    protected $fillable = ['firstName','lastName','name','gender', 'area_code', 'cellphone',
         'docType', 'docNum','username', 'email', 'avatar','password'];
 
     /**
@@ -23,8 +23,8 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token','notify_location',
-       'emailNotifications','pushNotifications','platform','token','green','red','trip'];
+    protected $hidden = ['password', 'remember_token','notify_location','is_alerting','is_tracking','alert_type','docType', 'docNum',
+       'emailNotifications','pushNotifications','platform','token','green','red','trip','hash'];
     public function userSocials() {
         return $this->hasMany('App\Models\UserSocial');
     }

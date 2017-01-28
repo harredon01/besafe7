@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -12,7 +13,12 @@ use App\Services\EditAlerts;
 class AuthApiController extends Controller {
 
 
-
+    /**
+     * The Guard implementation.
+     *
+     * @var Guard
+     */
+    protected $auth;
     /**
      * The registrar implementation.
      *
@@ -34,8 +40,9 @@ class AuthApiController extends Controller {
      * @param  \Illuminate\Contracts\Auth\Registrar  $registrar
      * @return void
      */
-    public function __construct(EditUserData $editUserData, EditAlerts $editAlerts) {
+    public function __construct(Guard $auth,EditUserData $editUserData, EditAlerts $editAlerts) {
         //$this->registrar = $registrar;
+        $this->auth = $auth;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
         $this->middleware('auth:api', ['except' => ['authenticate', 'create']]);
@@ -170,26 +177,4 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
-
-    public function getAuthenticatedUser() {
-        try {
-
-            if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['user_not_found'], 404);
-            }
-        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-
-            return response()->json(['token_expired'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-
-            return response()->json(['token_invalid'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-
-            return response()->json(['token_absent'], $e->getStatusCode());
-        }
-
-        // the token is valid and we have found the user via the sub claim
-        return response()->json(compact('user'));
-    }
-
 }
