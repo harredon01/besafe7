@@ -31,7 +31,6 @@ trait EditProfileUsers {
      */
     public function getEditProfile() {
         $user = $this->auth->user();
-        //dd($user);
         return view('user.editProfile')->with('user', $user);
     }
 

@@ -7,7 +7,8 @@
             $scope.cityVisible = false;
             angular.element(document).ready(function () {
                 $scope.getAddresses();
-                LocationService.getCountries().then(function (data) {
+                var where = "";
+                LocationService.getCountries(where).then(function (data) {
                     $scope.countries = data.data;
                 },
                         function (data) {
@@ -29,6 +30,7 @@
             }
             $scope.getAddresses = function () {
                 Users.getAddresses().then(function (data) {
+                    console.log("addresses",data);
                     $scope.addresses = data;
 
                 },

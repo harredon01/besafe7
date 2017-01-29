@@ -1,5 +1,5 @@
 angular.module('besafe')
-        .service('LocationService', function ($q, $location, $http, $rootScope) {
+        .service('LocationService', function ($q, $location, $http, $rootScope,API) {
 
             var locations = function ( where ) {
                 console.log($location.path());
@@ -23,7 +23,7 @@ angular.module('besafe')
 
                 $http({
                     method: "get",
-                    url: "/cities?region_id=" + regionId,
+                    url: API.address + "/cities?limit=50&region_id=" + regionId,
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -31,6 +31,20 @@ angular.module('besafe')
                         })
                         .error(function () {
                             def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+            };
+            var getRegionFromCity = function (city) {
+                var def = $q.defer();
+                $http.post(API.address + "/cities/from", city
+                        )
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function (data) {
+                            def.reject(data);
                         });
 
                 return def.promise;
@@ -41,7 +55,7 @@ angular.module('besafe')
 
                 $http({
                     method: "get",
-                    url: "/regions?country_id=" + countryID,
+                    url: API.address + "/regions?limit=40&country_id=" + countryID,
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -53,13 +67,27 @@ angular.module('besafe')
 
                 return def.promise;
             };
-            var getCountries = function (  ) {
-
+            var getCountry = function (id) {
                 var def = $q.defer();
-
                 $http({
                     method: "get",
-                    url: "/countries",
+                    url: API.address + "/countries?id=" + id,
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+            };
+            var getCountries = function (where) {
+                var def = $q.defer();
+                $http({
+                    method: "get",
+                    url: API.address + "/countries" + where,
                 })
                         .success(function (data) {
                             // console.log(data);
