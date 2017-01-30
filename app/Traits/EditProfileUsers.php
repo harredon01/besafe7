@@ -42,13 +42,6 @@ trait EditProfileUsers {
      */
     public function postEditProfile(Request $request) {
         $user = $this->auth->user();
-        $validator = $this->editUserData->validator($request->all());
-
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
         $this->editUserData->update($user, $request->all());
         return redirect($this->editProfilePath());
     }
@@ -60,33 +53,8 @@ trait EditProfileUsers {
      */
     public function getEditAddress() {
         $user = $this->auth->user();
-        $addresses = $this->editUserData->getAddresses($user);
-        $regions = Region::all();
-        $city = Region::all();
-        $countries = Country::all();
         return view('user.editAddress')
-                        ->with('user', $user)
-                        ->with('regions', $regions)
-                        ->with('countries', $countries)
-                        ->with('addresses', $addresses);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postEditAddress(Request $request) {
-        $user = $this->auth->user();
-        $validator = $this->editUserData->validatorAddress($request->all());
-
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
+                        ->with('user', $user);
     }
     
     /**
@@ -100,16 +68,6 @@ trait EditProfileUsers {
         return response()->json($this->editUserData->setAsBillingAddress($user,$address));
     }
     
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteAddress($address) {
-        $user = $this->auth->user();
-        return response()->json($this->editUserData->deleteAddress($user,$address));
-    }
 
     /**
      * Get the failed login message.

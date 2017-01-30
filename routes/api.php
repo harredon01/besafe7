@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::resource('address', 'AddressApiController');
+Route::resource('addresses', 'AddressApiController');
 
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');

@@ -89,8 +89,6 @@ class UserApiController extends Controller {
         return response()->json($this->editUserData->notificationMedical($user, $id));
     }
 
-    
-
     /**
      * Get Registered addresses.
      *
@@ -156,8 +154,6 @@ class UserApiController extends Controller {
         return response()->json($this->editUserData->deleteContact($user, $contactId));
     }
 
-    
-
     /**
      * creates or updates user address.
      *
@@ -187,7 +183,7 @@ class UserApiController extends Controller {
         return response()->json($this->editUserData->addContact($user, $contact_id));
     }
 
-    public function deleteAddress($address_id,Request $request) {
+    public function deleteAddress($address_id, Request $request) {
         $user = $request->user();
         return response()->json($this->editUserData->deleteAddress($user, $address_id));
     }
@@ -199,7 +195,7 @@ class UserApiController extends Controller {
      */
     public function index(Request $request) {
         $data = [];
-        $user = $request->user(); 
+        $user = $request->user();
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
         // the token is valid and we have found the user via the sub claim
@@ -222,14 +218,19 @@ class UserApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $validator = $this->editUserData->validator($request->all());
+        $data = $request->all();
+        if (array_key_exists("id", $data)) {
+            return response()->json($this->editUserData->update($data));
+        } else {
+            $validator = $this->editUserData->validatorRegister($data);
 
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            if ($validator->fails()) {
+                $this->throwValidationException(
+                        $request, $validator
+                );
+            }
+            return response()->json($this->editUserData->create($user, $data));
         }
-        return response()->json($this->editUserData->update($user, $request->all()));
     }
 
     /**

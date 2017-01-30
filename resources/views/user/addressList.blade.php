@@ -4,7 +4,7 @@
                         <ul>
 
                             <li id="address-@{{ address.id }}" ng-repeat="address in addresses">
-                                <span class="regionName">Type: @{{ address.type }}</span><br/>
+                                Type: <span class="type">@{{ address.type }}</span><br/>
                                 <span class="address_id" style="display:none">@{{ address.id }}</span><span class="firstName">@{{ address.firstName }}</span>, <span class="lastName">@{{ address.lastName }}</span>
                                 <br/><span class="phone">@{{ address.phone }}</span>, <span class="postal">@{{ address.postal }}</span>
                                 <br/><span class="address">@{{ address.address }}</span>, <span class="city">@{{ address.cityName }}</span><span class="city_id" style="display:none">@{{ address.city_id }}</span>

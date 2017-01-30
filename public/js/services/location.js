@@ -87,7 +87,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: "get",
-                    url: API.address + "/countries" + where,
+                    url: API.address + "/countries?limit=50&order_by=name,asc" + where,
                 })
                         .success(function (data) {
                             // console.log(data);

@@ -22,7 +22,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: 'get',
-                    url: '/user/addresses' 
+                    url: '/api/addresses' 
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -40,7 +40,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/user/editAddress',
+                        url: '/api/addresses',
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
@@ -55,14 +55,33 @@ angular.module('besafe')
                 /**/
 
             }
+            var saveUser = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/user',
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to create user");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
             var deleteAddress = function (address) {
                 var def = $q.defer();
                 $http({
                     method: 'DELETE',
-                    url: '/user/addresses/' + address
+                    url: '/api/addresses/' + address
                 })
                         .success(function (data) {
-                            // console.log(data);
+                            console.log(data);
                             def.resolve(data);
                         })
                         .error(function () {
@@ -95,6 +114,7 @@ angular.module('besafe')
                 setAsBillingAddress: setAsBillingAddress,
                 getAddresses:getAddresses,
                 saveAddress:saveAddress,
-                deleteAddress:deleteAddress
+                deleteAddress:deleteAddress,
+                saveUser:saveUser
             };
         })

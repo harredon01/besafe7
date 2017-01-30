@@ -31,16 +31,6 @@ class UserController extends Controller {
         $this->middleware('auth');
     }
     
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getAddresses() {
-        $user = $this->auth->user();
-        $addresses = $this->editUserData->getAddresses($user);
-        return response()->json($addresses);
-    }
     
     /**
      * Show the application dashboard to the user.

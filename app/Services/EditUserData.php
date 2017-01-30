@@ -43,12 +43,34 @@ class EditUserData {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validator(array $data) {
+    protected function validatorRegister(array $data)
+    {
         return Validator::make($data, [
-                    'firstName' => 'required|max:255',
-                    'lastName' => 'required|max:255',
-                    'email' => 'required|email|max:255',
-                    'cellphone' => 'required|max:255',
+            'firstName' => 'required|max:255',
+            'lastName' => 'required|max:255',
+            'cellphone' => 'required|max:255',
+            'area_code' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|min:6|confirmed',
+        ]);
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return User
+     */
+    protected function create(array $data)
+    {
+        return User::create([
+            'firstName' => $data['firstName'],
+            'lastName' => $data['lastName'],
+            'name' => $data['firstName']." ".$data['lastName'],
+            'email' => $data['email'],
+            'cellphone' => $data['cellphone'],
+            'area_code' => $data['area_code'],
+            'password' => bcrypt($data['password']),
         ]);
     }
 
@@ -130,13 +152,14 @@ class EditUserData {
         if (array_key_exists("cellphone", $data)) {
             $user->cellphone = $data['cellphone'];
         }
-        if (array_key_exists("firstName", $data) && array_key_exists("lastName", $data)) {
-            $user->name = $data['firstName'] + " " + $data['lastName'];
+        if (array_key_exists("gender", $data)) {
+            $user->gender = $data['gender'];
         }
+        $user->name = $user->firstName . " " . $user->lastName;
         $user->save();
         return array("status" => "success", "message" => "User Profile Updated");
     }
-    
+
     public function getContact($contactId) {
         return User::find($contactId);
     }
@@ -389,7 +412,7 @@ class EditUserData {
             }
         }
         DB::table('contacts')->insert($imports);
-        return array("status" => "success", "message" => "Contacts imported","last_id" => DB::getPdo()->lastInsertId());
+        return array("status" => "success", "message" => "Contacts imported", "last_id" => DB::getPdo()->lastInsertId());
     }
 
     /**
@@ -408,7 +431,7 @@ class EditUserData {
                 if ($exists) {
                     
                 } else {
-                    array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal',"created_at"=> date("Y-m-d H:i:s"),"updated_at"=>date("Y-m-d H:i:s")));
+                    array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s")));
                     $notification = [
                         "user_id" => $value,
                         "trigger_id" => $user->id,
@@ -418,13 +441,13 @@ class EditUserData {
                         "subject" => "Nuevo contacto " . $user->name,
                         "user_status" => $this->editAlerts->getUserNotifStatus($user)
                     ];
-                    $this->editAlerts->sendNotification($notification,true);
+                    $this->editAlerts->sendNotification($notification, true);
                 }
             }
         }
         DB::table('contacts')->insert($imports);
-        $lastId = DB::getPdo()->lastInsertId()+(count($imports)-1);
-        return array("status" => "success", "message" => "contacts imported","last_id" => $lastId);
+        $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
+        return array("status" => "success", "message" => "contacts imported", "last_id" => $lastId);
     }
 
     /**
@@ -587,8 +610,13 @@ class EditUserData {
                     'country_id' => $data['country_id']
                 ]);
             }
-
             $user->addresses()->save($address);
+            $region = Region::find($address->region_id);
+            $country = Country::find($address->country_id);
+            $city = City::find($address->city_id);
+            $address->cityName = $city->name;
+            $address->countryName = $country->name;
+            $address->regionName = $region->name;
             if ($data['type'] == 'billing') {
                 $this->setAsBillingAddress($user, $address->id);
             }
@@ -629,7 +657,7 @@ class EditUserData {
         $contact = User::find($contactId);
         if ($contact) {
             $id = DB::table('contacts')->insert(
-                    array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal',"created_at"=> date("Y-m-d H:i:s"),"updated_at"=>date("Y-m-d H:i:s"))
+                    array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
             );
             $contact->server_id = DB::getPdo()->lastInsertId();
             $notification = [
@@ -641,7 +669,7 @@ class EditUserData {
                 "subject" => "Nuevo contacto " . $user->name,
                 "user_status" => $this->editAlerts->getUserNotifStatus($user)
             ];
-            $this->editAlerts->sendNotification($notification,false);
+            $this->editAlerts->sendNotification($notification, false);
             return $contact;
         }
         return array("status" => "error", "message" => "Contact not found");
@@ -677,10 +705,10 @@ class EditUserData {
         }
         return $addresses;
     }
-    
-    public function getAddress(User $user,$id) {
+
+    public function getAddress(User $user, $id) {
         $address = $user->addresses()->where('id', $id)->get();
         return $address;
-    }  
+    }
 
 }

@@ -78,7 +78,7 @@
                             <div class="form-group">
                                 <label class="col-md-4 control-label">Country</label>
                                 <div class="col-md-6">
-                                    <select ng-model="data.country_id" name="country_id" ng-change="selectCountry(data.country_id)" required>
+                                    <select ng-model="data.country_id" name="country_id" ng-change="selectCountry(data.country_id)" >
                                         <option ng-repeat="country in countries" value="@{{country.id}}">@{{country.name}}</option>
                                     </select>
                                     <span style="color:red" ng-show="(myForm.country_id.$dirty && myForm.country_id.$invalid) || submitted && myForm.country_id.$invalid">

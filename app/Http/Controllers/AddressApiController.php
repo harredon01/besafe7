@@ -30,7 +30,7 @@ class AddressApiController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
+    public function index(Request $request) {
         $user = $request->user();
         $addresses = $this->editUserData->getAddresses($user);
         return response()->json(array("user" => $user, "addresses" => $addresses));

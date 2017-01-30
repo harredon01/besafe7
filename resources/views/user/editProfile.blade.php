@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" ng-controller="UserProfileCtrl">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
@@ -17,7 +17,7 @@
 									<li>{{ $error }}</li>
 								@endforeach
 							</ul>
-						</div>
+						</div> 
 					@endif
 
 					<form class="form-horizontal" role="form" method="POST" action="{{ url('/user/editProfile') }}">
@@ -34,6 +34,24 @@
 							<label class="col-md-4 control-label">Last Name</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="lastName" value="{{ $user->lastName }}">
+							</div>
+						</div>
+                                                <div class="form-group">
+							<label class="col-md-4 control-label">Email</label>
+							<div class="col-md-6">
+								<input type="text" class="form-control" name="email" value="{{ $user->email }}">
+							</div>
+						</div>
+                                                <div class="form-group">
+							<label class="col-md-4 control-label">Cellphone</label>
+							<div class="col-md-6">
+								<input type="text" class="form-control" name="cellphone" value="{{ $user->cellphone }}">
+							</div>
+						</div>
+                                                <div class="form-group">
+							<label class="col-md-4 control-label">Area Code</label>
+							<div class="col-md-6">
+								<input type="text" class="form-control" name="area_code" value="{{ $user->area_code }}">
 							</div>
 						</div>
                                                 <div class="form-group">
@@ -55,6 +73,7 @@
 								<input type="text" class="form-control" name="docNum" value="{{ $user->docNum }}">
 							</div>
 						</div>
+                                                
 
 						<div class="form-group">
 							<div class="col-md-6 col-md-offset-4">
