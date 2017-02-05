@@ -18,8 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('firstName');
 	    $table->integer('emailNotifications')->default(0);
 	    $table->integer('pushNotifications')->default(0);
-	    $table->integer('green')->nullable();
-	    $table->integer('red')->nullable();
+	    $table->string('green')->nullable();
+	    $table->string('red')->nullable();
 	    $table->integer('is_alerting')->default(0);
 	    $table->integer('is_tracking')->default(0);
 	    $table->string('alert_type')->nullable();

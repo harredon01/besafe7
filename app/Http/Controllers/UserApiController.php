@@ -9,6 +9,7 @@ use App\Services\EditUserData;
 use App\Services\CleanSearch;
 use App\Querybuilders\ContactQueryBuilder;
 use App\Models\User;
+use App\Models\Medical;
 use Image;
 use File;
 
@@ -196,8 +197,15 @@ class UserApiController extends Controller {
     public function index(Request $request) {
         $data = [];
         $user = $request->user();
+        $green = false;
+        if($user->green){
+            $green = true;
+        }
+        $count = Medical::where('user_id', $user->id)->count();
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
+        $data['count'] = $count;
+        $data['green'] = $green;
         // the token is valid and we have found the user via the sub claim
         return response()->json($data);
     }

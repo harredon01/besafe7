@@ -142,7 +142,8 @@ class EditLocation {
         }
         if (true) {
             $data["lat"] = $location['coords']['latitude'];
-            $data["report_time"] = $location['timestamp'];
+            $time = strtotime($location['timestamp']);
+            $data["report_time"] = date("Y-m-d H:i:s",$time);
             $data["long"] = $location['coords']['longitude'];
             $data["speed"] = $location['coords']['speed'];
             $data["status"] = "active";

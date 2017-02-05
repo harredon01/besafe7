@@ -5,17 +5,19 @@ namespace App\Models;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
+use App\Traits\Encryptable;
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+//    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable,Encryptable;
 
+    
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['firstName','lastName','name','gender', 'area_code', 'cellphone',
+    protected $fillable = ['id','firstName','lastName','name','gender', 'area_code', 'cellphone',
         'docType', 'docNum','username', 'email', 'avatar','password'];
 
     /**
@@ -25,6 +27,10 @@ class User extends Authenticatable
      */
     protected $hidden = ['password', 'remember_token','notify_location','is_alerting','is_tracking','alert_type','docType', 'docNum',
        'emailNotifications','pushNotifications','platform','token','green','red','trip','hash'];
+    protected $encryptable = [
+        'green',
+        'red'
+    ];
     public function userSocials() {
         return $this->hasMany('App\Models\UserSocial');
     }

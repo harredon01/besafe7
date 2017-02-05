@@ -43,15 +43,14 @@ class EditUserData {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validatorRegister(array $data)
-    {
+    protected function validatorRegister(array $data) {
         return Validator::make($data, [
-            'firstName' => 'required|max:255',
-            'lastName' => 'required|max:255',
-            'cellphone' => 'required|max:255',
-            'area_code' => 'required|max:255',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
+                    'firstName' => 'required|max:255',
+                    'lastName' => 'required|max:255',
+                    'cellphone' => 'required|max:255',
+                    'area_code' => 'required|max:255',
+                    'email' => 'required|email|max:255|unique:users',
+                    'password' => 'required|min:6|confirmed',
         ]);
     }
 
@@ -61,16 +60,15 @@ class EditUserData {
      * @param  array  $data
      * @return User
      */
-    protected function create(array $data)
-    {
+    protected function create(array $data) {
         return User::create([
-            'firstName' => $data['firstName'],
-            'lastName' => $data['lastName'],
-            'name' => $data['firstName']." ".$data['lastName'],
-            'email' => $data['email'],
-            'cellphone' => $data['cellphone'],
-            'area_code' => $data['area_code'],
-            'password' => bcrypt($data['password']),
+                    'firstName' => $data['firstName'],
+                    'lastName' => $data['lastName'],
+                    'name' => $data['firstName'] . " " . $data['lastName'],
+                    'email' => $data['email'],
+                    'cellphone' => $data['cellphone'],
+                    'area_code' => $data['area_code'],
+                    'password' => bcrypt($data['password']),
         ]);
     }
 
@@ -354,11 +352,34 @@ class EditUserData {
      * 
      */
     public function getMedical($user_id) {
-        $medical = DB::select("SELECT DATEDIFF(curdate(),birth) / 365.25 as age, m.*, u.firstName, u.lastName "
-                        . " from  medicals m join users u on u.id= m.user_id where u.id = ?", [$user_id]);
-        if (sizeof($medical) > 0) {
-            return $medical[0];
+        $medical = Medical::where("user_id", $user_id)->first();
+        if ($medical) {
+            $medical->age = intval(date('Y', time() - strtotime($medical->birth))) - 1970;
+            $data["gender"]=$medical->gender;
+            $data["weight"]=$medical->weight;
+            $data["blood_type"]=$medical->blood_type;
+            $data["antigent"]=$medical->antigent;
+            $data["birth"]=$medical->birth;
+            $data["surgical_history"]=$medical->surgical_history;
+            $data["obstetric_history"]=$medical->obstetric_history;
+            $data["medications"]=$medical->medications;
+            $data["alergies"]=$medical->alergies;
+            $data["immunization_history"]=$medical->immunization_history;
+            $data["medical_encounters"]=$medical->medical_encounters;
+            $data["prescriptions"]=$medical->prescriptions;
+            $data["emergency_name"]=$medical->emergency_name;
+            $data["relationship"]=$medical->relationship;
+            $data["number"]=$medical->number;
+            $data["other"]=$medical->other;
+            $data["eps"]=$medical->eps;
+            return $data;
         }
+
+//        $medical = DB::select("SELECT DATEDIFF(curdate(),birth) / 365.25 as age, m.*, u.firstName, u.lastName "
+//                        . " from  medicals m join users u on u.id= m.user_id where u.id = ?", [$user_id]);
+//        if (sizeof($medical) > 0) {
+//            return $medical[0];
+//        }
         return array("status" => "error", "message" => "Not found");
     }
 
