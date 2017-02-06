@@ -27,11 +27,13 @@
         <script src="{{ asset('/js/controllers/mapctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
         <script src="{{ asset('/js/services/location.js')}}"></script>
         <script src="{{ asset('/js/services/products.js')}}"></script>
         <script src="{{ asset('/js/services/checkout.js')}}"></script>
+        <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script>
         window.Laravel = <?php echo json_encode([
                 'csrfToken' => csrf_token(),
@@ -91,6 +93,7 @@
                                     </li>
                                     <li><a href="{{ url('user/editProfile')}}">Edit Profile</a></li>
                                     <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
+                                    <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
                                 </ul>
                             </li>
 

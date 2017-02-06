@@ -25,6 +25,7 @@ Route::post('contacts/add/{code?}', 'UserApiController@addContact');
 
 Route::get('user/medical/{code?}', 'UserApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
+Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
 

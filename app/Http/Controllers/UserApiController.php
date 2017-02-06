@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Medical;
 use Image;
 use File;
+use DB;
 
 class UserApiController extends Controller {
 
@@ -65,6 +66,31 @@ class UserApiController extends Controller {
             return response()->json($this->editUserData->updatePassword($user, $request->only("password")));
         }
         return response()->json(['error' => 'invalid password'], 401);
+    }
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getTokens(Request $request) {
+        $tokens = $request->user()->tokens->filter(function ($token) {
+                    return !$token->revoked;
+                })->values();
+        $clients = array();
+        foreach ($tokens as $token) {
+            if (array_key_exists($token->client_id, $clients)) {
+                $token->client_name = $clients[$token->client_id];
+            } else {
+                $followers = DB::select("SELECT id,name FROM oauth_clients WHERE id= $token->client_id  limit 1;  ");
+                if (sizeof($followers) > 0) {
+                    $clients[$followers[0]->id] = $followers[0]->name;
+                    $token->client_name = $followers[0]->name;
+                }
+            }
+        }
+        return $tokens;
     }
 
     /**
@@ -198,7 +224,7 @@ class UserApiController extends Controller {
         $data = [];
         $user = $request->user();
         $green = false;
-        if($user->green){
+        if ($user->green) {
             $green = true;
         }
         $count = Medical::where('user_id', $user->id)->count();

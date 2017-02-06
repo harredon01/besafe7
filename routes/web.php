@@ -21,6 +21,7 @@ Route::get('/home', 'HomeController@index');
 Route::get('user/editProfile', 'UserController@getEditProfile');
 Route::post('user/editProfile', 'UserController@postEditProfile');
 Route::get('user/editAddress', 'UserController@getEditAddress');
+Route::get('user/editAccess', 'UserController@access');
 Route::get('user/addresses', 'UserController@getAddresses');
 Route::delete('user/addresses/{code?}', 'UserController@deleteAddress');
 Route::post('user/billingAddress/{code?}', 'UserController@postSetAsBillingAddress');

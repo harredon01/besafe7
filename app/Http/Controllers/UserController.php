@@ -40,5 +40,14 @@ class UserController extends Controller {
     public function index() {
         return view('user.editProfile');
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function access() {
+        $user = $this->auth->user();
+        return view('user.editAccess')->with('user', $user);
+    }
 
 }
