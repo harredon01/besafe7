@@ -16,7 +16,7 @@ class Item extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','sku','ref2','price','quantity','user_id','product_variant_id','order_id'];
+    protected $fillable = ['name','sku','ref2','price','quantity','user_id','product_variant_id','order_id','attributes'];
 
 
     public function productVariant() {

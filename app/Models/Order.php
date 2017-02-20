@@ -16,7 +16,8 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status','subtotal','shipping','discount','tax','total','comments','total','billing_address_id','shipping_address_id','user_id'];
+    protected $fillable = ['status','subtotal','shipping','discount','tax','total','comments','total','billing_address_id',
+        'shipping_address_id','user_id','is_digital','is_shippable'];
 
 
     public function merchant() {

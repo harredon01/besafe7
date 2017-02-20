@@ -50,6 +50,7 @@ class EditOrder {
         $data = array();
         $items = Cart::getContent();
         $result = array();
+        $is_shippable = false;
         foreach ($items as $item) {
             $dataitem = array();
             $dataitem['id'] = $item->id; // the Id of the item
@@ -60,6 +61,12 @@ class EditOrder {
             $dataitem['priceSumConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
             $dataitem['quantity'] = $item->quantity; // the quantity
             $dataitem['attributes'] = $item->attributes; // the attributes
+            $attrs = json_decode($item->attributes,true);
+            if($attrs){
+                if($attrs['is_shippable']==true){
+                    $is_shippable = true;
+                }
+            }
             // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
             // so you can do things like below:
             array_push($result, $dataitem);
@@ -89,6 +96,7 @@ class EditOrder {
         $data['items'] = $result;
         $data['subtotal'] = $subTotal;
         $data['shipping'] = $shippingTotal;
+        $data['is_shippable'] = $is_shippable;
         if ($taxTotal == 0) {
             $temptotal = $subTotal / 1.16;
             $taxTotal = $subTotal - $temptotal;
@@ -113,6 +121,8 @@ class EditOrder {
                         'price' => 0,
                         'tax' => 0,
                         'delivery' => 0,
+                        'is_digital' => 0,
+                        'is_shippable' => 1,
                         'total' => 0,
                         'user_id' => $user->id
             ]);
@@ -123,7 +133,6 @@ class EditOrder {
     public function prepareOrder(User $user) {
         $order = $this->getOrder($user);
         $data = $this->getCheckoutCart();
-        Item::where('user_id', $user->id)->whereNull('order_id')->update(['order_id' => $order->id]);
         $order->status = "holding";
         $order->subtotal = $data["subtotal"];
         $order->tax = $data["tax"];
@@ -286,14 +295,14 @@ class EditOrder {
         }
         return array("status" => "error", "message" => "No Tax conditions for that address");
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
      * @return Response
      */
     public function setTaxConditions($conditions, User $user) {
-        
+
         foreach ($conditions as $condition) {
             $theCondition = Condition::find(intval($condition->id));
             if ($theCondition) {
@@ -359,7 +368,7 @@ class EditOrder {
             //$product = Product::find($item->product_id)->first();
             $productVariant = $item->productVariant;
             if ($productVariant->quantity > -1) {
-                $productVariant->quantity-= $item->quantity;
+                $productVariant->quantity -= $item->quantity;
                 if ($productVariant->quantity < 1) {
                     $productVariant->quantity = 0;
                 }
@@ -450,12 +459,13 @@ class EditOrder {
                 ));
                 array_push($applyConditions, $itemCondition);
             }
+            $attrs = json_decode($item->attributes, true);
             Cart::add(array(
                 'id' => $productVariant->id,
                 'name' => $product->name,
                 'price' => $productVariant->price,
                 'quantity' => $item->quantity,
-                'attributes' => array(),
+                'attributes' => $attrs,
                 'conditions' => $applyConditions
             ));
         }
@@ -517,13 +527,18 @@ class EditOrder {
                         ));
                         array_push($applyConditions, $itemCondition);
                     }
-
+                    $losAttributes = json_decode($productVariant->attributes, true);
+                    if (!$losAttributes) {
+                        $losAttributes = array();
+                    }
+                    $losAttributes['is_digital'] = $productVariant->is_digital;
+                    $losAttributes['is_shippable'] = $productVariant->is_shippable;
                     Cart::add(array(
                         'id' => $productVariant->id,
                         'name' => $product->name,
                         'price' => $productVariant->price,
                         'quantity' => (int) $data['quantity'],
-                        'attributes' => array(),
+                        'attributes' => $losAttributes,
                         'conditions' => $applyConditions
                     ));
                     $item = Item::create([
@@ -532,7 +547,7 @@ class EditOrder {
                                 'user_id' => $user->id,
                                 'price' => $productVariant->price,
                                 'quantity' => (int) $data['quantity'],
-                                'attributes' => array()
+                                'attributes' => json_encode($losAttributes)
                     ]);
                     return array("status" => "success", "message" => "item added to cart successfully");
                 } else {

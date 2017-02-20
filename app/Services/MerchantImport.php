@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
+use App\Models\Attribute;
+use App\Models\AttributeOption;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
@@ -576,8 +578,75 @@ class MerchantImport {
                             'price' => $sheet['price'],
                             'sale' => $sheet['sale'],
                             'quantity' => $sheet['quantity'],
-                            'attributes' => $sheet['attributes'],
+                            'is_digital' => $sheet['is_digital'],
+                            'is_shippable' => $sheet['is_shippable'],
+                                //'attributes' => $sheet['attributes'],
                 ]);
+            }
+        }
+    }
+
+    public function importAttributes($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            if ($sheet['id']) {
+                $attribute = Attribute::create([
+                            'id' => $sheet['id'],
+                            'name' => $sheet['name'],
+                            'description' => $sheet['description'],
+                            'type' => $sheet['type']
+                ]);
+            }
+        }
+    }
+
+    public function importAttributeOptions($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            if ($sheet['id']) {
+                $attribute = Attribute::find($sheet['attribute_id']);
+                $attributeOption = new AttributeOption([
+                    'id' => $sheet['id'],
+                    'valueS' => $sheet['values'],
+                    'valueI' => $sheet['valuei']
+                ]);
+                $attribute->attributeOptions()->save($attributeOption);
+            }
+        }
+    }
+
+    public function importProductAttributeOptions($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        $i = 0;
+        foreach ($reader as $sheet) {
+            if ($sheet['product_variant_id']) {
+                $attribute = Attribute::find($sheet['attribute_id']);
+                $attributeOption = AttributeOption::find($sheet['attribute_option_id']);
+                $product = Product::find($sheet['product_id']);
+                $productVariant = ProductVariant::find($sheet['product_variant_id']);
+                if (fmod($i, 4) == 0) {
+                    $productVariant->attributeOptions()->save($attributeOption, ['product_id' => $sheet['product_id'], 'attribute_id' => $sheet['attribute_id'], 'type' => 'option']);
+                } else if (fmod($i, 4) == 1) {
+                    $product->attributes()->save($attribute, ['product_variant_id' => $sheet['product_variant_id'], 'attribute_option_id' => $sheet['attribute_option_id'], 'type' => 'option']);
+                } else if (fmod($i, 4) == 2) {
+                    $attribute->products()->save($product, ['product_variant_id' => $sheet['product_variant_id'], 'attribute_option_id' => $sheet['attribute_option_id'], 'type' => 'option']);
+                } else if (fmod($i, 4) == 3) {
+                    $attributeOption->productVariants()->save($productVariant, ['product_id' => $sheet['product_id'], 'attribute_id' => $sheet['attribute_id'], 'type' => 'option']);
+                }
+                $losAttributes = json_decode($productVariant->attributes, true);
+                if (!$losAttributes) {
+                    $losAttributes = array();
+                }
+                $losAttributes[$attribute->name] = $attributeOption->valueS;
+                $productVariant->attributes = json_encode($losAttributes);
+                $productVariant->save();
+                $i++;
             }
         }
     }

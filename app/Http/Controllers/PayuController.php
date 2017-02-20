@@ -4,24 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\EditOrder;
 use App\Services\PayU;
-use App\Services\EditUserData;
 use Illuminate\Http\RedirectResponse;
 
 class PayuController extends Controller {
 
-    /**
-     * The edit order implementation.
-     *
-     */
-    protected $editOrder;
 
-    /**
-     * The edit order implementation.
-     *
-     */
-    protected $editUserData;
 
     /**
      * The edit order implementation.
@@ -34,9 +22,7 @@ class PayuController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditOrder $editOrder, EditUserData $editUserData, PayU $payU) {
-        $this->editOrder = $editOrder;
-        $this->editUserData = $editUserData;
+    public function __construct( PayU $payU) {
         $this->payU = $payU;
         $this->middleware('auth', ['except' => 'cartTest']);
     }
@@ -98,58 +84,11 @@ class PayuController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function postSetShippingAddress($address) {
-        $user = $request->user();
-        $status = $this->editOrder->setShippingAddress($user, $address);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function getBanks() {
         $status = $this->payU->getBanks();
         return response()->json($status);
     }
 
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getPaymentMethods($address) {
-        $user = $request->user();
-        $status = $this->payU->getBanks($user, $address);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postSetBillingAddress($address) {
-        $user = $request->user();
-        $status = $this->editOrder->postSetBillingAddress($user, $address);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getShippingConditions($address) {
-        $user = $request->user();
-        $status = $this->editOrder->getShippingConditions($user, $address);
-        return response()->json($status);
-    }
 
     /**
      * Handle a login request to the application.
@@ -160,116 +99,6 @@ class PayuController extends Controller {
     public function cartTest() {
         $status = $this->payU->ping();
         return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getTaxConditions() {
-        $user = $request->user();
-        $status = $this->editOrder->getTaxConditions($user);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postSetCoupon($coupon) {
-        $user = $request->user();
-        $status = $this->editOrder->setCouponCondition($user, $coupon);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postSetShippingCondition($condition, Request $request) {
-        $user = $request->user();
-        $status = $this->editOrder->setShippingCondition($user, $condition);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postUpdateCartItem(Request $request) {
-        $user = $request->user();
-        $status = $this->editOrder->updateCartItem($user, $request->all());
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postClearCart(Request $request) {
-        $user = $request->user();
-        $status = $this->editOrder->clearCart($user);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function loadActiveCart(Request $request) {
-        $user = $request->user();
-        $items = $this->editOrder->loadActiveCart($user);
-        return response()->json($items);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getCart(Request $request) {
-        $items = $this->editOrder->getCart();
-        return response()->json($items);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getCheckoutCart(Request $request) {
-        $data = $this->editOrder->getCheckoutCart();
-        return response()->json($data);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getCheckout(Request $request) {
-        $user = $request->user();
-        $status = $this->editOrder->getTaxConditions($user);
-        if ($status['status'] == 'success') {
-            return view('products.checkout')
-                            ->with('user', $user);
-        } else {
-            return new RedirectResponse(url('/user/editAddress'));
-        }
     }
 
 }

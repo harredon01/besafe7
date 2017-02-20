@@ -16,7 +16,7 @@ class ProductVariant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['sku','product_id','ref2','price','sale','tax','quantity'];
+    protected $fillable = ['sku','product_id','ref2','is_digital','is_shippable','price','sale','tax','quantity'];
 
     public function product() {
         return $this->belongsTo('App\Models\Product');
@@ -26,5 +26,11 @@ class ProductVariant extends Model {
     }
     public function conditions() {
         return $this->hasMany('App\Models\Condition');
+    }
+    public function attributes() {
+        return $this->belongsToMany('App\Models\Attribute','product_variant_attribute_option','product_variant_id','attribute_id')->withTimestamps();
+    }
+    public function attributeOptions() {
+        return $this->belongsToMany('App\Models\AttributeOption','product_variant_attribute_option','product_variant_id','attribute_option_id')->withTimestamps();
     }
 }

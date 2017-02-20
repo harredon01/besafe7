@@ -22,6 +22,8 @@ class CreateOrdersTable extends Migration {
                         $table->double('shipping', 15, 2);
                         $table->double('discount', 15, 2);
                         $table->double('total', 15, 2);
+                        $table->boolean('is_shippable');
+                        $table->boolean('is_digital');
                         $table->string('token')->index()->nullable();
                         $table->integer('payment_method_id')->unsigned()->nullable();
                         $table->foreign('payment_method_id')->references('id')

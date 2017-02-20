@@ -199,8 +199,11 @@ class MerchantTableSeeder extends Seeder {
         $this->merchantImport->importMerchants("policias.xlsx");
         $this->merchantImport->importMerchants("medicos1.xlsx");
         $this->merchantImport->importMerchants("medicos2.xlsx");
+        $this->merchantImport->importAttributes("attributes.xlsx");
+        $this->merchantImport->importAttributeOptions("attributeOptions.xlsx");
         $this->merchantImport->importProducts("products.xlsx");
         $this->merchantImport->importProductVariants("productvariants.xlsx");
+        $this->merchantImport->importProductAttributeOptions("productvariantsattributes.xlsx");
     }
 
 }

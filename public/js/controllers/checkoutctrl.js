@@ -148,7 +148,7 @@
             }
             $scope.getAddresses = function () {
                 Users.getAddresses().then(function (data) {
-                    $rootScope.addresses = data;
+                    $rootScope.addresses = data.addresses;
 
                 },
                         function (data) {

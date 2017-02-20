@@ -35,9 +35,11 @@
         <script src="{{ asset('/js/services/checkout.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script>
-        window.Laravel = <?php echo json_encode([
-                'csrfToken' => csrf_token(),
-        ]); ?>
+            window.Laravel = <?php
+echo json_encode([
+    'csrfToken' => csrf_token(),
+]);
+?>
         </script>
     </head>
     <body>
@@ -73,6 +75,10 @@
                             <li><a href="{{ url('/login') }}">Login</a></li>
                             <li><a href="{{ url('/register') }}">Register</a></li>
                             @else
+                            <li><a href="{{ url('/products')}}">Products</a></li>
+                            <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
+                                @include('products.cart')
+                            </li>
                             <li><a href="{{ url('/checkout')}}">Checkout</a></li>
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
