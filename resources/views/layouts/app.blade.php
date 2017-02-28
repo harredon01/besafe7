@@ -34,6 +34,7 @@
         <script src="{{ asset('/js/services/products.js')}}"></script>
         <script src="{{ asset('/js/services/checkout.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
+        
         <script>
             window.Laravel = <?php
 echo json_encode([
@@ -72,10 +73,10 @@ echo json_encode([
                         <ul class="nav navbar-nav navbar-right">
                             <!-- Authentication Links -->
                             @if (Auth::guest())
-                            <li><a href="{{ url('/login') }}">Login</a></li>
-                            <li><a href="{{ url('/register') }}">Register</a></li>
+                            <!--li><a href="{{ url('/login') }}">Login</a></li>
+                            <li><a href="{{ url('/register') }}">Register</a></li-->
                             @else
-                            <li><a href="{{ url('/products')}}">Products</a></li>
+                            <!--li><a href="{{ url('/products')}}">Products</a></li-->
                             <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
                                 @include('products.cart')
                             </li>
@@ -99,7 +100,7 @@ echo json_encode([
                                     </li>
                                     <li><a href="{{ url('user/editProfile')}}">Edit Profile</a></li>
                                     <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
-                                    <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
+                                    <!--li><a href="{{ url('user/editAccess')}}">Edit Access</a></li-->
                                 </ul>
                             </li>
 

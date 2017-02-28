@@ -14,7 +14,13 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Models\OfficeHour;
+use App\Models\Condition;
 use App\Models\PaymentMethod;
+use App\Services\EditUserData;
+use App\Services\EditLocation;
+use App\Services\EditAlerts;
+use App\Services\EditGroup;
+use App\Services\EditMerchant;
 use DB;
 
 class MerchantImport {
@@ -22,6 +28,19 @@ class MerchantImport {
     protected $delimiter = ',';
     protected $enclosure = '"';
     protected $lineEnding = '\r\n';
+    protected $editUserData;
+    protected $editLocation;
+    protected $editAlerts;
+    protected $editMerchant;
+    protected $editGroup;
+
+    public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMerchant $editMerchant, EditGroup $editGroup) {
+        $this->editUserData = $editUserData;
+        $this->editLocation = $editLocation;
+        $this->editAlerts = $editAlerts;
+        $this->editMerchant = $editMerchant;
+        $this->editGroup = $editGroup;
+    }
 
     public function getFile() {
         return storage_path('imports') . '/merchant test.xlsx';
@@ -427,7 +446,8 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $row) {
             if ($row['id']) {
-                $merchant1 = Merchant::create([
+
+                $merchant1 = Merchant::updateOrCreate(['merchant_id' => $row['id']], [
                             'merchant_id' => $row['id'],
                             'name' => $row['name'],
                             'type' => $row['type'],
@@ -462,7 +482,7 @@ class MerchantImport {
                 } else {
                     $code = $sheet['facebook_id'];
                 }
-                $country = Country::create([
+                $country = Country::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
                             'area_code' => $sheet['area_code'],
@@ -492,7 +512,8 @@ class MerchantImport {
                 } else {
                     $code2 = $sheet['facebook_country_id'];
                 }
-                $region = Region::create([
+                $region = Region::updateOrCreate([
+                            'id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
                             'country_id' => $sheet['country_id'],
@@ -525,7 +546,8 @@ class MerchantImport {
 //                if( $sheet['name'] =="BELMIRA"){
 //                    dd($sheet);
 //                }
-                $city = City::create([
+                $city = City::updateOrCreate([
+                            'id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
                             'code' => $sheet['code'],
@@ -551,7 +573,7 @@ class MerchantImport {
                 } else {
                     $code = $sheet['merchant_id'];
                 }
-                $product = Product::create([
+                $product = Product::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
                             'description' => $sheet['slug'],
@@ -569,7 +591,7 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
             if ($sheet['id']) {
-                $productVariant = ProductVariant::create([
+                $productVariant = ProductVariant::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'product_id' => $sheet['product_id'],
                             'sku' => $sheet['sku'],
@@ -592,7 +614,7 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
             if ($sheet['id']) {
-                $attribute = Attribute::create([
+                $attribute = Attribute::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
                             'description' => $sheet['description'],
@@ -657,35 +679,145 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
             if ($sheet['id']) {
-                $user = User::create([
-                            'id' => $sheet['id'],
-                            'firstName' => $sheet['firstName'],
-                            'emailNotifications' => $sheet['emailNotifications'],
-                            'pushNotifications' => $sheet['pushNotifications'],
-                            'green' => $sheet['green'],
-                            'red' => $sheet['red'],
-                            'is_alerting' => $sheet['is_alerting'],
-                            'is_tracking' => $sheet['is_tracking'],
-                            'alert_type' => $sheet['alert_type'],
-                            'notify_location' => $sheet['notify_location'],
-                            'lastName' => $sheet['lastName'],
-                            'cellphone' => $sheet['cellphone'],
-                            'area_code' => $sheet['area_code'],
-                            'hash' => $sheet['hash'],
-                            'trip' => $sheet['trip'],
-                            'token' => $sheet['token'],
-                            'platform' => $sheet['platform'],
-                            'name' => $sheet['name'],
-                            'docType' => $sheet['docType'],
-                            'docNum' => $sheet['docNum'],
-                            'email' => $sheet['email'],
-                            'username' => $sheet['username'],
-                            'avatar' => $sheet['avatar'],
-                            'gender' => $sheet['gender'],
-                            'birth' => $sheet['birth'],
-                            'weight' => $sheet['weight'],
-                            'blood_type' => $sheet['blood_type'],
-                ]);
+                $sheet['password'] = bcrypt(intval($sheet['password']) . "");
+                $sheet['id'] = intval($sheet['id']) . "";
+                $sheet['cellphone'] = intval($sheet['cellphone']) . "";
+                $sheet['area_code'] = intval($sheet['area_code']) . "";
+                $sheet['docnum'] = intval($sheet['docnum']) . "";
+
+                unset($sheet[0]);
+                $user = User::updateOrCreate(["id" => $sheet['id']], $sheet);
+            }
+        }
+    }
+
+    public function importConditions($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            if ($sheet["product_id"] == "NULL") {
+                unset($sheet["product_id"]);
+            }
+            if ($sheet["product_variant_id"] == "NULL") {
+                unset($sheet["product_variant_id"]);
+            }
+            if ($sheet["city_id"] == "NULL") {
+                unset($sheet["city_id"]);
+            }
+            if ($sheet["region_id"] == "NULL") {
+                unset($sheet["region_id"]);
+            }
+            if ($sheet["country_id"] == "NULL") {
+                unset($sheet["country_id"]);
+            }
+            Condition::updateOrCreate(["id" => $sheet['id']], $sheet);
+        }
+    }
+
+    public function importAddresses($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $this->editUserData->createOrUpdateAddress($user, $sheet);
+            }
+        }
+    }
+
+    public function importLocations($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $coords = array();
+                $location = array();
+                $extras = array();
+                $activity = array();
+                $battery = array();
+                $coords["latitude"] = $sheet["lat"];
+                $coords["longitude"] = $sheet["long"];
+                $coords["accuracy"] = $sheet["accuracy"];
+                $coords["speed"] = $sheet["speed"];
+                $coords["heading"] = $sheet["heading"];
+                $coords["altitude"] = $sheet["altitude"];
+                $dalast = false;
+                if($sheet["islast"]){
+                    $extras["islast"] = $sheet["islast"];
+                    $dalast = true;
+                    
+                } else {
+                    unset($sheet["islast"]);
+                }
+                $extras["code"] = $sheet["code"];
+                $activity["type"] = $sheet["activity"];
+                $activity["confidence"] = $sheet["confidence"];
+                $battery["level"] = $sheet["battery"];
+                $battery["is_charging"] = $sheet["is_charging"];
+                $location["timestamp"] = $sheet["created_at"];
+                $location["is_moving"] = $sheet["is_moving"];
+                $location["coords"] = $coords;
+                $location["extras"] = $extras;
+
+                $location["activity"] = $activity;
+                $location["battery"] = $battery;
+                $data["location"] = $location;
+                $this->editLocation->postLocation($data, $user);
+                if($dalast){
+                    sleep(1);
+                } 
+            }
+        }
+    }
+
+    public function importFollowers($filename) {
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $sheet['follower'] = str_replace("|",",",$sheet['follower']);
+                $this->editAlerts->addFollower($sheet, $user);
+            }
+        }
+    }
+
+    public function importReports($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $this->editMerchant->saveOrCreateReport($user, $sheet );
+            }
+        }
+    }
+
+    public function importContacts($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $this->editUserData->addContact($user, $sheet['contact_id']);
+            }
+        }
+    }
+
+    public function importGroups($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                $this->editGroup->saveOrCreateGroup($sheet, $user);
             }
         }
     }

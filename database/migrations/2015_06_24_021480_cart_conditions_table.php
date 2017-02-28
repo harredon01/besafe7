@@ -21,6 +21,7 @@ class CartConditionsTable extends Migration {
                         $table->string('value');
                         $table->string('coupon')->nullable();
                         $table->boolean('isActive');
+                        $table->integer('order')->unsigned()->nullable()->default(0);
                         $table->integer('product_id')->unsigned()->nullable();
                         $table->foreign('product_id')->references('id')
                                 ->on('products');

@@ -126,7 +126,7 @@ class EditUserData {
         }
         if (array_key_exists("cellphone", $data)) {
             if ($user->cellphone != $data['cellphone']) {
-                $finduser = User::where('cellphone', '=', $data['cellphone'])->first();
+                $finduser = User::where('cellphone', '=', $data['cellphone'])->where('area_code', '=', $data['area_code'])->first();
                 if ($finduser && $finduser->id != $user->id) {
                     return array("status" => "error", "message" => "Celphone already registered");
                 }
@@ -169,141 +169,8 @@ class EditUserData {
      * 
      */
     public function updateMedical(User $user, array $data) {
-        $medical = $user->medical;
-        if (array_key_exists("gender", $data)) {
-            $gender = $data['gender'];
-        } else {
-            $gender = "";
-        }
-        if (array_key_exists("birth", $data)) {
-            $birth = $data['birth'];
-        } else {
-            $birth = "";
-        }
-        if (array_key_exists("weight", $data)) {
-            $weight = $data['weight'];
-        } else {
-            $weight = "";
-        }
-        if (array_key_exists("blood_type", $data)) {
-            $blood_type = $data['blood_type'];
-        } else {
-            $blood_type = "";
-        }
-        if (array_key_exists("antigent", $data)) {
-            $antigent = $data['antigent'];
-        } else {
-            $antigent = "";
-        }
-        if (array_key_exists("alergies", $data)) {
-            $alergies = $data['alergies'];
-        } else {
-            $alergies = "";
-        }
-        if (array_key_exists("other", $data)) {
-            $other = $data['other'];
-        } else {
-            $other = "";
-        }
-        if (array_key_exists("surgical_history", $data)) {
-            $surgical_history = $data['surgical_history'];
-        } else {
-            $surgical_history = "";
-        }
-        if (array_key_exists("obstetric_history", $data)) {
-            $obstetric_history = $data['obstetric_history'];
-        } else {
-            $obstetric_history = "";
-        }
-        if (array_key_exists("medications", $data)) {
-            $medications = $data['medications'];
-        } else {
-            $medications = "";
-        }
-        if (array_key_exists("alergies", $data)) {
-            $alergies = $data['alergies'];
-        } else {
-            $alergies = "";
-        }
-        if (array_key_exists("immunization_history", $data)) {
-            $immunization_history = $data['immunization_history'];
-        } else {
-            $immunization_history = "";
-        }
-        if (array_key_exists("medical_encounters", $data)) {
-            $medical_encounters = $data['medical_encounters'];
-        } else {
-            $medical_encounters = "";
-        }
-        if (array_key_exists("prescriptions", $data)) {
-            $prescriptions = $data['prescriptions'];
-        } else {
-            $prescriptions = "";
-        }
-        if (array_key_exists("emergency_name", $data)) {
-            $emergency_name = $data['emergency_name'];
-        } else {
-            $emergency_name = "";
-        }
-        if (array_key_exists("relationship", $data)) {
-            $relationship = $data['relationship'];
-        } else {
-            $relationship = "";
-        }
-        if (array_key_exists("number", $data)) {
-            $number = $data['number'];
-        } else {
-            $number = "";
-        }
-        if (array_key_exists("eps", $data)) {
-            $eps = $data['eps'];
-        } else {
-            $eps = "";
-        }
-        if ($medical) {
-
-            $medical->gender = $gender;
-            $medical->weight = $weight;
-            $medical->blood_type = $blood_type;
-            $medical->antigent = $antigent;
-            $medical->birth = $birth;
-            $medical->surgical_history = $surgical_history;
-            $medical->obstetric_history = $obstetric_history;
-            $medical->medications = $medications;
-            $medical->alergies = $alergies;
-            $medical->immunization_history = $immunization_history;
-            $medical->medical_encounters = $medical_encounters;
-            $medical->prescriptions = $prescriptions;
-            $medical->emergency_name = $emergency_name;
-            $medical->relationship = $relationship;
-            $medical->number = $number;
-            $medical->other = $other;
-            $medical->eps = $eps;
-            $medical->save();
-        } else {
-            $medical = Medical::create([
-                        "gender" => $gender,
-                        "weight" => $weight,
-                        "blood_type" => $blood_type,
-                        "antigent" => $antigent,
-                        "alergies" => $alergies,
-                        "birth" => $birth,
-                        "user_id" => $user->id,
-                        'surgical_history' => $surgical_history,
-                        'obstetric_history' => $obstetric_history,
-                        'medications' => $medications,
-                        'alergies' => $alergies,
-                        'immunization_history' => $immunization_history,
-                        'medical_encounters' => $medical_encounters,
-                        'prescriptions' => $prescriptions,
-                        'emergency_name' => $emergency_name,
-                        'relationship' => $relationship,
-                        'number' => $number,
-                        'eps' => $eps,
-                        'other' => $other
-            ]);
-        }
-
+        $data["user_id"] = $user->id;
+        $medical = Medical::updateOrCreate(["user_id" => $user->id], $data);
         return array("status" => "success", "message" => "User Profile Updated");
     }
 
@@ -355,23 +222,23 @@ class EditUserData {
         $medical = Medical::where("user_id", $user_id)->first();
         if ($medical) {
             $medical->age = intval(date('Y', time() - strtotime($medical->birth))) - 1970;
-            $data["gender"]=$medical->gender;
-            $data["weight"]=$medical->weight;
-            $data["blood_type"]=$medical->blood_type;
-            $data["antigent"]=$medical->antigent;
-            $data["birth"]=$medical->birth;
-            $data["surgical_history"]=$medical->surgical_history;
-            $data["obstetric_history"]=$medical->obstetric_history;
-            $data["medications"]=$medical->medications;
-            $data["alergies"]=$medical->alergies;
-            $data["immunization_history"]=$medical->immunization_history;
-            $data["medical_encounters"]=$medical->medical_encounters;
-            $data["prescriptions"]=$medical->prescriptions;
-            $data["emergency_name"]=$medical->emergency_name;
-            $data["relationship"]=$medical->relationship;
-            $data["number"]=$medical->number;
-            $data["other"]=$medical->other;
-            $data["eps"]=$medical->eps;
+            $data["gender"] = $medical->gender;
+            $data["weight"] = $medical->weight;
+            $data["blood_type"] = $medical->blood_type;
+            $data["antigent"] = $medical->antigent;
+            $data["birth"] = $medical->birth;
+            $data["surgical_history"] = $medical->surgical_history;
+            $data["obstetric_history"] = $medical->obstetric_history;
+            $data["medications"] = $medical->medications;
+            $data["alergies"] = $medical->alergies;
+            $data["immunization_history"] = $medical->immunization_history;
+            $data["medical_encounters"] = $medical->medical_encounters;
+            $data["prescriptions"] = $medical->prescriptions;
+            $data["emergency_name"] = $medical->emergency_name;
+            $data["relationship"] = $medical->relationship;
+            $data["number"] = $medical->number;
+            $data["other"] = $medical->other;
+            $data["eps"] = $medical->eps;
             return $data;
         }
 
@@ -483,18 +350,6 @@ class EditUserData {
         foreach ($data as $value) {
             $contact = User::find($value['contact_id']);
             if ($contact) {
-//                $file = '/home/hoovert/access.log';
-//                // Open the file to get existing content
-//                $current = file_get_contents($file);
-//                //$daarray = json_decode(json_encode($data));
-//                // Append a new person to the file
-//
-//                $current .= json_encode($value);
-//                $current .= PHP_EOL;
-//                $current .= PHP_EOL;
-//                $current .= PHP_EOL;
-//                $current .= PHP_EOL;
-                //file_put_contents($file, $current);
                 array_push($importsget, $value['contact_id']);
                 $status = $value['level'];
             }
@@ -579,58 +434,22 @@ class EditUserData {
 
     public function createOrUpdateAddress(User $user, array $data) {
         if (array_key_exists("address_id", $data)) {
-            $address = Address::find(intval($data['address_id']));
+            $addressid = $data['address_id'];
+            unset($data['address_id']);
+            Address::where('user_id', $user->id)
+                    ->where('id', $addressid)->update($data);
+            $address = Address::find($addressid);
             if ($address) {
-                if ($address->user_id == $user->id) {
-                    $address->firstName = $data['firstName'];
-                    $address->lastName = $data['lastName'];
-                    $address->address = $data['address'];
-                    $address->type = $data['type'];
-                    if (array_key_exists("lat", $data)) {
-                        $address->lat = $data['lat'];
-                    }
-                    if (array_key_exists("long", $data)) {
-                        $address->long = $data['long'];
-                    }
-                    $address->city_id = $data['city_id'];
-                    $address->region_id = $data['region_id'];
-                    $address->postal = $data['postal'];
-                    $address->phone = $data['phone'];
-                    $address->country_id = $data['country_id'];
-                    $address->save();
-                    return array("status" => "success", "message" => "address updated", "address" => $address);
-                }
-                return array("status" => "error", "message" => "address does not belong to user");
+                $region = Region::find($address->region_id);
+                $country = Country::find($address->country_id);
+                $city = City::find($address->city_id);
+                $address->cityName = $city->name;
+                $address->countryName = $country->name;
+                $address->regionName = $region->name;
+                return array("status" => "success", "message" => "address updated", "address" => $address);
             }
-            return array("status" => "error", "message" => "address does not exist");
         } else {
-            if (array_key_exists("lat", $data) && array_key_exists("long", $data)) {
-                $address = new Address([
-                    'firstName' => $data['firstName'],
-                    'lastName' => $data['lastName'],
-                    'address' => $data['address'],
-                    'type' => $data['type'],
-                    'postal' => $data['postal'],
-                    'phone' => $data['phone'],
-                    'city_id' => $data['city_id'],
-                    'region_id' => $data['region_id'],
-                    'country_id' => $data['country_id'],
-                    'lat' => $data['lat'],
-                    'long' => $data['long'],
-                ]);
-            } else {
-                $address = new Address([
-                    'firstName' => $data['firstName'],
-                    'lastName' => $data['lastName'],
-                    'address' => $data['address'],
-                    'type' => $data['type'],
-                    'postal' => $data['postal'],
-                    'phone' => $data['phone'],
-                    'city_id' => $data['city_id'],
-                    'region_id' => $data['region_id'],
-                    'country_id' => $data['country_id']
-                ]);
-            }
+            $address = new Address($data);
             $user->addresses()->save($address);
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);

@@ -61,9 +61,9 @@ class EditOrder {
             $dataitem['priceSumConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
             $dataitem['quantity'] = $item->quantity; // the quantity
             $dataitem['attributes'] = $item->attributes; // the attributes
-            $attrs = json_decode($item->attributes,true);
-            if($attrs){
-                if($attrs['is_shippable']==true){
+            $attrs = json_decode($item->attributes, true);
+            if ($attrs) {
+                if ($attrs['is_shippable'] == true) {
                     $is_shippable = true;
                 }
             }
@@ -178,6 +178,14 @@ class EditOrder {
                 $order->billing_address_id = $address;
                 $order->user_id = $user->id;
                 $order->save();
+                $data = [
+                    "country_id" => $theAddress->country_id,
+                    "region_id" => $theAddress->region_id,
+                    "order" => "3",
+                    "type" => "tax",
+                    "orderObj" => $order
+                ];
+                $this->setConditionByType($user, $data);
                 return array("status" => "success", "message" => "Billing Address added to order");
             }
             return array("status" => "error", "message" => "Address does not belong to user");
@@ -198,12 +206,15 @@ class EditOrder {
             // add single condition on a cart bases
             $condition = new CartCondition(array(
                 'name' => $theCondition->name,
-                'type' => $theCondition->type,
+                'type' => "shipping",
                 'target' => $theCondition->target,
                 'value' => $theCondition->value,
+                'order' => $theCondition->order
             ));
             $order->shipping_condition_id = $theCondition->id;
             $order->save();
+            $order->conditions()->where('type', "shipping")->delete();
+            $order->conditions()->save($theCondition);
             Cart::condition($condition);
             return array("status" => "success", "message" => "Shipping condition set on the cart");
         }
@@ -215,19 +226,60 @@ class EditOrder {
      *
      * @return Response
      */
+    public function setConditionByType(User $user, $data) {
+        $conditions = Condition::where('isActive', true);
+        if ($data['type']) {
+            $conditions = $conditions->where('type', $data['type']);
+        }
+        if ($data['order']) {
+            $conditions = $conditions->where('order', $data['order']);
+        }
+        if ($data['country_id']) {
+            $conditions = $conditions->where('country_id', $data['country_id']);
+        }
+        if ($data['region_id']) {
+            $conditions = $conditions->where('region_id', $data['region_id']);
+        }
+        $conditions = $conditions->get();
+        $order = $data['orderObj'];
+        foreach ($conditions as $theCondition) {
+            if ($data['order']) {
+                $order = $data['order'];
+            } else {
+                $order = 0;
+            }
+            $condition = new CartCondition(array(
+                'name' => $theCondition->name,
+                'type' => $theCondition->type,
+                'target' => $theCondition->target,
+                'value' => $theCondition->value,
+                'order' => $order
+            ));
+            Cart::condition($condition);
+            $order->conditions()->save($theCondition);
+        }
+        return array("status" => "success", "message" => "Condition Set");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function setCouponCondition(User $user, $coupon) {
         $theCondition = Condition::where('coupon', $coupon);
         if ($theCondition) {
-            Cart::removeConditionsByType("shipping");
             // add single condition on a cart bases
             $condition = new CartCondition(array(
                 'name' => $theCondition->name,
                 'type' => $theCondition->type,
                 'target' => $theCondition->target,
                 'value' => $theCondition->value,
+                'order' => $theCondition->order
             ));
-
+            $order = $this->getOrder($user);
             Cart::condition($condition);
+            $order->conditions()->save($theCondition);
             return array("status" => "success", "message" => "Shipping condition set on the cart");
         }
         return array("status" => "error", "message" => "Address does not exist");
@@ -262,25 +314,6 @@ class EditOrder {
      *
      * @return Response
      */
-    public function getTaxConditions(User $user) {
-        $conditions = Condition::where('type', 'tax')
-                ->where('isActive', true)
-                ->where(function ($query) {
-                    $query->where('country_id', 1);
-                })
-                ->get();
-        if ($conditions) {
-
-            return $conditions;
-        }
-        return null;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function getCheckout(User $user) {
         $order = $this->getOrder($user);
         $order->payment_method_id = null;
@@ -288,37 +321,13 @@ class EditOrder {
         $order->shipping_address_id = null;
         $order->shipping_condition_id = null;
         $order->save();
-        $conditions = $this->getTaxConditions($user);
-        if ($conditions) {
-            $this->setTaxConditions($conditions, $user);
-            return array("status" => "success", "message" => "taxes set");
-        }
-        return array("status" => "error", "message" => "No Tax conditions for that address");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function setTaxConditions($conditions, User $user) {
-
-        foreach ($conditions as $condition) {
-            $theCondition = Condition::find(intval($condition->id));
-            if ($theCondition) {
-                Cart::removeConditionsByType("tax");
-                Cart::removeConditionsByType("shipping");
-                // add single condition on a cart bases
-                $condition = new CartCondition(array(
-                    'name' => $theCondition->name,
-                    'type' => $theCondition->type,
-                    'target' => $theCondition->target,
-                    'value' => $theCondition->value,
-                ));
-                Cart::condition($condition);
-            }
-        }
-        return array("status" => "success", "message" => "Tax applied");
+        $data = [
+            "order" => "1",
+            "type" => "sale",
+            "orderObj" => $order
+        ];
+        $this->setConditionByType($user, $data);
+        return array("status" => "success", "message" => "Order prepared", "Object" => $order);
     }
 
     /**

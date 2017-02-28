@@ -107,8 +107,9 @@ class EditMerchant {
         if ($report) {
 
             $files = FileM::where('type', 'report')->where("trigger_id", $reportId)->get();
-            if ($report->private == true) {
+            if ($report->anonymous == true) {
                 $report->email = "";
+                $report->user_id = "";
                 $report->celphone = "";
                 $data = [
                     "report" => $report,
@@ -292,9 +293,11 @@ class EditMerchant {
                         userables u ON r.id = u.object_id
                     WHERE
                         status = 'active'
-                            AND ((r.private = 0) OR (r.user_id = :user_id)
-                            OR (u.user_id = :user_id2
-                            AND u.userable_type = 'Report'))
+                            AND (
+                            (r.private = 0) 
+                            OR (r.user_id = :user_id)
+                            OR (u.user_id = :user_id2 AND u.userable_type = 'Report')
+                            )
                             and lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
                     HAVING distance < :radius
@@ -335,15 +338,11 @@ class EditMerchant {
         }
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id'] > 0) {
-                $merchant = Merchant::find($data['merchant_id']);
+                $merchantid = $data['merchant_id'];
+                unset($data['merchant_id']);
+                Merchant::where('id', $merchantid)->update($data);
+                $merchant = Group::find($merchantid);
                 if ($merchant) {
-                    $merchant->name = $data['name'];
-                    $merchant->email = $data['email'];
-                    $merchant->telefone = $data['telefone'];
-                    $merchant->description = $data['description'];
-                    $merchant->status = $data['status'];
-                    $merchant->icon = $data['icon'];
-                    $merchant->save();
                     return ['status' => "success", "message" => 'Merchant saved', "name" => $merchant->name];
                 }
                 return ['status' => "error", "message" => 'Merchant not found'];
@@ -369,30 +368,11 @@ class EditMerchant {
         }
         if (array_key_exists("id", $data)) {
             if ($data['id'] > 0) {
+                Report::where('user_id', $user->id)
+                        ->where('id', $data['id'])->update($data);
                 $report = Report::find($data['id']);
                 if ($report) {
-                    if ($report->user_id == $user->id) {
-                        $report->name = $data['name'];
-                        if (array_key_exists("telefone", $data)) {
-                            $report->telefone = $data['telefone'];
-                        }
-                        if (array_key_exists("email", $data)) {
-                            $report->email = $data['email'];
-                        }
-                        $report->description = $data['description'];
-                        $report->status = $data['status'];
-                        $report->address = $data['address'];
-                        $report->icon = $data['icon'];
-                        $report->city_id = $data['city_id'];
-                        $report->region_id = $data['region_id'];
-                        $report->country_id = $data['country_id'];
-                        $report->type = $data['city_id'];
-                        $report->lat = $data['lat'];
-                        $report->long = $data['long'];
-                        $report->save();
-                        return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
-                    }
-                    return ['status' => 'error', "message" => "report does not belong to user"];
+                    return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
                 }
                 return ['status' => 'error', "message" => "report does not exist"];
             }
@@ -476,7 +456,6 @@ class EditMerchant {
     public function validatorReport(array $data) {
         return Validator::make($data, [
                     'name' => 'required|max:255',
-                    'description' => 'required',
                     'type' => 'required|max:255',
                     'city_id' => 'required',
                     'region_id' => 'required',

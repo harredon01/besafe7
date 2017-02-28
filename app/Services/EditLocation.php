@@ -13,6 +13,7 @@ use Hash;
 use App\Models\Region;
 use App\Models\City;
 use App\Services\EditAlerts;
+use App\Services\EditMerchant;
 
 class EditLocation {
 
@@ -27,6 +28,8 @@ class EditLocation {
     const OBJECT_LOCATION = 'Location';
 
     protected $editAlerts;
+    
+    protected $editMerchant;
 
     /**
      * Create a new class instance.
@@ -34,8 +37,9 @@ class EditLocation {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
+    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant) {
         $this->editAlerts = $editAlerts;
+        $this->editMerchant = $editMerchant;
     }
 
     /**
@@ -114,7 +118,17 @@ class EditLocation {
      */
     public function getCitiesFrom(array $data) {
         return DB::select("SELECT id,name,country_id,region_id,ABS(lat - ? ) + ABS(`long`  - ? ) as diff "
-                        . " FROM cities where name like '%{$data['name']}%' order by diff asc;", [$data['latitude'], $data['longitude']]);
+                        . " FROM cities where name like '%{$data['name']}%' order by diff asc limit 5;", [$data['latitude'], $data['longitude']]);
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function getCitiesCloseTo(array $data) {
+        return DB::select("SELECT id,name,country_id,region_id,ABS(lat - ? ) + ABS(`long`  - ? ) as diff "
+                        . " FROM cities order by diff asc limit 1;", [$data['lat'], $data['long']]);
     }
 
     /**
@@ -143,46 +157,84 @@ class EditLocation {
         if (true) {
             $data["lat"] = $location['coords']['latitude'];
             $time = strtotime($location['timestamp']);
-            $data["report_time"] = date("Y-m-d H:i:s",$time);
+            $data["report_time"] = date("Y-m-d H:i:s", $time);
             $data["long"] = $location['coords']['longitude'];
             $data["speed"] = $location['coords']['speed'];
+            $data["accuracy"] = $location['coords']['accuracy'];
+            $data["altitude"] = $location['coords']['altitude'];
+            $data["heading"] = $location['coords']['heading'];
             $data["status"] = "active";
             $data["user_id"] = $user->id;
-            $data["name"] = $user->name; 
+            $data["name"] = $user->name;
             $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
 
 
             $data["battery"] = $location['battery']['level'];
+            $data["is_charging"] = $location['battery']['is_charging'];
+            $data["is_moving"] = $location['is_moving'];
 //            $data["report_time"] = str_replace("T", " ", $data["report_time"]);
 //            $data["report_time"] = date_create($data["report_time"]);
             if (array_key_exists("activity", $location)) {
                 $activity = $location['activity'];
-                if (array_key_exists("type", $activity)) {
+                if (array_key_exists("type", $activity) && array_key_exists("confidence", $activity)) {
                     $data["activity"] = $activity['type'];
+                    $data["confidence"] = $activity['confidence'];
                 }
             }
             if ($user->notify_location == 1) {
                 $user->notify_location = 0;
                 $saveuser = true;
-                $this->editAlerts->postNotificationLocation($user, 'location_first','');
+                $this->editAlerts->postNotificationLocation($user, 'location_first', '');
             }
-            if ($user->trip == 0) {
-                $hash = time() - 1477256930;
-                $user->trip = $hash;
+            if ($user->is_tracking != 1 || $user->trip == 0) {
+                $user = $this->editAlerts->makeUserTrip($user);
                 $saveuser = true;
+            }
+            if($user->write_report){
+                $user->write_report= false;
+                $saveuser = true;
+                $result = $this->getCitiesCloseTo($data);
+                $result = $result[0];
+                $file = '/home/hoovert/access.log';
+                // Open the file to get existing content
+                $current = file_get_contents($file);
+                //$daarray = json_decode(json_encode($data));
+                // Append a new person to the file
+
+                $current .= json_encode($result);
+                $current .= PHP_EOL;
+                $current .= PHP_EOL;
+                $current .= json_encode($data);
+                $current .= PHP_EOL;
+                $current .= PHP_EOL;
+                file_put_contents($file, $current);
+                $sheet = [
+                    "user_id" => $user->id,
+                    "name" => "Report " . date("Y-m-d h:i:sa"),
+                    "private" => false,
+                    "type" => "event",
+                    "anonymous" => true,
+                    "lat" => $data['lat'],
+                    "long" => $data['long'],
+                    "city_id" => $result->id,
+                    "region_id" => $result->region_id,
+                    "country_id" =>$result->country_id
+                ];
+                $this->editMerchant->saveOrCreateReport($user, $sheet);
             }
             $data["trip"] = $user->trip;
             if (array_key_exists("extras", $location)) {
                 $extras = $location['extras'];
                 if (array_key_exists("islast", $extras)) {
                     if (array_key_exists("code", $extras)) {
-                        $this->editAlerts->postNotificationLocation($user, "location_last",$extras['code']);
+                        $this->editAlerts->postNotificationLocation($user, "location_last", $extras['code']);
                     } else {
-                        $this->editAlerts->postNotificationLocation($user, "location_last",'');
+                        $this->editAlerts->postNotificationLocation($user, "location_last", '');
                     }
+
                     $data["status"] = "stopped";
                     $data["islast"] = true;
-                    
+
                     $store = true;
                     $user->is_tracking = 0;
                     $saveuser = true;
@@ -204,11 +256,11 @@ class EditLocation {
             $this->editAlerts->moveUserFollowing($user);
         }
         if ($saveuser) {
+            $user->is_tracking = true;
             $user->save();
         }
         return ['success' => 'location saved'];
     }
-
 
     /**
      * Get a validator for an incoming edit profile request.

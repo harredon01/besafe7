@@ -115,18 +115,6 @@ class CartController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getTaxConditions() {
-        $user = $this->auth->user();
-        $status = $this->editOrder->getTaxConditions($user);
-        return response()->json($status);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function postSetCoupon($coupon) {
         $user = $this->auth->user();
         $status = $this->editOrder->setCouponCondition($user, $coupon);

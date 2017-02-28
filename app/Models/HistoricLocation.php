@@ -16,8 +16,9 @@ class HistoricLocation extends Model {
      *
      * @var array
      */
-    protected $fillable = ['lat','long','status','name','islast','trip','user_id','speed','activity','battery','report_time','phone'];
-
+    protected $fillable = ['lat','long','status','name','islast','trip','user_id','speed','activity','battery','accuracy','report_time','phone',
+        'heading','altitude','confidence','is_moving','is_charging'];
+    
     public function user() {
         return $this->belongsTo('App\Models\User');
     }

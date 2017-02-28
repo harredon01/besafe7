@@ -24,6 +24,12 @@ class HistoricLocationsTable extends Migration {
                         $table->string('speed');
                         $table->string('activity');
                         $table->string('battery');
+                        $table->string('accuracy')->nullable();
+                        $table->string('heading')->nullable();
+                        $table->string('altitude')->nullable();
+                        $table->string('confidence')->nullable();
+                        $table->string('is_charging')->nullable();
+                        $table->string('is_moving')->nullable();
                         $table->string('islast');
                         $table->integer('trip')->unsigned()->nullable();
                         $table->index('trip');

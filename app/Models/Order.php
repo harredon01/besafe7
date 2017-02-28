@@ -32,5 +32,8 @@ class Order extends Model {
     public function paymentMethod() {
         return $this->belongsTo('App\Models\PaymentMethod');
     }
+    public function conditions() {
+        return $this->belongsToMany('App\Models\Condition','condition_order','order_id','condition_id');
+    }
 
 }

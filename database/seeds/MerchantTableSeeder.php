@@ -157,7 +157,7 @@ class MerchantTableSeeder extends Seeder {
                     'id' => '4',
                     'name' => "Debito",
         ]);
-        $itemCondition = Condition::create(array(
+        /*$itemCondition = Condition::create(array(
                     'name' => "Iva",
                     'type' => 'tax',
                     'target' => 'subtotal',
@@ -187,7 +187,7 @@ class MerchantTableSeeder extends Seeder {
                     'target' => 'subtotal',
                     'value' => '-10%',
                     'isActive' => true
-        ));
+        ));*/
     }
 
     public function createExcel() {
@@ -196,14 +196,37 @@ class MerchantTableSeeder extends Seeder {
 
     public function createMerchants() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
+        
         $this->merchantImport->importMerchants("policias.xlsx");
         $this->merchantImport->importMerchants("medicos1.xlsx");
         $this->merchantImport->importMerchants("medicos2.xlsx");
+        $this->command->info('Merchants seeded!');
         $this->merchantImport->importAttributes("attributes.xlsx");
         $this->merchantImport->importAttributeOptions("attributeOptions.xlsx");
+        $this->command->info('Attributes seeded!');
         $this->merchantImport->importProducts("products.xlsx");
         $this->merchantImport->importProductVariants("productvariants.xlsx");
         $this->merchantImport->importProductAttributeOptions("productvariantsattributes.xlsx");
+        $this->command->info('Products seeded!');
+        $this->merchantImport->importFollowers("followers.xlsx");
+        $this->command->info('Followers seeded!');
+        $this->merchantImport->importConditions("conditions.xlsx");
+        $this->command->info('Conditions seeded!');
+        $this->merchantImport->importLocations("locations.xlsx");
+        $this->merchantImport->importLocations("locations2.xlsx");
+        $this->merchantImport->importLocations("locations3.xlsx");
+        $this->merchantImport->importLocations("locations4.xlsx");
+        $this->command->info('Locations seeded!');
+        sleep(1);
+        $this->merchantImport->importFollowers("followers.xlsx");
+        $this->command->info('Followers seeded!');
+        $this->merchantImport->importLocations("locations.xlsx");
+        $this->merchantImport->importLocations("locations2.xlsx");
+        $this->merchantImport->importLocations("locations3.xlsx");
+        $this->merchantImport->importLocations("locations4.xlsx");
+        $this->command->info('Locations seeded!');
+        $this->merchantImport->importReports("reports.xlsx");
+        $this->command->info('Reports seeded!');
     }
 
 }

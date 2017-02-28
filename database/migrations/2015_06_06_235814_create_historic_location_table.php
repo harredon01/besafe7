@@ -22,6 +22,12 @@ class CreateHistoricLocationTable extends Migration {
                         $table->string('name');
                         $table->string('status')->nullable();
                         $table->string('speed')->nullable();
+                        $table->string('accuracy')->nullable();
+                        $table->string('heading')->nullable();
+                        $table->string('altitude')->nullable();
+                        $table->string('confidence')->nullable();
+                        $table->string('is_charging')->nullable();
+                        $table->string('is_moving')->nullable();
                         $table->string('activity')->nullable();
                         $table->string('battery')->nullable();
                         $table->string('islast')->nullable();

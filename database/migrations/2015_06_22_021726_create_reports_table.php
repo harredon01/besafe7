@@ -18,8 +18,9 @@ class CreateReportsTable extends Migration {
             $table->string('name');
             $table->string('type');
             $table->index('type');
-            $table->boolean('submitted');
+            $table->boolean('submitted')->default(0);
             $table->boolean('private');
+            $table->boolean('anonymous');
             $table->string('email')->nullable();
             $table->string('hash')->nullable();
             $table->string('telephone')->nullable();

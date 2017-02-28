@@ -8,6 +8,7 @@ use App\Models\Country;
 use App\Models\Group;
 
 use App\Services\EditUserData;
+use App\Services\MerchantImport;
 use App\Services\EditGroup;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
@@ -37,13 +38,20 @@ class UserTableSeeder extends Seeder {
      *
      */
     protected $editAlerts;
+    
+    /**
+     * The edit alerts implementation.
+     *
+     */
+    protected $merchantImport;
 
 
-    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts) {
+    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, MerchantImport $merchantImport) {
         $this->editGroup = $editGroup;
         $this->editLocation = $editLocation;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
+        $this->merchantImport = $merchantImport;
     }
 
     /**
@@ -53,7 +61,7 @@ class UserTableSeeder extends Seeder {
      */
     public function run() {
 
-        $data = array(
+        /*$data = array(
             'firstName' => "Hoovert",
             'name' => "Hoovert Arredondo",
             'lastName' => "Arredondo",
@@ -159,7 +167,13 @@ class UserTableSeeder extends Seeder {
             'region_id' => "11",
             'country_id' => "1",
         );
-        $this->editUserData->createOrUpdateAddress($user, $data);
+        $this->editUserData->createOrUpdateAddress($user, $data);*/
+        $this->merchantImport->importUsers("users.xlsx");
+        $this->command->info('users seeded!');
+        $this->merchantImport->importAddresses("address.xlsx");
+        $this->command->info('Addresses seeded!');
+        $this->merchantImport->importContacts("contacts.xlsx");
+        $this->command->info('Contacts seeded!');
         $this->updateMedical();
         $this->updateCodes();
 //        $this->createMessages();

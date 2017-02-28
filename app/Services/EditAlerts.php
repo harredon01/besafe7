@@ -79,6 +79,25 @@ class EditAlerts {
         }
     }
 
+    public function makeUserTrip(User $user) {
+        if ($user->is_tracking != 1 || $user->trip == 0) {
+            $exists = true;
+            $number = 0;
+            $user->is_tracking = 1;
+            while ($exists) {
+                $number = time() - 1477256930 + $user->id;
+                $test = User::where("trip", $number)->first();
+                if ($test) {
+                    $exists = true;
+                } else {
+                    $exists = false;
+                }
+            }
+            $user->trip = $number;
+        }
+        return $user;
+    }
+
     /**
      * Show the application registration form.
      *
@@ -110,11 +129,7 @@ class EditAlerts {
             $object = $data["object"];
             $object_id;
             if ($object == self::OBJECT_LOCATION) {
-                if ($user->is_tracking != 1) {
-                    $user->is_tracking = 1;
-                    $hash = time() - 1477256930;
-                    $user->trip = $hash;
-                }
+                $user = $this->makeUserTrip($user);
                 $user->notify_location = 1;
                 $user->save();
                 $object_id = $user->trip;
@@ -125,8 +140,6 @@ class EditAlerts {
                     $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
                     $sql = "SELECT id as contact_id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
                     $followers = DB::select($sql, $numbers);
-                } else if ($type == self::RED_MESSAGE_TYPE || $type == self::RED_MESSAGE_MEDICAL_TYPE) {
-                    $followers = DB::select("SELECT contact_id FROM contacts WHERE user_id= $user->id and level='" . self::RED_MESSAGE_TYPE . "' AND contact_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id );  ");
                 }
             } else if ($object == self::OBJECT_REPORT) {
 
@@ -230,7 +243,7 @@ class EditAlerts {
                 if ($pingingUser) {
                     $code = $data['code'];
                     $reply = $this->checkUserCode($user, $code);
-                    $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" =>$reply['status']);
+                    $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" => $reply['status']);
                     if ($reply['status'] == "success") {
                         $data = [
                             "user_id" => $pingingUser->id,
@@ -615,19 +628,18 @@ class EditAlerts {
     public function postEmergency(User $user, array $data, $secret) {
         $payload = array();
         $user->is_alerting = 1;
-        if (!$secret) {
-            $user->is_tracking = 0;
-        }
-
         $user->alert_type = $data['type'];
-        $data4 = array('type' => $data['type'], 'object' => self::OBJECT_LOCATION, 'follower' => '0', 'payload' => $payload);
-        $this->addFollower($data4, $user);
+        $user = $this->makeUserTrip($user);
+        $user->write_report= true;
+        $user->notify_location = 1;
+        $user->save();
         $subject = "Emergencia de " . $user->firstName . " " . $user->lastName;
         if ($data['type'] == self::RED_MESSAGE_MEDICAL_TYPE) {
             $subject = "Emergencia Medica de " . $user->firstName . " " . $user->lastName;
         }
         $followers = DB::select("SELECT contact_id FROM contacts WHERE user_id= $user->id and level='" . self::RED_MESSAGE_TYPE . "';  ");
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
+        $dafollowers = array();
         foreach ($followers as $follower) {
             $data = [
                 "user_id" => $follower->contact_id,
@@ -639,6 +651,16 @@ class EditAlerts {
                 "user_status" => $this->getUserNotifStatus($user)
             ];
             $this->sendNotification($data, true);
+            if (property_exists('follower', 'object_id')) {
+                $dafollower = $follower->contact_id;
+                if ($user->id != intval($dafollower)) {
+                    $item = ['user_id' => $dafollower, 'object_id' => $object_id, self::ACCESS_USER_OBJECT_TYPE => $object, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
+                    array_push($dafollowers, $item);
+                }
+            }
+        }
+        if (count($dafollowers) > 0) {
+            DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
         }
         if ($secret) {
             $data = [
@@ -652,6 +674,7 @@ class EditAlerts {
             ];
             $this->sendNotification($data, true);
         }
+
         return ['success' => 'Message sent to all contacts'];
     }
 
@@ -664,7 +687,6 @@ class EditAlerts {
             $payload = array("status" => "success", "trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
             $user->save();
             $subject = "Finalizada emergencia de " . $user->name;
-            
         } else if ($user->red == $code['code']) {
             $subject = "Alerta de " . $user->name;
             $payload = array("status" => "alert", "first_name" => $user->firstName, "last_name" => $user->lastName);

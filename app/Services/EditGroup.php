@@ -181,17 +181,13 @@ class EditGroup {
             return $validator->getMessageBag();
         }
         if (array_key_exists("group_id", $data)) {
-            $group = Group::find(intval($data['group_id']));
+            $groupid = $data['group_id'];
+            unset($data['group_id']);
+            Group::where('admin_id', $user->id)
+                    ->where('id', $groupid)->update($data);
+            $group = Group::find($groupid);
             if ($group) {
-                if ($group->admin_id = $user->id) {
-                    $group->name = $data['name'];
-                    $group->status = $data['status'];
-                    $group->avatar = $data['avatar'];
-                    $group->code = $data['code'];
-                    $group->save();
-                    return ['status' => 'success', "message" => 'Group updated', "code" => $group->code, "group" => $group];
-                }
-                return ['status' => 'error', "message" => 'You are not group admin'];
+                return ['status' => 'success', "message" => 'Group updated', "code" => $group->code, "group" => $group];
             }
             return ['status' => 'error', "message" => 'Group not found'];
         } else {

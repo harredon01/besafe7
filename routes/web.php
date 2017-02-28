@@ -42,7 +42,6 @@ Route::get('checkout', 'CartController@getCheckout');
 Route::get('checkout/shippingConditions/{code?}', 'CartController@getShippingConditions');
 Route::post('checkout/coupon/{code?}', 'CartController@postSetCoupon');
 Route::post('checkout/billingAddress/{code?}', 'CartController@postSetBillingAddress');
-Route::post('checkout/billingConditions', 'CartController@getTaxConditions');
 Route::post('checkout/shippingAddress/{code?}', 'CartController@postSetShippingAddress');
 Route::post('checkout/shippingCondition/{code?}', 'CartController@postSetShippingCondition');
 

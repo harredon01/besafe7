@@ -16,12 +16,13 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
 	    $table->increments('id');
             $table->string('firstName');
-	    $table->integer('emailNotifications')->default(0);
-	    $table->integer('pushNotifications')->default(0);
+	    $table->boolean('emailNotifications')->default(false);
+	    $table->boolean('pushNotifications')->default(false);
 	    $table->string('green')->nullable();
 	    $table->string('red')->nullable();
-	    $table->integer('is_alerting')->default(0);
-	    $table->integer('is_tracking')->default(0);
+	    $table->boolean('is_alerting')->default(false);
+	    $table->boolean('is_tracking')->default(false);
+            $table->boolean('write_report')->default(false);
 	    $table->string('alert_type')->nullable();
 	    $table->string('notify_location')->nullable();
             $table->string('lastName');

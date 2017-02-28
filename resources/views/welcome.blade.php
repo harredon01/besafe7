@@ -10,7 +10,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
+        <script src="{{ asset('/js/store.js')}}"></script>
         <!-- Styles -->
         <style>
             html, body {
@@ -68,13 +68,13 @@
     <body>
         <div class="flex-center position-ref full-height">
             @if (Route::has('login'))
-                <div class="top-right links">
+                <!--div class="top-right links">
                     <a href="{{ url('/login') }}">Login</a>
                     <a href="{{ url('/register') }}">Register</a>
-                </div>
+                </div-->
             @endif
 
-            <div class="content">
+            <div class="content"> 
                 <div class="title m-b-md">
                     Laravel
                 </div>

@@ -1,0 +1,5 @@
+id,name,type,target,value,coupon,isActive,product_id,product_variant_id,city_id,region_id,country_id,attributes
+1,Iva,tax,subtotal,+16%,NULL,1,NULL,NULL,NULL,NULL,1,NULL
+2,Envios,shipping,subtotal,5000,NULL,1,NULL,NULL,NULL,NULL,1,NULL
+3,Dia de la madre,sale,subtotal,-20%,NULL,1,NULL,NULL,NULL,NULL,NULL,NULL
+4,Cupon,coupon,subtotal,-10%,trevooh,1,NULL,NULL,NULL,NULL,NULL,NULL

@@ -17,7 +17,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id','city_id','region_id','country_id','name','type', 'email','telephone','address', 'description',
-        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id',"private","hash"];
+        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id',"private","hash","anonymous"];
 
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');

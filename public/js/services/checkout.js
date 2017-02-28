@@ -112,24 +112,6 @@ angular.module('besafe')
                 /**/
 
             }
-            var setBillingOrder = function () {
-                var def = $q.defer();
-                $http({
-                    method: 'POST',
-                    url: '/checkout/billingConditions'
-                })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
             var setBillingAddress = function (address_id) {
                 var def = $q.defer();
                 $http({
@@ -193,7 +175,6 @@ angular.module('besafe')
                 payCash:payCash,
                 getBanks:getBanks,
                 setShippingCondition:setShippingCondition,
-                getShippingConditions:getShippingConditions,
-                setBillingOrder:setBillingOrder
+                getShippingConditions:getShippingConditions
             };
         })

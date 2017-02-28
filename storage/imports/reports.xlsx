@@ -1,0 +1,24 @@
+name,type,private,anonymous,address,description,lat,long,city_id,region_id,country_id,user_id
+report1,event,0,1,Calle 73,description1,4.65298,-74.049918,524,11,1,1
+report2,event,0,1,Calle 74,description2,4.6530075419,-74.0497745259,524,11,1,1
+report3,event,0,1,Calle 75,description3,4.6532283144,-74.0493941388,524,11,1,1
+report4,event,0,1,Calle 76,description4,4.6533287583,-74.0491442738,524,11,1,1
+report5,event,0,1,Calle 77,description5,4.6534813708,-74.0490498529,524,11,1,1
+report6,event,0,1,Calle 78,description6,4.6536946344,-74.0490270095,524,11,1,2
+report7,event,0,1,Calle 79,description7,4.6538801645,-74.0486967387,524,11,1,2
+report8,event,0,1,Calle 80,description8,4.6542070856,-74.048431426,524,11,1,2
+report9,event,0,1,Calle 81,description9,4.6544053805,-74.0480525318,524,11,1,2
+report10,event,0,1,Calle 82,description10,4.6546604767,-74.0479896376,524,11,1,2
+report11,event,0,1,Calle 83,description11,4.6546944607,-74.0477659581,524,11,1,3
+report12,event,0,1,Calle 84,description12,4.6548950074,-74.0475774051,524,11,1,3
+report13,event,0,1,Calle 85,description13,4.6551744148,-74.0474990882,524,11,1,3
+report14,event,0,1,Calle 86,description14,4.6553385708,-74.0474850269,524,11,1,3
+report15,event,0,1,Calle 87,description15,4.6554041547,-74.0472642431,524,11,1,3
+report16,event,0,1,Calle 88,description16,4.6557264932,-74.0470218413,524,11,1,4
+report17,event,0,1,Calle 89,description17,4.655991232,-74.0468994586,524,11,1,4
+report18,event,0,1,Calle 90,description18,4.6560183092,-74.0468200715,524,11,1,4
+report19,event,0,1,Calle 91,description19,4.65298,-74.049918,524,11,1,4
+report20,event,0,1,Calle 92,description20,4.6530075419,-74.0497745259,524,11,1,4
+report21,event,0,1,Calle 93,description21,4.6532283144,-74.0493941388,524,11,1,3
+report22,event,0,1,Calle 94,description22,4.6533287583,-74.0491442738,524,11,1,3
+report22,event,0,1,,,4.6533287583,-74.0491442738,524,11,1,3
