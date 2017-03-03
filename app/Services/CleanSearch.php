@@ -166,7 +166,7 @@ class CleanSearch {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
                 return null;
-            }
+            } 
             $findme = 'order_by';
             $pos = strpos($mystring, $findme);
             if ($pos === false) {
@@ -225,19 +225,7 @@ class CleanSearch {
             } else {
                 
             }
-        }
-        $file = '/home/hoovert/access.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-
-        $current .= json_encode($finalString);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
+        } 
         $request2 = Request::create($finalString, 'GET');
         return $request2;
     }

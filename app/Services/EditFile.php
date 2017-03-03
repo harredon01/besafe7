@@ -44,27 +44,15 @@ class EditFile {
             $type = $typeg['type'];
             $file = $request->file('photo');
             $filetypeff = $request->only("filetype");
-            $filetype = $filetypeff['filetype'];
-            $filelog = '/home/hoovert/access.log';
-            // Open the file to get existing content
-            $current = file_get_contents($filelog);
-            //$daarray = json_decode(json_encode($data));
-            // Append a new person to the file
-
-            $current .= json_encode($type);
-            $current .= PHP_EOL;
-            $current .= json_encode($filetype);
-            $current .= PHP_EOL;
-            $current .= PHP_EOL;
-            file_put_contents($filelog, $current);
+            $filetype = $filetypeff['filetype']; 
             if ($type == "report") {
                 $trigger = Report::find($intended_id);
-                $path = 'images/reports/';
+                $path = 'images/reports/'; 
                 if ($trigger) {
                     if ($trigger->user_id == $user->id) {
                         if ($filetype == "photo") {
 
-                            $trigger_id = $trigger->id;
+                            $trigger_id = $trigger->id; 
                             $today = date("Y-m-d_H-i-s");
                             $filename = $today . "_report-" . $trigger->id . '.' . $file->getClientOriginalExtension();
                             $path = public_path($path . $filename);

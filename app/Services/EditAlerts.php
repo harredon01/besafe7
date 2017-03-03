@@ -625,21 +625,40 @@ class EditAlerts {
         }
     }
 
-    public function postEmergency(User $user, array $data, $secret) {
+    public function postEmergency(User $user, array $data, $secret) { 
         $payload = array();
         $user->is_alerting = 1;
         $user->alert_type = $data['type'];
         $user = $this->makeUserTrip($user);
-        $user->write_report= true;
+        $user->write_report = true;
         $user->notify_location = 1;
         $user->save();
         $subject = "Emergencia de " . $user->firstName . " " . $user->lastName;
         if ($data['type'] == self::RED_MESSAGE_MEDICAL_TYPE) {
             $subject = "Emergencia Medica de " . $user->firstName . " " . $user->lastName;
         }
-        $followers = DB::select("SELECT contact_id FROM contacts WHERE user_id= $user->id and level='" . self::RED_MESSAGE_TYPE . "';  ");
+        $followers = DB::select("select 
+                        contact_id, u.*
+                    from
+                        contacts c
+                            left join
+                        userables u ON c.contact_id = u.user_id
+                            and u.userable_type = '".self::OBJECT_LOCATION."'
+                            and userable_id = $user->id where c.user_id = $user->id  and level='".self::RED_MESSAGE_TYPE."';  ");
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
         $dafollowers = array();
+                $file = '/home/hoovert/access.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+$current .= 'contacts' .PHP_EOL;
+        $current .= json_encode($followers);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
         foreach ($followers as $follower) {
             $data = [
                 "user_id" => $follower->contact_id,
@@ -651,10 +670,10 @@ class EditAlerts {
                 "user_status" => $this->getUserNotifStatus($user)
             ];
             $this->sendNotification($data, true);
-            if (property_exists('follower', 'object_id')) {
+            if (!property_exists('follower', 'object_id')) {
                 $dafollower = $follower->contact_id;
                 if ($user->id != intval($dafollower)) {
-                    $item = ['user_id' => $dafollower, 'object_id' => $object_id, self::ACCESS_USER_OBJECT_TYPE => $object, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
+                    $item = ['user_id' => $dafollower, 'object_id' => $user->trip, self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_LOCATION, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
                     array_push($dafollowers, $item);
                 }
             }
