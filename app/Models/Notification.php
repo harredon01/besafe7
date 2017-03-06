@@ -16,7 +16,7 @@ class Notification extends Model {
      *
      * @var array
      */
-    protected $fillable = ['message','type','status','subject','payload','trigger_id','user_id','user_status'];
+    protected $fillable = ['message','type','status','subject','payload','trigger_id','user_id','user_status','notification_id'];
     
     public function user() {
         return $this->belongsTo('App\Models\User');

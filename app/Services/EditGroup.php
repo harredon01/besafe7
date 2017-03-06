@@ -99,6 +99,7 @@ class EditGroup {
                 $i = sizeof($members);
             }
             if (array_key_exists("contacts", $data)) {
+                $inviteUsers = array();
                 foreach ($data['contacts'] as $value) {
                     $contact = User::find($value);
                     if ($contact) {
@@ -114,24 +115,24 @@ class EditGroup {
                         $invite['color'] = $i;
                         $invite['created_at'] = date("Y-m-d H:i:s");
                         $invite['updated_at'] = date("Y-m-d H:i:s");
-                        $payload = array(
-                            "type" => "new_group",
-                            "group_id" => $group->id,
-                            "notification" => "Has sido agregado al grupo: " . $group->name,
-                        );
                         array_push($invites, $invite);
-                        $notification = [
-                            "user_id" => $value,
-                            "trigger_id" => $group->id,
-                            "message" => "Has sido agregado al grupo: " . $group->name,
-                            "payload" => $payload,
-                            "type" => "new_group",
-                            "subject" => "Nuevo grupo " . $group->name,
-                            "user_status" => $this->editAlerts->getUserNotifStatus($contact)
-                        ];
-                        $this->editAlerts->sendNotification($notification, false);
+                        array_push($inviteUsers, $contact);
                     }
                 }
+                $payload = array(
+                    "trigger_id" => $group->id,
+                    "type" => "new_group",
+                    "group_id" => $group->id,
+                    "notification" => "Has sido agregado al grupo: " . $group->name,
+                );
+                $notification = [
+                    "message" => "Has sido agregado al grupo: " . $group->name,
+                    "payload" => $payload,
+                    "type" => "new_group",
+                    "subject" => "Nuevo grupo " . $group->name,
+                    "user_status" => $this->editAlerts->getUserNotifStatus($contact)
+                ];
+                $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user);
                 $i++;
                 if ($isNew) {
                     $invite = array();
@@ -142,23 +143,18 @@ class EditGroup {
                     $invite['updated_at'] = date("Y-m-d H:i:s");
                     array_push($invites, $invite);
                 } else {
-                    foreach ($members as $value) {
-                        if ($value->id != $user->id) {
-                            $payload = array(
-                                "contacts" => $notifs
-                            );
-                            $notification = [
-                                "user_id" => $value->id,
-                                "trigger_id" => $group->id,
-                                "message" => "Nuevos usuarios al grupo: " . $group->name,
-                                "payload" => $payload,
-                                "type" => "group_invite",
-                                "subject" => "Nuevos usuarios al grupo: " . $group->name,
-                                "user_status" => $this->editAlerts->getUserNotifStatus($value)
-                            ];
-                            $this->editAlerts->sendNotification($notification, false);
-                        }
-                    }
+                    $payload = array(
+                        "contacts" => $notifs
+                    );
+                    $notification = [
+                        "trigger_id" => $group->id,
+                        "message" => "Nuevos usuarios al grupo: " . $group->name,
+                        "payload" => $payload,
+                        "type" => "group_invite",
+                        "subject" => "Nuevos usuarios al grupo: " . $group->name,
+                        "user_status" => $this->editAlerts->getUserNotifStatus($value)
+                    ];
+                    $this->editAlerts->sendMassMessage($notification, $members, $user);
                 }
                 DB::table('group_user')->insert(
                         $invites

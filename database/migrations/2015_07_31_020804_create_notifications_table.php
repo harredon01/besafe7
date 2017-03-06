@@ -17,6 +17,7 @@ class CreateNotificationsTable extends Migration {
 			$table->increments('id');
                         $table->string('subject');
                         $table->string('message');
+                        $table->integer('notification_id');
                         $table->text('payload');
                         $table->string('type');
                         $table->string('user_status');

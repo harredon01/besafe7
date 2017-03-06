@@ -50,8 +50,9 @@ class AlertsApiController extends Controller {
      */
     public function postMarkAsDownloaded(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->markAsDownloaded($user,$request->all()));
+        return response()->json($this->editAlerts->markAsDownloaded($user, $request->all()));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -61,15 +62,17 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editAlerts->addFollower($request->all(), $user));
     }
+
     /**
      * Store a newly created resource in storage.
      *
      * @return Response
      */
-    public function getRequestPing($pingee,Request $request) {
+    public function getRequestPing($pingee, Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->requestPing($user,$pingee));
+        return response()->json($this->editAlerts->requestPing($user, $pingee));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -79,6 +82,7 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editAlerts->replyPing($user, $request->all()));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -91,7 +95,7 @@ class AlertsApiController extends Controller {
 
     public function getNotifications(Request $request) {
         $user = $request->user();
-        $request2 = $this->cleanSearch->handle($user,$request);
+        $request2 = $this->cleanSearch->handle($user, $request);
         if ($request2) {
             $queryBuilder = new NotificationQueryBuilder(new Notification, $request2);
             $result = $queryBuilder->build()->paginate();
@@ -125,7 +129,6 @@ class AlertsApiController extends Controller {
         }
         return response()->json($this->editAlerts->getChat($user, $request->all()));
     }
-
 
     /**
      * Handle a registration request for the application.
@@ -163,7 +166,7 @@ class AlertsApiController extends Controller {
      */
     public function postEmergency(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->postEmergency($user, $request->only("type"),false));
+        return response()->json($this->editAlerts->postEmergency($user, $request->only("type"), false));
     }
 
     /**
@@ -175,23 +178,6 @@ class AlertsApiController extends Controller {
     public function postStopEmergency(Request $request) {
         $user = $request->user();
         return response()->json($this->editAlerts->postStopEmergency($user, $request->only("code")));
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postNotification(Request $request) {
-        $user = $request->user();
-        /* $validator = $this->editAlerts->validatorMessage($request->all());
-          if ($validator->fails()) {
-          $this->throwValidationException(
-          $request, $validator
-          );
-          } */
-        return response()->json($this->editAlerts->sendNotification($request->all(),true));
     }
 
     /**

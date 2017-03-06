@@ -26,7 +26,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = ['password', 'remember_token','notify_location','is_alerting','is_tracking','alert_type','docType', 'docNum','write_report',
-       'emailNotifications','pushNotifications','platform','token','green','red','trip','hash'];
+       'emailNotifications','pushNotifications','platform','token','green','red','trip','hash','token','platform'];
     protected $encryptable = [
         'green',
         'red'

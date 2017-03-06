@@ -91,22 +91,6 @@ class AlertsController extends Controller {
         return response()->json($this->editAlerts->readNotifications($user, $request->all(),"open"));
     }
     
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postNotification(Request $request) {
-        $user = $this->auth->user();
-        /*$validator = $this->editAlerts->validatorMessage($request->all());
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }*/
-        return response()->json($this->editAlerts->sendNotification($request->all(),true));
-    }
     
     /**
      * Handle a registration request for the application.

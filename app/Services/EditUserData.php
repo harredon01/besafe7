@@ -320,19 +320,18 @@ class EditUserData {
                     
                 } else {
                     array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s")));
-                    $notification = [
-                        "user_id" => $value,
-                        "trigger_id" => $user->id,
-                        "message" => "Has sido agregado como contacto por: " . $user->name,
-                        "payload" => "",
-                        "type" => "new_contact",
-                        "subject" => "Nuevo contacto " . $user->name,
-                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
-                    ];
-                    $this->editAlerts->sendNotification($notification, true);
                 }
             }
         }
+        $notification = [
+            "trigger_id" => $user->id,
+            "message" => "Has sido agregado como contacto por: " . $user->name,
+            "payload" => "",
+            "type" => "new_contact",
+            "subject" => "Nuevo contacto " . $user->name,
+            "user_status" => $this->editAlerts->getUserNotifStatus($user)
+        ];
+        $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user);
         DB::table('contacts')->insert($imports);
         $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
         return array("status" => "success", "message" => "contacts imported", "last_id" => $lastId);
@@ -498,10 +497,8 @@ class EditUserData {
         if ($contact) {
             $id = DB::table('contacts')->insert(
                     array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
-            );
-            $contact->server_id = DB::getPdo()->lastInsertId();
+            );            
             $notification = [
-                "user_id" => $contactId,
                 "trigger_id" => $user->id,
                 "message" => "Has sido agregado como contacto por: " . $user->name,
                 "payload" => "",
@@ -509,7 +506,8 @@ class EditUserData {
                 "subject" => "Nuevo contacto " . $user->name,
                 "user_status" => $this->editAlerts->getUserNotifStatus($user)
             ];
-            $this->editAlerts->sendNotification($notification, false);
+            $recipients = array($contact);
+            $this->editAlerts->sendMassMessage($notification, $recipients, $user);
             return $contact;
         }
         return array("status" => "error", "message" => "Contact not found");

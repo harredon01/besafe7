@@ -130,16 +130,31 @@ class EditAlerts {
             $object_id;
             if ($object == self::OBJECT_LOCATION) {
                 $user = $this->makeUserTrip($user);
-                $user->notify_location = 1;
-                $user->save();
+
                 $object_id = $user->trip;
                 if ($type == self::GROUP_LOCATION_TYPE) {
-                    $followers = DB::select("SELECT user_id as contact_id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                 } else if ($type == self::USER_LOCATION_TYPE) {
                     $numbers = explode(",", $data["follower"]);
                     $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                    $sql = "SELECT id as contact_id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
+                    $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
                     $followers = DB::select($sql, $numbers);
+                }
+                if ($user->is_tracking) {
+                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "payload" => $payload,
+                        "type" => self::LOCATION_FIRST,
+                        "subject" => $subject,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user);
+                } else {
+                    $user->notify_location = 1;
+                    $user->save();
                 }
             } else if ($object == self::OBJECT_REPORT) {
 
@@ -149,7 +164,7 @@ class EditAlerts {
                         $object_id = $data['report_id'];
                         $numbers = explode(",", $data["follower"]);
                         $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                        $sql = "SELECT id as contact_id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'  and object_id = $object_id  ); ";
+                        $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'  and object_id = $object_id  ); ";
                         $followers = DB::select($sql, $numbers);
                         $this->notifyReportFollowers($user, $followers, $report);
                     }
@@ -157,7 +172,7 @@ class EditAlerts {
             }
             $dafollowers = array();
             foreach ($followers as $follower) {
-                $dafollower = $follower->contact_id;
+                $dafollower = $follower->id;
                 if ($user->id == intval($dafollower)) {
                     
                 } else {
@@ -177,7 +192,7 @@ class EditAlerts {
     public function markAsDownloaded(User $user, array $data) {
         $numbers = explode(",", $data["read"]);
         $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-        $sql = "update notifications set status='downloaded' WHERE  id IN ({$bindingsString}) AND user_id = $user->id; ";
+        $sql = "update notifications set status='downloaded' WHERE  notification_id IN ({$bindingsString}) AND user_id = $user->id; ";
         DB::update($sql, $numbers);
         return ['success' => 'notifications updated'];
     }
@@ -185,7 +200,7 @@ class EditAlerts {
     public function postNotificationLocation(User $user, $type, $code) {
         $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
         $subject = "";
-        $followers = DB::select("SELECT user_id as contact_id FROM " . self::ACCESS_USER_OBJECT . " WHERE " . self::ACCESS_USER_OBJECT_ID . "=? and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$user->id]);
+        $followers = DB::select("SELECT user_id as id FROM " . self::ACCESS_USER_OBJECT . " WHERE " . self::ACCESS_USER_OBJECT_ID . "=? and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$user->id]);
         if ($type == self::LOCATION_FIRST) {
             $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
         } else {
@@ -203,37 +218,86 @@ class EditAlerts {
                 $subject = "Viaje de " . $user->firstName . " " . $user->lastName . " terminado.";
             }
         }
-        foreach ($followers as $follower) {
-            $data = [
-                "user_id" => $follower->contact_id,
-                "trigger_id" => $user->id,
-                "message" => "",
-                "payload" => $payload,
-                "type" => $type,
-                "subject" => $subject,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($data, true);
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "payload" => $payload,
+            "type" => $type,
+            "subject" => $subject,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        return $this->sendMassMessage($data, $followers, $user);
+    }
+
+    public function sendMassMessage(array $data, array $recipients, User $userSending) {
+        $arrayPushAndroid = array();
+        $arrayPushIos = array();
+        $arrayEmail = array();
+        $arrayContent = array();
+        $arrayPayload = $data['payload'];
+        $data['notification_id'] = time();
+        $data['status'] = "unread";
+        $checkSame = false;
+        $data['payload'] = json_encode($data['payload']);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+
+        if ($userSending) {
+            $checkSame = true;
         }
-        return ['success' => 'follower saved'];
+        if (count($recipients) > 0) {
+            foreach ($recipients as $recipient) {
+                $user = User::find($recipient->id);
+                if ($user) {
+                    if ($checkSame && $user->id == $userSending->id) {
+                        continue;
+                    }
+                    $data['user_id'] = $user->id;
+                    $notification = new Notification($data);
+                    $notification->save();
+                    $arrayContent[] = $data;
+                    if ($user->emailNotifications) {
+                        array_push($arrayEmail, array("name" => $user->name, "email" => $user->email));
+                    }
+
+                    if ($user->pushNotifications) {
+
+                        if ($user->platform == "android") {
+                            array_push($arrayPushAndroid, $user->token);
+                        }
+                        if ($user->platform == "ios") {
+                            array_push($arrayPushIos, $user->token);
+                        }
+                    }
+                }
+            }
+            $data['payload'] = $arrayPayload;
+            $data['created_at'] = $notification->created_at;
+            $data['updated_at'] = $notification->created_at;
+            $data['msg'] = $data['message'];
+            $data['name'] = $userSending->firstName . " " . $userSending->lastName;
+            if (count($arrayPushAndroid) > 0) {
+                $this->sendMessage($data, $arrayPushAndroid, $arrayEmail, 'android');
+            }
+            if (count($arrayPushIos) > 0) {
+                $this->sendMessage($data, $arrayPushIos, $arrayEmail, 'ios');
+            }
+        }
     }
 
     public function requestPing(User $user, $pingee) {
         $pingingUser = User::find($pingee);
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
-        if ($pingingUser) {
-            $data = [
-                "user_id" => $pingee,
-                "trigger_id" => $user->id,
-                "message" => "",
-                "payload" => $payload,
-                "type" => "request_ping",
-                "subject" => "Ping!",
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($data, true);
-            return ['success' => 'follower saved'];
-        }
+        $followers = array($pingingUser);
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "payload" => $payload,
+            "type" => "request_ping",
+            "subject" => "Ping!",
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        return $this->sendMassMessage($data, $followers, $user);
     }
 
     public function replyPing(User $user, array $data) {
@@ -245,8 +309,8 @@ class EditAlerts {
                     $reply = $this->checkUserCode($user, $code);
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" => $reply['status']);
                     if ($reply['status'] == "success") {
+                        $followers = array($pingingUser);
                         $data = [
-                            "user_id" => $pingingUser->id,
                             "trigger_id" => $user->id,
                             "message" => "",
                             "payload" => $payload,
@@ -254,10 +318,10 @@ class EditAlerts {
                             "subject" => "Ping.",
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
-                        $this->sendNotification($data, true);
+                        return $this->sendMassMessage($data, $followers, $user);
                     } else if ($reply['status'] == "info") {
+                        $followers = array($pingingUser);
                         $data = [
-                            "user_id" => $pingingUser->id,
                             "trigger_id" => $user->id,
                             "message" => "",
                             "payload" => $payload,
@@ -265,7 +329,7 @@ class EditAlerts {
                             "subject" => "Ping!!",
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
-                        $this->sendNotification($data, true);
+                        return $this->sendMassMessage($data, $followers, $user);
                     } else if ($reply['status'] == "alert") {
                         
                     }
@@ -312,7 +376,7 @@ class EditAlerts {
             $activeuser = $followers[0]->user_id;
             $stop[] = [
                 "user_id" => $followers[0]->user_id,
-                "trip" => $followers[0]->hash
+                "trip" => $followers[0]->object_id
             ];
             foreach ($followers as $follower) {
                 $counter++;
@@ -320,12 +384,11 @@ class EditAlerts {
                     if ($counter > 1) {
                         $stop[] = [
                             "user_id" => $follower->userable_id,
-                            "trip" => $follower->hash
+                            "trip" => $follower->object_id
                         ];
                     }
                 } else {
                     $notification = [
-                        "user_id" => $activeuser,
                         "trigger_id" => -1,
                         "message" => "Estos usuarios terminaron su viaje",
                         "payload" => $stop,
@@ -333,17 +396,17 @@ class EditAlerts {
                         "subject" => "Estos usuarios terminaron su viaje",
                         "user_status" => "normal"
                     ];
-                    $this->sendNotification($notification, false);
+                    $recipients = array($follower);
+                    $this->sendMassMessage($notification, $recipients, null);
                     $activeuser = $follower->user_id;
                     $stop = array();
                     $stop[] = [
                         "user_id" => $follower->userable_id,
-                        "trip" => $follower->hash
+                        "trip" => $follower->object_id
                     ];
                 }
                 if ($counter == $length) {
                     $notification = [
-                        "user_id" => $activeuser,
                         "trigger_id" => -1,
                         "message" => "Estos usuarios terminaron su viaje",
                         "payload" => $stop,
@@ -351,42 +414,37 @@ class EditAlerts {
                         "subject" => "Estos usuarios terminaron su viaje",
                         "user_status" => "normal"
                     ];
-                    $this->sendNotification($notification, false);
+                    $recipients = array($follower);
+                    $this->sendMassMessage($notification, $recipients, null);
                 }
             }
         }
 
 
-        foreach ($tracking as $tracker) {
-            $notification = [
-                "user_id" => $tracker->userable_id,
-                "trigger_id" => -1,
-                "message" => "Tu viaje ha terminado por limite de tiempo. ",
-                "payload" => "",
-                "type" => self::TRACKING_LIMIT_TRACKING,
-                "subject" => "Tu viaje ha terminado por limite de tiempo. ",
-                "user_status" => "normal"
-            ];
-            $this->sendNotification($notification, true);
-        }
+        $notification = [
+            "trigger_id" => -1,
+            "message" => "Tu viaje ha terminado por limite de tiempo. ",
+            "payload" => "",
+            "type" => self::TRACKING_LIMIT_TRACKING,
+            "subject" => "Tu viaje ha terminado por limite de tiempo. ",
+            "user_status" => "normal"
+        ];
+        $this->sendMassMessage($notification, $tracking, null);
         return ['success' => 'followers notified'];
     }
 
     public function notifyReportFollowers(User $user, array $followers, Report $report) {
         $dareport = array("report_id" => $report->id, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
-        foreach ($followers as $follower) {
-            $notification = [
-                "user_id" => $follower->contact_id,
-                "trigger_id" => $user->id,
-                "message" => $user->firstName . " " . $user->lastName . " ha compartido un reporte",
-                "type" => self::OBJECT_REPORT,
-                "subject" => "Nuevo Reporte",
-                "payload" => $dareport,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($notification, true);
-        }
+        $notification = [
+            "trigger_id" => $user->id,
+            "message" => $user->firstName . " " . $user->lastName . " ha compartido un reporte",
+            "type" => self::OBJECT_REPORT,
+            "subject" => "Nuevo Reporte",
+            "payload" => $dareport,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        $this->sendMassMessage($notification, $followers, $user);
         return ['success' => 'followers notified'];
     }
 
@@ -461,45 +519,36 @@ class EditAlerts {
             $subject = "Usuario abandono";
             $message = $user->firstName . " " . $user->lastName . " ha abandonado el grupo: " . $group->name;
         }
-        foreach ($group->users as $follower) {
-            if ($follower->id != $user->id) {
-                $notification = [
-                    "user_id" => $follower->id,
-                    "trigger_id" => $group->id,
-                    "message" => $message,
-                    "type" => $type,
-                    "subject" => $subject,
-                    "payload" => $payload,
-                    "user_status" => $this->getUserNotifStatus($user)
-                ];
-                $this->sendNotification($notification, false);
-            }
-        }
+        $data = [
+            "trigger_id" => $group->id,
+            "message" => $message,
+            "type" => $type,
+            "subject" => $subject,
+            "payload" => $payload,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        return $this->sendMassMessage($data, $group->users, $user);
 
         return ['success' => 'members notified'];
     }
 
     public function notifyContacts(User $user, $filename) {
-        $followers = DB::select("SELECT contact_id FROM contacts WHERE user_id= $user->id and level <> '" .
+        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level <> '" .
                         self::CONTACT_BLOCKED . "'   ");
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
             "last_name" => $user->lastName,
             "filename" => $filename);
-        foreach ($followers as $follower) {
-            $notification = [
-                "user_id" => $follower->contact_id,
-                "trigger_id" => $user->id,
-                "message" => $user->firstName . " " . $user->lastName . " ha cambiado su avatar ",
-                "type" => self::USER_AVATAR,
-                "subject" => "Nuevo Avatar",
-                "payload" => $payload,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($notification, false);
-        }
-        return ['success' => 'contacts notified'];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => $user->firstName . " " . $user->lastName . " ha cambiado su avatar ",
+            "type" => self::USER_AVATAR,
+            "subject" => "Nuevo Avatar",
+            "payload" => $payload,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        return $this->sendMassMessage($data, $followers, $user);
     }
 
     /**
@@ -508,7 +557,7 @@ class EditAlerts {
      * @return Response
      */
     public function readNotifications(User $user, array $data, $status) {
-        $sql = "UPDATE notifications SET status='$status' WHERE id in ( ";
+        $sql = "UPDATE notifications SET status='$status' WHERE user_id = $user->id AND notification_id in ( ";
         $total = count($data);
         if ($total < 1) {
             $data = [
@@ -573,11 +622,11 @@ class EditAlerts {
                 ];
                 $message = Message::create($confirm);
                 $dauser = array();
+                $recipients = array($recipient);
                 $dauser['firstname'] = $user->firstName;
                 $dauser['lastname'] = $user->lastName;
-                //$dauser['message'] = $data['message'];
-                $notification = [
-                    "user_id" => $data['to_id'],
+                $dauser['message_id'] = $message->id;
+                $data = [
                     "trigger_id" => $user->id,
                     "message" => $data['message'],
                     "payload" => $dauser,
@@ -588,7 +637,7 @@ class EditAlerts {
                 $confirm['id'] = $message->id;
                 $confirm['created_at'] = $message->created_at;
                 $confirm['updated_at'] = $message->updated_at;
-                $confirm['result'] = $this->sendNotification($notification, true);
+                $confirm['result'] = $this->sendMassMessage($data, $recipients, $user);
                 return $confirm;
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
@@ -606,26 +655,22 @@ class EditAlerts {
                 $dauser['firstname'] = $user->firstName;
                 $dauser['lastname'] = $user->lastName;
                 $dauser['from_user'] = $user->id;
-                foreach ($group->users as $recipient) {
-                    if (!($user->id == $recipient->id)) {
-                        $notification = [
-                            "user_id" => $recipient->id,
-                            "trigger_id" => $group->id,
-                            "message" => $data['message'],
-                            "payload" => $dauser,
-                            "type" => self::GROUP_MESSAGE_TYPE,
-                            "subject" => $subject,
-                            "user_status" => $this->getUserNotifStatus($user)
-                        ];
-                        $this->sendNotification($notification, true);
-                    }
-                }
+                $dauser['message_id'] = $message->id;
+                $data = [
+                    "trigger_id" => $group->id,
+                    "message" => $data['message'],
+                    "payload" => $dauser,
+                    "type" => self::GROUP_MESSAGE_TYPE,
+                    "subject" => $subject,
+                    "user_status" => $this->getUserNotifStatus($user)
+                ];
+                $this->sendMassMessage($data, $group->users, $user);
                 return $message;
             }
         }
     }
 
-    public function postEmergency(User $user, array $data, $secret) { 
+    public function postEmergency(User $user, array $data, $secret) {
         $payload = array();
         $user->is_alerting = 1;
         $user->alert_type = $data['type'];
@@ -638,52 +683,42 @@ class EditAlerts {
             $subject = "Emergencia Medica de " . $user->firstName . " " . $user->lastName;
         }
         $followers = DB::select("select 
-                        contact_id, u.*
+                        contact_id as id,object_id
                     from
                         contacts c
                             left join
                         userables u ON c.contact_id = u.user_id
-                            and u.userable_type = '".self::OBJECT_LOCATION."'
-                            and userable_id = $user->id where c.user_id = $user->id  and level='".self::RED_MESSAGE_TYPE."';  ");
+                            and u.userable_type = '" . self::OBJECT_LOCATION . "'
+                            and userable_id = $user->id where c.user_id = $user->id  and level='" . self::RED_MESSAGE_TYPE . "';  ");
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
-        $dafollowers = array();
-                $file = '/home/hoovert/access.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-$current .= 'contacts' .PHP_EOL;
-        $current .= json_encode($followers);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
+        $followersInsert = array();
+        $followersPush = array();
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "payload" => $payload,
+            "type" => $data['type'],
+            "subject" => $subject,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
         foreach ($followers as $follower) {
-            $data = [
-                "user_id" => $follower->contact_id,
-                "trigger_id" => $user->id,
-                "message" => "",
-                "payload" => $payload,
-                "type" => $data['type'],
-                "subject" => $subject,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($data, true);
+
+            array_push($followersPush, $follower);
             if (!property_exists('follower', 'object_id')) {
-                $dafollower = $follower->contact_id;
+                $dafollower = $follower->id;
                 if ($user->id != intval($dafollower)) {
                     $item = ['user_id' => $dafollower, 'object_id' => $user->trip, self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_LOCATION, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
-                    array_push($dafollowers, $item);
+                    array_push($followersInsert, $item);
                 }
             }
         }
-        if (count($dafollowers) > 0) {
-            DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
+        $this->sendMassMessage($data, $followersPush, $user);
+        if (count($followersInsert) > 0) {
+            DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
         }
         if ($secret) {
+            $recipient = array($user);
             $data = [
-                "user_id" => $user->id,
                 "trigger_id" => $user->id,
                 "message" => "",
                 "payload" => "",
@@ -691,16 +726,66 @@ $current .= 'contacts' .PHP_EOL;
                 "subject" => "message from besafe",
                 "user_status" => $this->getUserNotifStatus($user)
             ];
-            $this->sendNotification($data, true);
+            $this->sendMassMessage($data, $recipient, $user);
         }
 
         return ['success' => 'Message sent to all contacts'];
     }
 
+    public function sendMessage(array $msg, array $userPush, array $userEmail, $platform) {
+        //$result['notification'] = $notification;
+
+        if (count($userPush) > 0) {
+            $content = array(
+                "en" => 'English Message'
+            );
+            if ($platform == "android") {
+                $fields = array(
+                    'app_id' => env('ONESIGNAL_APP_ID_ANDROID'),
+                    'include_player_ids' => $userPush,
+                    'data' => $msg,
+                    'contents' => $content
+                );
+                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_ANDROID');
+            } elseif ($platform == "ios") {
+                $fields = array(
+                    'app_id' => env('ONESIGNAL_APP_ID_ANDROID'),
+                    'include_player_ids' => $userPush,
+                    'data' => $msg,
+                    'contents' => $content
+                );
+                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_IOS');
+            }
+
+            $fields = json_encode($fields);
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
+                $auth));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+            curl_setopt($ch, CURLOPT_HEADER, FALSE);
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+            $response = curl_exec($ch);
+            curl_close($ch);
+            $result['push'] = $response;
+        }
+        if (count($userEmail) > 0) {
+            $mail = Mail::send('emails.order', ["message" => $msg], function($message) {
+                        $message->from('noreply@hoovert.com', 'Hoove');
+                        $message->to($userEmail)->subject($msg['subject']);
+                    });
+            $result['mail'] = $mail;
+        }
+        return $result;
+    }
+
     public function postStopEmergency(User $user, $code) {
         if ($user->green == $code['code']) {
             $user->is_alerting = 0;
-            $user->is_tracking = 0;
             $user->alert_type = "";
             $user->hash = "";
             $payload = array("status" => "success", "trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
@@ -713,19 +798,16 @@ $current .= 'contacts' .PHP_EOL;
             $subject = "Precaucion con " . $user->name;
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
-        $followers = DB::select("SELECT contact_id FROM contacts WHERE user_id= $user->id and level = 'emergency' ");
-        foreach ($followers as $follower) {
-            $data = [
-                "user_id" => $follower->contact_id,
-                "trigger_id" => $user->id,
-                "message" => "",
-                "payload" => $payload,
-                "type" => self::RED_MESSAGE_END,
-                "subject" => $subject,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendNotification($data, true);
-        }
+        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level = 'emergency' ");
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "payload" => $payload,
+            "type" => self::RED_MESSAGE_END,
+            "subject" => $subject,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        $this->sendMassMessage($data, $followers, $user);
         if ($user->green == $code['code']) {
             return array("status" => "success", "message" => "Emergency Ended");
         } else if ($user->red == $code['code']) {
@@ -761,9 +843,9 @@ $current .= 'contacts' .PHP_EOL;
     }
 
     public function moveOldUserFollowing() {
-        $following = DB::select("SELECT * from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' order by user_id");
+        $following = DB::select("SELECT user_id as id,user_id,object_id,userable_id,created_at,updated_at from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' order by user_id");
         if (sizeof($following) > 0) {
-            $tracking = DB::select("SELECT * from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  group by " . self::ACCESS_USER_OBJECT_ID . " ");
+            $tracking = DB::select("SELECT userable_id as id from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  group by " . self::ACCESS_USER_OBJECT_ID . " ");
             $this->notifyFollowers($following, $tracking);
         }
         $total = array();
@@ -817,53 +899,31 @@ $current .= 'contacts' .PHP_EOL;
         ]);
     }
 
-    public function sendNotification(array $data, $sendpush) {
+    public function sendNotification(array $data, array $userPush, array $userEmail, $platform) {
 
-        //$result['notification'] = $notification;
-
-        $notification = new Notification([
-            "user_id" => $data['user_id'],
-            "trigger_id" => $data['trigger_id'],
-            "message" => $data['message'],
-            "payload" => json_encode($data['payload']),
-            "type" => $data['type'],
-            "subject" => $data['subject'],
-            "user_status" => $data['user_status'],
-            "status" => "unread",
-        ]);
-        $notification->save();
-        $user = User::find($data['user_id']);
-        if ($user->emailNotifications == true && $sendpush) {
-            $mail = Mail::send('emails.order', ['user' => $user, "notification" => $notification], function($message) {
+        if (count($userEmail) > 0) {
+            $mail = Mail::send('emails.order', ["message" => $data], function($message) {
                         $message->from('noreply@hoovert.com', 'Hoove');
-                        $message->to('harredon01@gmail.com', 'Hoovert Arredondo')->subject($notification->subject);
+                        $message->to($userEmail)->subject($data['subject']);
                     });
             $result['mail'] = $mail;
         }
-        if ($user->pushNotifications == true && $sendpush) {
-            $msg = array
-                (
-                'id' => $notification->id,
-                'msg' => $notification->message,
-                'type' => $notification->type,
-                'status' => $notification->status,
-                'name' => $user->firstName . " " . $user->lastName,
-                'user_id' => $user->id,
-                'trigger_id' => $notification->trigger_id,
-                'payload' => $notification->payload,
-                'user_status' => $notification->user_status,
-                'created_at' => $notification->created_at,
-            );
+        if (count($userPush) > 0) {
+            $deviceCollection = array();
+            foreach ($userPush as $value) {
+                $deviceCollection[] = PushNotification::Device($value);
+            }
+            $devices = PushNotification::DeviceCollection($deviceCollection);
             $message = PushNotification::Message($data['subject'], array(
-                        'a' => $msg
+                        'a' => $data
             ));
-            if ($user->platform == "android") {
+            if ($platform == "android") {
                 PushNotification::app('appNameAndroid')
-                        ->to($user->token)
+                        ->to($devices)
                         ->send($message);
-            } elseif ($user->platform == "ios") {
+            } elseif ($platform == "ios") {
                 PushNotification::app('appNameIOS')
-                        ->to($user->token)
+                        ->to($devices)
                         ->send($message);
             }
         }

@@ -33,7 +33,6 @@ Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
 Route::post('groups/invite', 'GroupController@inviteUsers');
 Route::resource('groups', 'GroupController');
 
-Route::post('alerts', 'AlertsApiController@postNotification');
 Route::get('alerts', 'AlertsApiController@getNotifications');
 Route::delete('alerts/{code?}', 'AlertsApiController@deleteNotification');
 Route::get('alerts/count_unread', 'AlertsApiController@getCountNotificationsUnread');
