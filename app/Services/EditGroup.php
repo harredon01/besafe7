@@ -95,7 +95,7 @@ class EditGroup {
             if ($isNew) {
                 $i = 0;
             } else {
-                $members = $group->users;
+                $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ?', [$user->id, $group->id]);
                 $i = sizeof($members);
             }
             if (array_key_exists("contacts", $data)) {
@@ -126,11 +126,12 @@ class EditGroup {
                     "notification" => "Has sido agregado al grupo: " . $group->name,
                 );
                 $notification = [
+                    "trigger_id" => $group->id,
                     "message" => "Has sido agregado al grupo: " . $group->name,
                     "payload" => $payload,
                     "type" => "new_group",
                     "subject" => "Nuevo grupo " . $group->name,
-                    "user_status" => $this->editAlerts->getUserNotifStatus($contact)
+                    "user_status" => $this->editAlerts->getUserNotifStatus($user)
                 ];
                 $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user);
                 $i++;
@@ -152,7 +153,7 @@ class EditGroup {
                         "payload" => $payload,
                         "type" => "group_invite",
                         "subject" => "Nuevos usuarios al grupo: " . $group->name,
-                        "user_status" => $this->editAlerts->getUserNotifStatus($value)
+                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
                     ];
                     $this->editAlerts->sendMassMessage($notification, $members, $user);
                 }

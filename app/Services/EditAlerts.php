@@ -249,7 +249,7 @@ class EditAlerts {
             foreach ($recipients as $recipient) {
                 $user = User::find($recipient->id);
                 if ($user) {
-                    if ($checkSame && $user->id == $userSending->id) {
+                    if ($checkSame && $user->id == $userSending->id && $data['type']!=self::RED_SECRET_TYPE) {
                         continue;
                     }
                     $data['user_id'] = $user->id;
@@ -304,9 +304,12 @@ class EditAlerts {
         if (array_key_exists("code", $data)) {
             if (array_key_exists("user_id", $data)) {
                 $pingingUser = User::find($data["user_id"]);
+                
                 if ($pingingUser) {
+                    
                     $code = $data['code'];
                     $reply = $this->checkUserCode($user, $code);
+                    
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" => $reply['status']);
                     if ($reply['status'] == "success") {
                         $followers = array($pingingUser);
@@ -344,7 +347,7 @@ class EditAlerts {
             $data = array('code' => $code);
             if ($user->is_alerting == 1) {
                 $this->postStopEmergency($user, $data);
-            }
+            } 
 
             return ['status' => 'success', "message" => "Code received"];
         } else if ($user->red == $code) {
@@ -527,7 +530,11 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        return $this->sendMassMessage($data, $group->users, $user);
+        $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id  ;");
+        $this->sendMassMessage($data, $followers, $user);
 
         return ['success' => 'members notified'];
     }
@@ -664,7 +671,11 @@ class EditAlerts {
                     "subject" => $subject,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $this->sendMassMessage($data, $group->users, $user);
+                $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id  ;");
+                $this->sendMassMessage($data, $followers, $user);
                 return $message;
             }
         }
@@ -785,12 +796,16 @@ class EditAlerts {
 
     public function postStopEmergency(User $user, $code) {
         if ($user->green == $code['code']) {
-            $user->is_alerting = 0;
-            $user->alert_type = "";
-            $user->hash = "";
-            $payload = array("status" => "success", "trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-            $user->save();
-            $subject = "Finalizada emergencia de " . $user->name;
+            if ($user->is_alerting) {
+                $user->is_alerting = 0;
+                $user->alert_type = "";
+                $user->hash = "";
+                $payload = array("status" => "success", "trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                $user->save();
+                $subject = "Finalizada emergencia de " . $user->name;
+            } else {
+                return array("status" => "info", "message" => "User not in emergency");
+            }
         } else if ($user->red == $code['code']) {
             $subject = "Alerta de " . $user->name;
             $payload = array("status" => "alert", "first_name" => $user->firstName, "last_name" => $user->lastName);

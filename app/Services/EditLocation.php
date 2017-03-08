@@ -232,6 +232,10 @@ class EditLocation {
 
         $location = Location::create($data);
         if ($store) {
+            $user->is_tracking = 0;
+            $saveuser = true;
+            $user->hash = "";
+            $user->trip = 0;
             $locations = Location::where('user_id', '=', $user->id)
                             ->get()->toArray();
             if (sizeof($locations) > 0) {
