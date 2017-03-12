@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
+use App\Jobs\PostLocation;
+use App\Jobs\AddFollower;
 use App\Models\Attribute;
 use App\Models\AttributeOption;
 use App\Models\Product;
@@ -766,7 +768,7 @@ class MerchantImport {
                 $location["activity"] = $activity;
                 $location["battery"] = $battery;
                 $data["location"] = $location;
-                $this->editLocation->postLocation($data, $user);
+                dispatch(new PostLocation($user, $data));
                 if($dalast){
                     sleep(1);
                 } 
@@ -781,7 +783,7 @@ class MerchantImport {
             $user = User::find($sheet['user_id']);
             if ($user) {
                 $sheet['follower'] = str_replace("|",",",$sheet['follower']);
-                $this->editAlerts->addFollower($sheet, $user);
+                dispatch(new AddFollower($user, $sheet));
             }
         }
     }

@@ -5,6 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Jobs\AddFollower;
+use App\Jobs\RequestPing;
+use App\Jobs\ReplyPing;
+use App\Jobs\PostMessage;
+use App\Jobs\PostEmergency;
+use App\Jobs\PostEmergencyEnd;
+use App\Jobs\PostMarkAsDownloaded;
 use App\Services\EditAlerts;
 use App\Services\CleanSearch;
 use App\Querybuilders\NotificationQueryBuilder;
@@ -50,7 +57,8 @@ class AlertsApiController extends Controller {
      */
     public function postMarkAsDownloaded(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->markAsDownloaded($user, $request->all()));
+        dispatch(new PostMarkAsDownloaded($user, $request->all()));
+        return response()->json(['status' => 'success', 'message' => 'postMarkAsDownloaded queued']);
     }
 
     /**
@@ -60,7 +68,8 @@ class AlertsApiController extends Controller {
      */
     public function postAddFollower(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->addFollower($request->all(), $user));
+        dispatch(new AddFollower($user, $request->all()));
+        return response()->json(['status' => 'success', 'message' => 'postAddFollower queued']);
     }
 
     /**
@@ -70,7 +79,8 @@ class AlertsApiController extends Controller {
      */
     public function getRequestPing($pingee, Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->requestPing($user, $pingee));
+        dispatch(new RequestPing($user, $pingee));
+        return response()->json(['status' => 'success', 'message' => 'getRequestPing queued']);
     }
 
     /**
@@ -80,7 +90,8 @@ class AlertsApiController extends Controller {
      */
     public function postReplyPing(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->replyPing($user, $request->all()));
+        dispatch(new ReplyPing($user, $request->all()));
+        return response()->json(['status' => 'success', 'message' => 'postReplyPing queued']);
     }
 
     /**
@@ -144,7 +155,8 @@ class AlertsApiController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editAlerts->postMessage($user, $request->all()));
+        dispatch(new PostMessage($user, $request->all()));
+        return response()->json(['status' => 'success', 'message' => 'postMessage queued']);
     }
 
     /**
@@ -166,7 +178,8 @@ class AlertsApiController extends Controller {
      */
     public function postEmergency(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->postEmergency($user, $request->only("type"), false));
+        dispatch(new PostEmergency($user, $request->only("type"),false));
+        return response()->json(['status' => 'success', 'message' => 'postEmergency queued']);
     }
 
     /**
@@ -177,7 +190,8 @@ class AlertsApiController extends Controller {
      */
     public function postStopEmergency(Request $request) {
         $user = $request->user();
-        return response()->json($this->editAlerts->postStopEmergency($user, $request->only("code")));
+        dispatch(new PostEmergencyEnd($user, $request->only("code")));
+        return response()->json(['status' => 'success', 'message' => 'postStopEmergency queued']);
     }
 
     /**

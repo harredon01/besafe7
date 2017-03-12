@@ -26,10 +26,12 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = ['password', 'remember_token','notify_location','is_alerting','is_tracking','alert_type','docType', 'docNum','write_report',
-       'emailNotifications','pushNotifications','platform','token','green','red','trip','hash','token','platform'];
+       'emailNotifications','pushNotifications','platform','token','green','red','trip','hash','token','platform','card_brand','card_last_four'];
     protected $encryptable = [
         'green',
-        'red'
+        'red',
+        'card_brand',
+        'card_last_four'
     ];
     public function userSocials() {
         return $this->hasMany('App\Models\UserSocial');

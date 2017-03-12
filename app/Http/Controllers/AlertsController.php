@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditAlerts;
-
+use App\Jobs\PostMessage;
 
 class AlertsController extends Controller {
 
@@ -66,7 +66,8 @@ class AlertsController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editAlerts->postMessage($user, $request->all()));
+        dispatch(new PostMessage($user, $request->all()));
+        return response()->json(['status' => 'success', 'message' => 'postMessage queued']);
     }
     
     /**

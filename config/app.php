@@ -170,6 +170,7 @@ return [
 	Unlu\Laravel\Api\ApiQueryBuilderServiceProvider::class,
 	Laravel\Passport\PassportServiceProvider::class,
         Barryvdh\Cors\ServiceProvider::class,
+        Laravel\Scout\ScoutServiceProvider::class,
 
 	/*
          * Package Service Providers...

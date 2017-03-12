@@ -18,6 +18,7 @@ class CreateGroupsTable extends Migration {
                         $table->string('name');
                         $table->string('code')->nullable();
                         $table->string('status');
+                        $table->string('type');
                         $table->string('avatar')->nullable();
                         $table->integer('admin_id')->unsigned();
                         $table->foreign('admin_id')->references('id')

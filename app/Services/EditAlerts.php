@@ -5,6 +5,8 @@ namespace App\Services;
 use Validator;
 use App\Models\Group;
 use App\Models\User;
+use App\Jobs\PostEmergencyEnd;
+use App\Jobs\PostEmergency;
 use App\Models\Report;
 use App\Models\Message;
 use App\Models\Notification;
@@ -346,14 +348,14 @@ class EditAlerts {
         if ($user->green == $code) {
             $data = array('code' => $code);
             if ($user->is_alerting == 1) {
-                $this->postStopEmergency($user, $data);
+                dispatch(new PostEmergencyEnd($user, $data));
             } 
 
             return ['status' => 'success', "message" => "Code received"];
         } else if ($user->red == $code) {
             $result = array();
             $result["type"] = self::RED_MESSAGE_TYPE;
-            $this->postEmergency($user, $result, true);
+            dispatch(new PostEmergency($user, $result,true));
             return ['status' => 'alert', "message" => "Code received"];
         } else {
             return ['status' => 'info', "message" => "Code received"];
