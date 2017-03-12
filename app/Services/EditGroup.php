@@ -4,7 +4,8 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Group;
-use App\Models\Notification;
+use App\Jobs\InviteUsers;
+use App\Jobs\NotifyGroup;
 use App\Models\User;
 use Illuminate\Http\Response;
 use App\Services\EditAlerts;
@@ -53,7 +54,10 @@ class EditGroup {
             $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ?', [$user->id, $group_id]);
             $this->editAlerts->deleteGroupNotifs($user, $group_id);
             if ($deleted > 0) {
-                $this->editAlerts->notifyGroup($user, $group, $admin, 'group_leave');
+                if($group->is_public){
+                    dispatch(new NotifyGroup($user, $group, $admin, 'group_leave'));
+                }
+                
                 return ['status' => 'success', "message" => 'Group deleted'];
             } else {
                 return ['status' => 'error', "message" => 'Group not deleted'];
@@ -195,7 +199,7 @@ class EditGroup {
             $group = Group::create($data);
             $i = 0;
             $data["group_id"] = $group->id;
-            $this->inviteUsers($user, $data, true);
+            dispatch(new InviteUsers($user, $data, true));
             return $group;
         }
         return ['success' => 'Group saved', "group" => $group];

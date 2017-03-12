@@ -10,6 +10,7 @@ use App\Models\Region;
 use App\Models\City;
 use App\Jobs\PostLocation;
 use App\Jobs\AddFollower;
+use App\Jobs\AddContact;
 use App\Models\Attribute;
 use App\Models\AttributeOption;
 use App\Models\Product;
@@ -807,7 +808,7 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $this->editUserData->addContact($user, $sheet['contact_id']);
+                dispatch(new AddContact($user, $sheet['contact_id']));
             }
         }
     }

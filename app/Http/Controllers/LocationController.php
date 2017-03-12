@@ -12,6 +12,7 @@ use App\Querybuilders\HistoricLocationQueryBuilder;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Services\CleanSearch;
 use App\Jobs\PostLocation;
+use App\Jobs\MoveOld;
 use App\Models\UserableHistoric;
 use App\Models\Userable;
 use App\Models\Country;
@@ -57,8 +58,8 @@ class LocationController extends Controller {
      * @return Response
      */
     public function moveOldLocations() {
-        $locations = $this->editLocation->moveOldLocations();
-        return response()->json(compact('locations'));
+        dispatch(new MoveOld());
+        return response()->json(null);
     }
 
     /**

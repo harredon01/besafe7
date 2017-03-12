@@ -143,21 +143,22 @@ class EditAlerts {
                     $followers = DB::select($sql, $numbers);
                 }
                 if ($user->is_tracking) {
-                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
-                    $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "",
-                        "payload" => $payload,
-                        "type" => self::LOCATION_FIRST,
-                        "subject" => $subject,
-                        "user_status" => $this->getUserNotifStatus($user)
-                    ];
-                    $this->sendMassMessage($data, $followers, $user);
+                    
                 } else {
                     $user->notify_location = 1;
                     $user->save();
                 }
+                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
+                $data = [
+                    "trigger_id" => $user->id,
+                    "message" => "",
+                    "payload" => $payload,
+                    "type" => self::LOCATION_FIRST,
+                    "subject" => $subject,
+                    "user_status" => $this->getUserNotifStatus($user)
+                ];
+                $this->sendMassMessage($data, $followers, $user);
             } else if ($object == self::OBJECT_REPORT) {
 
                 if (array_key_exists("report_id", $data)) {
@@ -251,7 +252,7 @@ class EditAlerts {
             foreach ($recipients as $recipient) {
                 $user = User::find($recipient->id);
                 if ($user) {
-                    if ($checkSame && $user->id == $userSending->id && $data['type']!=self::RED_SECRET_TYPE) {
+                    if ($checkSame && $user->id == $userSending->id && $data['type'] != self::RED_SECRET_TYPE) {
                         continue;
                     }
                     $data['user_id'] = $user->id;
@@ -306,12 +307,12 @@ class EditAlerts {
         if (array_key_exists("code", $data)) {
             if (array_key_exists("user_id", $data)) {
                 $pingingUser = User::find($data["user_id"]);
-                
+
                 if ($pingingUser) {
-                    
+
                     $code = $data['code'];
                     $reply = $this->checkUserCode($user, $code);
-                    
+
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" => $reply['status']);
                     if ($reply['status'] == "success") {
                         $followers = array($pingingUser);
@@ -349,13 +350,13 @@ class EditAlerts {
             $data = array('code' => $code);
             if ($user->is_alerting == 1) {
                 dispatch(new PostEmergencyEnd($user, $data));
-            } 
+            }
 
             return ['status' => 'success', "message" => "Code received"];
         } else if ($user->red == $code) {
             $result = array();
             $result["type"] = self::RED_MESSAGE_TYPE;
-            dispatch(new PostEmergency($user, $result,true));
+            dispatch(new PostEmergency($user, $result, true));
             return ['status' => 'alert', "message" => "Code received"];
         } else {
             return ['status' => 'info', "message" => "Code received"];

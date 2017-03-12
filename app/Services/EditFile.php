@@ -4,7 +4,8 @@ namespace App\Services;
 
 use Validator;
 use App\Models\FileM;
-use App\Models\Merchant;
+use App\Jobs\NotifyGroup;
+use App\Jobs\NotifyContacts;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Report;
@@ -81,7 +82,7 @@ class EditFile {
                     $path = public_path($path . $filename);
                     Image::make($file->getRealPath())->resize(200, 200)->save($path);
                     $saved = true;
-                    $this->editAlerts->notifyContacts($user, $filename);
+                    dispatch(new NotifyContacts($user, $filename));
                 }
             } else if ($type == "group_avatar") {
                 $trigger = Group::find($intended_id);
@@ -101,7 +102,7 @@ class EditFile {
                             $path = public_path($path . $filename);
                             Image::make($file->getRealPath())->resize(200, 200)->save($path);
                             $saved = true;
-                            $this->editAlerts->notifyGroup($user, $trigger, $filename, $type);
+                            dispatch(new NotifyGroup($user, $trigger, $filename, $type));
                         }
                     } else {
                         return array("status" => "error", "message" => "User not admin group");

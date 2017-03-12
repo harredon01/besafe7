@@ -2,9 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\City;
-use App\Models\Region;
-use App\Models\Country;
+use App\Jobs\AddContact;
 use App\Models\Group;
 
 use App\Services\EditUserData;
@@ -202,7 +200,7 @@ class UserTableSeeder extends Seeder {
                 if ($user->id == $user2->id) {
                     
                 } else {
-                    $this->editUserData->addContact($user, $user2->id);
+                    dispatch(new AddContact($user, $user2->id));
                 }
             }
             if ($usert->id == $user->id) {

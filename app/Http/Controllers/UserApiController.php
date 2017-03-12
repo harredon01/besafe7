@@ -10,8 +10,8 @@ use App\Services\CleanSearch;
 use App\Querybuilders\ContactQueryBuilder;
 use App\Models\User;
 use App\Models\Medical;
-use Image;
-use File;
+use App\Jobs\ImportContactsId;
+use App\Jobs\AddContact;
 use DB;
 
 class UserApiController extends Controller {
@@ -123,7 +123,8 @@ class UserApiController extends Controller {
      */
     public function importContactsId(Request $request) {
         $user = $request->user();
-        return response()->json($this->editUserData->importContactsId($user, $request->all()));
+        dispatch(new ImportContactsId($user, $request->all()));
+        return response()->json(['status' => 'success','message' => 'importContactsId queued']);
     }
 
     /**
@@ -207,7 +208,8 @@ class UserApiController extends Controller {
      */
     public function addContact($contact_id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editUserData->addContact($user, $contact_id));
+        dispatch(new AddContact($user, $contact_id));
+        return response()->json(['status' => 'success','message' => 'addContact queued']);
     }
 
     public function deleteAddress($address_id, Request $request) {

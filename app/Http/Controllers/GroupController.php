@@ -97,7 +97,8 @@ class GroupController extends Controller {
 
     public function inviteUsers(Request $request) {
         $user = $request->user();
-        return response()->json($this->editGroup->inviteUsers($user, $request->all(),false));
+        dispatch(new InviteUsers($user, $request->all(),false));
+        return response()->json(['status' => 'success','message' => 'inviteUsers queued']);
     }
 
     /**
