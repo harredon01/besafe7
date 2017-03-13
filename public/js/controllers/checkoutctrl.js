@@ -32,6 +32,11 @@
                             $scope.coupon = data.coupon;
                             $scope.discount = data.sale + data.coupon;
                             $scope.total = data.total;
+                            if (data.is_shippable) {
+                                $rootScope.$broadcast('Shippable');
+                            } else {
+                                $rootScope.$broadcast('NotShippable');
+                            }
                         } else {
                             $window.location.href = '/products';
                         }
@@ -105,18 +110,32 @@
             $scope.regionVisible = false;
             $scope.cityVisible = false;
             $scope.addAddress = false;
-            $rootScope.shippingAddressSet = false;
-            $rootScope.shippingCondition = false;
+            $scope.visible = false;
+            $rootScope.shippingAddressSet = true;
+            $rootScope.shippingCondition = true;
             $rootScope.billingAddressSet = false;
             $rootScope.paymentMethodSet = false;
+
+            $rootScope.$on('Shippable', function (event, args) {
+                $rootScope.shippingAddressSet = false;
+                $rootScope.shippingCondition = false;
+                $rootScope.billingAddressSet = false;
+                $rootScope.paymentMethodSet = false;
+                $scope.visible = true;
+            });
+
+
             angular.element(document).ready(function () {
                 $scope.getAddresses();
-                LocationService.getCountries().then(function (data) {
+                LocationService.getCountries("").then(function (data) {
                     $rootScope.countries = data.data;
                 },
                         function (data) {
 
                         });
+            });
+            $rootScope.$on('NotShippable', function (event, args) {
+                $scope.visible = false;
 
             });
             $scope.cleanJson = function () {
@@ -266,23 +285,30 @@
             $scope.addAddress = false;
             $scope.credito = false;
             $scope.cash = false;
+            $scope.isDigital = false;
             $scope.debito = false;
             angular.element(document).ready(function () {
                 var d = new Date();
                 $scope.years = [];
-                $scope.months=[];
+                $scope.months = [];
                 var year = d.getFullYear()
                 for (i = 0; i < 12; i++) {
-                    if(i < 9){
-                        $scope.months.push("0"+(i+1));
+                    if (i < 9) {
+                        $scope.months.push("0" + (i + 1));
                     } else {
-                        $scope.months.push(i+1);
+                        $scope.months.push(i + 1);
                     }
-                    
+
                 }
                 for (i = 0; i < 13; i++) {
-                    $scope.years.push(year+i);
+                    $scope.years.push(year + i);
                 }
+            });
+            $rootScope.$on('Shippable', function (event, args) {
+                $scope.isDigital = false;
+            });
+            $rootScope.$on('NotShippable', function (event, args) {
+                $scope.isDigital = true;
             });
             $scope.save = function (isvalid) {
                 $scope.submitted = true;
@@ -314,7 +340,7 @@
                 $scope.submitted3 = true;
                 if (isvalid) {
                     Checkout.payDebitCard($.param($scope.data3)).then(function (data) {
-                        window.location.href=data.transactionResponse.extraParameters.BANK_URL;
+                        window.location.href = data.transactionResponse.extraParameters.BANK_URL;
                     },
                             function (data) {
 
@@ -325,22 +351,14 @@
                 $scope.submitted4 = true;
                 if (isvalid) {
                     Checkout.payCash($.param($scope.data4)).then(function (data) {
-                        window.location.href=data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML;
+                        window.location.href = data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML;
                     },
                             function (data) {
 
                             });
                 }
             }
-            $scope.getAddresses = function () {
-                Users.getAddresses().then(function (data) {
-                    $rootScope.addresses = data;
 
-                },
-                        function (data) {
-
-                        });
-            }
             $scope.selectAddress = function (address_id) {
                 Checkout.setBillingAddress(address_id).then(function (data) {
                     $rootScope.billingAddressSet = true;

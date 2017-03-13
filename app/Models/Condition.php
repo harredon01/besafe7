@@ -18,7 +18,7 @@ class Condition extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name', 'type', 'target', 'value', 'attributes', 'product_id', 'product_variant_id', 'coupon', 'city_id', 'region_id', 'country_id','order'];
+    protected $fillable = ['name', 'type', 'target', 'value', 'attributes', 'product_id', 'product_variant_id', 'coupon', 'city_id', 'region_id', 'country_id','order','isReusable','used'];
 
     public function product() {
         return $this->belongsTo('App\Models\Product');

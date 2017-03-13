@@ -198,7 +198,6 @@ class CartController extends Controller {
      */
     public function getCheckout() {
         $user = $this->auth->user();
-        $this->editOrder->getCheckout($user);
         return view('products.checkout')
                ->with('user', $user);
     }

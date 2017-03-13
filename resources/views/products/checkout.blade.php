@@ -19,10 +19,10 @@
                         </ul>
                     </div>
                     @endif
-                    <div class="replace-checkout-cart" ng-controller="CheckoutCartCtrl">
+                    <div class="replace-checkout-cart" ng-controller="CheckoutCartCtrl" ng-hide="isDigital">
                         @include('products.checkoutCart')
                     </div>
-                    <div class="address" ng-controller="CheckoutShippingCtrl">
+                    <div class="address" ng-controller="CheckoutShippingCtrl" ng-show="visible">
                         <div class="replace-address">
                             @include('user.checkoutAddressList')
                             <a href="javascript:;" ng-click="showAddressForm()">Nueva direccion</a>
@@ -41,7 +41,7 @@
 
                     </div>
 
-                    <div class="payment-methods" ng-show="shippingCondition" ng-controller="CheckoutBillingCtrl">
+                    <div class="payment-methods" ng-show="shippingCondition || isDigital" ng-controller="CheckoutBillingCtrl">
                         <div class="replace-address">
                             @include('products.checkoutPaymentMethods')
                         </div>

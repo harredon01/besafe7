@@ -9,8 +9,6 @@
                                 <br/><span class="regionName">@{{ address.regionName }}</span>, <span class="countryName">@{{ address.countryName }}</span>
                                 <span class="region_id" style="display:none">@{{ address.region_id }}</span>, <span class="country_id"  style="display:none">@{{ address.country_id }}</span>
                                 <br/>
-                                <span class="shipping">Seleccionada: @{{ address.selected }}</span>
-                                <span class="billing">Seleccionada: @{{ address.selectedB }}</span>
                                 <a href="javascript:;" ng-click="selectAddress(address.id)">Select</a>
                             </li>
                         </ul>

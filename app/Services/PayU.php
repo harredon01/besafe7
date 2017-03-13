@@ -40,54 +40,56 @@ class PayU {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $order = $this->editOrder->prepareOrder($user);
-        $billing = Address::find($order->billing_address_id);
+        $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
-            $shipping = Address::find($order->shipping_address_id);
-            if ($shipping) {
-                $billingCountry = Country::find($billing->country_id);
-                $billingRegion = Region::find($billing->region_id);
-                $billingCity = City::find($billing->city_id);
-                $shippingCountry = Country::find($billing->country_id);
-                $shippingRegion = Region::find($billing->region_id);
-                $shippingCity = City::find($billing->city_id);
-                $deviceSessionId = md5(session_id() . microtime());
-                $accountId = "512321";
-                $apiLogin = "pRRXKOl8ikMmt9u";
-                $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
-                $reference = "besafe_test_" . $order->id;
-                $currency = "COP";
-                $merchantId = "508029";
-                $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
-                $sig = sha1($str);
-                $merchant = [
-                    'apiLogin' => $apiLogin,
-                    'apiKey' => $apiKey
-                ];
-                $additionalValues = [
-                    'value' => number_format($order->total, 2, '.', ''),
-                    'currency' => $currency
-                ];
-                $additionalValuesCont = [
-                    'TX_VALUE' => $additionalValues
-                ];
 
-                $buyerAddress = [
-                    "street1" => $billing->address,
-                    "street2" => "",
-                    "city" => $billingCity->name,
-                    "state" => $billingRegion->name,
-                    "country" => $billingCountry->code,
-                    "postalCode" => $billing->postal,
-                    "phone" => $billing->phone
-                ];
-                $buyer = [
-                    "merchantBuyerId" => "1",
-                    "fullName" => $billingCity->name,
-                    "emailAddress" => $data['payer_email'],
-                    "contactPhone" => $billing->phone,
-                    "dniNumber" => $data['payer_id'],
-                    "shippingAddress" => $buyerAddress
-                ];
+
+            $billingCountry = Country::find($billing->country_id);
+            $billingRegion = Region::find($billing->region_id);
+            $billingCity = City::find($billing->city_id);
+            $shippingCountry = Country::find($billing->country_id);
+            $shippingRegion = Region::find($billing->region_id);
+            $shippingCity = City::find($billing->city_id);
+            $deviceSessionId = md5(session_id() . microtime());
+            $accountId = "512321";
+            $apiLogin = "pRRXKOl8ikMmt9u";
+            $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+            $reference = "besafe_test_" . $order->id;
+            $currency = "COP";
+            $merchantId = "508029";
+            $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
+            $sig = sha1($str);
+            $merchant = [
+                'apiLogin' => $apiLogin,
+                'apiKey' => $apiKey
+            ];
+            $additionalValues = [
+                'value' => number_format($order->total, 2, '.', ''),
+                'currency' => $currency
+            ];
+            $additionalValuesCont = [
+                'TX_VALUE' => $additionalValues
+            ];
+
+            $buyerAddress = [
+                "street1" => $billing->address,
+                "street2" => "",
+                "city" => $billingCity->name,
+                "state" => $billingRegion->name,
+                "country" => $billingCountry->code,
+                "postalCode" => $billing->postal,
+                "phone" => $billing->phone
+            ];
+            $buyer = [
+                "merchantBuyerId" => "1",
+                "fullName" => $billingCity->name,
+                "emailAddress" => $data['payer_email'],
+                "contactPhone" => $billing->phone,
+                "dniNumber" => $data['payer_id'],
+                "shippingAddress" => $buyerAddress
+            ];
+            $shipping = $order->orderAddresses()->where('type', "shipping")->first();
+            if ($shipping) {
                 $ShippingAddress = [
                     "street1" => $shipping->address,
                     "street2" => "",
@@ -97,19 +99,8 @@ class PayU {
                     "postalCode" => $shipping->postal,
                     "phone" => $shipping->phone
                 ];
-                $order = [
-                    "accountId" => $accountId,
-                    "referenceCode" => $reference,
-                    "description" => "besafe payment test",
-                    "language" => "es",
-                    "signature" => $sig,
-                    "notifyUrl" => "http://www.tes.com/confirmation",
-                    "additionalValues" => $additionalValuesCont,
-                    "buyer" => $buyer,
-                    "shippingAddress" => $ShippingAddress
-                ];
-
-                $payerAddress = [
+            } else {
+                $ShippingAddress = [
                     "street1" => $billing->address,
                     "street2" => "",
                     "city" => $billingCity->name,
@@ -118,46 +109,68 @@ class PayU {
                     "postalCode" => $billing->postal,
                     "phone" => $billing->phone
                 ];
-                $payer = [
-                    "merchantPayerId" => "1",
-                    "fullName" => $billingCity->name,
-                    "emailAddress" => $data['payer_email'],
-                    "contactPhone" => $billing->phone,
-                    "dniNumber" => $data['payer_id'],
-                    "billingAddress" => $payerAddress
-                ];
-                $creditCard = [
-                    "number" => $data['cc_number'],
-                    "securityCode" => $data['cc_security_code'],
-                    "expirationDate" => $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
-                    "name" => $data['cc_name']
-                ];
-                $extraParams = [
-                    "INSTALLMENTS_NUMBER" => 1
-                ];
-                $transaction = [
-                    "order" => $order,
-                    "payer" => $payer,
-                    "creditCard" => $creditCard,
-                    "extraParameters" => $extraParams,
-                    "type" => "AUTHORIZATION_AND_CAPTURE",
-                    "paymentMethod" => $data['cc_branch'],
-                    "paymentCountry" => $billingCountry->code,
-                    "deviceSessionId" => $deviceSessionId,
-                    "ipAddress" => $data['ip_address'],
-                    "cookie" => "pt1t38347bs6jc9ruv2ecpv7o2",
-                    "userAgent" => $data['user_agent']
-                ];
-                $dataSent = [
-                    "language" => "es",
-                    "command" => "SUBMIT_TRANSACTION",
-                    "merchant" => $merchant,
-                    "transaction" => $transaction,
-                    "test" => false,
-                ];
-//        return $dataSent;
-                return $this->sendRequest($dataSent);
             }
+            $order = [
+                "accountId" => $accountId,
+                "referenceCode" => $reference,
+                "description" => "besafe payment test",
+                "language" => "es",
+                "signature" => $sig,
+                "notifyUrl" => "http://www.tes.com/confirmation",
+                "additionalValues" => $additionalValuesCont,
+                "buyer" => $buyer,
+                "shippingAddress" => $ShippingAddress
+            ];
+
+            $payerAddress = [
+                "street1" => $billing->address,
+                "street2" => "",
+                "city" => $billingCity->name,
+                "state" => $billingRegion->name,
+                "country" => $billingCountry->code,
+                "postalCode" => $billing->postal,
+                "phone" => $billing->phone
+            ];
+            $payer = [
+                "merchantPayerId" => "1",
+                "fullName" => $billingCity->name,
+                "emailAddress" => $data['payer_email'],
+                "contactPhone" => $billing->phone,
+                "dniNumber" => $data['payer_id'],
+                "billingAddress" => $payerAddress
+            ];
+            $creditCard = [
+                "number" => $data['cc_number'],
+                "securityCode" => $data['cc_security_code'],
+                "expirationDate" => $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
+                "name" => $data['cc_name']
+            ];
+            $extraParams = [
+                "INSTALLMENTS_NUMBER" => 1
+            ];
+            $transaction = [
+                "order" => $order,
+                "payer" => $payer,
+                "creditCard" => $creditCard,
+                "extraParameters" => $extraParams,
+                "type" => "AUTHORIZATION_AND_CAPTURE",
+                "paymentMethod" => $data['cc_branch'],
+                "paymentCountry" => $billingCountry->code,
+                "deviceSessionId" => $deviceSessionId,
+                "ipAddress" => $data['ip_address'],
+                "cookie" => "pt1t38347bs6jc9ruv2ecpv7o2",
+                "userAgent" => $data['user_agent']
+            ];
+            $dataSent = [
+                "language" => "es",
+                "command" => "SUBMIT_TRANSACTION",
+                "merchant" => $merchant,
+                "transaction" => $transaction,
+                "test" => false,
+            ];
+//        return $dataSent;
+            return $this->sendRequest($dataSent);
+
             return array("status" => "error", "message" => "missing Shipping Address");
         }
         return array("status" => "error", "message" => "missing billing Address");
@@ -169,7 +182,7 @@ class PayU {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $order = $this->editOrder->prepareOrder($user);
-        $billing = Address::find($order->billing_address_id);
+        $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
             $billingCountry = Country::find($billing->country_id);
             $billingCity = City::find($billing->city_id);
@@ -258,9 +271,9 @@ class PayU {
         $reference = "besafe_test_" . $order->id;
         $currency = "COP";
         $merchantId = "508029";
-        $date= date_create();
+        $date = date_create();
         date_add($date, date_interval_create_from_date_string("7 days"));
-        $date = date_format($date, "Y-m-d")."T".date_format($date, "G:i:s");
+        $date = date_format($date, "Y-m-d") . "T" . date_format($date, "G:i:s");
         $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
         $sig = sha1($str);
         $merchant = [

@@ -16,18 +16,17 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status','subtotal','shipping','discount','tax','total','comments','total','billing_address_id',
-        'shipping_address_id','user_id','is_digital','is_shippable'];
+    protected $fillable = ['status','subtotal','shipping','discount','tax','total','comments','total','user_id','is_digital','is_shippable'];
 
 
-    public function merchant() {
-        return $this->belongsTo('App\Models\Merchant');
-    }
     public function user() {
         return $this->belongsTo('App\Models\User');
     }
     public function items() {
         return $this->hasMany('App\Models\Item');
+    }
+    public function orderAddresses() {
+        return $this->hasMany('App\Models\OrderAddress');
     }
     public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');

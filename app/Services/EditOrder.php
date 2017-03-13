@@ -4,6 +4,9 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Order;
+use App\Models\Transaction;
+use App\Models\OrderAddress;
+use App\Models\OrderPayment;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Condition;
@@ -133,7 +136,7 @@ class EditOrder {
     public function prepareOrder(User $user) {
         $order = $this->getOrder($user);
         $data = $this->getCheckoutCart();
-        $order->status = "holding";
+        //$order->status = "holding";
         $order->subtotal = $data["subtotal"];
         $order->tax = $data["tax"];
         $order->shipping = $data["shipping"];
@@ -154,10 +157,11 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $order->shipping_condition_id = null;
-                $order->shipping_address_id = $address;
-                $order->user_id = $user->id;
-                $order->save();
+                $orderAddresses = $theAddress->toarray();
+                $orderAddresses['order_id'] = $order->id;
+                $orderAddresses['type'] = "shipping";
+                $order->orderAddresses()->where('type', "shipping")->delete();
+                OrderAddress::insert($orderAddresses);
                 return array("status" => "success", "message" => "Address added to order");
             }
             return array("status" => "error", "message" => "Address does not belong to user");
@@ -175,17 +179,12 @@ class EditOrder {
         $theAddress = Address::find(intval($address));
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
-                $order->billing_address_id = $address;
-                $order->user_id = $user->id;
-                $order->save();
-                $data = [
-                    "country_id" => $theAddress->country_id,
-                    "region_id" => $theAddress->region_id,
-                    "order" => "3",
-                    "type" => "tax",
-                    "orderObj" => $order
-                ];
-                $this->setConditionByType($user, $data);
+                $order = $this->getOrder($user);
+                $orderAddresses = $theAddress->toarray();
+                $orderAddresses['order_id'] = $order->id;
+                $orderAddresses['type'] = "billing";
+                $order->orderAddresses()->where('type', "billing")->delete();
+                OrderAddress::insert($orderAddresses);
                 return array("status" => "success", "message" => "Billing Address added to order");
             }
             return array("status" => "error", "message" => "Address does not belong to user");
@@ -211,8 +210,6 @@ class EditOrder {
                 'value' => $theCondition->value,
                 'order' => $theCondition->order
             ));
-            $order->shipping_condition_id = $theCondition->id;
-            $order->save();
             $order->conditions()->where('type', "shipping")->delete();
             $order->conditions()->save($theCondition);
             Cart::condition($condition);
@@ -226,61 +223,23 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setConditionByType(User $user, $data) {
-        $conditions = Condition::where('isActive', true);
-        if ($data['type']) {
-            $conditions = $conditions->where('type', $data['type']);
-        }
-        if ($data['order']) {
-            $conditions = $conditions->where('order', $data['order']);
-        }
-        if ($data['country_id']) {
-            $conditions = $conditions->where('country_id', $data['country_id']);
-        }
-        if ($data['region_id']) {
-            $conditions = $conditions->where('region_id', $data['region_id']);
-        }
-        $conditions = $conditions->get();
-        $order = $data['orderObj'];
-        foreach ($conditions as $theCondition) {
-            if ($data['order']) {
-                $order = $data['order'];
-            } else {
-                $order = 0;
-            }
-            $condition = new CartCondition(array(
-                'name' => $theCondition->name,
-                'type' => $theCondition->type,
-                'target' => $theCondition->target,
-                'value' => $theCondition->value,
-                'order' => $order
-            ));
-            Cart::condition($condition);
-            $order->conditions()->save($theCondition);
-        }
-        return array("status" => "success", "message" => "Condition Set");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function setCouponCondition(User $user, $coupon) {
         $theCondition = Condition::where('coupon', $coupon);
         if ($theCondition) {
             // add single condition on a cart bases
-            $condition = new CartCondition(array(
-                'name' => $theCondition->name,
-                'type' => $theCondition->type,
-                'target' => $theCondition->target,
-                'value' => $theCondition->value,
-                'order' => $theCondition->order
-            ));
-            $order = $this->getOrder($user);
-            Cart::condition($condition);
-            $order->conditions()->save($theCondition);
-            return array("status" => "success", "message" => "Shipping condition set on the cart");
+            if ($theCondition->isReusable || (!$theCondition->isReusable && !$theCondition->used)) {
+                $condition = new CartCondition(array(
+                    'name' => $theCondition->name,
+                    'type' => $theCondition->type,
+                    'target' => $theCondition->target,
+                    'value' => $theCondition->value,
+                    'order' => $theCondition->order
+                ));
+                $order = $this->getOrder($user);
+                Cart::condition($condition);
+                $order->conditions()->save($theCondition);
+                return array("status" => "success", "message" => "Shipping condition set on the cart");
+            }
         }
         return array("status" => "error", "message" => "Address does not exist");
     }
@@ -314,27 +273,6 @@ class EditOrder {
      *
      * @return Response
      */
-    public function getCheckout(User $user) {
-        $order = $this->getOrder($user);
-        $order->payment_method_id = null;
-        $order->billing_address_id = null;
-        $order->shipping_address_id = null;
-        $order->shipping_condition_id = null;
-        $order->save();
-        $data = [
-            "order" => "1",
-            "type" => "sale",
-            "orderObj" => $order
-        ];
-        $this->setConditionByType($user, $data);
-        return array("status" => "success", "message" => "Order prepared", "Object" => $order);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function setOrderDetails(User $user, array $data) {
         $order = $this->getCart($user);
 
@@ -346,23 +284,15 @@ class EditOrder {
           dd($test);
           } */
         if ($paymentMethod) {
-            $hasMethod = DB::table('merchant_payment_methods')->where('merchant_id', $order->merchant_id)->where('payment_method_id', $paymentMethod->id)->first();
-            if ($hasMethod) {
-
-                if (array_key_exists("comments", $data)) {
-                    $order->comments = $data['comments'];
-                }
-                if (array_key_exists("cash_for_change", $data)) {
-                    $order->cash_for_change = $data['cash_for_change'];
-                }
-                $order->payment_method_id = $data["payment_method_id"];
-
-                $this->updateInventory($order);
-                $order->status = "holding";
-                $this->emailMerchant($user, $order);
-                return array("status" => "success", "message" => "Email sent to merchant");
+            if (array_key_exists("comments", $data)) {
+                $order->comments = $data['comments'];
             }
-            return array("status" => "error", "message" => "Merchant does not support selected payment method");
+            if (array_key_exists("cash_for_change", $data)) {
+                $order->cash_for_change = $data['cash_for_change'];
+            }
+            $order->payment_method_id = $paymentMethod->id;
+            $order->status = "holding";
+            return array("status" => "success", "message" => "Email sent to merchant");
         }
         return array("status" => "error", "message" => "Invalid Payment Method");
     }
@@ -391,7 +321,7 @@ class EditOrder {
      *
      * @return Response
      */
-    public function emailMerchant(User $user, Order $order) {
+    public function emailSales(User $user, Order $order) {
         /* Mail::send('emails.order', ['user' => $user, "order" => $order], function($message) {
           $message->from('noreply@hoovert.com', 'Hoove');
           $message->to('harredon01@gmail.com', 'Hoovert Arredondo')->subject('Exitoo!');

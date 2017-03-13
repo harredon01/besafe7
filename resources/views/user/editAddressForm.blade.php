@@ -2,17 +2,6 @@
                             <input type="hidden" name="_token" value="{{ csrf_token()}}">
                             <input type="hidden" ng-model="data.address_id" name="address_id" value="">
                             <input type="hidden" ng-model="data.section" name="section" value="profile">
-                            <div class="form-group" >
-                                <label class="col-md-4 control-label">Type</label>
-                                <div class="col-md-6">
-                                    <select ng-model="data.type" name="type" required>
-                                        <option value="shipping">Shipping</option>
-                                        <option value="billing">Billing</option>
-                                    </select>
-                                    <span style="color:red" ng-show="(myForm.type.$dirty && myForm.type.$invalid) || submitted && myForm.type.$invalid">
-                                        <span ng-show="submitted && myForm.type.$error.required">Porfavor Selecciona un Tipo</span>
-                                </div>
-                            </div>
                             <div class="form-group">
                                 <label class="col-md-4 control-label">First Name</label>
                                 <div class="col-md-6">

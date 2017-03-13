@@ -20,6 +20,8 @@ class CartConditionsTable extends Migration {
                         $table->string('target');
                         $table->string('value');
                         $table->string('coupon')->nullable();
+                        $table->boolean('isReusable');
+                        $table->boolean('used');
                         $table->boolean('isActive');
                         $table->integer('order')->unsigned()->nullable()->default(0);
                         $table->integer('product_id')->unsigned()->nullable();
