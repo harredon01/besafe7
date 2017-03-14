@@ -25,6 +25,9 @@ class Order extends Model {
     public function items() {
         return $this->hasMany('App\Models\Item');
     }
+    public function transactions() {
+        return $this->hasMany('App\Models\Transaction');
+    }
     public function orderAddresses() {
         return $this->hasMany('App\Models\OrderAddress');
     }

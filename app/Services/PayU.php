@@ -5,16 +5,11 @@ namespace App\Services;
 use Validator;
 use App\Models\Country;
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Region;
 use App\Models\City;
-use App\Models\ProductVariant;
-use App\Models\PaymentMethod;
-use App\Models\Address;
+use App\Models\Transaction;
 use App\Services\EditOrder;
-use GuzzleHttp\Client;
-use Darryldecode\Cart\CartCondition;
-use Cart;
-use DB;
 
 class PayU {
 
@@ -54,7 +49,7 @@ class PayU {
             $accountId = "512321";
             $apiLogin = "pRRXKOl8ikMmt9u";
             $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
-            $reference = "besafe_test_" . $order->id;
+            $reference = "besafe_test_1_" . $order->id;
             $currency = "COP";
             $merchantId = "508029";
             $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
@@ -110,7 +105,7 @@ class PayU {
                     "phone" => $billing->phone
                 ];
             }
-            $order = [
+            $orderCont = [
                 "accountId" => $accountId,
                 "referenceCode" => $reference,
                 "description" => "besafe payment test",
@@ -149,7 +144,7 @@ class PayU {
                 "INSTALLMENTS_NUMBER" => 1
             ];
             $transaction = [
-                "order" => $order,
+                "order" => $orderCont,
                 "payer" => $payer,
                 "creditCard" => $creditCard,
                 "extraParameters" => $extraParams,
@@ -169,9 +164,8 @@ class PayU {
                 "test" => false,
             ];
 //        return $dataSent;
-            return $this->sendRequest($dataSent);
-
-            return array("status" => "error", "message" => "missing Shipping Address");
+            $result = $this->sendRequest($dataSent);
+            return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
     }
@@ -190,7 +184,7 @@ class PayU {
             $accountId = "512321";
             $apiLogin = "pRRXKOl8ikMmt9u";
             $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
-            $reference = "besafe_test_" . $order->id;
+            $reference = "besafe_test_1_" . $order->id;
             $currency = "COP";
             $merchantId = "508029";
             $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
@@ -211,7 +205,7 @@ class PayU {
                 "emailAddress" => $data['payer_email'],
             ];
 
-            $order = [
+            $orderCont = [
                 "accountId" => $accountId,
                 "referenceCode" => $reference,
                 "description" => "besafe payment test",
@@ -236,7 +230,7 @@ class PayU {
                 "PSE_REFERENCE3" => $data['pse_reference3']
             ];
             $transaction = [
-                "order" => $order,
+                "order" => $orderCont,
                 "payer" => $payer,
                 "extraParameters" => $extraParams,
                 "type" => "AUTHORIZATION_AND_CAPTURE",
@@ -254,7 +248,8 @@ class PayU {
                 "test" => false,
             ];
 
-            return $this->sendRequest($dataSent);
+            $result = $this->sendRequest($dataSent);
+            return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
     }
@@ -268,7 +263,7 @@ class PayU {
         $accountId = "512321";
         $apiLogin = "pRRXKOl8ikMmt9u";
         $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
-        $reference = "besafe_test_" . $order->id;
+        $reference = "besafe_test_1_" . $order->id;
         $currency = "COP";
         $merchantId = "508029";
         $date = date_create();
@@ -291,7 +286,7 @@ class PayU {
         $buyer = [
             "emailAddress" => $data['payer_email'],
         ];
-        $order = [
+        $orderCont = [
             "accountId" => $accountId,
             "referenceCode" => $reference,
             "description" => "besafe payment test",
@@ -302,7 +297,7 @@ class PayU {
             "buyer" => $buyer
         ];
         $transaction = [
-            "order" => $order,
+            "order" => $orderCont,
             "type" => "AUTHORIZATION_AND_CAPTURE",
             "paymentMethod" => "BALOTO",
             "paymentCountry" => "CO",
@@ -316,7 +311,8 @@ class PayU {
             "transaction" => $transaction,
             "test" => false,
         ];
-        return $this->sendRequest($dataSent);
+        $result = $this->sendRequest($dataSent);
+        return $this->handleTransactionResponse($result, $user, $order);
     }
 
     public function getBanks() {
@@ -341,7 +337,7 @@ class PayU {
         return $this->sendRequest($dataSent);
     }
 
-    public function getPaymentMethods(User $user) {
+    public function getPaymentMethods() {
         $apiLogin = "pRRXKOl8ikMmt9u";
         $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
         $merchant = [
@@ -358,7 +354,7 @@ class PayU {
         return $this->sendRequest($dataSent);
     }
 
-    public function getStatusOrderId(User $user, $order_id) {
+    public function getStatusOrderId($order_id) {
         $apiLogin = "pRRXKOl8ikMmt9u";
         $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
         $merchant = [
@@ -379,7 +375,7 @@ class PayU {
         return $this->sendRequest($dataSent);
     }
 
-    public function getStatusOrderRef(User $user, $order_ref) {
+    public function getStatusOrderRef($order_ref) {
         $apiLogin = "pRRXKOl8ikMmt9u";
         $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
         $merchant = [
@@ -400,7 +396,7 @@ class PayU {
         return $this->sendRequest($dataSent);
     }
 
-    public function getStatusTransaction(User $user, $transaction_id) {
+    public function getStatusTransaction($transaction_id) {
         $apiLogin = "pRRXKOl8ikMmt9u";
         $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
         $merchant = [
@@ -421,8 +417,26 @@ class PayU {
         return $this->sendRequest($dataSent);
     }
 
-    public function sendRequest(array $data) {
+    public function handleTransactionResponse($response, User $user, Order $order) {
+        if ($response['code'] == "SUCCESS") {
+            if ($user) {
+                $transactionResponse = $response['transactionResponse'];
+                $transactionResponse['order_id'] = $order->id;
+                $transactionResponse['user_id'] = $user->id;
+                if (array_key_exists("extras", $transactionResponse)) {
+                    $extras = $transactionResponse['extras'];
+                    unset($transactionResponse['extras']);
+                    $transactionResponse['extras'] = json_encode($extras);
+                }
+                $transaction = Transaction::create($transactionResponse);
+                return ["status" => "success", "transaction" => $transaction, "response" => $response];
+            } else {
+                return $response;
+            }
+        }
+    }
 
+    public function sendRequest(array $data) {
 
 //        $client = new Client([
 //            // Base URI is used with relative requests
@@ -452,8 +466,34 @@ class PayU {
         );
         $response = curl_exec($curl);
         curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response));
-        return $response;
+        $response = json_decode(str_replace("\\", "", $response), true);
+        return  $response;
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function checkOrders() {
+        $transactions = Transaction::where("state", "pending")->get();
+        foreach ($transactions as $transaction) {
+            $response = $this->getStatusOrderId($transaction->orderId);
+            dd($response);
+            if ($response['code'] == "SUCCESS") {
+                $result = $response['result'];
+                $payload = $result['payload'];
+                if ($payload['state'] == "PENDING") {
+                    continue;
+                } else {
+                    Transaction::where('transactionId', $transaction->transactionId)
+                            ->update($payload);
+                    $transaction = Transaction::find($transaction->id);
+                    $this->editOrder->approveOrder($transaction->order_id);
+                }
+            }
+        }
     }
 
     /**

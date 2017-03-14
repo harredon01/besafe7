@@ -52,6 +52,7 @@ Route::post('pay/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('pay/pay_cash', 'PayuController@postPayCash');
 Route::post('pay/response', 'PayuController@postResponse');
 Route::get('pay/return', 'PayuController@getReturn');
+Route::get('pay/cron', 'PayuController@cronPayU');
 
 
 

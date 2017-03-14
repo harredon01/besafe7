@@ -136,7 +136,7 @@ class EditOrder {
     public function prepareOrder(User $user) {
         $order = $this->getOrder($user);
         $data = $this->getCheckoutCart();
-        //$order->status = "holding";
+        $order->status = "holding";
         $order->subtotal = $data["subtotal"];
         $order->tax = $data["tax"];
         $order->shipping = $data["shipping"];
@@ -158,6 +158,8 @@ class EditOrder {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
                 $orderAddresses = $theAddress->toarray();
+                $orderAddresses['address_id'] = $theAddress->id;
+                unset($orderAddresses['id']);
                 $orderAddresses['order_id'] = $order->id;
                 $orderAddresses['type'] = "shipping";
                 $order->orderAddresses()->where('type', "shipping")->delete();
@@ -181,6 +183,8 @@ class EditOrder {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
                 $orderAddresses = $theAddress->toarray();
+                $orderAddresses['address_id'] = $theAddress->id;
+                unset($orderAddresses['id']);
                 $orderAddresses['order_id'] = $order->id;
                 $orderAddresses['type'] = "billing";
                 $order->orderAddresses()->where('type', "billing")->delete();
@@ -215,6 +219,10 @@ class EditOrder {
             Cart::condition($condition);
             return array("status" => "success", "message" => "Shipping condition set on the cart");
         }
+        return array("status" => "error", "message" => "Address does not exist");
+    }
+    public function approveOrder($orderId) {
+
         return array("status" => "error", "message" => "Address does not exist");
     }
 

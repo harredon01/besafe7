@@ -478,20 +478,22 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            if ($sheet['id']) {
-                $code;
-                if ($sheet['facebook_id'] == "NULL") {
-                    $code = null;
-                } else {
-                    $code = $sheet['facebook_id'];
+            foreach ($sheet as $row) {
+                if ($row['id']) {
+                    $code;
+                    if ($row['facebook_id'] == "NULL") {
+                        $code = null;
+                    } else {
+                        $code = $sheet['facebook_id'];
+                    }
+                    $country = Country::updateOrCreate(['id' => $row['id']], [
+                                'id' => $row['id'],
+                                'name' => $row['name'],
+                                'area_code' => $row['area_code'],
+                                'code' => $row['code'],
+                                'facebook_id' => $code
+                    ]);
                 }
-                $country = Country::updateOrCreate(['id' => $sheet['id']], [
-                            'id' => $sheet['id'],
-                            'name' => $sheet['name'],
-                            'area_code' => $sheet['area_code'],
-                            'code' => $sheet['code'],
-                            'facebook_id' => $code
-                ]);
             }
         }
     }
@@ -749,10 +751,9 @@ class MerchantImport {
                 $coords["heading"] = $sheet["heading"];
                 $coords["altitude"] = $sheet["altitude"];
                 $dalast = false;
-                if($sheet["islast"]){
+                if ($sheet["islast"]) {
                     $extras["islast"] = $sheet["islast"];
                     $dalast = true;
-                    
                 } else {
                     unset($sheet["islast"]);
                 }
@@ -770,9 +771,9 @@ class MerchantImport {
                 $location["battery"] = $battery;
                 $data["location"] = $location;
                 dispatch(new PostLocation($user, $data));
-                if($dalast){
+                if ($dalast) {
                     sleep(1);
-                } 
+                }
             }
         }
     }
@@ -783,7 +784,7 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $sheet['follower'] = str_replace("|",",",$sheet['follower']);
+                $sheet['follower'] = str_replace("|", ",", $sheet['follower']);
                 dispatch(new AddFollower($user, $sheet));
             }
         }
@@ -796,7 +797,7 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $this->editMerchant->saveOrCreateReport($user, $sheet );
+                $this->editMerchant->saveOrCreateReport($user, $sheet);
             }
         }
     }

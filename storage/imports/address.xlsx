@@ -1,5 +1,5 @@
 id,firstName,lastName,address,type,postal,phone,lat,long,city_id,country_id,region_id,user_id
-15,Rodrigo,Arias,Carrera 1 este # 74 - 14,billing,57,3105507245,4.654419,-74.049405,524,1,11,1
-16,Hoov,Arre,Calle 73 # o - 39 este Apto 502,billing,57,3105507245,4.652879,-74.050242,524,1,11,2
-17,Seb,Jara,Cra 5 # 72-14,billing,57,3105507245,4.654462,-74.053375,524,1,11,3
-18,Cami,Sand,Cra 7 # 64-44,billing,57,3105507245,4.648751,-74.059104,524,1,11,4
+15,Rodrigo,Arias,Carrera 1 este # 74 - 14,billing,110221,3105507245,4.654419,-74.049405,524,1,11,1
+16,Hoov,Arre,Calle 73 # o - 39 este Apto 502,billing,110221,3105507245,4.652879,-74.050242,524,1,11,2
+17,Seb,Jara,Cra 5 # 72-14,billing,110221,3105507245,4.654462,-74.053375,524,1,11,3
+18,Cami,Sand,Cra 7 # 64-44,billing,110221,3105507245,4.648751,-74.059104,524,1,11,4

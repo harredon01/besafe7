@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\PayU;
+use App\Jobs\PayUCron;
 use Illuminate\Http\RedirectResponse;
 
 class PayuController extends Controller {
@@ -24,7 +25,7 @@ class PayuController extends Controller {
      */
     public function __construct( PayU $payU) {
         $this->payU = $payU;
-        $this->middleware('auth', ['except' => 'cartTest']);
+        $this->middleware('auth', ['except' => [ 'cartTest','cronPayU']]);
     }
 
     /**
@@ -99,6 +100,11 @@ class PayuController extends Controller {
     public function cartTest() {
         $status = $this->payU->ping();
         return response()->json($status);
+    }
+    
+    public function cronPayU(){
+        $this->payU->checkOrders();
+        //dispatch(new PayUCron());
     }
 
 }
