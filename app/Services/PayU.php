@@ -47,8 +47,8 @@ class PayU {
             $shippingCity = City::find($billing->city_id);
             $deviceSessionId = md5(session_id() . microtime());
             $accountId = "512321";
-            $apiLogin = "pRRXKOl8ikMmt9u";
-            $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+            $apiLogin = env('PAYU_LOGIN');
+            $apiKey = env('PAYU_KEY');
             $reference = "besafe_test_1_" . $order->id;
             $currency = "COP";
             $merchantId = "508029";
@@ -164,7 +164,7 @@ class PayU {
                 "test" => false,
             ];
 //        return $dataSent;
-            $result = $this->sendRequest($dataSent);
+            $result = $this->sendRequest($dataSent, false);
             return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
@@ -182,8 +182,8 @@ class PayU {
             $billingCity = City::find($billing->city_id);
             $deviceSessionId = md5(session_id() . microtime());
             $accountId = "512321";
-            $apiLogin = "pRRXKOl8ikMmt9u";
-            $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+            $apiLogin = env('PAYU_LOGIN');
+            $apiKey = env('PAYU_KEY');
             $reference = "besafe_test_1_" . $order->id;
             $currency = "COP";
             $merchantId = "508029";
@@ -248,7 +248,7 @@ class PayU {
                 "test" => false,
             ];
 
-            $result = $this->sendRequest($dataSent);
+            $result = $this->sendRequest($dataSent,false);
             return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
@@ -261,8 +261,8 @@ class PayU {
         }
         $order = $this->editOrder->prepareOrder($user);
         $accountId = "512321";
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $reference = "besafe_test_1_" . $order->id;
         $currency = "COP";
         $merchantId = "508029";
@@ -311,13 +311,13 @@ class PayU {
             "transaction" => $transaction,
             "test" => false,
         ];
-        $result = $this->sendRequest($dataSent);
+        $result = $this->sendRequest($dataSent,false);
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
     public function getBanks() {
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -334,12 +334,12 @@ class PayU {
             "bankListInformation" => $bankListInformation,
             "test" => false,
         ];
-        return $this->sendRequest($dataSent);
+        return $this->sendRequest($dataSent,false);
     }
 
     public function getPaymentMethods() {
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -351,12 +351,12 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent);
+        return $this->sendRequest($dataSent,false);
     }
 
     public function getStatusOrderId($order_id) {
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -372,12 +372,12 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent);
+        return $this->sendRequest($dataSent,true);
     }
 
     public function getStatusOrderRef($order_ref) {
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -393,12 +393,12 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent);
+        return $this->sendRequest($dataSent,true);
     }
 
     public function getStatusTransaction($transaction_id) {
-        $apiLogin = "pRRXKOl8ikMmt9u";
-        $apiKey = "4Vj8eK4rloUd272L48hsrarnUA";
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -414,7 +414,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent);
+        return $this->sendRequest($dataSent,false);
     }
 
     public function handleTransactionResponse($response, User $user, Order $order) {
@@ -436,7 +436,7 @@ class PayU {
         }
     }
 
-    public function sendRequest(array $data) {
+    public function sendRequest(array $data, $query) {
 
 //        $client = new Client([
 //            // Base URI is used with relative requests
@@ -454,8 +454,12 @@ class PayU {
 //        dd($r);
 //        return $r->getBody();
         //return $data;
-        $data_string = json_encode($data);
-        $curl = curl_init('https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi');
+	$data_string = json_encode($data);
+        if($query){
+            $curl = curl_init(env('PAYU_REPORTS'));
+	} else {
+            $curl = curl_init(env('PAYU_PAYMENTS'));
+	}
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
