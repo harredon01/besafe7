@@ -22,7 +22,10 @@ class ProductVariant extends Model {
         return $this->belongsTo('App\Models\Product');
     }
     public function items() {
-        return $this->hasMany('App\Models\Product');
+        return $this->hasMany('App\Models\Items');
+    }
+    public function plan() {
+        return $this->hasOne('App\Models\Plan');
     }
     public function conditions() {
         return $this->hasMany('App\Models\Condition');

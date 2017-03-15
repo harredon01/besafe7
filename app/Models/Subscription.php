@@ -18,7 +18,7 @@ class Subscription extends Model
      *
      * @var array
      */
-    protected $fillable = ['id','type', 'name','other','plan_id','plan','quantity','trial_ends_at','ends_at'];
+    protected $fillable = ['id','type','status', 'name','other','plan_id','plan','quantity','trial_ends_at','ends_at'];
 
 
     public function user() {
@@ -29,5 +29,8 @@ class Subscription extends Model
     }
     public function order() {
         return $this->belongsTo('App\Models\Order');
+    }
+    public function plan() {
+        return $this->belongsTo('App\Models\Plan');
     }
 }

@@ -25,7 +25,7 @@ class PayuController extends Controller {
      */
     public function __construct( PayU $payU) {
         $this->payU = $payU;
-        $this->middleware('auth', ['except' => [ 'cartTest','cronPayU']]);
+        $this->middleware('auth', ['except' => [ 'cartTest','cronPayU','webhookPayU','returnPayU']]);
     }
 
     /**
@@ -104,6 +104,14 @@ class PayuController extends Controller {
     
     public function cronPayU(){
         $this->payU->checkOrders();
+        //dispatch(new PayUCron());
+    }
+    public function webhookPayU(Request $request){
+        $this->payU->checkOrders($request->all());
+        //dispatch(new PayUCron());
+    }
+    public function returnPayU(Request $request){
+        $this->payU->webhookPayU($request->all());
         //dispatch(new PayUCron());
     }
 

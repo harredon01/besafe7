@@ -16,6 +16,7 @@ class CreateOrdersTable extends Migration {
 		{
 			$table->increments('id');
                         $table->string('status');
+                        $table->string('referenceCode');
                         $table->string('comments')->nullable();
                         $table->double('subtotal', 15, 2);
                         $table->double('tax', 15, 2);

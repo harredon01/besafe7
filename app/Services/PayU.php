@@ -50,6 +50,8 @@ class PayU {
             $apiLogin = env('PAYU_LOGIN');
             $apiKey = env('PAYU_KEY');
             $reference = "besafe_test_1_" . $order->id;
+            $order->referenceCode = $reference;
+            $order->save();
             $currency = "COP";
             $merchantId = "508029";
             $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
@@ -185,6 +187,8 @@ class PayU {
             $apiLogin = env('PAYU_LOGIN');
             $apiKey = env('PAYU_KEY');
             $reference = "besafe_test_1_" . $order->id;
+            $order->referenceCode = $reference;
+            $order->save();
             $currency = "COP";
             $merchantId = "508029";
             $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
@@ -248,7 +252,7 @@ class PayU {
                 "test" => false,
             ];
 
-            $result = $this->sendRequest($dataSent,false);
+            $result = $this->sendRequest($dataSent, false);
             return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
@@ -264,6 +268,8 @@ class PayU {
         $apiLogin = env('PAYU_LOGIN');
         $apiKey = env('PAYU_KEY');
         $reference = "besafe_test_1_" . $order->id;
+        $order->referenceCode = $reference;
+        $order->save();
         $currency = "COP";
         $merchantId = "508029";
         $date = date_create();
@@ -311,7 +317,7 @@ class PayU {
             "transaction" => $transaction,
             "test" => false,
         ];
-        $result = $this->sendRequest($dataSent,false);
+        $result = $this->sendRequest($dataSent, false);
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
@@ -334,7 +340,7 @@ class PayU {
             "bankListInformation" => $bankListInformation,
             "test" => false,
         ];
-        return $this->sendRequest($dataSent,false);
+        return $this->sendRequest($dataSent, false);
     }
 
     public function getPaymentMethods() {
@@ -351,7 +357,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent,false);
+        return $this->sendRequest($dataSent, false);
     }
 
     public function getStatusOrderId($order_id) {
@@ -372,7 +378,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent,true);
+        return $this->sendRequest($dataSent, true);
     }
 
     public function getStatusOrderRef($order_ref) {
@@ -393,7 +399,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent,true);
+        return $this->sendRequest($dataSent, true);
     }
 
     public function getStatusTransaction($transaction_id) {
@@ -414,7 +420,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent,false);
+        return $this->sendRequest($dataSent, false);
     }
 
     public function handleTransactionResponse($response, User $user, Order $order) {
@@ -422,7 +428,9 @@ class PayU {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionResponse['order_id'] = $order->id;
+                $transactionResponse['referenceCode'] = $order->referenceCode;
                 $transactionResponse['user_id'] = $user->id;
+                $transactionResponse['gateway'] = 'payu';
                 if (array_key_exists("extras", $transactionResponse)) {
                     $extras = $transactionResponse['extras'];
                     unset($transactionResponse['extras']);
@@ -454,12 +462,12 @@ class PayU {
 //        dd($r);
 //        return $r->getBody();
         //return $data;
-	$data_string = json_encode($data);
-        if($query){
+        $data_string = json_encode($data);
+        if ($query) {
             $curl = curl_init(env('PAYU_REPORTS'));
-	} else {
+        } else {
             $curl = curl_init(env('PAYU_PAYMENTS'));
-	}
+        }
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -471,7 +479,7 @@ class PayU {
         $response = curl_exec($curl);
         curl_close($curl);
         $response = json_decode(str_replace("\\", "", $response), true);
-        return  $response;
+        return $response;
     }
 
     /**
@@ -497,6 +505,110 @@ class PayU {
                     $this->editOrder->approveOrder($transaction->order_id);
                 }
             }
+        }
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function webhookPayU(array $data) {
+        $ApiKey = env('PAYU_KEY');
+        $merchant_id = $data['merchantId'];
+        $referenceCode = $data['referenceCode'];
+        $TX_VALUE = $data['TX_VALUE'];
+        $New_value = number_format($TX_VALUE, 1, '.', '');
+        $currency = $data['currency'];
+        $transactionState = $data['transactionState'];
+        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
+        $firmacreada = md5($firma_cadena);
+        $firma = $data['signature'];
+        $transactionId = $data['transactionId'];
+        if (strtoupper($firma) == strtoupper($firmacreada)) {
+            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
+            if ($transaction) {
+                $transaction->currency = $data['currency'];
+                $transaction->state = $data['transactionState'];
+                $transaction->description = $data['description'];
+                $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
+                $transaction->trazabilityCode = $data['cus'];
+                $transaction->transactionDate = $data['processingDate'];
+                $transaction->authorizationCode = $data['authorizationCode'];
+                $transaction->extras = json_encode($data);
+                $order = $transaction->order;
+                if ($data['transactionState'] == 4) {
+                    $this->editOrder->approveOrder($order);
+                    $transaction->description = "Transacción aprobada";
+                } else if ($data['transactionState'] == 6) {
+                    $this->editOrder->rejectOrder($order);
+                    $transaction->description = "Transacción rechazada";
+                } else if ($data['transactionState'] == 104) {
+                    $this->editOrder->errorOrder($order);
+                    $transaction->description = "Error";
+                } else if ($data['transactionState'] == 7) {
+                    $transaction->description = "Transacción pendiente";
+                } else {
+                    $transaction->description = $data['mensaje'];
+                }
+                $transaction->save();
+                return ["status"=>"success", "message" => "transaction processed"];
+            }
+        } else {
+            
+        }
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function returnPayu(array $data) {
+        $ApiKey = env('PAYU_KEY');
+        $merchant_id = $data['merchantId'];
+        $referenceCode = $data['referenceCode'];
+        $TX_VALUE = $data['TX_VALUE'];
+        $New_value = number_format($TX_VALUE, 1, '.', '');
+        $currency = $data['currency'];
+        $transactionState = $data['transactionState'];
+        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
+        $firmacreada = md5($firma_cadena);
+        $firma = $data['signature'];
+        $transactionId = $data['transactionId'];
+        if (strtoupper($firma) == strtoupper($firmacreada)) {
+            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
+            if ($transaction) {
+                $transaction->currency = $data['currency'];
+                $transaction->state = $data['transactionState'];
+                $transaction->description = $data['description'];
+                $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
+                $transaction->trazabilityCode = $data['cus'];
+                $transaction->transactionDate = $data['processingDate'];
+                $transaction->authorizationCode = $data['authorizationCode'];
+                $transaction->extras = json_encode($data);
+                $order = $transaction->order;
+                if ($data['transactionState'] == 4) {
+                    $this->editOrder->approveOrder($order);
+                    $transaction->description = "Transacción aprobada";
+                } else if ($data['transactionState'] == 6) {
+                    $this->editOrder->rejectOrder($order);
+                    $transaction->description = "Transacción rechazada";
+                } else if ($data['transactionState'] == 104) {
+                    $this->editOrder->errorOrder($order);
+                    $transaction->description = "Error";
+                } else if ($data['transactionState'] == 7) {
+                    $transaction->description = "Transacción pendiente";
+                } else {
+                    $transaction->description = $data['mensaje'];
+                }
+                $transaction->save();
+                return ["order"=>$order, "transaction" => $transaction];
+            }
+        } else {
+            
         }
     }
 

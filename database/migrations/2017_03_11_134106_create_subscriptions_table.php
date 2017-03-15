@@ -18,6 +18,7 @@ class CreateSubscriptionsTable extends Migration {
             $table->integer('group_id');
             $table->integer('order_id');
             $table->string('type');
+            $table->string('status');
             $table->string('name');
             $table->text('other');
             $table->string('plan_id');

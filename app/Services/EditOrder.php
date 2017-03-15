@@ -221,8 +221,15 @@ class EditOrder {
         }
         return array("status" => "error", "message" => "Address does not exist");
     }
-    public function approveOrder($orderId) {
-
+    public function approveOrder(Order $order) {
+        $subscriptions = $order->subscriptions();
+        foreach($subscriptions as $subscription){
+            $plan = $subscription->plan();
+            $subscription->status = "active";
+            $subscription->ends_at = date_add($subscription->ends_at,date_interval_create_from_date_string($plan->amount." ".$plan->interval));
+            $subscription->save();
+            $this->emailCustomer($order); 
+        }
         return array("status" => "error", "message" => "Address does not exist");
     }
 

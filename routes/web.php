@@ -50,8 +50,8 @@ Route::get('pay/payment_methods', 'PayuController@getPaymentMethods');
 Route::post('pay/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('pay/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('pay/pay_cash', 'PayuController@postPayCash');
-Route::post('pay/response', 'PayuController@postResponse');
-Route::get('pay/return', 'PayuController@getReturn');
+Route::post('pay/response', 'PayuController@webhookPayU');
+Route::get('pay/return', 'PayuController@returnPayU');
 Route::get('pay/cron', 'PayuController@cronPayU');
 
 

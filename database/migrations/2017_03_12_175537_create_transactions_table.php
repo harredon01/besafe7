@@ -16,6 +16,10 @@ class CreateTransactionsTable extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('orderId')->nullable();
+            $table->string('description')->nullable();
+            $table->string('currency')->nullable();
+            $table->string('gateway')->nullable();
+            $table->string('referenceCode')->nullable();
             $table->string('transactionId')->nullable();
             $table->string('state')->nullable();
             $table->integer('order_id')->unsigned()->nullable();
