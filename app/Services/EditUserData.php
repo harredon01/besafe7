@@ -331,7 +331,7 @@ class EditUserData {
             "subject" => "Nuevo contacto " . $user->name,
             "user_status" => $this->editAlerts->getUserNotifStatus($user)
         ];
-        $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user);
+        $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
         DB::table('contacts')->insert($imports);
         $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
         return array("status" => "success", "message" => "contacts imported", "last_id" => $lastId);
@@ -507,7 +507,7 @@ class EditUserData {
                 "user_status" => $this->editAlerts->getUserNotifStatus($user)
             ];
             $recipients = array($contact);
-            $this->editAlerts->sendMassMessage($notification, $recipients, $user);
+            $this->editAlerts->sendMassMessage($notification, $recipients, $user, true);
             return $contact;
         }
         return array("status" => "error", "message" => "Contact not found");

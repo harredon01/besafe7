@@ -54,10 +54,10 @@ class EditGroup {
             $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ?', [$user->id, $group_id]);
             $this->editAlerts->deleteGroupNotifs($user, $group_id);
             if ($deleted > 0) {
-                if($group->is_public){
+                if (!$group->is_public) {
                     dispatch(new NotifyGroup($user, $group, $admin, 'group_leave'));
                 }
-                
+
                 return ['status' => 'success', "message" => 'Group deleted'];
             } else {
                 return ['status' => 'error', "message" => 'Group not deleted'];
@@ -95,6 +95,13 @@ class EditGroup {
         $group = Group::find(intval($data["group_id"]));
 
         if ($group) {
+            if ($group->is_public && $group->isActive()) {
+                
+            } else if (!$group->is_public) {
+                
+            } else {
+                return null;
+            }
             $members = array();
             if ($isNew) {
                 $i = 0;
@@ -137,7 +144,7 @@ class EditGroup {
                     "subject" => "Nuevo grupo " . $group->name,
                     "user_status" => $this->editAlerts->getUserNotifStatus($user)
                 ];
-                $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user);
+                $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
                 $i++;
                 if ($isNew) {
                     $invite = array();
@@ -148,18 +155,20 @@ class EditGroup {
                     $invite['updated_at'] = date("Y-m-d H:i:s");
                     array_push($invites, $invite);
                 } else {
-                    $payload = array(
-                        "contacts" => $notifs
-                    );
-                    $notification = [
-                        "trigger_id" => $group->id,
-                        "message" => "Nuevos usuarios al grupo: " . $group->name,
-                        "payload" => $payload,
-                        "type" => "group_invite",
-                        "subject" => "Nuevos usuarios al grupo: " . $group->name,
-                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
-                    ];
-                    $this->editAlerts->sendMassMessage($notification, $members, $user);
+                    if(!$group->is_public) {
+                        $payload = array(
+                            "contacts" => $notifs
+                        );
+                        $notification = [
+                            "trigger_id" => $group->id,
+                            "message" => "Nuevos usuarios al grupo: " . $group->name,
+                            "payload" => $payload,
+                            "type" => "group_invite",
+                            "subject" => "Nuevos usuarios al grupo: " . $group->name,
+                            "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                        ];
+                        $this->editAlerts->sendMassMessage($notification, $members, $user, true);
+                    }
                 }
                 DB::table('group_user')->insert(
                         $invites

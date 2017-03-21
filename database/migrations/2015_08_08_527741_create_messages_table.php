@@ -21,6 +21,7 @@ class CreateMessagesTable extends Migration {
                         $table->integer('user_id')->unsigned();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
+                        $table->boolean('is_public')->default(false);
                         $table->integer('messageable_id')->unsigned()->nullable();
                         $table->index('messageable_id');
                         $table->string('priority');

@@ -73,8 +73,27 @@ class EditAlerts {
      */
     public function getChat(User $user, array $data) {
         if ($data['type'] == self::GROUP_TYPE) {
-            $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" AND  ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
-            return array_reverse($messages);
+            $group = Group::find($data['to_id']);
+            if ($group) {
+                if ($group->is_public && $group->isActive()) {
+                    $recipients = DB::select("select 
+                        user_id as id
+                            from
+                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 ;");
+                    if (count($recipients) > 0) {
+                        $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" AND ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
+                        return array_reverse($messages);
+                    } else {
+                        $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" AND is_public = 1 AND ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
+                        return array_reverse($messages);
+                    }
+                } else if (!$group->is_public) {
+                    $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" AND  ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
+                    return array_reverse($messages);
+                } else {
+                    return null;
+                }
+            }
         } elseif ($data['type'] == self::USER_TYPE) {
             $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
             return array_reverse($messages);
@@ -135,7 +154,14 @@ class EditAlerts {
 
                 $object_id = $user->trip;
                 if ($type == self::GROUP_LOCATION_TYPE) {
-                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                    $group = Group::find($data["follower"]);
+                    if ($group->is_public && $group->isActive()) {
+                        $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                    } else if (!$group->is_public) {
+                        $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                    } else {
+                        return null;
+                    }
                 } else if ($type == self::USER_LOCATION_TYPE) {
                     $numbers = explode(",", $data["follower"]);
                     $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
@@ -158,7 +184,7 @@ class EditAlerts {
                     "subject" => $subject,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $this->sendMassMessage($data, $followers, $user);
+                $this->sendMassMessage($data, $followers, $user, true);
             } else if ($object == self::OBJECT_REPORT) {
 
                 if (array_key_exists("report_id", $data)) {
@@ -229,10 +255,10 @@ class EditAlerts {
             "subject" => $subject,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        return $this->sendMassMessage($data, $followers, $user);
+        return $this->sendMassMessage($data, $followers, $user, true);
     }
 
-    public function sendMassMessage(array $data, array $recipients, User $userSending) {
+    public function sendMassMessage(array $data, array $recipients, User $userSending, $push) {
         $arrayPushAndroid = array();
         $arrayPushIos = array();
         $arrayEmail = array();
@@ -263,7 +289,7 @@ class EditAlerts {
                         array_push($arrayEmail, array("name" => $user->name, "email" => $user->email));
                     }
 
-                    if ($user->pushNotifications) {
+                    if ($user->pushNotifications && $push) {
 
                         if ($user->platform == "android") {
                             array_push($arrayPushAndroid, $user->token);
@@ -300,7 +326,7 @@ class EditAlerts {
             "subject" => "Ping!",
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        return $this->sendMassMessage($data, $followers, $user);
+        return $this->sendMassMessage($data, $followers, $user, true);
     }
 
     public function replyPing(User $user, array $data) {
@@ -324,7 +350,7 @@ class EditAlerts {
                             "subject" => "Ping.",
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
-                        return $this->sendMassMessage($data, $followers, $user);
+                        return $this->sendMassMessage($data, $followers, $user, true);
                     } else if ($reply['status'] == "info") {
                         $followers = array($pingingUser);
                         $data = [
@@ -335,7 +361,7 @@ class EditAlerts {
                             "subject" => "Ping!!",
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
-                        return $this->sendMassMessage($data, $followers, $user);
+                        return $this->sendMassMessage($data, $followers, $user, true);
                     } else if ($reply['status'] == "alert") {
                         
                     }
@@ -403,7 +429,7 @@ class EditAlerts {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    $this->sendMassMessage($notification, $recipients, null);
+                    $this->sendMassMessage($notification, $recipients, null, false);
                     $activeuser = $follower->user_id;
                     $stop = array();
                     $stop[] = [
@@ -421,7 +447,7 @@ class EditAlerts {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    $this->sendMassMessage($notification, $recipients, null);
+                    $this->sendMassMessage($notification, $recipients, null, false);
                 }
             }
         }
@@ -435,7 +461,7 @@ class EditAlerts {
             "subject" => "Tu viaje ha terminado por limite de tiempo. ",
             "user_status" => "normal"
         ];
-        $this->sendMassMessage($notification, $tracking, null);
+        $this->sendMassMessage($notification, $tracking, null, false);
         return ['success' => 'followers notified'];
     }
 
@@ -450,7 +476,7 @@ class EditAlerts {
             "payload" => $dareport,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        $this->sendMassMessage($notification, $followers, $user);
+        $this->sendMassMessage($notification, $followers, $user, true);
         return ['success' => 'followers notified'];
     }
 
@@ -537,7 +563,16 @@ class EditAlerts {
                         user_id as id
                     from
                         group_user where group_id = $group->id  ;");
-        $this->sendMassMessage($data, $followers, $user);
+        if ($group->is_public && $group->isActive()) {
+            if ($type == self::GROUP_AVATAR) {
+                $this->sendMassMessage($data, $followers, $user, false);
+            }
+        } else if (!$group->is_public) {
+            $this->sendMassMessage($data, $followers, $user, true);
+        } else {
+            return null;
+        }
+
 
         return ['success' => 'members notified'];
     }
@@ -558,7 +593,7 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        return $this->sendMassMessage($data, $followers, $user);
+        return $this->sendMassMessage($data, $followers, $user, true);
     }
 
     /**
@@ -647,25 +682,55 @@ class EditAlerts {
                 $confirm['id'] = $message->id;
                 $confirm['created_at'] = $message->created_at;
                 $confirm['updated_at'] = $message->updated_at;
-                $confirm['result'] = $this->sendMassMessage($data, $recipients, $user);
+                $confirm['result'] = $this->sendMassMessage($data, $recipients, $user, true);
                 return $confirm;
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             $subject = "Mensaje de " . $user->firstName . " " . $user->lastName . " recibido en " . $group->name;
             if ($group) {
+
+                $public = false;
+                if ($group->is_public && $group->isActive()) {
+                    $recipients = DB::select("select 
+                        user_id as id
+                            from
+                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 ;");
+                    if (count($recipients) > 0) {
+                        $followers = DB::select("select 
+                        user_id as id
+                            from
+                            group_user where group_id = $group->id  ;");
+                        $public = true;
+                    } else {
+                        $followers = DB::select("select 
+                        user_id as id
+                            from
+                            group_user where group_id = $group->id and is_admin = 1 ;");
+                    }
+                } else if (!$group->is_public) {
+                    $followers = DB::select("select 
+                        user_id as id
+                            from
+                            group_user where group_id = $group->id  ;");
+                    $public = false;
+                } else {
+                    return null;
+                }
                 $message = Message::create([
                             "status" => 'unread',
                             "message" => $data['message'],
                             self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
                             self::MESSAGE_AUTHOR_ID => $user->id,
                             self::MESSAGE_RECIPIENT_ID => $group->id,
+                            'is_public' => $public,
                 ]);
                 $dauser = array();
                 $dauser['firstname'] = $user->firstName;
                 $dauser['lastname'] = $user->lastName;
                 $dauser['from_user'] = $user->id;
                 $dauser['message_id'] = $message->id;
+                $dauser['public'] = $public;
                 $data = [
                     "trigger_id" => $group->id,
                     "message" => $data['message'],
@@ -674,11 +739,7 @@ class EditAlerts {
                     "subject" => $subject,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $followers = DB::select("select 
-                        user_id as id
-                    from
-                        group_user where group_id = $group->id  ;");
-                $this->sendMassMessage($data, $followers, $user);
+                $this->sendMassMessage($data, $followers, $user, true);
                 return $message;
             }
         }
@@ -726,7 +787,7 @@ class EditAlerts {
                 }
             }
         }
-        $this->sendMassMessage($data, $followersPush, $user);
+        $this->sendMassMessage($data, $followersPush, $user, true);
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
         }
@@ -740,7 +801,7 @@ class EditAlerts {
                 "subject" => "message from besafe",
                 "user_status" => $this->getUserNotifStatus($user)
             ];
-            $this->sendMassMessage($data, $recipient, $user);
+            $this->sendMassMessage($data, $recipient, $user, true);
         }
 
         return ['success' => 'Message sent to all contacts'];
@@ -825,7 +886,7 @@ class EditAlerts {
             "subject" => $subject,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        $this->sendMassMessage($data, $followers, $user);
+        $this->sendMassMessage($data, $followers, $user, true);
         if ($user->green == $code['code']) {
             return array("status" => "success", "message" => "Emergency Ended");
         } else if ($user->red == $code['code']) {

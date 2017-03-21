@@ -16,7 +16,7 @@ class Message extends Model {
      *
      * @var array
      */
-    protected $fillable = ['message','messageable_type','user_id','priority','status','messageable_id'];
+    protected $fillable = ['message','messageable_type','user_id','priority','status','messageable_id','is_public'];
     
     public function messageable()
     {

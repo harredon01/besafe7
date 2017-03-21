@@ -29,8 +29,10 @@ class CreateUsersTable extends Migration {
             $table->index('cellphone');
             $table->string('area_code');
             $table->index('area_code');
+            $table->string('stripe_id')->nullable();
             $table->string('card_brand')->nullable();
             $table->string('card_last_four')->nullable();
+            $table->timestamp('trial_ends_at')->nullable();
             $table->string('hash')->nullable();
             $table->integer('trip')->unsigned()->nullable();
             $table->index('trip');

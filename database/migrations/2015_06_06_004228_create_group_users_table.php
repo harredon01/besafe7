@@ -19,6 +19,7 @@ class CreateGroupUsersTable extends Migration {
                         $table->integer('user_id')->unsigned();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
+                        $table->boolean('is_admin')->default(false);
                         $table->integer('group_id')->unsigned();
                         $table->foreign('group_id')->references('id')
                                 ->on('groups');

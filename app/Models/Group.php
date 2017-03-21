@@ -1,5 +1,5 @@
 <?php namespace App\Models;
-
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model {
@@ -16,7 +16,7 @@ class Group extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','status','avatar','code', 'admin_id','is_private'];
+    protected $fillable = ['name','status','avatar','code', 'admin_id','is_public','ends_at'];
 
     public function users() {
         return $this->belongsToMany('App\Models\User')->withPivot('color')->withTimestamps();
@@ -26,5 +26,9 @@ class Group extends Model {
     }
     public function messages() {
         return $this->morphMany('App\Models\Message','messageable');
+    }
+    public function isActive()
+    {
+        return $this->ends_at && Carbon::now()->lt($this->ends_at);
     }
 }

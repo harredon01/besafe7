@@ -24,6 +24,6 @@ class Plan extends Model
         return $this->belongsTo('App\Models\ProductVariant');
     }
     public function subscription() {
-        return $this->hasOne('App\Models\Subscription');
+        return $this->hasMany('App\Models\Subscription');
     }
 }

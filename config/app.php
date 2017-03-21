@@ -171,7 +171,7 @@ return [
 	Laravel\Passport\PassportServiceProvider::class,
         Barryvdh\Cors\ServiceProvider::class,
         Laravel\Scout\ScoutServiceProvider::class,
-
+        Laravel\Cashier\CashierServiceProvider::class,
 	/*
          * Package Service Providers...
          */
@@ -186,7 +186,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        
     ],
 
     /*
