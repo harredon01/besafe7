@@ -10,6 +10,11 @@ class LocationQueryBuilder extends QueryBuilder
            ->where('userables.user_id', '=', $id)
            ->where('userable_type', '=', "Location");
    }
+   public function filterByGroupId($query, $id) 
+   {
+      return $query->join('group_user', 'locations.user_id', '=', 'group_user.user_id')
+           ->where('group_user.group_id', '=', $id);
+   }
    public function filterByHashId($query, $id)
    {
       return $query->join('locations', 'locations.user_id', '=', 'users.id')

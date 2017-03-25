@@ -47,7 +47,7 @@ class LocationController extends Controller {
      */
     public function __construct(Guard $auth, EditLocation $editLocation, CleanSearch $cleanSearch) {
         $this->editLocation = $editLocation;
-        $this->cleanSearch = $cleanSearch;
+        $this->cleanSearch = $cleanSearch; 
         $this->auth = $auth;
         $this->middleware('auth:api', ['except' => ['moveHistoricLocations', 'moveOldLocations','getCountries2']]);
     }

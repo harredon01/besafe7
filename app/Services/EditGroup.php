@@ -97,11 +97,15 @@ class EditGroup {
         if ($group) {
             if ($group->is_public && $group->isActive()) {
                 
-            } else if (!$group->is_public) {
+            } else if (!$group->is_public) { 
                 
             } else {
                 return null;
             }
+            $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? and is_admin = 1 ', [$user->id, $group->id]);
+            if(sizeof($members) == 0){
+                return null;
+            } 
             $members = array();
             if ($isNew) {
                 $i = 0;
