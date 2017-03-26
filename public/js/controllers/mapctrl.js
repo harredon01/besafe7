@@ -7,7 +7,7 @@ angular.module('besafe')
             $rootScope.activeMarker = null;
             $rootScope.markers = [];
             $rootScope.mapLoaded = false;
-            var url = window.location.href
+            var url = window.location.href;
             var res = url.split("/map/");
             console.log("url");
             console.log(JSON.stringify(res));

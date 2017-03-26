@@ -70,56 +70,5 @@ class MapExternalController extends Controller {
         $report = $this->editMerchant->getReportByHash($code);
         return view('report')->with('report', $report['report'])->with('images', $report['files']);
     }
-    
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function getLocations(Request $request) {
-        $request2 = $this->cleanSearch->handleLocation($request);
-        if ($request2) {
-            if($request2->only("hash_id")){
-                $queryBuilder = new LocationQueryBuilder(new User, $request2);
-            } else {
-                $queryBuilder = new LocationQueryBuilder(new Userable, $request2);
-            }
-            $result = $queryBuilder->build()->paginate();
-            return response()->json([
-                        'data' => $result->items(),
-                        "total" => $result->total(),
-                        "per_page" => $result->perPage(),
-                        "page" => $result->currentPage(),
-                        "last_page" => $result->lastPage(),
-            ]);
-        }
-        return response()->json([
-                    'status' => "error",
-                    'message' => "no user id parameter allowed"
-                        ], 401);
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function getReports(Request $request) {
-        $request2 = $this->cleanSearch->handleReport($request);
-        if ($request2) {
-            $queryBuilder = new ReportQueryBuilder(new Report, $request2);
-            $result = $queryBuilder->build()->paginate();
-            return response()->json([
-                        'data' => $result->items(),
-                        "total" => $result->total(),
-                        "per_page" => $result->perPage(),
-                        "page" => $result->currentPage(),
-                        "last_page" => $result->lastPage(),
-            ]);
-        }
-        return response()->json([
-                    'status' => "error",
-                    'message' => "illegal parameter"
-                        ], 401);
-    }
 
 }

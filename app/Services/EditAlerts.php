@@ -175,16 +175,16 @@ class EditAlerts {
                     $user->save();
                 }
                 $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
+                $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
                 $data = [
                     "trigger_id" => $user->id,
                     "message" => "",
                     "payload" => $payload,
-                    "type" => self::LOCATION_FIRST,
+                    "type" => self::NOTIFICATION_LOCATION,
                     "subject" => $subject,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $this->sendMassMessage($data, $followers, $user, true);
+                $this->sendMassMessage($data, $followers, $user, false);
             } else if ($object == self::OBJECT_REPORT) {
 
                 if (array_key_exists("report_id", $data)) {

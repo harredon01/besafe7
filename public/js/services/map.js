@@ -216,7 +216,7 @@ angular.module('besafe')
 
             };
             var getServerLocations = function (where, hash) {
-                LocationService.locations(where).then(function (data) {
+                LocationService.shared(where).then(function (data) {
                     if (data.total == 0) {
                         $rootScope.isActive = false;
                         alert("User has no active locations");

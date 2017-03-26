@@ -155,6 +155,7 @@ class EditGroup {
                     $invite['group_id'] = $group->id;
                     $invite['user_id'] = $user->id;
                     $invite['color'] = $i;
+                    $invite['is_admin'] = true;
                     $invite['created_at'] = date("Y-m-d H:i:s");
                     $invite['updated_at'] = date("Y-m-d H:i:s");
                     array_push($invites, $invite);

@@ -61,5 +61,3 @@ Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
-Route::get('safereportsext', 'MapExternalController@getReports');
-Route::get('locationsext', 'MapExternalController@getLocations');

@@ -25,10 +25,12 @@
         <script src="{{ asset('/js/constants.js')}}"></script>
         <script src="{{ asset('/js/controllers/userctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/mapctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/mapdashctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
+        <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
         <script src="{{ asset('/js/services/location.js')}}"></script>
         <script src="{{ asset('/js/services/products.js')}}"></script>

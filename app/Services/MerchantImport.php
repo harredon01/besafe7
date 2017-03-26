@@ -732,13 +732,15 @@ class MerchantImport {
         }
     }
 
-    public function importLocations($filename) {
+    public function importLocations($filename,$userId) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
+        
         foreach ($reader as $sheet) {
-            $user = User::find($sheet['user_id']);
+            $user = User::find($userId);
             if ($user) {
+                unset($sheet["user_id"]);
                 $coords = array();
                 $location = array();
                 $extras = array();
@@ -811,6 +813,10 @@ class MerchantImport {
             if ($user) {
                 dispatch(new AddContact($user, $sheet['contact_id']));
             }
+            $contact = User::find($sheet['contact_id']);
+            if($contact){
+                dispatch(new AddContact($contact, $sheet['user_id']));
+            }
         }
     }
 
@@ -821,7 +827,52 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
+                unset($sheet['user_id']);
+                $contacts = explode(",", $sheet['contacts']);
+                $sheet['contacts'] = $contacts;
                 $this->editGroup->saveOrCreateGroup($sheet, $user);
+            }
+        }
+    }
+    public function inviteGroups($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                unset($sheet['user_id']);
+                $contacts = explode(",", $sheet['contacts']);
+                $sheet['contacts'] = $contacts;
+                dispatch(new InviteUsers($user, $sheet, false));
+            }
+        }
+    }
+    public function shareLocationGroup($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                unset($sheet['user_id']);
+                $sheet['type'] = 'group';
+                $sheet['object'] = 'Location';
+                $sheet['follower'] = $sheet['group_id'];
+                unset($sheet['group_id']);
+                dispatch(new AddFollower($user, $sheet));
+            }
+        }
+    }
+    public function sendMessageGroup($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $user = User::find($sheet['user_id']);
+            if ($user) {
+                unset($sheet['user_id']);
+                dispatch(new InviteUsers($user, $sheet, false));
             }
         }
     }

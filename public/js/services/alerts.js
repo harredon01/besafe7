@@ -70,11 +70,6 @@ angular.module('starter')
                 });
                 Contacts.clearData(message.trigger_id);
                 showEmergency(message);
-                MapService.getLastLocation(message.trigger_id).then(function (data) {
-                    getTrip(message.trigger_id, data.trip);
-                },
-                        function (data) {
-                        });
             };
 
             var followNotification = function (notification, contact_id) {
