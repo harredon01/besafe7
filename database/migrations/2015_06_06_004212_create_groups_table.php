@@ -18,7 +18,7 @@ class CreateGroupsTable extends Migration {
                         $table->string('name');
                         $table->string('code')->nullable();
                         $table->string('status');
-                        $table->string('type');
+                        $table->string('type')->nullable();
                         $table->string('avatar')->nullable();
                         $table->timestamp('ends_at')->nullable();
                         $table->boolean('is_public')->default(false);

@@ -9,6 +9,8 @@ use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
 use App\Jobs\PostLocation;
+use App\Jobs\InviteUsers;
+use App\Jobs\PostMessage;
 use App\Jobs\AddFollower;
 use App\Jobs\AddContact;
 use App\Models\Attribute;
@@ -860,7 +862,8 @@ class MerchantImport {
                 $sheet['object'] = 'Location';
                 $sheet['follower'] = $sheet['group_id'];
                 unset($sheet['group_id']);
-                dispatch(new AddFollower($user, $sheet));
+                $this->editAlerts->addFollower($sheet, $user);
+                //dispatch(new AddFollower($user, $sheet));
             }
         }
     }
@@ -872,7 +875,8 @@ class MerchantImport {
             $user = User::find($sheet['user_id']);
             if ($user) {
                 unset($sheet['user_id']);
-                dispatch(new InviteUsers($user, $sheet, false));
+                $this->editAlerts->postMessage($user, $sheet);
+                //dispatch(new PostMessage($user, $sheet));
             }
         }
     }

@@ -93,19 +93,19 @@ class EditGroup {
         $invites = array();
         $notifs = array();
         $group = Group::find(intval($data["group_id"]));
-
+        
         if ($group) {
             if ($group->is_public && $group->isActive()) {
                 
-            } else if (!$group->is_public) { 
+            } else if (!$group->is_public) {
                 
             } else {
                 return null;
             }
-            $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? and is_admin = 1 ', [$user->id, $group->id]);
-            if(sizeof($members) == 0){
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 ', [$user->id, $group->id]);
+            if (sizeof($members) == 0) {
                 return null;
-            } 
+            }
             $members = array();
             if ($isNew) {
                 $i = 0;
@@ -151,16 +151,9 @@ class EditGroup {
                 $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
                 $i++;
                 if ($isNew) {
-                    $invite = array();
-                    $invite['group_id'] = $group->id;
-                    $invite['user_id'] = $user->id;
-                    $invite['color'] = $i;
-                    $invite['is_admin'] = true;
-                    $invite['created_at'] = date("Y-m-d H:i:s");
-                    $invite['updated_at'] = date("Y-m-d H:i:s");
-                    array_push($invites, $invite);
+
                 } else {
-                    if(!$group->is_public) {
+                    if (!$group->is_public) {
                         $payload = array(
                             "contacts" => $notifs
                         );
@@ -207,13 +200,30 @@ class EditGroup {
             return ['status' => 'error', "message" => 'Group not found'];
         } else {
             $invites = array();
+            $admin = array();
             $data["admin_id"] = $user->id;
             $data["status"] = "active";
             $data["avatar"] = "default";
+            $invites = $data['contacts'];
+            unset($data['contacts']);
+            unset($data[""]);
             $group = Group::create($data);
+            $invite = array();
+            $invite['group_id'] = $group->id;
+            $invite['user_id'] = $user->id;
+            $invite['color'] = 1;
+            $invite['is_admin'] = true;
+            $invite['created_at'] = date("Y-m-d H:i:s");
+            $invite['updated_at'] = date("Y-m-d H:i:s");
+            array_push($admin, $invite);
+            DB::table('group_user')->insert(
+                        $admin
+                );
             $i = 0;
+            $data['contacts'] = $invites;
             $data["group_id"] = $group->id;
-            dispatch(new InviteUsers($user, $data, true));
+            //dispatch(new InviteUsers($user, $data, true));
+            $this->inviteUsers($user, $data, true); 
             return $group;
         }
         return ['success' => 'Group saved', "group" => $group];

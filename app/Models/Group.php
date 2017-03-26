@@ -10,6 +10,11 @@ class Group extends Model {
      * @var string
      */
     protected $table = 'groups';
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at'
+    ];
 
     /**
      * The attributes that are mass assignable.

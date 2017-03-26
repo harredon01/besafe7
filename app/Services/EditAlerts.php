@@ -155,10 +155,19 @@ class EditAlerts {
                 $object_id = $user->trip;
                 if ($type == self::GROUP_LOCATION_TYPE) {
                     $group = Group::find($data["follower"]);
-                    if ($group->is_public && $group->isActive()) {
-                        $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
-                    } else if (!$group->is_public) {
-                        $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                    if ($group) {
+                        $res = $group->users()->where('user_id', $user->id)->get();
+                        if (count($res)) {
+                            if ($group->is_public && $group->isActive()) {
+                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                            } else if (!$group->is_public) {
+                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                            } else {
+                                return null;
+                            }
+                        } else {
+                            return null;
+                        }
                     } else {
                         return null;
                     }
@@ -263,6 +272,7 @@ class EditAlerts {
         $arrayPushIos = array();
         $arrayEmail = array();
         $arrayContent = array();
+        $notification = null;
         $arrayPayload = $data['payload'];
         $data['notification_id'] = time();
         $data['status'] = "unread";
@@ -300,16 +310,18 @@ class EditAlerts {
                     }
                 }
             }
-            $data['payload'] = $arrayPayload;
-            $data['created_at'] = $notification->created_at;
-            $data['updated_at'] = $notification->created_at;
-            $data['msg'] = $data['message'];
-            $data['name'] = $userSending->firstName . " " . $userSending->lastName;
-            if (count($arrayPushAndroid) > 0) {
-                $this->sendMessage($data, $arrayPushAndroid, $arrayEmail, 'android');
-            }
-            if (count($arrayPushIos) > 0) {
-                $this->sendMessage($data, $arrayPushIos, $arrayEmail, 'ios');
+            if ($notification) {
+                $data['payload'] = $arrayPayload;
+                $data['created_at'] = $notification->created_at;
+                $data['updated_at'] = $notification->created_at;
+                $data['msg'] = $data['message'];
+                $data['name'] = $userSending->firstName . " " . $userSending->lastName;
+                if (count($arrayPushAndroid) > 0) {
+                    $this->sendMessage($data, $arrayPushAndroid, $arrayEmail, 'android');
+                }
+                if (count($arrayPushIos) > 0) {
+                    $this->sendMessage($data, $arrayPushIos, $arrayEmail, 'ios');
+                }
             }
         }
     }
@@ -687,60 +699,63 @@ class EditAlerts {
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
+
             $subject = "Mensaje de " . $user->firstName . " " . $user->lastName . " recibido en " . $group->name;
             if ($group) {
-
-                $public = false;
-                if ($group->is_public && $group->isActive()) {
-                    $recipients = DB::select("select 
+                $res = $group->users()->where('user_id', $user->id)->get();
+                if (count($res)) {
+                    $public = false;
+                    if ($group->is_public && $group->isActive()) {
+                        $recipients = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 ;");
-                    if (count($recipients) > 0) {
-                        $followers = DB::select("select 
+                        if (count($recipients) > 0) {
+                            $followers = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id  ;");
-                        $public = true;
-                    } else {
-                        $followers = DB::select("select 
+                            $public = true;
+                        } else {
+                            $followers = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id and is_admin = 1 ;");
-                    }
-                } else if (!$group->is_public) {
-                    $followers = DB::select("select 
+                        }
+                    } else if (!$group->is_public) {
+                        $followers = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id  ;");
-                    $public = false;
-                } else {
-                    return null;
+                        $public = false;
+                    } else {
+                        return null;
+                    }
+                    $message = Message::create([
+                                "status" => 'unread',
+                                "message" => $data['message'],
+                                self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
+                                self::MESSAGE_AUTHOR_ID => $user->id,
+                                self::MESSAGE_RECIPIENT_ID => $group->id,
+                                'is_public' => $public,
+                    ]);
+                    $dauser = array();
+                    $dauser['firstname'] = $user->firstName;
+                    $dauser['lastname'] = $user->lastName;
+                    $dauser['from_user'] = $user->id;
+                    $dauser['message_id'] = $message->id;
+                    $dauser['public'] = $public;
+                    $data = [
+                        "trigger_id" => $group->id,
+                        "message" => $data['message'],
+                        "payload" => $dauser,
+                        "type" => self::GROUP_MESSAGE_TYPE,
+                        "subject" => $subject,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, true);
+                    return $message;
                 }
-                $message = Message::create([
-                            "status" => 'unread',
-                            "message" => $data['message'],
-                            self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
-                            self::MESSAGE_AUTHOR_ID => $user->id,
-                            self::MESSAGE_RECIPIENT_ID => $group->id,
-                            'is_public' => $public,
-                ]);
-                $dauser = array();
-                $dauser['firstname'] = $user->firstName;
-                $dauser['lastname'] = $user->lastName;
-                $dauser['from_user'] = $user->id;
-                $dauser['message_id'] = $message->id;
-                $dauser['public'] = $public;
-                $data = [
-                    "trigger_id" => $group->id,
-                    "message" => $data['message'],
-                    "payload" => $dauser,
-                    "type" => self::GROUP_MESSAGE_TYPE,
-                    "subject" => $subject,
-                    "user_status" => $this->getUserNotifStatus($user)
-                ];
-                $this->sendMassMessage($data, $followers, $user, true);
-                return $message;
             }
         }
     }
