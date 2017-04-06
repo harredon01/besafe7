@@ -115,6 +115,28 @@ class UserApiController extends Controller {
 
         return response()->json($this->editUserData->notificationMedical($user, $id));
     }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function blockContact($id, Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->blockContact($user, $id));
+    }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function unblockContact($id, Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->unblockContact($user, $id));
+    }
 
     /**
      * Get Registered addresses.

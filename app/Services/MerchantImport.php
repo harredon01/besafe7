@@ -10,7 +10,7 @@ use App\Models\Region;
 use App\Models\City;
 use App\Jobs\PostLocation;
 use App\Jobs\InviteUsers;
-use App\Jobs\PostMessage;
+use App\Models\Block;
 use App\Jobs\AddFollower;
 use App\Jobs\AddContact;
 use App\Models\Attribute;
@@ -500,6 +500,77 @@ class MerchantImport {
         }
     }
 
+    public function importCountries2($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            //foreach ($sheet as $row) {
+            if ($row['geoname_id']) {
+                $code;
+                if (array_key_exists('facebook_id',$row)) {
+                    if ($row['facebook_id'] == "NULL") {
+                        $row['code'] = null;
+                    } else {
+                        $row['code'] = $sheet['facebook_id'];
+                    }
+                }
+
+                $row['id'] = $row['geoname_id'];
+                $row['name'] = $row['country_name'];
+                $row['code'] = $row['country_iso_code'];
+                unset($row['geoname_id']);
+                unset($row['locale_code']);
+                unset($row['continent_code']);
+                unset($row['continent_name']);
+                unset($row['country_iso_code']);
+                unset($row['country_name']);
+                if($row['name']){
+                    $country = Country::updateOrCreate($row);
+                } 
+                
+            }
+            //}
+        }
+    }
+
+    public function importCountriesBlocks($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            //foreach ($sheet as $row) {
+                $country = Country::find($row['registered_country_geoname_id']);
+                if ($country) {
+                    unset($row['registered_country_geoname_id']);
+                    unset($row['represented_country_geoname_id']);
+                    unset($row['is_anonymous_proxy']);
+                    unset($row['is_satellite_provider']);
+                    unset($row['postal_code']);
+                    unset($row['accuracy_radius']);
+                    unset($row['geoname_id']);
+                    $block = Block::updateOrCreate($row);
+                    $country->blocks()->save($block);
+                }
+            //}
+        }
+    }
+
+    public function importCountriesAreas($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            foreach ($sheet as $row) {
+                $country = Country::where('name', 'like', '%' . $row['name'] . '%')->first();
+                if ($country) {
+                    $country->area_code = $row['area_code'];
+                    $country->save();
+                }
+            }
+        }
+    }
+
     public function importRegions($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
@@ -565,6 +636,50 @@ class MerchantImport {
                             'lat' => $sheet['lat'],
                             'long' => $sheet['long'],
                 ]);
+            }
+        }
+    }
+
+    public function importCities2($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            if ($sheet['geoname_id']) {
+                $sheet['id'] = $sheet['geoname_id'];
+                unset($sheet['geoname_id']);
+                $city = City::updateOrCreate($sheet);
+            }
+        }
+    }
+
+    public function importCitiesBlocks($filename) {
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            $city = City::find('name', 'like', '%' . $sheet['name'] . '%');
+            if ($city) {
+                $city->lat = $sheet['latitude'];
+                $city->long = $sheet['longitude'];
+                $city->country_id = $sheet['registered_country_geoname_id'];
+                $city->network = $sheet['network'];
+                $city->save();
+            }
+        }
+    }
+
+    public function importCitiesData($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            foreach ($sheet as $row) {
+                $city = City::where('name', 'like', '%' . $row['name'] . '%')->first();
+                if ($city) {
+                    $city->lat = $sheet['lat'];
+                    $city->long = $sheet['long'];
+                    $city->save();
+                }
             }
         }
     }
@@ -734,11 +849,11 @@ class MerchantImport {
         }
     }
 
-    public function importLocations($filename,$userId) {
+    public function importLocations($filename, $userId) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
-        
+
         foreach ($reader as $sheet) {
             $user = User::find($userId);
             if ($user) {
@@ -816,7 +931,7 @@ class MerchantImport {
                 dispatch(new AddContact($user, $sheet['contact_id']));
             }
             $contact = User::find($sheet['contact_id']);
-            if($contact){
+            if ($contact) {
                 dispatch(new AddContact($contact, $sheet['user_id']));
             }
         }
@@ -836,6 +951,7 @@ class MerchantImport {
             }
         }
     }
+
     public function inviteGroups($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
@@ -850,6 +966,7 @@ class MerchantImport {
             }
         }
     }
+
     public function shareLocationGroup($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
@@ -867,6 +984,7 @@ class MerchantImport {
             }
         }
     }
+
     public function sendMessageGroup($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);

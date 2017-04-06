@@ -18,10 +18,13 @@ class Country extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id','name', 'facebook_id',"code","area_code"];
+    protected $fillable = ['id','name', 'facebook_id',"code","area_code",'continent_code','continent_name','country_iso'];
 
     public function regions() {
         return $this->hasMany('App\Models\Region');
+    }
+    public function blocks() {
+        return $this->hasMany('App\Models\Block');
     }
     public function cities() {
         return $this->hasMany('App\Models\Region');

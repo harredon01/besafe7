@@ -229,7 +229,7 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('Reports seeded!');
         $this->merchantImport->importGroups("groups.xlsx");
         $this->command->info('Groups seeded!');
-        $this->merchantImport->shareLocationGroup("invitegroup.xlsx");
+        $this->merchantImport->inviteGroups("invitegroup.xlsx");
         $this->command->info('Groups shareLocationGroup!');
         $this->merchantImport->importLocations("locations.xlsx",1);
         $this->merchantImport->importLocations("locations2.xlsx",2);

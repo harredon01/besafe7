@@ -45,7 +45,9 @@ class GroupController extends Controller {
             $queryBuilder = new GroupQueryBuilder(new Group, $request2);
             $result = $queryBuilder->build()->paginate();
             foreach ($result->items() as $group){
-                $group->users;
+                if(!$group->is_public){
+                    $group->users;
+                }
                 array_push($data,$group);
             }
              

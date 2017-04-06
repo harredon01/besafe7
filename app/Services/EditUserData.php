@@ -16,6 +16,8 @@ use App\Services\EditAlerts;
 
 class EditUserData {
 
+    const CONTACT_BLOCKED = 'contact_blocked';
+    const CONTACT_BLOCKER = 'contact_blocker';
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
@@ -364,6 +366,47 @@ class EditUserData {
      * @param  User, array  $data
      * 
      */
+    public function blockContact(User $user, $contactId) {
+        $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array('level' => self::CONTACT_BLOCKED));
+        $users = DB::table('contacts')->where('contact_id', $user->id)->where('user_id', $contactId)->update(array('level' => self::CONTACT_BLOCKER));
+        return array("status" => "success", "message" => "contact blocked");
+    }
+
+    /**
+     * Import Contacts.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function unblockContact(User $user, $contactId) {
+        $unblock = true;
+        $query = "select * from contacts where user_id = $user->id and contact_id = ? and level = '" . self::CONTACT_BLOCKED . "' ";
+        $contacts = DB::select($query, [$contactId]);
+
+        if (count($contacts) == 0) {
+            $unblock = false;
+        }
+        $query = "select * from contacts where contact_id = $user->id and user_id = ? and level = '" . self::CONTACT_BLOCKER . "' ";
+        $contacts = DB::select($query, [$contactId]);
+
+        if (count($contacts) == 0) {
+            $unblock = false;
+        }
+        if ($unblock) {
+            $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->where('level', self::CONTACT_BLOCKED)->update(array('level' => 'normal'));
+            $users = DB::table('contacts')->where('contact_id', $user->id)->where('user_id', $contactId)->where('level', self::CONTACT_BLOCKER)->update(array('level' => 'normal'));
+            return array("status" => "success", "message" => "contact  unblocked");
+        } else {
+            return array("status" => "error", "message" => "cant unblock contact");
+        }
+    }
+
+    /**
+     * Import Contacts.
+     *
+     * @param  User, array  $data
+     * 
+     */
     public function checkContacts(User $user, array $data) {
         $query = "select id, firstName, lastName, email, cellphone, area_code from users where id not in (select contact_id from contacts where user_id = $user->id ) and id <> $user->id and ( ";
         $i = 0;
@@ -495,19 +538,23 @@ class EditUserData {
     public function addContact(User $user, $contactId) {
         $contact = User::find($contactId);
         if ($contact) {
-            $id = DB::table('contacts')->insert(
-                    array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
-            );            
-            $notification = [
-                "trigger_id" => $user->id,
-                "message" => "Has sido agregado como contacto por: " . $user->name,
-                "payload" => "",
-                "type" => "new_contact",
-                "subject" => "Nuevo contacto " . $user->name,
-                "user_status" => $this->editAlerts->getUserNotifStatus($user)
-            ];
-            $recipients = array($contact);
-            $this->editAlerts->sendMassMessage($notification, $recipients, $user, true);
+            $followers = DB::select("SELECT * FROM contacts WHERE user_id=? AND contact_id=? ", [$user->id, $contactId]);
+            if (count($followers) == 0) {
+                $id = DB::table('contacts')->insert(
+                        array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
+                );
+                $notification = [
+                    "trigger_id" => $user->id,
+                    "message" => "Has sido agregado como contacto por: " . $user->name,
+                    "payload" => "",
+                    "type" => "new_contact",
+                    "subject" => "Nuevo contacto " . $user->name,
+                    "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                ];
+                $recipients = array($contact);
+                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true);
+                return $contact;
+            }
             return $contact;
         }
         return array("status" => "error", "message" => "Contact not found");
