@@ -13,8 +13,9 @@ class CreateReportsTable extends Migration {
     public function up() {
         Schema::create('reports', function(Blueprint $table) {
             $table->increments('id');
-            $table->string('merchant_id')->nullable();
-            $table->index('merchant_id');
+            $table->integer('group_id')->unsigned()->nullable();
+            $table->foreign('group_id')->references('id')
+                ->on('groups');
             $table->string('name');
             $table->string('type');
             $table->index('type');
@@ -31,13 +32,13 @@ class CreateReportsTable extends Migration {
             $table->double('long', 12, 9)->nullable();
             $table->index('lat');
             $table->index('long');
-            $table->integer('city_id')->unsigned();
+            $table->integer('city_id')->unsigned()->nullable();
             $table->foreign('city_id')->references('id')
                     ->on('cities');
-            $table->integer('region_id')->unsigned();
+            $table->integer('region_id')->unsigned()->nullable();
             $table->foreign('region_id')->references('id')
                     ->on('regions');
-            $table->integer('country_id')->unsigned();
+            $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')
                     ->on('countries');
             $table->integer('user_id')->unsigned();

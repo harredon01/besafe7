@@ -44,8 +44,8 @@ class Report extends Model {
         return $this->belongsToMany('App\Models\Category')->withTimestamps();
     }
 
-    public function user() {
-        return $this->hasOne('App\Models\User');
+    public function group() {
+        return $this->belongsTo('App\Models\Group');
     }
 
 }

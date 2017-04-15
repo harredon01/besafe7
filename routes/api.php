@@ -30,6 +30,7 @@ Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
 
+Route::get('groups/admin', 'GroupController@getAdminGroups');
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
 Route::post('groups/invite', 'GroupController@inviteUsers');
 Route::resource('groups', 'GroupController');

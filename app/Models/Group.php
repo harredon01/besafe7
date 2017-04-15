@@ -21,10 +21,13 @@ class Group extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','status','avatar','code', 'admin_id','is_public','ends_at'];
+    protected $fillable = ['name','status','avatar','code', 'max_users','is_public','ends_at'];
 
     public function users() {
         return $this->belongsToMany('App\Models\User')->withPivot('color')->withTimestamps();
+    }
+    public function reports() {
+        return $this->hasMany('App\Models\Group');
     }
     public function subscription() {
         return $this->hasOne('App\Models\Subscription');

@@ -8,7 +8,6 @@ use App\Models\User;
 
 class CleanSearch {
 
-
     public function handle(User $user, Request $request) {
         $mystring = $request->getRequestUri();
         $findme = '?';
@@ -166,7 +165,7 @@ class CleanSearch {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
                 return null;
-            } 
+            }
             $findme = 'order_by';
             $pos = strpos($mystring, $findme);
             if ($pos === false) {
@@ -198,19 +197,31 @@ class CleanSearch {
                 $findme = 'private=0';
                 $pos = strpos($mystring, $findme);
                 if ($pos === false) {
-                    $findme = 'shared_id=';
+                    $findme = 'group_id';
                     $pos = strpos($mystring, $findme);
-                    if ($pos === false) {
-                        $findme = 'shared=true';
-                        $pos = strpos($mystring, $findme);
-                        if ($pos === false) {
-                            $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,asc";
+                    if ($pos === true) {
+                        $group_id = $request->only("group_id");
+                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? ', [$user->id, $group_id]);
+                        if (sizeof($members) == 0) {
+                            return null;
                         } else {
-                            $mystring = str_replace("shared=true", "", $mystring);
-                            $finalString = $mystring . "shared_id=" . $user->id;
+                            $finalString = $mystring;
                         }
                     } else {
-                        return null;
+                        $findme = 'shared_id=';
+                        $pos = strpos($mystring, $findme);
+                        if ($pos === false) {
+                            $findme = 'shared=true';
+                            $pos = strpos($mystring, $findme);
+                            if ($pos === false) {
+                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,asc";
+                            } else {
+                                $mystring = str_replace("shared=true", "", $mystring);
+                                $finalString = $mystring . "shared_id=" . $user->id;
+                            }
+                        } else {
+                            return null;
+                        }
                     }
                 } else {
                     $finalString = $mystring . "&order_by=created_at,desc";
@@ -225,7 +236,7 @@ class CleanSearch {
             } else {
                 
             }
-        } 
+        }
         $request2 = Request::create($finalString, 'GET');
         return $request2;
     }

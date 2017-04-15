@@ -22,9 +22,7 @@ class CreateGroupsTable extends Migration {
                         $table->string('avatar')->nullable();
                         $table->timestamp('ends_at')->nullable();
                         $table->boolean('is_public')->default(false);
-                        $table->integer('admin_id')->unsigned();
-                        $table->foreign('admin_id')->references('id')
-                                ->on('users');
+                        $table->integer('max_users')->unsigned()->nullable();
 			$table->timestamps();
 		});
 	}

@@ -17,8 +17,6 @@ use App\Services\EditMerchant;
 
 class EditLocation {
 
-    const USER_LOCATION_TYPE = 'user';
-    const GROUP_LOCATION_TYPE = 'group';
     const LOCATION_TYPE = 'location';
     const ACCESS_USER_OBJECT = 'userables';
     const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';

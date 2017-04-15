@@ -85,6 +85,18 @@ class GroupController extends Controller {
         $group = $this->editGroup->leaveGroup($user, $group);
         return response()->json(compact('group'));
     }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getAdminGroups(Request $request) {
+        $user = $request->user();
+        $groups = $this->editGroup->getActiveAdminGroups($user);
+        return response()->json(compact('groups'));
+    }
 
     /**
      * Display the specified resource.

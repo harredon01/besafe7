@@ -945,6 +945,8 @@ class MerchantImport {
             $user = User::find($sheet['user_id']);
             if ($user) {
                 unset($sheet['user_id']);
+                unset($sheet['admin_id']);
+                unset($sheet['']);
                 $contacts = explode(",", $sheet['contacts']);
                 $sheet['contacts'] = $contacts;
                 $this->editGroup->saveOrCreateGroup($sheet, $user);

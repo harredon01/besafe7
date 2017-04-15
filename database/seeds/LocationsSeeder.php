@@ -70,13 +70,15 @@ class LocationsSeeder extends Seeder {
 
     public function createLocations() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importCountries2("GeoLite2-Country-Locations-en.xlsx");
-        $this->merchantImport->importCountriesBlocks("GeoLite2-Country-Blocks-IPv4.xlsx");
+        $this->merchantImport->importCountries("countries.xlsx");
+        //$this->merchantImport->importCountries2("GeoLite2-Country-Locations-en.xlsx");
+        //$this->merchantImport->importCountriesBlocks("GeoLite2-Country-Blocks-IPv4.xlsx");
         $this->merchantImport->importCountriesAreas("countries.xlsx");
-        //$this->merchantImport->importRegions("regions.xlsx");
-        $this->merchantImport->importCities2("GeoLite2-City-Locations-en.xlsx");
+        $this->merchantImport->importRegions("regions.xlsx");
+        /*$this->merchantImport->importCities2("GeoLite2-City-Locations-en.xlsx");
         $this->merchantImport->importCitiesBlocks("GeoLite2-City-Blocks-IPv4.xlsx");
-        $this->merchantImport->importCitiesData("cities.xlsx");
+        $this->merchantImport->importCitiesData("cities.xlsx");*/
+        $this->merchantImport->importCities("cities.xlsx");
     }
 
 }

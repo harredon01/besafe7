@@ -12,11 +12,22 @@ use DB;
 
 class EditMerchant {
 
+    const OBJECT_REPORT_GROUP = 'Report_Group';
     /**
-     * The Auth implementation.
+     * The EditAlert implementation.
      *
      */
-    protected $auth;
+    protected $editAlerts;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(EditAlerts $editAlerts) {
+        $this->editAlerts = $editAlerts;
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -366,11 +377,48 @@ class EditMerchant {
         if ($validator->fails()) {
             return $validator->getMessageBag();
         }
+        $group = null;
+        $push = false;
         if (array_key_exists("id", $data)) {
             if ($data['id'] > 0) {
+                if (array_key_exists("anonymous", $data)) {
+                    if ($data['anonymous'] == true) {
+                        $data['email'] = "";
+                        $data['telephone'] = "";
+                    }
+                }
+                if (array_key_exists("group_id", $data)) {
+                    $group = Group::find($data["group_id"]);
+                    if ($group) {
+                        if (array_key_exists("push", $data)) {
+                            $push = $data["push"];
+                        }
+                        if ($group->is_public && $group->isActive()) {
+                            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 ', [$user->id, $group->id]);
+                            if (sizeof($members) == 0) {
+                                return null;
+                            }
+                        }
+                    }
+                }
+
                 Report::where('user_id', $user->id)
                         ->where('id', $data['id'])->update($data);
                 $report = Report::find($data['id']);
+                if ($group) {
+                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? ", [intval($data["group_id"])]);
+                    $payload = array("report" => $report, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "payload" => $payload,
+                        "type" => self::OBJECT_REPORT_GROUP,
+                        "subject" => $subject,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, $push);
+                }
                 if ($report) {
                     return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
                 }
@@ -455,11 +503,6 @@ class EditMerchant {
      */
     public function validatorReport(array $data) {
         return Validator::make($data, [
-                    'name' => 'required|max:255',
-                    'type' => 'required|max:255',
-                    'city_id' => 'required',
-                    'region_id' => 'required',
-                    'country_id' => 'required',
                     'lat' => 'required',
                     'long' => 'required',
         ]);

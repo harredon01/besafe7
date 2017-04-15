@@ -40,8 +40,6 @@ class EditAlerts {
     const TRACKING_LIMIT_FOLLOWER = 'tracking_limit_follower';
     const TRACKING_LIMIT_TRACKING = 'tracking_limit_tracking';
     const NOTIFICATION_APP = 'notification_app';
-    const USER_LOCATION_TYPE = 'user';
-    const GROUP_LOCATION_TYPE = 'group';
     const ACCESS_USER_OBJECT = 'userables';
     const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';
     const ACCESS_USER_OBJECT_ID = 'userable_id';
@@ -49,23 +47,6 @@ class EditAlerts {
     const MESSAGE_AUTHOR_ID = 'user_id';
     const MESSAGE_RECIPIENT_ID = 'messageable_id';
     const MESSAGE_RECIPIENT_TYPE = 'messageable_type';
-
-    /**
-     * The Auth implementation.
-     *
-     */
-    protected $auth;
-    protected $editLocations;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    /* public function __construct(EditLocation $editLocations) {
-      $this->editLocations = $editLocations;
-      } */
 
     /**
      * Gets the messages between two users.
@@ -144,7 +125,7 @@ class EditAlerts {
             return $validator->getMessageBag();
         }
 
-        if ($user->id == intval($data["follower"]) && $data["type"] == self::USER_LOCATION_TYPE) {
+        if ($user->id == intval($data["follower"]) && $data["type"] == self::USER_TYPE) {
             
         } else {
             $type = $data["type"];
@@ -154,7 +135,7 @@ class EditAlerts {
                 $user = $this->makeUserTrip($user);
 
                 $object_id = $user->trip;
-                if ($type == self::GROUP_LOCATION_TYPE) {
+                if ($type == self::GROUP_TYPE) {
                     $group = Group::find($data["follower"]);
                     if ($group) {
                         $res = $group->users()->where('user_id', $user->id)->get();
@@ -172,10 +153,10 @@ class EditAlerts {
                     } else {
                         return null;
                     }
-                } else if ($type == self::USER_LOCATION_TYPE) {
+                } else if ($type == self::USER_TYPE) {
                     $numbers = explode(",", $data["follower"]);
                     $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                    $sql = "SELECT contact_id as id FROM contacts WHERE  contact_id IN ({$bindingsString}) AND user_id = $user->id and level <> '".  self::CONTACT_BLOCKED . "' and level <> 'block' AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
+                    $sql = "SELECT contact_id as id FROM contacts WHERE  contact_id IN ({$bindingsString}) AND user_id = $user->id and level <> '" . self::CONTACT_BLOCKED . "' and level <> 'block' AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
                     $followers = DB::select($sql, $numbers);
                 }
                 if ($user->is_tracking) {
@@ -196,16 +177,37 @@ class EditAlerts {
                 ];
                 $this->sendMassMessage($data, $followers, $user, false);
             } else if ($object == self::OBJECT_REPORT) {
-
                 if (array_key_exists("report_id", $data)) {
                     $report = Report::find($data['report_id']);
                     if ($report) {
-                        $object_id = $data['report_id'];
-                        $numbers = explode(",", $data["follower"]);
-                        $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                        $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'  and object_id = $object_id  ); ";
-                        $followers = DB::select($sql, $numbers);
-                        $this->notifyReportFollowers($user, $followers, $report);
+                        if ($report->user_id == $user->id) {
+                            if ($type == self::GROUP_TYPE) {
+                                $group = Group::find($data["follower"]);
+                                if ($group) {
+                                    $res = $group->users()->where('user_id', $user->id)->get();
+                                    if (count($res) > 0) {
+                                        if (!$group->is_public) {
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? ", [intval($data["follower"])]);
+                                        } else {
+                                            return null;
+                                        }
+                                    } else {
+                                        return null;
+                                    }
+                                } else {
+                                    return null;
+                                }
+                            } else if ($type == self::USER_TYPE) {
+                                $object_id = $data['report_id'];
+                                $numbers = explode(",", $data["follower"]);
+                                $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
+                                $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM "
+                                        . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and "
+                                        . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'  and object_id = $object_id  ); ";
+                                $followers = DB::select($sql, $numbers);
+                            }
+                            $this->notifyReportFollowers($user, $followers, $report);
+                        }
                     }
                 }
             }
@@ -673,7 +675,7 @@ class EditAlerts {
                 $followers = DB::select("select 
                         user_id 
                     from
-                        contacts where user_id = $user->id && contact_id = $recipient->id and (level = '".  self::CONTACT_BLOCKED . "' or level = '".  self::CONTACT_BLOCKER . "') ;");
+                        contacts where user_id = $user->id && contact_id = $recipient->id and (level = '" . self::CONTACT_BLOCKED . "' or level = '" . self::CONTACT_BLOCKER . "') ;");
                 if (count($followers) == 0) {
                     $subject = "Mensaje de " . $user->firstName . " " . $user->lastName;
                     $confirm = [
