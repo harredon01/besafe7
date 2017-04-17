@@ -17,10 +17,12 @@ use PushNotification;
 class EditAlerts {
 
     const GROUP_AVATAR = 'group_avatar';
-    const GROUP_LEAVE = 'group_leave';
+    const GROUP_LEAVE = 'group_leave'; 
+    const GROUP_REMOVE = 'group_remove';
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
     const GROUP_MESSAGE_TYPE = 'group_message';
+    const GROUP_MESSAGE_TYPE = 'group_admin';
     const NEW_CONTACT = 'new_contact';
     const CONTACT_BLOCKED = 'contact_blocked';
     const CONTACT_BLOCKER = 'contact_blocker';
@@ -536,35 +538,59 @@ class EditAlerts {
     }
 
     public function notifyGroup(User $user, Group $group, $filename, $type) {
+        if ($group->is_public && $group->isActive()) {
+ 
+        } else if (!$group->is_public) {
+            
+        } else {
+            return null;
+        }
+        $payload = array(
+            "group_id" => $group->id,
+            "first_name" => $user->firstName,
+            "last_name" => $user->lastName,
+            "user_id" => $user->id
+        );
         if ($type == self::GROUP_AVATAR) {
-            $payload = array(
-                "group_id" => $group->id,
-                "first_name" => $user->firstName,
-                "last_name" => $user->lastName,
-                "filename" => $filename,
-            );
+            $payload["filename"] = $filename;
             $subject = "Nuevo Icono";
             $message = $user->firstName . " " . $user->lastName . " ha cambiado el icono del grupo: " . $group->name;
+            $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id and user_id <> $user->id ;");
         } else if ($type == self::GROUP_LEAVE) {
             if ($filename) {
-                $payload = array(
-                    "group_id" => $group->id,
-                    "first_name" => $user->firstName,
-                    "last_name" => $user->lastName,
-                    "user_id" => $user->id,
-                    "admin_id" => $filename
-                );
-            } else {
-                $payload = array(
-                    "group_id" => $group->id,
-                    "first_name" => $user->firstName,
-                    "last_name" => $user->lastName,
-                    "user_id" => $user->id
-                );
+                $payload["admin_id"] = $filename;
             }
-
             $subject = "Usuario abandono";
             $message = $user->firstName . " " . $user->lastName . " ha abandonado el grupo: " . $group->name;
+            $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id and user_id <> $user->id ;");
+        } else if ($type == self::GROUP_REMOVE) {
+            $numbers = explode(",", $filename);
+            
+            $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
+            $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+            $followers = DB::select($sql, $numbers);
+            $data = [
+                "trigger_id" => $group->id,
+                "message" => $message,
+                "type" => $type,
+                "subject" => $subject,
+                "payload" => $payload,
+                "user_status" => $this->getUserNotifStatus($user)
+            ];
+            $this->sendMassMessage($data, $followers, $user, false);
+            $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+            DB::statement($sql, $numbers);
+            $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id ; ";
+            $followers = DB::select($sql, $numbers);
+            $payload["expelled"] = $numbers;
+            $subject = "Usuarios removidos del grupo";
+            $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
         }
         $data = [
             "trigger_id" => $group->id,
@@ -574,21 +600,7 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        $followers = DB::select("select 
-                        user_id as id
-                    from
-                        group_user where group_id = $group->id  ;");
-        if ($group->is_public && $group->isActive()) {
-            if ($type == self::GROUP_AVATAR) {
-                $this->sendMassMessage($data, $followers, $user, false);
-            }
-        } else if (!$group->is_public) {
-            $this->sendMassMessage($data, $followers, $user, true);
-        } else {
-            return null;
-        }
-
-
+        $this->sendMassMessage($data, $followers, $user, false);
         return ['success' => 'members notified'];
     }
 
@@ -609,6 +621,25 @@ class EditAlerts {
             "user_status" => $this->getUserNotifStatus($user)
         ];
         return $this->sendMassMessage($data, $followers, $user, true);
+    }
+
+    public function notifyUser($user, $actionUser, $group, $type) {
+        $followers = DB::select("SELECT user_id as id FROM group_user WHERE user_id= $actionUser->id and group_id '" .
+                        $group . "'   ");
+        $payload = array(
+            "user_id" => $user->id,
+            "first_name" => $user->firstName,
+            "last_name" => $user->lastName);
+
+        $data = [
+            "trigger_id" => $group->id,
+            "message" => $user->firstName . " " . $user->lastName . " te ha hecho administrador ",
+            "type" => $type,
+            "subject" => "Nuevo administrador de grupo",
+            "payload" => $payload,
+            "user_status" => $this->getUserNotifStatus($user)
+        ];
+        return $this->sendMassMessage($data, $followers, $user, false);
     }
 
     /**

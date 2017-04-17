@@ -6,12 +6,16 @@ use Validator;
 use App\Models\Group;
 use App\Jobs\InviteUsers;
 use App\Jobs\NotifyGroup;
+use App\Jobs\AdminGroup;
 use App\Models\User;
 use Illuminate\Http\Response;
 use App\Services\EditAlerts;
 use DB;
 
 class EditGroup {
+
+    const GROUP_REMOVE = 'group_remove';
+    const GROUP_LEAVE = 'group_leave';
 
     /**
      * The EditAlert implementation.
@@ -39,6 +43,44 @@ class EditGroup {
         return DB::select('select g.* from groups g join group_user gu on g.id = gu.group_id'
                         . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE();', [$user->id]);
     }
+    
+    public function requestSetAdminGroup(User $user, array $data) {
+        dispatch(new AdminGroup($user, $data['user_id'], $data['group_id']));
+        //$this->setAdminGroup($user, $data['user_id'], $data['group_id']);
+        return ['message' => 'request saved', "status" => "success"]; 
+    }
+
+    public function setAdminGroup(User $user, $userId,$groupId) {
+        $dauser = User::find($userId);
+        if ($user) {
+            $group = Group::find($groupId);
+            if ($group) {
+                $following = DB::statement("update group_user set is_admin = 1 where user_id = $dauser->id AND group_id = $group->id ");
+                $this->editAlerts->notifyUser($user, $dauser, $group);
+            }
+        }
+    }
+
+    public function deleteGroupUser(User $user, Group $group) {
+        $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ?', [$user->id, $group->id]);
+        $this->editAlerts->deleteGroupNotifs($user, $group->id);
+        if ($deleted > 0) {
+            if (!$group->is_public) {
+                $this->editAlerts->notifyGroup($user, $group, null, self::GROUP_LEAVE);
+            }
+        }
+        $users = DB::select('select * from group_user where group_id = ? limit 2', [$group->id]);
+        if (count($users) == 0) {
+            $group->delete();
+        }
+    }
+
+    public function requestRemoveFromGroup(User $user, array $data) {
+        $group = Group::find($data["group_id"]);
+        if ($group) {
+            dispatch(new NotifyGroup($user, $group, $data["expelled"], self::GROUP_REMOVE));
+        }
+    }
 
     public function leaveGroup(User $user, $group_id) {
         $group = Group::find($group_id);
@@ -48,19 +90,23 @@ class EditGroup {
             if (count($users) > 0) {
                 $member = $users[0];
                 if ($member->is_admin) {
-                    return null;
-                } else {
-                    $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ?', [$user->id, $group_id]);
-                    $this->editAlerts->deleteGroupNotifs($user, $group_id);
-                    if ($deleted > 0) {
-                        if (!$group->is_public) {
-                            dispatch(new NotifyGroup($user, $group, $admin, 'group_leave'));
-                        }
-
-                        return ['status' => 'success', "message" => 'Group deleted'];
+                    if ($group->is_public) {
+                        return null;
                     } else {
-                        return ['status' => 'error', "message" => 'Group not deleted'];
+                        $users = DB::select('select * from group_user where user_id  <> ? and group_id = ?', [$user->id, $group_id]);
+                        if (count($users) > 0) {
+                            $canditate = $users[0];
+                            $data = [
+                                "user_id" => $canditate->user_id,
+                                "group_id" => $group->id
+                            ];
+                            $this->setAdminGroup($user, $data);
+                        } else {
+                            $this->deleteGroupUser($user, $group);
+                        }
                     }
+                } else {
+                    $this->deleteGroupUser($user, $group);
                 }
             }
         }
@@ -114,6 +160,9 @@ class EditGroup {
                 $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ?', [$user->id, $group->id]);
                 $i = sizeof($members);
             }
+            if ($group->max_users >= $i) {
+                return null;
+            }
             $is_admin = false;
             if ($group->is_public) {
                 $is_admin = true;
@@ -138,6 +187,9 @@ class EditGroup {
                         $invite['updated_at'] = date("Y-m-d H:i:s");
                         array_push($invites, $invite);
                         array_push($inviteUsers, $contact);
+                        if ($group->max_users >= $i) {
+                            break;
+                        }
                     }
                 }
                 $payload = array(
@@ -179,8 +231,6 @@ class EditGroup {
                 );
             }
         }
-
-
         return $group;
     }
 
@@ -212,6 +262,9 @@ class EditGroup {
             $admin = array();
             $data["status"] = "active";
             $data["avatar"] = "default";
+            if ($data["is_public"] == true) {
+                $data["max_users"] = 10;
+            }
             $invites = $data['contacts'];
             unset($data['contacts']);
             unset($data[""]);
@@ -230,8 +283,8 @@ class EditGroup {
             $i = 0;
             $data['contacts'] = $invites;
             $data["group_id"] = $group->id;
-            //dispatch(new InviteUsers($user, $data, true));
-            $this->inviteUsers($user, $data, true);
+            dispatch(new InviteUsers($user, $data, true));
+            //$this->inviteUsers($user, $data, true);
             return $group;
         }
         return ['success' => 'Group saved', "group" => $group];

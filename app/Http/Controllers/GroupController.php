@@ -80,9 +80,31 @@ class GroupController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function leaveGroup($group,Request $request) {
+    public function leaveGroup($dagroup,Request $request) {
         $user = $request->user();
-        $group = $this->editGroup->leaveGroup($user, $group);
+        $group = $this->editGroup->leaveGroup($user, $dagroup);
+        return response()->json(compact('group'));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function removeGroup(Request $request) { 
+        $user = $request->user();
+        $group = $this->editGroup->requestRemoveFromGroup($user, $request->all());
+        return response()->json(compact('group'));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function setAdminGroup(Request $request) {
+        $user = $request->user();
+        $group = $this->editGroup->requestSetAdminGroup($user, $request->all());
         return response()->json(compact('group'));
     }
     
