@@ -17,12 +17,13 @@ use PushNotification;
 class EditAlerts {
 
     const GROUP_AVATAR = 'group_avatar';
-    const GROUP_LEAVE = 'group_leave'; 
+    const GROUP_LEAVE = 'group_leave';
     const GROUP_REMOVE = 'group_remove';
+    const GROUP_EXPELL = 'group_expell';
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
     const GROUP_MESSAGE_TYPE = 'group_message';
-    const GROUP_MESSAGE_TYPE = 'group_admin';
+    const GROUP_ADMIN = 'group_admin';
     const NEW_CONTACT = 'new_contact';
     const CONTACT_BLOCKED = 'contact_blocked';
     const CONTACT_BLOCKER = 'contact_blocker';
@@ -145,7 +146,7 @@ class EditAlerts {
                             if ($group->is_public && $group->isActive()) {
                                 $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                             } else if (!$group->is_public) {
-                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                             } else {
                                 return null;
                             }
@@ -158,7 +159,7 @@ class EditAlerts {
                 } else if ($type == self::USER_TYPE) {
                     $numbers = explode(",", $data["follower"]);
                     $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                    $sql = "SELECT contact_id as id FROM contacts WHERE  contact_id IN ({$bindingsString}) AND user_id = $user->id and level <> '" . self::CONTACT_BLOCKED . "' and level <> 'block' AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
+                    $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString}) AND id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
                     $followers = DB::select($sql, $numbers);
                 }
                 if ($user->is_tracking) {
@@ -183,15 +184,17 @@ class EditAlerts {
                     $report = Report::find($data['report_id']);
                     if ($report) {
                         if ($report->user_id == $user->id) {
+                            $type = true;
                             if ($type == self::GROUP_TYPE) {
                                 $group = Group::find($data["follower"]);
                                 if ($group) {
                                     $res = $group->users()->where('user_id', $user->id)->get();
                                     if (count($res) > 0) {
                                         if (!$group->is_public) {
-                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? ", [intval($data["follower"])]);
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ", [intval($data["follower"])]);
                                         } else {
-                                            return null;
+                                            $type = false;
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                                         }
                                     } else {
                                         return null;
@@ -203,12 +206,12 @@ class EditAlerts {
                                 $object_id = $data['report_id'];
                                 $numbers = explode(",", $data["follower"]);
                                 $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-                                $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString})  AND id NOT IN (SELECT user_id FROM "
+                                $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString}) AND id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "')  AND id NOT IN (SELECT user_id FROM "
                                         . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and "
                                         . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'  and object_id = $object_id  ); ";
                                 $followers = DB::select($sql, $numbers);
                             }
-                            $this->notifyReportFollowers($user, $followers, $report);
+                            $this->notifyReportFollowers($user, $followers, $report,$type);
                         }
                     }
                 }
@@ -482,7 +485,7 @@ class EditAlerts {
         return ['success' => 'followers notified'];
     }
 
-    public function notifyReportFollowers(User $user, array $followers, Report $report) {
+    public function notifyReportFollowers(User $user, array $followers, Report $report,$type) {
         $dareport = array("report_id" => $report->id, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
         $notification = [
@@ -493,7 +496,7 @@ class EditAlerts {
             "payload" => $dareport,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        $this->sendMassMessage($notification, $followers, $user, true);
+        $this->sendMassMessage($notification, $followers, $user, $type);
         return ['success' => 'followers notified'];
     }
 
@@ -539,7 +542,7 @@ class EditAlerts {
 
     public function notifyGroup(User $user, Group $group, $filename, $type) {
         if ($group->is_public && $group->isActive()) {
- 
+            
         } else if (!$group->is_public) {
             
         } else {
@@ -570,25 +573,34 @@ class EditAlerts {
                     from
                         group_user where group_id = $group->id and user_id <> $user->id ;");
         } else if ($type == self::GROUP_REMOVE) {
-            $numbers = explode(",", $filename);
-            
-            $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
-            $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
-            $followers = DB::select($sql, $numbers);
-            $data = [
-                "trigger_id" => $group->id,
-                "message" => $message,
-                "type" => $type,
-                "subject" => $subject,
-                "payload" => $payload,
-                "user_status" => $this->getUserNotifStatus($user)
-            ];
-            $this->sendMassMessage($data, $followers, $user, false);
-            $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
-            DB::statement($sql, $numbers);
-            $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id ; ";
-            $followers = DB::select($sql, $numbers);
-            $payload["expelled"] = $numbers;
+            if (count($filename) > 0) {
+                $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                $followers = DB::select($sql, $filename);
+                $message = "Has sido removido del grupo: " . $group->name;
+                $subject = "Usuario Removido";
+                $data = [
+                    "trigger_id" => $group->id,
+                    "message" => $message,
+                    "type" => self::GROUP_EXPELL,
+                    "subject" => $subject,
+                    "payload" => $payload,
+                    "user_status" => $this->getUserNotifStatus($user)
+                ];
+                $this->sendMassMessage($data, $followers, $user, false);
+                $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                DB::statement($sql, $filename);
+                if ($group->is_public) {
+                    $followers = array();
+                } else {
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $followers = DB::select($sql, $filename);
+                }
+            } else {
+                $followers = array();
+            }
+
+            $payload["expelled"] = $filename;
             $subject = "Usuarios removidos del grupo";
             $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
         }

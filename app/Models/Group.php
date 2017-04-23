@@ -24,7 +24,7 @@ class Group extends Model {
     protected $fillable = ['name','status','avatar','code', 'max_users','is_public','ends_at'];
 
     public function users() {
-        return $this->belongsToMany('App\Models\User')->withPivot('color')->withTimestamps();
+        return $this->belongsToMany('App\Models\User')->withPivot('color')->withPivot('is_admin')->withTimestamps();
     }
     public function reports() {
         return $this->hasMany('App\Models\Group');

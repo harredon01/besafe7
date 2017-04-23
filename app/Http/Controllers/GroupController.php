@@ -45,8 +45,13 @@ class GroupController extends Controller {
             $queryBuilder = new GroupQueryBuilder(new Group, $request2);
             $result = $queryBuilder->build()->paginate();
             foreach ($result->items() as $group){
+                $group->admin_id = 0;
                 if(!$group->is_public){
                     $group->users;
+                } else {
+                    if($this->editGroup->checkAdminGroup($user, $group->id)){
+                        $group->admin_id = 1;
+                    }
                 }
                 array_push($data,$group);
             }
@@ -118,6 +123,17 @@ class GroupController extends Controller {
         $user = $request->user();
         $groups = $this->editGroup->getActiveAdminGroups($user);
         return response()->json(compact('groups'));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getAdminGroupUsers(Request $request) {
+        $user = $request->user();
+        $contacts = $this->editGroup->getAdminGroupUsers($user,$request->all());
+        return response()->json(compact('contacts'));
     }
 
     /**

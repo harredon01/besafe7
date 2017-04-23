@@ -15,6 +15,7 @@ use DB;
 class EditGroup {
 
     const GROUP_REMOVE = 'group_remove';
+    const CONTACT_BLOCKED = 'contact_blocked';
     const GROUP_LEAVE = 'group_leave';
 
     /**
@@ -43,20 +44,32 @@ class EditGroup {
         return DB::select('select g.* from groups g join group_user gu on g.id = gu.group_id'
                         . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE();', [$user->id]);
     }
-    
+
+    public function checkAdminGroup(User $user, $groupId) {
+        $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1', [$groupId, $user->id]);
+        if (count($results) > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function requestSetAdminGroup(User $user, array $data) {
         dispatch(new AdminGroup($user, $data['user_id'], $data['group_id']));
         //$this->setAdminGroup($user, $data['user_id'], $data['group_id']);
-        return ['message' => 'request saved', "status" => "success"]; 
+        return ['message' => 'request saved', "status" => "success"];
     }
 
-    public function setAdminGroup(User $user, $userId,$groupId) {
+    public function setAdminGroup(User $user, $userId, $groupId) {
         $dauser = User::find($userId);
         if ($user) {
-            $group = Group::find($groupId);
-            if ($group) {
-                $following = DB::statement("update group_user set is_admin = 1 where user_id = $dauser->id AND group_id = $group->id ");
-                $this->editAlerts->notifyUser($user, $dauser, $group);
+            $users = DB::select("select * from contacts where user_id = $dauser->id and level = '" . self::CONTACT_BLOCKED . "' and contact_id = $user->id ");
+            if (count($users) == 0) {
+                $group = Group::find($groupId);
+                if ($group) {
+                    $following = DB::statement("update group_user set is_admin = 1 where user_id = $dauser->id AND group_id = $group->id ");
+                    $this->editAlerts->notifyUser($user, $dauser, $group);
+                }
             }
         }
     }
@@ -80,6 +93,16 @@ class EditGroup {
         if ($group) {
             dispatch(new NotifyGroup($user, $group, $data["expelled"], self::GROUP_REMOVE));
         }
+    }
+
+    public function getAdminGroupUsers(User $user, array $data) {
+        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? limit 2', [$user->id, $data["group_id"]]);
+        if (count($users) == 1) {
+            $per_page = 10;
+            $skip = ($data['page'] - 1) * $per_page;
+            return DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
+        }
+        return null;
     }
 
     public function leaveGroup(User $user, $group_id) {
@@ -121,7 +144,7 @@ class EditGroup {
         $group = Group::where('id', '=', $code)
                         ->where('status', '=', 'active')->first();
         if ($group) {
-            $members = DB::select('select user_id as id from group_user where group_id = ?', [ $group->id]);
+            $members = DB::select('select user_id as id from group_user where group_id = ?', [$group->id]);
             if (count($members) >= $group->max_users) {
                 return null;
             }

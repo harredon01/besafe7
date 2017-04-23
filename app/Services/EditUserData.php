@@ -367,8 +367,11 @@ class EditUserData {
      * 
      */
     public function blockContact(User $user, $contactId) {
-        $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array('level' => self::CONTACT_BLOCKED));
-        $users = DB::table('contacts')->where('contact_id', $user->id)->where('user_id', $contactId)->update(array('level' => self::CONTACT_BLOCKER));
+        $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->updateOrCreate(array(
+            'level' => self::CONTACT_BLOCKED,
+            'user_id' => $user->id,
+            'contact_id' => $contactId,
+        ));
         return array("status" => "success", "message" => "contact blocked");
     }
 
@@ -384,17 +387,11 @@ class EditUserData {
         $contacts = DB::select($query, [$contactId]);
 
         if (count($contacts) == 0) {
-            $unblock = false;
-        }
-        $query = "select * from contacts where contact_id = $user->id and user_id = ? and level = '" . self::CONTACT_BLOCKER . "' ";
-        $contacts = DB::select($query, [$contactId]);
-
-        if (count($contacts) == 0) {
-            $unblock = false;
-        }
-        if ($unblock) {
-            $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->where('level', self::CONTACT_BLOCKED)->update(array('level' => 'normal'));
-            $users = DB::table('contacts')->where('contact_id', $user->id)->where('user_id', $contactId)->where('level', self::CONTACT_BLOCKER)->update(array('level' => 'normal'));
+            $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->updateOrCreate(array(
+                'level' => 'normal',
+                'user_id' => $user->id,
+                'contact_id' => $contactId,
+            ));
             return array("status" => "success", "message" => "contact  unblocked");
         } else {
             return array("status" => "error", "message" => "cant unblock contact");
