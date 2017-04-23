@@ -367,12 +367,26 @@ class EditUserData {
      * 
      */
     public function blockContact(User $user, $contactId) {
-        $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->updateOrCreate(array(
-            'level' => self::CONTACT_BLOCKED,
-            'user_id' => $user->id,
-            'contact_id' => $contactId,
-        ));
-        return array("status" => "success", "message" => "contact blocked");
+        $contact = User::find($contactId);
+        if ($contact) {
+            $count = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->count();
+            if ($count == 0) {
+                DB::table('contacts')->insert(array(
+                    'level' => self::CONTACT_BLOCKED,
+                    'user_id' => $user->id,
+                    'contact_id' => $contactId,
+                ));
+            } else {
+                $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array(
+                    'level' => self::CONTACT_BLOCKED,
+                    'user_id' => $user->id,
+                    'contact_id' => $contactId,
+                ));
+            }
+
+            return array("status" => "success", "message" => "contact blocked");
+        }
+        return array("status" => "error", "message" => "contact not found");
     }
 
     /**
@@ -382,20 +396,12 @@ class EditUserData {
      * 
      */
     public function unblockContact(User $user, $contactId) {
-        $unblock = true;
-        $query = "select * from contacts where user_id = $user->id and contact_id = ? and level = '" . self::CONTACT_BLOCKED . "' ";
-        $contacts = DB::select($query, [$contactId]);
-
-        if (count($contacts) == 0) {
-            $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->updateOrCreate(array(
-                'level' => 'normal',
-                'user_id' => $user->id,
-                'contact_id' => $contactId,
-            ));
-            return array("status" => "success", "message" => "contact  unblocked");
-        } else {
-            return array("status" => "error", "message" => "cant unblock contact");
-        }
+        $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array(
+            'level' => 'normal',
+            'user_id' => $user->id,
+            'contact_id' => $contactId,
+        ));
+        return array("status" => "success", "message" => "contact  unblocked");
     }
 
     /**

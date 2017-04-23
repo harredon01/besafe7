@@ -18,15 +18,14 @@ class EditAlerts {
 
     const GROUP_AVATAR = 'group_avatar';
     const GROUP_LEAVE = 'group_leave';
-    const GROUP_REMOVE = 'group_remove';
-    const GROUP_EXPELL = 'group_expell';
+    const GROUP_REMOVED = 'group_removed';
+    const GROUP_EXPELLED = 'group_expelled';
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
     const GROUP_MESSAGE_TYPE = 'group_message';
     const GROUP_ADMIN = 'group_admin';
     const NEW_CONTACT = 'new_contact';
     const CONTACT_BLOCKED = 'contact_blocked';
-    const CONTACT_BLOCKER = 'contact_blocker';
     const NEW_GROUP = 'new_group';
     const GROUP_TYPE = 'group';
     const USER_TYPE = 'user';
@@ -572,7 +571,7 @@ class EditAlerts {
                         user_id as id
                     from
                         group_user where group_id = $group->id and user_id <> $user->id ;");
-        } else if ($type == self::GROUP_REMOVE) {
+        } else if ($type == self::GROUP_REMOVED) {
             if (count($filename) > 0) {
                 $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                 $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
@@ -582,7 +581,7 @@ class EditAlerts {
                 $data = [
                     "trigger_id" => $group->id,
                     "message" => $message,
-                    "type" => self::GROUP_EXPELL,
+                    "type" =>$type,
                     "subject" => $subject,
                     "payload" => $payload,
                     "user_status" => $this->getUserNotifStatus($user)
@@ -599,7 +598,7 @@ class EditAlerts {
             } else {
                 $followers = array();
             }
-
+            $type = self::GROUP_EXPELLED;
             $payload["expelled"] = $filename;
             $subject = "Usuarios removidos del grupo";
             $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
@@ -718,7 +717,7 @@ class EditAlerts {
                 $followers = DB::select("select 
                         user_id 
                     from
-                        contacts where user_id = $user->id && contact_id = $recipient->id and (level = '" . self::CONTACT_BLOCKED . "' or level = '" . self::CONTACT_BLOCKER . "') ;");
+                        contacts where contact_id = $user->id and user_id = $recipient->id and level = '" . self::CONTACT_BLOCKED . "' ;");
                 if (count($followers) == 0) {
                     $subject = "Mensaje de " . $user->firstName . " " . $user->lastName;
                     $confirm = [
@@ -778,7 +777,7 @@ class EditAlerts {
                         $followers = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id  ;");
+                            group_user where group_id = $group->id and group_user.user_id NOT IN (SELECT user_id from contacts WHERE contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ;");
                         $public = false;
                     } else {
                         return null;
@@ -831,7 +830,8 @@ class EditAlerts {
                             left join
                         userables u ON c.contact_id = u.user_id
                             and u.userable_type = '" . self::OBJECT_LOCATION . "'
-                            and userable_id = $user->id where c.user_id = $user->id  and level='" . self::RED_MESSAGE_TYPE . "';  ");
+                            and userable_id = $user->id where c.user_id = $user->id  and level='" . self::RED_MESSAGE_TYPE . "' "
+                        . " and c.contact_id NOT IN ( SELECT user_id FROM contacts WHERE contact_id = $user->id and level = '" . self::CONTACT_BLOCKED . "');  ");
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
         $followersInsert = array();
         $followersPush = array();
@@ -944,7 +944,7 @@ class EditAlerts {
             $subject = "Precaucion con " . $user->name;
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
-        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level = 'emergency' ");
+        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level = 'emergency' and contacts.contact_id NOT IN ( SELECT user_id FROM contacts WHERE contact_id = $user->id and level = '" . self::CONTACT_BLOCKED . "') ");
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
