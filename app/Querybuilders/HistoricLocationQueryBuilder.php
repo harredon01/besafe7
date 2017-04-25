@@ -15,11 +15,6 @@ class HistoricLocationQueryBuilder extends QueryBuilder
       return $query->where('historic_location.trip', '=', $id)
               ->where('userables_historic.object_id', '=', $id);
    }
-   public function filterByGroupId($query, $id) 
-   {
-      return $query->join('group_user', 'historic_location.user_id', '=', 'group_user.user_id')
-           ->where('group_user.group_id', '=', $id);
-   }
    public function filterByTargetId($query, $id)
    {
       return $query->where('historic_location.user_id', '=', $id);

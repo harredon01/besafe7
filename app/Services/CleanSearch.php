@@ -201,7 +201,7 @@ class CleanSearch {
                     $pos = strpos($mystring, $findme);
                     if ($pos === true) {
                         $group_id = $request->only("group_id");
-                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? ', [$user->id, $group_id]);
+                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $group_id]);
                         if (sizeof($members) == 0) {
                             return null;
                         } else {

@@ -24,6 +24,7 @@ class CreateGroupUsersTable extends Migration {
                         $table->foreign('group_id')->references('id')
                                 ->on('groups');
                         $table->string('color');
+                        $table->string('status');
                         $table->timestamps();
 		});
 	}

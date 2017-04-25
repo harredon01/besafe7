@@ -6,6 +6,7 @@ use Validator;
 use App\Models\FileM;
 use App\Models\Merchant;
 use App\Models\User;
+use App\Models\Group;
 use App\Models\Report;
 use Illuminate\Http\Response;
 use DB;
@@ -394,7 +395,7 @@ class EditMerchant {
                             $push = $data["push"];
                         }
                         if ($group->is_public && $group->isActive()) {
-                            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 ', [$user->id, $group->id]);
+                            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status <> "blocked" ', [$user->id, $group->id]);
                             if (sizeof($members) == 0) {
                                 return null;
                             }
@@ -406,9 +407,9 @@ class EditMerchant {
                         ->where('id', $data['id'])->update($data);
                 $report = Report::find($data['id']);
                 if ($group) {
-                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? ", [intval($data["group_id"])]);
+                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' ", [intval($data["group_id"])]);
                     $payload = array("report" => $report, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
+                    $subject = $user->firstName . " " . $user->lastName . " ha compartido un reporte contigo";
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",

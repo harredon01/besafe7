@@ -132,8 +132,8 @@ class GroupController extends Controller {
      */
     public function getAdminGroupUsers(Request $request) {
         $user = $request->user();
-        $contacts = $this->editGroup->getAdminGroupUsers($user,$request->all());
-        return response()->json(compact('contacts'));
+        $groups = $this->editGroup->getAdminGroupUsers($user,$request->all());
+        return response()->json(compact('groups'));
     }
 
     /**
