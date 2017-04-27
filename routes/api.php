@@ -34,7 +34,7 @@ Route::get('groups/admin', 'GroupController@getAdminGroups');
 Route::post('groups/admin', 'GroupController@setAdminGroup');
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
 Route::post('groups/admin_users', 'GroupController@getAdminGroupUsers');
-Route::post('groups/remove', 'GroupController@removeGroup'); 
+Route::post('groups/status', 'GroupController@changeStatusGroup'); 
 Route::post('groups/invite', 'GroupController@inviteUsers');
 Route::resource('groups', 'GroupController');
 

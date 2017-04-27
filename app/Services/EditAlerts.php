@@ -19,6 +19,7 @@ class EditAlerts {
     const GROUP_AVATAR = 'group_avatar';
     const GROUP_LEAVE = 'group_leave';
     const GROUP_REMOVED = 'group_removed';
+    const GROUP_RETURNED = 'group_returned';
     const GROUP_EXPELLED = 'group_expelled';
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
@@ -599,18 +600,47 @@ class EditAlerts {
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
                 $this->sendMassMessage($data, $followers, $user, false);
-                if($group->isActive() && $group->is_public){
+                if ($group->isActive() && $group->is_public) {
                     $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else {
                     $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 }
-                
+
                 DB::statement($sql, $filename);
                 if ($group->is_public) {
                     $followers = array();
                 } else {
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
                     $followers = DB::select($sql, $filename);
+                }
+            } else {
+                $followers = array();
+            }
+            $type = self::GROUP_EXPELLED;
+            $payload["expelled"] = $filename;
+            $subject = "Usuarios removidos del grupo";
+            $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
+        } else if ($type == self::GROUP_RETURNED) {
+            if (count($filename) > 0) {
+                if ($group->isActive() && $group->is_public) {
+                    $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $followers = DB::select($sql, $filename);
+                    $message = "Has sido restaurado al grupo: " . $group->name;
+                    $subject = "Usuario Restaurado";
+                    $data = [
+                        "trigger_id" => $group->id,
+                        "message" => $message,
+                        "type" => $type,
+                        "subject" => $subject,
+                        "payload" => $payload,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, false);
+                    $sql = "UPDATE group_user set status = 'normal' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+
+                    DB::statement($sql, $filename);
+                    $followers = array();
                 }
             } else {
                 $followers = array();

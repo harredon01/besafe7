@@ -96,9 +96,9 @@ class GroupController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function removeGroup(Request $request) { 
+    public function changeStatusGroup(Request $request) { 
         $user = $request->user();
-        $group = $this->editGroup->requestRemoveFromGroup($user, $request->all());
+        $group = $this->editGroup->requestChangeStatusGroup($user, $request->all());
         return response()->json(compact('group'));
     }
     /**

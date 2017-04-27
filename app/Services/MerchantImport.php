@@ -964,6 +964,7 @@ class MerchantImport {
                 unset($sheet['user_id']);
                 $contacts = explode(",", $sheet['contacts']);
                 $sheet['contacts'] = $contacts;
+                //$this->editGroup->inviteUsers($user, $sheet, false);
                 dispatch(new InviteUsers($user, $sheet, false));
             }
         }

@@ -88,19 +88,26 @@ class EditGroup {
         }
     }
 
-    public function requestRemoveFromGroup(User $user, array $data) {
+    public function requestChangeStatusGroup(User $user, array $data) {
         $group = Group::find($data["group_id"]);
         if ($group) {
-            dispatch(new NotifyGroup($user, $group, $data["expelled"], self::GROUP_REMOVE));
+            dispatch(new NotifyGroup($user, $group, $data["expelled"], $data["status"]));
         }
     }
 
     public function getAdminGroupUsers(User $user, array $data) {
         $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 2', [$user->id, $data["group_id"]]);
+        return $users;
         if (count($users) == 1) {
             $per_page = 10;
+            return $data;
             $skip = ($data['page'] - 1) * $per_page;
-            return DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "<>", "blocked")->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
+            if($data['level']=="blocked"){
+                return DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "=", "blocked")->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
+            } else {
+                return DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "<>", "blocked")->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
+            }
+            
         }
         return null;
     }
@@ -172,6 +179,7 @@ class EditGroup {
             } else {
                 return null;
             }
+            
             $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status <> "blocked" ', [$user->id, $group->id]);
             if (sizeof($members) == 0) {
                 return null;
@@ -183,7 +191,7 @@ class EditGroup {
                 $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status <> "blocked"', [$user->id, $group->id]);
                 $i = sizeof($members);
             }
-            if ($group->max_users >= $i) {
+            if ($group->max_users <= $i) {
                 return null;
             }
             $is_admin = false;
@@ -211,7 +219,7 @@ class EditGroup {
                         $invite['updated_at'] = date("Y-m-d H:i:s");
                         array_push($invites, $invite);
                         array_push($inviteUsers, $contact);
-                        if ($group->max_users >= $i) {
+                        if ($group->max_users <= $i) {
                             break;
                         }
                     }
