@@ -416,9 +416,9 @@ class EditMerchant {
                         "payload" => $payload,
                         "type" => self::OBJECT_REPORT_GROUP,
                         "subject" => $subject,
-                        "user_status" => $this->getUserNotifStatus($user)
+                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
                     ];
-                    $this->sendMassMessage($data, $followers, $user, $push);
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, $push);
                 }
                 if ($report) {
                     return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];

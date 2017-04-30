@@ -25,6 +25,7 @@ class EditAlerts {
     const USER_MESSAGE_TYPE = 'user_message';
     const GROUP_MESSAGE_TYPE = 'group_message';
     const GROUP_ADMIN = 'group_admin';
+    const GROUP_ADMIN_NEW = 'group_admin_new';
     const NEW_CONTACT = 'new_contact';
     const CONTACT_BLOCKED = 'contact_blocked';
     const NEW_GROUP = 'new_group';
@@ -89,7 +90,11 @@ class EditAlerts {
         if ($user->is_tracking != 1 || $user->trip == 0) {
             $exists = true;
             $number = 0;
-            $user->is_tracking = 1;
+            if ($user->is_tracking != 1) {
+                $user->is_tracking = 1;
+                
+            }
+
             while ($exists) {
                 $number = time() - 1477256930 + $user->id;
                 $test = User::where("trip", $number)->first();
@@ -100,6 +105,7 @@ class EditAlerts {
                 }
             }
             $user->trip = $number;
+            $user->save();
         }
         return $user;
     }
@@ -163,22 +169,30 @@ class EditAlerts {
                     $followers = DB::select($sql, $numbers);
                 }
                 if ($user->is_tracking) {
-                    
+                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "payload" => $payload,
+                        "type" => self::LOCATION_FIRST,
+                        "subject" => $subject,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, true);
                 } else {
-                    $user->notify_location = 1;
-                    $user->save();
+                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "payload" => $payload,
+                        "type" => self::NOTIFICATION_LOCATION,
+                        "subject" => $subject,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, false);
                 }
-                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
-                $data = [
-                    "trigger_id" => $user->id,
-                    "message" => "",
-                    "payload" => $payload,
-                    "type" => self::NOTIFICATION_LOCATION,
-                    "subject" => $subject,
-                    "user_status" => $this->getUserNotifStatus($user)
-                ];
-                $this->sendMassMessage($data, $followers, $user, false);
             } else if ($object == self::OBJECT_REPORT) {
                 if (array_key_exists("report_id", $data)) {
                     $report = Report::find($data['report_id']);
@@ -601,9 +615,9 @@ class EditAlerts {
                 ];
                 $this->sendMassMessage($data, $followers, $user, false);
                 if ($group->isActive() && $group->is_public) {
-                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
                 } else {
-                    $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
                 }
 
                 DB::statement($sql, $filename);
@@ -624,7 +638,7 @@ class EditAlerts {
             if (count($filename) > 0) {
                 if ($group->isActive() && $group->is_public) {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
                     $followers = DB::select($sql, $filename);
                     $message = "Has sido restaurado al grupo: " . $group->name;
                     $subject = "Usuario Restaurado";
@@ -637,7 +651,7 @@ class EditAlerts {
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
                     $this->sendMassMessage($data, $followers, $user, false);
-                    $sql = "UPDATE group_user set status = 'normal' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $sql = "UPDATE group_user set status = 'normal' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
 
                     DB::statement($sql, $filename);
                     $followers = array();
@@ -649,6 +663,35 @@ class EditAlerts {
             $payload["expelled"] = $filename;
             $subject = "Usuarios removidos del grupo";
             $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
+        } else if ($type == self::GROUP_ADMIN) {
+            if (count($filename) > 0) {
+                if (!$group->is_public) {
+                    $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $followers = DB::select($sql, $filename);
+                    $message = "Te han vuelto administrador del grupo: " . $group->name;
+                    $subject = "Usuario Restaurado";
+                    $data = [
+                        "trigger_id" => $group->id,
+                        "message" => $message,
+                        "type" => $type,
+                        "subject" => $subject,
+                        "payload" => $payload,
+                        "user_status" => $this->getUserNotifStatus($user)
+                    ];
+                    $this->sendMassMessage($data, $followers, $user, false);
+                    $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    DB::statement($sql, $filename);
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
+                    $followers = DB::select($sql, $filename);
+                }
+            } else {
+                $followers = array();
+            }
+            $type = self::GROUP_ADMIN_NEW;
+            $payload["expelled"] = $filename;
+            $subject = "Usuarios son administradores del grupo";
+            $message = "Los siguientes usuarios han sido vueltos administradores: " . $group->name;
         }
         $data = [
             "trigger_id" => $group->id,

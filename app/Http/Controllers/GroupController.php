@@ -101,17 +101,6 @@ class GroupController extends Controller {
         $group = $this->editGroup->requestChangeStatusGroup($user, $request->all());
         return response()->json(compact('group'));
     }
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
-    public function setAdminGroup(Request $request) {
-        $user = $request->user();
-        $group = $this->editGroup->requestSetAdminGroup($user, $request->all());
-        return response()->json(compact('group'));
-    }
     
     /**
      * Display the specified resource.
