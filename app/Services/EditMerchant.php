@@ -409,13 +409,11 @@ class EditMerchant {
                 if ($group) {
                     $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' ", [intval($data["group_id"])]);
                     $payload = array("report" => $report, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $subject = $user->firstName . " " . $user->lastName . " ha compartido un reporte contigo";
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",
                         "payload" => $payload,
                         "type" => self::OBJECT_REPORT_GROUP,
-                        "subject" => $subject,
                         "user_status" => $this->editAlerts->getUserNotifStatus($user)
                     ];
                     $this->editAlerts->sendMassMessage($data, $followers, $user, $push);

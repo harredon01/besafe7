@@ -8,6 +8,9 @@ use App\Services\CleanSearch;
 use App\Querybuilders\GroupQueryBuilder;
 use App\Services\EditAlerts;
 use App\Models\Group;
+use App\Jobs\InviteUsers;
+use App\Jobs\LeaveGroup;
+use App\Jobs\AdminGroup;
 
 class GroupController extends Controller {
 
@@ -87,7 +90,9 @@ class GroupController extends Controller {
      */
     public function leaveGroup($dagroup,Request $request) {
         $user = $request->user();
-        $group = $this->editGroup->leaveGroup($user, $dagroup);
+        $group = array();
+        dispatch(new LeaveGroup($user, $dagroup));
+        //$group = $this->editGroup->leaveGroup($user, $dagroup);
         return response()->json(compact('group'));
     }
     /**

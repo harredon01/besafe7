@@ -31,6 +31,7 @@ class LocationsSeeder extends Seeder {
         DB::table('routes')->delete();
         DB::table('vehicles')->delete();
         DB::table('cargos')->delete();
+        DB::table('translations')->delete();
 
         DB::table('categories')->delete();
         DB::table('notifications')->delete();

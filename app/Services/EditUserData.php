@@ -17,7 +17,7 @@ use App\Services\EditAlerts;
 class EditUserData {
 
     const CONTACT_BLOCKED = 'contact_blocked';
-    const CONTACT_BLOCKER = 'contact_blocker';
+    const NEW_CONTACT = 'new_contact';
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
@@ -313,7 +313,8 @@ class EditUserData {
      */
     public function importContactsId(User $user, array $data) {
         $imports = array();
-        $notifications = array();
+        $inviteUsers = array();
+        $payload = array('first_name' => $user->firstName, 'last_name' => $user->lastName);
         foreach ($data as $value) {
             $contact = User::find($value);
             if ($contact) {
@@ -321,16 +322,16 @@ class EditUserData {
                 if ($exists) {
                     
                 } else {
+                    array_push($inviteUsers, $contact);
                     array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s")));
                 }
             }
         }
         $notification = [
             "trigger_id" => $user->id,
-            "message" => "Has sido agregado como contacto por: " . $user->name,
-            "payload" => "",
-            "type" => "new_contact",
-            "subject" => "Nuevo contacto " . $user->name,
+            "message" => "",
+            "payload" => $payload,
+            "type" => self::NEW_CONTACT,
             "user_status" => $this->editAlerts->getUserNotifStatus($user)
         ];
         $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
@@ -546,12 +547,12 @@ class EditUserData {
                 $id = DB::table('contacts')->insert(
                         array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
                 );
+                $payload = array('first_name' => $user->firstName, 'last_name' => $user->lastName);
                 $notification = [
                     "trigger_id" => $user->id,
                     "message" => "Has sido agregado como contacto por: " . $user->name,
-                    "payload" => "",
-                    "type" => "new_contact",
-                    "subject" => "Nuevo contacto " . $user->name,
+                    "payload" => $payload,
+                    "type" => self::NEW_CONTACT,
                     "user_status" => $this->editAlerts->getUserNotifStatus($user)
                 ];
                 $recipients = array($contact);

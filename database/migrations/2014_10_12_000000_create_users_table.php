@@ -38,6 +38,7 @@ class CreateUsersTable extends Migration {
             $table->index('trip');
             $table->string('gender')->nullable();
             $table->string('token')->nullable();
+            $table->string('language')->nullable();
             $table->string('avatar')->default("");
             $table->string('platform')->nullable();
             $table->string('name')->nullable();

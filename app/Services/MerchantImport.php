@@ -17,6 +17,7 @@ use App\Models\Attribute;
 use App\Models\AttributeOption;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Translation;
 use App\Models\Merchant;
 use App\Models\OfficeHour;
 use App\Models\Condition;
@@ -639,6 +640,20 @@ class MerchantImport {
             }
         }
     }
+    public function importTranslations($filename) {
+
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+             unset($sheet['']);
+                $translation = Translation::updateOrCreate([
+                            'code' => $sheet['code'], 
+                            'language' => $sheet['language'],
+                            'value' => $sheet['value']
+                ]);
+
+        }
+    }
 
     public function importCities2($filename) {
 
@@ -806,6 +821,11 @@ class MerchantImport {
                 $sheet['cellphone'] = intval($sheet['cellphone']) . "";
                 $sheet['area_code'] = intval($sheet['area_code']) . "";
                 $sheet['docnum'] = intval($sheet['docnum']) . "";
+                if($sheet['language']=="En-us"){
+                    $sheet['language']= "en-us";
+                } else if($sheet['language']=="Es-co"){
+                    $sheet['language']= "en-us";
+                } 
 
                 unset($sheet[0]);
                 $user = User::updateOrCreate(["id" => $sheet['id']], $sheet);

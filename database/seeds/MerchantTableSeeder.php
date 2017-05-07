@@ -196,7 +196,8 @@ class MerchantTableSeeder extends Seeder {
 
     public function createMerchants() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        
+        $this->merchantImport->importTranslations("translations.xlsx");
+        $this->command->info('Translations seeded');
         $this->merchantImport->importMerchants("policias.xlsx");
         $this->merchantImport->importMerchants("medicos1.xlsx");
         $this->merchantImport->importMerchants("medicos2.xlsx");
@@ -229,6 +230,7 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('Reports seeded!');
         $this->merchantImport->importGroups("groups.xlsx");
         $this->command->info('Groups seeded!');
+        
         $this->merchantImport->inviteGroups("invitegroup.xlsx");
         $this->command->info('Groups shareLocationGroup!');
         $this->merchantImport->importLocations("locations.xlsx",1);

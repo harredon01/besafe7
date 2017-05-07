@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Jobs\PostEmergencyEnd;
 use App\Jobs\PostEmergency;
 use App\Models\Report;
+use App\Models\Translation;
 use App\Models\Message;
 use App\Models\Notification;
 use Mail;
@@ -51,6 +52,8 @@ class EditAlerts {
     const MESSAGE_AUTHOR_ID = 'user_id';
     const MESSAGE_RECIPIENT_ID = 'messageable_id';
     const MESSAGE_RECIPIENT_TYPE = 'messageable_type';
+    const REQUEST_PING = "request_ping";
+    const REPLY_PING = "reply_ping";
 
     /**
      * Gets the messages between two users.
@@ -92,7 +95,6 @@ class EditAlerts {
             $number = 0;
             if ($user->is_tracking != 1) {
                 $user->is_tracking = 1;
-                
             }
 
             while ($exists) {
@@ -170,25 +172,21 @@ class EditAlerts {
                 }
                 if ($user->is_tracking) {
                     $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",
                         "payload" => $payload,
                         "type" => self::LOCATION_FIRST,
-                        "subject" => $subject,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
                     $this->sendMassMessage($data, $followers, $user, true);
                 } else {
                     $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $subject = $user->firstName . " " . $user->lastName . " ha compartido su ubicacion contigo";
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",
                         "payload" => $payload,
                         "type" => self::NOTIFICATION_LOCATION,
-                        "subject" => $subject,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
                     $this->sendMassMessage($data, $followers, $user, false);
@@ -202,13 +200,18 @@ class EditAlerts {
                             if ($type == self::GROUP_TYPE) {
                                 $group = Group::find($data["follower"]);
                                 if ($group) {
-                                    $res = $group->users()->where('user_id', $user->id)->get();
-                                    if (count($res) > 0) {
-                                        if (!$group->is_public) {
-                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ", [intval($data["follower"])]);
-                                        } else {
+                                    $recipients = DB::select("select 
+                                            user_id as id
+                                                from
+                                                group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status <> 'blocked';");
+                                    if (count($recipients) > 0) {
+                                        if ($group->is_public && $group->isActive()) {
                                             $type = false;
-                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
+                                        } else if (!$group->is_public) {
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND  status <> 'blocked' AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
+                                        } else {
+                                            return null;
                                         }
                                     } else {
                                         return null;
@@ -259,23 +262,11 @@ class EditAlerts {
 
     public function postNotificationLocation(User $user, $type, $code) {
         $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-        $subject = "";
         $followers = DB::select("SELECT user_id as id FROM " . self::ACCESS_USER_OBJECT . " WHERE " . self::ACCESS_USER_OBJECT_ID . "=? and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$user->id]);
-        if ($type == self::LOCATION_FIRST) {
-            $subject = "Primera ubicacion de " . $user->firstName . " " . $user->lastName . " recibida";
-        } else {
+        if ($type == self::LOCATION_LAST) {
             if ($code) {
                 $result = $this->checkUserCode($user, $code);
                 $payload['status'] = $result['status'];
-                if ($result['status'] == "success") {
-                    $subject = "Viaje de " . $user->firstName . " " . $user->lastName . " terminado.";
-                } else if ($result['status'] == "info") {
-                    $subject = "Viaje de " . $user->firstName . " " . $user->lastName . " terminado con codigo erroneo.";
-                } else if ($result['status'] == "alert") {
-                    $subject = "Viaje de " . $user->firstName . " " . $user->lastName . " terminado en alerta.";
-                }
-            } else {
-                $subject = "Viaje de " . $user->firstName . " " . $user->lastName . " terminado.";
             }
         }
         $data = [
@@ -283,7 +274,6 @@ class EditAlerts {
             "message" => "",
             "payload" => $payload,
             "type" => $type,
-            "subject" => $subject,
             "user_status" => $this->getUserNotifStatus($user)
         ];
         return $this->sendMassMessage($data, $followers, $user, true);
@@ -295,7 +285,9 @@ class EditAlerts {
         $arrayEmail = array();
         $arrayContent = array();
         $notification = null;
+        $translation = Translation::where('language', $userSending->language)->where("code", $data['type'])->first();
         $arrayPayload = $data['payload'];
+        $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
         $data['notification_id'] = time();
         $data['status'] = "unread";
         $checkSame = false;
@@ -367,8 +359,7 @@ class EditAlerts {
                 "trigger_id" => $user->id,
                 "message" => "",
                 "payload" => $payload,
-                "type" => "request_ping",
-                "subject" => "Ping!",
+                "type" => self::REQUEST_PING,
                 "user_status" => $this->getUserNotifStatus($user)
             ];
             return $this->sendMassMessage($data, $followers, $user, true);
@@ -392,8 +383,7 @@ class EditAlerts {
                             "trigger_id" => $user->id,
                             "message" => "",
                             "payload" => $payload,
-                            "type" => "reply_ping",
-                            "subject" => "Ping.",
+                            "type" => self::REPLY_PING,
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
                         return $this->sendMassMessage($data, $followers, $user, true);
@@ -403,8 +393,7 @@ class EditAlerts {
                             "trigger_id" => $user->id,
                             "message" => "",
                             "payload" => $payload,
-                            "type" => "reply_ping",
-                            "subject" => "Ping!!",
+                            "type" => self::REPLY_PING,
                             "user_status" => $this->getUserNotifStatus($user)
                         ];
                         return $this->sendMassMessage($data, $followers, $user, true);
@@ -468,10 +457,9 @@ class EditAlerts {
                 } else {
                     $notification = [
                         "trigger_id" => -1,
-                        "message" => "Estos usuarios terminaron su viaje",
+                        "message" => "",
                         "payload" => $stop,
                         "type" => self::TRACKING_LIMIT_FOLLOWER,
-                        "subject" => "Estos usuarios terminaron su viaje",
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
@@ -486,10 +474,9 @@ class EditAlerts {
                 if ($counter == $length) {
                     $notification = [
                         "trigger_id" => -1,
-                        "message" => "Estos usuarios terminaron su viaje",
+                        "message" => "",
                         "payload" => $stop,
                         "type" => self::TRACKING_LIMIT_FOLLOWER,
-                        "subject" => "Estos usuarios terminaron su viaje",
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
@@ -501,10 +488,9 @@ class EditAlerts {
 
         $notification = [
             "trigger_id" => -1,
-            "message" => "Tu viaje ha terminado por limite de tiempo. ",
+            "message" => "",
             "payload" => "",
             "type" => self::TRACKING_LIMIT_TRACKING,
-            "subject" => "Tu viaje ha terminado por limite de tiempo. ",
             "user_status" => "normal"
         ];
         $this->sendMassMessage($notification, $tracking, null, false);
@@ -512,13 +498,12 @@ class EditAlerts {
     }
 
     public function notifyReportFollowers(User $user, array $followers, Report $report, $type) {
-        $dareport = array("report_id" => $report->id, "first_name" => $user->firstName, "last_name" => $user->lastName
+        $dareport = array("report_id" => $report->id, "report_name" => $report->name, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
         $notification = [
             "trigger_id" => $user->id,
-            "message" => $user->firstName . " " . $user->lastName . " ha compartido un reporte",
+            "message" => "",
             "type" => self::OBJECT_REPORT,
-            "subject" => "Nuevo Reporte",
             "payload" => $dareport,
             "user_status" => $this->getUserNotifStatus($user)
         ];
@@ -576,14 +561,16 @@ class EditAlerts {
         }
         $payload = array(
             "group_id" => $group->id,
+            "group_name" => $group->name,
             "first_name" => $user->firstName,
             "last_name" => $user->lastName,
             "user_id" => $user->id
         );
         if ($type == self::GROUP_AVATAR) {
             $payload["filename"] = $filename;
-            $subject = "Nuevo Icono";
-            $message = $user->firstName . " " . $user->lastName . " ha cambiado el icono del grupo: " . $group->name;
+            $group->avatar = $filename;
+            $group->save();
+            $message = "";
             $followers = DB::select("select 
                         user_id as id
                     from
@@ -592,8 +579,7 @@ class EditAlerts {
             if ($filename) {
                 $payload["admin_id"] = $filename;
             }
-            $subject = "Usuario abandono";
-            $message = $user->firstName . " " . $user->lastName . " ha abandonado el grupo: " . $group->name;
+            $message = "";
             $followers = DB::select("select 
                         user_id as id
                     from
@@ -603,13 +589,11 @@ class EditAlerts {
                 $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                 $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
                 $followers = DB::select($sql, $filename);
-                $message = "Has sido removido del grupo: " . $group->name;
-                $subject = "Usuario Removido";
+                $message = "";
                 $data = [
                     "trigger_id" => $group->id,
                     "message" => $message,
                     "type" => $type,
-                    "subject" => $subject,
                     "payload" => $payload,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
@@ -632,21 +616,18 @@ class EditAlerts {
             }
             $type = self::GROUP_EXPELLED;
             $payload["expelled"] = $filename;
-            $subject = "Usuarios removidos del grupo";
-            $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
+            $message = "";
         } else if ($type == self::GROUP_RETURNED) {
             if (count($filename) > 0) {
                 if ($group->isActive() && $group->is_public) {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
                     $followers = DB::select($sql, $filename);
-                    $message = "Has sido restaurado al grupo: " . $group->name;
-                    $subject = "Usuario Restaurado";
+                    $message = "";
                     $data = [
                         "trigger_id" => $group->id,
                         "message" => $message,
                         "type" => $type,
-                        "subject" => $subject,
                         "payload" => $payload,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
@@ -661,21 +642,18 @@ class EditAlerts {
             }
             $type = self::GROUP_EXPELLED;
             $payload["expelled"] = $filename;
-            $subject = "Usuarios removidos del grupo";
-            $message = "Los siguientes usuarios han sido removidos del grupo: " . $group->name;
+            $message = "";
         } else if ($type == self::GROUP_ADMIN) {
             if (count($filename) > 0) {
                 if (!$group->is_public) {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
                     $followers = DB::select($sql, $filename);
-                    $message = "Te han vuelto administrador del grupo: " . $group->name;
-                    $subject = "Usuario Restaurado";
+                    $message = "";
                     $data = [
                         "trigger_id" => $group->id,
                         "message" => $message,
                         "type" => $type,
-                        "subject" => $subject,
                         "payload" => $payload,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
@@ -690,14 +668,12 @@ class EditAlerts {
             }
             $type = self::GROUP_ADMIN_NEW;
             $payload["expelled"] = $filename;
-            $subject = "Usuarios son administradores del grupo";
-            $message = "Los siguientes usuarios han sido vueltos administradores: " . $group->name;
+            $message = "";
         }
         $data = [
             "trigger_id" => $group->id,
             "message" => $message,
             "type" => $type,
-            "subject" => $subject,
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
@@ -715,9 +691,8 @@ class EditAlerts {
             "filename" => $filename);
         $data = [
             "trigger_id" => $user->id,
-            "message" => $user->firstName . " " . $user->lastName . " ha cambiado su avatar ",
+            "message" => "",
             "type" => self::USER_AVATAR,
-            "subject" => "Nuevo Avatar",
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
@@ -733,9 +708,8 @@ class EditAlerts {
 
         $data = [
             "trigger_id" => $group->id,
-            "message" => $user->firstName . " " . $user->lastName . " te ha hecho administrador ",
+            "message" => "",
             "type" => $type,
-            "subject" => "Nuevo administrador de grupo",
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
@@ -808,7 +782,6 @@ class EditAlerts {
                     from
                         contacts where contact_id = $user->id and user_id = $recipient->id and level = '" . self::CONTACT_BLOCKED . "' ;");
                 if (count($followers) == 0) {
-                    $subject = "Mensaje de " . $user->firstName . " " . $user->lastName;
                     $confirm = [
                         "message" => $data['message'],
                         self::MESSAGE_RECIPIENT_TYPE => self::USER_MESSAGE_TYPE,
@@ -819,15 +792,14 @@ class EditAlerts {
                     $message = Message::create($confirm);
                     $dauser = array();
                     $recipients = array($recipient);
-                    $dauser['firstname'] = $user->firstName;
-                    $dauser['lastname'] = $user->lastName;
+                    $dauser['first_name'] = $user->firstName;
+                    $dauser['last_name'] = $user->lastName;
                     $dauser['message_id'] = $message->id;
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => $data['message'],
                         "payload" => $dauser,
                         "type" => self::USER_MESSAGE_TYPE,
-                        "subject" => $subject,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
                     $confirm['id'] = $message->id;
@@ -840,7 +812,6 @@ class EditAlerts {
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
 
-            $subject = "Mensaje de " . $user->firstName . " " . $user->lastName . " recibido en " . $group->name;
             if ($group) {
                 $res = $group->users()->where('user_id', $user->id)->get();
                 if (count($res) > 0) {
@@ -880,8 +851,8 @@ class EditAlerts {
                                 'is_public' => $public,
                     ]);
                     $dauser = array();
-                    $dauser['firstname'] = $user->firstName;
-                    $dauser['lastname'] = $user->lastName;
+                    $dauser['first_name'] = $user->firstName;
+                    $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
                     $dauser['message_id'] = $message->id;
                     $dauser['public'] = $public;
@@ -890,7 +861,6 @@ class EditAlerts {
                         "message" => $data['message'],
                         "payload" => $dauser,
                         "type" => self::GROUP_MESSAGE_TYPE,
-                        "subject" => $subject,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
                     $this->sendMassMessage($data, $followers, $user, true);
@@ -901,17 +871,12 @@ class EditAlerts {
     }
 
     public function postEmergency(User $user, array $data, $secret) {
-        $payload = array();
         $user->is_alerting = 1;
         $user->alert_type = $data['type'];
         $user = $this->makeUserTrip($user);
         $user->write_report = true;
         $user->notify_location = 1;
         $user->save();
-        $subject = "Emergencia de " . $user->firstName . " " . $user->lastName;
-        if ($data['type'] == self::RED_MESSAGE_MEDICAL_TYPE) {
-            $subject = "Emergencia Medica de " . $user->firstName . " " . $user->lastName;
-        }
         $followers = DB::select("select 
                         contact_id as id,object_id
                     from
@@ -929,7 +894,6 @@ class EditAlerts {
             "message" => "",
             "payload" => $payload,
             "type" => $data['type'],
-            "subject" => $subject,
             "user_status" => $this->getUserNotifStatus($user)
         ];
         foreach ($followers as $follower) {
@@ -952,9 +916,8 @@ class EditAlerts {
             $data = [
                 "trigger_id" => $user->id,
                 "message" => "",
-                "payload" => "",
+                "payload" => $payload,
                 "type" => self::RED_SECRET_TYPE,
-                "subject" => "message from besafe",
                 "user_status" => $this->getUserNotifStatus($user)
             ];
             $this->sendMassMessage($data, $recipient, $user, true);
@@ -1022,15 +985,12 @@ class EditAlerts {
                 $user->hash = "";
                 $payload = array("status" => "success", "trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                 $user->save();
-                $subject = "Finalizada emergencia de " . $user->name;
             } else {
                 return array("status" => "info", "message" => "User not in emergency");
             }
         } else if ($user->red == $code['code']) {
-            $subject = "Alerta de " . $user->name;
             $payload = array("status" => "alert", "first_name" => $user->firstName, "last_name" => $user->lastName);
         } else {
-            $subject = "Precaucion con " . $user->name;
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
         $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level = 'emergency' and contacts.contact_id NOT IN ( SELECT user_id FROM contacts WHERE contact_id = $user->id and level = '" . self::CONTACT_BLOCKED . "') ");
@@ -1039,7 +999,6 @@ class EditAlerts {
             "message" => "",
             "payload" => $payload,
             "type" => self::RED_MESSAGE_END,
-            "subject" => $subject,
             "user_status" => $this->getUserNotifStatus($user)
         ];
         $this->sendMassMessage($data, $followers, $user, true);
