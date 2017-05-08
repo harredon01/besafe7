@@ -285,9 +285,16 @@ class EditAlerts {
         $arrayEmail = array();
         $arrayContent = array();
         $notification = null;
-        $translation = Translation::where('language', $userSending->language)->where("code", $data['type'])->first();
-        $arrayPayload = $data['payload'];
-        $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
+        if ($userSending->id > 0) {
+            $translation = Translation::where('language', $userSending->language)->where("code", $data['type'])->first();
+            $arrayPayload = $data['payload'];
+            $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
+        } else {
+            $translation = Translation::where('language', 'en-us')->where("code",$data['type'])->first();
+            $arrayPayload = $data['payload'];
+            $data['subject'] =  $translation->value;
+        }
+
         $data['notification_id'] = time();
         $data['status'] = "unread";
         $checkSame = false;
@@ -439,6 +446,7 @@ class EditAlerts {
         $stop = array();
         $counter = 0;
         $length = count($followers);
+        $model = new User(['name' => 'foo', 'id' => -1]);
         if ($length > 0) {
             $activeuser = $followers[0]->user_id;
             $stop[] = [
@@ -480,7 +488,8 @@ class EditAlerts {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    $this->sendMassMessage($notification, $recipients, null, false);
+                    
+                    $this->sendMassMessage($notification, $recipients, $model, false);
                 }
             }
         }
@@ -493,7 +502,7 @@ class EditAlerts {
             "type" => self::TRACKING_LIMIT_TRACKING,
             "user_status" => "normal"
         ];
-        $this->sendMassMessage($notification, $tracking, null, false);
+        $this->sendMassMessage($notification, $tracking, $model, false);
         return ['success' => 'followers notified'];
     }
 

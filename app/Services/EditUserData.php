@@ -45,7 +45,7 @@ class EditUserData {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validatorRegister(array $data) {
+    public function validatorRegister(array $data) {
         return Validator::make($data, [
                     'firstName' => 'required|max:255',
                     'lastName' => 'required|max:255',
