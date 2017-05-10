@@ -471,7 +471,7 @@ class EditAlerts {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    $this->sendMassMessage($notification, $recipients, null, false);
+                    $this->sendMassMessage($notification, $recipients, $model, false);
                     $activeuser = $follower->user_id;
                     $stop = array();
                     $stop[] = [
