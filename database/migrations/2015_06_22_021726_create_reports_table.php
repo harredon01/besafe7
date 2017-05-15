@@ -45,8 +45,7 @@ class CreateReportsTable extends Migration {
             $table->foreign('user_id')->references('id')
                     ->on('users');
             $table->double('minimum', 15, 2)->nullable();
-            $table->string('delivery_time')->nullable();
-            $table->double('delivery_price', 15, 2)->nullable();
+            $table->dateTime('report_time')->nullable();
             $table->string('status')->nullable();
             $table->timestamps();
         });

@@ -276,8 +276,8 @@ class EditUserData {
      * 
      */
     public function getCodes(User $user) {
-        $medical = DB::select("SELECT green,red from users where id = ?", [$user->id]);
-        return $medical[0];
+        $result = ["green" => $user->green,"red" =>$user->red];
+        return $result;
     }
 
     /**

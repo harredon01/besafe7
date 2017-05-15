@@ -214,17 +214,17 @@ class CleanSearch {
                             $findme = 'shared=true';
                             $pos = strpos($mystring, $findme);
                             if ($pos === false) {
-                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,asc";
+                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id;
+                                $finalString = $mystring . "shared_id=" . $user->id. "&order_by=id,desc";
                             }
                         } else {
                             return null;
                         }
                     }
                 } else {
-                    $finalString = $mystring . "&order_by=created_at,desc";
+                    $finalString = $mystring . "&order_by=id,desc";
                 }
             } else {
                 return null;

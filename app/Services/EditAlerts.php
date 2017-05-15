@@ -195,7 +195,7 @@ class EditAlerts {
                 if (array_key_exists("report_id", $data)) {
                     $report = Report::find($data['report_id']);
                     if ($report) {
-                        if ($report->user_id == $user->id) {
+                        if ($report->user_id == $user->id || !$report->private) {
                             $type = true;
                             if ($type == self::GROUP_TYPE) {
                                 $group = Group::find($data["follower"]);
@@ -290,9 +290,9 @@ class EditAlerts {
             $arrayPayload = $data['payload'];
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
         } else {
-            $translation = Translation::where('language', 'en-us')->where("code",$data['type'])->first();
+            $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
-            $data['subject'] =  $translation->value;
+            $data['subject'] = $translation->value;
         }
 
         $data['notification_id'] = time();
@@ -488,7 +488,7 @@ class EditAlerts {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    
+
                     $this->sendMassMessage($notification, $recipients, $model, false);
                 }
             }

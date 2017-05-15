@@ -14,6 +14,7 @@ use DB;
 class EditMerchant {
 
     const OBJECT_REPORT_GROUP = 'Report_Group';
+
     /**
      * The EditAlert implementation.
      *
@@ -117,12 +118,12 @@ class EditMerchant {
     public function getReport(User $user, $reportId) {
         $report = Report::find($reportId);
         if ($report) {
-
+            if ($user->id == $report->user_id) {
+                $report->mine = true;
+            }
             $files = FileM::where('type', 'report')->where("trigger_id", $reportId)->get();
             if ($report->anonymous == true) {
-                $report->email = "";
                 $report->user_id = "";
-                $report->celphone = "";
                 $data = [
                     "report" => $report,
                     "user" => "",
@@ -446,6 +447,12 @@ class EditMerchant {
                     $data["telephone"] = $user->area_code . " " . $user->cellphone;
                 }
             }
+            if (array_key_exists("anonymous", $data)) {
+                if ($data['anonymous'] == true) {
+                    $data['email'] = "";
+                    $data['telephone'] = "";
+                }
+            }
             $report = Report::create($data);
             return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
         }
@@ -459,7 +466,10 @@ class EditMerchant {
     public function getReportHash(User $user, $id) {
         $report = Report::find($id);
         if ($report) {
-            if ($report->user_id == $user->id) {
+            if ($report->user_id == $user->id || !$report->private) {
+                if ($report->hash) {
+                    return ['status' => 'success', "hash" => $report->hash];
+                }
                 $hashExists = true;
                 while ($hashExists) {
                     $hash = str_random(40);
