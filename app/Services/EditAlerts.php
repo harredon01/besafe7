@@ -289,6 +289,18 @@ class EditAlerts {
             $translation = Translation::where('language', $userSending->language)->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
+            $pos = strpos("e".$data['type'], 'Report');
+            if ($pos) {
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['report_type'],$data['subject']);
+            }
+            $pos = strpos("e".$data['type'], 'group'); 
+            if ($pos ) {
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['group_name'],$data['subject']);
+            }
+            $pos = strpos($data['subject'], '{group}');
+            if ($pos) {
+                $data['subject'] = str_replace("{group}", $arrayPayload['group_name'],$data['subject']);
+            }
         } else {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
@@ -507,7 +519,7 @@ class EditAlerts {
     }
 
     public function notifyReportFollowers(User $user, array $followers, Report $report, $type) {
-        $dareport = array("report_id" => $report->id, "report_name" => $report->name, "first_name" => $user->firstName, "last_name" => $user->lastName
+        $dareport = array("report_id" => $report->id, "report_type" => $report->type, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
         $notification = [
             "trigger_id" => $user->id,
@@ -861,6 +873,7 @@ class EditAlerts {
                     ]);
                     $dauser = array();
                     $dauser['first_name'] = $user->firstName;
+                    $dauser['group_name'] = $group->name;
                     $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
                     $dauser['message_id'] = $message->id;

@@ -409,10 +409,11 @@ class EditMerchant {
                 $report = Report::find($data['id']);
                 if ($group) {
                     $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' ", [intval($data["group_id"])]);
-                    $payload = array("report" => $report, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $payload = array("report" => $report,"report_type" => $report->type, "first_name" => $user->firstName, "last_name" => $user->lastName,"group_name" => $group->name );
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",
+                        "subject" => "",
                         "payload" => $payload,
                         "type" => self::OBJECT_REPORT_GROUP,
                         "user_status" => $this->editAlerts->getUserNotifStatus($user)
