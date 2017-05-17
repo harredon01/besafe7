@@ -196,7 +196,8 @@ class EditAlerts {
                     $report = Report::find($data['report_id']);
                     if ($report) {
                         if ($report->user_id == $user->id || !$report->private) {
-                            $type = true;
+				$type = true;
+				$object_id = $report->id;
                             if ($type == self::GROUP_TYPE) {
                                 $group = Group::find($data["follower"]);
                                 if ($group) {
