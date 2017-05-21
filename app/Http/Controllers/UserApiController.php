@@ -145,6 +145,7 @@ class UserApiController extends Controller {
      */
     public function importContactsId(Request $request) {
         $user = $request->user();
+        //$this->editUserData->importContactsId($user, $request->all());
         dispatch(new ImportContactsId($user, $request->all()));
         return response()->json(['status' => 'success','message' => 'importContactsId queued']);
     }

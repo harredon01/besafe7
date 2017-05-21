@@ -74,7 +74,7 @@ class AuthApiController extends Controller {
      */
     public function create(Request $request) {
         $credentials = $request->only('area_code', 'cellphone', 'email');
-        $validator = $this->registrar->validator($request->all());
+        $validator = $this->editUserData->validatorRegister($request->all());
 
         if ($validator->fails()) {
             return response()->json(['statuss' => 'error', 'message' => $validator->getMessageBag()]);
@@ -87,12 +87,8 @@ class AuthApiController extends Controller {
         if ($verifycel) {
             return response()->json(['statuss' => 'error', 'message' => "Ese celular en ese pais ya existe"], 200);
         }
-        $data['password'] = bcrypt($data['password']);
-        $data['name'] = $data['firstName'] . " " . $data['lastName'];
-        $data['salt'] = str_random(40);
-        $user = User::create($data);
-        $token = $user->createToken('Token Name')->accessToken;
-        return response()->json(['status' => 'success', 'token' => $token]);
+        $data = $request->all();
+        return response()->json($this->editUserData->create($data));
     }
 
     /**

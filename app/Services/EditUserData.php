@@ -62,16 +62,13 @@ class EditUserData {
      * @param  array  $data
      * @return User
      */
-    protected function create(array $data) {
-        return User::create([
-                    'firstName' => $data['firstName'],
-                    'lastName' => $data['lastName'],
-                    'name' => $data['firstName'] . " " . $data['lastName'],
-                    'email' => $data['email'],
-                    'cellphone' => $data['cellphone'],
-                    'area_code' => $data['area_code'],
-                    'password' => bcrypt($data['password']),
-        ]);
+    public function create(array $data) {
+        $data['password'] = bcrypt($data['password']);
+        $data['name'] = $data['firstName'] . " " . $data['lastName'];
+        $data['salt'] = str_random(40);
+        $data['language'] = 'en-us';
+        $user = User::create($data);
+        return ['status' => 'success'];
     }
 
     /**

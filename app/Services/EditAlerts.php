@@ -287,7 +287,7 @@ class EditAlerts {
         $arrayContent = array();
         $notification = null;
         if ($userSending->id > 0) {
-            $translation = Translation::where('language', $userSending->language)->where("code", $data['type'])->first();
+            $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
             $pos = strpos("e".$data['type'], 'Report');
