@@ -29,12 +29,11 @@ class PayU {
         $this->editOrder = $editOrder;
     }
 
-    public function payCreditCard(User $user, array $data) {
+    public function payCreditCard(User $user, array $data, Order $order) {
         $validator = $this->validatorCC($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
-        $order = $this->editOrder->prepareOrder($user);
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
 
@@ -172,12 +171,171 @@ class PayU {
         return array("status" => "error", "message" => "missing billing Address");
     }
 
-    public function payDebitCard(User $user, array $data) {
+    public function payToken(User $user, array $data, Order $order) {
+        $validator = $this->validatorToken($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $billing = $order->orderAddresses()->where('type', "billing")->first();
+        if ($billing) {
+            $creditCardTokenId = "";
+
+
+            $billingCountry = Country::find($billing->country_id);
+            $billingRegion = Region::find($billing->region_id);
+            $billingCity = City::find($billing->city_id);
+            $shippingCountry = Country::find($billing->country_id);
+            $shippingRegion = Region::find($billing->region_id);
+            $shippingCity = City::find($billing->city_id);
+            $deviceSessionId = md5(session_id() . microtime());
+            $accountId = "512321";
+            $apiLogin = env('PAYU_LOGIN');
+            $apiKey = env('PAYU_KEY');
+            $reference = "besafe_test_1_" . $order->id;
+            $order->referenceCode = $reference;
+            $order->save();
+            $currency = "COP";
+            $merchantId = "508029";
+            $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
+            $sig = sha1($str);
+            $merchant = [
+                'apiLogin' => $apiLogin,
+                'apiKey' => $apiKey
+            ];
+            $additionalValues = [
+                'value' => number_format($order->total, 2, '.', ''),
+                'currency' => $currency
+            ];
+            $additionalValuesCont = [
+                'TX_VALUE' => $additionalValues
+            ];
+
+            $buyerAddress = [
+                "street1" => $billing->address,
+                "street2" => "",
+                "city" => $billingCity->name,
+                "state" => $billingRegion->name,
+                "country" => $billingCountry->code,
+                "postalCode" => $billing->postal,
+                "phone" => $billing->phone
+            ];
+            $buyer = [
+                "merchantBuyerId" => "1",
+                "fullName" => $billingCity->name,
+                "emailAddress" => $data['payer_email'],
+                "contactPhone" => $billing->phone,
+                "dniNumber" => $data['payer_id'],
+                "shippingAddress" => $buyerAddress
+            ];
+            $shipping = $order->orderAddresses()->where('type', "shipping")->first();
+            if ($shipping) {
+                $ShippingAddress = [
+                    "street1" => $shipping->address,
+                    "street2" => "",
+                    "city" => $shippingCity->name,
+                    "state" => $shippingRegion->name,
+                    "country" => $shippingCountry->code,
+                    "postalCode" => $shipping->postal,
+                    "phone" => $shipping->phone
+                ];
+            } else {
+                $ShippingAddress = [
+                    "street1" => $billing->address,
+                    "street2" => "",
+                    "city" => $billingCity->name,
+                    "state" => $billingRegion->name,
+                    "country" => $billingCountry->code,
+                    "postalCode" => $billing->postal,
+                    "phone" => $billing->phone
+                ];
+            }
+            $orderCont = [
+                "accountId" => $accountId,
+                "referenceCode" => $reference,
+                "description" => "besafe payment test",
+                "language" => "es",
+                "signature" => $sig,
+                "notifyUrl" => "http://www.tes.com/confirmation",
+                "additionalValues" => $additionalValuesCont,
+                "buyer" => $buyer,
+                "shippingAddress" => $ShippingAddress
+            ];
+
+            $payerAddress = [
+                "street1" => $billing->address,
+                "street2" => "",
+                "city" => $billingCity->name,
+                "state" => $billingRegion->name,
+                "country" => $billingCountry->code,
+                "postalCode" => $billing->postal,
+                "phone" => $billing->phone
+            ];
+            $payer = [
+                "merchantPayerId" => "1",
+                "fullName" => $billingCity->name,
+                "emailAddress" => $data['payer_email'],
+                "contactPhone" => $billing->phone,
+                "dniNumber" => $data['payer_id'],
+                "billingAddress" => $payerAddress
+            ];
+
+            $extraParams = [
+                "INSTALLMENTS_NUMBER" => 1
+            ];
+            $transaction = [
+                "order" => $orderCont,
+                "payer" => $payer,
+                "creditCardTokenId" => $creditCardTokenId,
+                "extraParameters" => $extraParams,
+                "type" => "AUTHORIZATION_AND_CAPTURE",
+                "paymentMethod" => $data['cc_branch'],
+                "paymentCountry" => $billingCountry->code,
+                "deviceSessionId" => $deviceSessionId,
+                "ipAddress" => $data['ip_address'],
+                "cookie" => "pt1t38347bs6jc9ruv2ecpv7o2",
+                "userAgent" => $data['user_agent']
+            ];
+            $dataSent = [
+                "language" => "es",
+                "command" => "SUBMIT_TRANSACTION",
+                "merchant" => $merchant,
+                "transaction" => $transaction,
+                "test" => false,
+            ];
+//        return $dataSent;
+            $result = $this->sendRequest($dataSent, false);
+            return $this->handleTransactionResponse($result, $user, $order);
+        }
+        return array("status" => "error", "message" => "missing billing Address");
+    }
+
+    public function createToken(User $user, array $data) {
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
+        $merchant = [
+            'apiLogin' => $apiLogin,
+            'apiKey' => $apiKey
+        ];
+        $creditCardToken = [
+            "payerId" => "10",
+            "name" => "full name",
+            "identificationNumber" => "32144457",
+            "paymentMethod" => "VISA",
+            "number" => "4111111111111111",
+            "expirationDate" => "2017/01"
+        ];
+        $request = [
+            "command" => "CREATE_TOKEN",
+            "merchant" => $merchant,
+            "creditCardToken" => $creditCardToken
+        ];
+    }
+
+    public function payDebitCard(User $user, array $data, Order $order) {
         $validator = $this->validatorDebit($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
-        $order = $this->editOrder->prepareOrder($user);
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
             $billingCountry = Country::find($billing->country_id);
@@ -240,6 +398,7 @@ class PayU {
                 "type" => "AUTHORIZATION_AND_CAPTURE",
                 "paymentMethod" => "PSE",
                 "paymentCountry" => $billingCountry->code,
+                "deviceSessionId" => $deviceSessionId,
                 "ipAddress" => $data['ip_address'],
                 "cookie" => $data['cookie'],
                 "userAgent" => $data['user_agent']
@@ -258,12 +417,11 @@ class PayU {
         return array("status" => "error", "message" => "missing billing Address");
     }
 
-    public function payCash(User $user, array $data) {
+    public function payCash(User $user, array $data, Order $order) {
         $validator = $this->validatorCash($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
-        $order = $this->editOrder->prepareOrder($user);
         $accountId = "512321";
         $apiLogin = env('PAYU_LOGIN');
         $apiKey = env('PAYU_KEY');
@@ -437,6 +595,13 @@ class PayU {
                     $transactionResponse['extras'] = json_encode($extras);
                 }
                 $transaction = Transaction::create($transactionResponse);
+                if ($transactionResponse['state'] == 'APPROVED') {
+                    $this->editOrder->approveOrder($order, $transaction->id);
+                } else if ($transactionResponse['state'] == 'PENDING') {
+                    $this->editOrder->setOrderPending($order, $transaction->id);
+                } else {
+                    $this->editOrder->cancelOrder($order, $transaction->id);
+                }
                 return ["status" => "success", "transaction" => $transaction, "response" => $response];
             } else {
                 return $response;
@@ -492,17 +657,17 @@ class PayU {
         $transactions = Transaction::where("state", "pending")->get();
         foreach ($transactions as $transaction) {
             $response = $this->getStatusOrderId($transaction->orderId);
-            dd($response);
             if ($response['code'] == "SUCCESS") {
                 $result = $response['result'];
                 $payload = $result['payload'];
-                if ($payload['state'] == "PENDING") {
+                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
+                $order = $transaction->order;
+                if ($transactionResponse['state'] == 'APPROVED') {
+                    $this->editOrder->approveOrder($order, $transaction->id);
+                } else if ($transactionResponse['state'] == 'PENDING') {
                     continue;
                 } else {
-                    Transaction::where('transactionId', $transaction->transactionId)
-                            ->update($payload);
-                    $transaction = Transaction::find($transaction->id);
-                    $this->editOrder->approveOrder($transaction->order_id);
+                    $this->editOrder->cancelOrder($order, $transaction->id);
                 }
             }
         }
@@ -539,21 +704,21 @@ class PayU {
                 $transaction->extras = json_encode($data);
                 $order = $transaction->order;
                 if ($data['transactionState'] == 4) {
-                    $this->editOrder->approveOrder($order);
+                    $this->editOrder->approveOrder($order, $transaction->id);
                     $transaction->description = "Transacción aprobada";
                 } else if ($data['transactionState'] == 6) {
-                    $this->editOrder->rejectOrder($order);
+                    $this->editOrder->cancelOrder($order, $transaction->id);
                     $transaction->description = "Transacción rechazada";
                 } else if ($data['transactionState'] == 104) {
-                    $this->editOrder->errorOrder($order);
+                    $this->editOrder->cancelOrder($order, $transaction->id);
                     $transaction->description = "Error";
                 } else if ($data['transactionState'] == 7) {
-                    $transaction->description = "Transacción pendiente";
+                    $this->editOrder->setOrderPending($order, $transaction->id);
                 } else {
                     $transaction->description = $data['mensaje'];
                 }
                 $transaction->save();
-                return ["status"=>"success", "message" => "transaction processed"];
+                return ["status" => "success", "message" => "transaction processed", "data" => $data ];
             }
         } else {
             
@@ -591,21 +756,21 @@ class PayU {
                 $transaction->extras = json_encode($data);
                 $order = $transaction->order;
                 if ($data['transactionState'] == 4) {
-                    $this->editOrder->approveOrder($order);
+                    $this->editOrder->approveOrder($order, $transaction->id);
                     $transaction->description = "Transacción aprobada";
                 } else if ($data['transactionState'] == 6) {
-                    $this->editOrder->rejectOrder($order);
+                    $this->editOrder->cancelOrder($order, $transaction->id);
                     $transaction->description = "Transacción rechazada";
                 } else if ($data['transactionState'] == 104) {
-                    $this->editOrder->errorOrder($order);
+                    $this->editOrder->cancelOrder($order, $transaction->id);
                     $transaction->description = "Error";
                 } else if ($data['transactionState'] == 7) {
-                    $transaction->description = "Transacción pendiente";
+                    $this->editOrder->setOrderPending($order, $transaction->id);
                 } else {
                     $transaction->description = $data['mensaje'];
                 }
                 $transaction->save();
-                return ["order"=>$order, "transaction" => $transaction];
+                return ["status" => "successed", "message" => "transaction Processed"];
             }
         } else {
             

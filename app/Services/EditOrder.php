@@ -445,8 +445,8 @@ class EditOrder {
         if ($item) {
             $quantity = $item->quantity + (int) $data['quantity'];
             $productVariant = $item->productVariant;
-            if ($productVariant->quantity >= $quantity) {
-                Cart::update($productVariant->id, array(
+            if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
+                Cart::update($item->id, array(
                     'quantity' => (int) $data['quantity'], // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
                 ));
                 $item->quantity = $quantity;
@@ -458,7 +458,7 @@ class EditOrder {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                if ((int) $productVariant->quantity >= (int) $data['quantity']) {
+                if ((int) $productVariant->quantity >= (int) $data['quantity']  || $productVariant->is_digital ) {
                     $conditions = $productVariant->conditions()->where('isActive', true)->get();
                     $applyConditions = array();
                     foreach ($conditions as $condition) {
@@ -487,14 +487,6 @@ class EditOrder {
                     }
                     $losAttributes['is_digital'] = $productVariant->is_digital;
                     $losAttributes['is_shippable'] = $productVariant->is_shippable;
-                    Cart::add(array(
-                        'id' => $productVariant->id,
-                        'name' => $product->name,
-                        'price' => $productVariant->price,
-                        'quantity' => (int) $data['quantity'],
-                        'attributes' => $losAttributes,
-                        'conditions' => $applyConditions
-                    ));
                     $item = Item::create([
                                 'product_variant_id' => $productVariant->id,
                                 'name' => $product->name,
@@ -503,6 +495,15 @@ class EditOrder {
                                 'quantity' => (int) $data['quantity'],
                                 'attributes' => json_encode($losAttributes)
                     ]);
+                    Cart::add(array(
+                        'id' => $item->id,
+                        'name' => $product->name,
+                        'price' => $productVariant->price,
+                        'quantity' => (int) $data['quantity'],
+                        'attributes' => $losAttributes,
+                        'conditions' => $applyConditions
+                    ));
+                    
                     return array("status" => "success", "message" => "item added to cart successfully");
                 } else {
                     return array("status" => "error", "message" => "No more stock of that product");
@@ -525,10 +526,10 @@ class EditOrder {
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
-                if ($productVariant->quantity >= ((int) $data['quantity'] )) {
+                if ($productVariant->quantity >= ((int) $data['quantity'] )  || $productVariant->is_digital) {
                     $item->quantity = (int) $data['quantity'];
                     $item->save();
-                    Cart::update($productVariant->id, array(
+                    Cart::update($item->id, array(
                         'quantity' => array(
                             'relative' => false,
                             'value' => $item->quantity
