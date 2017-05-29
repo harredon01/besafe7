@@ -1,6 +1,6 @@
 angular.module('besafe')
         
-        .service('Checkout', function ($q, $http) {
+        .service('Payu', function ($q, $http) {
 
             var setShippingAddress = function (address_id) {
                 var def = $q.defer();
@@ -18,6 +18,81 @@ angular.module('besafe')
 
                 return def.promise;
                 /**/
+            }
+            var payCreditCard = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/pay/pay_cc',
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var getBanks = function () {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/pay/banks',
+                        
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var payDebitCard = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/pay/pay_debit',
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var payCash = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/pay/pay_cash',
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
             }
             var setShippingCondition = function (condition_id) {
                 var def = $q.defer();

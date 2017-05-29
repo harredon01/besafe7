@@ -1,6 +1,6 @@
 ﻿angular.module('besafe')
 
-        .controller('CheckoutCartCtrl', function ($scope, $rootScope, LocationService, Users, Checkout, Products, $window) {
+        .controller('CheckoutCartCtrl', function ($scope, $rootScope, Users, Checkout, Products, $window) {
             $scope.data = {};
             angular.element(document).ready(function () {
                 $scope.getCart();
@@ -274,7 +274,7 @@
                         });
             }
         })
-        .controller('CheckoutBillingCtrl', function ($scope, $rootScope, LocationService, Users, Checkout, Products, $window) {
+        .controller('CheckoutBillingCtrl', function ($scope, $rootScope, LocationService, Users, Checkout, Payu, $window) {
             $scope.data = {};
             $scope.data2 = {};
             $scope.data3 = {};
@@ -328,7 +328,7 @@
             $scope.payCreditCard = function (isvalid) {
                 $scope.submitted2 = true;
                 if (isvalid) {
-                    Checkout.payCreditCard($.param($scope.data2)).then(function (data) {
+                    Payu.payCreditCard($.param($scope.data2)).then(function (data) {
                         //$scope.data2 = {};
                     },
                             function (data) {
@@ -339,7 +339,7 @@
             $scope.payDebitCard = function (isvalid) {
                 $scope.submitted3 = true;
                 if (isvalid) {
-                    Checkout.payDebitCard($.param($scope.data3)).then(function (data) {
+                    Payu.payDebitCard($.param($scope.data3)).then(function (data) {
                         window.location.href = data.transactionResponse.extraParameters.BANK_URL;
                     },
                             function (data) {
@@ -350,7 +350,7 @@
             $scope.payCash = function (isvalid) {
                 $scope.submitted4 = true;
                 if (isvalid) {
-                    Checkout.payCash($.param($scope.data4)).then(function (data) {
+                    Payu.payCash($.param($scope.data4)).then(function (data) {
                         window.location.href = data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML;
                     },
                             function (data) {
@@ -458,7 +458,7 @@
                 $scope.debito = false;
                 if (method == "PSE") {
                     $scope.debito = true;
-                    Checkout.getBanks().then(function (data) {
+                    Payu.getBanks().then(function (data) {
                         $scope.banks = data.banks;
                     },
                             function (data) {
@@ -472,5 +472,8 @@
                     $scope.cash = true;
                 }
             }
+        })
+        .controller('CheckoutGatewaysCtrl', function () {
+
         })
         

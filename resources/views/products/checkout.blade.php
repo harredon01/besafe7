@@ -35,17 +35,32 @@
                             <a href="javascript:;" ng-click="hideAddressForm()">Cerrar</a>
                         </div>
                         <div class="replace-address" ng-show="shippingAddressSet">
-                            
+
                             @include('products.ShippingMethodsList')
                         </div>
 
                     </div>
-
-                    <div class="payment-methods" ng-show="shippingCondition || isDigital" ng-controller="CheckoutBillingCtrl">
+                    <div class="payment-gateways" ng-show="shippingCondition || isDigital" ng-controller="CheckoutGatewaysCtrl">
                         <div class="replace-address">
-                            @include('products.checkoutPaymentMethods')
+                            @include('products.checkoutPaymentGateways')
                         </div>
-                        
+
+                    </div>
+                    <div class="payu" style="display: none">
+                        <div class="payment-methods" ng-show="shippingCondition || isDigital" ng-controller="CheckoutBillingCtrl">
+                            <div class="replace-address">
+                                @include('products.checkoutPaymentMethods')
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="stripe" style="display: none">
+                        <div class="replace-address">
+                            @include('products.checkoutStripePaymentMethods')
+                        </div>
+
                     </div>
 
 

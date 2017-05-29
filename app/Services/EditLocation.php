@@ -71,7 +71,7 @@ class EditLocation {
      * @return Location
      */
     public function moveOldLocations() {
-        $locations = Location::whereRaw(" DATEDIFF(CURDATE(),created_at) > 1")->get()->toarray();
+        /*$locations = Location::whereRaw(" DATEDIFF(CURDATE(),created_at) > 1")->get()->toarray();
         if (sizeof($locations) > 0) {
             HistoricLocation::insert($locations);
             DB::delete("DELETE from locations where DATEDIFF(CURDATE(),created_at) > 1");
@@ -82,7 +82,7 @@ class EditLocation {
             DB::delete("DELETE from historic_location where DATEDIFF(CURDATE(),created_at) > 4");
         }
         $this->editAlerts->moveOldUserFollowing();
-        $this->editAlerts->moveOldReportsSharing();
+        $this->editAlerts->moveOldReportsSharing();*/
     }
 
     /**
