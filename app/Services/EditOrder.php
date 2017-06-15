@@ -13,6 +13,8 @@ use App\Models\Condition;
 use App\Models\ProductVariant;
 use App\Models\PaymentMethod;
 use App\Models\Address;
+use App\Services\PayU;
+use App\Services\Stripe;
 use Mail;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -25,6 +27,31 @@ class EditOrder {
      *
      */
     protected $auth;
+
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $payU;
+
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $stripe;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(PayU $payU, Stripe $stripe) {
+        $this->payU = $payU;
+        $this->stripe = $stripe;
+    }
 
     public function getCart() {
         $items = Cart::getContent();
@@ -54,6 +81,7 @@ class EditOrder {
         $items = Cart::getContent();
         $result = array();
         $is_shippable = false;
+        $is_subscription = false;
         foreach ($items as $item) {
             $dataitem = array();
             $dataitem['id'] = $item->id; // the Id of the item
@@ -66,12 +94,12 @@ class EditOrder {
             $dataitem['attributes'] = $item->attributes; // the attributes
             $attrs = json_decode($item->attributes, true);
             if ($attrs) {
-                if ($attrs['is_shippable'] == true) {
-                    $is_shippable = true;
+                if (array_key_exists("is_shippable", $attrs)) {
+                    if ($attrs['is_shippable'] == true) {
+                        $is_shippable = true;
+                    }
                 }
             }
-            // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
-            // so you can do things like below:
             array_push($result, $dataitem);
         }
         $subTotal = Cart::getSubTotal();
@@ -100,6 +128,7 @@ class EditOrder {
         $data['subtotal'] = $subTotal;
         $data['shipping'] = $shippingTotal;
         $data['is_shippable'] = $is_shippable;
+        $data['is_subscription'] = $is_subscription;
         if ($taxTotal == 0) {
             $temptotal = $subTotal / 1.16;
             $taxTotal = $subTotal - $temptotal;
@@ -135,15 +164,127 @@ class EditOrder {
 
     public function prepareOrder(User $user) {
         $order = $this->getOrder($user);
-        $data = $this->getCheckoutCart();
-        $order->status = "holding";
+        $data = $this->getCheckoutCart($order);
+        //$this->addItemsOrder($user, $order);
+
+        $order->is_shippable = $data['is_shippable'];
+        $order->is_subscription = $data['is_subscription'];
         $order->subtotal = $data["subtotal"];
         $order->tax = $data["tax"];
         $order->shipping = $data["shipping"];
         $order->discount = $data["discount"];
         $order->total = $data["total"];
         $order->save();
+        /* $className = "App\\Services\\" . $payment;
+          $gateway = new $className; //// <--- this thing will be autoloaded */
         return $order;
+    }
+
+    public function processModel(User $user, array $data) {
+        $class = "App\\Models\\" . $data["model"];
+        $model = $class::find($data['id']);
+        $interval = $data['interval'];
+        $interval_type = $data['interval_type'];
+        if ($model->isActive()) {
+            $date = $model->ends_at;
+        } else {
+            $date = date("Y-m-d");
+        }
+
+        //increment 
+        $mod_date = strtotime($date . "+ " . $interval . " " . $interval_type);
+        $newdate = date("Y-m-d", $mod_date);
+        $model->ends_at = $newdate;
+        $model->save();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function payOrder(User $user, array $data, $source) {
+        $items = Cart::getContent();
+        $order = $this->getOrder($user);
+        $order->status = "holding";
+        $order->save();
+        $is_shippable = false;
+        $data = array();
+        foreach ($items as $item) {
+            $dataitem = array();
+            $cartItem = Item::find($item->id);
+            if ($cartItem) {
+                
+            } else {
+                $cartItem = new Item;
+            }
+            $cartItem->id = $item->id; // the Id of the item
+            $cartItem->name = $item->name; // the name
+            $cartItem->order_id = $order->id; // the order
+            $cartItem->price = $item->price; // the single price without conditions applied
+            $cartItem->priceSum = $item->getPriceSum(); // the subtotal without conditions applied
+            $cartItem->priceConditions = $item->getPriceWithConditions(); // the single price with conditions applied
+            $cartItem->priceSumConditions = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
+            $cartItem->quantity = $item->quantity; // the quantity
+            $cartItem->attributes = $item->attributes; // the attributes
+            // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
+            // so you can do things like below:
+            $attrs = json_decode($item->attributes, true);
+            if ($attrs) {
+                if (array_key_exists("is_shippable", $attrs)) {
+                    if ($attrs['is_shippable'] == true) {
+                        $is_shippable = true;
+                    }
+                }
+            }
+
+            $cartItem->save();
+        }
+        if (count($items) > 0) {
+            $subTotal = Cart::getSubTotal();
+            $shippingItems = Cart::getConditionsByType("shipping");
+            $shippingTotal = 0;
+            foreach ($shippingItems as $item) {
+                $shippingTotal += $item->getCalculatedValue($subTotal);
+            }
+            $taxItems = Cart::getConditionsByType("tax");
+            $taxTotal = 0;
+            foreach ($taxItems as $item) {
+                $taxTotal += $item->getCalculatedValue($subTotal);
+            }
+            $saleItems = Cart::getConditionsByType("sale");
+            $saleTotal = 0;
+            foreach ($saleItems as $item) {
+                $saleTotal += $item->getCalculatedValue($subTotal);
+            }
+            $couponItems = Cart::getConditionsByType("coupon");
+            $couponTotal = 0;
+            foreach ($couponItems as $item) {
+                $couponTotal += $item->getCalculatedValue($subTotal);
+            }
+            $total = Cart::getTotal();
+            $order->subtotal = $subTotal;
+            $order->shipping = $shippingTotal;
+            $order->is_shippable = $is_shippable;
+            if ($taxTotal == 0) {
+                $temptotal = $subTotal / 1.16;
+                $taxTotal = $subTotal - $temptotal;
+                $subTotal = $temptotal;
+            }
+            $order->tax = $taxTotal;
+            $order->discount = $saleTotal + $couponTotal;
+            $order->total = $total;
+            $className = "App\\Services\\" . $source;
+            $gateway = new $className; //// <--- this thing will be autoloaded
+            $sources = $user->sources()->where('gateway', strtolower($source))->get();
+            if ($sources) {
+                
+            } else {
+                $client = $gateway->createClient($user);
+            }
+            return $gateway->makeCharge($user, $data);
+        }
+        return array("status" => "error", "message" => "Empty Cart");
     }
 
     /**
@@ -221,16 +362,61 @@ class EditOrder {
         }
         return array("status" => "error", "message" => "Address does not exist");
     }
+
     public function approveOrder(Order $order) {
-        $subscriptions = $order->subscriptions();
-        foreach($subscriptions as $subscription){
-            $plan = $subscription->plan();
-            $subscription->status = "active";
-            $subscription->ends_at = date_add($subscription->ends_at,date_interval_create_from_date_string($plan->amount." ".$plan->interval));
-            $subscription->save();
-            $this->emailCustomer($order); 
+        $items = Cart::getContent();
+        $data = array();
+        $result = array();
+        foreach ($items as $item) {
+            $dataitem = array();
+            $dataitem['id'] = $item->id; // the Id of the item
+            $dataitem['name'] = $item->name; // the name
+            $dataitem['price'] = $item->price; // the single price without conditions applied
+            $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
+            $dataitem['priceConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
+            $dataitem['priceSumConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
+            $dataitem['quantity'] = $item->quantity; // the quantity
+            $dataitem['attributes'] = $item->attributes; // the attributes
+            // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
+            // so you can do things like below:
+            array_push($data, $dataitem);
+        }
+        $items = $order->items();
+        foreach ($items as $item) {
+            $data = json_decode($item->attributes);
+            if (array_key_exists("type", $data)) {
+                if ($data['type'] == "subscription") {
+                    $object = $data['object'];
+                    $id = $data['id'];
+                    $payer = $order->user_id;
+                    $interval = $data['interval'];
+                    $interval_type = $data['interval_type'];
+                    $date = date("Y-m-d");
+                    //increment 2 days
+                    $mod_date = strtotime($date . "+ " . $interval . " " . $interval_type);
+                    $newdate = date("Y-m-d", $mod_date);
+                    // add date to object
+                }
+            }
+            $attrs = json_decode($item->attributes, true);
+            if ($attrs) {
+                if (array_key_exists("model", $attrs)) {
+                    $class = "App\\Models\\" . $attrs["model"];
+                    $model = $class::where("id", $attrs['id']);
+                } else {
+                    
+                }
+            }
         }
         return array("status" => "error", "message" => "Address does not exist");
+    }
+
+    public function denyOrder(Order $order) {
+        
+    }
+
+    public function pendingOrder(Order $order) {
+        
     }
 
     /**
@@ -281,35 +467,6 @@ class EditOrder {
             return array("status" => "error", "message" => "No shipping conditions for that address");
         }
         return array("status" => "error", "message" => "Address not found");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function setOrderDetails(User $user, array $data) {
-        $order = $this->getCart($user);
-
-        $paymentMethod = PaymentMethod::find(intval($data["payment_method_id"]));
-        $test["payment_method_id"] = $data["payment_method_id"];
-        $test["payment"] = $paymentMethod;
-        $test["order"] = $order;
-        /* if($order->id==3){
-          dd($test);
-          } */
-        if ($paymentMethod) {
-            if (array_key_exists("comments", $data)) {
-                $order->comments = $data['comments'];
-            }
-            if (array_key_exists("cash_for_change", $data)) {
-                $order->cash_for_change = $data['cash_for_change'];
-            }
-            $order->payment_method_id = $paymentMethod->id;
-            $order->status = "holding";
-            return array("status" => "success", "message" => "Email sent to merchant");
-        }
-        return array("status" => "error", "message" => "Invalid Payment Method");
     }
 
     /**
@@ -458,7 +615,7 @@ class EditOrder {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                if ((int) $productVariant->quantity >= (int) $data['quantity']  || $productVariant->is_digital ) {
+                if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
                     $conditions = $productVariant->conditions()->where('isActive', true)->get();
                     $applyConditions = array();
                     foreach ($conditions as $condition) {
@@ -503,7 +660,7 @@ class EditOrder {
                         'attributes' => $losAttributes,
                         'conditions' => $applyConditions
                     ));
-                    
+
                     return array("status" => "success", "message" => "item added to cart successfully");
                 } else {
                     return array("status" => "error", "message" => "No more stock of that product");
@@ -526,7 +683,7 @@ class EditOrder {
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
-                if ($productVariant->quantity >= ((int) $data['quantity'] )  || $productVariant->is_digital) {
+                if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
                     $item->quantity = (int) $data['quantity'];
                     $item->save();
                     Cart::update($item->id, array(

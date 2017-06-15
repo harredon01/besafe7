@@ -1,4 +1,4 @@
-angular.module('starter')
+angular.module('besafe')
         .factory('Alerts', function ($q, $rootScope, $http, $ionicPopup, $cordovaToast, $state, MapService, $cordovaSQLite, $ionicHistory, Groups, Chats, Contacts, API) {
             // Might use a resource here that returns a JSON array
             var RED_MESSAGE_TYPE = 'emergency';

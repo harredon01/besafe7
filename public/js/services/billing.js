@@ -1,0 +1,181 @@
+angular.module('besafe')
+        
+        .service('Billing', function ($q, $http) {
+
+            var createSubscriptionExisting = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/subscriptions/'+platform,
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var createSubscription = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/subscriptions/'+platform,
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var editSubscription = function (data,subscription,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/subscriptions/'+platform+"/"+subscription,
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var getSubscriptions = function (platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/subscriptions/'+platform,
+                        
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get sources");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var deleteSubscription = function (subscription,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'Delete',
+                        url: '/subscriptions/'+platform+"/"+subscription,
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var createSource = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/sources/'+platform,
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var getSources = function (platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/sources/'+platform,
+                        
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get sources");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var deleteSource = function (source,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'Delete',
+                        url: '/sources/'+platform+"/"+source,
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var makeCharge = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/pay/pay_cash',
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            return {
+                deleteSource: deleteSource,
+                getSources:getSources,
+                createSource: createSource,
+                makeCharge: makeCharge,
+                deleteSubscription:deleteSubscription,
+                getSubscriptions:getSubscriptions,
+                editSubscription:editSubscription,
+                createSubscription:createSubscription,
+                createSubscriptionExisting:createSubscriptionExisting
+            };
+        })

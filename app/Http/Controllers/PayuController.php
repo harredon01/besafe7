@@ -39,7 +39,6 @@ class PayuController extends Controller {
         $data = $request->all();
         $data['ip_address'] = $request->ip();
         $data['user_agent'] = $request->header('User-Agent');
-        ;
         $data['cookie'] = $request->cookie('name');
         $status = $this->payU->payCreditCard($user, $data);
         return response()->json($status);

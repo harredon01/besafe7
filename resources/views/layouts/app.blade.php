@@ -29,6 +29,7 @@
         <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
@@ -36,7 +37,7 @@
         <script src="{{ asset('/js/services/products.js')}}"></script>
         <script src="{{ asset('/js/services/checkout.js')}}"></script>
         <script src="{{ asset('/js/services/payu.js')}}"></script>
-        <script src="{{ asset('/js/services/stripe.js')}}"></script>
+        <script src="{{ asset('/js/services/billing.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script src="https://js.stripe.com/v2/"></script>
         <script src="https://js.stripe.com/v3/"></script>
@@ -82,7 +83,8 @@ echo json_encode([
                             <!--li><a href="{{ url('/login') }}">Login</a></li>
                             <li><a href="{{ url('/register') }}">Register</a></li-->
                             @else
-                            <!--li><a href="{{ url('/products')}}">Products</a></li-->
+                            <li><a href="{{ url('products')}}">Products</a></li>
+                            <li><a href="{{ url('plans')}}">Plans</a></li>
                             <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
                                 @include('products.cart')
                             </li>
@@ -106,6 +108,8 @@ echo json_encode([
                                     </li>
                                     <li><a href="{{ url('user/editProfile')}}">Edit Profile</a></li>
                                     <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
+                                    <li><a href="{{ url('sources')}}">Edit Sources</a></li>
+                                    <li><a href="{{ url('subscriptions')}}">Edit Subscriptions</a></li>
                                     <!--li><a href="{{ url('user/editAccess')}}">Edit Access</a></li-->
                                 </ul>
                             </li>

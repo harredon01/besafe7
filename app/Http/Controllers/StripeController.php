@@ -58,7 +58,7 @@ class PayuController extends Controller {
         $data['user_agent'] = $request->header('User-Agent');
         ;
         $data['cookie'] = $request->cookie('name');
-        $status = $this->payU->payDebitCard($user, $data);
+        $status = $this->payU->makeCharge($user, $data);
         return response()->json($status);
     }
 
@@ -87,6 +87,17 @@ class PayuController extends Controller {
      */
     public function getBanks() {
         $status = $this->payU->getBanks();
+        return response()->json($status);
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getSources(Request $request) {
+        $user = $request->user();
+        $status = $this->payU->getSources($user);
         return response()->json($status);
     }
 

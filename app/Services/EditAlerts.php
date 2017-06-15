@@ -289,6 +289,20 @@ class EditAlerts {
         if ($userSending->id > 0) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
+            if(!$translation){
+                        $file = '/home/hoovert/acces2.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+
+        $current .= json_encode($data);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
+            }
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
             $pos = strpos("e".$data['type'], 'Report');
             if ($pos) {

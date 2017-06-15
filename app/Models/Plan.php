@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,11 +18,8 @@ class Plan extends Model
      *
      * @var array
      */
-    protected $fillable = ['plan_id', 'name','type', 'duration', 'level','interval','amount'];
+    protected $fillable = ['plan_id', 'name','type', 'duration', 'interval','interval_type','gateway'];
 
-    public function productVariant() {
-        return $this->belongsTo('App\Models\ProductVariant');
-    }
     public function subscription() {
         return $this->hasMany('App\Models\Subscription');
     }

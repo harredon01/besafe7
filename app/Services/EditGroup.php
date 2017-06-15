@@ -298,6 +298,7 @@ class EditGroup {
             $data["max_users"] = 10;
             $invites = $data['contacts'];
             unset($data['contacts']);
+            unset($data[0]);
             unset($data[""]);
             if($data['is_public']){
                 $data['ends_at'] = date('Y-m-d', strtotime("+10 days"));

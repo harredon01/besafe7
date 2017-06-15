@@ -19,6 +19,10 @@ class CreateItemsTable extends Migration {
                         $table->string('sku');
                         $table->string('ref2');
                         $table->double('price', 15, 2);
+                        $table->double('priceSum', 15, 2);
+                        $table->double('priceConditions', 15, 2);
+                        $table->double('priceSumConditions', 15, 2);
+                        $table->boolean('is_subscription');
                         $table->integer('quantity');
                         $table->integer('product_variant_id')->unsigned()->nullable();
                         $table->foreign('product_variant_id')->references('id')

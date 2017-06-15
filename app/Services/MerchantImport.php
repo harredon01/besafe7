@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
+use App\Models\Plan;
 use App\Jobs\PostLocation;
 use App\Jobs\InviteUsers;
 use App\Models\Block;
@@ -709,7 +710,7 @@ class MerchantImport {
                     $code = null;
                 } else {
                     $code = $sheet['merchant_id'];
-                }
+        }
                 $product = Product::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
@@ -718,7 +719,19 @@ class MerchantImport {
                             'isActive' => $sheet['isactive'],
                             'slug' => $sheet['slug'],
                 ]);
-            }
+    }
+        }
+    }
+    
+    public function importPlans($filename) {
+        $excel = Excel::load(storage_path('imports') . '/' . $filename);
+        $reader = $excel->toArray();
+        $i = 1;
+        foreach ($reader as $sheet) {
+            $sheet['id'] = $i;
+            $sheet['plan_id'] ="plan-". $i;
+            $i++;
+            $plan = Plan::updateOrCreate($sheet); 
         }
     }
 

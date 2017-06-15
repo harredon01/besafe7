@@ -15,6 +15,23 @@ use Illuminate\Http\Request;
 
 Route::resource('addresses', 'AddressApiController');
 
+Route::delete('subscriptions/{source?}/{id?}', 'SubscriptionApiController@destroy');
+Route::post('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
+Route::patch('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
+Route::put('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
+//Route::get('subscriptions/{source?}', 'SubscriptionApiController@show');
+Route::post('subscriptions/{source?}', 'SubscriptionApiController@store');
+Route::post('subscriptions/{source?}/existing', 'SubscriptionApiController@storeExistingSource');
+Route::get('subscriptions/{source?}', 'SubscriptionApiController@index');
+
+Route::delete('sources/{source?}/{id?}', 'SourceApiController@destroy');
+//Route::post('sources/{source?}/{id?}', 'SourceApiController@edit');
+//Route::patch('sources/{source?}/{id?}', 'SourceApiController@edit');
+//Route::put('sources/{source?}/{id?}', 'SourceApiController@edit');
+Route::get('sources/{source?}/{id?}', 'SourceApiController@show');
+Route::post('sources/{source?}', 'SourceApiController@store');
+Route::get('sources/{source?}', 'SourceApiController@index');
+
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');

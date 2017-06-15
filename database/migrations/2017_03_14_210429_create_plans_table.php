@@ -17,11 +17,10 @@ class CreatePlansTable extends Migration
             $table->increments('id');
             $table->string('plan_id');
             $table->string('type');
-            $table->string('level');
             $table->string('name');
             $table->string('interval');
-            $table->string('amount');
-            $table->string('duration');
+            $table->string('interval_type');
+	    $table->string('gateway');
             $table->timestamps();
         });
     }

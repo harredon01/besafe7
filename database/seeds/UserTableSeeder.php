@@ -166,6 +166,8 @@ class UserTableSeeder extends Seeder {
             'country_id' => "1",
         );
         $this->editUserData->createOrUpdateAddress($user, $data);*/
+        $this->merchantImport->importTranslations("translations.xlsx");
+        $this->command->info('Translations seeded');
         $this->merchantImport->importUsers("users.xlsx");
         $this->command->info('users seeded!');
         $this->merchantImport->importAddresses("address.xlsx");

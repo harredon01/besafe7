@@ -8,26 +8,14 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Region;
 use App\Models\City;
+use App\Jobs\ApproveOrder;
+use App\Jobs\DenyOrder;
+use App\Jobs\PendingOrder;
+use App\Models\Source;
+use App\Models\Subscription;
 use App\Models\Transaction;
-use App\Services\EditOrder;
 
 class PayU {
-
-    /**
-     * The Auth implementation.
-     *
-     */
-    protected $editOrder;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(EditOrder $editOrder) {
-        $this->editOrder = $editOrder;
-    }
 
     public function payCreditCard(User $user, array $data, Order $order) {
         $validator = $this->validatorCC($data);
@@ -165,20 +153,20 @@ class PayU {
                 "test" => false,
             ];
 //        return $dataSent;
-            $result = $this->sendRequest($dataSent, false);
+            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
             return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
     }
 
-    public function payToken(User $user, array $data, Order $order) {
-        $validator = $this->validatorToken($data);
+    public function useSource(User $user, array $data, Order $order) {
+        $validator = $this->validatorUseSource($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
-            $creditCardTokenId = "";
+            $creditCardTokenId = $data['source'];
 
 
             $billingCountry = Country::find($billing->country_id);
@@ -303,32 +291,21 @@ class PayU {
                 "test" => false,
             ];
 //        return $dataSent;
-            $result = $this->sendRequest($dataSent, false);
+            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
             return $this->handleTransactionResponse($result, $user, $order);
         }
         return array("status" => "error", "message" => "missing billing Address");
     }
 
-    public function createToken(User $user, array $data) {
-        $apiLogin = env('PAYU_LOGIN');
-        $apiKey = env('PAYU_KEY');
-        $merchant = [
-            'apiLogin' => $apiLogin,
-            'apiKey' => $apiKey
-        ];
-        $creditCardToken = [
-            "payerId" => "10",
-            "name" => "full name",
-            "identificationNumber" => "32144457",
-            "paymentMethod" => "VISA",
-            "number" => "4111111111111111",
-            "expirationDate" => "2017/01"
-        ];
-        $request = [
-            "command" => "CREATE_TOKEN",
-            "merchant" => $merchant,
-            "creditCardToken" => $creditCardToken
-        ];
+    public function makeCharge(User $user, Order $order, array $payload) {
+        $method = 'pay' . studly_case(str_replace('.', '_', $payload['type']));
+        if (method_exists($this, $method)) {
+            $result = $this->{$method}($user, $payload, $order);
+            return $this->saveTransaction($user, $result);
+            ;
+        } else {
+            return $this->missingMethod();
+        }
     }
 
     public function payDebitCard(User $user, array $data, Order $order) {
@@ -411,8 +388,7 @@ class PayU {
                 "test" => false,
             ];
 
-            $result = $this->sendRequest($dataSent, false);
-            return $this->handleTransactionResponse($result, $user, $order);
+            return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
         }
         return array("status" => "error", "message" => "missing billing Address");
     }
@@ -475,8 +451,7 @@ class PayU {
             "transaction" => $transaction,
             "test" => false,
         ];
-        $result = $this->sendRequest($dataSent, false);
-        return $this->handleTransactionResponse($result, $user, $order);
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
     public function getBanks() {
@@ -498,7 +473,383 @@ class PayU {
             "bankListInformation" => $bankListInformation,
             "test" => false,
         ];
-        return $this->sendRequest($dataSent, false);
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+    }
+
+    public function createSource(Source $source, array $data) {
+        $validator = $this->validatorSource($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $address = [
+            "line1" => $data['line1'],
+            "line2" => $data['line2'],
+            "line3" => $data['line3'],
+            "postalCode" => $data['postalCode'],
+            "city" => $data['city'],
+            "state" => $data['state'],
+            "country" => $data['country'],
+            "phone" => $data['phone'],
+        ];
+        $source = [
+            "name" => $data['branch'],
+            "document" => $data['document'],
+            "number" => $data['number'],
+            "expMonth" => $data['expMonth'],
+            "expYear" => $data['expYear'],
+            "type" => $data['branch']
+        ];
+        $response = $this->sendRequest($source, 'https://sandbox.api.payulatam.com/rest/v4.9/customers/' . $source->client_id . '/creditCards');
+        if (array_key_exists("token", $response)) {
+            $source->source = $response["token"];
+            $source->save();
+        }
+        return $response['code'];
+    }
+
+    public function editSource(Source $source, array $data) {
+
+//        $address = [
+//            "line1" => $data['line1'],
+//            "line2" => $data['line2'],
+//            "line3" => $data['line3'],
+//            "postalCode" => $data['postalCode'],
+//            "city" => $data['city'],
+//            "state" => $data['state'],
+//            "country" => $data['country'],
+//            "phone" => $data['phone'],
+//        ];
+//        $source = [
+//            "name" => $data['type'],
+//            "document" => $data['document'],
+//            "number" => $data['number'],
+//            "expMonth" => $data['expMonth'],
+//            "expYear" => $data['expYear'],
+//            "type" => $data['type']
+//        ];
+//        $response = $this->sendRequest($source, 'https://sandbox.api.payulatam.com/rest/v4.9/creditCards/' . $data['source']);
+//        if (array_key_exists("token", $response)) {
+//            $source->source = $response["token"];
+//            $source->save();
+//        }
+//        return $response;
+    }
+
+    public function deleteSource(Source $source, $token) {
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
+        $merchant = [
+            'apiLogin' => $apiLogin,
+            'apiKey' => $apiKey
+        ];
+
+        $bankListInformation = [
+            "payerId" => $source->client_id,
+            "creditCardTokenId" => $token
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "REMOVE_TOKEN",
+            "merchant" => $merchant,
+            "removeCreditCardToken" => $bankListInformation,
+            "test" => false,
+        ];
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+    }
+
+    public function getSources(Source $source) {
+        $client = $this->getClient($source);
+        if ($client) {
+            return $client['creditCards'];
+        }
+        return null;
+    }
+
+    public function getSource(Source $source, $token) {
+        return null;
+    }
+
+    public function setAsDefault(Source $source, array $data) {
+        // Token is created using Stripe.js or Checkout!
+        // Get the payment token submitted by the form:
+        $validator = $this->validatorDefault($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $token = $data['source'];
+        $source->source = $token;
+        $source->save();
+    }
+
+    public function createClient(User $user) {
+        $dataSent = [
+            "fullName" => $user->name,
+            "email" => $user->email,
+        ];
+        $response = $this->sendRequest($dataSent, 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/customers/');
+        if (array_key_exists("id", $response)) {
+            $source = new Source([
+                "gateway" => "payu",
+                "client_id" => $response['id']
+            ]);
+            $user->sources()->save($source);
+            return $source;
+        }
+        return null;
+    }
+
+    public function getClient(Source $source) {
+        $url = 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/customers/' . $source->client_id;
+        return $this->getRequest($url);
+    }
+
+    public function deleteClient(User $user, $client) {
+        $sources = $user->sources()->where('gateway', "payu")
+                        ->where('client_id', $client)->get();
+        if ($sources) {
+            $url = env('PAYU_PAYMENTS') . "/rest/v4.9/customers/" . $client;
+            $this->sendDelete($url);
+            return $user->sources()->where('gateway', "payu")->where('client_id', $client)->delete();
+        }
+    }
+
+    public function getSubscriptions(Source $source) {
+        $client = $this->getClient($source);
+        if ($client) {
+            return $client['subscriptions'];
+        }
+        return null;
+    }
+
+    public function editSubscription(User $user, Source $source, $id, array $data) {
+        $validator = $this->validatorEditSubscription($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $subscription = $user->subscriptions()->where('gateway', 'payu')->where('source_id', $id)->first();
+        if ($subscription) {
+            if ($subscription->is_active()) {
+                $datetime1 = strtotime($subscription->ends_at);
+                $datetime2 = strtotime("now");
+                $secs = $datetime2 - $datetime1; // == return sec in difference
+                $days = $secs / 86400;
+                $data['trialDays'] = $days;
+            } else {
+                $data['trialDays'] = 0;
+            }
+            $url = 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/subscriptions/';
+            $planL = Plan::find($data['plan_id']);
+            $plan = [
+                "planCode" => $planL->code
+            ];
+
+            $creditCard = [
+                "token" => $source->source
+            ];
+            $creditCards = array($creditCard);
+            $customer = [
+                "id" => $source->client_id,
+                "creditCards" => $creditCards,
+            ];
+            $dataSent = [
+                "quantity" => 1,
+                "installments" => $data['installments'],
+                "trialDays" => $data['trialDays'],
+                "customer" => $customer,
+                "plan" => $plan
+            ];
+            $response = $this->sendRequest($dataSent, $url);
+            if (array_key_exists("id", $response)) {
+                $this->deleteSubscription($user, $subscription->source_id);
+                $subscription->gateway = "payu";
+                $subscription->status = "active";
+                $subscription->type = $planL->type;
+                $subscription->name = $planL->name;
+                $subscription->source_id = $response['id'];
+                $subscription->client_id = $source->client_id;
+                $subscription->interval = $planL->interval;
+                $subscription->interval_type = $planL->interval_type;
+                $subscription->quantity = $data['quantity'];
+                $subscription->ends_at = Date($response['currentPeriodEnd']);
+                $subscription->save();
+                return $response['id'];
+            }
+        }
+    }
+
+    public function createSubscription(User $user, Source $source, array $data) {
+        $validator = $this->validatorSubscription($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $url = 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/subscriptions/';
+        $planL = Plan::find($data['plan_id']);
+        $plan = [
+            "planCode" => $planL->code
+        ];
+
+        $creditCard = [
+            "token" => $source->source
+        ];
+        $creditCards = array($creditCard);
+        $customer = [
+            "id" => $source->client_id,
+            "creditCards" => $creditCards,
+        ];
+        $dataSent = [
+            "quantity" => $data['quantity'],
+            "installments" => $data['installments'],
+            "trialDays" => $data['trialDays'],
+            "customer" => $customer,
+            "plan" => $plan
+        ];
+        $response = $this->sendRequest($dataSent, $url);
+        if (array_key_exists("id", $response)) {
+            $subscription = new Subscription([
+                "gateway" => "payu",
+                "status" => "active",
+                "type" => $planL->type,
+                "name" => $planL->name,
+                "source_id" => $response['id'],
+                "client_id" => $source->client_id,
+                "object_id" => $data['object_id'],
+                "interval" => $planL->interval,
+                "interval_type" => $planL->interval_type,
+                "quantity" => $data['quantity'],
+                "ends_at" => Date($response['currentPeriodEnd'])
+            ]);
+            $user->subscriptions()->save($subscription);
+            return $response['id'];
+        }
+    }
+    public function createSubscriptionExistingSource(User $user, Source $source, array $data) {
+        $validator = $this->validatorSubscription($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $url = 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/subscriptions/';
+        $planL = Plan::find($data['plan_id']);
+        $plan = [
+            "planCode" => $planL->code
+        ];
+
+        $creditCard = [
+            "token" => $data['source']
+        ];
+        $creditCards = array($creditCard);
+        $customer = [
+            "id" => $source->client_id,
+            "creditCards" => $creditCards,
+        ];
+        $dataSent = [
+            "quantity" => $data['quantity'],
+            "installments" => $data['installments'],
+            "trialDays" => $data['trialDays'],
+            "customer" => $customer,
+            "plan" => $plan
+        ];
+        $response = $this->sendRequest($dataSent, $url);
+        if (array_key_exists("id", $response)) {
+            $subscription = new Subscription([
+                "gateway" => "payu",
+                "status" => "active",
+                "type" => $planL->type,
+                "name" => $planL->name,
+                "source_id" => $response['id'],
+                "client_id" => $source->client_id,
+                "object_id" => $data['object_id'],
+                "interval" => $planL->interval,
+                "interval_type" => $planL->interval_type,
+                "quantity" => $data['quantity'],
+                "ends_at" => Date($response['currentPeriodEnd'])
+            ]);
+            $user->subscriptions()->save($subscription);
+            return $response['id'];
+        }
+    }
+
+    public function createSubscriptionSource(User $user, Source $source, array $data) {
+        $validator = $this->validatorSubscriptionSource($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $url = 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/subscriptions/';
+        $planL = Plan::find($data['plan_id']);
+        $plan = [
+            "planCode" => $planL->code
+        ];
+        $address = [
+            "line1" => $data['line1'],
+            "line2" => $data['line2'],
+            "line3" => $data['line3'],
+            "postalCode" => $data['postalCode'],
+            "city" => $data['city'],
+            "state" => $data['state'],
+            "country" => $data['country'],
+            "phone" => $data['phone']
+        ];
+
+        $creditCard = [
+            "name" => $data['name'],
+            "document" => $data['document'],
+            "number" => $data['number'],
+            "expMonth" => $data['expMonth'],
+            "expYear" => $data['expYear'],
+            "type" => $data['branch'],
+            "address" => $address
+        ];
+        $creditCards = array($creditCard);
+        $customer = [
+            "id" => $source->client_id,
+            "creditCards" => $creditCards,
+        ];
+        $dataSent = [
+            "quantity" => $data['quantity'],
+            "installments" => $data['installments'],
+            "trialDays" => $data['trialDays'],
+            "customer" => $customer,
+            "plan" => $plan
+        ];
+        $response = $this->sendRequest($dataSent, $url);
+        if (array_key_exists("id", $response)) {
+            $subscription = new Subscription([
+                "gateway" => "payu",
+                "status" => "active",
+                "type" => $planL->type,
+                "name" => $planL->name,
+                "source_id" => $response['id'],
+                "client_id" => $source->client_id,
+                "object_id" => $data['object_id'],
+                "interval" => $planL->interval,
+                "interval_type" => $planL->interval_type,
+                "quantity" => $data['quantity'],
+                "ends_at" => Date($response['currentPeriodEnd'])
+            ]);
+            $user->subscriptions()->save($subscription);
+        }
+        if (array_key_exists("customer", $response)) {
+            $customerReply = $response['customer'];
+            if (array_key_exists("creditCards", $customerReply)) {
+                $card = $customerReply['creditCards'][0];
+                $source->source = $card['token'];
+                $source->save();
+            }
+        }
+        return null;
+    }
+
+    public function createSubscriptionSourceClient(User $user, array $data) {
+        $source = $this->createClient($user);
+        if ($source) {
+            $this->createSubscriptionSource($user, $data, $source);
+        }
+        return null;
+    }
+
+    public function deleteSubscription(User $user, $subscription) {
+        $url = env('PAYU_PAYMENTS') . "/rest/v4.9/subscriptions/" . $subscription;
+        $this->sendDelete($url);
+        return $user->subscriptions()->where('gateway', "payu")->where('source_id', $subscription)->delete();
     }
 
     public function getPaymentMethods() {
@@ -515,7 +866,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, false);
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
     public function getStatusOrderId($order_id) {
@@ -536,7 +887,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, true);
+        return $this->sendRequest($dataSent, env('PAYU_REPORTS'));
     }
 
     public function getStatusOrderRef($order_ref) {
@@ -557,7 +908,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, true);
+        return $this->sendRequest($dataSent, env('PAYU_REPORTS'));
     }
 
     public function getStatusTransaction($transaction_id) {
@@ -578,7 +929,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, false);
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
     public function handleTransactionResponse($response, User $user, Order $order) {
@@ -589,18 +940,18 @@ class PayU {
                 $transactionResponse['referenceCode'] = $order->referenceCode;
                 $transactionResponse['user_id'] = $user->id;
                 $transactionResponse['gateway'] = 'payu';
-                if (array_key_exists("extras", $transactionResponse)) {
-                    $extras = $transactionResponse['extras'];
-                    unset($transactionResponse['extras']);
-                    $transactionResponse['extras'] = json_encode($extras);
-                }
+                /* if (array_key_exists("extras", $transactionResponse)) {
+                  $extras = $transactionResponse['extras'];
+                  unset($transactionResponse['extras']);
+                  $transactionResponse['extras'] = json_encode($extras);
+                  } */
                 $transaction = Transaction::create($transactionResponse);
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    $this->editOrder->approveOrder($order, $transaction->id);
+                    dispatch(new ApproveOrder($order));
                 } else if ($transactionResponse['state'] == 'PENDING') {
-                    $this->editOrder->setOrderPending($order, $transaction->id);
+                    dispatch(new DenyOrder($order));
                 } else {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
+                    dispatch(new PendingOrder($order));
                 }
                 return ["status" => "success", "transaction" => $transaction, "response" => $response];
             } else {
@@ -610,35 +961,59 @@ class PayU {
     }
 
     public function sendRequest(array $data, $query) {
-
-//        $client = new Client([
-//            // Base URI is used with relative requests
-//            'base_uri' => 'https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi',
-//            // You can set any number of default request options.
-//            'timeout' => 10.0,
-//        ]);
-//        $headers = [
-//            'Content-Type' => 'application/json; charset=utf-8',
-//            'Accept' => 'application/json'
-//        ];
-//        $r = $client->request('POST', 'https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi', [
-//            'json' => $data
-//        ]);
-//        dd($r);
-//        return $r->getBody();
-        //return $data;
         $data_string = json_encode($data);
-        if ($query) {
-            $curl = curl_init(env('PAYU_REPORTS'));
-        } else {
-            $curl = curl_init(env('PAYU_PAYMENTS'));
-        }
+        $curl = curl_init($query);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charset=utf-8',
             'Content-Length: ' . strlen($data_string),
+            'Accept: application/json')
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode(str_replace("\\", "", $response), true);
+        return $response;
+    }
+
+    public function sendGet($query) {
+        $curl = curl_init($query);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
+            'Accept: application/json')
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode(str_replace("\\", "", $response), true);
+        return $response;
+    }
+
+    public function sendPut(array $data, $query) {
+        $data_string = json_encode($data);
+        $curl = curl_init($query);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
+            'Accept: application/json')
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode(str_replace("\\", "", $response), true);
+        return $response;
+    }
+
+    public function sendDelete($query) {
+
+        $curl = curl_init($query);
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json; charset=utf-8',
             'Accept: application/json')
         );
         $response = curl_exec($curl);
@@ -663,11 +1038,11 @@ class PayU {
                 $transactionResponse = $payload['transactions'][0]['transactionResponse'];
                 $order = $transaction->order;
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    $this->editOrder->approveOrder($order, $transaction->id);
+                    dispatch(new ApproveOrder($order));
                 } else if ($transactionResponse['state'] == 'PENDING') {
                     continue;
                 } else {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
+                    dispatch(new DenyOrder($order));
                 }
             }
         }
@@ -679,7 +1054,7 @@ class PayU {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function webhookPayU(array $data) {
+    public function webhook(array $data) {
         $ApiKey = env('PAYU_KEY');
         $merchant_id = $data['merchantId'];
         $referenceCode = $data['referenceCode'];
@@ -690,39 +1065,54 @@ class PayU {
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
         $firmacreada = md5($firma_cadena);
         $firma = $data['signature'];
-        $transactionId = $data['transactionId'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
-            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
-            if ($transaction) {
-                $transaction->currency = $data['currency'];
-                $transaction->state = $data['transactionState'];
-                $transaction->description = $data['description'];
-                $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
-                $transaction->trazabilityCode = $data['cus'];
-                $transaction->transactionDate = $data['processingDate'];
-                $transaction->authorizationCode = $data['authorizationCode'];
-                $transaction->extras = json_encode($data);
-                $order = $transaction->order;
-                if ($data['transactionState'] == 4) {
-                    $this->editOrder->approveOrder($order, $transaction->id);
-                    $transaction->description = "Transacción aprobada";
-                } else if ($data['transactionState'] == 6) {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
-                    $transaction->description = "Transacción rechazada";
-                } else if ($data['transactionState'] == 104) {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
-                    $transaction->description = "Error";
-                } else if ($data['transactionState'] == 7) {
-                    $this->editOrder->setOrderPending($order, $transaction->id);
-                } else {
-                    $transaction->description = $data['mensaje'];
-                }
-                $transaction->save();
-                return ["status" => "success", "message" => "transaction processed", "data" => $data ];
+            $transaction = $this->saveTransaction($data);
+            if ($data['transactionState'] == 4) {
+                dispatch(new ApproveOrder($order));
+                $transaction->description = "Transacción aprobada";
+            } else if ($data['transactionState'] == 6) {
+                dispatch(new DenyOrder($order));
+                $transaction->description = "Transacción rechazada";
+            } else if ($data['transactionState'] == 104) {
+                dispatch(new DenyOrder($order));
+                $transaction->description = "Error";
+            } else if ($data['transactionState'] == 7) {
+                dispatch(new PendingOrder($order));
+            } else {
+                $transaction->description = $data['mensaje'];
             }
+            return ["status" => "success", "message" => "transaction processed", "data" => $data];
         } else {
             
         }
+    }
+
+    public function saveTransaction(User $user, array $data) {
+        $transactionId = $data['transactionId'];
+        $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
+        if ($transaction) {
+            $transaction->currency = $data['currency'];
+            $transaction->state = $data['transactionState'];
+            $transaction->description = $data['description'];
+            $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
+            $transaction->trazabilityCode = $data['cus'];
+            $transaction->transactionDate = $data['processingDate'];
+            $transaction->authorizationCode = $data['authorizationCode'];
+            $transaction->extras = json_encode($data);
+            $transaction->save();
+        } else {
+            $data["state"] = $data["transactionState"];
+            unset($data["transactionState"]);
+            $data["paymentNetworkResponseCode"] = $data["polResponseCode"];
+            unset($data["polResponseCode"]);
+            $data["trazabilityCode"] = $data["cus"];
+            unset($data["cus"]);
+            $data["transactionDate"] = $data["processingDate"];
+            unset($data["processingDate"]);
+            $data["extras"] = json_encode($data);
+            $transaction = Transaction::create($data);
+        }
+        return $transaction;
     }
 
     /**
@@ -756,16 +1146,16 @@ class PayU {
                 $transaction->extras = json_encode($data);
                 $order = $transaction->order;
                 if ($data['transactionState'] == 4) {
-                    $this->editOrder->approveOrder($order, $transaction->id);
+                    dispatch(new ApproveOrder($order));
                     $transaction->description = "Transacción aprobada";
                 } else if ($data['transactionState'] == 6) {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
+                    dispatch(new DenyOrder($order));
                     $transaction->description = "Transacción rechazada";
                 } else if ($data['transactionState'] == 104) {
-                    $this->editOrder->cancelOrder($order, $transaction->id);
+                    dispatch(new DenyOrder($order));
                     $transaction->description = "Error";
                 } else if ($data['transactionState'] == 7) {
-                    $this->editOrder->setOrderPending($order, $transaction->id);
+                    dispatch(new PendingOrder($order));
                 } else {
                     $transaction->description = $data['mensaje'];
                 }
@@ -821,6 +1211,112 @@ class PayU {
     public function validatorCash(array $data) {
         return Validator::make($data, [
                     'payer_email' => 'required|email|max:255',
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorUseSource(array $data) {
+        return Validator::make($data, [
+                    'source' => 'required|email|max:255',
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorSubscription(array $data) {
+        return Validator::make($data, [
+                    'source' => 'required|max:255',
+                    'installments' => 'required|max:255',
+                    'plan_id' => 'required|max:255',
+                    'object_id' => 'required|max:255',
+        ]);
+    }
+    
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorEditSubscription(array $data) {
+        return Validator::make($data, [
+                    'source' => 'required|max:255',
+                    'installments' => 'required|max:255',
+                    'plan_id' => 'required|max:255',
+        ]);
+    }
+    
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorSubscriptionSource(array $data) {
+        return Validator::make($data, [
+                    'plan_id' => 'required|max:255',
+                    'installments' => 'required|max:255',
+                    'object_id' => 'required|max:255',
+                    'line1' => 'required|max:255',
+                    'line2' => 'required|max:255',
+                    'line3' => 'required|max:255',
+                    'postalCode' => 'required|max:255',
+                    'city' => 'required|max:255',
+                    'state' => 'required|max:255',
+                    'country' => 'required|max:255',
+                    'phone' => 'required|max:255',
+                    'document' => 'required|max:255',
+                    'number' => 'required|max:255',
+                    'expMonth' => 'required|max:255',
+                    'expYear' => 'required|max:255',
+                    'branch' => 'required|max:255'
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorDefault(array $data) {
+        return Validator::make($data, [
+                    'source' => 'required|email|max:255',
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorSource(array $data) {
+        return Validator::make($data, [
+                    'line1' => 'required|max:255',
+                    'line2' => 'required|max:255',
+                    'line3' => 'required|max:255',
+                    'postalCode' => 'required|max:255',
+                    'city' => 'required|max:255',
+                    'state' => 'required|max:255',
+                    'country' => 'required|max:255',
+                    'phone' => 'required|max:255',
+                    'document' => 'required|max:255',
+                    'number' => 'required|max:255',
+                    'expMonth' => 'required|max:255',
+                    'expYear' => 'required|max:255',
+                    'branch' => 'required|max:255'
         ]);
     }
 

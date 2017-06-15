@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePlansTable extends Migration
+class CreateSourcesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -17,6 +17,7 @@ class CreatePlansTable extends Migration
             $table->increments('id');
             $table->string('source');
             $table->string('gateway');
+            $table->string('client_id');
             $table->string('extra');
             $table->string('type');
             $table->boolean('is_active');
@@ -34,6 +35,6 @@ class CreatePlansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plans');
+        Schema::dropIfExists('sources');
     }
 }

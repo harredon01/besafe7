@@ -69,6 +69,9 @@ class User extends Authenticatable
     public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');
     }
+    public function sources() {
+        return $this->hasMany('App\Models\Source');
+    }
     public function medical() {
         return $this->hasOne('App\Models\Medical');
     }

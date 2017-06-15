@@ -187,7 +187,7 @@ class CartController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function getCheckoutCart(Request $request) {
-        $data = $this->editOrder->getCheckoutCart();
+        $data = $this->editOrder->getCheckoutCart(null);
         return response()->json($data);
     }
 

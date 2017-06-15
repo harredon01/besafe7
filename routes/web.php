@@ -30,6 +30,10 @@ Route::post('user/editAddress', 'UserController@postEditAddress');
 Route::get('products', 'ProductController@getproducts');
 Route::get('products/{code?}', 'ProductController@getproduct');
 
+Route::get('plans', 'BillingController@getPlans');
+Route::get('sources', 'BillingController@getSources');
+Route::get('subscriptions', 'BillingController@getSubscriptions');
+
 Route::get('carts', 'CartController@getCart');
 Route::get('cart/checkout', 'CartController@getCheckoutCart');
 Route::post('cart/add', 'CartController@postAddCartItem');

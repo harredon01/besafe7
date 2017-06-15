@@ -1,4 +1,4 @@
-angular.module('starter')
+angular.module('besafe')
         .controller('MapCtrl', function ($scope, $ionicPopover, Alerts, $cordovaToast, $rootScope, MapDashService, $ionicPlatform, $state, API, Contacts, 
 $cordovaInAppBrowser, MapDashService, $ionicPopup) {
             $scope.map = {center: {latitude: 45, longitude: -73}, zoom: 8};
