@@ -6,7 +6,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/subscriptions/'+platform,
+                        url: 'api/subscriptions/'+platform,
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
@@ -25,7 +25,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/subscriptions/'+platform,
+                        url: 'api/subscriptions/'+platform,
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
@@ -44,7 +44,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/subscriptions/'+platform+"/"+subscription,
+                        url: 'api/subscriptions/'+platform+"/"+subscription,
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
@@ -63,7 +63,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'GET',
-                        url: '/subscriptions/'+platform,
+                        url: 'api/subscriptions/'+platform,
                         
                     })
                             .success(function (data) {
@@ -81,7 +81,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'Delete',
-                        url: '/subscriptions/'+platform+"/"+subscription,
+                        url: 'api/subscriptions/'+platform+"/"+subscription,
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -98,7 +98,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/sources/'+platform,
+                        url: 'api/sources/'+platform,
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
@@ -117,7 +117,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'GET',
-                        url: '/sources/'+platform,
+                        url: 'api/sources/'+platform,
                         
                     })
                             .success(function (data) {
@@ -135,7 +135,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'Delete',
-                        url: '/sources/'+platform+"/"+source,
+                        url: 'api/sources/'+platform+"/"+source,
                     })
                             .success(function (data) {
                                 def.resolve(data);

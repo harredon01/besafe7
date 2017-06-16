@@ -18,7 +18,9 @@ class Source extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id','source','client_id','type', 'extra','is_active'];
+    protected $fillable = ['id','source','client_id','type', 'extra','is_active','has_default'];
+    
+    protected $hidden = ['source'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');

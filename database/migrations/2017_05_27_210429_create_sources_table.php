@@ -21,6 +21,7 @@ class CreateSourcesTable extends Migration
             $table->string('extra');
             $table->string('type');
             $table->boolean('is_active');
+            $table->boolean('has_default');
             $table->integer('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')
                     ->on('users');

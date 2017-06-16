@@ -47,7 +47,8 @@
 echo json_encode([
     'csrfToken' => csrf_token(),
 ]);
-?>
+?>;
+    Stripe.setPublishableKey('pk_test_6pRNASCoBOKtIshFeQd4XMUh');
         </script>
     </head>
     <body>

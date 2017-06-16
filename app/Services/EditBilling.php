@@ -22,36 +22,6 @@ use DB;
 
 class EditBilling {
 
-    /**
-     * The Auth implementation.
-     *
-     */
-    protected $auth;
-
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $payU;
-
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $stripe;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(PayU $payU, Stripe $stripe) {
-        $this->payU = $payU;
-        $this->stripe = $stripe;
-    }
 
     public function processModel(User $user, array $data) {
         $class = "App\\Models\\" . $data["model"];
@@ -81,14 +51,17 @@ class EditBilling {
         $className = "App\\Services\\" . $source;
         $gateway = new $className; //// <--- this thing will be autoloaded
         $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
-        if ($source) {
-            return $gateway->createSource($source, $data);
-        } else {
-            $source=$gateway->createClient($user);
-            return $gateway->createSource($source, $data);
+        if ($sources) {
+            $source = $sources[0];
+            if ($source) {
+                return $gateway->createSource($source, $data);
+            } else {
+                $source = $gateway->createClient($user);
+                return $gateway->createSource($source, $data);
+            }
         }
     }
+
     public function editSource(User $user, $source, $id, array $data) {
 //        $className = "App\\Services\\" . $source;
 //        $sources = $user->sources()->where('gateway', strtolower($source))->get();
@@ -98,16 +71,15 @@ class EditBilling {
 //            return $gateway->editSource($user,$source, $id, $data);
 //        }
     }
+
     public function getSource(User $user, $source, $id, array $data) {
         $className = "App\\Services\\" . $source;
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $gateway = new $className;
             return $gateway->getSource($source, $id);
         }
     }
-
 
     public function useSource(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
@@ -116,8 +88,7 @@ class EditBilling {
     }
 
     public function getSources(User $user, $source) {
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $sources = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
@@ -128,29 +99,27 @@ class EditBilling {
     }
 
     public function deleteSource(User $user, $source, $id) {
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
             $result = $gateway->deleteSource($source, $id);
-            if($result['status']=="success"){
-                if($source->source==$id){
+            if ($result['status'] == "success") {
+                if ($source->source == $id) {
                     $source->source = null;
                     $source->save();
                 }
             }
             return $result;
-        } 
+        }
     }
 
     public function getPlans() {
-	    return Plan::all();
+        return Plan::all();
     }
-    
+
     public function getSubscriptions(User $user, $source) {
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
@@ -166,24 +135,27 @@ class EditBilling {
 
     public function deleteSubscription(User $user, $source, $id) {
         $className = "App\\Services\\" . $source;
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $gateway = new $className;
             return $gateway->deleteSubscription($user, $id);
-        } 
+        }
     }
 
     public function createSubscription(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $gateway = new $className;
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
-            if ($source->source) {
-                return $gateway->createSubscription($user, $source, $data);
+            if ($source->has_default) {
+                if(array_key_exists("source", $data)){
+                    return $gateway->createSubscriptionExistingSource($user, $source, $data);
+                } else {
+                    return $gateway->createSubscription($user, $source, $data);
+                }
+                
             } else {
                 return $gateway->createSubscriptionSource($user, $source, $data);
             }
@@ -191,11 +163,10 @@ class EditBilling {
             return $gateway->createSubscriptionSourceClient($user, $data);
         }
     }
+
     public function createSubscriptionExistingSource(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
-        
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
         if ($source) {
@@ -210,11 +181,10 @@ class EditBilling {
         $className = "App\\Services\\" . $source;
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        $source = $sources[0];
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             $gateway = new $className;
-            return $gateway->editSubscription($user,$source, $id, $data);
+            return $gateway->editSubscription($user, $source, $id, $data);
         }
     }
 

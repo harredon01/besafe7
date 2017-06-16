@@ -726,11 +726,7 @@ class MerchantImport {
     public function importPlans($filename) {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
-        $i = 1;
         foreach ($reader as $sheet) {
-            $sheet['id'] = $i;
-            $sheet['plan_id'] ="plan-". $i;
-            $i++;
             $plan = Plan::updateOrCreate($sheet); 
         }
     }

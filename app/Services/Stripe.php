@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Order;
+use App\Models\Plan;
+use App\Models\Subscription;
+use Validator;
 
 class Stripe {
 
@@ -71,7 +74,7 @@ class Stripe {
 
     public function getSources(Source $source) {
         $result = \Stripe\Customer::retrieve($source->client_id)->sources->all(array(
-                    'limit' => 20));
+            'limit' => 20));
         return $result['data'];
     }
 
@@ -79,6 +82,7 @@ class Stripe {
         $customer = \Stripe\Customer::retrieve($source->client_id);
         $customer->sources->retrieve($token)->delete();
     }
+
     public function getSource(Source $source, $id) {
         $customer = \Stripe\Customer::retrieve($source->client_id);
         $customer->sources->retrieve($id);
@@ -98,7 +102,8 @@ class Stripe {
             $source = new Source([
                 "gateway" => "payu",
                 "client_id" => $customer->id,
-                "source" => $data['source']
+                "source" => $data['source'],
+                "has_default" => true
             ]);
             $user->sources()->save($source);
             $subscription = \Stripe\Subscription::create(array(
@@ -132,7 +137,10 @@ class Stripe {
         $customer = \Stripe\Customer::retrieve($source->client_id);
         if ($customer) {
             $token = $data['source'];
-            $source->source = $token;
+            if ($data['save']) {
+                $source->source = $token;
+                $source->has_default = true;
+            }
             $source->save();
             $planL = Plan::where("plan_id", $data['plan_id'])->first();
             $customer->sources->create(array("source" => $token));
@@ -158,6 +166,7 @@ class Stripe {
             return $subscriptionL;
         }
     }
+
     public function createSubscriptionExistingSource(User $user, Source $source, array $data) {
         $validator = $this->validatorSubscriptionSource($data);
         if ($validator->fails()) {
@@ -240,7 +249,7 @@ class Stripe {
                 $planL = Plan::where("plan_id", $data['plan_id'])->first();
                 $sub->plan = $planL->code;
                 $sub->save();
-                
+
                 $subscription->status = "active";
                 $subscription->type = $planL->type;
                 $subscription->name = $planL->name;
@@ -412,7 +421,7 @@ class Stripe {
     public function missingMethod($parameters = []) {
         return new Response;
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -421,10 +430,11 @@ class Stripe {
      */
     public function validatorSource(array $data) {
         return Validator::make($data, [
-                    'source' => 'required|max:255'
+                    'source' => 'required|max:255',
+                    'default' => 'required|max:255',
         ]);
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -436,7 +446,7 @@ class Stripe {
                     'source' => 'required|max:255'
         ]);
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -446,17 +456,21 @@ class Stripe {
     public function validatorSubscriptionSource(array $data) {
         return Validator::make($data, [
                     'source' => 'required|max:255',
+                    'default' => 'required|max:255',
                     'plan_id' => 'required|max:255',
                     'object_id' => 'required|max:255'
         ]);
     }
+
     public function validatorSubscriptionSourceClient(array $data) {
         return Validator::make($data, [
                     'source' => 'required|max:255',
                     'plan_id' => 'required|max:255',
+                    'default' => 'required|max:255',
                     'object_id' => 'required|max:255'
         ]);
     }
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -465,9 +479,10 @@ class Stripe {
      */
     public function validatorUseSource(array $data) {
         return Validator::make($data, [
-                    'source' => 'required|max:255'
+                    'source' => 'required|max:255',
         ]);
     }
+
     /**
      * Get a validator for an incoming registration request.
      *

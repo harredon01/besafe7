@@ -2,11 +2,14 @@
 
         .controller('SourcesCtrl', function ($scope, LocationService, Billing, $rootScope) {
             $scope.data = {};
+            $scope.months = [];
+            $scope.years = [];
             $scope.sources;
             $rootScope.gateway = "PayU";
             $scope.cityVisible = false;
             angular.element(document).ready(function () {
                 $scope.getSources();
+                $scope.loadMonths();
             });
             $scope.save = function (isvalid) {
                 $scope.submitted = true;
@@ -28,6 +31,15 @@
                             function (data) {
 
                             });
+                }
+            }
+            $scope.loadMonths = function () {
+                var date = new Date();
+                for (i = 0; i < 15; i++) {
+                    $scope.years.push(date.getFullYear() + i);
+                }
+                for (i = 0; i < 12; i++) {
+                    $scope.months.push(1 + i);
                 }
             }
             $scope.getSources = function () {
@@ -252,11 +264,57 @@
         })
         .controller('CreateSourceStripeCtrl', function ($scope, Billing, $rootScope) {
             $scope.data = {};
+            $scope.months = [];
+            $scope.years = [];
+            $scope.sources = [];
+            $scope.localGateway = "";
+            $scope.hasDefault = false;
+            
+            angular.element(document).ready(function () {
+                $scope.loadMonths();
+                console.log(JSON.stringify($scope.config));
+                var sources = $scope.config.sources;
+                $scope.localGateway= $scope.config.gateway;
+                for(item in sources){
+                    if(sources[item].gateway ==$scope.localGateway){
+                        if(sources[item].source){
+                            $scope.hasDefault = true;
+                        } else {
+                            $scope.getSources();
+                        } 
+                        
+                    }
+                }
+                console.log(JSON.stringify($scope.config));
+            });
             $scope.save = function (isvalid) {
                 $scope.submitted = true;
                 if (isvalid) {
                     $scope.stripeCreateToken();
                 }
+            }
+             $scope.getSources = function (source) {
+                Billing.getSources(source).then(function (data) {
+                    $scope.sources = data.sources;
+
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.loadMonths = function () {
+                var date = new Date();
+                for (i = 0; i < 15; i++) {
+                    $scope.years.push(date.getFullYear() + i);
+                }
+                for (i = 0; i < 12; i++) {
+                    $scope.months.push(1 + i);
+                }
+                $scope.data.number = "4242424242424242";
+                $scope.data.cvc = "123";
+                $scope.data.postal = "33132";
+                $scope.data.expYear = "2020";
+                $scope.data.expMonth = "12";
             }
 
             $scope.stripeCreateToken = function () {
@@ -265,7 +323,7 @@
                     card: {
                         number: $scope.data.number,
                         cvc: $scope.data.cvc,
-                        exp_month:$scope.data.expMonth,
+                        exp_month: $scope.data.expMonth,
                         exp_year: $scope.data.expYear,
                     },
                     owner: {
@@ -278,27 +336,28 @@
 
             function stripeResponseHandler(status, response) {
 
-                // Grab the form:
-                var $form = $('#payment-form');
 
                 if (response.error) { // Problem!
 
                     // Show the errors on the form
-                    $form.find('.payment-errors').text(response.error.message);
-                    $form.find('button').prop('disabled', false); // Re-enable submission
+                    //$form.find('.payment-errors').text(response.error.message);
+                    //$form.find('button').prop('disabled', false); // Re-enable submission
 
                 } else { // Source was created!
-
                     // Get the source ID:
-                    var source = response.id;
+                    $scope.data.source = response.id;
+                    $scope.data.plan_id = response.id;
+                    $scope.data.object_id = response.id;
+                    Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
+                        console.log("Subscription created");
 
-                    // Insert the source into the form so it gets submitted to the server:
-                    $form.append($('<input type="hidden" name="source" />').val(source));
+                        $scope.data = {};
+                        $scope.submitted = false;
+                    },
+                            function (data) {
 
-                    // Submit the form:
-                    $form.get(0).submit();
+                            });
 
                 }
             }
-            $scope.data = {};
         })
