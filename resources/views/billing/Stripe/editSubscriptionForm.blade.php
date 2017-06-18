@@ -60,21 +60,6 @@
                         <span ng-show="submitted && myFormSimple.object_id.$error.required">please select a beneficiary</span>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label">Save this card</label>
-                <div class="col-md-6">
-                    <input type="text" ng-model="data.save" name="save" value="{{ old('save')}}" required>
-                    
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-md-4 control-label">Set as default</label>
-                <div class="col-md-6">
-                    <input type="text" ng-model="data.default" name="default" value="{{ old('default')}}" required>
-                    
-                </div>
-            </div>
-
 
             <div class="form-group">
                 <div class="col-md-6 col-md-offset-4">
@@ -84,7 +69,7 @@
             </div>
         </form>
     </div>
-    <div ng-hide="has_default">
+    <div ng-show="has_default">
         <form class="form-horizontal" role="form" name="myFormSimple" ng-submit="saveSimple(myFormSimple.$valid)" novalidate>
             <input type="hidden" name="_token" value="{{ csrf_token()}}">
             <input type="hidden" ng-model="data.plan_id" name="plan_id" >

@@ -20,13 +20,13 @@
                     </div>
                     @endif
                     <div >
-                        @include('billing.payu.sources')
+                        @include('billing.PayU.sources')
                     </div>
 
 
                     <div >
                        
-                        @include('billing.stripe.sources')
+                        @include('billing.Stripe.sources')
                     
                     </div>
 

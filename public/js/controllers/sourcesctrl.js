@@ -277,17 +277,30 @@
                 $scope.localGateway= $scope.config.gateway;
                 for(item in sources){
                     if(sources[item].gateway ==$scope.localGateway){
-                        if(sources[item].source){
+                        if(sources[item].has_default){
                             $scope.hasDefault = true;
-                        } else {
-                            $scope.getSources();
-                        } 
+			}
                         
                     }
                 }
                 console.log(JSON.stringify($scope.config));
             });
-            $scope.save = function (isvalid) {
+            
+            $scope.saveSimple = function (isvalid) {
+                $scope.submitted = true;
+                if (isvalid) {
+                    Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
+                        console.log("Subscription created");
+
+                        $scope.data = {};
+                        $scope.submitted = false;
+                    },
+                            function (data) {
+
+                            });
+                }
+            }
+	    $scope.save = function (isvalid) {
                 $scope.submitted = true;
                 if (isvalid) {
                     $scope.stripeCreateToken();
@@ -346,8 +359,8 @@
                 } else { // Source was created!
                     // Get the source ID:
                     $scope.data.source = response.id;
-                    $scope.data.plan_id = response.id;
-                    $scope.data.object_id = response.id;
+                    $scope.data.plan_id = 1;
+                    $scope.data.object_id = 1;
                     Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
                         console.log("Subscription created");
 
