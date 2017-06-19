@@ -77,6 +77,23 @@ angular.module('besafe')
                 /**/
 
             }
+            var getPlans = function (platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: 'api/plans',
+                        
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get plans");
+                        });
+
+                return def.promise;
+
+            }
             var deleteSubscription = function (subscription,platform) {
                 var def = $q.defer();
                 $http({
@@ -191,6 +208,7 @@ angular.module('besafe')
                 getSources:getSources,
                 createSource: createSource,
                 setAsDefault:setAsDefault,
+                getPlans:getPlans,
                 makeCharge: makeCharge,
                 deleteSubscription:deleteSubscription,
                 getSubscriptions:getSubscriptions,

@@ -33,6 +33,8 @@ Route::delete('sources/{source?}/{id?}', 'SourceApiController@destroy');
 Route::get('sources/{source?}/{id?}', 'SourceApiController@show');
 Route::post('sources/{source?}/default', 'SourceApiController@setAsDefault');
 
+Route::get('plans', 'SourceApiController@getPlans');
+
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');
 Route::post('contacts/check', 'UserApiController@checkContacts');

@@ -2,7 +2,8 @@
 
 @section('content')
 <script type="text/javascript">
-    var sources = {!! $user->sources !!};
+    var sources = {!! $user->sources !!}
+    ;
 </script>
 <div class="container-fluid" ng-controller="PlansCtrl">
     <div class="row">
@@ -37,7 +38,7 @@
                                 <p>
                                     Duration {{ $plan->interval }} {{ $plan->interval_type }}
                                 </p>
-                                <a href="javascript:;" ng-click="addCartItem({{ $plan->id }})" class="editar">agregar</a>
+                                <a href="javascript:;" ng-click="selectPlan('{{ $plan->plan_id }}')" class="editar">Select</a>
                             </li>
                             @endforeach
                         </ul>
@@ -48,12 +49,12 @@
 
                     <div ng-controller="GatewaysCtrl">
                         <div class="form-group">
-                        <div class="col-md-6 col-md-offset-4">
-                            <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>
-                            <button ng-click="selectGateway('Stripe')" class="btn btn-primary">Stripe</button>
+                            <div class="col-md-6 col-md-offset-4">
+                                <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>
+                                <button ng-click="selectGateway('Stripe')" class="btn btn-primary">Stripe</button>
 
+                            </div>
                         </div>
-                    </div>
                     </div>
                     <div class='clear'></div>
                     <div ng-show="gateway=='PayU'">
@@ -64,6 +65,7 @@
 
                     <div ng-show="gateway=='Stripe'">
                         <h2>Stripe</h2>
+                        @include('billing.Stripe.sourceList')
                         @include('billing.Stripe.editSubscriptionForm')
 
                     </div>

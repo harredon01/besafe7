@@ -5,7 +5,8 @@
             $scope.months = [];
             $scope.years = [];
             $scope.sources = [];
-            $scope.cityVisible = false;
+            $scope.buying = false;
+            $scope.editSource = false;
             $scope.config = {};
             angular.element(document).ready(function () {
                 console.log(JSON.stringify($scope.config));
@@ -25,6 +26,13 @@
                 console.log("Saving: " + isvalid);
                 if (isvalid) {
                     $scope.stripeCreateToken();
+                }
+            }
+            $scope.edit = function () {
+                if ($scope.editSource) {
+                    $scope.editSource = false;
+                } else {
+                    $scope.editSource = true;
                 }
             }
 
@@ -57,32 +65,7 @@
                 } else { // Source was created!
                     // Get the source ID:
                     $scope.data.source = response.id;
-                    $scope.data.plan_id = "Plan-2";
-                    $scope.data.object_id = 1;
-                    $scope.data.default = true;
-                    delete $scope.data['cvc'];
-                    delete $scope.data['expMonth'];
-                    delete $scope.data['expYear'];
-                    delete $scope.data['number'];
-                    delete $scope.data['postal'];
-                    console.log("Data sent");
-                    console.log(JSON.stringify($scope.data));
-                    console.log(JSON.stringify($.param($scope.data)));
-                    Billing.createSource($.param($scope.data), $rootScope.gateway).then(function (data) {
-                        console.log("Return source");
-                        console.log(JSON.stringify(data));
-                        if (data.type == "card") {
-                            var card = data.card;
-                            card.type = "card";
-                            $scope.sources.push(card);
-                        }
-                        $scope.data = {};
-                        $scope.submitted = false;
-                    },
-                            function (data) {
-
-                            });
-
+                    $scope.saveSource();
                 }
             }
             $scope.loadMonths = function () {
@@ -95,8 +78,33 @@
                     $scope.months.push(1 + i);
                 }
             }
-            $scope.getSources = function () {
-                Billing.getSources($rootScope.gateway).then(function (data) {
+            $scope.saveSource = function () {
+                $scope.data.default = true;
+                delete $scope.data['cvc'];
+                delete $scope.data['expMonth'];
+                delete $scope.data['expYear'];
+                delete $scope.data['number'];
+                delete $scope.data['postal'];
+                console.log("Data sent");
+                console.log(JSON.stringify($scope.data));
+                console.log(JSON.stringify($.param($scope.data)));
+                Billing.createSource($.param($scope.data), $rootScope.gateway).then(function (data) {
+                    console.log("Return source");
+                    console.log(JSON.stringify(data));
+                    if (data.type == "card") {
+                        var card = data.card;
+                        card.type = "card";
+                        $scope.sources.push(card);
+                    }
+                    $scope.data = {};
+                    $scope.submitted = false;
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.getSources = function (gateway) {
+                Billing.getSources(gateway).then(function (data) {
 
                     var sources = data.sources;
                     for (item in sources) {
@@ -125,9 +133,16 @@
                         function (data) {
                         });
             }
+            $scope.selectSource = function (source) {
+                $rootScope.$broadcast('SourceSelected', {source: source.id});
+            }
+            $rootScope.$on('GetSources', function (event, args) {
+                $scope.getSources(args.gateway);
+                $scope.buying = true;
+            });
             $rootScope.$on('GatewaySelected', function (event, args) {
                 if ($rootScope.gateway == $scope.localGateway) {
-                    $scope.getSources();
+                    $scope.getSources($scope.localGateway);
                     $scope.loadMonths();
                     $scope.data.cvc = "123";
                     $scope.data.postal = "33132";
@@ -157,11 +172,22 @@
 
         }).controller('SubscriptionsCtrl', function ($scope, Billing, $rootScope) {
     $scope.data = {};
-    $scope.subscriptions;
-    $rootScope.gateway = "PayU";
+    $scope.subscriptions = [];
+    $scope.plans = [];
     $scope.cityVisible = false;
     angular.element(document).ready(function () {
-        $scope.getSubscriptions();
+        console.log(JSON.stringify($scope.config));
+        var sources = $scope.config.sources;
+        $scope.localGateway = $scope.config.gateway;
+
+        console.log($scope.localGateway);
+        for (item in sources) {
+            console.log(JSON.stringify(sources[item]));
+            if (sources[item].gateway == $scope.localGateway) {
+                $scope.getSubscriptions();
+            }
+        }
+
     });
     $scope.save = function (isvalid) {
         $scope.submitted = true;
@@ -186,8 +212,17 @@
         }
     }
     $scope.getSubscriptions = function () {
-        Billing.getSubscriptions($rootScope.gateway).then(function (data) {
+        Billing.getSubscriptions($scope.localGateway).then(function (data) {
             $scope.subscriptions = data.subscriptions;
+
+        },
+                function (data) {
+
+                });
+    }
+    $scope.getPlans = function () {
+        Billing.getPlans().then(function (data) {
+            $scope.plans = data.plans;
 
         },
                 function (data) {
@@ -210,124 +245,44 @@
     $scope.clean = function () {
         $scope.data = {};
     }
-    $scope.updateSubscription = function (subscription) {
-        for (item in $scope.subscriptions) {
-            if ($scope.subscriptions[item].subscription_id == subscription.subscription_id) {
-                $scope.subscriptions.splice(item, 1);
-                $scope.subscriptions.push(subscription);
+    $scope.updateSubscription = function (subscription_id, plan_id) {
+        var data = {plan_id: plan_id};
+        Billing.editSubscription($.param(data), subscription_id, $rootScope.gateway).then(function (data) {
+            subscription_id = "" + subscription_id;
+            for (item in $scope.subscriptions) {
+                if ($scope.subscriptions[item].subscription_id == subscription_id) {
+                    console.log("deleting subscription", $scope.subscriptions[item]);
+                    $scope.subscriptions.splice(item, 1);
+
+                }
             }
+            $scope.subscriptions.push(data.subscription);
+        },
+                function (data) {
+                });
+    }
+    $scope.editSubscription = function () {
+        $scope.getPlans();
+    }
+    $rootScope.$on('GatewaySelected', function (event, args) {
+        console.log("Gateway selected");
+        if ($rootScope.gateway == $scope.localGateway) {
+            $scope.getSubscriptions();
         }
-    }
-    $scope.editSubscription = function (subscription_id) {
-        $scope.data.subscription_id = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.subscription_id')).html();
-        $scope.data.type = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.type')).html();
-        $scope.data.firstName = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.firstName')).html();
-        $scope.data.lastName = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.lastName')).html();
-        $scope.data.subscription = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.subscription')).html();
-        $scope.data.phone = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.phone')).html();
-        $scope.data.postal = angular.element(document.querySelector('li#subscription-' + subscription_id + ' span.postal')).html();
-    }
+    });
 
 }).controller('PlansCtrl', function ($scope, Billing, $rootScope) {
-    function stripeCreateToken() {
-        Stripe.source.create({
-            type: 'card',
-            card: {
-                number: $('.card-number').val(),
-                cvc: $('.card-cvc').val(),
-                exp_month: $('.card-expiry-month').val(),
-                exp_year: $('.card-expiry-year').val(),
-            },
-            owner: {
-                address: {
-                    postal_code: $('.address_zip').val()
-                }
-            }
-        }, stripeResponseHandler);
+
+    $scope.selectPlan = function (plan) {
+        $rootScope.$broadcast('PlanSelected', {plan: plan});
     }
-
-    function stripeResponseHandler(status, response) {
-
-        // Grab the form:
-        var $form = $('#payment-form');
-
-        if (response.error) { // Problem!
-
-            // Show the errors on the form
-            $form.find('.payment-errors').text(response.error.message);
-            $form.find('button').prop('disabled', false); // Re-enable submission
-
-        } else { // Source was created!
-
-            // Get the source ID:
-            var source = response.id;
-
-            // Insert the source into the form so it gets submitted to the server:
-            $form.append($('<input type="hidden" name="source" />').val(source));
-
-            // Submit the form:
-            $form.get(0).submit();
-
-        }
-    }
-    $scope.data = {};
-    $scope.subscriptions;
-    $scope.cityVisible = false;
-    $scope.save = function (isvalid) {
-        $scope.submitted = true;
-        if (isvalid) {
-            var existing = false;
-            if ($scope.data.subscription_id) {
-                existing = true;
-            }
-            Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
-                if (existing) {
-//                            $scope.updateSubscription(data.subscription);
-                } else {
-//                            $scope.subscriptions.push(data.subscription);
-                }
-
-                $scope.data = {};
-                $scope.submitted = false;
-            },
-                    function (data) {
-
-                    });
-        }
-    }
-    $scope.saveSimple = function (isvalid) {
-        $scope.submitted = true;
-        if (isvalid) {
-            var existing = false;
-            if ($scope.data.subscription_id) {
-                existing = true;
-            }
-            Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
-                if (existing) {
-//                            $scope.updateSubscription(data.subscription);
-                } else {
-//                            $scope.subscriptions.push(data.subscription);
-                }
-
-                $scope.data = {};
-                $scope.submitted = false;
-            },
-                    function (data) {
-
-                    });
-        }
-    }
-
-    $scope.clean = function () {
-        $scope.data = {};
-    }
-
 })
         .controller('GatewaysCtrl', function ($scope, Billing, $rootScope) {
 
             $scope.data = {};
             $scope.subscriptions;
             $scope.cityVisible = false;
+
             $scope.selectGateway = function (gateway) {
                 $rootScope.gateway = gateway;
                 $rootScope.$broadcast('GatewaySelected');
@@ -339,22 +294,27 @@
             $scope.years = [];
             $scope.sources = [];
             $scope.localGateway = "";
+            $scope.sourceSelected = false;
+            $scope.showSources = false;
+            $scope.buying = true;
             $scope.hasDefault = false;
+            $scope.data.object_id = 1;
 
             angular.element(document).ready(function () {
                 $scope.loadMonths();
                 console.log(JSON.stringify($scope.config));
                 var sources = $scope.config.sources;
                 $scope.localGateway = $scope.config.gateway;
+
                 console.log($scope.localGateway);
                 for (item in sources) {
                     console.log(JSON.stringify(sources[item]));
                     if (sources[item].gateway == $scope.localGateway) {
                         if (sources[item].has_default) {
+                            $scope.sourceSelected = true;
                             $scope.hasDefault = true;
-                            console.log($scope.hasDefault);
+                            console.log("Has default");
                         }
-
                     }
                 }
 
@@ -363,45 +323,62 @@
             $scope.saveSimple = function (isvalid) {
                 $scope.submitted = true;
                 if (isvalid) {
-                    $scope.data.plan_id = "Plan-2";
-                    $scope.data.object_id = 1;
-                    $scope.data.default = true;
-                    delete $scope.data['cvc'];
-                    delete $scope.data['expMonth'];
-                    delete $scope.data['expYear'];
-                    delete $scope.data['number'];
-                    delete $scope.data['postal'];
-                    Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
-                        if ("status" in data) {
-                            if (data.status == 'active') {
-                                console.log("Subscription created");
-                                $scope.data = {};
-                                $scope.submitted = false;
-                                return true;
-                            }
-                        }
-                        $scope.errors = data;
-                        $scope.showErrors = true;
-                    },
-                            function (data) {
-
-                            });
+                    $scope.createSubscription();
                 }
+            }
+            $scope.selectSource = function (source) {
+                var data = {};
+                data.source = source.id
+                Billing.setAsDefault($.param(data), $rootScope.gateway).then(function (data) {
+                    for (item in $scope.sources) {
+                        $scope.sources[item].is_default = false;
+                        if ($scope.sources[item].id == source.id) {
+                            $scope.sources[item].is_default = true;
+                        }
+                    }
+                },
+                        function (data) {
+                            window.location.reload();
+                        });
+            }
+            $scope.setAsDefault = function (source) {
+
+            }
+            $scope.useDefault = function () {
+                delete $scope.data['source'];
+                $scope.sourceSelected = true;
+                document.getElementById('simple').click();
+            }
+            $scope.getSources = function () {
+                $scope.sourceSelected = false;
+                Billing.getSources($scope.localGateway).then(function (data) {
+
+                    var sources = data.sources;
+                    for (item in sources) {
+                        if (sources[item].type == "card") {
+                            var card = sources[item].card;
+                            card.type = "card";
+                            card.id = sources[item].id;
+                            card.is_default = sources[item].is_default;
+                            $scope.sources.push(card);
+                        }
+                    }
+                    if ($scope.sources.length > 0) {
+                        $scope.showSources = true;
+                    } else {
+                        $scope.showSources = false;
+                    }
+
+                },
+                        function (data) {
+
+                        });
             }
             $scope.save = function (isvalid) {
                 $scope.submitted = true;
                 if (isvalid) {
                     $scope.stripeCreateToken();
                 }
-            }
-            $scope.getSources = function (source) {
-                Billing.getSources(source).then(function (data) {
-                    $scope.sources = data.sources;
-
-                },
-                        function (data) {
-
-                        });
             }
             $scope.loadMonths = function () {
                 var date = new Date();
@@ -416,6 +393,33 @@
                 $scope.data.postal = "33132";
                 $scope.data.expYear = "2020";
                 $scope.data.expMonth = "12";
+            }
+            $scope.createSubscription = function () {
+
+                $scope.data.default = true;
+                delete $scope.data['cvc'];
+                delete $scope.data['expMonth'];
+                delete $scope.data['expYear'];
+                delete $scope.data['number'];
+                delete $scope.data['postal'];
+                console.log("Data sent");
+                console.log(JSON.stringify($scope.data));
+                console.log(JSON.stringify($.param($scope.data)));
+                Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
+                    if ("status" in data) {
+                        if (data.status == 'active') {
+                            console.log("Subscription created");
+                            $scope.data = {};
+                            $scope.submitted = false;
+                            return true;
+                        }
+                    }
+                    $scope.errors = data;
+                    $scope.showErrors = true;
+                },
+                        function (data) {
+
+                        });
             }
 
             $scope.stripeCreateToken = function () {
@@ -434,6 +438,12 @@
                     }
                 }, stripeResponseHandler);
             }
+            $rootScope.$on('PlanSelected', function (event, args) {
+                $scope.data.plan_id = args.plan;
+            });
+            $rootScope.$on('ObjectSelected', function (event, args) {
+                $scope.data.object_id = args.object_id;
+            });
 
             function stripeResponseHandler(status, response) {
 
@@ -447,32 +457,7 @@
                 } else { // Source was created!
                     // Get the source ID:
                     $scope.data.source = response.id;
-                    $scope.data.plan_id = "Plan-2";
-                    $scope.data.object_id = 1;
-                    $scope.data.default = true;
-                    delete $scope.data['cvc'];
-                    delete $scope.data['expMonth'];
-                    delete $scope.data['expYear'];
-                    delete $scope.data['number'];
-                    delete $scope.data['postal'];
-                    console.log("Data sent");
-                    console.log(JSON.stringify($scope.data));
-                    console.log(JSON.stringify($.param($scope.data)));
-                    Billing.createSubscription($.param($scope.data), $rootScope.gateway).then(function (data) {
-                        if ("status" in data) {
-                            if (data.status == 'active') {
-                                console.log("Subscription created");
-                                $scope.data = {};
-                                $scope.submitted = false;
-                                return true;
-                            }
-                        }
-                        $scope.errors = data;
-                        $scope.showErrors = true;
-                    },
-                            function (data) {
-
-                            });
+                    $scope.createSubscription();
 
                 }
             }

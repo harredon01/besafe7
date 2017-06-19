@@ -31,8 +31,8 @@ class SubscriptionApiController extends Controller {
      */
     public function index(Request $request, $source) {
         $user = $request->user();
-        $sources = $this->editBilling->getSubscriptions($user,$source);
-        return response()->json(array("user" => $user, "sources" => $sources));
+        $subscriptions = $this->editBilling->getSubscriptions($user,$source);
+        return response()->json(array("user" => $user, "subscriptions" => $subscriptions));
     }
 
     /**

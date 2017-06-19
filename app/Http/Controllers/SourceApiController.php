@@ -76,6 +76,16 @@ class SourceApiController extends Controller {
         $sources = $this->editBilling->getSource($user, $source, $id);
         return response()->json(array("user" => $user, "sources" => $sources));
     }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getPlans(Request $request) {
+        $plans = $this->editBilling->getPlans();
+        return response()->json(array("plans" => $plans));
+    }
 
     /**
      * Show the form for editing the specified resource.

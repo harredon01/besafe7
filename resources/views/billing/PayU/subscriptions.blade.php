@@ -20,7 +20,7 @@
                     </div>
                     @endif
                     <div class="replace-address">
-                        @include('billing.PayU.subscriptionsList')
+                        @include('billing.PayU.subscriptionList')
                     </div>
 
 

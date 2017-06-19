@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Hola {{$user->firstName}}, aca puedes editar tus Subscripciones
+                <div class="panel-heading">Hola {{$user->firstName}}, aca puedes editar tus Subscripcionesss
 
                 </div>
                 <div class="panel-body">
@@ -19,15 +19,26 @@
                         </ul>
                     </div>
                     @endif
-                    <div >
-                        @include('billing.payu.subscriptions')
+                    <div ng-controller="GatewaysCtrl">
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-4">
+                                <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>
+                                <button ng-click="selectGateway('Stripe')" class="btn btn-primary">Stripe</button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class='clear'></div>
+                    <div ng-show="gateway=='PayU'">
+                        <h2>Pay U </h2>
+                        
                     </div>
 
 
-                    <div >
-                       
-                        @include('billing.stripe.subscriptions')
-                    
+                    <div ng-show="gateway=='Stripe'">
+                        <h2>Stripe</h2>
+                        @include('billing.Stripe.editSubscriptionPlanForm')
+
                     </div>
 
                 </div>
