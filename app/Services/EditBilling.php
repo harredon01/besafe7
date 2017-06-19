@@ -80,6 +80,14 @@ class EditBilling {
             return $gateway->getSource($source, $id);
         }
     }
+    public function setAsDefault(User $user, $source, array $data) {
+        $className = "App\\Services\\" . $source;
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
+        if ($source) {
+            $gateway = new $className;
+            return $gateway->setAsDefault($source, $data);
+        }
+    }
 
     public function useSource(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
@@ -88,9 +96,9 @@ class EditBilling {
     }
 
     public function getSources(User $user, $source) {
-        $sources = $user->sources()->where('gateway', strtolower($source))->first();
+        $className = "App\\Services\\" . $source;
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
-            $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
             return $gateway->getSources($source);
         } else {
@@ -99,9 +107,9 @@ class EditBilling {
     }
 
     public function deleteSource(User $user, $source, $id) {
+        $className = "App\\Services\\" . $source;
         $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
-            $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
             $result = $gateway->deleteSource($source, $id);
             if ($result['status'] == "success") {
@@ -119,9 +127,9 @@ class EditBilling {
     }
 
     public function getSubscriptions(User $user, $source) {
+        $className = "App\\Services\\" . $source;
         $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
-            $className = "App\\Services\\" . $source;
             $gateway = new $className; //// <--- this thing will be autoloaded
             $result = [
                 "locals" => $user->subscriptions(),

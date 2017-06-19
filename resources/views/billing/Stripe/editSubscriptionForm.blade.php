@@ -1,5 +1,6 @@
-<div ng-controller="CreateSourceStripeCtrl" ng-init="config={sources:{!! $user->sources !!},gateway:'Stripe'}">
-    <div ng-hide="has_default">
+<div ng-controller="CreateSourceStripeCtrl" ng-init='config={sources:{!! $user->sources !!},gateway:"Stripe"}'>
+    <p ng-show='showErrors'>@{{errors}}</p>
+    <div ng-hide="hasDefault">
         <form class="form-horizontal" role="form" name="myForm" ng-submit="save(myForm.$valid)" novalidate>
             <input type="hidden" name="_token" value="{{ csrf_token()}}">
             <input type="hidden" ng-model="data.plan_id" name="plan_id" >
@@ -69,7 +70,7 @@
             </div>
         </form>
     </div>
-    <div ng-show="has_default">
+    <div ng-show="hasDefault">
         <form class="form-horizontal" role="form" name="myFormSimple" ng-submit="saveSimple(myFormSimple.$valid)" novalidate>
             <input type="hidden" name="_token" value="{{ csrf_token()}}">
             <input type="hidden" ng-model="data.plan_id" name="plan_id" >

@@ -19,17 +19,28 @@
                         </ul>
                     </div>
                     @endif
-                    <div >
+
+                    <div ng-controller="GatewaysCtrl">
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-4">
+                                <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>
+                                <button ng-click="selectGateway('Stripe')" class="btn btn-primary">Stripe</button>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class='clear'></div>
+                    <div ng-show="gateway=='PayU'">
+                        <h2>Pay U </h2>
                         @include('billing.PayU.sources')
                     </div>
 
 
-                    <div >
-                       
+                    <div ng-show="gateway=='Stripe'">
+                        <h2>Stripe</h2>
                         @include('billing.Stripe.sources')
-                    
-                    </div>
 
+                    </div>
                 </div>
             </div>
         </div>

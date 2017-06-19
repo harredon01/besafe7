@@ -148,6 +148,25 @@ angular.module('besafe')
                 /**/
 
             }
+            var setAsDefault = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: 'api/sources/'+platform+"/default",
+                        data: data, // pass in data as strings
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
             var makeCharge = function (data) {
                 var def = $q.defer();
                 $http({
@@ -171,6 +190,7 @@ angular.module('besafe')
                 deleteSource: deleteSource,
                 getSources:getSources,
                 createSource: createSource,
+                setAsDefault:setAsDefault,
                 makeCharge: makeCharge,
                 deleteSubscription:deleteSubscription,
                 getSubscriptions:getSubscriptions,

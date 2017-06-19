@@ -49,6 +49,21 @@ class SourceApiController extends Controller {
         $data['cookie'] = $request->cookie('name');
         return response()->json($this->editBilling->createSource($user, $source, $data));
     }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setAsDefault(Request $request, $source) {
+        $user = $request->user();
+        $data = $request->all();
+        $data['ip_address'] = $request->ip();
+        $data['user_agent'] = $request->header('User-Agent');
+        $data['cookie'] = $request->cookie('name');
+        return response()->json($this->editBilling->setAsDefault($user, $source, $data));
+    }
 
     /**
      * Display the specified resource.

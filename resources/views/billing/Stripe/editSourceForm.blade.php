@@ -1,4 +1,4 @@
-<div ng-controller="CreateSourceStripeCtrl">
+
 <form class="form-horizontal" role="form" name="myForm" ng-submit="save(myForm.$valid)" novalidate>
     <input type="hidden" name="_token" value="{{ csrf_token()}}">
     <div class="form-group">
@@ -54,4 +54,3 @@
         </div>
     </div>
 </form>
-</div>

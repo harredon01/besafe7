@@ -20,7 +20,7 @@ class Plan extends Model
      */
     protected $fillable = ['plan_id', 'name','type', 'duration', 'interval','interval_type','gateway'];
 
-    public function subscription() {
+    public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');
     }
 }

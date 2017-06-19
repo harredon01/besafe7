@@ -24,15 +24,14 @@ Route::put('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
 //Route::get('subscriptions/{source?}', 'SubscriptionApiController@show');
 
 
-
+Route::post('sources/{source?}', 'SourceApiController@store');
+Route::get('sources/{source?}', 'SourceApiController@index');
 Route::delete('sources/{source?}/{id?}', 'SourceApiController@destroy');
 //Route::post('sources/{source?}/{id?}', 'SourceApiController@edit');
 //Route::patch('sources/{source?}/{id?}', 'SourceApiController@edit');
 //Route::put('sources/{source?}/{id?}', 'SourceApiController@edit');
 Route::get('sources/{source?}/{id?}', 'SourceApiController@show');
-Route::post('sources/{source?}', 'SourceApiController@store');
-Route::get('sources/{source?}', 'SourceApiController@index');
-
+Route::post('sources/{source?}/default', 'SourceApiController@setAsDefault');
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');

@@ -64,7 +64,7 @@
 
                     <div ng-show="gateway=='Stripe'">
                         <h2>Stripe</h2>
-                        @include('billing.Stripe.editSubscription')
+                        @include('billing.Stripe.editSubscriptionForm')
 
                     </div>
 

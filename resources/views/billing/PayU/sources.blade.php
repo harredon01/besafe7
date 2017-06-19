@@ -1,7 +1,5 @@
-@extends('layouts.app')
 
-@section('content')
-<div class="container-fluid" ng-controller="SourcesCtrl" ng-init="config={sources:{!! $user->sources !!},gateway:'Stripe'}">
+<div class="container-fluid" ng-controller="SourcesCtrl" ng-init='config={sources:{!! $user->sources !!},gateway:"PayU"}'>
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
@@ -35,4 +33,4 @@
         </div>
     </div>
 </div>
-@endsection
+

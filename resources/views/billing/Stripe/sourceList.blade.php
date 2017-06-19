@@ -5,13 +5,13 @@
 
         <li id="source-@{{ source.id }}" ng-repeat="source in sources">
             Type: <span class="type">@{{ source.type }}</span><br/>
-            <span class="source_id" style="display:none">@{{ source.id }}</span><span class="firstName">@{{ source.firstName }}</span>, <span class="lastName">@{{ source.lastName }}</span>
-            <br/><span class="phone">@{{ source.phone }}</span>, <span class="postal">@{{ source.postal }}</span>
-            <br/><span class="source">@{{ source.source }}</span>, <span class="city">@{{ source.cityName }}</span><span class="city_id" style="display:none">@{{ source.city_id }}</span>
-            <br/><span class="regionName">@{{ source.regionName }}</span>, <span class="countryName">@{{ source.countryName }}</span>
-            <span class="region_id" style="display:none">@{{ source.region_id }}</span>, <span class="country_id"  style="display:none">@{{ source.country_id }}</span>
-            <br/><a href="javascript:;" ng-click="setAsDefault(source.id)" class="editar">Set as Default</a>
-            <br/><a href="javascript:;" ng-click="deleteSource(source.id)" class="editar">Borrar</a>
+            Expiration: <span class="exp_month">@{{ source.exp_month }}</span> / <span class="exp_year">@{{ source.exp_year }}</span>
+            <br/>Brand: <span class="brand">@{{ source.brand }}</span>
+            <br/>Country: <span class="country">@{{ source.country }}</span>
+            <br/>Last Four: <span class="last4" >@{{ source.last4 }}</span>
+            <br/><span class="last4" ng-show="source.is_default">Default:  @{{ source.is_default }}</span>
+            <br/><a href="javascript:;" ng-click="setAsDefault(source)" ng-hide="source.is_default" class="editar">Set as Default</a>
+            <br/><a href="javascript:;" ng-click="deleteSource(source)" class="editar">Borrar</a>
         </li>
 
     </ul>

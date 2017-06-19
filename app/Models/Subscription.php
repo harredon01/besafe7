@@ -25,7 +25,7 @@ class Subscription extends Model
      *
      * @var array
      */
-    protected $fillable = ['id','source_id','type','status', 'name','other','id','plan','gateway','client_id','object_id','interval','interval_type','quantity','trial_ends_at','ends_at'];
+    protected $fillable = ['id','source_id','type','status', 'name','other','plan_id','plan','gateway','client_id','object_id','interval','interval_type','quantity','trial_ends_at','ends_at'];
 
 
     public function user() {
