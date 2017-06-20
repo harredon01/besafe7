@@ -30,7 +30,7 @@ class Stripe {
             ));
             if ($customer->id) {
                 $source = new Source([
-                    "gateway" => "payu",
+                    "gateway" => "Stripe",
                     "client_id" => $customer->id
                 ]);
                 $user->sources()->save($source);
@@ -210,14 +210,15 @@ class Stripe {
                     $user->sources()->save($source);
 
                     $subscriptionL = new Subscription([
-                        "gateway" => "stripe",
+                        "gateway" => "Stripe",
                         "status" => "active",
                         "type" => $planL->type,
                         "name" => $planL->name,
                         "plan" => $planL->plan_id,
                         "plan_id" => $planL->id,
+                        "level" => $planL->level,
                         "source_id" => $subscription->id,
-                        "client_id" => $source->client_id,
+                        "client_id" => $customer->id,
                         "object_id" => $data['object_id'],
                         "interval" => $planL->interval,
                         "interval_type" => $planL->interval_type,
@@ -274,7 +275,7 @@ class Stripe {
                                 "plan" => $planL->plan_id,
                                 "metadata" => $data,
                     ));
-                    
+
                     if ($data['default']) {
                         $source->source = $token;
                         $source->has_default = true;
@@ -284,14 +285,15 @@ class Stripe {
 
 
                     $subscriptionL = new Subscription([
-                        "gateway" => "stripe",
+                        "gateway" => "Stripe",
                         "status" => "active",
                         "type" => $planL->type,
                         "name" => $planL->name,
                         "plan" => $planL->plan_id,
                         "plan_id" => $planL->id,
+                        "level" => $planL->level,
                         "source_id" => $subscription->id,
-                        "client_id" => $source->client_id,
+                        "client_id" => $customer->id,
                         "object_id" => $data['object_id'],
                         "interval" => $planL->interval,
                         "interval_type" => $planL->interval_type,
@@ -353,14 +355,15 @@ class Stripe {
                         $source->save();
                     }
                     $subscriptionL = new Subscription([
-                        "gateway" => "stripe",
+                        "gateway" => "Stripe",
                         "status" => "active",
                         "type" => $planL->type,
                         "name" => $planL->name,
                         "plan" => $planL->plan_id,
                         "plan_id" => $planL->id,
+                        "level" => $planL->level,
                         "source_id" => $subscription->id,
-                        "client_id" => $source->client_id,
+                        "client_id" => $customer->id,
                         "object_id" => $data['object_id'],
                         "interval" => $planL->interval,
                         "interval_type" => $planL->interval_type,
@@ -415,14 +418,15 @@ class Stripe {
                                     "metadata" => $data,
                         ));
                         $subscriptionL = new Subscription([
-                            "gateway" => "stripe",
+                            "gateway" => "Stripe",
                             "status" => "active",
                             "type" => $planL->type,
                             "name" => $planL->name,
                             "plan" => $planL->plan_id,
                             "plan_id" => $planL->id,
+                            "level" => $planL->level,
                             "source_id" => $subscription->id,
-                            "client_id" => $source->client_id,
+                            "client_id" => $customer->id,
                             "object_id" => $data['object_id'],
                             "interval" => $planL->interval,
                             "interval_type" => $planL->interval_type,
@@ -471,7 +475,7 @@ class Stripe {
         try {
             $sub = \Stripe\Subscription::retrieve($subscription);
             if ($sub) {
-                $subscription = $user->subscriptions()->where('gateway', "stripe")->where('source_id', $subscription)->first();
+                $subscription = $user->subscriptions()->where('gateway', "Stripe")->where('source_id', $subscription)->first();
                 if ($subscription) {
                     $planL = Plan::where("plan_id", $data['plan_id'])->first();
                     if ($planL) {
@@ -521,7 +525,7 @@ class Stripe {
         try {
             $sub = \Stripe\Subscription::retrieve($subscription);
             if ($sub) {
-                $source = $user->subscriptions()->where('gateway', "stripe")->where('source_id', $subscription)->first();
+                $source = $user->subscriptions()->where('gateway', "Stripe")->where('source_id', $subscription)->first();
                 if ($source) {
                     if ($sub->customer == $source->client_id) {
                         $sub->cancel();
@@ -556,7 +560,7 @@ class Stripe {
     }
 
     public function getSubscriptions(Source $source) {
-        $result =  \Stripe\Subscription::all(array('customer' => $source->client_id));
+        $result = \Stripe\Subscription::all(array('customer' => $source->client_id));
         return $result['data'];
     }
 
@@ -566,7 +570,7 @@ class Stripe {
             if ($validator->fails()) {
                 return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
             }
-            $sources = $user->sources()->where('gateway', "stripe")->get();
+            $sources = $user->sources()->where('gateway', "Stripe")->get();
             if ($sources) {
                 $customer = \Stripe\Customer::retrieve($sources[0]->client_id);
                 if ($customer) {
@@ -681,6 +685,64 @@ class Stripe {
                 return $subscription->stripe_id === $payload['data']['object']['id'];
             })->each(function ($subscription) {
                 $subscription->markAsCancelled();
+            });
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    protected function handleCustomerSubscriptionCreated(array $payload) {
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+        $local = $this;
+        if ($user) {
+            $user->subscriptions->filter(function ($subscription) use ($payload, $local) {
+                return $subscription->stripe_id === $payload['data']['object']['id'];
+            })->each(function ($subscription) {
+                $source = Source::where('gateway', 'Stripe')->where('client_id', $subscription->customer)->first();
+                $plan = $subscription->plan;
+                $planL = Plan::where('plan_id',$plan->id);
+                $subscriptionL = new Subscription([
+                    "gateway" => "Stripe",
+                    "status" => "active",
+                    "type" => $planL->type,
+                    "name" => $planL->name,
+                    "plan" => $planL->plan_id,
+                    "plan_id" => $planL->id,
+                    "level" => $planL->level,
+                    "interval" => $planL->interval,
+                    "interval_type" => $planL->interval_type,
+                    'user_id' => $source->user_id,
+                    "source_id" => $subscription->id,
+                    "client_id" => $subscription->customer,
+                    "ends_at" => Date($subscription->current_period_end)
+                ]);
+                $user->subscriptions()->save($subscriptionL);
+                $subscription->markAsCancelled();
+            });
+        }
+
+        return new Response('Webhook Handled', 200);
+    }
+
+    protected function handleCustomerSubscriptionUpdated(array $payload) {
+        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
+        $local = $this;
+        if ($user) {
+            $user->subscriptions->filter(function ($subscription) use ($payload, $local) {
+                return $subscription->stripe_id === $payload['data']['object']['id'];
+            })->each(function ($subscription) {
+                $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $subscription->id)->first();
+                $data = $subscription->metadata;
+
+                $subscriptionL->object_id = $data['object_id'];
+                $subscriptionL->quantity = $data['quantity'];
+                $subscriptionL->ends_at = Date($subscription->current_period_end);
+                $objectType = "App\\Models\\" . $data['type'];
+                $object = new $objectType;
+                $target = $object->find($data["object_id"]);
+                $target->ends_at = Date($subscription->current_period_end);
+                $target->save();
+                $subscriptionL->save();
             });
         }
 
@@ -817,6 +879,7 @@ class Stripe {
                     'object_id' => 'required|max:255',
         ]);
     }
+
     /**
      * Get a validator for an incoming registration request.
      *

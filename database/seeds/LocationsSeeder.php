@@ -66,6 +66,9 @@ class LocationsSeeder extends Seeder {
         DB::table('cities')->delete();
         DB::table('regions')->delete();
         DB::table('countries')->delete();
+        DB::table('subscriptions')->delete();
+        DB::table('plans')->delete();
+        DB::table('sources')->delete();
         $this->createLocations();
     }
 

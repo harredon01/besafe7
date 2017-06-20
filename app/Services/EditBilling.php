@@ -5,7 +5,7 @@ namespace App\Services;
 use Validator;
 use App\Models\Order;
 use App\Models\Plan;
-use App\Models\OrderAddress;
+use App\Models\Group;
 use App\Models\OrderPayment;
 use App\Models\User;
 use App\Models\Item;
@@ -126,19 +126,14 @@ class EditBilling {
         return Plan::all();
     }
 
-    public function getSubscriptions(User $user, $source) {
-        $className = "App\\Services\\" . $source;
-        $source = $user->sources()->where('gateway', strtolower($source))->first();
-        if ($source) {
-            $gateway = new $className; //// <--- this thing will be autoloaded
-            $result = [
-                "locals" => $user->subscriptions(),
-                "external" => $gateway->getSubscriptions($source),
-            ];
-            return $result;
-        } else {
-            return array();
+    public function getSubscriptions(User $user) {
+        $subsc = $user->subscriptions;
+        foreach ($subsc as $item) {
+            $objectType = "App\\Models\\".$item->type;
+            $object = new $objectType;
+            $item->object = $object->find($item->object_id);
         }
+        return $subsc;
     }
 
     public function deleteSubscription(User $user, $source, $id) {

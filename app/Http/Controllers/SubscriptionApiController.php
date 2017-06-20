@@ -29,9 +29,9 @@ class SubscriptionApiController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $source) {
+    public function index(Request $request) {
         $user = $request->user();
-        $subscriptions = $this->editBilling->getSubscriptions($user,$source);
+        $subscriptions = $this->editBilling->getSubscriptions($user);
         return response()->json(array("user" => $user, "subscriptions" => $subscriptions));
     }
 

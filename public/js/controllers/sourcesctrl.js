@@ -170,24 +170,13 @@
             }
 
 
-        }).controller('SubscriptionsCtrl', function ($scope, Billing, $rootScope) {
+}).controller('SubscriptionsCtrl', function ($scope, Billing, $rootScope) {
     $scope.data = {};
     $scope.subscriptions = [];
     $scope.plans = [];
     $scope.cityVisible = false;
     angular.element(document).ready(function () {
-        console.log(JSON.stringify($scope.config));
-        var sources = $scope.config.sources;
-        $scope.localGateway = $scope.config.gateway;
-
-        console.log($scope.localGateway);
-        for (item in sources) {
-            console.log(JSON.stringify(sources[item]));
-            if (sources[item].gateway == $scope.localGateway) {
-                $scope.getSubscriptions();
-            }
-        }
-
+        $scope.getSubscriptions();
     });
     $scope.save = function (isvalid) {
         $scope.submitted = true;
@@ -214,7 +203,13 @@
     $scope.getSubscriptions = function () {
         Billing.getSubscriptions($scope.localGateway).then(function (data) {
             $scope.subscriptions = data.subscriptions;
-
+            for (x in $scope.subscriptions) {
+                var obj = $scope.subscriptions[x].object;
+                $scope.subscriptions[x].object_name = obj.name;
+                $scope.subscriptions[x].object_code = obj.code;
+                $scope.subscriptions[x].object_status = obj.status;
+                $scope.subscriptions[x].object_ends = obj.ends_at;
+            }
         },
                 function (data) {
 
@@ -229,12 +224,11 @@
 
                 });
     }
-    $scope.deleteSubscription = function (subscription_id) {
-        Billing.deleteSubscription(subscription_id, $rootScope.gateway).then(function (data) {
-            subscription_id = "" + subscription_id;
+    $scope.deleteSubscription = function (subscription) {
+        Billing.deleteSubscription(subscription.source_id, subscription.gateway).then(function (data) {
+            var subscription_id = "" + subscription.source_id;
             for (item in $scope.subscriptions) {
-                if ($scope.subscriptions[item].subscription_id == subscription_id) {
-                    console.log("deleting subscription", $scope.subscriptions[item]);
+                if ($scope.subscriptions[item].source_id == subscription_id) {
                     $scope.subscriptions.splice(item, 1);
                 }
             }
@@ -264,12 +258,6 @@
     $scope.editSubscription = function () {
         $scope.getPlans();
     }
-    $rootScope.$on('GatewaySelected', function (event, args) {
-        console.log("Gateway selected");
-        if ($rootScope.gateway == $scope.localGateway) {
-            $scope.getSubscriptions();
-        }
-    });
 
 }).controller('PlansCtrl', function ($scope, Billing, $rootScope) {
 

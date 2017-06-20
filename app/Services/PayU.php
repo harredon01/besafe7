@@ -589,7 +589,7 @@ class PayU {
         $response = $this->sendRequest($dataSent, 'https://sandbox.api.payulatam.com/payments-api/rest/v4.9/customers/');
         if (array_key_exists("id", $response)) {
             $source = new Source([
-                "gateway" => "payu",
+                "gateway" => "PayU",
                 "client_id" => $response['id']
             ]);
             $user->sources()->save($source);
@@ -604,12 +604,12 @@ class PayU {
     }
 
     public function deleteClient(User $user, $client) {
-        $sources = $user->sources()->where('gateway', "payu")
+        $sources = $user->sources()->where('gateway', "PayU")
                         ->where('client_id', $client)->get();
         if ($sources) {
             $url = env('PAYU_PAYMENTS') . "/rest/v4.9/customers/" . $client;
             $this->sendDelete($url);
-            return $user->sources()->where('gateway', "payu")->where('client_id', $client)->delete();
+            return $user->sources()->where('gateway', "PayU")->where('client_id', $client)->delete();
         }
     }
 
@@ -661,7 +661,7 @@ class PayU {
             $response = $this->sendRequest($dataSent, $url);
             if (array_key_exists("id", $response)) {
                 $this->deleteSubscription($user, $subscription->source_id);
-                $subscription->gateway = "payu";
+                $subscription->gateway = "PayU";
                 $subscription->status = "active";
                 $subscription->type = $planL->type;
                 $subscription->name = $planL->name;
@@ -706,10 +706,13 @@ class PayU {
         $response = $this->sendRequest($dataSent, $url);
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
-                "gateway" => "payu",
+                "gateway" => "PayU",
                 "status" => "active",
                 "type" => $planL->type,
                 "name" => $planL->name,
+                "plan" => $planL->plan_id,
+                "plan_id" => $planL->id,
+                "level" => $planL->level,
                 "source_id" => $response['id'],
                 "client_id" => $source->client_id,
                 "object_id" => $data['object_id'],
@@ -722,6 +725,7 @@ class PayU {
             return $response['id'];
         }
     }
+
     public function createSubscriptionExistingSource(User $user, Source $source, array $data) {
         $validator = $this->validatorSubscription($data);
         if ($validator->fails()) {
@@ -751,10 +755,13 @@ class PayU {
         $response = $this->sendRequest($dataSent, $url);
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
-                "gateway" => "payu",
+                "gateway" => "PayU",
                 "status" => "active",
                 "type" => $planL->type,
-                "name" => $planL->name,
+                        "name" => $planL->name,
+                        "plan" => $planL->plan_id,
+                        "plan_id" => $planL->id,
+                        "level" => $planL->level,
                 "source_id" => $response['id'],
                 "client_id" => $source->client_id,
                 "object_id" => $data['object_id'],
@@ -813,10 +820,13 @@ class PayU {
         $response = $this->sendRequest($dataSent, $url);
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
-                "gateway" => "payu",
+                "gateway" => "PayU",
                 "status" => "active",
                 "type" => $planL->type,
-                "name" => $planL->name,
+                        "name" => $planL->name,
+                        "plan" => $planL->plan_id,
+                        "plan_id" => $planL->id,
+                        "level" => $planL->level,
                 "source_id" => $response['id'],
                 "client_id" => $source->client_id,
                 "object_id" => $data['object_id'],
@@ -849,7 +859,7 @@ class PayU {
     public function deleteSubscription(User $user, $subscription) {
         $url = env('PAYU_PAYMENTS') . "/rest/v4.9/subscriptions/" . $subscription;
         $this->sendDelete($url);
-        return $user->subscriptions()->where('gateway', "payu")->where('source_id', $subscription)->delete();
+        return $user->subscriptions()->where('gateway', "PayU")->where('source_id', $subscription)->delete();
     }
 
     public function getPaymentMethods() {
@@ -1240,7 +1250,7 @@ class PayU {
                     'object_id' => 'required|max:255',
         ]);
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *
@@ -1254,7 +1264,6 @@ class PayU {
                     'plan_id' => 'required|max:255',
         ]);
     }
-    
 
     /**
      * Get a validator for an incoming registration request.

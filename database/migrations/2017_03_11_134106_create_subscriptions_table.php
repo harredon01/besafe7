@@ -27,9 +27,11 @@ class CreateSubscriptionsTable extends Migration {
             $table->integer('object_id')->nullable();
             $table->string('interval')->nullable();
             $table->string('interval_type')->nullable();
+            $table->string('level');
             $table->integer('quantity')->nullable();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

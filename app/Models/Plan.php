@@ -18,7 +18,7 @@ class Plan extends Model
      *
      * @var array
      */
-    protected $fillable = ['plan_id', 'name','type', 'duration', 'interval','interval_type','gateway'];
+    protected $fillable = ['plan_id', 'name','type', 'duration', 'interval','interval_type','level','gateway'];
 
     public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');

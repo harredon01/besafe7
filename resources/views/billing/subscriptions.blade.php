@@ -19,26 +19,30 @@
                         </ul>
                     </div>
                     @endif
-                    <div ng-controller="GatewaysCtrl">
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>
-                                <button ng-click="selectGateway('Stripe')" class="btn btn-primary">Stripe</button>
+                    <div ng-controller="SubscriptionsCtrl" >
 
-                            </div>
+                        <div>
+                            Listed Subscriptions<br><br>
+                            <ul>
+
+                                <li id="subscription-@{{ subscription.id }}" ng-repeat="subscription in subscriptions">
+                                    Type: <span class="type">@{{ subscription.type }}</span><br/>
+                                    Object: <span class="type">@{{ subscription.object_name }}</span><br/>
+                                    Object Code: <span class="type">@{{ subscription.object_code }}</span><br/>
+                                    Object Status: <span class="type">@{{ subscription.object_status }}</span><br/>
+                                    Object Expiration: <span class="type">@{{ subscription.object_ends }}</span><br/>
+                                    Plan: <span class="firstName">@{{ subscription.plan }}</span><br/>
+                                    Gateway: <span class="firstName">@{{ subscription.gateway }}</span><br/>
+                                    Expires: <span class="firstName">@{{ subscription.ends_at }}</span><br/>
+                                    <br/><a href="javascript:;" ng-click="editSubscription(subscription)" class="editar">Edit</a>
+                                    <br/><a href="javascript:;" ng-click="deleteSubscription(subscription)" class="editar">Delete</a>
+                                    <br/><a href="javascript:;" ng-click="updateCard(subscription)" ng-show="subscription.gateway =='PayU'" class="editar">Update Card</a>
+                                    <br/><a href="/sources" ng-show="subscription.gateway =='stripe'" class="editar">Update Default Card</a>
+                                </li>
+
+                            </ul>
                         </div>
-                    </div>
-                    <div class='clear'></div>
-                    <div ng-show="gateway=='PayU'">
-                        <h2>Pay U </h2>
-                        
-                    </div>
-
-
-                    <div ng-show="gateway=='Stripe'">
-                        <h2>Stripe</h2>
                         @include('billing.Stripe.editSubscriptionPlanForm')
-
                     </div>
 
                 </div>

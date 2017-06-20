@@ -48,7 +48,6 @@ class BillingController extends Controller {
      */
     public function getSubscriptions() {
         $user = $this->auth->user();
-        $user->sources;
         return view('billing.subscriptions')->with('user',$user );
     }
 

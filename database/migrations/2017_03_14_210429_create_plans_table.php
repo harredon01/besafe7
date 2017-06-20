@@ -20,6 +20,7 @@ class CreatePlansTable extends Migration
             $table->string('name');
             $table->string('interval');
             $table->string('interval_type');
+            $table->string('level');
 	    $table->string('gateway');
             $table->timestamps();
         });

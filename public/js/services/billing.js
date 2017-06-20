@@ -59,11 +59,11 @@ angular.module('besafe')
                 /**/
 
             }
-            var getSubscriptions = function (platform) {
+            var getSubscriptions = function () {
                 var def = $q.defer();
                 $http({
                         method: 'GET',
-                        url: 'api/subscriptions/'+platform,
+                        url: 'api/subscriptions',
                         
                     })
                             .success(function (data) {
