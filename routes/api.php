@@ -34,6 +34,7 @@ Route::get('sources/{source?}/{id?}', 'SourceApiController@show');
 Route::post('sources/{source?}/default', 'SourceApiController@setAsDefault');
 
 Route::get('plans', 'SourceApiController@getPlans');
+Route::post('stripe', 'WebhookController@handleWebhookStripe');
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');

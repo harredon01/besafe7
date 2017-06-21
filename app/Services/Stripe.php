@@ -7,7 +7,9 @@ use App\Models\Order;
 use App\Models\Plan;
 use App\Models\Source;
 use App\Models\Subscription;
+use Illuminate\Http\Response;
 use Validator;
+use Stripe\Event as StripeEvent;
 
 class Stripe {
 
@@ -19,6 +21,10 @@ class Stripe {
      */
     public function __construct() {
         \Stripe\Stripe::setApiKey("sk_test_tDJJWJMN72ql5LHKHAtkCrpd");
+    }
+
+    public function saveTransaction() {
+        
     }
 
     public function createClient(User $user) {
@@ -71,6 +77,7 @@ class Stripe {
             $token = $data['source'];
             if ($data["default"]) {
                 $source->source = $token;
+                $source->has_default = true;
                 $source->save();
             }
             $customer = \Stripe\Customer::retrieve($source->client_id);
@@ -125,6 +132,7 @@ class Stripe {
         $customer->save();
 
         $source->source = $token;
+        $source->has_default = true;
         $source->save();
     }
 
@@ -629,9 +637,7 @@ class Stripe {
         if (!$this->isInTestingEnvironment() && !$this->eventExistsOnStripe($payload['id'])) {
             return;
         }
-
         $method = 'handle' . studly_case(str_replace('.', '_', $payload['type']));
-        $this->saveTransaction($payload);
         if (method_exists($this, $method)) {
             return $this->{$method}($payload);
         } else {
@@ -678,30 +684,21 @@ class Stripe {
     }
 
     protected function handleCustomerSubscriptionDeleted(array $payload) {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-
-        if ($user) {
-            $user->subscriptions->filter(function ($subscription) use ($payload) {
-                return $subscription->stripe_id === $payload['data']['object']['id'];
-            })->each(function ($subscription) {
-                $subscription->markAsCancelled();
-            });
+        $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $payload['data']['object']['id'])->first();
+        if ($subscriptionL) {
+            $subscriptionL->delete();
+            return new Response('Webhook Handled', 200);
         }
-
-        return new Response('Webhook Handled', 200);
+        return new Response('Subscription not found', 400);
     }
 
     protected function handleCustomerSubscriptionCreated(array $payload) {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-        $local = $this;
-        if ($user) {
-            $user->subscriptions->filter(function ($subscription) use ($payload, $local) {
-                return $subscription->stripe_id === $payload['data']['object']['id'];
-            })->each(function ($subscription) {
-                $source = Source::where('gateway', 'Stripe')->where('client_id', $subscription->customer)->first();
-                $plan = $subscription->plan;
-                $planL = Plan::where('plan_id',$plan->id);
-                $subscriptionL = new Subscription([
+        $source = Source::where('gateway', 'Stripe')->where('client_id', $payload['data']['object']['customer'])->first();
+        if ($source) {
+            $plan = $payload['data']['object']['plan']['id'];
+            $planL = Plan::where('plan_id', $plan)->first();
+            if ($planL) {
+                Subscription::create([
                     "gateway" => "Stripe",
                     "status" => "active",
                     "type" => $planL->type,
@@ -712,41 +709,48 @@ class Stripe {
                     "interval" => $planL->interval,
                     "interval_type" => $planL->interval_type,
                     'user_id' => $source->user_id,
-                    "source_id" => $subscription->id,
-                    "client_id" => $subscription->customer,
-                    "ends_at" => Date($subscription->current_period_end)
+                    "source_id" => $payload['data']['object']['id'],
+                    "client_id" => $payload['data']['object']['customer'],
+                    "ends_at" => Date($payload['data']['object']['current_period_end'])
                 ]);
-                $user->subscriptions()->save($subscriptionL);
-                $subscription->markAsCancelled();
-            });
+                return new Response('Webhook Handled', 200);
+            }
+            return new Response('Plan for subscription not found', 400);
         }
-
-        return new Response('Webhook Handled', 200);
+        return new Response('Source for Client not found', 400);
     }
 
     protected function handleCustomerSubscriptionUpdated(array $payload) {
-        $user = $this->getUserByStripeId($payload['data']['object']['customer']);
-        $local = $this;
-        if ($user) {
-            $user->subscriptions->filter(function ($subscription) use ($payload, $local) {
-                return $subscription->stripe_id === $payload['data']['object']['id'];
-            })->each(function ($subscription) {
-                $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $subscription->id)->first();
-                $data = $subscription->metadata;
-
+        $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $payload['data']['object']['id'])->first();
+        if ($subscriptionL) {
+            $plan = $payload['data']['object']['plan']['id'];
+            $planL = Plan::where('plan_id', $plan)->first();
+            if ($planL) {
+                $data = $payload['data']['object']['metadata'];
                 $subscriptionL->object_id = $data['object_id'];
                 $subscriptionL->quantity = $data['quantity'];
-                $subscriptionL->ends_at = Date($subscription->current_period_end);
-                $objectType = "App\\Models\\" . $data['type'];
+                $subscriptionL->ends_at = Date($payload['data']['object']['current_period_end']);
+                $subscriptionL->type = $planL->type;
+                $subscriptionL->name = $planL->name;
+                $subscriptionL->plan = $planL->plan_id;
+                $subscriptionL->plan_id = $planL->id;
+                $subscriptionL->level = $planL->level;
+                $subscriptionL->interval = $planL->interval;
+                $subscriptionL->interval_type = $planL->interval_type;
+                $objectType = "App\\Models\\" . $subscriptionL->type;
                 $object = new $objectType;
                 $target = $object->find($data["object_id"]);
-                $target->ends_at = Date($subscription->current_period_end);
+                $target->ends_at = Date($payload['data']['object']['current_period_end']);
+                if ($subscriptionL->type == "Group") {
+                    $target->level = $planL->level;
+                }
                 $target->save();
                 $subscriptionL->save();
-            });
+                return new Response('Webhook Handled', 200);
+            }
+            return new Response('Plan not found', 400);
         }
-
-        return new Response('Webhook Handled', 200);
+        return new Response('Subscription not found', 400);
     }
 
     /**
@@ -755,19 +759,19 @@ class Stripe {
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function handleChargeSuccedded(array $payload) {
-        $user = $this->getOrderByPayload($payload['data']['object']['customer']);
-
-        if ($user) {
-
-            $user->subscriptions->filter(function ($subscription) use ($payload) {
-                return $subscription->stripe_id === $payload['data']['object']['id'];
-            })->each(function ($subscription) {
-                $subscription->markAsCancelled();
-            });
+    protected function handleInvoicePaymentSuccedded(array $payload) {
+        $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $payload['data']['object']['id'])->first();
+        if ($subscriptionL) {
+            $subscriptionL->ends_at = Date($payload['data']['object']['current_period_end']);
+            $objectType = "App\\Models\\" . $subscriptionL->type;
+            $object = new $objectType;
+            $target = $object->find($subscriptionL->object_id);
+            $target->ends_at = Date($payload['data']['object']['current_period_end']);
+            $target->save();
+            $subscriptionL->save();
+            return new Response('Webhook Handled', 200);
         }
-
-        return new Response('Webhook Handled', 200);
+        return new Response('Subscription not found', 400);
     }
 
     /**
@@ -790,7 +794,18 @@ class Stripe {
      */
     protected function eventExistsOnStripe($id) {
         try {
-            return !is_null(StripeEvent::retrieve($id, config('services.stripe.secret')));
+            $result = !is_null(StripeEvent::retrieve($id, config('services.stripe.secret')));
+            return $result;
+        } catch (Stripe_InvalidRequestError $e) {
+            return false;
+        } catch (Stripe_AuthenticationError $e) {
+            return false;
+            // (maybe you changed API keys recently)
+        } catch (Stripe_ApiConnectionError $e) {
+            return false;
+        } catch (Stripe_Error $e) {
+            return false;
+            // yourself an email
         } catch (Exception $e) {
             return false;
         }
@@ -812,7 +827,7 @@ class Stripe {
      * @return mixed
      */
     public function missingMethod($parameters = []) {
-        return new Response;
+        return new Response('Event not monitored', 200);
     }
 
     /**

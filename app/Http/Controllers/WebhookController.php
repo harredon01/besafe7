@@ -11,14 +11,14 @@ use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController extends Controller {
-    
+
     /**
      * The Guard implementation.
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $payU;
-    
+
     /**
      * The Guard implementation.
      *
@@ -47,6 +47,7 @@ class WebhookController extends Controller {
         $payload = json_decode($request->getContent(), true);
         $this->stripe->webhook($payload);
     }
+
     public function handleWebhookPayu(Request $request) {
         $payload = json_decode($request->getContent(), true);
         $this->payu->webhook($payload);
@@ -58,5 +59,4 @@ class WebhookController extends Controller {
      * @param  array  $payload
      * @return \Symfony\Component\HttpFoundation\Response
      */
-
 }

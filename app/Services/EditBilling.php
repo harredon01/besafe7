@@ -22,7 +22,6 @@ use DB;
 
 class EditBilling {
 
-
     public function processModel(User $user, array $data) {
         $class = "App\\Models\\" . $data["model"];
         $model = $class::find($data['id']);
@@ -50,15 +49,12 @@ class EditBilling {
     public function createSource(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $gateway = new $className; //// <--- this thing will be autoloaded
-        $sources = $user->sources()->where('gateway', strtolower($source))->get();
-        if ($sources) {
-            $source = $sources[0];
-            if ($source) {
-                return $gateway->createSource($source, $data);
-            } else {
-                $source = $gateway->createClient($user);
-                return $gateway->createSource($source, $data);
-            }
+        $source = $user->sources()->where('gateway', strtolower($source))->first();
+        if ($source) {
+            return $gateway->createSource($source, $data);
+        } else {
+            $source = $gateway->createClient($user);
+            return $gateway->createSource($source, $data);
         }
     }
 
@@ -80,6 +76,7 @@ class EditBilling {
             return $gateway->getSource($source, $id);
         }
     }
+
     public function setAsDefault(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $source = $user->sources()->where('gateway', strtolower($source))->first();
@@ -129,7 +126,7 @@ class EditBilling {
     public function getSubscriptions(User $user) {
         $subsc = $user->subscriptions;
         foreach ($subsc as $item) {
-            $objectType = "App\\Models\\".$item->type;
+            $objectType = "App\\Models\\" . $item->type;
             $object = new $objectType;
             $item->object = $object->find($item->object_id);
         }
@@ -153,12 +150,11 @@ class EditBilling {
         $source = $user->sources()->where('gateway', strtolower($source))->first();
         if ($source) {
             if ($source->has_default) {
-                if(array_key_exists("source", $data)){
+                if (array_key_exists("source", $data)) {
                     return $gateway->createSubscriptionExistingSource($user, $source, $data);
                 } else {
                     return $gateway->createSubscription($user, $source, $data);
                 }
-                
             } else {
                 return $gateway->createSubscriptionSource($user, $source, $data);
             }
