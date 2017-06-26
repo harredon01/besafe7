@@ -145,45 +145,48 @@ class EditBilling {
     public function createSubscription(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $gateway = new $className;
-        $data['trialDays'] = 0;
-        $data['quantity'] = 1;
-        $source = $user->sources()->where('gateway', strtolower($source))->first();
-        if ($source) {
-            if ($source->has_default) {
-                if (array_key_exists("source", $data)) {
-                    return $gateway->createSubscriptionExistingSource($user, $source, $data);
+        $validator = $this->validatorSubscription($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $plan = Plan::where("plan_id", $data['plan_id'])->first();
+        if ($plan) {
+            $class = "App\\Models\\" . $data["model"];
+            $model = $class::find($data['object_id']);
+            if ($model) {
+                $source = $user->sources()->where('gateway', strtolower($source))->first();
+                if ($source) {
+                    if ($source->has_default) {
+                        if (array_key_exists("source", $data)) {
+                            return $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
+                        } if (array_key_exists("new", $data)) {
+                            return $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                        } else {
+                            return $gateway->createSubscription($user, $source, $plan, $data);
+                        }
+                    } else {
+                        return $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                    }
                 } else {
-                    return $gateway->createSubscription($user, $source, $data);
+                    return $gateway->createSubscriptionSourceClient($user, $plan, $data);
                 }
-            } else {
-                return $gateway->createSubscriptionSource($user, $source, $data);
             }
-        } else {
-            return $gateway->createSubscriptionSourceClient($user, $data);
+            return response()->json(['status' => 'error', 'message' => "Model not found"]);
         }
-    }
-
-    public function createSubscriptionExistingSource(User $user, $source, array $data) {
-        $className = "App\\Services\\" . $source;
-        $source = $user->sources()->where('gateway', strtolower($source))->first();
-        $data['trialDays'] = 0;
-        $data['quantity'] = 1;
-        if ($source) {
-            $gateway = new $className;
-            $gateway->createSubscriptionExistingSource($user, $source, $data);
-        } else {
-            return null;
-        }
+        return response()->json(['status' => 'error', 'message' => "Plan not found"]);
     }
 
     public function editSubscription(User $user, $source, $id, array $data) {
         $className = "App\\Services\\" . $source;
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
-        $source = $user->sources()->where('gateway', strtolower($source))->first();
-        if ($source) {
-            $gateway = new $className;
-            return $gateway->editSubscription($user, $source, $id, $data);
+        $plan = Plan::where("plan_id", $data['plan_id'])->first();
+        if ($plan) {
+            $source = $user->sources()->where('gateway', strtolower($source))->first();
+            if ($source) {
+                $gateway = new $className;
+                return $gateway->editSubscription($user, $source, $plan, $id, $data);
+            }
         }
     }
 
@@ -247,8 +250,8 @@ class EditBilling {
      */
     public function validatorSubscription(array $data) {
         return Validator::make($data, [
-                    'product_id' => 'required|max:255',
-                    'quantity' => 'required|max:255',
+                    'plan_id' => 'required|max:255',
+                    'object_id' => 'required|max:255',
         ]);
     }
 

@@ -42,7 +42,24 @@
 
                             </ul>
                         </div>
-                        @include('billing.Stripe.editSubscriptionPlanForm')
+                        <div ng-show="showEdit">
+                            Plans<br><br>
+                            <ul>
+
+                                <li id="subscription-@{{ plan.id }}" ng-repeat="plan in plans">
+                                    Type: <span class="type">@{{ plan.type }}</span><br/>
+                                    Plan: <span class="firstName">@{{ plan.name }}</span><br/>
+                                    Interval: <span class="firstName">@{{ plan.interval }}</span><br/>
+                                    Interval type: <span class="firstName">@{{ plan.interval_type }}</span><br/>
+                                    Gateway: <span class="firstName">@{{ plan.price }}</span><br/>
+                                    Expires: <span class="firstName">@{{ plan.level }}</span><br/>
+                                    <br/><a href="javascript:;" ng-click="selectPlan(plan.plan_id)" class="editar">Select</a>
+                                </li>
+
+                            </ul>
+                            @include('billing.Stripe.editSubscriptionPlanForm')
+                        </div>
+                        
                     </div>
 
                 </div>

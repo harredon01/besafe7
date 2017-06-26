@@ -45,12 +45,19 @@
                 <span ng-show="submitted && myForm.expYear.$error.required">Porfavor indica el año de vencimiento</span>
         </div>
     </div>
+    <div class="form-group" ng-hide="hideDefault">
+        <label class="col-md-4 control-label">Set as default</label>
+        <div class="col-md-6">
+            <input type="checkbox" ng-model="data.default" name="default" value="false" >
+           
+        </div>
+    </div>
 
     <div class="form-group">
         <div class="col-md-6 col-md-offset-4">
             <button type="submit" class="btn btn-primary">Save</button>
             <button ng-click="clean()" class="btn btn-primary">Clean</button>
-
+            <button ng-click="edit()" class="btn btn-primary">Done</button>
         </div>
     </div>
 </form>

@@ -1,4 +1,4 @@
-<div ng-controller="CreateSourceStripeCtrl" ng-init='config={sources:{!! $user->sources !!},gateway:"Stripe"}'>
+<div ng-controller="SubscriptionPlansStripeCtrl" ng-init='config={sources:{!! $user->sources !!},gateway:"Stripe"}'>
     <p ng-show='showErrors'>@{{errors}}</p>
     <div ng-hide="sourceSelected">
         <form class="form-horizontal" role="form" name="myForm" ng-submit="save(myForm.$valid)" novalidate>
@@ -9,7 +9,7 @@
                 <div class="col-md-6">
                     <input type="text" ng-model="data.number" class="form-control" name="number" value="{{ old('number')}}" required>
                     <span style="color:red" ng-show="(myForm.number.$dirty && myForm.number.$invalid) || submitted && myForm.number.$invalid">
-                        <span ng-show="submitted && myForm.number.$error.required">Porfavor ingresa un numero de tarjeta</span>
+                        <span ng-show="submitted && myForm.number.$error.required">Please input your credit card number</span>
                 </div>
             </div>
             <div class="form-group">
@@ -17,7 +17,7 @@
                 <div class="col-md-6">
                     <input type="text" ng-model="data.cvc" class="form-control" name="cvc" value="{{ old('cvc')}}" required>
                     <span style="color:red" ng-show="(myForm.cvc.$dirty && myForm.cvc.$invalid) || submitted && myForm.cvc.$invalid">
-                        <span ng-show="submitted && myForm.cvc.$error.required">Porfavor ingresa el numero de seguridad</span>
+                        <span ng-show="submitted && myForm.cvc.$error.required">Please input your security code</span>
                 </div>
             </div>
             <div class="form-group">
@@ -25,7 +25,7 @@
                 <div class="col-md-6">
                     <input type="text" ng-model="data.postal" class="form-control" name="postal" value="{{ old('postal')}}" required>
                     <span style="color:red" ng-show="(myForm.postal.$dirty && myForm.postal.$invalid) || submitted && myForm.postal.$invalid">
-                        <span ng-show="submitted && myForm.postal.$error.required">Porfavor ingresa un codigo postal</span>
+                        <span ng-show="submitted && myForm.postal.$error.required">Please input your postal code</span>
                 </div>
             </div>
             <div class="form-group">
@@ -35,7 +35,7 @@
                         <option ng-repeat="month in months" value="@{{month}}">@{{month}}</option>
                     </select>
                     <span style="color:red" ng-show="(myForm.expMonth.$dirty && myForm.expMonth.$invalid) || submitted && myForm.expMonth.$invalid">
-                        <span ng-show="submitted && myForm.expMonth.$error.required">Porfavor indica el mes de vencimiento</span>
+                        <span ng-show="submitted && myForm.expMonth.$error.required">Please select the expiration month</span>
                 </div>
             </div>
             <div class="form-group">
@@ -45,7 +45,7 @@
                         <option ng-repeat="year in years" value="@{{year}}">@{{year}}</option>
                     </select>
                     <span style="color:red" ng-show="(myForm.expYear.$dirty && myForm.expYear.$invalid) || submitted && myForm.expYear.$invalid">
-                        <span ng-show="submitted && myForm.expYear.$error.required">Porfavor indica el año de vencimiento</span>
+                        <span ng-show="submitted && myForm.expYear.$error.required">Please select the expiration year</span>
                 </div>
             </div>
 
@@ -100,8 +100,8 @@
 
             <div class="form-group">
                 <div class="col-md-6 col-md-offset-4">
-                    <button type="submit" id="simple" class="btn btn-primary" ng-show="hasDefault">One Click Pay</button>
-                    <button type="submit" id="simple" class="btn btn-primary" ng-hide="hasDefault">Submit</button>
+                    <button type="submit" id="simple" class="btn btn-primary" >One Click Pay</button>
+                    <a href="/sources" >Edit Cards</a>
                 </div>
             </div>
         </form>

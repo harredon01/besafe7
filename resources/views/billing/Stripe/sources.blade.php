@@ -4,7 +4,7 @@
         @include('billing.Stripe.sourceList')
     </div>
 
-    <div class="form-group">
+    <div class="form-group" ng-hide="editSource">
         <div class="col-md-6 col-md-offset-4">
             <button ng-click="edit()" class="btn btn-primary">Add new</button>
         </div>
@@ -12,8 +12,5 @@
     <div ng-show="editSource">
 
         @include('billing.Stripe.editSourceForm')
-        <div class="col-md-6 col-md-offset-4">
-            <button ng-click="edit()" class="btn btn-primary">Done</button>
-        </div>
     </div>
 </div>

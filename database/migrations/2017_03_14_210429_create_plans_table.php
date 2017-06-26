@@ -22,6 +22,7 @@ class CreatePlansTable extends Migration
             $table->string('interval_type');
             $table->string('level');
 	    $table->string('gateway');
+            $table->double('price', 15, 2);
             $table->timestamps();
         });
     }
