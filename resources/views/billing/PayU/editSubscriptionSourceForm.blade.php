@@ -1,6 +1,5 @@
 <form class="form-horizontal" role="form" name="myForm" ng-submit="save(myForm.$valid)" novalidate>
     <input type="hidden" name="_token" value="{{ csrf_token()}}">
-    <input type="hidden" ng-model="data.plan_id" name="plan_id" >
     <div class="form-group">
         <label class="col-md-4 control-label">Direccion</label>
         <div class="col-md-6">
@@ -24,7 +23,7 @@
     <div class="form-group">
         <label class="col-md-4 control-label">Codigo Postal</label>
         <div class="col-md-6">
-            <input type="text" ng-model="data.postalCode" class="form-control" name="postalCode" value="{{ old('postalCode')}}" required>
+            <input type="text" ng-model="data.postalCode" class="form-control" name="postalCode" value="{{ old('postalCode')}}">
             <span style="color:red" ng-show="(myForm.postalCode.$dirty && myForm.postalCode.$invalid) || submitted && myForm.postalCode.$invalid">
                 <span ng-show="submitted && myForm.postalCode.$error.required">Porfavor Ingresa el Codigo Postal</span>
         </div>
@@ -66,7 +65,15 @@
         <div class="col-md-6">
             <input type="text" ng-model="data.document" class="form-control" name="document" value="{{ old('document')}}" required>
             <span style="color:red" ng-show="(myForm.document.$dirty && myForm.document.$invalid) || submitted && myForm.document.$invalid">
-                <span ng-show="submitted && myForm.phone.$error.required">Porfavor ingresa un numero de documento</span>
+                <span ng-show="submitted && myForm.document.$error.required">Porfavor ingresa un numero de documento</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label">Nombre</label>
+        <div class="col-md-6">
+            <input type="text" ng-model="data.name" class="form-control" name="name" value="{{ old('name')}}" required>
+            <span style="color:red" ng-show="(myForm.name.$dirty && myForm.name.$invalid) || submitted && myForm.name.$invalid">
+                <span ng-show="submitted && myForm.name.$error.required">Porfavor ingresa el nombre del que aparece en la tarjeta</span>
         </div>
     </div>
     <div class="form-group">
@@ -113,6 +120,14 @@
             <input type="text" ng-model="data.object_id" class="form-control" name="object_id" value="{{ old('object_id')}}" required>
             <span style="color:red" ng-show="(myForm.object_id.$dirty && myForm.object_id.$invalid) || submitted && myForm.object_id.$invalid">
                 <span ng-show="submitted && myForm.object_id.$error.required">Porfavor ingresa un Beneficiario</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label">Plan</label>
+        <div class="col-md-6">
+            <input type="text" ng-model="data.plan_id" class="form-control" name="plan_id" value="{{ old('plan_id')}}" required>
+            <span style="color:red" ng-show="(myForm.plan_id.$dirty && myForm.plan_id.$invalid) || submitted && myForm.plan_id.$invalid">
+                <span ng-show="submitted && myForm.plan_id.$error.required">Porfavor Selecciona un plan</span>
         </div>
     </div>
 

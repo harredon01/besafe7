@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Order;
 use App\Models\Region;
 use App\Models\City;
+use App\Models\Plan;
 use App\Jobs\ApproveOrder;
 use App\Jobs\DenyOrder;
 use App\Jobs\PendingOrder;
@@ -492,7 +493,7 @@ class PayU {
             "phone" => $data['phone'],
         ];
         $datasent = [
-            "name" => $data['branch'],
+            "name" => $data['name'],
             "document" => $data['document'],
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
@@ -628,7 +629,7 @@ class PayU {
         return null;
     }
 
-    public function editSubscription(User $user, Source $source,Plan $planL, $id, array $data) {
+    public function editSubscription(User $user, Source $source, Plan $planL, $id, array $data) {
         $validator = $this->validatorEditSubscription($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
@@ -646,7 +647,7 @@ class PayU {
             }
             $url = env('PAYU_REST');
             $plan = [
-                "planCode" => $planL->code
+                "planCode" => $planL->plan_id
             ];
 
             $creditCard = [
@@ -683,14 +684,14 @@ class PayU {
         }
     }
 
-    public function createSubscription(User $user, Source $source,Plan $planL, array $data) {
+    public function createSubscription(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscription($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [
-            "planCode" => $planL->code
+            "planCode" => $planL->plan_id
         ];
 
         $creditCard = [
@@ -727,18 +728,42 @@ class PayU {
                 "ends_at" => Date($response['currentPeriodEnd'])
             ]);
             $user->subscriptions()->save($subscription);
-            return $response['id'];
+            $response["status"] = "success";
+            return $response;
         }
+        return response()->json(['status' => 'error', 'response' => $response]);
     }
 
-    public function createSubscriptionExistingSource(User $user, Source $source,Plan $planL, array $data) {
+    public function createPlan(Plan $planL) {
+        $url = env('PAYU_REST') . 'plans/';
+        $additionalValues = [
+            "name" => "PLAN_VALUE",
+            "value" => "20000",
+            "currency" => "COP"
+        ];
+
+        $dataSent = [
+            "accountId" => "512321",
+            "planCode" => $planL->plan_id,
+            "description" => 0,
+            "interval" => "MONTH",
+            "intervalCount" => "1",
+            "maxPaymentsAllowed" => "12",
+            "paymentAttemptsDelay" => "1",
+            "additionalValues" => array($additionalValues),
+        ];
+        $response = $this->sendPost($dataSent, $url);
+        return $response;
+    }
+
+    public function createSubscriptionExistingSource(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscriptionExisting($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [
-            "planCode" => $planL->code
+            "planCode" => $planL->plan_id
         ];
 
         $creditCard = [
@@ -752,7 +777,7 @@ class PayU {
         $dataSent = [
             "quantity" => 1,
             "installments" => 1,
-            "trialDays" =>0,
+            "trialDays" => 0,
             "customer" => $customer,
             "plan" => $plan
         ];
@@ -771,22 +796,23 @@ class PayU {
                 "object_id" => $data['object_id'],
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
-                "quantity" => $data['quantity'],
+                "quantity" => 1,
                 "ends_at" => Date($response['currentPeriodEnd'])
             ]);
             $user->subscriptions()->save($subscription);
-            return $response['id'];
+            $response["status"] = "success";
+            return $response;
         }
     }
 
-    public function createSubscriptionSource(User $user, Source $source,Plan $planL, array $data) {
+    public function createSubscriptionSource(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscriptionSource($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [
-            "planCode" => $planL->code
+            "planCode" => $planL->plan_id
         ];
         $address = [
             "line1" => $data['line1'],
@@ -820,7 +846,7 @@ class PayU {
             "customer" => $customer,
             "plan" => $plan
         ];
-        $response = $this->sendRequest($dataSent, $url);
+        $response = $this->sendPost($dataSent, $url);
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
@@ -859,10 +885,10 @@ class PayU {
         return $response;
     }
 
-    public function createSubscriptionSourceClient(User $user,Plan $planL, array $data) {
+    public function createSubscriptionSourceClient(User $user, Plan $planL, array $data) {
         $source = $this->createClient($user);
         if ($source) {
-            $this->createSubscriptionSource($user, $data, $source);
+            return $this->createSubscriptionSource($user, $source, $planL, $data);
         }
         return null;
     }
@@ -1327,9 +1353,10 @@ class PayU {
 //                    'installments' => 'required|max:255',
                     'object_id' => 'required|max:255',
                     'line1' => 'required|max:255',
-                    'line2' => 'required|max:255',
-                    'line3' => 'required|max:255',
-                    'postalCode' => 'required|max:255',
+//                    'line2' => 'required|max:255',
+//                    'line3' => 'required|max:255',
+//                    'postalCode' => 'required|max:255',
+                    'name' => 'required|max:255',
                     'city' => 'required|max:255',
                     'state' => 'required|max:255',
                     'country' => 'required|max:255',

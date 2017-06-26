@@ -151,7 +151,8 @@ class EditBilling {
         }
         $plan = Plan::where("plan_id", $data['plan_id'])->first();
         if ($plan) {
-            $class = "App\\Models\\" . $data["model"];
+            //$reply = $gateway->createPlan($plan);
+            $class = "App\\Models\\" . $plan->type;
             $model = $class::find($data['object_id']);
             if ($model) {
                 $source = $user->sources()->where('gateway', strtolower($source))->first();

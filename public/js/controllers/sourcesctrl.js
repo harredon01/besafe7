@@ -586,13 +586,14 @@
     }
     $scope.selectSource = function (source) {
         $scope.data.source = source.token;
-        $scope.sourceSelected = true;
-        document.getElementById('simple').click();
-    }
-    $scope.useDefault = function () {
-        delete $scope.data['source'];
-        $scope.sourceSelected = true;
-        document.getElementById('simple').click();
+        $scope.submitted = true;
+        if($scope.data.plan_id && $scope.data.object_id){
+            $scope.sourceSelected = true;
+            $scope.createSubscription();
+        } else {
+            $scope.sourceSelected = true;
+        }
+        
     }
     $scope.newCardTrigger = function () {
         $scope.newCard = true;
@@ -623,6 +624,7 @@
     $scope.save = function (isvalid) {
         $scope.submitted = true;
         if (isvalid) {
+            $scope.data.new = true;
             $scope.createSubscription();
         }
     }
@@ -637,6 +639,7 @@
         }
     }
     $scope.loadTestData = function () {
+        $scope.data.name = "Hoovert Arredondo";
         $scope.data.line1 = "Calle 73 # 0-24";
         $scope.data.line2 = "Apto 202";
         $scope.data.line3 = "";
@@ -657,9 +660,10 @@
         console.log(JSON.stringify($.param($scope.data)));
         Billing.createSubscription($.param($scope.data), $scope.localGateway).then(function (data) {
             if ("status" in data) {
-                if (data.status == 'active') {
+                if (data.status == 'success') {
                     console.log("Subscription created");
                     $scope.data = {};
+                    window.location.href = "/subscriptions";
                     $scope.submitted = false;
                     return true;
                 }
