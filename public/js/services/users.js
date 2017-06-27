@@ -92,11 +92,11 @@ angular.module('besafe')
                 /**/
 
             }
-            var getShippingConditions = function (address_id) {
+            var getContacts = function () {
                 var def = $q.defer();
                 $http({
-                    method: 'GET',
-                    url: '/checkout/shippingConditions/' + address_id
+                    method: 'get',
+                    url: '/api/contacts' 
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -115,6 +115,7 @@ angular.module('besafe')
                 getAddresses:getAddresses,
                 saveAddress:saveAddress,
                 deleteAddress:deleteAddress,
-                saveUser:saveUser
+                saveUser:saveUser,
+                getContacts:getContacts
             };
         })

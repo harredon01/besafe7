@@ -39,6 +39,7 @@
         <script src="{{ asset('/js/services/payu.js')}}"></script>
         <script src="{{ asset('/js/services/billing.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
+        <script src="{{ asset('/js/services/groups.js')}}"></script>
         <script src="https://js.stripe.com/v2/"></script>
         <script src="https://js.stripe.com/v3/"></script>
 

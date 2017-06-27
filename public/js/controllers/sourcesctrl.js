@@ -422,6 +422,53 @@
                 $rootScope.$broadcast('GatewaySelected');
             }
         })
+        .controller('ObjectCtrl', function ($scope, Groups, User, $rootScope) {
+
+            $scope.groups = [];
+            $scope.contacts = [];
+            $scope.invites = [];
+            $scope.subscriptions;
+            $scope.cityVisible = false;
+
+            $scope.selectGroup = function (group_id) {
+                $rootScope.$broadcast('ObjectSelected', {object_id: group_id});
+            }
+            $scope.getGroups = function (page) {
+                Groups.getGroups(page).then(function (data) {
+                    $scope.groups = data.data;
+                },
+                        function (data) {
+                        });
+            }
+            $scope.getContacts = function (page) {
+                User.getContacts(page).then(function (data) {
+                    $scope.contacts = data.data;
+                },
+                        function (data) {
+                        });
+            }
+            $scope.create = function () {
+                //formData = {text: $scope.data.outgoing, recipient_id: $stateParams.chatId, priority: "normal", type: "user_message"};
+                if ($scope.data.name && $scope.data.name != "") {
+                    var finalSent = [];
+                    var finalInvites = [];
+                    for (id in $scope.invites) {
+                        for (contact in $scope.contacts) {
+                            if ($scope.contacts[contact].contact_id == $scope.invites[id]) {
+                                finalSent.push($scope.contacts[contact]);
+                                finalInvites.push($scope.invites[id]);
+                            }
+                        }
+                    }
+                    var formData = {name: $scope.data.name, contacts: finalInvites, completeData: finalSent};
+                    Groups.saveGroup(formData).then(function (data) {
+                        $scope.selectGroup(data.id);
+                    },
+                            function (data) {
+                            });
+                }
+            };
+        })
         .controller('SubscriptionPlansStripeCtrl', function ($scope, Billing, $rootScope) {
             $scope.data = {};
             $scope.months = [];
@@ -587,13 +634,13 @@
     $scope.selectSource = function (source) {
         $scope.data.source = source.token;
         $scope.submitted = true;
-        if($scope.data.plan_id && $scope.data.object_id){
+        if ($scope.data.plan_id && $scope.data.object_id) {
             $scope.sourceSelected = true;
             $scope.createSubscription();
         } else {
             $scope.sourceSelected = true;
         }
-        
+
     }
     $scope.newCardTrigger = function () {
         $scope.newCard = true;

@@ -884,6 +884,108 @@ class PayU {
         }
         return $response;
     }
+    public function createAll(User $user, Source $source, Plan $planL, array $data) {
+        $validator = $this->validatorSubscriptionSource($data);
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+        }
+        $url = env('PAYU_REST') . 'subscriptions/';
+        $additionalValues = [
+            "name" => "PLAN_VALUE",
+            "value" => "20000",
+            "currency" => "COP"
+        ];
+
+        $plan = [
+            "accountId" => "512321",
+            "planCode" => "Plan-id",
+            "description" => "Plan-id",
+            "interval" => "MONTH",
+            "intervalCount" => "1",
+            "maxPaymentsAllowed" => "12",
+            "maxPaymentAttempts" => "3",
+            "paymentAttemptsDelay" => "1",
+            "maxPendingPayments" => "1",
+            "trialDays" => "30",
+            "additionalValues" => array($additionalValues),
+        ];
+        $address = [
+            "line1" => "Calle 73 # 0 - 24 ",
+            "line2" => "Apto 202",
+            "line3" => "",
+            "postalCode" => "",
+            "city" => "Bogota",
+            "state" => "Cundinamarca",
+            "country" => "CO",
+            "phone" => "3105507245"
+        ];
+
+        $creditCard = [
+            "name" => "Hoovert Arredondo",
+            "document" => "1231231232",
+            "number" => "4242424242424242",
+            "expMonth" => "12",
+            "expYear" => "2020",
+            "type" => "VISA",
+            "address" => $address
+        ];
+        $creditCards = array($creditCard);
+        $customer = [
+            "fullName" => "Hoovert Arredondo",
+            "email" => "harredon01@gmail.com",
+            "creditCards" => $creditCards,
+        ];
+        $dataSent = [
+            "quantity" => 1,
+            "installments" => 1,
+            "trialDays" => 0,
+            "immediatePayment" => true,
+            "recurringBillItems" => array(),
+            "extra1" => "",
+            "extra2" => "",
+            "customer" => $customer,
+            "plan" => $plan,
+            "deliveryAddress" => $address,
+            "notifyUrl" => "http://hoovert.com/api/payu",
+        ];
+        $response = $this->sendPost($dataSent, $url);
+        if (array_key_exists("id", $response)) {
+            $subscription = new Subscription([
+                "gateway" => "PayU",
+                "status" => "active",
+                "type" => $planL->type,
+                "name" => $planL->name,
+                "plan" => $planL->plan_id,
+                "plan_id" => $planL->id,
+                "level" => $planL->level,
+                "source_id" => $response['id'],
+                "client_id" => $source->client_id,
+                "object_id" => $data['object_id'],
+                "interval" => $planL->interval,
+                "interval_type" => $planL->interval_type,
+                "quantity" => 1,
+                "ends_at" => Date($response['currentPeriodEnd'])
+            ]);
+            $user->subscriptions()->save($subscription);
+        }
+        if (array_key_exists("customer", $response)) {
+            $customerReply = $response['customer'];
+            $response['status'] = "success";
+            if (array_key_exists("creditCards", $customerReply)) {
+                $card = $customerReply['creditCards'][0];
+                if ($card) {
+                    if (array_key_exists("default", $data)) {
+                        if ($data["default"]) {
+                            $source->source = $card['token'];
+                            $source->has_default = true;
+                            $source->save();
+                        }
+                    }
+                }
+            }
+        }
+        return $response;
+    }
 
     public function createSubscriptionSourceClient(User $user, Plan $planL, array $data) {
         $source = $this->createClient($user);
