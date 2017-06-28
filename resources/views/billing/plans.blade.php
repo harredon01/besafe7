@@ -25,7 +25,7 @@
                     @endif
                     @if (count($plans) > 0)
                     <div>
-                        Products<br><br>
+                        Our plans<br><br>
                         <ul>
                             @foreach ($plans as $plan)
                             <li>
@@ -44,10 +44,11 @@
                         </ul>
 
                     </div>
+                    @include('groups.selectGroup')
 
                     @endif
 
-                    <div ng-controller="GatewaysCtrl">
+                    <div ng-controller="GatewaysCtrl" ng-show="objectSelected">
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
                                 <button ng-click="selectGateway('PayU')" class="btn btn-primary">PayU</button>

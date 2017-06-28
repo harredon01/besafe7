@@ -321,9 +321,9 @@ class EditGroup {
             $data["group_id"] = $group->id;
             dispatch(new InviteUsers($user, $data, true));
             //$this->inviteUsers($user, $data, true);
-            return $group;
+            return ['status' =>'success','message'=> 'Group saved', "group" => $group];
         }
-        return ['success' => 'Group saved', "group" => $group];
+        
     }
 
     /**

@@ -30,6 +30,7 @@
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>

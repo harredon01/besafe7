@@ -92,11 +92,15 @@ angular.module('besafe')
                 /**/
 
             }
-            var getContacts = function () {
+            var getContacts = function (text) {
+                var where = "";
+                if(text.length>0){
+                    where = "?name=\*"+text+"\*";
+                }
                 var def = $q.defer();
                 $http({
                     method: 'get',
-                    url: '/api/contacts' 
+                    url: '/api/contacts' +where
                 })
                         .success(function (data) {
                             // console.log(data);

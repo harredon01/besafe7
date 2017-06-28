@@ -1,10 +1,10 @@
 
                     <div>
-                        Listed Addresses<br><br>
+                        Your contacts<br><br>
                         <ul>
 
-                            <li id="group-@{{ group.id }}" ng-repeat="group in groups">
-                                Type: <span class="type">@{{ group.name }}</span><br/><a href="javascript:;" ng-click="selectGroup(group.id)" >Select</a>
+                            <li id="contact-@{{ contact.id }}" ng-repeat="contact in contacts">
+                                Type: <span class="type">@{{ contact.name }}</span><br/><a href="javascript:;" ng-click="selectGroup(contact.id)" >Select</a>
                             </li>
 
                         </ul>
