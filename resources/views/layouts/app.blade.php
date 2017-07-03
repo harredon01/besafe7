@@ -83,8 +83,8 @@ echo json_encode([
                         <ul class="nav navbar-nav navbar-right">
                             <!-- Authentication Links -->
                             @if (Auth::guest())
-                            <!--li><a href="{{ url('/login') }}">Login</a></li>
-                            <li><a href="{{ url('/register') }}">Register</a></li-->
+                            <li><a href="{{ url('/login') }}">Login</a></li>
+                            <li><a href="{{ url('/register') }}">Register</a></li>
                             @else
                             <li><a href="{{ url('products')}}">Products</a></li>
                             <li><a href="{{ url('plans')}}">Plans</a></li>
@@ -113,7 +113,7 @@ echo json_encode([
                                     <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
                                     <li><a href="{{ url('sources')}}">Edit Sources</a></li>
                                     <li><a href="{{ url('subscriptions')}}">Edit Subscriptions</a></li>
-                                    <!--li><a href="{{ url('user/editAccess')}}">Edit Access</a></li-->
+                                    <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
                                 </ul>
                             </li>
 

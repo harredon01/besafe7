@@ -86,6 +86,11 @@
             $scope.selectContact = function (contact) {
                 $scope.invites.push(contact.contact_id);
                 $scope.chosen.push(contact);
+                for(item in $scope.contacts){
+                    if($scope.contacts[item].contact_id == contact.contact_id){
+                        $scope.contacts.splice(item, 1);
+                    }
+                }
             }
             $scope.deleteContact = function (contact) {
                 for(item in $scope.chosen){

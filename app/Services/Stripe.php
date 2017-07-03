@@ -193,7 +193,7 @@ class Stripe {
         $customer->sources->retrieve($id);
     }
 
-    public function createSubscriptionSourceClient(User $user,Plan $planL, array $data) {
+    public function createSubscriptionSourceClient(User $user, Plan $planL, array $data) {
         try {
             $validator = $this->validatorSubscriptionSource($data);
             if ($validator->fails()) {
@@ -204,39 +204,38 @@ class Stripe {
                         "source" => $data['source'],
             ));
             if ($customer) {
+                $token = $data['source'];
+                $subscription = \Stripe\Subscription::create(array(
+                            "customer" => $customer->id,
+                            "plan" => $planL->plan_id,
+                            "metadata" => $data,
+                ));
+                $source = new Source([
+                    "gateway" => "Stripe",
+                    "client_id" => $customer->id,
+                    "source" => $token,
+                    "has_default" => true
+                ]);
+                $user->sources()->save($source);
 
-                    unset($data['source']);
-                    $subscription = \Stripe\Subscription::create(array(
-                                "customer" => $customer->id,
-                                "plan" => $planL->plan_id,
-                                "metadata" => $data,
-                    ));
-                    $source = new Source([
-                        "gateway" => "Stripe",
-                        "client_id" => $customer->id,
-                        "source" => $data['source'],
-                        "has_default" => true
-                    ]);
-                    $user->sources()->save($source);
-
-                    $subscriptionL = new Subscription([
-                        "gateway" => "Stripe",
-                        "status" => "active",
-                        "type" => $planL->type,
-                        "name" => $planL->name,
-                        "plan" => $planL->plan_id,
-                        "plan_id" => $planL->id,
-                        "level" => $planL->level,
-                        "source_id" => $subscription->id,
-                        "client_id" => $customer->id,
-                        "object_id" => $data['object_id'],
-                        "interval" => $planL->interval,
-                        "interval_type" => $planL->interval_type,
-                        "quantity" => $data['quantity'],
-                        "ends_at" => Date($subscription->current_period_end)
-                    ]);
-                    $user->subscriptions()->save($subscriptionL);
-                    return $subscriptionL;
+                $subscriptionL = new Subscription([
+                    "gateway" => "Stripe",
+                    "status" => "active",
+                    "type" => $planL->type,
+                    "name" => $planL->name,
+                    "plan" => $planL->plan_id,
+                    "plan_id" => $planL->id,
+                    "level" => $planL->level,
+                    "source_id" => $subscription->id,
+                    "client_id" => $customer->id,
+                    "object_id" => $data['object_id'],
+                    "interval" => $planL->interval,
+                    "interval_type" => $planL->interval_type,
+                    "quantity" => 1,
+                    "ends_at" => Date($subscription->current_period_end)
+                ]);
+                $user->subscriptions()->save($subscriptionL);
+                return $subscriptionL;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -264,7 +263,7 @@ class Stripe {
         }
     }
 
-    public function createSubscriptionSource(User $user, Source $source,Plan $planL, array $data) {
+    public function createSubscriptionSource(User $user, Source $source, Plan $planL, array $data) {
 
         try {
             $validator = $this->validatorSubscriptionSource($data);
@@ -274,42 +273,41 @@ class Stripe {
             $customer = \Stripe\Customer::retrieve($source->client_id);
             if ($customer) {
 
-                    $token = $data['source'];
-                    $customer->sources->create(array("source" => $token));
-                    unset($data['source']);
-                    $subscription = \Stripe\Subscription::create(array(
-                                "customer" => $customer->id,
-                                "plan" => $planL->plan_id,
-                                "metadata" => $data,
-                    ));
+                $token = $data['source'];
+                $customer->sources->create(array("source" => $token));
+                unset($data['source']);
+                $subscription = \Stripe\Subscription::create(array(
+                            "customer" => $customer->id,
+                            "plan" => $planL->plan_id,
+                            "metadata" => $data,
+                ));
 
-                    if ($data['default']) {
-                        $source->source = $token;
-                        $source->has_default = true;
-                        $source->save();
-                    }
+                if ($data['default']) {
+                    $source->source = $token;
+                    $source->has_default = true;
+                    $source->save();
+                }
 
 
 
-                    $subscriptionL = new Subscription([
-                        "gateway" => "Stripe",
-                        "status" => "active",
-                        "type" => $planL->type,
-                        "name" => $planL->name,
-                        "plan" => $planL->plan_id,
-                        "plan_id" => $planL->id,
-                        "level" => $planL->level,
-                        "source_id" => $subscription->id,
-                        "client_id" => $customer->id,
-                        "object_id" => $data['object_id'],
-                        "interval" => $planL->interval,
-                        "interval_type" => $planL->interval_type,
-                        "quantity" => $data['quantity'],
-                        "ends_at" => Date($subscription->current_period_end)
-                    ]);
-                    $user->subscriptions()->save($subscriptionL);
-                    return $subscriptionL;
-  
+                $subscriptionL = new Subscription([
+                    "gateway" => "Stripe",
+                    "status" => "active",
+                    "type" => $planL->type,
+                    "name" => $planL->name,
+                    "plan" => $planL->plan_id,
+                    "plan_id" => $planL->id,
+                    "level" => $planL->level,
+                    "source_id" => $subscription->id,
+                    "client_id" => $customer->id,
+                    "object_id" => $data['object_id'],
+                    "interval" => $planL->interval,
+                    "interval_type" => $planL->interval_type,
+                    "quantity" => 1,
+                    "ends_at" => Date($subscription->current_period_end)
+                ]);
+                $user->subscriptions()->save($subscriptionL);
+                return $subscriptionL;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -337,7 +335,7 @@ class Stripe {
         }
     }
 
-    public function createSubscriptionExistingSource(User $user, Source $source,Plan $planL, array $data) {
+    public function createSubscriptionExistingSource(User $user, Source $source, Plan $planL, array $data) {
         try {
             $validator = $this->validatorSubscriptionSource($data);
             if ($validator->fails()) {
@@ -348,35 +346,35 @@ class Stripe {
                 $token = $data['source'];
                 unset($data['source']);
 
-                    $subscription = \Stripe\Subscription::create(array(
-                                "customer" => $customer->id,
-                                'source' => $token,
-                                "plan" => $planL->plan_id,
-                                "metadata" => $data,
-                    ));
-                    if ($data['default']) {
-                        $source->source = $token;
-                        $source->has_default = true;
-                        $source->save();
-                    }
-                    $subscriptionL = new Subscription([
-                        "gateway" => "Stripe",
-                        "status" => "active",
-                        "type" => $planL->type,
-                        "name" => $planL->name,
-                        "plan" => $planL->plan_id,
-                        "plan_id" => $planL->id,
-                        "level" => $planL->level,
-                        "source_id" => $subscription->id,
-                        "client_id" => $customer->id,
-                        "object_id" => $data['object_id'],
-                        "interval" => $planL->interval,
-                        "interval_type" => $planL->interval_type,
-                        "quantity" => $data['quantity'],
-                        "ends_at" => Date($subscription->current_period_end)
-                    ]);
-                    $user->subscriptions()->save($subscriptionL);
-                    return $subscriptionL;
+                $subscription = \Stripe\Subscription::create(array(
+                            "customer" => $customer->id,
+                            'source' => $token,
+                            "plan" => $planL->plan_id,
+                            "metadata" => $data,
+                ));
+                if ($data['default']) {
+                    $source->source = $token;
+                    $source->has_default = true;
+                    $source->save();
+                }
+                $subscriptionL = new Subscription([
+                    "gateway" => "Stripe",
+                    "status" => "active",
+                    "type" => $planL->type,
+                    "name" => $planL->name,
+                    "plan" => $planL->plan_id,
+                    "plan_id" => $planL->id,
+                    "level" => $planL->level,
+                    "source_id" => $subscription->id,
+                    "client_id" => $customer->id,
+                    "object_id" => $data['object_id'],
+                    "interval" => $planL->interval,
+                    "interval_type" => $planL->interval_type,
+                    "quantity" => 1,
+                    "ends_at" => Date($subscription->current_period_end)
+                ]);
+                $user->subscriptions()->save($subscriptionL);
+                return $subscriptionL;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -404,7 +402,7 @@ class Stripe {
         }
     }
 
-    public function createSubscription(User $user, Source $source,Plan $planL, array $data) {
+    public function createSubscription(User $user, Source $source, Plan $planL, array $data) {
         try {
             $validator = $this->validatorSubscription($data);
             if ($validator->fails()) {
@@ -414,29 +412,29 @@ class Stripe {
             if ($customer) {
                 if ($customer->default_source) {
 
-                        $subscription = \Stripe\Subscription::create(array(
-                                    "customer" => $customer->id,
-                                    "plan" => $planL->plan_id,
-                                    "metadata" => $data,
-                        ));
-                        $subscriptionL = new Subscription([
-                            "gateway" => "Stripe",
-                            "status" => "active",
-                            "type" => $planL->type,
-                            "name" => $planL->name,
-                            "plan" => $planL->plan_id,
-                            "plan_id" => $planL->id,
-                            "level" => $planL->level,
-                            "source_id" => $subscription->id,
-                            "client_id" => $customer->id,
-                            "object_id" => $data['object_id'],
-                            "interval" => $planL->interval,
-                            "interval_type" => $planL->interval_type,
-                            "quantity" => $data['quantity'],
-                            "ends_at" => Date($subscription->current_period_end)
-                        ]);
-                        $user->subscriptions()->save($subscriptionL);
-                        return $subscriptionL;
+                    $subscription = \Stripe\Subscription::create(array(
+                                "customer" => $customer->id,
+                                "plan" => $planL->plan_id,
+                                "metadata" => $data,
+                    ));
+                    $subscriptionL = new Subscription([
+                        "gateway" => "Stripe",
+                        "status" => "active",
+                        "type" => $planL->type,
+                        "name" => $planL->name,
+                        "plan" => $planL->plan_id,
+                        "plan_id" => $planL->id,
+                        "level" => $planL->level,
+                        "source_id" => $subscription->id,
+                        "client_id" => $customer->id,
+                        "object_id" => $data['object_id'],
+                        "interval" => $planL->interval,
+                        "interval_type" => $planL->interval_type,
+                        "quantity" => 1,
+                        "ends_at" => Date($subscription->current_period_end)
+                    ]);
+                    $user->subscriptions()->save($subscriptionL);
+                    return $subscriptionL;
                 }
                 return ["status" => "error", "message" => "User does not have default source"];
             }
@@ -467,7 +465,7 @@ class Stripe {
         }
     }
 
-    public function editSubscription(User $user, Source $source,Plan $planL, $subscription, array $data) {
+    public function editSubscription(User $user, Source $source, Plan $planL, $subscription, array $data) {
         $validator = $this->validatorEditSubscription($data);
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
@@ -477,20 +475,20 @@ class Stripe {
             if ($sub) {
                 $subscription = $user->subscriptions()->where('gateway', "Stripe")->where('source_id', $subscription)->first();
                 if ($subscription) {
-                        $sub->plan = $planL->plan_id;
-                        $sub->save();
-                        $subscription->status = "active";
-                        $subscription->type = $planL->type;
-                        $subscription->name = $planL->name;
-                        if (array_key_exists("object_id", $data)) {
-                            $subscription->object_id = $data['object_id'];
-                        }
-                        $subscription->interval = $planL->interval;
-                        $subscription->interval_type = $planL->interval_type;
-                        $subscription->quantity = 1;
-                        $subscription->ends_at = Date($sub->current_period_end);
-                        $subscription->save();
-                        return $subscription;
+                    $sub->plan = $planL->plan_id;
+                    $sub->save();
+                    $subscription->status = "active";
+                    $subscription->type = $planL->type;
+                    $subscription->name = $planL->name;
+                    if (array_key_exists("object_id", $data)) {
+                        $subscription->object_id = $data['object_id'];
+                    }
+                    $subscription->interval = $planL->interval;
+                    $subscription->interval_type = $planL->interval_type;
+                    $subscription->quantity = 1;
+                    $subscription->ends_at = Date($sub->current_period_end);
+                    $subscription->save();
+                    return $subscription;
                 }
             }
         } catch (\Stripe\Error\Card $e) {
@@ -688,21 +686,27 @@ class Stripe {
             $plan = $payload['data']['object']['plan']['id'];
             $planL = Plan::where('plan_id', $plan)->first();
             if ($planL) {
-                Subscription::create([
-                    "gateway" => "Stripe",
-                    "status" => "active",
-                    "type" => $planL->type,
-                    "name" => $planL->name,
-                    "plan" => $planL->plan_id,
-                    "plan_id" => $planL->id,
-                    "level" => $planL->level,
-                    "interval" => $planL->interval,
-                    "interval_type" => $planL->interval_type,
-                    'user_id' => $source->user_id,
-                    "source_id" => $payload['data']['object']['id'],
-                    "client_id" => $payload['data']['object']['customer'],
-                    "ends_at" => Date($payload['data']['object']['current_period_end'])
-                ]);
+                $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $payload['data']['object']['id'])->first();
+                if ($subscriptionL) {
+                    
+                } else {
+                    Subscription::create([
+                        "gateway" => "Stripe",
+                        "status" => "active",
+                        "type" => $planL->type,
+                        "name" => $planL->name,
+                        "plan" => $planL->plan_id,
+                        "plan_id" => $planL->id,
+                        "level" => $planL->level,
+                        "interval" => $planL->interval,
+                        "interval_type" => $planL->interval_type,
+                        'user_id' => $source->user_id,
+                        "source_id" => $payload['data']['object']['id'],
+                        "client_id" => $payload['data']['object']['customer'],
+                        "ends_at" => Date($payload['data']['object']['current_period_end'])
+                    ]);
+                }
+
                 return new Response('Webhook Handled', 200);
             }
             return new Response('Plan for subscription not found', 400);
@@ -750,18 +754,40 @@ class Stripe {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function handleInvoicePaymentSuccedded(array $payload) {
-        $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $payload['data']['object']['id'])->first();
-        if ($subscriptionL) {
-            $subscriptionL->ends_at = Date($payload['data']['object']['current_period_end']);
-            $objectType = "App\\Models\\" . $subscriptionL->type;
-            $object = new $objectType;
-            $target = $object->find($subscriptionL->object_id);
-            $target->ends_at = Date($payload['data']['object']['current_period_end']);
-            $target->save();
-            $subscriptionL->save();
-            return new Response('Webhook Handled', 200);
+        $received = $payload['data']['object'];
+        if (array_key_exists("lines", $received)) {
+            $lines = $received['lines'];
+            $source = Source::where('gateway', 'Stripe')->where('client_id', $received['customer'])->first();
+            if (array_key_exists("data", $lines)) {
+                if (count($lines['data'] > 0)) {
+                    $subscription = $lines['data'][0];
+                    $subscriptionL = Subscription::where('gateway', 'Stripe')->where('source_id', $subscription['id'])->first();
+                    if ($subscriptionL) {
+                        $subscriptionL->ends_at = Date($subscription['period']['ends']);
+                        $objectType = "App\\Models\\" . $subscriptionL->type;
+                        $object = new $objectType;
+                        $target = $object->find($subscriptionL->object_id);
+                        $target->ends_at = Date($subscription['period']['ends']);
+                        $target->save();
+                        $subscriptionL->save();
+                        Payment::create([
+                            "gateway" => "Stripe",
+                            "status" => "succedded",
+                            "type" => "subscription",
+                            "subtotal" => $received['subtotal'],
+                            "tax" => $received['tax'],
+                            "discount" => 0,
+                            "total" => $received['total'],
+                            'user_id' => $source->user_id,
+                            "date" => Date($received['date']),
+                            "payload" => json_encode($received)
+                        ]);
+                        return new Response('Webhook Handled', 200);
+                    }
+                    return new Response('Subscription not found', 400);
+                }
+            }
         }
-        return new Response('Subscription not found', 400);
     }
 
     /**

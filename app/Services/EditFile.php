@@ -13,10 +13,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use DB;
 use Image;
+use Illuminate\Support\Facades\Storage;
 use File;
 
 class EditFile {
-    
+
     /**
      * The EditAlert implementation.
      *
@@ -45,19 +46,21 @@ class EditFile {
             $type = $typeg['type'];
             $file = $request->file('photo');
             $filetypeff = $request->only("filetype");
-            $filetype = $filetypeff['filetype']; 
+            $filetype = $filetypeff['filetype'];
             if ($type == "report") {
                 $trigger = Report::find($intended_id);
-                $path = 'images/reports/'; 
+                $path = 'images/reports/';
                 if ($trigger) {
                     if ($trigger->user_id == $user->id) {
                         if ($filetype == "photo") {
 
-                            $trigger_id = $trigger->id; 
-                            $today = date("Y-m-d_H-i-s");
-                            $filename = $today . "_report-" . $trigger->id . '.' . $file->getClientOriginalExtension();
-                            $path = public_path($path . $filename);
-                            Image::make($file->getRealPath())->resize(800, 800)->save($path);
+                            $trigger_id = $trigger->id;
+                            /* $today = date("Y-m-d_H-i-s");
+                              $filename = $today . "_report-" . $trigger->id . '.' . $file->getClientOriginalExtension();
+                              $path = public_path($path . $filename);
+                              Image::make($file->getRealPath())->resize(800, 800)->save($path); */
+                            $path = Storage::putFile('public/reports', $file);
+                            $filename = $path;
                             $saved = true;
                         }
                     } else {
@@ -67,48 +70,51 @@ class EditFile {
                     return array("status" => "error", "message" => "File invalid");
                 }
             } else if ($type == "user_avatar") {
-                $path = 'images/avatars/';
                 if ($filetype == "photo") {
                     if ($user->avatar || $user->avatar != "") {
-                        $pathToImage = public_path($path) . $user->avatar;
-                        File::delete($pathToImage);
-                        FileM::where("file",$user->avatar)->delete();
+                        //$pathToImage = public_path($path) . $user->avatar;
+                        Storage::delete($user->avatar);
+                        FileM::where("file", $user->avatar)->delete();
                     }
-                    $image = $request->file('photo');
-                    $filename = "user-" . time() . '.' . $image->getClientOriginalExtension();
-                    $user->avatar = $filename;
+                    /* $image = $request->file('photo'); */
+                    //$filename = "user-" . time() . '.' . $image->getClientOriginalExtension();
+
+                    $path = Storage::putFile('public/avatars', $file);
+                    $filename = $path;
+                    $user->avatar = $path;
                     $user->save();
                     $trigger_id = $user->id;
-                    $path = public_path($path . $filename);
-                    Image::make($file->getRealPath())->resize(200, 200)->save($path);
+                    //$path = public_path($path . $filename);
+                    //Image::make($file->getRealPath())->resize(200, 200)->save($path);
                     $saved = true;
                     dispatch(new NotifyContacts($user, $filename));
                 }
             } else if ($type == "group_avatar") {
-                $trigger = Group::find($intended_id);
-                if ($trigger) {
-                    $path = 'images/groups/';
-                    if ($trigger->admin_id == $user->id) {
+                $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 2', [$user->id, $intended_id]);
+                if (count($users) == 1) {
+                    $trigger = Group::find($intended_id);
+                    if ($trigger) {
                         if ($filetype == "photo") {
                             if ($trigger->avatar || $trigger->avatar != "") {
-                                $pathToImage = public_path($path) . $trigger->avatar;
-                                FileM::where("file",$trigger->avatar)->delete();
-                                File::delete($pathToImage);
+                                //$pathToImage = public_path($path) . $trigger->avatar;
+                                FileM::where("file", $trigger->avatar)->delete();
+                                Storage::delete($trigger->avatar);
                             }
-                            $filename = "group-" . time().'.' . $file->getClientOriginalExtension(); 
+                            $path = Storage::putFile('public/groups', $file);
+                            $filename = $path;
                             $trigger->avatar = $filename;
                             $trigger->save();
                             $trigger_id = $trigger->id;
-                            $path = public_path($path . $filename);
-                            Image::make($file->getRealPath())->resize(200, 200)->save($path);
+                            //$path = public_path($path . $filename);
+                            //Image::make($file->getRealPath())->resize(200, 200)->save($path);
                             $saved = true;
                             dispatch(new NotifyGroup($user, $trigger, $filename, $type));
                         }
                     } else {
-                        return array("status" => "error", "message" => "User not admin group");
+                        return array("status" => "error", "message" => "Group invalid");
                     }
                 } else {
-                    return array("status" => "error", "message" => "Group invalid");
+                    return array("status" => "error", "message" => "User not admin group");
                 }
             }
             if ($trigger_id && $saved) {
@@ -139,13 +145,8 @@ class EditFile {
         $file = FileM::find($file_id);
 
         if ($file) {
-            if ($file->user_id = $user->id) {
-                $filename = $file->file;
-                if ($file->type == "report") {
-                    $filename = "images/reports/" . $filename;
-                }
-                $path = public_path($filename);
-                File::delete($path);
+            if ($file->user_id == $user->id) {
+                Storage::delete($file->file);
                 $file->delete();
                 $data = [
                     "status" => "success",

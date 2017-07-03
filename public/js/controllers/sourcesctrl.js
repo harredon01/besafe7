@@ -415,7 +415,7 @@
 
             $scope.data = {};
             $scope.objectSelected = false;
-            
+
 
             $scope.selectGateway = function (gateway) {
                 $rootScope.gateway = gateway;
@@ -704,7 +704,12 @@
                         $scope.hasDefault = false;
                         $scope.getSources();
                     }
+                } else {
+                    $scope.sourceSelected = false;
+                    $scope.hasDefault = false;
+                    $scope.getSources();
                 }
+
             }
             $scope.loadMonths();
             $scope.loadTestData();

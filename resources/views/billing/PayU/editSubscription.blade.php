@@ -1,4 +1,4 @@
-<div ng-controller="SubscriptionPlansPayuCtrl" ng-init='config={sources:{!! $user->sources !!},gateway:"PayU"}'>
+<div ng-controller="SubscriptionPlansPayuCtrl" ng-init='config={sources:{!! $user->sources !!}}'>
     <div ng-hide="sourceSelected">
         @include('billing.PayU.sourceList')
         <div class="form-group" ng-hide="newCard">
