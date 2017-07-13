@@ -208,7 +208,7 @@ class UserTableSeeder extends Seeder {
             if ($usert->id == $user->id) {
                 
             } else {
-                $this->editGroup->joinGroupByCode($user, $group->id);
+                $this->editGroup->joinGroupById($user, $group->id);
             }
         }
 

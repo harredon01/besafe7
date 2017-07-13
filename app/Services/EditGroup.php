@@ -18,7 +18,9 @@ class EditGroup {
     const CONTACT_BLOCKED = 'contact_blocked';
     const GROUP_LEAVE = 'group_leave';
     const NEW_GROUP = 'new_group';
+    const GROUP_ACTIVE = 'group_active';
     const GROUP_INVITE = 'group_invite';
+    const GROUP_PENDING = 'group_pending';
 
     /**
      * The EditAlert implementation.
@@ -44,27 +46,26 @@ class EditGroup {
 
     public function getActiveAdminGroups(User $user) {
         return DB::select('select g.* from groups g join group_user gu on g.id = gu.group_id'
-                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.status <> "blocked";', [$user->id]);
+                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.status = "active";', [$user->id]);
     }
 
-    public function checkAdminGroup(User $user, $groupId) {
-        $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND status <> "blocked" ', [$groupId, $user->id]);
-        if (count($results) > 0) {
-            return true;
-        } else {
-            return false;
-        }
+    public function checkAdminGroup($userId, $groupId) {
+        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND status = "active"', [$groupId, $userId]);
+    }
+
+    public function checkUserGroup($userId, $groupId) {
+        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? AND status = "active" limit 2', [$groupId, $userId]);
     }
 
     public function deleteGroupUser(User $user, Group $group) {
-        $users = DB::select('select * from group_user where user_id  = ? and group_id = ? limit 1', [$user->id, $group->id]);
+        $users = $this->checkUserGroup($user->id, $group->id);
         if (count($users) > 0) {
-            $usersf = DB::select('select * from group_user where group_id = ? AND status <> "blocked" AND user_id  <> ? limit 2', [$group->id, $user->id]);
+
             if (!$group->is_public) {
 
                 $profile = $users[0];
                 if ($profile->is_admin) {
-                    $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 limit 1', [$user->id, $group->id]);
+                    $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 AND status = "active" limit 1', [$user->id, $group->id]);
                     if (count($users2) == 0) {
                         $canditate = $usersf[0];
                         $data = [
@@ -87,7 +88,7 @@ class EditGroup {
                     
                 }
             }
-            $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? AND status <> "blocked"', [$user->id, $group->id]);
+            $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
             if (count($usersf) == 0) {
                 $group->delete();
             }
@@ -95,31 +96,44 @@ class EditGroup {
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
+        $validator = $this->validatorStatus($data);
+        if ($validator->fails()) {
+            return $validator->getMessageBag();
+        }
         $group = Group::find($data["group_id"]);
 
         if ($group) {
-            $users = DB::select('select * from group_user where group_id = ? AND is_admin = 1 and user_id = ? limit 2', [$group->id, $user->id]);
+            $users = $this->checkAdminGroup($user->id, $group->id);
             if (count($users) == 1) {
-                dispatch(new NotifyGroup($user, $group, $data["expelled"], $data["status"]));
+                if ($data['status'] == "group_active") {
+                    $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
+                    $i = sizeof($members) - 1;
+                    $invitesLength = count($data["party"]);
+                    if (($i + $invitesLength) <= $group->max_users) {
+                        dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
+                        //return $this->editAlerts->notifyGroup($user, $group, $data["party"], $data["status"]);
+                        return ['status' => 'success', "message" => 'Request queued for active'];
+                    } else {
+                        $max = $group->max_users - $i;
+                        return ['status' => 'error', "message" => 'Max users exceeded', "max" => $max];
+                    }
+                } else {
+                    dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
+                    //return $this->editAlerts->notifyGroup($user, $group, $data["party"], $data["status"]);
+                    return ['status' => 'success', "message" => 'Request queued'];
+                }
             }
         }
     }
 
     public function getAdminGroupUsers(User $user, array $data) {
-        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 2', [$user->id, $data["group_id"]]);
+        $users = $this->checkAdminGroup($user->id, $data["group_id"]);
         if (count($users) == 1) {
             $per_page = 10;
             $skip = ($data['page'] - 1) * $per_page;
-            if ($data['level'] == "contact_blocked") {
-
-                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "=", "blocked")->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
-                $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "=", "blocked")->select('name', 'user_id as contact_id')->count();
-                return $data;
-            } else {
-                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "<>", "blocked")->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
-                $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', "<>", "blocked")->select('name', 'user_id as contact_id')->count();
-                return $data;
-            }
+            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
+            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id')->count();
+            return $data;
         }
         return null;
     }
@@ -144,11 +158,10 @@ class EditGroup {
      *
      * @return Response
      */
-    public function joinGroupByCode(User $user, $code) {
-        $group = Group::where('id', '=', $code)
-                        ->where('status', '=', 'active')->first();
+    public function joinGroupById(User $user, $code) {
+        $group = Group::where('id', '=', $code)->first();
         if ($group) {
-            $members = DB::select('select user_id as id from group_user where group_id = ? AND status <> "blocked" ', [$group->id]);
+            $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
             if (count($members) >= $group->max_users) {
                 return null;
             }
@@ -158,9 +171,50 @@ class EditGroup {
                 $color = intval($value->color);
             }
             $color ++;
-            $user->groups()->save($group, ['color' => $color]);
+            $user->groups()->save($group, ['color' => $color, "status" => "pending", "is_admin" => false]);
         }
         return $group;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getGroupByCode($code) {
+        $group = Group::where('code', '=', $code)->first();
+        if ($group->isActive() && $group->is_public) {
+            return ['status' => 'success', "group" => $group];
+        }
+        return ['status' => 'error', "message" => 'Group not found or inactive'];
+    }
+
+    public function joinGroupByCode(User $user, $code) {
+        $group = Group::where('code', '=', $code)->first();
+        
+        if ($group) {
+            if ($group->is_public && $group->isActive()) {
+                $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
+                
+                if (count($members) >= $group->max_users) {
+                    return ['status' => 'error', "message" => 'Group Full'];
+                }
+                
+                $members = DB::select('select user_id as id from group_user where group_id = ? AND user_id = ? ', [$group->id,$user->id]);
+                
+                if (count($members) > 0) {
+                    return ['status' => 'error', "message" => 'User cant join'];
+                }
+                
+                $user->groups()->save($group, ["status" => "pending", "is_admin" => false]);
+                $group->is_authorized = false;
+                dispatch(new NotifyGroup($user, $group, null, self::GROUP_PENDING));
+                //$this->editAlerts->notifyGroup($user, $group, null, self::GROUP_PENDING);
+                return ['status' => 'success', "message" => 'Group joined', "group" => $group];
+            }
+            return ['status' => 'error', "message" => 'Group not public'];
+        }
+        return ['status' => 'error', "message" => 'Group not found'];
     }
 
     public function inviteUsers($user, $data, $isNew) {
@@ -176,8 +230,7 @@ class EditGroup {
             } else {
                 return null;
             }
-
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status <> "blocked" ', [$user->id, $group->id]);
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
             if (sizeof($members) == 0) {
                 return null;
             }
@@ -185,8 +238,8 @@ class EditGroup {
             if ($isNew) {
                 $i = 0;
             } else {
-                $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status <> "blocked"', [$user->id, $group->id]);
-                $i = sizeof($members);
+                $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
+                $i = sizeof($members) - 1;
             }
             if ($group->max_users <= $i) {
                 return null;
@@ -210,7 +263,7 @@ class EditGroup {
                         $invite['group_id'] = $group->id;
                         $invite['user_id'] = $value;
                         $invite['color'] = $i;
-                        $invite['status'] = "normal";
+                        $invite['status'] = "active";
                         $invite['is_admin'] = $is_admin;
                         $invite['created_at'] = date("Y-m-d H:i:s");
                         $invite['updated_at'] = date("Y-m-d H:i:s");
@@ -279,7 +332,7 @@ class EditGroup {
         }
         if (array_key_exists("group_id", $data)) {
             $groupid = $data['group_id'];
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status <> "blocked" ', [$user->id, $groupid]);
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $groupid]);
             if (sizeof($members) == 0) {
                 return null;
             }
@@ -300,15 +353,26 @@ class EditGroup {
             unset($data['contacts']);
             unset($data[0]);
             unset($data[""]);
-            if($data['is_public']){
-                $data['ends_at'] = date('Y-m-d', strtotime("+10 days"));
+            if ($data['is_public']) {
+                $again = true;
+                $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
+                while ($again) {
+                    $string = str_random(12);
+                    $group = Group::where("code", $string)->first();
+                    if ($group) {
+                        
+                    } else {
+                        $again = false;
+                        $data['code'] = $string;
+                    }
+                }
             }
             $group = Group::create($data);
             $invite = array();
             $invite['group_id'] = $group->id;
             $invite['user_id'] = $user->id;
             $invite['color'] = 1;
-            $invite['status'] = "normal";
+            $invite['status'] = "active";
             $invite['is_admin'] = true;
             $invite['created_at'] = date("Y-m-d H:i:s");
             $invite['updated_at'] = date("Y-m-d H:i:s");
@@ -321,9 +385,8 @@ class EditGroup {
             $data["group_id"] = $group->id;
             dispatch(new InviteUsers($user, $data, true));
             //$this->inviteUsers($user, $data, true);
-            return ['status' =>'success','message'=> 'Group saved', "group" => $group];
+            return ['status' => 'success', 'message' => 'Group saved', "group" => $group];
         }
-        
     }
 
     /**
@@ -348,6 +411,18 @@ class EditGroup {
         return Validator::make($data, [
                     'user_id' => 'required|max:255',
                     'group_id' => 'required|max:255',
+        ]);
+    }
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorStatus(array $data) {
+        return Validator::make($data, [
+                    'group_id' => 'required|max:255',
+                    'status' => 'required|max:255',
         ]);
     }
 

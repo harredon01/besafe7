@@ -52,8 +52,15 @@ class GroupController extends Controller {
                 if(!$group->is_public){
                     $group->users;
                 } else {
-                    if($this->editGroup->checkAdminGroup($user, $group->id)){
+                    $results = $this->editGroup->checkAdminGroup($user->id, $group->id);
+                    if(count($results)>0){
                         $group->admin_id = 1;
+                    }
+                    $results = $this->editGroup->checkUserGroup($user->id, $group->id);
+                    if(count($results)>0){
+                        $group->is_authorized = true;
+                    } else {
+                        $group->is_authorized = false;
                     }
                 }
                 array_push($data,$group);
@@ -103,8 +110,8 @@ class GroupController extends Controller {
      */
     public function changeStatusGroup(Request $request) { 
         $user = $request->user();
-        $group = $this->editGroup->requestChangeStatusGroup($user, $request->all());
-        return response()->json(compact('group'));
+        $results = $this->editGroup->requestChangeStatusGroup($user, $request->all());
+        return response()->json($results);
     }
     
     /**
@@ -145,6 +152,16 @@ class GroupController extends Controller {
         $user = $request->user();
         dispatch(new InviteUsers($user, $request->all(),false));
         return response()->json(['status' => 'success','message' => 'inviteUsers queued']);
+    }
+    public function getGroupByCode($code) {
+        $response = $this->editGroup->getGroupByCode($code);
+        return response()->json($response);
+    }
+    
+    public function joinGroupByCode(Request $request, $code) {
+        $user = $request->user();
+        $response = $this->editGroup->joinGroupByCode($user,$code);
+        return response()->json($response);
     }
 
     /**

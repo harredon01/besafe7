@@ -23,6 +23,9 @@ class LocationsSeeder extends Seeder {
     }
 
     public function run() {
+        DB::table('subscriptions')->delete();
+        DB::table('plans')->delete();
+        DB::table('sources')->delete();
         DB::table('files')->delete();
         DB::table('reports')->delete();
         DB::table('medicals')->delete();
@@ -66,9 +69,7 @@ class LocationsSeeder extends Seeder {
         DB::table('cities')->delete();
         DB::table('regions')->delete();
         DB::table('countries')->delete();
-        DB::table('subscriptions')->delete();
-        DB::table('plans')->delete();
-        DB::table('sources')->delete();
+        
         $this->createLocations();
     }
 

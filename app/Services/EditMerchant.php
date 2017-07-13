@@ -255,7 +255,7 @@ class EditMerchant {
      * @return Response
      */
     public function getNearby(User $user, array $data) {
-        $radius = $data['radius'];
+        $radius = 1;
         $R = 6371;
         $lat = $data['lat'];
         $long = $data['long'];
@@ -281,7 +281,7 @@ class EditMerchant {
 			
                     WHERE status = 'active' and lat BETWEEN :latinf AND :latsup
         AND `long` BETWEEN :longinf AND :longsup 
-                    HAVING distance < :radius order by distance asc"
+                    HAVING distance < :radius order by distance asc limit 20 "
                         . "", $thedata);
         $thedata = [
             'lat' => $lat,
@@ -314,9 +314,49 @@ class EditMerchant {
                             and lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
                     HAVING distance < :radius
-                    order by distance asc"
+                    order by distance asc limit 20 "
                         . "", $thedata);
         $results = array("merchants" => $merchants, "reports" => $reports);
+        return $results;
+    }
+    
+    public function getNearbyReports(array $data) {
+        $radius = 1;
+        $R = 6371;
+        $lat = $data['lat'];
+        $long = $data['long'];
+        $maxLat = $lat + rad2deg($radius / $R);
+        $minLat = $lat - rad2deg($radius / $R);
+        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $thedata = [
+            'lat' => $lat,
+            'lat2' => $lat,
+            'long' => $long,
+            'latinf' => $minLat,
+            'latsup' => $maxLat,
+            'longinf' => $minLon,
+            'longsup' => $maxLon,
+            'radius' => $radius,
+        ];
+        $reports = DB::select(" "
+                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address, 
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
+                   FROM
+                        reports r
+                            left join
+                        userables u ON r.id = u.object_id
+                    WHERE
+                        status = 'active'
+                            AND r.private = 0
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
+                    HAVING distance < :radius
+                    order by distance asc limit 20 "
+                        . "", $thedata);
+        $results = array("reports" => $reports);
         return $results;
     }
 
@@ -528,7 +568,6 @@ class EditMerchant {
         return Validator::make($data, [
                     'lat' => 'required|max:255',
                     'long' => 'required|max:255',
-                    'radius' => 'required|max:255',
         ]);
     }
 

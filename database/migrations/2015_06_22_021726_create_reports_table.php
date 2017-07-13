@@ -19,6 +19,7 @@ class CreateReportsTable extends Migration {
             $table->string('name');
             $table->string('type');
             $table->index('type');
+            $table->string('object');
             $table->boolean('submitted')->default(0);
             $table->boolean('private');
             $table->boolean('anonymous');

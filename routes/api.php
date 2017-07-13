@@ -52,6 +52,8 @@ Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
 
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
+Route::get('groups/code/{code?}', 'GroupController@getGroupByCode');
+Route::post('groups/code/{code?}', 'GroupController@joinGroupByCode');
 Route::post('groups/admin_users', 'GroupController@getAdminGroupUsers');
 Route::post('groups/status', 'GroupController@changeStatusGroup'); 
 Route::post('groups/invite', 'GroupController@inviteUsers');
@@ -79,6 +81,7 @@ Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
 Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchant');
 Route::get('merchants/nearby', 'MerchantApiController@getNearby');
+Route::get('merchants/nearby_reports', 'MerchantApiController@getNearbyReports');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
 Route::post('merchants/search', 'MerchantApiController@findMerchant');
 

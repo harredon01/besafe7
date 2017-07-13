@@ -20,7 +20,8 @@ class EditAlerts {
     const GROUP_AVATAR = 'group_avatar';
     const GROUP_LEAVE = 'group_leave';
     const GROUP_REMOVED = 'group_removed';
-    const GROUP_RETURNED = 'group_returned';
+    const GROUP_ACTIVE = 'group_active';
+    const GROUP_PENDING = 'group_pending';
     const GROUP_EXPELLED = 'group_expelled';
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
@@ -68,7 +69,7 @@ class EditAlerts {
                     $recipients = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status <> 'blocked';");
+                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status = 'active';");
                     if (count($recipients) > 0) {
                         $messages = DB::select('select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" AND ( (' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )) order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
                         return array_reverse($messages);
@@ -152,9 +153,9 @@ class EditAlerts {
                         $res = $group->users()->where('user_id', $user->id)->get();
                         if (count($res) > 0) {
                             if ($group->is_public && $group->isActive()) {
-                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND status <> 'blocked' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin=1 AND status = 'active' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                             } else if (!$group->is_public) {
-                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND  status <> 'blocked' AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
+                                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND  status = 'active' AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' and object_id = $object_id ); ", [intval($data["follower"])]);
                             } else {
                                 return null;
                             }
@@ -196,21 +197,21 @@ class EditAlerts {
                     $report = Report::find($data['report_id']);
                     if ($report) {
                         if ($report->user_id == $user->id || !$report->private) {
-				$type = true;
-				$object_id = $report->id;
+                            $type = true;
+                            $object_id = $report->id;
                             if ($type == self::GROUP_TYPE) {
                                 $group = Group::find($data["follower"]);
                                 if ($group) {
                                     $recipients = DB::select("select 
                                             user_id as id
                                                 from
-                                                group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status <> 'blocked';");
+                                                group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status = 'active';");
                                     if (count($recipients) > 0) {
                                         if ($group->is_public && $group->isActive()) {
                                             $type = false;
-                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status = 'active' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
                                         } else if (!$group->is_public) {
-                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND  status <> 'blocked' AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
+                                            $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND  status = 'active' AND group_user.user_id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $report->id ); ", [intval($data["follower"])]);
                                         } else {
                                             return null;
                                         }
@@ -289,32 +290,18 @@ class EditAlerts {
         if ($userSending->id > 0) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
-            if(!$translation){
-                        $file = '/home/hoovert/acces2.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-
-        $current .= json_encode($data);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
-            }
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
-            $pos = strpos("e".$data['type'], 'Report');
+            $pos = strpos("e" . $data['type'], 'Report');
             if ($pos) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['report_type'],$data['subject']);
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['report_type'], $data['subject']);
             }
-            $pos = strpos("e".$data['type'], 'group'); 
-            if ($pos ) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['group_name'],$data['subject']);
+            $pos = strpos("e" . $data['type'], 'group');
+            if ($pos) {
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['group_name'], $data['subject']);
             }
             $pos = strpos($data['subject'], '{group}');
             if ($pos) {
-                $data['subject'] = str_replace("{group}", $arrayPayload['group_name'],$data['subject']);
+                $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
             }
         } else {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
@@ -602,6 +589,7 @@ class EditAlerts {
             "last_name" => $user->lastName,
             "user_id" => $user->id
         );
+        $push = false;
         if ($type == self::GROUP_AVATAR) {
             $payload["filename"] = $filename;
             $group->avatar = $filename;
@@ -610,7 +598,7 @@ class EditAlerts {
             $followers = DB::select("select 
                         user_id as id
                     from
-                        group_user where group_id = $group->id and user_id <> $user->id AND status <> 'blocked' ;");
+                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active' ;");
         } else if ($type == self::GROUP_LEAVE) {
             if ($filename) {
                 $payload["admin_id"] = $filename;
@@ -619,11 +607,11 @@ class EditAlerts {
             $followers = DB::select("select 
                         user_id as id
                     from
-                        group_user where group_id = $group->id and user_id <> $user->id AND status <> 'blocked';");
+                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active';");
         } else if ($type == self::GROUP_REMOVED) {
             if (count($filename) > 0) {
                 $bindingsString = trim(str_repeat('?,', count($filename)), ',');
-                $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
+                $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 $followers = DB::select($sql, $filename);
                 $message = "";
                 $data = [
@@ -633,7 +621,7 @@ class EditAlerts {
                     "payload" => $payload,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $this->sendMassMessage($data, $followers, $user, false);
+                $this->sendMassMessage($data, $followers, $user, true);
                 if ($group->isActive() && $group->is_public) {
                     $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
                 } else {
@@ -644,41 +632,37 @@ class EditAlerts {
                 if ($group->is_public) {
                     $followers = array();
                 } else {
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  group_id = $group->id AND status = 'active'; ";
                     $followers = DB::select($sql, $filename);
                 }
             } else {
                 $followers = array();
             }
             $type = self::GROUP_EXPELLED;
-            $payload["expelled"] = $filename;
+            $payload["party"] = $filename;
             $message = "";
-        } else if ($type == self::GROUP_RETURNED) {
+        } else if ($type == self::GROUP_ACTIVE) {
+            $followers = array();
             if (count($filename) > 0) {
                 if ($group->isActive() && $group->is_public) {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     $followers = DB::select($sql, $filename);
-                    $message = "";
-                    $data = [
-                        "trigger_id" => $group->id,
-                        "message" => $message,
-                        "type" => $type,
-                        "payload" => $payload,
-                        "user_status" => $this->getUserNotifStatus($user)
-                    ];
-                    $this->sendMassMessage($data, $followers, $user, false);
-                    $sql = "UPDATE group_user set status = 'normal' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
-
+                    $sql = "UPDATE group_user set status = 'active' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
                     DB::statement($sql, $filename);
-                    $followers = array();
                 }
-            } else {
-                $followers = array();
             }
-            $type = self::GROUP_EXPELLED;
-            $payload["expelled"] = $filename;
             $message = "";
+            $push = true;
+        } else if ($type == self::GROUP_PENDING) {
+            $followers = array();
+            if ($group->isActive() && $group->is_public) {
+                $sql = "SELECT user_id as id FROM group_user WHERE group_id = $group->id and is_admin = true; ";
+                $followers = DB::select($sql);
+                $message = "";
+            }
+            $message = "";
+            $push = true;
         } else if ($type == self::GROUP_ADMIN) {
             if (count($filename) > 0) {
                 if (!$group->is_public) {
@@ -696,14 +680,14 @@ class EditAlerts {
                     $this->sendMassMessage($data, $followers, $user, false);
                     $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status <> 'blocked'; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status = 'active'; ";
                     $followers = DB::select($sql, $filename);
                 }
             } else {
                 $followers = array();
             }
             $type = self::GROUP_ADMIN_NEW;
-            $payload["expelled"] = $filename;
+            $payload["party"] = $filename;
             $message = "";
         }
         $data = [
@@ -713,7 +697,7 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        $this->sendMassMessage($data, $followers, $user, false);
+        return $this->sendMassMessage($data, $followers, $user, $push);
         return ['success' => 'members notified'];
     }
 
@@ -736,7 +720,7 @@ class EditAlerts {
     }
 
     public function notifyUser($user, $actionUser, $group, $type) {
-        $followers = DB::select("SELECT user_id as id FROM group_user WHERE user_id= $actionUser->id and group_id = $group->id AND status <> 'blocked'  ");
+        $followers = DB::select("SELECT user_id as id FROM group_user WHERE user_id= $actionUser->id and group_id = $group->id AND status = 'active'  ");
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -856,24 +840,24 @@ class EditAlerts {
                         $recipients = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 AND status <> 'blocked';");
+                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 AND status = 'active';");
                         if (count($recipients) > 0) {
                             $followers = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id AND status <> 'blocked' ;");
+                            group_user where group_id = $group->id AND status = 'active' ;");
                             $public = true;
                         } else {
                             $followers = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id and is_admin = 1 AND status <> 'blocked';");
+                            group_user where group_id = $group->id and is_admin = 1 AND status = 'active';");
                         }
                     } else if (!$group->is_public) {
                         $followers = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id AND status <> 'blocked' and group_user.user_id NOT IN (SELECT user_id from contacts WHERE contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ;");
+                            group_user where group_id = $group->id AND status = 'active' and group_user.user_id NOT IN (SELECT user_id from contacts WHERE contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ;");
                         $public = false;
                     } else {
                         return null;

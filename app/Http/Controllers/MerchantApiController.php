@@ -110,6 +110,21 @@ class MerchantApiController extends Controller {
         }
         return response()->json($this->editMerchant->getNearby($user, $request->all()));
     }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getNearbyReports(Request $request) {
+        $validator = $this->editMerchant->validatorGetNearby($request->all());
+        if ($validator->fails()) {
+            $this->throwValidationException(
+                    $request, $validator
+            );
+        }
+        return response()->json($this->editMerchant->getNearbyReports($request->all()));
+    }
 
     /**
      * Display a listing of the resource.
