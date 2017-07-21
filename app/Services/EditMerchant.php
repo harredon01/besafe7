@@ -296,7 +296,7 @@ class EditMerchant {
             'user_id2' => $user->id,
         ];
         $reports = DB::select(""
-                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address, 
+                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address,report_time, 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
@@ -311,7 +311,8 @@ class EditMerchant {
                             OR (r.user_id = :user_id)
                             OR (u.user_id = :user_id2 AND u.userable_type = 'Report')
                             )
-                            and lat BETWEEN :latinf AND :latsup
+                            AND r.type <> ''
+                            AND lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
                     HAVING distance < :radius
                     order by distance asc limit 20 "
@@ -340,7 +341,7 @@ class EditMerchant {
             'radius' => $radius,
         ];
         $reports = DB::select(" "
-                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address, 
+                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address, report_time,
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
@@ -351,6 +352,7 @@ class EditMerchant {
                     WHERE
                         status = 'active'
                             AND r.private = 0
+                            AND r.type <> ''
                             AND lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
                     HAVING distance < :radius
