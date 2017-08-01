@@ -5,7 +5,7 @@ namespace App\Services;
 use Validator;
 use App\Models\Order;
 use App\Models\Plan;
-use App\Models\Group;
+use App\Models\Subscription;
 use App\Models\OrderPayment;
 use App\Models\User;
 use App\Models\Item;
@@ -13,7 +13,7 @@ use App\Models\Condition;
 use App\Models\ProductVariant;
 use App\Models\PaymentMethod;
 use App\Models\Address;
-use App\Services\PayU;
+use App\Services\EditGroup;
 use App\Services\Stripe;
 use Mail;
 use Darryldecode\Cart\CartCondition;
@@ -21,6 +21,22 @@ use Cart;
 use DB;
 
 class EditBilling {
+
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $editGroup;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(EditGroup $editGroup) {
+        $this->editGroup = $editGroup;
+    }
 
     public function processModel(User $user, array $data) {
         $class = "App\\Models\\" . $data["model"];
@@ -109,10 +125,13 @@ class EditBilling {
         if ($source) {
             $gateway = new $className; //// <--- this thing will be autoloaded
             $result = $gateway->deleteSource($source, $id);
-            if ($result['status'] == "success") {
-                if ($source->source == $id) {
-                    $source->source = null;
-                    $source->save();
+            return $result;
+            if (array_key_exists("status", $result)) {
+                if ($result['status'] == "success") {
+                    if ($source->source == $id) {
+                        $source->source = null;
+                        $source->save();
+                    }
                 }
             }
             return $result;
@@ -133,6 +152,20 @@ class EditBilling {
         return $subsc;
     }
 
+    public function getSubscriptionsObject(User $user, $type, $object) {
+
+        $subsc = array();
+        if ($type == "user") {
+            $subsc = Subscription::where("object_id", $user->id)->where("type", $type)->get();
+        } else if ($type == "group") {
+            $users = $this->editGroup->checkAdminGroup($user->id, $object);
+            if (count($users) == 1) {
+                $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();
+            }
+        }
+        return $subsc;
+    }
+
     public function deleteSubscription(User $user, $source, $id) {
         $className = "App\\Services\\" . $source;
         $source = $user->sources()->where('gateway', strtolower($source))->first();
@@ -145,13 +178,9 @@ class EditBilling {
     public function createSubscription(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $gateway = new $className;
-        $validator = $this->validatorSubscription($data);
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
-        }
         $plan = Plan::where("plan_id", $data['plan_id'])->first();
         if ($plan) {
-            $reply = $gateway->createPlan($plan);
+            //$reply = $gateway->createPlan($plan);
             $class = "App\\Models\\" . $plan->type;
             $model = $class::find($data['object_id']);
             if ($model) {
@@ -159,18 +188,24 @@ class EditBilling {
                 if ($source) {
                     if ($source->has_default) {
                         if (array_key_exists("source", $data)) {
-                            return $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
+                            $result = $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
                         } if (array_key_exists("new", $data)) {
-                            return $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                            $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
                         } else {
-                            return $gateway->createSubscription($user, $source, $plan, $data);
+                            $result = $gateway->createSubscription($user, $source, $plan, $data);
                         }
                     } else {
-                        return $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                        $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
                     }
                 } else {
-                    return $gateway->createSubscriptionSourceClient($user, $plan, $data);
+                    $result = $gateway->createSubscriptionSourceClient($user, $plan, $data);
                 }
+                if ($result['status'] == "success") {
+                    $subscription = $result['subscription'];
+                    $model->ends_at = $subscription->ends_at;
+                    $model->save();
+                }
+                return $result;
             }
             return response()->json(['status' => 'error', 'message' => "Model not found"]);
         }
@@ -240,19 +275,6 @@ class EditBilling {
         return Validator::make($data, [
                     'product_id' => 'required|max:255',
                     'quantity' => 'required|max:255',
-        ]);
-    }
-
-    /**
-     * Get a validator for an incoming edit profile request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorSubscription(array $data) {
-        return Validator::make($data, [
-                    'plan_id' => 'required|max:255',
-                    'object_id' => 'required|max:255',
         ]);
     }
 

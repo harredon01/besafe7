@@ -21,9 +21,10 @@ Route::delete('subscriptions/{source?}/{id?}', 'SubscriptionApiController@destro
 Route::post('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
 Route::patch('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
 Route::put('subscriptions/{source?}/{id?}', 'SubscriptionApiController@edit');
+Route::get('subscriptionsearch/{type?}/{object?}', 'SubscriptionApiController@getSubscriptionsObject');
 //Route::get('subscriptions/{source?}', 'SubscriptionApiController@show');
 
-
+Route::get('sources', 'SourceApiController@quickSources');
 Route::post('sources/{source?}', 'SourceApiController@store');
 Route::get('sources/{source?}', 'SourceApiController@index');
 Route::delete('sources/{source?}/{id?}', 'SourceApiController@destroy');

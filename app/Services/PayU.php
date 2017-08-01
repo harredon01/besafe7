@@ -13,6 +13,7 @@ use App\Jobs\ApproveOrder;
 use App\Jobs\DenyOrder;
 use App\Jobs\PendingOrder;
 use App\Models\Source;
+use Carbon\Carbon;
 use App\Models\Subscription;
 use App\Models\Transaction;
 
@@ -567,9 +568,9 @@ class PayU {
                 }
                 return $result;
             }
-            return null;
+            return array();
         }
-        return null;
+        return array();
     }
 
     public function getSource(Source $source, $token) {
@@ -677,7 +678,7 @@ class PayU {
                 $subscription->interval = $planL->interval;
                 $subscription->interval_type = $planL->interval_type;
                 $subscription->quantity = $data['quantity'];
-                $subscription->ends_at = Date($response['currentPeriodEnd']);
+                $subscription->ends_at = Date($response['currentPeriodEnd']/1000);
                 $subscription->save();
                 return $response['id'];
             }
@@ -713,7 +714,7 @@ class PayU {
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
-                "status" => "active",
+                "status" => "createSubscription" . $response['currentPeriodEnd'],
                 "type" => $planL->type,
                 "name" => $planL->name,
                 "plan" => $planL->plan_id,
@@ -725,10 +726,11 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd'])
+                "ends_at" => Date($response['currentPeriodEnd']/1000)
             ]);
             $user->subscriptions()->save($subscription);
             $response["status"] = "success";
+            $response["subscription"] = $subscription;
             return $response;
         }
         return response()->json(['status' => 'error', 'response' => $response]);
@@ -785,7 +787,7 @@ class PayU {
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
-                "status" => "active",
+                "status" => "createSubscriptionExistingSource" . $response['currentPeriodEnd'],
                 "type" => $planL->type,
                 "name" => $planL->name,
                 "plan" => $planL->plan_id,
@@ -797,10 +799,11 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd'])
+                "ends_at" => Date($response['currentPeriodEnd']/1000)
             ]);
             $user->subscriptions()->save($subscription);
             $response["status"] = "success";
+            $response["subscription"] = $subscription;
             return $response;
         }
     }
@@ -862,13 +865,14 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd'])
+                "ends_at" => Date($response['currentPeriodEnd']/1000)
             ]);
             $user->subscriptions()->save($subscription);
         }
         if (array_key_exists("customer", $response)) {
             $customerReply = $response['customer'];
             $response['status'] = "success";
+            $response["subscription"] = $subscription;
             if (array_key_exists("creditCards", $customerReply)) {
                 $card = $customerReply['creditCards'][0];
                 if ($card) {
@@ -884,6 +888,7 @@ class PayU {
         }
         return $response;
     }
+
     public function createAll(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscriptionSource($data);
         if ($validator->fails()) {
@@ -971,6 +976,7 @@ class PayU {
         if (array_key_exists("customer", $response)) {
             $customerReply = $response['customer'];
             $response['status'] = "success";
+            $response["subscription"] = $subscription;
             if (array_key_exists("creditCards", $customerReply)) {
                 $card = $customerReply['creditCards'][0];
                 if ($card) {
@@ -1167,15 +1173,21 @@ class PayU {
     }
 
     public function sendPut(array $data, $query) {
+        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
+        $headers = array(
+            'Content-Type: application/json; charset=utf-8',
+            'Content-Length: ',
+            'Accept: application/json',
+            'Accept-language: es',
+            'Authorization: Basic ' . $auth,
+        );
         $data_string = json_encode($data);
         $curl = curl_init($query);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json; charset=utf-8',
-            'Accept: application/json')
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
         );
         $response = curl_exec($curl);
         curl_close($curl);
@@ -1184,13 +1196,18 @@ class PayU {
     }
 
     public function sendDelete($query) {
-
+        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
+        $headers = array(
+            'Content-Type: application/json; charset=utf-8',
+            'Content-Length: ',
+            'Accept: application/json',
+            'Accept-language: es',
+            'Authorization: Basic ' . $auth,
+        );
         $curl = curl_init($query);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json; charset=utf-8',
-            'Accept: application/json')
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
         );
         $response = curl_exec($curl);
         curl_close($curl);
@@ -1493,6 +1510,7 @@ class PayU {
     public function validatorSource(array $data) {
         return Validator::make($data, [
                     // 'default' => 'required|max:255',
+                    'name' => 'required|max:255',
                     'line1' => 'required|max:255',
 //                    'line2' => 'required|max:255',
 //                    'line3' => 'required|max:255',

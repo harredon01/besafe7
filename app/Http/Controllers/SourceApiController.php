@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Unlu\Laravel\Api\QueryBuilder;
 use App\Services\EditBilling;
-
+use App\Models\Plan;
 class SourceApiController extends Controller {
 
     /**
@@ -33,6 +34,15 @@ class SourceApiController extends Controller {
         $user = $request->user();
         $sources = $this->editBilling->getSources($user, $source);
         return response()->json(array("user" => $user, "sources" => $sources));
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function quickSources(Request $request) {
+        $user = $request->user();
+        return response()->json(array("sources" => $user->sources));
     }
 
     /**
@@ -77,14 +87,20 @@ class SourceApiController extends Controller {
         return response()->json(array("user" => $user, "sources" => $sources));
     }
     /**
-     * Display the specified resource.
+     * Display a listing of the resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function getPlans(Request $request) {
-        $plans = $this->editBilling->getPlans();
-        return response()->json(array("plans" => $plans));
+        $queryBuilder = new QueryBuilder(new Plan, $request);
+        $result = $queryBuilder->build()->paginate();
+        return response()->json([
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+        ]);
     }
 
     /**

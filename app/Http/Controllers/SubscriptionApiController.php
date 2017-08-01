@@ -36,6 +36,17 @@ class SubscriptionApiController extends Controller {
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getSubscriptionsObject(Request $request, $type, $object) {
+        $user = $request->user();
+        $subscriptions = $this->editBilling->getSubscriptionsObject($user, $type, $object);
+        return response()->json(array("user" => $user, "subscriptions" => $subscriptions));
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -49,6 +60,7 @@ class SubscriptionApiController extends Controller {
         $data['cookie'] = $request->cookie('name');
         return response()->json($this->editBilling->createSubscription($user, $source, $data));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -70,15 +82,14 @@ class SubscriptionApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $source,$id) {
+    public function edit(Request $request, $source, $id) {
         $user = $request->user();
         $data = $request->all();
         $data['ip_address'] = $request->ip();
         $data['user_agent'] = $request->header('User-Agent');
         $data['cookie'] = $request->cookie('name');
-        return response()->json($this->editBilling->UpdateSubscription($user, $source,$id, $data));
+        return response()->json($this->editBilling->UpdateSubscription($user, $source, $id, $data));
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -86,9 +97,9 @@ class SubscriptionApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $source,$id) {
+    public function destroy(Request $request, $source, $id) {
         $user = $request->user();
-        return response()->json($this->editBilling->deleteSubscription($user, $source,$id));
+        return response()->json($this->editBilling->deleteSubscription($user, $source, $id));
     }
 
 }

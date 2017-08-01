@@ -345,7 +345,7 @@
         $scope.submitted = true;
         if (isvalid) {
             var data = {plan_id: $scope.data.plan_id};
-            Billing.editSubscription($.param(data), $scope.data.subscription_id, $scope.localGateway).then(function (data) {
+            Billing.editSubscription(data, $scope.data.subscription_id, $scope.localGateway).then(function (data) {
                 $scope.data.subscription_id = "" + $scope.data.subscription_id;
                 for (item in $scope.subscriptions) {
                     if ($scope.subscriptions[item].source_id == $scope.data.subscription_id) {
@@ -485,7 +485,7 @@
                 console.log(JSON.stringify($.param($scope.data)));
                 Billing.createSubscription($.param($scope.data), $scope.localGateway).then(function (data) {
                     if ("status" in data) {
-                        if (data.status == 'active') {
+                        if (data.status == 'success') {
                             console.log("Subscription created");
                             $scope.data = {};
                             $scope.submitted = false;

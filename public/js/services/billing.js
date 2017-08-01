@@ -77,12 +77,34 @@ angular.module('besafe')
                 /**/
 
             }
-            var getPlans = function (platform) {
+            
+            var getSubscriptionsTypeObject = function (type,object) {
+                var def = $q.defer();
+                
+                $http({
+                        method: 'GET',
+                        url: 'api/subscriptions/object/'+type+"/"+object,
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to getSubscriptionsTypeObject");
+                        });
+                return def.promise;
+            }
+            
+            var getPlans = function (where) {
+                var url ="";
+                if(where){
+                    url = 'api/plans?' +where;
+                } else {
+                    url = 'api/plans';
+                }
                 var def = $q.defer();
                 $http({
                         method: 'GET',
-                        url: 'api/plans',
-                        
+                        url: url,
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -90,10 +112,9 @@ angular.module('besafe')
                         .error(function () {
                             def.reject("Failed to get plans");
                         });
-
                 return def.promise;
-
             }
+            
             var deleteSubscription = function (subscription,platform) {
                 var def = $q.defer();
                 $http({
@@ -214,6 +235,7 @@ angular.module('besafe')
                 getSubscriptions:getSubscriptions,
                 editSubscription:editSubscription,
                 createSubscription:createSubscription,
-                createSubscriptionExisting:createSubscriptionExisting
+                createSubscriptionExisting:createSubscriptionExisting,
+                getSubscriptionsTypeObject:getSubscriptionsTypeObject
             };
         })

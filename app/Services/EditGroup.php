@@ -191,21 +191,21 @@ class EditGroup {
 
     public function joinGroupByCode(User $user, $code) {
         $group = Group::where('code', '=', $code)->first();
-        
+
         if ($group) {
             if ($group->is_public && $group->isActive()) {
                 $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
-                
+
                 if (count($members) >= $group->max_users) {
                     return ['status' => 'error', "message" => 'Group Full'];
                 }
-                
-                $members = DB::select('select user_id as id from group_user where group_id = ? AND user_id = ? ', [$group->id,$user->id]);
-                
+
+                $members = DB::select('select user_id as id from group_user where group_id = ? AND user_id = ? ', [$group->id, $user->id]);
+
                 if (count($members) > 0) {
                     return ['status' => 'error', "message" => 'User cant join'];
                 }
-                
+
                 $user->groups()->save($group, ["status" => "pending", "is_admin" => false]);
                 $group->is_authorized = false;
                 dispatch(new NotifyGroup($user, $group, null, self::GROUP_PENDING));
@@ -353,20 +353,23 @@ class EditGroup {
             unset($data['contacts']);
             unset($data[0]);
             unset($data[""]);
-            if ($data['is_public']) {
-                $again = true;
-                $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
-                while ($again) {
-                    $string = str_random(12);
-                    $group = Group::where("code", $string)->first();
-                    if ($group) {
-                        
-                    } else {
-                        $again = false;
-                        $data['code'] = $string;
+            if (array_key_exists('is_public', $data)) {
+                if ($data['is_public']) {
+                    $again = true;
+                    $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
+                    while ($again) {
+                        $string = str_random(12);
+                        $group = Group::where("code", $string)->first();
+                        if ($group) {
+                            
+                        } else {
+                            $again = false;
+                            $data['code'] = $string;
+                        }
                     }
                 }
             }
+
             $group = Group::create($data);
             $invite = array();
             $invite['group_id'] = $group->id;
@@ -413,6 +416,7 @@ class EditGroup {
                     'group_id' => 'required|max:255',
         ]);
     }
+
     /**
      * Get a validator for an incoming edit profile request.
      *

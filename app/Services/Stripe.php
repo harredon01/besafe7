@@ -131,7 +131,7 @@ class Stripe {
 
         $customer = \Stripe\Customer::retrieve($source->client_id);
         $token = $data['source'];
-        $customer->source = $token;
+        $customer->default_source = $token;
         $customer->save();
 
         $source->source = $token;
@@ -235,7 +235,8 @@ class Stripe {
                     "ends_at" => Date($subscription->current_period_end)
                 ]);
                 $user->subscriptions()->save($subscriptionL);
-                return $subscriptionL;
+                $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscriptionL);
+                return $result;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -279,14 +280,13 @@ class Stripe {
                 $subscription = \Stripe\Subscription::create(array(
                             "customer" => $customer->id,
                             "plan" => $planL->plan_id,
+                            'source' => $token,
                             "metadata" => $data,
                 ));
 
-                if ($data['default']) {
-                    $source->source = $token;
-                    $source->has_default = true;
-                    $source->save();
-                }
+                $source->source = $token;
+                $source->has_default = true;
+                $source->save();
 
 
 
@@ -307,7 +307,8 @@ class Stripe {
                     "ends_at" => Date($subscription->current_period_end)
                 ]);
                 $user->subscriptions()->save($subscriptionL);
-                return $subscriptionL;
+                $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscriptionL);
+                return $result;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -352,11 +353,11 @@ class Stripe {
                             "plan" => $planL->plan_id,
                             "metadata" => $data,
                 ));
-                if ($data['default']) {
-                    $source->source = $token;
-                    $source->has_default = true;
-                    $source->save();
-                }
+
+                $source->source = $token;
+                $source->has_default = true;
+                $source->save();
+
                 $subscriptionL = new Subscription([
                     "gateway" => "Stripe",
                     "status" => "active",
@@ -374,7 +375,8 @@ class Stripe {
                     "ends_at" => Date($subscription->current_period_end)
                 ]);
                 $user->subscriptions()->save($subscriptionL);
-                return $subscriptionL;
+                $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscriptionL);
+                return $result;
             }
         } catch (\Stripe\Error\Card $e) {
             // Since it's a decline, \Stripe\Error\Card will be caught
@@ -434,7 +436,8 @@ class Stripe {
                         "ends_at" => Date($subscription->current_period_end)
                     ]);
                     $user->subscriptions()->save($subscriptionL);
-                    return $subscriptionL;
+                    $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscriptionL);
+                    return $result;
                 }
                 return ["status" => "error", "message" => "User does not have default source"];
             }
@@ -488,7 +491,8 @@ class Stripe {
                     $subscription->quantity = 1;
                     $subscription->ends_at = Date($sub->current_period_end);
                     $subscription->save();
-                    return $subscription;
+                    $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscriptionL);
+                    return $result;
                 }
             }
         } catch (\Stripe\Error\Card $e) {
@@ -855,7 +859,6 @@ class Stripe {
     public function validatorSource(array $data) {
         return Validator::make($data, [
                     'source' => 'required|max:255',
-                    'default' => 'required|max:255',
         ]);
     }
 
