@@ -26,6 +26,7 @@ class EditAlerts {
     const USER_AVATAR = 'user_avatar';
     const USER_MESSAGE_TYPE = 'user_message';
     const GROUP_MESSAGE_TYPE = 'group_message';
+    const GROUP_PRIVATE_MESSAGE_TYPE = 'group_private_message';
     const GROUP_ADMIN = 'group_admin';
     const GROUP_ADMIN_NEW = 'group_admin_new';
     const NEW_CONTACT = 'new_contact';
@@ -833,50 +834,69 @@ class EditAlerts {
             $group = Group::find(intval($data['to_id']));
 
             if ($group) {
-                $res = $group->users()->where('user_id', $user->id)->get();
+                $res = $group->users()->where('user_id', $user->id)->where('status', 'active')->get();
                 if (count($res) > 0) {
-                    $public = false;
                     if ($group->is_public && $group->isActive()) {
                         $recipients = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 AND status = 'active';");
                         if (count($recipients) > 0) {
-                            $followers = DB::select("select 
-                        user_id as id
-                            from
-                            group_user where group_id = $group->id AND status = 'active' ;");
-                            $public = true;
+                            if (array_key_exists("target_id", $data)) {
+                                $followers = DB::select("select 
+                                user_id as id
+                                    from
+                                    group_user where group_id = $group->id AND status = 'active' and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
+                            } else {
+                                $followers = DB::select("select 
+                                user_id as id
+                                    from
+                                    group_user where group_id = $group->id AND status = 'active' ;");
+                            }
                         } else {
                             $followers = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id and is_admin = 1 AND status = 'active';");
+                            $data['target_id'] = $user->id;
                         }
                     } else if (!$group->is_public) {
                         $followers = DB::select("select 
                         user_id as id
                             from
                             group_user where group_id = $group->id AND status = 'active' and group_user.user_id NOT IN (SELECT user_id from contacts WHERE contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') ;");
-                        $public = false;
                     } else {
                         return null;
                     }
-                    $message = Message::create([
-                                "status" => 'unread',
-                                "message" => $data['message'],
-                                self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
-                                self::MESSAGE_AUTHOR_ID => $user->id,
-                                self::MESSAGE_RECIPIENT_ID => $group->id,
-                                'is_public' => $public,
-                    ]);
                     $dauser = array();
                     $dauser['first_name'] = $user->firstName;
                     $dauser['group_name'] = $group->name;
                     $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
+                    
+                    $dauser['public'] = $group->is_public;
+                    if (array_key_exists("target_id", $data)) {
+                        $dauser['target_id'] = $data['target_id'];
+                        $message = Message::create([
+                                    "status" => 'unread',
+                                    "message" => $data['message'],
+                                    self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
+                                    self::MESSAGE_AUTHOR_ID => $user->id,
+                                    self::MESSAGE_RECIPIENT_ID => $group->id,
+                                    'is_public' => $group->is_public,
+                                    'target_id' => $data['target_id']
+                        ]);
+                    } else {
+                        $message = Message::create([
+                                    "status" => 'unread',
+                                    "message" => $data['message'],
+                                    self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
+                                    self::MESSAGE_AUTHOR_ID => $user->id,
+                                    self::MESSAGE_RECIPIENT_ID => $group->id,
+                                    'is_public' => $group->is_public,
+                        ]);
+                    }
                     $dauser['message_id'] = $message->id;
-                    $dauser['public'] = $public;
                     $data = [
                         "trigger_id" => $group->id,
                         "message" => $data['message'],

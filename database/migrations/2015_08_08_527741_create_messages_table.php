@@ -24,6 +24,8 @@ class CreateMessagesTable extends Migration {
                         $table->boolean('is_public')->default(false);
                         $table->integer('messageable_id')->unsigned()->nullable();
                         $table->index('messageable_id');
+                        $table->integer('target_id')->unsigned()->nullable();
+                        $table->index('target_id');
                         $table->string('priority');
                         $table->timestamps();
 		});
