@@ -624,9 +624,9 @@ class EditAlerts {
                 ];
                 $this->sendMassMessage($data, $followers, $user, true);
                 if ($group->isActive() && $group->is_public) {
-                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
+                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else {
-                    $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id and is_admin = false; ";
+                    $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 }
 
                 DB::statement($sql, $filename);
