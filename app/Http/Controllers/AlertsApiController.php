@@ -155,7 +155,8 @@ class AlertsApiController extends Controller {
                     $request, $validator
             );
         }
-        dispatch(new PostMessage($user, $request->all()));
+        //dispatch(new PostMessage($user, $request->all()));
+        $this->editAlerts->postMessage($user, $request->all());
         return response()->json(['status' => 'success', 'message' => 'postMessage queued']);
     }
 

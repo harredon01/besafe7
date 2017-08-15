@@ -832,7 +832,6 @@ class EditAlerts {
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
-
             if ($group) {
                 $res = $group->users()->where('user_id', $user->id)->where('status', 'active')->get();
                 if (count($res) > 0) {
