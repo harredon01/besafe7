@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 use App\Models\User;
+use App\Models\Group;
 use App\Services\EditGroup;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -16,18 +17,19 @@ class InviteUsers implements ShouldQueue
     protected $user;
     protected $data;
     protected $is_new;
+    protected $group;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user, array $data, $is_new)
+    public function __construct(User $user, array $data, $is_new,Group $group)
     {
         $this->user = $user;
         $this->data = $data;
         $this->is_new = $is_new;
-
+        $this->group = $group;
     }
 
     /**
@@ -37,7 +39,7 @@ class InviteUsers implements ShouldQueue
      */
     public function handle(EditGroup $editGroup)
     {
-        $editGroup->inviteUsers($this->user, $this->data,$this->is_new); 
+        $editGroup->inviteUsers($this->user, $this->data,$this->is_new,$this->group); 
     }
 }
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditGroup;
@@ -10,7 +11,6 @@ use App\Services\EditAlerts;
 use App\Models\Group;
 use App\Jobs\InviteUsers;
 use App\Jobs\LeaveGroup;
-use App\Jobs\AdminGroup;
 
 class GroupController extends Controller {
 
@@ -25,7 +25,7 @@ class GroupController extends Controller {
      *
      */
     protected $editAlerts;
-    
+
     /**
      * The edit profile implementation.
      *
@@ -42,30 +42,30 @@ class GroupController extends Controller {
 
     public function index(Request $request) {
         $user = $request->user();
-        $request2 = $this->cleanSearch->handle($user,$request);
+        $request2 = $this->cleanSearch->handle($user, $request);
         if ($request2) {
             $data = array();
             $queryBuilder = new GroupQueryBuilder(new Group, $request2);
             $result = $queryBuilder->build()->paginate();
-            foreach ($result->items() as $group){
+            foreach ($result->items() as $group) {
                 $group->admin_id = 0;
-                if(!$group->is_public){
+                if (!$group->is_public) {
                     $group->users;
                 } else {
                     $results = $this->editGroup->checkAdminGroup($user->id, $group->id);
-                    if(count($results)>0){
+                    if (count($results) > 0) {
                         $group->admin_id = 1;
                     }
                     $results = $this->editGroup->checkUserGroup($user->id, $group->id);
-                    if(count($results)>0){
+                    if (count($results) > 0) {
                         $group->is_authorized = true;
                     } else {
                         $group->is_authorized = false;
                     }
                 }
-                array_push($data,$group);
+                array_push($data, $group);
             }
-             
+
             return response()->json([
                         'data' => $data,
                         "total" => $result->total(),
@@ -95,25 +95,26 @@ class GroupController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function leaveGroup($dagroup,Request $request) {
+    public function leaveGroup($dagroup, Request $request) {
         $user = $request->user();
         $group = array();
         dispatch(new LeaveGroup($user, $dagroup));
         //$group = $this->editGroup->leaveGroup($user, $dagroup);
         return response()->json(compact('group'));
     }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function changeStatusGroup(Request $request) { 
+    public function changeStatusGroup(Request $request) {
         $user = $request->user();
         $results = $this->editGroup->requestChangeStatusGroup($user, $request->all());
         return response()->json($results);
     }
-    
+
     /**
      * Display the specified resource.
      *
@@ -125,6 +126,7 @@ class GroupController extends Controller {
         $groups = $this->editGroup->getActiveAdminGroups($user);
         return response()->json(compact('groups'));
     }
+
     /**
      * Display the specified resource.
      *
@@ -133,7 +135,7 @@ class GroupController extends Controller {
      */
     public function getAdminGroupUsers(Request $request) {
         $user = $request->user();
-        $groups = $this->editGroup->getAdminGroupUsers($user,$request->all());
+        $groups = $this->editGroup->getAdminGroupUsers($user, $request->all());
         return response()->json(compact('groups'));
     }
 
@@ -150,17 +152,43 @@ class GroupController extends Controller {
 
     public function inviteUsers(Request $request) {
         $user = $request->user();
-        dispatch(new InviteUsers($user, $request->all(),false));
-        return response()->json(['status' => 'success','message' => 'inviteUsers queued']);
+        $data = $request->all();
+        $group = Group::find(intval($data["group_id"]));
+
+        if ($group) {
+            if ($group->is_public && $group->isActive()) {
+                
+            } else if (!$group->is_public) {
+                
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'inviteUsers failed group inactive']);
+            }
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
+            if (sizeof($members) == 0) {
+                return response()->json(['status' => 'error', 'message' => 'User not admin']);
+            }
+            $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active"', [$group->id]);
+            $i = sizeof($members);
+            if (array_key_exists("contacts", $data)) {
+                $i = $i+count($data['contacts']);
+            }
+            if ($group->max_users < $i) {
+                return response()->json(['status' => 'error', 'message' => "too many invites"]);
+            }
+            dispatch(new InviteUsers($user, $data, false, $group));
+            return response()->json(['status' => 'success', 'message' => 'inviteUsers queued', 'is_public' => $group->is_public]);
+        }
+        return response()->json(['status' => 'error', 'message' => 'inviteUsers failed']);
     }
+
     public function getGroupByCode($code) {
         $response = $this->editGroup->getGroupByCode($code);
         return response()->json($response);
     }
-    
+
     public function joinGroupByCode(Request $request, $code) {
         $user = $request->user();
-        $response = $this->editGroup->joinGroupByCode($user,$code);
+        $response = $this->editGroup->joinGroupByCode($user, $code);
         return response()->json($response);
     }
 

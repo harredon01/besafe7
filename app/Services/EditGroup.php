@@ -94,7 +94,7 @@ class EditGroup {
                 $profile = $users[0];
                 if ($profile->is_admin) {
                     return null;
-                } 
+                }
             }
         }
     }
@@ -221,105 +221,94 @@ class EditGroup {
         return ['status' => 'error', "message" => 'Group not found'];
     }
 
-    public function inviteUsers($user, $data, $isNew) {
+    public function inviteUsers($user, $data, $isNew, $group) {
         $invites = array();
         $notifs = array();
-        $group = Group::find(intval($data["group_id"]));
-
-        if ($group) {
-            if ($group->is_public && $group->isActive()) {
-                
-            } else if (!$group->is_public) {
-                
-            } else {
-                return null;
+        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
+        if (sizeof($members) == 0) {
+            return null;
+        }
+        $members = array();
+        if ($isNew) {
+            $i = 0;
+        } else {
+            $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
+            $i = sizeof($members) + 1;
+        }
+        if ($group->max_users <= $i) {
+            return null;
+        }
+        $is_admin = false;
+        if ($group->is_public) {
+            $is_admin = true;
+        }
+        if (array_key_exists("contacts", $data)) {
+            $inviteUsers = array();
+            foreach ($data['contacts'] as $value) {
+                $contact = User::find($value);
+                if ($contact) {
+                    $i++;
+                    $invite = array();
+                    $notif = array();
+                    $notif['group_id'] = $group->id;
+                    $notif['contact_id'] = $contact->id;
+                    $notif['cellphone'] = $contact->area_code . " " . $contact->cellphone;
+                    array_push($notifs, $notif);
+                    $invite['group_id'] = $group->id;
+                    $invite['user_id'] = $value;
+                    $invite['color'] = $i;
+                    $invite['status'] = "active";
+                    $invite['is_admin'] = $is_admin;
+                    $invite['created_at'] = date("Y-m-d H:i:s");
+                    $invite['updated_at'] = date("Y-m-d H:i:s");
+                    array_push($invites, $invite);
+                    array_push($inviteUsers, $contact);
+                    if ($group->max_users <= $i) {
+                        break;
+                    }
+                }
             }
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
-            if (sizeof($members) == 0) {
-                return null;
-            }
-            $members = array();
+            $payload = array(
+                "trigger_id" => $group->id,
+                "type" => self::NEW_GROUP,
+                "group_id" => $group->id,
+                "group_name" => $group->name,
+                "first_name" => $user->firstName,
+                "last_name" => $user->lastName
+            );
+            $notification = [
+                "trigger_id" => $group->id,
+                "message" => "",
+                "payload" => $payload,
+                "type" => self::NEW_GROUP,
+                "user_status" => $this->editAlerts->getUserNotifStatus($user)
+            ];
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
+            $i++;
             if ($isNew) {
-                $i = 0;
+                
             } else {
-                $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
-                $i = sizeof($members) - 1;
-            }
-            if ($group->max_users <= $i) {
-                return null;
-            }
-            $is_admin = false;
-            if ($group->is_public) {
-                $is_admin = true;
-            }
-            if (array_key_exists("contacts", $data)) {
-                $inviteUsers = array();
-                foreach ($data['contacts'] as $value) {
-                    $contact = User::find($value);
-                    if ($contact) {
-                        $i++;
-                        $invite = array();
-                        $notif = array();
-                        $notif['group_id'] = $group->id;
-                        $notif['contact_id'] = $contact->id;
-                        $notif['cellphone'] = $contact->area_code . " " . $contact->cellphone;
-                        array_push($notifs, $notif);
-                        $invite['group_id'] = $group->id;
-                        $invite['user_id'] = $value;
-                        $invite['color'] = $i;
-                        $invite['status'] = "active";
-                        $invite['is_admin'] = $is_admin;
-                        $invite['created_at'] = date("Y-m-d H:i:s");
-                        $invite['updated_at'] = date("Y-m-d H:i:s");
-                        array_push($invites, $invite);
-                        array_push($inviteUsers, $contact);
-                        if ($group->max_users <= $i) {
-                            break;
-                        }
-                    }
+                if (!$group->is_public) {
+                    $payload = array(
+                        "contacts" => $notifs,
+                        "group_id" => $group->id,
+                        "group_name" => $group->name,
+                        "first_name" => $user->firstName,
+                        "last_name" => $user->lastName
+                    );
+                    $notification = [
+                        "trigger_id" => $group->id,
+                        "message" => "",
+                        "payload" => $payload,
+                        "type" => self::GROUP_INVITE,
+                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                    ];
+                    $this->editAlerts->sendMassMessage($notification, $members, $user, true);
                 }
-                $payload = array(
-                    "trigger_id" => $group->id,
-                    "type" => self::NEW_GROUP,
-                    "group_id" => $group->id,
-                    "group_name" => $group->name,
-                    "first_name" => $user->firstName,
-                    "last_name" => $user->lastName
-                );
-                $notification = [
-                    "trigger_id" => $group->id,
-                    "message" => "",
-                    "payload" => $payload,
-                    "type" => self::NEW_GROUP,
-                    "user_status" => $this->editAlerts->getUserNotifStatus($user)
-                ];
-                $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
-                $i++;
-                if ($isNew) {
-                    
-                } else {
-                    if (!$group->is_public) {
-                        $payload = array(
-                            "contacts" => $notifs,
-                            "group_id" => $group->id,
-                            "group_name" => $group->name,
-                            "first_name" => $user->firstName,
-                            "last_name" => $user->lastName
-                        );
-                        $notification = [
-                            "trigger_id" => $group->id,
-                            "message" => "",
-                            "payload" => $payload,
-                            "type" => self::GROUP_INVITE,
-                            "user_status" => $this->editAlerts->getUserNotifStatus($user)
-                        ];
-                        $this->editAlerts->sendMassMessage($notification, $members, $user, true);
-                    }
-                }
-                DB::table('group_user')->insert(
-                        $invites
-                );
             }
+            DB::table('group_user')->insert(
+                    $invites
+            );
         }
         return $group;
     }
