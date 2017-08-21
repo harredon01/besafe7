@@ -54,11 +54,12 @@ class EditGroup {
     }
 
     public function checkUserGroup($userId, $groupId) {
-        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? AND status = "active" limit 2', [$groupId, $userId]);
+        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? AND status = "active" limit 1', [$groupId, $userId]);
     }
 
     public function deleteGroupUser(User $user, Group $group) {
         $users = $this->checkUserGroup($user->id, $group->id);
+        $deleteGroup = false;
         if (count($users) > 0) {
 
             if (!$group->is_public) {
@@ -67,30 +68,33 @@ class EditGroup {
                 if ($profile->is_admin) {
                     $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 AND status = "active" limit 1', [$user->id, $group->id]);
                     if (count($users2) == 0) {
-                        $canditate = $usersf[0];
-                        $data = [
-                            "user_id" => $canditate->user_id,
-                            "group_id" => $group->id
-                        ];
-                        $this->setAdminGroup($data);
-                        $this->editAlerts->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
+                        $usersf = DB::select('select user_id from group_user where user_id  <> ? and group_id = ? limit 1', [$user->id, $group->id]);
+                        if (count($usersf) > 0) {
+                            $canditate = $usersf[0];
+                            $data = [
+                                "user_id" => $canditate->user_id,
+                                "group_id" => $group->id
+                            ];
+                            $this->setAdminGroup($data);
+                            $this->editAlerts->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
+                        } else {
+                            $deleteGroup = true;
+                        }
                     } else {
                         $this->editAlerts->notifyGroup($user, $group, null, false);
                     }
                 } else {
                     $this->editAlerts->notifyGroup($user, $group, null, false);
                 }
+                $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
+                if ($deleteGroup) {
+                    $group->delete();
+                }
             } else {
                 $profile = $users[0];
                 if ($profile->is_admin) {
                     return null;
-                } else {
-                    
-                }
-            }
-            $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
-            if (count($usersf) == 0) {
-                $group->delete();
+                } 
             }
         }
     }

@@ -590,7 +590,7 @@ class EditAlerts {
             "last_name" => $user->lastName,
             "user_id" => $user->id
         );
-        $push = false;
+        $push = true;
         if ($type == self::GROUP_AVATAR) {
             $payload["filename"] = $filename;
             $group->avatar = $filename;
@@ -600,6 +600,7 @@ class EditAlerts {
                         user_id as id
                     from
                         group_user where group_id = $group->id and user_id <> $user->id AND status = 'active' ;");
+            //$push = false;
         } else if ($type == self::GROUP_LEAVE) {
             if ($filename) {
                 $payload["admin_id"] = $filename;
@@ -609,6 +610,7 @@ class EditAlerts {
                         user_id as id
                     from
                         group_user where group_id = $group->id and user_id <> $user->id AND status = 'active';");
+            //$push = false;
         } else if ($type == self::GROUP_REMOVED) {
             if (count($filename) > 0) {
                 $bindingsString = trim(str_repeat('?,', count($filename)), ',');
@@ -678,7 +680,7 @@ class EditAlerts {
                         "payload" => $payload,
                         "user_status" => $this->getUserNotifStatus($user)
                     ];
-                    $this->sendMassMessage($data, $followers, $user, false);
+                    $this->sendMassMessage($data, $followers, $user, true);
                     $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status = 'active'; ";
@@ -698,7 +700,7 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
         ];
-        return $this->sendMassMessage($data, $followers, $user, $push);
+        return $this->sendMassMessage($data, $followers, $user, true);
         return ['success' => 'members notified'];
     }
 
