@@ -1,6 +1,5 @@
 angular.module('besafe')
-        .controller('MapCtrl', function ($scope, $ionicPopover, Alerts, $cordovaToast, $rootScope, MapDashService, $ionicPlatform, $state, API, Contacts, 
-$cordovaInAppBrowser, MapDashService, $ionicPopup) {
+        .controller('MapCtrl', function ($scope, $rootScope, MapDashService, API, MapDashService) {
             $scope.map = {center: {latitude: 45, longitude: -73}, zoom: 8};
             $rootScope.sharedTimeout = 8000;
             $rootScope.sharedTimeout2 = 180000;
@@ -24,7 +23,6 @@ $cordovaInAppBrowser, MapDashService, $ionicPopup) {
                 MapDashService.setActive("user", dauser, latLng);
                 console.log("click on markers");
                 google.maps.event.trigger(marker, 'click');// setCenter takes a LatLng object
-                $scope.popover.hide();
             }
             $scope.updateLocations = function () {
                 google.maps.event.trigger($rootScope.map, 'resize');
@@ -49,7 +47,7 @@ $cordovaInAppBrowser, MapDashService, $ionicPopup) {
             $rootScope.$on('NoSharers', function () {
                 $rootScope.tracking = false;
                 if($rootScope.mapActiveType != "me" && $rootScope.mapActiveType != "trip"){
-                    $cordovaToast.showShortTop('Nadie te esta compartiendo');
+                    alert('Nadie te esta compartiendo');
                 }
                 for (polyline in $rootScope.polylines) {
                     MapDashService.deleteUserMarkers($rootScope.polylines[polyline].user_id);
@@ -72,9 +70,7 @@ $cordovaInAppBrowser, MapDashService, $ionicPopup) {
                 MapDashService.updateLocations();
 
             }
-            $ionicPlatform.ready(function () {
-                $scope.initMap();
-            });
+            $scope.initMap();
             $scope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                 if (toState.name == 'tab.map') {
                     $scope.initMap();

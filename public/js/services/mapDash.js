@@ -1,5 +1,5 @@
 angular.module('besafe')
-        .factory('MapDashService', function ($q, $rootScope, LocationService, $cordovaToast, $cordovaSQLite, TimeService) {
+        .factory('MapDashService', function ($q, $rootScope, LocationService) {
             var myLatlng;
             var mapOptions;
             $rootScope.map;
@@ -164,7 +164,7 @@ angular.module('besafe')
                     console.log(JSON.stringify(data));
                     console.log("merchants received from server: " + pins.length);
                     if (pins.length == 0) {
-                        $cordovaToast.showShortTop('No tenemos informacion de puntos de seguridad en ese punto');
+                        alert('No tenemos informacion de puntos de seguridad en ese punto');
                     } else {
                         cleanMerchants(data);
                     }
@@ -181,7 +181,7 @@ angular.module('besafe')
                     if (res.length > 0) {
                         displayTrip(res);
                     } else {
-                        $cordovaToast.showShortTop('No encuentro ese viaje');
+                        alert('No encuentro ese viaje');
                     }
                 },
                         function (data) {
@@ -205,7 +205,7 @@ angular.module('besafe')
                     $rootScope.merchantspending = false;
                 }
                 setActive($rootScope.mapActiveType, $rootScope.mapId, null);
-                $cordovaToast.showShortTop('doble click para encontrar puntos de seguridad');
+                alert('doble click para encontrar puntos de seguridad');
             };
             var setActive = function (type, id, latLng) {
                 console.log("Setting as active: " + id + " type: " + type);

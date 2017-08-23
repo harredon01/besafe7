@@ -379,7 +379,7 @@ class EditGroup {
             $i = 0;
             $data['contacts'] = $invites;
             $data["group_id"] = $group->id;
-            dispatch(new InviteUsers($user, $data, true));
+            dispatch(new InviteUsers($user, $data, true, $group));
             //$this->inviteUsers($user, $data, true);
             return ['status' => 'success', 'message' => 'Group saved', "group" => $group];
         }

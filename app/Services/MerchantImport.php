@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
+use App\Models\Group;
 use App\Models\Plan;
 use App\Jobs\PostLocation;
 use App\Jobs\InviteUsers;
@@ -993,8 +994,9 @@ class MerchantImport {
                 unset($sheet['user_id']);
                 $contacts = explode(",", $sheet['contacts']);
                 $sheet['contacts'] = $contacts;
+                $group = Group::find($sheet['group_id']);
                 //$this->editGroup->inviteUsers($user, $sheet, false);
-                dispatch(new InviteUsers($user, $sheet, false));
+                dispatch(new InviteUsers($user, $sheet, false, $group));
             }
         }
     }
