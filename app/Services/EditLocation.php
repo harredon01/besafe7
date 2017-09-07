@@ -100,7 +100,6 @@ class EditLocation {
             } else {
                 $hashExists = false;
                 $user->hash = $hash;
-                $user->notify_location = 1;
                 $user->is_tracking = 1;
                 $user->save();
             }
@@ -141,7 +140,7 @@ class EditLocation {
           return $validator->getMessageBag();
           } */
         //return $data['location']['coords']['latitude'];
-        $store = false;
+        $storeTripCall = false;
         $saveuser = false;
         $location = $data['location'];
         unset($data['location']);
@@ -177,11 +176,6 @@ class EditLocation {
                 $data["activity"] = $activity['type'];
                 $data["confidence"] = $activity['confidence'];
             }
-        }
-        if ($user->notify_location == 1) {
-            $user->notify_location = 0;
-            $saveuser = true;
-            $this->editAlerts->postNotificationLocation($user, 'location_first', '');
         }
         if ($user->is_tracking != 1 || $user->trip == 0) {
             $user = $this->editAlerts->makeUserTrip($user);
@@ -219,7 +213,7 @@ class EditLocation {
                 $data["status"] = "stopped";
                 $data["islast"] = true;
 
-                $store = true;
+                $storeTripCall = true;
                 $user->is_tracking = 0;
                 $saveuser = true;
                 $user->hash = "";
@@ -229,7 +223,7 @@ class EditLocation {
 
 
         $location = Location::create($data);
-        if ($store) {
+        if ($storeTripCall) {
             $user->is_tracking = 0;
             $saveuser = true;
             $user->hash = "";

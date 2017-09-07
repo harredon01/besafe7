@@ -16,6 +16,10 @@ use DB;
 
 class UserApiController extends Controller {
 
+    const OBJECT_LOCATION = 'Location';
+    const ACCESS_USER_OBJECT = 'userables';
+    const ACCESS_USER_OBJECT_ID = 'userable_id';
+    const ACCESS_USER_OBJECT_TYPE = 'userable_type';
     /**
      * The Guard implementation.
      *
@@ -115,7 +119,7 @@ class UserApiController extends Controller {
 
         return response()->json($this->editUserData->notificationMedical($user, $id));
     }
-    
+
     /**
      * Handle a registration request for the application.
      *
@@ -126,7 +130,7 @@ class UserApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editUserData->blockContact($user, $id));
     }
-    
+
     /**
      * Handle a registration request for the application.
      *
@@ -147,7 +151,7 @@ class UserApiController extends Controller {
         $user = $request->user();
         //$this->editUserData->importContactsId($user, $request->all());
         dispatch(new ImportContactsId($user, $request->all()));
-        return response()->json(['status' => 'success','message' => 'importContactsId queued']);
+        return response()->json(['status' => 'success', 'message' => 'importContactsId queued']);
     }
 
     /**
@@ -232,7 +236,7 @@ class UserApiController extends Controller {
     public function addContact($contact_id, Request $request) {
         $user = $request->user();
         dispatch(new AddContact($user, $contact_id));
-        return response()->json(['status' => 'success','message' => 'addContact queued']);
+        return response()->json(['status' => 'success', 'message' => 'addContact queued']);
     }
 
     public function deleteAddress($address_id, Request $request) {
@@ -252,11 +256,13 @@ class UserApiController extends Controller {
         if ($user->green) {
             $green = true;
         }
+        //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
         $count = Medical::where('user_id', $user->id)->count();
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
         $data['count'] = $count;
         $data['green'] = $green;
+        //$data['followers'] = count($users2);
         // the token is valid and we have found the user via the sub claim
         return response()->json($data);
     }

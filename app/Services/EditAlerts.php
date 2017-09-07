@@ -172,27 +172,15 @@ class EditAlerts {
                     $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString}) AND id NOT IN (SELECT user_id FROM contacts where contact_id = $user->id AND level = '" . self::CONTACT_BLOCKED . "') AND id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  and object_id = $object_id ); ";
                     $followers = DB::select($sql, $numbers);
                 }
-                if ($user->is_tracking) {
-                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "",
-                        "payload" => $payload,
-                        "type" => self::LOCATION_FIRST,
-                        "user_status" => $this->getUserNotifStatus($user)
-                    ];
-                    $this->sendMassMessage($data, $followers, $user, true);
-                } else {
-                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "",
-                        "payload" => $payload,
-                        "type" => self::NOTIFICATION_LOCATION,
-                        "user_status" => $this->getUserNotifStatus($user)
-                    ];
-                    $this->sendMassMessage($data, $followers, $user, false);
-                }
+                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                $data = [
+                    "trigger_id" => $user->id,
+                    "message" => "",
+                    "payload" => $payload,
+                    "type" => self::NOTIFICATION_LOCATION,
+                    "user_status" => $this->getUserNotifStatus($user)
+                ];
+                $this->sendMassMessage($data, $followers, $user, false);
             } else if ($object == self::OBJECT_REPORT) {
                 if (array_key_exists("report_id", $data)) {
                     $report = Report::find($data['report_id']);
@@ -874,7 +862,7 @@ class EditAlerts {
                     $dauser['group_name'] = $group->name;
                     $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
-                    
+
                     $dauser['public'] = $group->is_public;
                     if (array_key_exists("target_id", $data)) {
                         $dauser['target_id'] = $data['target_id'];
@@ -917,7 +905,6 @@ class EditAlerts {
         $user->alert_type = $data['type'];
         $user = $this->makeUserTrip($user);
         $user->write_report = true;
-        $user->notify_location = 1;
         $user->save();
         $followers = DB::select("select 
                         contact_id as id,object_id
