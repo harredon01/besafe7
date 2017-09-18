@@ -17,7 +17,7 @@ class Merchant extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id','city_id','region_id','country_id','name','type', 'email','telephone','address', 'description',
-        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id',"hash"];
+        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id',"hash",'private','group_id'];
 
 
     public function products() {
@@ -28,6 +28,9 @@ class Merchant extends Model {
     }
     public function city() {
         return $this->hasOne('App\Models\City');
+    }
+    public function group() {
+        return $this->hasOne('App\Models\Group');
     }
     public function region() {
         return $this->hasOne('App\Models\Region');

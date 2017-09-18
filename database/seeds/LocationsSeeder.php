@@ -48,12 +48,10 @@ class LocationsSeeder extends Seeder {
         DB::table('messages')->delete();
         DB::table('group_user')->delete();
         DB::table('contacts')->delete();
-        DB::table('groups')->delete();
         DB::table('merchant_payment_methods')->delete();
         DB::table('merchant_user')->delete();
         DB::table('addresses')->delete();
         
-        DB::table('users')->delete();
         DB::table('category_product')->delete();
         DB::table('category_merchant')->delete();
         DB::table('product_variant_attribute_option')->delete();
@@ -69,7 +67,8 @@ class LocationsSeeder extends Seeder {
         DB::table('cities')->delete();
         DB::table('regions')->delete();
         DB::table('countries')->delete();
-        
+        DB::table('groups')->delete();
+        DB::table('users')->delete();
         $this->createLocations();
     }
 

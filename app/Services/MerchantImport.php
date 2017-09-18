@@ -42,6 +42,9 @@ class MerchantImport {
     protected $editMerchant;
     protected $editGroup;
 
+    const OBJECT_LOCATION = 'Location';
+    const OBJECT_REPORT = 'Report';
+
     public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMerchant $editMerchant, EditGroup $editGroup) {
         $this->editUserData = $editUserData;
         $this->editLocation = $editLocation;
@@ -453,27 +456,54 @@ class MerchantImport {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $row) {
-            if ($row['id']) {
+            if (array_key_exists('user_id', $row)) {
+                $user = User::find($row['user_id']);
+                if ($user) {
+                    $coords = ["lat" => $row['lat'], "long" => $row['long']];
+                    $results = $this->editMerchant->saveOrCreateObject($user, $coords, "Merchant");
+                    $merchant = $results['object'];
+                    $row['telephone'] = $row['phone_number'];
+                    if(!$row['telephone']){
+                        $row['telephone'] = 111111;
+                    }
 
-                $merchant1 = Merchant::updateOrCreate(['merchant_id' => $row['id']], [
-                            'merchant_id' => $row['id'],
-                            'name' => $row['name'],
-                            'type' => $row['type'],
-                            'email' => $row['email'],
-                            'telephone' => $row['phone_number'],
-                            'address' => $row['address'] . ", " . $row['location'],
-                            'description' => $row['description'],
-                            'icon' => $row['category'],
-                            'lat' => $row['lat'],
-                            'long' => $row['long'],
-                            'minimum' => $row['minimum'],
-                            'city_id' => $row['city_id'],
-                            'region_id' => $row['region_id'],
-                            'country_id' => $row['country_id'],
-                            'delivery_time' => $row['schedule_search'],
-                            'delivery_price' => $row['delivery_price'],
-                            'status' => "active",
-                ]);
+                    
+                    $row['description'] = $row['location'];
+                    unset($row['minimum']);
+                    unset($row['location']);
+                    unset($row['name_html']);
+                    unset($row['category']);
+                    unset($row['category_slug']);
+                    unset($row['delivery']);
+                    unset($row['phone_number']);
+                    unset($row['schedule']);
+                    unset($row['schedule_search']);
+                    unset($row[0]);
+                    $row['id'] = $merchant->id;
+                    $this->editMerchant->saveOrCreateObject($user, $row, "Merchant");
+                }
+            } else {
+                if ($row['id']) {
+                    $merchant1 = Merchant::updateOrCreate(['merchant_id' => $row['id']], [
+                                'merchant_id' => $row['id'],
+                                'name' => $row['name'],
+                                'type' => $row['type'],
+                                'email' => $row['email'],
+                                'telephone' => $row['phone_number'],
+                                'address' => $row['address'] . ", " . $row['location'],
+                                'description' => $row['description'],
+                                'icon' => $row['category'],
+                                'lat' => $row['lat'],
+                                'long' => $row['long'],
+                                'minimum' => $row['minimum'],
+                                'city_id' => $row['city_id'],
+                                'region_id' => $row['region_id'],
+                                'country_id' => $row['country_id'],
+                                'delivery_time' => $row['schedule_search'],
+                                'delivery_price' => $row['delivery_price'],
+                                'status' => "active",
+                    ]);
+                }
             }
         }
     }
@@ -511,7 +541,7 @@ class MerchantImport {
             //foreach ($sheet as $row) {
             if ($row['geoname_id']) {
                 $code;
-                if (array_key_exists('facebook_id',$row)) {
+                if (array_key_exists('facebook_id', $row)) {
                     if ($row['facebook_id'] == "NULL") {
                         $row['code'] = null;
                     } else {
@@ -528,10 +558,9 @@ class MerchantImport {
                 unset($row['continent_name']);
                 unset($row['country_iso_code']);
                 unset($row['country_name']);
-                if($row['name']){
+                if ($row['name']) {
                     $country = Country::updateOrCreate($row);
-                } 
-                
+                }
             }
             //}
         }
@@ -543,18 +572,18 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $row) {
             //foreach ($sheet as $row) {
-                $country = Country::find($row['registered_country_geoname_id']);
-                if ($country) {
-                    unset($row['registered_country_geoname_id']);
-                    unset($row['represented_country_geoname_id']);
-                    unset($row['is_anonymous_proxy']);
-                    unset($row['is_satellite_provider']);
-                    unset($row['postal_code']);
-                    unset($row['accuracy_radius']);
-                    unset($row['geoname_id']);
-                    $block = Block::updateOrCreate($row);
-                    $country->blocks()->save($block);
-                }
+            $country = Country::find($row['registered_country_geoname_id']);
+            if ($country) {
+                unset($row['registered_country_geoname_id']);
+                unset($row['represented_country_geoname_id']);
+                unset($row['is_anonymous_proxy']);
+                unset($row['is_satellite_provider']);
+                unset($row['postal_code']);
+                unset($row['accuracy_radius']);
+                unset($row['geoname_id']);
+                $block = Block::updateOrCreate($row);
+                $country->blocks()->save($block);
+            }
             //}
         }
     }
@@ -642,18 +671,18 @@ class MerchantImport {
             }
         }
     }
+
     public function importTranslations($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-             unset($sheet['']);
-                $translation = Translation::updateOrCreate([
-                            'code' => $sheet['code'], 
-                            'language' => $sheet['language'],
-                            'value' => $sheet['value']
-                ]);
-
+            unset($sheet['']);
+            $translation = Translation::updateOrCreate([
+                        'code' => $sheet['code'],
+                        'language' => $sheet['language'],
+                        'value' => $sheet['value']
+            ]);
         }
     }
 
@@ -711,7 +740,7 @@ class MerchantImport {
                     $code = null;
                 } else {
                     $code = $sheet['merchant_id'];
-        }
+                }
                 $product = Product::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
@@ -720,15 +749,15 @@ class MerchantImport {
                             'isActive' => $sheet['isactive'],
                             'slug' => $sheet['slug'],
                 ]);
-    }
+            }
         }
     }
-    
+
     public function importPlans($filename) {
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
-            $plan = Plan::updateOrCreate($sheet); 
+            $plan = Plan::updateOrCreate($sheet);
         }
     }
 
@@ -831,11 +860,11 @@ class MerchantImport {
                 $sheet['cellphone'] = intval($sheet['cellphone']) . "";
                 $sheet['area_code'] = intval($sheet['area_code']) . "";
                 $sheet['docnum'] = intval($sheet['docnum']) . "";
-                if($sheet['language']=="En-us"){
-                    $sheet['language']= "en-us";
-                } else if($sheet['language']=="Es-co"){
-                    $sheet['language']= "en-us";
-                } 
+                if ($sheet['language'] == "En-us") {
+                    $sheet['language'] = "en-us";
+                } else if ($sheet['language'] == "Es-co") {
+                    $sheet['language'] = "en-us";
+                }
 
                 unset($sheet[0]);
                 $user = User::updateOrCreate(["id" => $sheet['id']], $sheet);
@@ -946,7 +975,12 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $this->editMerchant->saveOrCreateReport($user, $sheet);
+                $coords = ["lat" => $sheet['lat'], "long" => $sheet['long']];
+                $results = $this->editMerchant->saveOrCreateObject($user, $coords, self::OBJECT_REPORT);
+                $report = $results['object'];
+                $sheet['id'] = $report->id;
+                $sheet['report_time'] = date("Y-m-d h:i:sa");
+                $this->editMerchant->saveOrCreateObject($user, $sheet, self::OBJECT_REPORT);
             }
         }
     }

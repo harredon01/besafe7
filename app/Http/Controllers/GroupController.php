@@ -11,6 +11,7 @@ use App\Services\EditAlerts;
 use App\Models\Group;
 use App\Jobs\InviteUsers;
 use App\Jobs\LeaveGroup;
+use DB;
 
 class GroupController extends Controller {
 

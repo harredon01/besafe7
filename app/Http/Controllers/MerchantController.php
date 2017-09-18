@@ -117,15 +117,6 @@ class MerchantController extends Controller {
     }
 
     /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function findMerchant(Request $request) {
-        return response()->json($this->editMerchant->findMerchant($request->only("name")));
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
      * @return Response

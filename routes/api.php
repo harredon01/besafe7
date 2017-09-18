@@ -74,17 +74,20 @@ Route::post('emergency/stop', 'AlertsApiController@postStopEmergency');
 Route::post('reports/share', 'AlertsApiController@postAddFollower');
 Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
+Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
 Route::resource('reports', 'ReportApiController');
 
-Route::get('merchants', 'MerchantApiController@getMerchants');
+
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
+Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
 Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchant');
-Route::get('merchants/nearby', 'MerchantApiController@getNearby');
-Route::get('merchants/nearby_reports', 'MerchantApiController@getNearbyReports');
+Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
+Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
 Route::post('merchants/search', 'MerchantApiController@findMerchant');
+Route::resource('merchants', 'MerchantApiController');
 
 
 Route::post('imagesapi', 'FileApiController@postFile');

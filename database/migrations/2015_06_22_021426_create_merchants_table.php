@@ -28,13 +28,18 @@ class CreateMerchantsTable extends Migration {
             $table->double('long', 12, 9)->nullable();
             $table->index('lat');
             $table->index('long');
-            $table->integer('city_id')->unsigned();
+            $table->boolean('submitted')->default(0);
+            $table->boolean('private')->default(false);
+            $table->integer('city_id')->unsigned()->nullable();
             $table->foreign('city_id')->references('id')
                     ->on('cities');
-            $table->integer('region_id')->unsigned();
+            $table->integer('group_id')->unsigned()->nullable();
+            $table->foreign('group_id')->references('id')
+                    ->on('groups');
+            $table->integer('region_id')->unsigned()->nullable();
             $table->foreign('region_id')->references('id')
                     ->on('regions');
-            $table->integer('country_id')->unsigned();
+            $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')
                     ->on('countries');
             $table->integer('user_id')->unsigned()->nullable();

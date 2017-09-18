@@ -196,12 +196,10 @@ class MerchantTableSeeder extends Seeder {
 
     public function createMerchants() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importMerchants("policias.xlsx");
+        
         $this->merchantImport->importPlans("plans.xlsx");
         $this->command->info('plans seeded!');
-        $this->merchantImport->importMerchants("medicos1.xlsx");
-        $this->merchantImport->importMerchants("medicos2.xlsx");
-        $this->command->info('Merchants seeded!');
+        
         $this->merchantImport->importAttributes("attributes.xlsx");
         $this->merchantImport->importAttributeOptions("attributeOptions.xlsx");
         $this->command->info('Attributes seeded!');
@@ -226,8 +224,7 @@ class MerchantTableSeeder extends Seeder {
         $this->merchantImport->importLocations("locations3.xlsx",3);
         $this->merchantImport->importLocations("locations4.xlsx",4);
         $this->command->info('Locations seeded!');
-        $this->merchantImport->importReports("reports.xlsx");
-        $this->command->info('Reports seeded!');
+        
         $this->merchantImport->importGroups("groups.xlsx");
         $this->command->info('Groups seeded!');
         
@@ -260,6 +257,16 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('Groups Locations finished!');
         $this->merchantImport->sendMessageGroup("messageGroup.xlsx");
         $this->command->info('Group messages sent');
+        
+        $this->merchantImport->importMerchants("medicos1.xlsx");
+        $this->command->info('medicos1.xlsx seeded!');
+        $this->merchantImport->importMerchants("medicos2.xlsx");
+        $this->command->info('medicos2.xlsx seeded!');
+        $this->merchantImport->importMerchants("policias.xlsx");
+        $this->command->info('policias.xlsx seeded!');
+        $this->merchantImport->importReports("reports.xlsx");
+        $this->command->info('reports.xlsx seeded!');
+        
     }
 
 }

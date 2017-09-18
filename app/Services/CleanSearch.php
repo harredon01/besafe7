@@ -205,7 +205,7 @@ class CleanSearch {
                         if (sizeof($members) == 0) {
                             return null;
                         } else {
-                            $finalString = $mystring;
+                            $finalString = $mystring. "&status=active";
                         }
                     } else {
                         $findme = 'shared_id=';
@@ -217,7 +217,7 @@ class CleanSearch {
                                 $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id. "&order_by=id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=id,desc";
                             }
                         } else {
                             return null;
@@ -233,6 +233,68 @@ class CleanSearch {
             $pos = strpos($finalString, $findme);
             if ($pos === false) {
                 $finalString = $finalString . "&order_by=reports.id,desc";
+            } else {
+                
+            }
+        }
+        $request2 = Request::create($finalString, 'GET');
+        return $request2;
+    }
+    public function handleMerchant($request) {
+        $user = $request->user();
+        $mystring = $request->getRequestUri();
+        $findme = '?';
+        $finalString = "";
+        $pos = strpos($mystring, $findme);
+        if ($pos === false) {
+            $finalString = $mystring . "?order_by=merchants.id,desc&user_id=" . $user->id;
+        } else {
+            $check = explode("?", $mystring);
+            if (count($check) != 2) {
+                return null;
+            }
+            $findme = 'user_id';
+            $pos = strpos($mystring, $findme);
+            if ($pos === false) {
+                $findme = 'private=0';
+                $pos = strpos($mystring, $findme);
+                if ($pos === false) {
+                    $findme = 'group_id';
+                    $pos = strpos($mystring, $findme);
+                    if ($pos === true) {
+                        $group_id = $request->only("group_id");
+                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $group_id]);
+                        if (sizeof($members) == 0) {
+                            return null;
+                        } else {
+                            $finalString = $mystring. "&status=active";
+                        }
+                    } else {
+                        $findme = 'shared_id=';
+                        $pos = strpos($mystring, $findme);
+                        if ($pos === false) {
+                            $findme = 'shared=true';
+                            $pos = strpos($mystring, $findme);
+                            if ($pos === false) {
+                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
+                            } else {
+                                $mystring = str_replace("shared=true", "", $mystring);
+                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=id,desc";
+                            }
+                        } else {
+                            return null;
+                        }
+                    }
+                } else {
+                    $finalString = $mystring . "&order_by=id,desc";
+                }
+            } else {
+                return null;
+            }
+            $findme = 'order_by';
+            $pos = strpos($finalString, $findme);
+            if ($pos === false) {
+                $finalString = $finalString . "&order_by=merchants.id,desc";
             } else {
                 
             }

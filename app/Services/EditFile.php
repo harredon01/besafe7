@@ -9,6 +9,7 @@ use App\Jobs\NotifyContacts;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Report;
+use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use DB;
@@ -47,19 +48,15 @@ class EditFile {
             $file = $request->file('photo');
             $filetypeff = $request->only("filetype");
             $filetype = $filetypeff['filetype'];
-            if ($type == "report") {
-                $trigger = Report::find($intended_id);
+            if ($type == "Report" || $type == "Merchant") {
+                $object = "App\\Models\\".$type;
+                $trigger = $object::find($intended_id);
                 $path = 'images/reports/';
                 if ($trigger) {
                     if ($trigger->user_id == $user->id) {
                         if ($filetype == "photo") {
-
                             $trigger_id = $trigger->id;
-                            /* $today = date("Y-m-d_H-i-s");
-                              $filename = $today . "_report-" . $trigger->id . '.' . $file->getClientOriginalExtension();
-                              $path = public_path($path . $filename);
-                              Image::make($file->getRealPath())->resize(800, 800)->save($path); */
-                            $path = Storage::putFile('public/reports', $file);
+                            $path = Storage::putFile('public/'. strtolower($type), $file);
                             $filename = $path;
                             $saved = true;
                         }

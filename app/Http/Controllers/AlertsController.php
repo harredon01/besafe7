@@ -155,7 +155,6 @@ class AlertsController extends Controller {
      * @return Response
      */
     public function show($id) {
-        return $this->editMerchant->getMerchant($id);
     }
 
     /**

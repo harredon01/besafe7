@@ -187,8 +187,11 @@ class EditGroup {
      */
     public function getGroupByCode($code) {
         $group = Group::where('code', '=', $code)->first();
-        if ($group->isActive() && $group->is_public) {
-            return ['status' => 'success', "group" => $group];
+        if ($group) {
+            if ($group->isActive() && $group->is_public) {
+                return ['status' => 'success', "group" => $group];
+            }
+            return ['status' => 'error', "message" => 'Group not found or inactive'];
         }
         return ['status' => 'error', "message" => 'Group not found or inactive'];
     }

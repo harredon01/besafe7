@@ -25,7 +25,8 @@ class MapExternalController extends Controller {
       | controller as you wish. It is just here to get your app started!
       |
      */
-    
+    const OBJECT_REPORT = 'Report';
+    const OBJECT_MERCHANT = 'Merchant';
 
     
     /**
@@ -61,14 +62,25 @@ class MapExternalController extends Controller {
         $user = User::where('hash',$code)->first();
         return view('map')->with('following', $user);
     }
+    
     /**
      * Show the application dashboard to the user.
      *
      * @return Response
      */
     public function report($code = null) {
-        $report = $this->editMerchant->getReportByHash($code);
+        $report = $this->editMerchant->getObjectByHash($code,self::OBJECT_REPORT);
         return view('report')->with('report', $report['report'])->with('images', $report['files']);
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function merchant($code = null) {
+        $object = $this->editMerchant->getObjectByHash($code,self::OBJECT_MERCHANT);
+        return view('merchant')->with('merchant', $object['merchant'])->with('images', $object['files']);
     }
 
 }

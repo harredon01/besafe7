@@ -6,19 +6,8 @@ use Validator;
 use App\Models\Order;
 use App\Models\Plan;
 use App\Models\Subscription;
-use App\Models\OrderPayment;
 use App\Models\User;
-use App\Models\Item;
-use App\Models\Condition;
-use App\Models\ProductVariant;
-use App\Models\PaymentMethod;
-use App\Models\Address;
 use App\Services\EditGroup;
-use App\Services\Stripe;
-use Mail;
-use Darryldecode\Cart\CartCondition;
-use Cart;
-use DB;
 
 class EditBilling {
 
@@ -178,52 +167,60 @@ class EditBilling {
     public function createSubscription(User $user, $source, array $data) {
         $className = "App\\Services\\" . $source;
         $gateway = new $className;
-        $plan = Plan::where("plan_id", $data['plan_id'])->first();
-        if ($plan) {
-            //$reply = $gateway->createPlan($plan);
-            $class = "App\\Models\\" . $plan->type;
-            $model = $class::find($data['object_id']);
-            if ($model) {
-                $source = $user->sources()->where('gateway', strtolower($source))->first();
-                if ($source) {
-                    if ($source->has_default) {
-                        if (array_key_exists("source", $data)) {
-                            $result = $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
-                        } if (array_key_exists("new", $data)) {
-                            $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
+        if (array_key_exists("plan_id", $data)) {
+            $plan = Plan::where("plan_id", $data['plan_id'])->first();
+            if ($plan) {
+                //$reply = $gateway->createPlan($plan);
+                $class = "App\\Models\\" . $plan->type;
+                $model = $class::find($data['object_id']);
+                if ($model) {
+                    $source = $user->sources()->where('gateway', strtolower($source))->first();
+                    if ($source) {
+                        if ($source->has_default) {
+                            if (array_key_exists("source", $data)) {
+                                $result = $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
+                            } if (array_key_exists("new", $data)) {
+                                $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                            } else {
+                                $result = $gateway->createSubscription($user, $source, $plan, $data);
+                            }
                         } else {
-                            $result = $gateway->createSubscription($user, $source, $plan, $data);
+                            $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
                         }
                     } else {
-                        $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                        $result = $gateway->createSubscriptionSourceClient($user, $plan, $data);
                     }
-                } else {
-                    $result = $gateway->createSubscriptionSourceClient($user, $plan, $data);
+                    if ($result['status'] == "success") {
+                        $subscription = $result['subscription'];
+                        $model->ends_at = $subscription->ends_at;
+                        $model->save();
+                    }
+                    return $result;
                 }
-                if ($result['status'] == "success") {
-                    $subscription = $result['subscription'];
-                    $model->ends_at = $subscription->ends_at;
-                    $model->save();
-                }
-                return $result;
+                return response()->json(['status' => 'error', 'message' => "Model not found"]);
             }
-            return response()->json(['status' => 'error', 'message' => "Model not found"]);
+            return response()->json(['status' => 'error', 'message' => "Plan not found"]);
         }
-        return response()->json(['status' => 'error', 'message' => "Plan not found"]);
+        return response()->json(['status' => 'error', 'message' => "Plan id is required"]);
     }
 
     public function editSubscription(User $user, $source, $id, array $data) {
         $className = "App\\Services\\" . $source;
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
-        $plan = Plan::where("plan_id", $data['plan_id'])->first();
-        if ($plan) {
-            $source = $user->sources()->where('gateway', strtolower($source))->first();
-            if ($source) {
-                $gateway = new $className;
-                return $gateway->editSubscription($user, $source, $plan, $id, $data);
+        if (array_key_exists("plan_id", $data)) {
+            $plan = Plan::where("plan_id", $data['plan_id'])->first();
+            if ($plan) {
+                $source = $user->sources()->where('gateway', strtolower($source))->first();
+                if ($source) {
+                    $gateway = new $className;
+                    return $gateway->editSubscription($user, $source, $plan, $id, $data);
+                }
+                return response()->json(['status' => 'error', 'message' => "Model not found"]);
             }
+            return response()->json(['status' => 'error', 'message' => "Plan not found"]);
         }
+        return response()->json(['status' => 'error', 'message' => "Plan id is required"]);
     }
 
     public function receiveSubscriptionPayment(User $user, $source, array $data) {

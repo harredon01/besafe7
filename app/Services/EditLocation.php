@@ -24,6 +24,7 @@ class EditLocation {
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
     const OBJECT_USER = 'user';
     const OBJECT_LOCATION = 'Location';
+    const OBJECT_REPORT = 'Report';
 
     protected $editAlerts;
     protected $editMerchant;
@@ -189,7 +190,7 @@ class EditLocation {
             $sheet = [
                 "user_id" => $user->id,
                 "name" => "Report " . date("Y-m-d h:i:sa"),
-                "private" => false,
+                "private" => true,
                 "type" => "event",
                 "anonymous" => true,
                 "lat" => $data['lat'],
@@ -198,7 +199,7 @@ class EditLocation {
                 "region_id" => $result->region_id,
                 "country_id" => $result->country_id
             ];
-            $this->editMerchant->saveOrCreateReport($user, $sheet);
+            $this->editMerchant->saveOrCreateObject($user, $sheet,self::OBJECT_REPORT);
         }
         $data["trip"] = $user->trip;
         if (array_key_exists("extras", $location)) {

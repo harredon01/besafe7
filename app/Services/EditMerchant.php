@@ -14,6 +14,9 @@ use DB;
 class EditMerchant {
 
     const OBJECT_REPORT_GROUP = 'Report_Group';
+    const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
+    const OBJECT_REPORT = 'Report';
+    const OBJECT_MERCHANT = 'Merchant';
 
     /**
      * The EditAlert implementation.
@@ -57,16 +60,6 @@ class EditMerchant {
      *
      * @return Response
      */
-    public function findMerchant($name) {
-        $merchant = Merchant::where('name', 'LIKE', '%' . $name['name'] . '%')->get();
-        return $merchant;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function getPaymentMethodsMerchant($id) {
         $merchant = Merchant::find($id);
         $merchant->paymentMethods;
@@ -78,10 +71,11 @@ class EditMerchant {
      *
      * @return Response
      */
-    public function deleteReport(User $user, $reportId) {
-        $report = Report::find($reportId);
-        if ($user->id == $report->user_id) {
-            $report->delete();
+    public function deleteObject(User $user, $reportId, $type) {
+        $type = "App\\Models\\".$type;
+        $object = $type::find($reportId);
+        if ($user->id == $object->user_id) {
+            $object->delete();
         }
     }
 
@@ -90,102 +84,74 @@ class EditMerchant {
      *
      * @return Response
      */
-    public function getReport(User $user, $reportId) {
-        $report = Report::find($reportId);
-        if ($report) {
-            if ($user->id == $report->user_id) {
-                $report->mine = true;
-            }
-            $files = FileM::where('type', 'report')->where("trigger_id", $reportId)->get();
-            if ($report->anonymous == true) {
-                $report->user_id = "";
-                $data = [
-                    "report" => $report,
-                    "user" => "",
-                    "files" => $files,
-                ];
-            } else {
-                $reportingUser = User::find($report->user_id);
-                $data = [
-                    "report" => $report,
-                    "user" => $reportingUser,
-                    "files" => $files,
-                ];
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getReportUser(User $user, $reportId) {
-        $report = Report::find($reportId);
-        if ($report) {
+    public function getObjectUser(User $user, $objectId, $type) {
+        $target = "App\\Models\\".$type;
+        $object = $target::find($objectId);
+        if ($object) {
             $send = false;
-            if ($report->user_id == $user->id) {
+            if ($object->user_id == $user->id) {
                 $send = true;
-            } else if ($report->private) {
+            } else if ($object->private) {
                 $group = DB::table('userables')
                                 ->where('user_id', $user->id)
-                                ->where('userable_type', "Report")
-                                ->where("object_id", $report->id)->first();
+                                ->where('userable_type', $type)
+                                ->where("object_id", $object->id)->first();
                 if ($group) {
                     $send = true;
                 }
-            } else if (!$report->private) {
+            } else if (!$object->private) {
                 $send = true;
             }
             if ($send == true) {
-                $files = FileM::where("type", "report")->where("trigger_id", $report->id)->get();
-                if ($report->private == true) {
-                    $report->email == "";
-                    $report->telephone == "";
+                $files = FileM::where("type", self::OBJECT_REPORT)->where("trigger_id", $object->id)->get();
+                if ($type == self::OBJECT_REPORT) {
+                    if ($object->private == true && $type == "Report") {
+                        $object->email == "";
+                        $object->telephone == "";
+                    }
+                    $data = [
+                        "report" => $object,
+                        "files" => $files,
+                    ];
+                } else if ($type == self::OBJECT_MERCHANT) {
+                    $data = [
+                        "merchant" => $object,
+                        "files" => $files,
+                    ];
                 }
-                $data = [
-                    "report" => $report,
-                    "files" => $files,
-                ];
+
+
                 return $data;
             }
-            return ['status' => "error", "message" => 'Report not found for user'];
+            return ['status' => "error", "message" => $type . ' not found for user'];
         } else {
-            return ['status' => "error", "message" => 'Report not found'];
+            return ['status' => "error", "message" => $type . ' not found'];
         }
     }
 
-    public function getReportByHash($code) {
-        $report = Report::where('hash', $code)->first();
-        if ($report) {
-            $files = FileM::where("type", "report")->where("trigger_id", $report->id)->get();
-            if ($report->private == true) {
-                $report->email == "";
-                $report->telephone == "";
+    public function getObjectByHash($code, $type) {
+        $target = "App\\Models\\".$type;
+        $object = $target::where('hash', $code)->first();
+        if ($object) {
+            $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+            if ($type == self::OBJECT_REPORT) {
+                if ($object->private == true && $type == "Report") {
+                    $object->email == "";
+                    $object->telephone == "";
+                }
+                $data = [
+                    "report" => $object,
+                    "files" => $files,
+                ];
+            } else if ($type == self::OBJECT_MERCHANT) {
+                $data = [
+                    "merchant" => $object,
+                    "files" => $files,
+                ];
             }
-            $data = [
-                "report" => $report,
-                "files" => $files,
-            ];
             return $data;
         } else {
-            return ['status' => "error", "message" => 'Report not found'];
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function deleteUserReport(User $user, $reportId) {
-        $report = Report::find($reportId);
-        if ($report) {
-            if ($user->id == $report->user_id) {
-                $report->delete();
-            }
+            return ['status' => "error", "message" => $type . ' not found'];
         }
     }
 
@@ -229,7 +195,18 @@ class EditMerchant {
      *
      * @return Response
      */
-    public function getNearby(User $user, array $data) {
+    public function getNearby(array $data) {
+        $merchants = $this->getNearbyMerchants($data);
+        $reports = $this->getNearbyReports($data);
+        return array("merchants" => $merchants['merchants'], "reports" => $reports['reports']);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getNearbyMerchants(array $data) {
         $radius = 1;
         $R = 6371;
         $lat = $data['lat'];
@@ -258,44 +235,9 @@ class EditMerchant {
         AND `long` BETWEEN :longinf AND :longsup 
                     HAVING distance < :radius order by distance asc limit 20 "
                         . "", $thedata);
-        $thedata = [
-            'lat' => $lat,
-            'lat2' => $lat,
-            'long' => $long,
-            'latinf' => $minLat,
-            'latsup' => $maxLat,
-            'longinf' => $minLon,
-            'longsup' => $maxLon,
-            'radius' => $radius,
-            'user_id' => $user->id,
-            'user_id2' => $user->id,
-        ];
-        $reports = DB::select(""
-                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address,report_time, 
-			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
-                   FROM
-                        reports r
-                            left join
-                        userables u ON r.id = u.object_id
-                    WHERE
-                        status = 'active'
-                            AND (
-                            (r.private = 0) 
-                            OR (r.user_id = :user_id)
-                            OR (u.user_id = :user_id2 AND u.userable_type = 'Report')
-                            )
-                            AND r.type <> ''
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
-                    HAVING distance < :radius
-                    order by distance asc limit 20 "
-                        . "", $thedata);
-        $results = array("merchants" => $merchants, "reports" => $reports);
-        return $results;
+        return array("merchants" => $merchants);
     }
-    
+
     public function getNearbyReports(array $data) {
         $radius = 1;
         $R = 6371;
@@ -333,8 +275,7 @@ class EditMerchant {
                     HAVING distance < :radius
                     order by distance asc limit 20 "
                         . "", $thedata);
-        $results = array("reports" => $reports);
-        return $results;
+        return array("reports" => $reports);
     }
 
     function findLonBoundary($lat, $lon, $lat1, $lat2) {
@@ -356,6 +297,32 @@ class EditMerchant {
         return array('latinf' => $lat1, 'latsup' => $lat2);
     }
 
+    function checkGroupStatus(User $user, Group $group, array $data) {
+        if ($group->is_public && $group->isActive()) {
+            $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? AND status <> "blocked" ', [$user->id, $group->id]);
+            if (sizeof($members) == 0) {
+                return null;
+            } else {
+                $member = $members[0];
+                if ($member->is_admin) {
+                    $data['status'] = "active";
+                } else {
+                    $data['status'] = "pending";
+                }
+            }
+        } else if (!$group->is_public) {
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? ', [$user->id, $group->id]);
+            if (sizeof($members) > 0) {
+                $data['status'] = "active";
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        return $data;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -371,7 +338,7 @@ class EditMerchant {
                 $merchantid = $data['merchant_id'];
                 unset($data['merchant_id']);
                 Merchant::where('id', $merchantid)->update($data);
-                $merchant = Group::find($merchantid);
+                $merchant = Merchant::find($merchantid);
                 if ($merchant) {
                     return ['status' => "success", "message" => 'Merchant saved', "name" => $merchant->name];
                 }
@@ -386,93 +353,116 @@ class EditMerchant {
         }
     }
 
+    public function notifyGroup(Group $group, User $user, array $data, $type, $object) {
+        if ($group) {
+            if ($group->is_public && $group->isActive()) {
+                if ($data['status'] == "pending") {
+                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=?  AND is_admin = 1 AND status <> 'blocked' and user_id <>? ", [intval($data["group_id"]), $user->id]);
+                } elseif ($data['status'] == "active") {
+                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=?  AND status <> 'blocked' and user_id <>? ", [intval($data["group_id"]), $user->id]);
+                } else {
+                    return null;
+                }
+            } else if (!$group->is_public) {
+                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? and user_id <>? ", [intval($data["group_id"]), $user->id]);
+            } else {
+                return null;
+            }
+            $payload = array("class" => $type, "type" => $object->type,"object_type" => $object->type, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
+            if ($type == "Report") {
+                $type = self::OBJECT_REPORT_GROUP;
+            } else if ($type == "Merchant") {
+                $type = self::OBJECT_MERCHANT_GROUP;
+            }
+            $data = [
+                "trigger_id" => $user->id,
+                "message" => "",
+                "subject" => "",
+                "payload" => $payload,
+                "type" => $type,
+                "user_status" => $this->editAlerts->getUserNotifStatus($user)
+            ];
+            $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @return Response
      */
-    public function saveOrCreateReport(User $user, array $data) {
-        $validator = $this->validatorReport($data);
-        if ($validator->fails()) {
-            return $validator->getMessageBag();
-        }
-        $group = null;
-        $push = false;
-        if (array_key_exists("id", $data)) {
-            if ($data['id'] > 0) {
-                if (array_key_exists("anonymous", $data)) {
-                    if ($data['anonymous'] == true) {
-                        $data['email'] = "";
-                        $data['telephone'] = "";
-                    }
-                }
-                if (array_key_exists("group_id", $data)) {
-                    $group = Group::find($data["group_id"]);
-                    if ($group) {
-                        if (array_key_exists("push", $data)) {
-                            $push = $data["push"];
-                        }
-                        if ($group->is_public && $group->isActive()) {
-                            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status <> "blocked" ', [$user->id, $group->id]);
-                            if (sizeof($members) == 0) {
-                                return null;
-                            }
-                        }
-                    }
-                }
+    public function saveOrCreateObject(User $user, array $data, $type) {
 
-                Report::where('user_id', $user->id)
-                        ->where('id', $data['id'])->update($data);
-                $report = Report::find($data['id']);
-                if ($group) {
-                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND status <> 'blocked' ", [intval($data["group_id"])]);
-                    $payload = array("report" => $report,"report_type" => $report->type, "first_name" => $user->firstName, "last_name" => $user->lastName,"group_name" => $group->name );
-                    $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "",
-                        "subject" => "",
-                        "payload" => $payload,
-                        "type" => self::OBJECT_REPORT_GROUP,
-                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
-                    ];
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, $push);
-                }
-                if ($report) {
-                    return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
-                }
-                return ['status' => 'error', "message" => "report does not exist"];
-            }
-            return ['status' => 'error', "message" => "report id invalid"];
-        } else {
-            $data["status"] = "active";
-            $data["icon"] = "default";
-            $data["user_id"] = $user->id;
-            if (!array_key_exists("email", $data)) {
-                $data["email"] = $user->email;
-            } else {
-                if ($data["email"]) {
-                    
-                } else {
-                    $data["email"] = $user->email;
-                }
-            }
-            if (!array_key_exists("telephone", $data)) {
-                $data["telephone"] = $user->area_code . " " . $user->cellphone;
-            } else {
-                if ($data["telephone"]) {
-                    
-                } else {
-                    $data["telephone"] = $user->area_code . " " . $user->cellphone;
-                }
-            }
+        $group = null;
+        if ($type == self::OBJECT_REPORT) {
             if (array_key_exists("anonymous", $data)) {
                 if ($data['anonymous'] == true) {
                     $data['email'] = "";
                     $data['telephone'] = "";
                 }
             }
-            $report = Report::create($data);
-            return ['status' => 'success', "message" => "Report saved: " . $report->name, "report_id" => $report->id];
+        }
+
+        if (array_key_exists("group_id", $data)) {
+            $group = Group::find($data["group_id"]);
+            if ($group) {
+                $data = $this->checkGroupStatus($user, $group, $data);
+                if (!$data) {
+                    return null;
+                }
+                $data['private'] = true;
+            }
+        } else {
+            if (!array_key_exists("id", $data)) {
+                $data['status'] = "pending";
+            }
+        }
+
+
+        if (array_key_exists("id", $data)) {
+            if ($type == self::OBJECT_REPORT) {
+                $validator = $this->validatorReport($data);
+                if ($validator->fails()) {
+                    return $validator->getMessageBag();
+                }
+                $object = $this->updateObject($user, $data, $type);
+            } else if ($type == self::OBJECT_MERCHANT) {
+                $validator = $this->validatorMerchant($data);
+                if ($validator->fails()) {
+                    return $validator->getMessageBag();
+                }
+                $object = $this->updateObject($user, $data, $type);
+            } else {
+                return ['status' => 'error', "message" => "Object type not supported"];
+            }
+        } else {
+            $validator = $this->validatorLat($data);
+            if ($validator->fails()) {
+                return $validator->getMessageBag();
+            }
+            $object = $this->createObject($user, $data, $type);
+        }
+        if ($group) {
+            $this->notifyGroup($group, $user, $data, $type, $object);
+            
+        }
+        return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function updateObject(User $user, array $data, $object) {
+        $object = "App\\Models\\".$object;
+        $object::where('user_id', $user->id)
+                ->where('id', $data['id'])->update($data);
+        $result = $object::find($data['id']);
+        if ($result) {
+            return $result;
+        } else {
+            return null;
         }
     }
 
@@ -481,23 +471,37 @@ class EditMerchant {
      *
      * @return Location
      */
-    public function getReportHash(User $user, $id) {
-        $report = Report::find($id);
-        if ($report) {
-            if ($report->user_id == $user->id || !$report->private) {
-                if ($report->hash) {
-                    return ['status' => 'success', "hash" => $report->hash];
+    public function createObject(User $user, array $data, $object) {
+        $data["user_id"] = $user->id;
+        $data["status"] = "pending";
+        $object = "App\\Models\\".$object;
+        $result = $object::create($data);
+        return $result;
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function getObjectHash(User $user, $id, $type) {
+        $type = "App\\Models\\".$type;
+        $object = $type::find($id);
+        if ($object) {
+            if ($object->user_id == $user->id || !$object->private) {
+                if ($object->hash) {
+                    return ['status' => 'success', "hash" => $object->hash];
                 }
                 $hashExists = true;
                 while ($hashExists) {
                     $hash = str_random(40);
-                    $reports = DB::select("SELECT * from reports where hash = ? ", [$hash]);
-                    if ($reports) {
+                    $objects = $type::where("hash", $hash)->first();
+                    if ($objects) {
                         $hashExists = true;
                     } else {
                         $hashExists = false;
-                        $report->hash = $hash;
-                        $report->save();
+                        $object->hash = $hash;
+                        $object->save();
                         return ['status' => 'success', "hash" => $hash];
                     }
                 }
@@ -518,7 +522,7 @@ class EditMerchant {
                     'name' => 'required|max:255',
                     'telephone' => 'required|max:255',
                     'description' => 'required|max:255',
-                    'email' => 'required|email|max:255|unique:merchants',
+                    'address' => 'required|max:255',
         ]);
     }
 
@@ -530,8 +534,10 @@ class EditMerchant {
      */
     public function validatorReport(array $data) {
         return Validator::make($data, [
-                    'lat' => 'required',
-                    'long' => 'required',
+                    'name' => 'required|max:255',
+                    'type' => 'required|max:255',
+                    'report_time' => 'required|max:255',
+                    'address' => 'required|max:255',
         ]);
     }
 
@@ -541,10 +547,10 @@ class EditMerchant {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorGetNearby(array $data) {
+    public function validatorLat(array $data) {
         return Validator::make($data, [
-                    'lat' => 'required|max:255',
-                    'long' => 'required|max:255',
+                    'lat' => 'required',
+                    'long' => 'required',
         ]);
     }
 

@@ -12,6 +12,7 @@ use App\Models\Report;
 
 class ReportApiController extends Controller {
 
+    const OBJECT_REPORT = 'Report';
     /**
      * The edit profile implementation.
      *
@@ -65,6 +66,21 @@ class ReportApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 401);
     }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getNearbyReports(Request $request) {
+        $validator = $this->editMerchant->validatorLat($request->all());
+        if ($validator->fails()) {
+            $this->throwValidationException(
+                    $request, $validator
+            );
+        }
+        return response()->json($this->editMerchant->getNearbyReports($request->all()));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -76,17 +92,7 @@ class ReportApiController extends Controller {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateReport($user, $request->all()));
-    }
+    
 
     /**
      * Display the specified resource.
@@ -112,6 +118,18 @@ class ReportApiController extends Controller {
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $user = $request->user();
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
+    }
+    
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -121,7 +139,7 @@ class ReportApiController extends Controller {
     public function update(Request $request, $id)
     {
         $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateReport($user, $request->all()));
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
     }
 
     /**
@@ -133,7 +151,7 @@ class ReportApiController extends Controller {
     public function destroy($id)
     {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteReport($user, $request->all()));
+        return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_REPORT));
     }
     
     /**
@@ -141,29 +159,11 @@ class ReportApiController extends Controller {
      *
      * @return Response
      */
-    public function getReportUser($reportId, Request $request) {
+    public function getObjectUser($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getReportUser($user, $reportId));
+        return response()->json($this->editMerchant->getObjectUser($user, $reportId, self::OBJECT_REPORT));
     }
     
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function deleteUserReport(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editMerchant->deleteUserReport($user, $request->all()));
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function deleteReportImage(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editMerchant->deleteReportImage($user, $request->all()));
-    }
 
     /**
      * Display a listing of the resource.
@@ -177,6 +177,6 @@ class ReportApiController extends Controller {
 
     public function getReportHash($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getReportHash($user, $reportId));
+        return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_REPORT));
     }
 }
