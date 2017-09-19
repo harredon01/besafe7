@@ -103,7 +103,7 @@ class ReportApiController extends Controller {
     public function show($id, Request $request)
     {
         $user = $request->user();
-        return response()->json($this->editMerchant->getReport($user, $id));
+        return response()->json($this->editMerchant->getObjectUser($user, $id, self::OBJECT_REPORT));
     }
 
     /**
