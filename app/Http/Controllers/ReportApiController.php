@@ -126,7 +126,24 @@ class ReportApiController extends Controller {
     public function store(Request $request)
     {
         $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
+        $data = $request->only([
+            'id',
+            'type',
+            'name',
+            'email',
+            'telephone',
+            'address',
+            'report_time',
+            'private',
+            'anonymous',
+            'group_id',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id'
+        ]);
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
     
     /**
@@ -139,7 +156,25 @@ class ReportApiController extends Controller {
     public function update(Request $request, $id)
     {
         $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
+        $data = $request->only([
+            'id',
+            'type',
+            'name',
+            'email',
+            'telephone',
+            'address',
+            'report_time',
+            'private',
+            'anonymous',
+            'group_id',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id'
+        ]);
+        $data['id']=$id;
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
 
     /**
@@ -148,7 +183,7 @@ class ReportApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
         $user = $request->user();
         return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_REPORT));

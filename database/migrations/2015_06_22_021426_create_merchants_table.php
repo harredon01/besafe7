@@ -15,13 +15,13 @@ class CreateMerchantsTable extends Migration {
             $table->increments('id');
             $table->string('merchant_id')->unique()->nullable();
             $table->index('merchant_id');
-            $table->string('name');
-            $table->string('type');
+            $table->string('name')->nullable();
+            $table->string('type')->nullable();
             $table->index('type');
             $table->string('email')->nullable();
             $table->string('telephone')->nullable();
             $table->string('hash')->nullable();
-            $table->string('address')->nullable();
+            $table->string('address');
             $table->text('description')->nullable();
             $table->string('icon')->nullable();
             $table->double('lat', 12, 9)->nullable();

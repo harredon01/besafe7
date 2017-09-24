@@ -133,7 +133,7 @@ class EditLocation {
      *
      * @return \Illuminate\Http\Response
      */
-    public function postLocation(array $data, User $user) {
+    public function postLocation(array $data2, User $user) {
         //
 
         /* $validator = $this->validatorLocation($data);
@@ -141,9 +141,10 @@ class EditLocation {
           return $validator->getMessageBag();
           } */
         //return $data['location']['coords']['latitude'];
+        $data = [];
         $storeTripCall = false;
         $saveuser = false;
-        $location = $data['location'];
+        $location = $data2['location'];
         unset($data['location']);
         if (array_key_exists("extras", $location)) {
             $extras = $location['extras'];

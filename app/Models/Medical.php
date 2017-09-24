@@ -19,10 +19,10 @@ class Medical extends Model
      *
      * @var array
      */
-    protected $fillable = ['gender','birth', 'weight','blood_type', 'antigent', 'surgical_history','obstetric_history', 
+    protected $fillable = ['gender','birth', 'weight','blood_type', 'antigen', 'surgical_history','obstetric_history', 
         'medications','alergies', 'immunization_history','medical_encounters','prescriptions','emergency_name', 'relationship',
         'number','other', 'user_id','eps'];
-    protected $encryptable = ['gender','weight','blood_type', 'antigent', 'surgical_history','obstetric_history', 
+    protected $encryptable = ['gender','weight','blood_type', 'antigen', 'surgical_history','obstetric_history', 
         'medications','alergies', 'immunization_history','medical_encounters','prescriptions','emergency_name', 'relationship',
         'number','other','eps'];
     

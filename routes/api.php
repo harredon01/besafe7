@@ -79,6 +79,7 @@ Route::resource('reports', 'ReportApiController');
 
 
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
+Route::post('merchants/share', 'AlertsApiController@postAddFollower');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');

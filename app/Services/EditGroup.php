@@ -326,13 +326,18 @@ class EditGroup {
         if ($validator->fails()) {
             return $validator->getMessageBag();
         }
-        if (array_key_exists("group_id", $data)) {
+        if ($data["group_id"]) {
             $groupid = $data['group_id'];
             $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $groupid]);
             if (sizeof($members) == 0) {
                 return null;
             }
             unset($data['group_id']);
+            foreach ($data as $key => $value) {
+                if (!$value) {
+                    unset($data[$key]);
+                }
+            }
             Group::where('id', $groupid)->update($data);
             $group = Group::find($groupid);
             if ($group) {
@@ -349,22 +354,22 @@ class EditGroup {
             unset($data['contacts']);
             unset($data[0]);
             unset($data[""]);
-            if (array_key_exists('is_public', $data)) {
-                if ($data['is_public']) {
-                    $again = true;
-                    $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
-                    while ($again) {
-                        $string = str_random(12);
-                        $group = Group::where("code", $string)->first();
-                        if ($group) {
-                            
-                        } else {
-                            $again = false;
-                            $data['code'] = $string;
-                        }
+            if ($data['is_public']) {
+                $again = true;
+                $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
+                while ($again) {
+                    $string = str_random(12);
+                    $group = Group::where("code", $string)->first();
+                    if ($group) {
+                        
+                    } else {
+                        $again = false;
+                        $data['code'] = $string;
                     }
                 }
             }
+
+
 
             $group = Group::create($data);
             $invite = array();

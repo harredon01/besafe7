@@ -12,13 +12,13 @@ use App\Services\EditAlerts;
 
 class AuthApiController extends Controller {
 
-
     /**
      * The Guard implementation.
      *
      * @var Guard
      */
     protected $auth;
+
     /**
      * The registrar implementation.
      *
@@ -40,7 +40,7 @@ class AuthApiController extends Controller {
      * @param  \Illuminate\Contracts\Auth\Registrar  $registrar
      * @return void
      */
-    public function __construct(Guard $auth,EditUserData $editUserData, EditAlerts $editAlerts) {
+    public function __construct(Guard $auth, EditUserData $editUserData, EditAlerts $editAlerts) {
         //$this->registrar = $registrar;
         $this->auth = $auth;
         $this->editUserData = $editUserData;
@@ -87,7 +87,19 @@ class AuthApiController extends Controller {
         if ($verifycel) {
             return response()->json(['statuss' => 'error', 'message' => "Ese celular en ese pais ya existe"], 200);
         }
-        $data = $request->all();
+        $data = $request->only([
+            'firstName',
+            'lastName',
+            'area_code',
+            'cellphone',
+            'email',
+            'password',
+            'password_confirmation',
+            'language',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
         return response()->json($this->editUserData->create($data));
     }
 
@@ -127,7 +139,26 @@ class AuthApiController extends Controller {
         $user = $request->user();
         $data = $request->only('password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['password']])) {
-            return response()->json($this->editUserData->updateMedical($user, $request->all()));
+            $data = $request->only([
+                'gender',
+                'birth',
+                'weight',
+                'blood_type',
+                'antigen',
+                'surgical_history',
+                'obstetric_history',
+                'medications',
+                'alergies',
+                'immunization_history',
+                'medical_encounters',
+                'prescriptions',
+                'emergency_name',
+                'relationship',
+                'number',
+                'other',
+                'eps'
+            ]);
+            return response()->json($this->editUserData->updateMedical($user, $data));
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
@@ -173,4 +204,5 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
+
 }

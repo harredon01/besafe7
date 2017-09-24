@@ -283,9 +283,26 @@ class UserApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $data = $request->all();
-        if (array_key_exists("id", $data)) {
-            return response()->json($this->editUserData->update($data));
+        $data = $request->only([
+            'id',
+            'docNum',
+            'docType',
+            'gender',
+            'firstName',
+            'lastName',
+            'area_code',
+            'cellphone',
+            'email',
+            'password',
+            'password_confirmation',
+            'language',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        
+        if ($data['id']) {
+            return response()->json($this->editUserData->update($user,$data));
         } else {
             $validator = $this->editUserData->validatorRegister($data);
 

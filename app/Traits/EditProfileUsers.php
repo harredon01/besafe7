@@ -42,7 +42,21 @@ trait EditProfileUsers {
      */
     public function postEditProfile(Request $request) {
         $user = $this->auth->user();
-        $this->editUserData->update($user, $request->all());
+        $data = $request->only([
+            'id',
+            'firstName',
+            'lastName',
+            'area_code',
+            'cellphone',
+            'email',
+            'password',
+            'password_confirmation',
+            'language',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        $this->editUserData->update($user, $data);
         return redirect($this->editProfilePath());
     }
 

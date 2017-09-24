@@ -72,7 +72,7 @@ class EditMerchant {
      * @return Response
      */
     public function deleteObject(User $user, $reportId, $type) {
-        $type = "App\\Models\\".$type;
+        $type = "App\\Models\\" . $type;
         $object = $type::find($reportId);
         if ($user->id == $object->user_id) {
             $object->delete();
@@ -85,11 +85,12 @@ class EditMerchant {
      * @return Response
      */
     public function getObjectUser(User $user, $objectId, $type) {
-        $target = "App\\Models\\".$type;
+        $target = "App\\Models\\" . $type;
         $object = $target::find($objectId);
         if ($object) {
             $send = false;
             if ($object->user_id == $user->id) {
+                $object->mine = true;
                 $send = true;
             } else if ($object->private) {
                 $group = DB::table('userables')
@@ -103,7 +104,7 @@ class EditMerchant {
                 $send = true;
             }
             if ($send == true) {
-                $files = FileM::where("type", self::OBJECT_REPORT)->where("trigger_id", $object->id)->get();
+                $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
                 if ($type == self::OBJECT_REPORT) {
                     if ($object->private == true && $type == "Report") {
                         $object->email == "";
@@ -130,7 +131,7 @@ class EditMerchant {
     }
 
     public function getObjectByHash($code, $type) {
-        $target = "App\\Models\\".$type;
+        $target = "App\\Models\\" . $type;
         $object = $target::where('hash', $code)->first();
         if ($object) {
             $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
@@ -368,7 +369,7 @@ class EditMerchant {
             } else {
                 return null;
             }
-            $payload = array("class" => $type, "type" => $object->type,"object_type" => $object->type, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
+            $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
             if ($type == "Report") {
                 $type = self::OBJECT_REPORT_GROUP;
             } else if ($type == "Merchant") {
@@ -395,7 +396,7 @@ class EditMerchant {
 
         $group = null;
         if ($type == self::OBJECT_REPORT) {
-            if (array_key_exists("anonymous", $data)) {
+            if ($data['anonymous']) {
                 if ($data['anonymous'] == true) {
                     $data['email'] = "";
                     $data['telephone'] = "";
@@ -403,7 +404,7 @@ class EditMerchant {
             }
         }
 
-        if (array_key_exists("group_id", $data)) {
+        if ($data['group_id']) {
             $group = Group::find($data["group_id"]);
             if ($group) {
                 $data = $this->checkGroupStatus($user, $group, $data);
@@ -413,38 +414,34 @@ class EditMerchant {
                 $data['private'] = true;
             }
         } else {
-            if (!array_key_exists("id", $data)) {
+            if ($data['id']) {
                 $data['status'] = "pending";
             }
         }
-
-
-        if (array_key_exists("id", $data)) {
-            if ($type == self::OBJECT_REPORT) {
-                $validator = $this->validatorReport($data);
-                if ($validator->fails()) {
-                    return $validator->getMessageBag();
+        if ($data['id']) {
+            foreach ($data as $key => $value) {
+                if (!$value) {
+                    unset($data[$key]);
                 }
-                $object = $this->updateObject($user, $data, $type);
-            } else if ($type == self::OBJECT_MERCHANT) {
+            }
+            $object = $this->updateObject($user, $data, $type);
+        } else {
+            if ($type == self::OBJECT_MERCHANT) {
                 $validator = $this->validatorMerchant($data);
                 if ($validator->fails()) {
                     return $validator->getMessageBag();
                 }
-                $object = $this->updateObject($user, $data, $type);
-            } else {
-                return ['status' => 'error', "message" => "Object type not supported"];
+                $object = $this->createObject($user, $data, $type);
+            } else if ($type == self::OBJECT_REPORT) {
+                $validator = $this->validatorReport($data);
+                if ($validator->fails()) {
+                    return $validator->getMessageBag();
+                }
+                $object = $this->createObject($user, $data, $type);
             }
-        } else {
-            $validator = $this->validatorLat($data);
-            if ($validator->fails()) {
-                return $validator->getMessageBag();
-            }
-            $object = $this->createObject($user, $data, $type);
         }
         if ($group) {
             $this->notifyGroup($group, $user, $data, $type, $object);
-            
         }
         return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
     }
@@ -455,7 +452,7 @@ class EditMerchant {
      * @return Location
      */
     public function updateObject(User $user, array $data, $object) {
-        $object = "App\\Models\\".$object;
+        $object = "App\\Models\\" . $object;
         $object::where('user_id', $user->id)
                 ->where('id', $data['id'])->update($data);
         $result = $object::find($data['id']);
@@ -474,7 +471,7 @@ class EditMerchant {
     public function createObject(User $user, array $data, $object) {
         $data["user_id"] = $user->id;
         $data["status"] = "pending";
-        $object = "App\\Models\\".$object;
+        $object = "App\\Models\\" . $object;
         $result = $object::create($data);
         return $result;
     }
@@ -485,7 +482,7 @@ class EditMerchant {
      * @return Location
      */
     public function getObjectHash(User $user, $id, $type) {
-        $type = "App\\Models\\".$type;
+        $type = "App\\Models\\" . $type;
         $object = $type::find($id);
         if ($object) {
             if ($object->user_id == $user->id || !$object->private) {
@@ -521,8 +518,9 @@ class EditMerchant {
         return Validator::make($data, [
                     'name' => 'required|max:255',
                     'telephone' => 'required|max:255',
-                    'description' => 'required|max:255',
                     'address' => 'required|max:255',
+                    'lat' => 'required',
+                    'long' => 'required',
         ]);
     }
 
@@ -538,6 +536,8 @@ class EditMerchant {
                     'type' => 'required|max:255',
                     'report_time' => 'required|max:255',
                     'address' => 'required|max:255',
+                    'lat' => 'required',
+                    'long' => 'required',
         ]);
     }
 

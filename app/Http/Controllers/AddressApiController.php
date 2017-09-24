@@ -50,7 +50,21 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
+        $data = $request->only([
+            'address_id',
+            'firstName',
+            'lastName',
+            'address',
+            'type',
+            'postal',
+            'phone',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        return response()->json($this->editUserData->createOrUpdateAddress($user, $data));
     }
 
     /**
@@ -68,7 +82,21 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
+        $data = $request->only([
+            'address_id',
+            'firstName',
+            'lastName',
+            'address',
+            'type',
+            'postal',
+            'phone',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        return response()->json($this->editUserData->createOrUpdateAddress($user, $data));
     }
 
     /**
@@ -98,7 +126,21 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
+        $data = $request->only([
+            'address_id',
+            'firstName',
+            'lastName',
+            'address',
+            'type',
+            'postal',
+            'phone',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        return response()->json($this->editUserData->createOrUpdateAddress($user, $data));
     }
 
     /**
@@ -117,7 +159,21 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editUserData->createOrUpdateAddress($user, $request->all()));
+        $data = $request->only([
+            'address_id',
+            'firstName',
+            'lastName',
+            'address',
+            'type',
+            'postal',
+            'phone',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        return response()->json($this->editUserData->createOrUpdateAddress($user, $data));
     }
 
     /**

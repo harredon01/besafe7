@@ -173,7 +173,21 @@ class MerchantApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
+        $data = $request->only([
+            'id',
+            'type',
+            'name',
+            'email',
+            'telephone',
+            'address',
+            'group_id',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id'
+        ]);
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
 
     /**
@@ -185,7 +199,21 @@ class MerchantApiController extends Controller {
      */
     public function update(Request $request, $id) {
         $user = $request->user();
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $request->all(), self::OBJECT_REPORT));
+        $data = $request->only([
+            'type',
+            'name',
+            'email',
+            'telephone',
+            'address',
+            'group_id',
+            'lat',
+            'long',
+            'city_id',
+            'region_id',
+            'country_id'
+        ]);
+        $data['id'] = $id;
+        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
 
     /**
@@ -194,13 +222,13 @@ class MerchantApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
+    public function destroy($id,Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_REPORT));
+        return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_MERCHANT));
     }
 
     public function getMerchantHash($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_REPORT));
+        return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_MERCHANT));
     }
 }

@@ -107,7 +107,7 @@ class EditUserData {
      * 
      */
     public function update(User $user, array $data) {
-        if (array_key_exists("email", $data)) {
+        if ($data['email']) {
             if ($user->email != $data['email']) {
                 $finduser = User::where('email', '=', $data['email'])->first();
                 if ($finduser && $finduser->id != $user->id) {
@@ -115,7 +115,7 @@ class EditUserData {
                 }
             }
         }
-        if (array_key_exists("docNum", $data)) {
+        if ($data['docNum']) {
             if ($user->docNum != $data['docNum']) {
                 $finduser = User::where('docNum', '=', $data['docNum'])->first();
                 if ($finduser && $finduser->id != $user->id) {
@@ -123,7 +123,7 @@ class EditUserData {
                 }
             }
         }
-        if (array_key_exists("cellphone", $data)) {
+        if ($data['cellphone'] && $data['area_code']) {
             if ($user->cellphone != $data['cellphone']) {
                 $finduser = User::where('cellphone', '=', $data['cellphone'])->where('area_code', '=', $data['area_code'])->first();
                 if ($finduser && $finduser->id != $user->id) {
@@ -131,25 +131,28 @@ class EditUserData {
                 }
             }
         }
-        if (array_key_exists("firstName", $data)) {
+        if ($data['firstName']) {
             $user->firstName = $data['firstName'];
         }
-        if (array_key_exists("lastName", $data)) {
+        if ($data['lastName']) {
             $user->lastName = $data['lastName'];
         }
-        if (array_key_exists("docType", $data)) {
+        if ($data['docType']) {
             $user->docType = $data['docType'];
         }
-        if (array_key_exists("docNum", $data)) {
+        if ($data['docNum']) {
             $user->docNum = $data['docNum'];
         }
-        if (array_key_exists("email", $data)) {
+        if ($data['email']) {
             $user->email = $data['email'];
         }
-        if (array_key_exists("cellphone", $data)) {
+        if ($data['cellphone']) {
             $user->cellphone = $data['cellphone'];
         }
-        if (array_key_exists("gender", $data)) {
+        if ($data['area_code']) {
+            $user->area_code = $data['area_code'];
+        }
+        if ($data['gender']) {
             $user->gender = $data['gender'];
         }
         $user->name = $user->firstName . " " . $user->lastName;
@@ -169,6 +172,11 @@ class EditUserData {
      */
     public function updateMedical(User $user, array $data) {
         $data["user_id"] = $user->id;
+        foreach ($data as $key => $value) {
+            if (!$value) {
+                unset($data[$key]);
+            }
+        }
         $medical = Medical::updateOrCreate(["user_id" => $user->id], $data);
         return array("status" => "success", "message" => "User Profile Updated");
     }
@@ -220,11 +228,11 @@ class EditUserData {
     public function getMedical($user_id) {
         $medical = Medical::where("user_id", $user_id)->first();
         if ($medical) {
-            $medical->age = intval(date('Y', time() - strtotime($medical->birth))) - 1970;
+            $data["age"]= date_diff(date_create($medical->birth), date_create('now'))->y;
             $data["gender"] = $medical->gender;
             $data["weight"] = $medical->weight;
             $data["blood_type"] = $medical->blood_type;
-            $data["antigent"] = $medical->antigent;
+            $data["antigen"] = $medical->antigen;
             $data["birth"] = $medical->birth;
             $data["surgical_history"] = $medical->surgical_history;
             $data["obstetric_history"] = $medical->obstetric_history;
@@ -273,7 +281,7 @@ class EditUserData {
      * 
      */
     public function getCodes(User $user) {
-        $result = ["green" => $user->green,"red" =>$user->red];
+        $result = ["green" => $user->green, "red" => $user->red];
         return $result;
     }
 
@@ -468,15 +476,18 @@ class EditUserData {
      * 
      */
     public function registerToken(User $user, array $data) {
-        $user->platform = $data['platform'];
-        $user->token = $data['token'];
-        $user->pushNotifications = 1;
-        $user->save();
-        return array("status" => "success", "message" => "User Gcm Token Registered");
+        if (array_key_exists("platform", $data) && array_key_exists("token", $data)) {
+            $user->platform = $data['platform'];
+            $user->token = $data['token'];
+            $user->pushNotifications = 1;
+            $user->save();
+            return array("status" => "success", "message" => "User Gcm Token Registered");
+        }
+        return array("status" => "error", "message" => "Bad request");
     }
 
     public function createOrUpdateAddress(User $user, array $data) {
-        if (array_key_exists("address_id", $data)) {
+        if ($data["address_id"]) {
             $addressid = $data['address_id'];
             unset($data['address_id']);
             Address::where('user_id', $user->id)
@@ -486,9 +497,15 @@ class EditUserData {
                 $region = Region::find($address->region_id);
                 $country = Country::find($address->country_id);
                 $city = City::find($address->city_id);
-                $address->cityName = $city->name;
-                $address->countryName = $country->name;
-                $address->regionName = $region->name;
+                if ($city) {
+                    $address->cityName = $city->name;
+                }
+                if ($region) {
+                    $address->regionName = $region->name;
+                }
+                if ($country) {
+                    $address->countryName = $country->name;
+                }
                 return array("status" => "success", "message" => "address updated", "address" => $address);
             }
         } else {
@@ -497,9 +514,15 @@ class EditUserData {
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);
             $city = City::find($address->city_id);
-            $address->cityName = $city->name;
-            $address->countryName = $country->name;
-            $address->regionName = $region->name;
+            if ($city) {
+                $address->cityName = $city->name;
+            }
+            if ($region) {
+                $address->regionName = $region->name;
+            }
+            if ($country) {
+                $address->countryName = $country->name;
+            }
             if ($data['type'] == 'billing') {
                 $this->setAsBillingAddress($user, $address->id);
             }

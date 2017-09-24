@@ -22,7 +22,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous","object"];
+        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous","object",'report_time'];
     protected $hidden = ['user_id'];
 
     public function hours() {

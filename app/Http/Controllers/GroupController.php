@@ -200,7 +200,13 @@ class GroupController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        return response()->json($this->editGroup->saveOrCreateGroup($request->all(), $user));
+        $data = $request->only([
+            'group_id',
+            'contacts',
+            'is_public',
+            'name'
+        ]);
+        return response()->json($this->editGroup->saveOrCreateGroup($data, $user));
     }
 
     /**
