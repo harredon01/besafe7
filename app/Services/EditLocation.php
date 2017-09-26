@@ -198,7 +198,8 @@ class EditLocation {
                 "long" => $data['long'],
                 "city_id" => $result->id,
                 "region_id" => $result->region_id,
-                "country_id" => $result->country_id
+                "country_id" => $result->country_id,
+                "group_id" => null
             ];
             $this->editMerchant->saveOrCreateObject($user, $sheet,self::OBJECT_REPORT);
         }
