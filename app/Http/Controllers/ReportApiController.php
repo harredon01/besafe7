@@ -9,6 +9,7 @@ use App\Services\MerchantImport;
 use App\Services\CleanSearch;
 use App\Querybuilders\ReportQueryBuilder;
 use App\Models\Report;
+use DB;
 
 class ReportApiController extends Controller {
 

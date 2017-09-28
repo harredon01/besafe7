@@ -217,7 +217,7 @@ class CleanSearch {
                                 $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=reports.id,desc";
                             }
                         } else {
                             return null;
@@ -279,7 +279,7 @@ class CleanSearch {
                                 $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=merchants.id,desc";
                             }
                         } else {
                             return null;

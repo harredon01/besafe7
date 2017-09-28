@@ -6,10 +6,10 @@ class ReportQueryBuilder extends QueryBuilder
 {
    public function filterBySharedId($query, $id)
    {
-      return $query->join('userables', 'reports.id', '=', 'userables.object_id')
+        return $query->join('userables', 'reports.id', '=', 'userables.object_id')
            ->where('userables.user_id', '=', $id)
            ->where('userable_type', '=', "Report");
-   }
+    }
 }
 
 /* 

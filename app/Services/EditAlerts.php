@@ -186,12 +186,15 @@ class EditAlerts {
                 if (array_key_exists("object_id", $data)) {
                     $classp = "App\\Models\\" . $object;
                     $objectActive = $classp::find($data['object_id']);
+                    
                     if ($objectActive) {
                         if ($objectActive->user_id == $user->id || !$objectActive->private) {
                             $object_id = $objectActive->id;
                             if ($type == self::GROUP_TYPE) {
+                                
                                 $group = Group::find($data["follower"]);
                                 if ($group) {
+                                    
                                     $recipients = DB::select("select 
                                             user_id as id
                                                 from
@@ -209,6 +212,7 @@ class EditAlerts {
                                             user_id as id
                                                 from
                                                 group_user where group_id = $group->id and user_id = $user->id and status = 'active';");
+                                        
                                         if (count($recipients) > 0) {
                                             if ($group->is_public && $group->isActive()) {
                                                 $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? AND is_admin = 1  AND status = 'active' AND user_id NOT IN (SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "' and object_id = $objectActive->id ); ", [intval($data["follower"])]);
@@ -219,6 +223,7 @@ class EditAlerts {
                                             }
                                         }
                                     }
+                                    
                                 } else {
                                     return null;
                                 }
