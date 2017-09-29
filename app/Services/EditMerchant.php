@@ -76,6 +76,16 @@ class EditMerchant {
         $object = $type::find($reportId);
         if ($user->id == $object->user_id) {
             $object->delete();
+        } else {
+            if ($object->group_id) {
+                $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" and is_admin = true ', [$user->id, $object->group_id]);
+                if (sizeof($members) == 0) {
+                    return null;
+                } else {
+                    $object->group_id = null;
+                    $object->save();
+                }
+            }
         }
     }
 
@@ -227,13 +237,17 @@ class EditMerchant {
             'radius' => $radius
         ];
         $merchants = DB::select(""
-                        . "SELECT merchants.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
+                        . "SELECT m.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
 			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( merchants.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  merchants.lat  ) ) ) ) AS Distance FROM merchants 
-			
-                    WHERE status = 'active' and lat BETWEEN :latinf AND :latsup
-        AND `long` BETWEEN :longinf AND :longsup 
+		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  m.lat  ) ) ) ) AS Distance 
+                   FROM merchants m
+                    WHERE
+                        status = 'active'
+                            AND m.private = 0
+                            AND m.type <> ''
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
                     HAVING distance < :radius order by distance asc limit 20 "
                         . "", $thedata);
         return array("merchants" => $merchants);
@@ -265,8 +279,6 @@ class EditMerchant {
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
                    FROM
                         reports r
-                            left join
-                        userables u ON r.id = u.object_id
                     WHERE
                         status = 'active'
                             AND r.private = 0

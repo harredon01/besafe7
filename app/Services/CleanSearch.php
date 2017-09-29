@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Models\User;
-
+use DB;
 class CleanSearch {
 
     public function handle(User $user, Request $request) {
@@ -199,15 +199,7 @@ class CleanSearch {
                 if ($pos === false) {
                     $findme = 'group_id';
                     $pos = strpos($mystring, $findme);
-                    if ($pos === true) {
-                        $group_id = $request->only("group_id");
-                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $group_id]);
-                        if (sizeof($members) == 0) {
-                            return null;
-                        } else {
-                            $finalString = $mystring. "&status=active";
-                        }
-                    } else {
+                    if ($pos === false) {
                         $findme = 'shared_id=';
                         $pos = strpos($mystring, $findme);
                         if ($pos === false) {
@@ -217,10 +209,18 @@ class CleanSearch {
                                 $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=reports.id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=reports.id,desc";
                             }
                         } else {
                             return null;
+                        }
+                    } else {
+                        $data = $request->only("group_id");
+                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
+                        if (sizeof($members) == 0) {
+                            return null;
+                        } else {
+                            $finalString = $mystring . "&status=active";
                         }
                     }
                 } else {
@@ -240,6 +240,7 @@ class CleanSearch {
         $request2 = Request::create($finalString, 'GET');
         return $request2;
     }
+
     public function handleMerchant($request) {
         $user = $request->user();
         $mystring = $request->getRequestUri();
@@ -261,15 +262,7 @@ class CleanSearch {
                 if ($pos === false) {
                     $findme = 'group_id';
                     $pos = strpos($mystring, $findme);
-                    if ($pos === true) {
-                        $group_id = $request->only("group_id");
-                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $group_id]);
-                        if (sizeof($members) == 0) {
-                            return null;
-                        } else {
-                            $finalString = $mystring. "&status=active";
-                        }
-                    } else {
+                    if ($pos === false) {
                         $findme = 'shared_id=';
                         $pos = strpos($mystring, $findme);
                         if ($pos === false) {
@@ -279,10 +272,18 @@ class CleanSearch {
                                 $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
                             } else {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id. "&status=active&order_by=merchants.id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=merchants.id,desc";
                             }
                         } else {
                             return null;
+                        }
+                    } else {
+                        $data = $request->only("group_id");
+                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
+                        if (sizeof($members) == 0) {
+                            return null;
+                        } else {
+                            $finalString = $mystring . "&status=active";
                         }
                     }
                 } else {
