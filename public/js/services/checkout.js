@@ -18,7 +18,7 @@ angular.module('besafe')
 
                 return def.promise;
                 /**/
-            }
+            };
             var setShippingCondition = function (condition_id) {
                 var def = $q.defer();
                 $http({
@@ -36,7 +36,7 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            }
+            };
             var setBillingAddress = function (address_id) {
                 var def = $q.defer();
                 $http({
@@ -54,7 +54,7 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            }
+            };
             var setCoupon = function (coupon) {
                 var def = $q.defer();
                 $http({
@@ -72,7 +72,7 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            }
+            };
             var getShippingConditions = function (address_id) {
                 var def = $q.defer();
                 $http({
@@ -90,7 +90,67 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            }
+            };
+            var payCreditCard = function (data) {
+                var def = $q.defer();
+                
+                $http.post( '/payu/pay_cash', data)
+                        .success(function (data) {
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            };
+            var payDebitCard = function (data) {
+                var def = $q.defer();
+                
+                $http.post( '/payu/pay_cash', data)
+                        .success(function (data) {
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            };
+            var payCash = function (data) {
+                var def = $q.defer();
+                
+                $http.post( '/payu/pay_cash', data)
+                        .success(function (data) {
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            };
+            var getBanks = function (data) {
+                var def = $q.defer();
+                
+                $http.post( '/payu/pay_cash', data)
+                        .success(function (data) {
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get nearby");
+                        });
+
+                return def.promise;
+                /**/
+
+            };
             return {
                 setShippingAddress: setShippingAddress,
                 payCreditCard:payCreditCard,

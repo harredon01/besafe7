@@ -49,12 +49,11 @@ Route::post('checkout/billingAddress/{code?}', 'CartController@postSetBillingAdd
 Route::post('checkout/shippingAddress/{code?}', 'CartController@postSetShippingAddress');
 Route::post('checkout/shippingCondition/{code?}', 'CartController@postSetShippingCondition');
 
-Route::get('pay/banks', 'PayuController@getBanks');
-Route::get('pay/payment_methods', 'PayuController@getPaymentMethods');
-Route::post('pay/pay_cc', 'PayuController@postPayCreditCard');
-Route::post('pay/pay_debit', 'PayuController@postPayDebitCard');
-Route::post('pay/pay_cash', 'PayuController@postPayCash');
-Route::post('pay/response', 'PayuController@webhookPayU');
+Route::get('payu/banks', 'PayuController@getBanks');
+Route::get('payu/payment_methods', 'PayuController@getPaymentMethods');
+Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
+Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
+Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::get('pay/return', 'PayuController@returnPayU');
 Route::get('pay/cron', 'PayuController@cronPayU');
 

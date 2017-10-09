@@ -16,6 +16,8 @@ class CreateOrdersTable extends Migration {
 		{
 			$table->increments('id');
                         $table->string('status');
+                        $table->string('payment')->nullable();
+                        $table->string('execution')->nullable();
                         $table->string('referenceCode');
                         $table->string('comments')->nullable();
                         $table->double('subtotal', 15, 2);
@@ -25,12 +27,17 @@ class CreateOrdersTable extends Migration {
                         $table->double('total', 15, 2);
                         $table->boolean('is_shippable');
                         $table->boolean('is_digital');
+                        $table->boolean('requires_authorization');
                         $table->integer('payment_method_id')->unsigned()->nullable();
                         $table->foreign('payment_method_id')->references('id')
                                 ->on('payment_methods');
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
+                        $table->text('extras')->nullable();
+                        $table->integer('merchant_id')->unsigned()->nullable();
+                        $table->foreign('merchant_id')->references('id')
+                                ->on('merchants');
 			$table->timestamps();
 		});
 	}

@@ -92,6 +92,7 @@
                         var card = data.card;
                         card.type = "card";
                         $scope.sources.push(card);
+                        $scope.editSource = false;
                     }
                     $scope.data = {};
                     $scope.submitted = false;
@@ -165,7 +166,7 @@
             $scope.setAsDefault = function (source) {
                 var data = {};
                 data.source = source.id
-                Billing.setAsDefault($.param(data), $rootScope.gateway).then(function (data) {
+                Billing.setAsDefault(data, $rootScope.gateway).then(function (data) {
                     for (item in $scope.sources) {
                         $scope.sources[item].is_default = false;
                         if ($scope.sources[item].id == source.id) {
@@ -179,7 +180,7 @@
             }
 
 
-        }).controller('SourcesPayuCtrl', function ($scope, LocationService, Billing, $rootScope) {
+        }).controller('SourcesPayuCtrl', function ($scope, Billing, $rootScope) {
     $scope.data = {};
     $scope.months = [];
     $scope.years = [];
@@ -236,6 +237,7 @@
             if (result.status == "success") {
                 $scope.getSources();
                 $scope.data = {};
+                $scope.data.country = "CO";
                 $scope.submitted = false;
                 $scope.editSource = false;
             } else {
@@ -284,6 +286,7 @@
                 });
     }
     $scope.loadTestData = function () {
+        $scope.data.name = "Hoovert Arredondo";
         $scope.data.line1 = "Calle 73 # 0-24";
         $scope.data.line2 = "Apto 202";
         $scope.data.line3 = "";
@@ -318,7 +321,7 @@
     $scope.setAsDefault = function (source) {
         var data = {};
         data.source = source.token
-        Billing.setAsDefault($.param(data), $scope.localGateway).then(function (data) {
+        Billing.setAsDefault(data, $scope.localGateway).then(function (data) {
             for (item in $scope.sources) {
                 $scope.sources[item].is_default = false;
                 if ($scope.sources[item].token == source.token) {
@@ -332,7 +335,7 @@
     }
 
 
-}).controller('SubscriptionsCtrl', function ($scope, Billing, $rootScope) {
+}).controller('SubscriptionsCtrl', function ($scope, Billing) {
     $scope.data = {};
     $scope.subscriptions = [];
     $scope.plans = [];
@@ -557,7 +560,8 @@
                     $scope.loadTestData();
                 }
             });
-        }).controller('SubscriptionPlansPayuCtrl', function ($scope, Billing, $rootScope) {
+        })
+        .controller('SubscriptionPlansPayuCtrl', function ($scope, Billing, $rootScope) {
     $scope.data = {};
     $scope.months = [];
     $scope.years = [];
@@ -593,10 +597,7 @@
         if ($scope.data.plan_id && $scope.data.object_id) {
             $scope.sourceSelected = true;
             $scope.createSubscription();
-        } else {
-            $scope.sourceSelected = true;
-        }
-
+        } 
     }
     $scope.newCardTrigger = function () {
         $scope.newCard = true;
@@ -638,10 +639,12 @@
             $scope.years.push(date.getFullYear() + i);
         }
         for (i = 0; i < 12; i++) {
-            $scope.months.push(1 + i);
+            $scope.months.push( 1 + i);
         }
+        console.log(JSON.stringify($scope.months));
     }
     $scope.loadTestData = function () {
+        console.log("Loading test data");
         $scope.data.name = "Hoovert Arredondo";
         $scope.data.line1 = "Calle 73 # 0-24";
         $scope.data.line2 = "Apto 202";

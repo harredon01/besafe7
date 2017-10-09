@@ -82,6 +82,7 @@ class EditOrder {
         $result = array();
         $is_shippable = false;
         $is_subscription = false;
+        $requires_authorization = false;
         foreach ($items as $item) {
             $dataitem = array();
             $dataitem['id'] = $item->id; // the Id of the item
@@ -97,6 +98,16 @@ class EditOrder {
                 if (array_key_exists("is_shippable", $attrs)) {
                     if ($attrs['is_shippable'] == true) {
                         $is_shippable = true;
+                    }
+                }
+                if (array_key_exists("is_subscription", $attrs)) {
+                    if ($attrs['is_subscription'] == true) {
+                        $is_subscription = true;
+                    }
+                }
+                if (array_key_exists("requires_authorization", $attrs)) {
+                    if ($attrs['requires_authorization'] == true) {
+                        $requires_authorization = true;
                     }
                 }
             }
@@ -128,12 +139,8 @@ class EditOrder {
         $data['subtotal'] = $subTotal;
         $data['shipping'] = $shippingTotal;
         $data['is_shippable'] = $is_shippable;
+        $data['requires_authorization'] = $requires_authorization;
         $data['is_subscription'] = $is_subscription;
-        if ($taxTotal == 0) {
-            $temptotal = $subTotal / 1.16;
-            $taxTotal = $subTotal - $temptotal;
-            $subTotal = $temptotal;
-        }
         $data['tax'] = $taxTotal;
         $data['sale'] = $saleTotal;
         $data['coupon'] = $couponTotal;
@@ -169,6 +176,7 @@ class EditOrder {
 
         $order->is_shippable = $data['is_shippable'];
         $order->is_subscription = $data['is_subscription'];
+        $order->requires_authorization = $data['requires_authorization'];
         $order->subtotal = $data["subtotal"];
         $order->tax = $data["tax"];
         $order->shipping = $data["shipping"];
@@ -203,87 +211,17 @@ class EditOrder {
      *
      * @return Response
      */
-    public function payOrder(User $user, array $data, $source) {
-        $items = Cart::getContent();
+    public function payOrder(User $user, array $data) {
         $order = $this->getOrder($user);
+        Item::where('user_id', $user->id)
+                ->update(['order_id' => $order->id]);
         $order->status = "holding";
+            if ($data['use_default']) {
+                
+            }
+        
+        
         $order->save();
-        $is_shippable = false;
-        $data = array();
-        foreach ($items as $item) {
-            $dataitem = array();
-            $cartItem = Item::find($item->id);
-            if ($cartItem) {
-                
-            } else {
-                $cartItem = new Item;
-            }
-            $cartItem->id = $item->id; // the Id of the item
-            $cartItem->name = $item->name; // the name
-            $cartItem->order_id = $order->id; // the order
-            $cartItem->price = $item->price; // the single price without conditions applied
-            $cartItem->priceSum = $item->getPriceSum(); // the subtotal without conditions applied
-            $cartItem->priceConditions = $item->getPriceWithConditions(); // the single price with conditions applied
-            $cartItem->priceSumConditions = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
-            $cartItem->quantity = $item->quantity; // the quantity
-            $cartItem->attributes = $item->attributes; // the attributes
-            // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
-            // so you can do things like below:
-            $attrs = json_decode($item->attributes, true);
-            if ($attrs) {
-                if (array_key_exists("is_shippable", $attrs)) {
-                    if ($attrs['is_shippable'] == true) {
-                        $is_shippable = true;
-                    }
-                }
-            }
-
-            $cartItem->save();
-        }
-        if (count($items) > 0) {
-            $subTotal = Cart::getSubTotal();
-            $shippingItems = Cart::getConditionsByType("shipping");
-            $shippingTotal = 0;
-            foreach ($shippingItems as $item) {
-                $shippingTotal += $item->getCalculatedValue($subTotal);
-            }
-            $taxItems = Cart::getConditionsByType("tax");
-            $taxTotal = 0;
-            foreach ($taxItems as $item) {
-                $taxTotal += $item->getCalculatedValue($subTotal);
-            }
-            $saleItems = Cart::getConditionsByType("sale");
-            $saleTotal = 0;
-            foreach ($saleItems as $item) {
-                $saleTotal += $item->getCalculatedValue($subTotal);
-            }
-            $couponItems = Cart::getConditionsByType("coupon");
-            $couponTotal = 0;
-            foreach ($couponItems as $item) {
-                $couponTotal += $item->getCalculatedValue($subTotal);
-            }
-            $total = Cart::getTotal();
-            $order->subtotal = $subTotal;
-            $order->shipping = $shippingTotal;
-            $order->is_shippable = $is_shippable;
-            if ($taxTotal == 0) {
-                $temptotal = $subTotal / 1.16;
-                $taxTotal = $subTotal - $temptotal;
-                $subTotal = $temptotal;
-            }
-            $order->tax = $taxTotal;
-            $order->discount = $saleTotal + $couponTotal;
-            $order->total = $total;
-            $className = "App\\Services\\" . $source;
-            $gateway = new $className; //// <--- this thing will be autoloaded
-            $sources = $user->sources()->where('gateway', strtolower($source))->get();
-            if ($sources) {
-                
-            } else {
-                $client = $gateway->createClient($user);
-            }
-            return $gateway->makeCharge($user, $data);
-        }
         return array("status" => "error", "message" => "Empty Cart");
     }
 
@@ -355,12 +293,70 @@ class EditOrder {
                 'value' => $theCondition->value,
                 'order' => $theCondition->order
             ));
+            $insertCondition = $theCondition->toArray();
+            unset($insertCondition['id']);
+            $insertCondition['order_id'] = $order->id;
             $order->conditions()->where('type', "shipping")->delete();
-            $order->conditions()->save($theCondition);
+            Condition::insert($insertCondition);
             Cart::condition($condition);
             return array("status" => "success", "message" => "Shipping condition set on the cart");
         }
         return array("status" => "error", "message" => "Address does not exist");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function setTaxesCondition(User $user, array $data) {
+        $order = $this->getOrder($user);
+        Cart::removeConditionsByType("tax");
+        if (array_key_exists("country_id", $data)) {
+            if ($data['country_id']) {
+                $conditions = Condition::where('country_id', $data['country_id'])
+                                ->where('type', 'tax')->get();
+                foreach ($conditions as $value) {
+                    // add single condition on a cart bases
+                    $condition = new CartCondition(array(
+                        'name' => $value->name,
+                        'type' => "tax",
+                        'target' => $value->target,
+                        'value' => $value->value,
+                        'order' => $value->order
+                    ));
+                    $insertCondition = $value->toArray();
+                    unset($insertCondition['id']);
+                    $insertCondition['order_id'] = $order->id;
+                    $order->conditions()->where('type', "tax")->delete();
+                    Condition::insert($insertCondition);
+                    Cart::condition($condition);
+                }
+            }
+        }
+        if (array_key_exists("region_id", $data)) {
+            if ($data['region_id']) {
+                $conditions = Condition::where('region_id', $data['region_id'])
+                                ->where('type', 'tax')->get();
+                foreach ($conditions as $value) {
+                    // add single condition on a cart bases
+                    $condition = new CartCondition(array(
+                        'name' => $value->name,
+                        'type' => "tax",
+                        'target' => $value->target,
+                        'value' => $value->value,
+                        'order' => $value->order
+                    ));
+                    $insertCondition = $value->toArray();
+                    unset($insertCondition['id']);
+                    $insertCondition['order_id'] = $order->id;
+                    $order->conditions()->where('type', "tax")->delete();
+                    Condition::insert($insertCondition);
+                    Cart::condition($condition);
+                }
+            }
+        }
+        return array("status" => "success", "message" => "Tax conditions set on the cart");
     }
 
     public function approveOrder(Order $order) {
@@ -415,7 +411,7 @@ class EditOrder {
         
     }
 
-    public function pendingOrder(Order $order) {
+    public function submitOrder(Order $order) {
         
     }
 
@@ -425,20 +421,25 @@ class EditOrder {
      * @return Response
      */
     public function setCouponCondition(User $user, $coupon) {
-        $theCondition = Condition::where('coupon', $coupon);
+        $theCondition = Condition::where('coupon', $coupon)->where('status', 'active')->first();
+        Cart::removeConditionsByType("coupon");
         if ($theCondition) {
             // add single condition on a cart bases
             if ($theCondition->isReusable || (!$theCondition->isReusable && !$theCondition->used)) {
                 $condition = new CartCondition(array(
                     'name' => $theCondition->name,
-                    'type' => $theCondition->type,
+                    'type' => 'coupon',
                     'target' => $theCondition->target,
                     'value' => $theCondition->value,
                     'order' => $theCondition->order
                 ));
                 $order = $this->getOrder($user);
+                $insertCondition = $theCondition->toArray();
+                unset($insertCondition['id']);
+                $insertCondition['order_id'] = $order->id;
+                $order->conditions()->where('type', "coupon")->delete();
+                Condition::insert($insertCondition);
                 Cart::condition($condition);
-                $order->conditions()->save($theCondition);
                 return array("status" => "success", "message" => "Shipping condition set on the cart");
             }
         }
@@ -535,6 +536,26 @@ class EditOrder {
      *
      * @return Response
      */
+    public function checkCartMerchant(User $user, ProductVariant $variant) {
+        $item = Item::where('user_id', $user->id)->first();
+        if (!$item) {
+            return true;
+        } else {
+            $tester = $item->productVariant;
+            if ($tester) {
+                if ($tester->merchant_id == $variant->merchant_id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function clearCartSession() {
         Cart::clear();
     }
@@ -594,11 +615,9 @@ class EditOrder {
         if ((int) $data['quantity'] <= 0) {
             return array("status" => "error", "message" => "amount must be a positive integer");
         }
-        $item = Item::where('product_variant_id', $data['product_variant_id'])
+        $item = Item::where('id', intval($data['item_id']))
                         ->where('user_id', $user->id)
-                        ->whereNull('order_id')->first();
-
-
+                        ->where('order_id', null)->first();
         if ($item) {
             $quantity = $item->quantity + (int) $data['quantity'];
             $productVariant = $item->productVariant;
@@ -615,55 +634,71 @@ class EditOrder {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
-                    $conditions = $productVariant->conditions()->where('isActive', true)->get();
-                    $applyConditions = array();
-                    foreach ($conditions as $condition) {
-                        $itemCondition = new CartCondition(array(
-                            'name' => $condition->name,
-                            'type' => $condition->type,
-                            'target' => $condition->target,
-                            'value' => $condition->value,
-                        ));
-                        array_push($applyConditions, $itemCondition);
-                    }
-                    $product = $productVariant->product;
-                    $conditions = $product->conditions()->where('isActive', true)->get();
-                    foreach ($conditions as $condition) {
-                        $itemCondition = new CartCondition(array(
-                            'name' => $condition->name,
-                            'type' => $condition->type,
-                            'target' => $condition->target,
-                            'value' => $condition->value,
-                        ));
-                        array_push($applyConditions, $itemCondition);
-                    }
-                    $losAttributes = json_decode($productVariant->attributes, true);
-                    if (!$losAttributes) {
-                        $losAttributes = array();
-                    }
-                    $losAttributes['is_digital'] = $productVariant->is_digital;
-                    $losAttributes['is_shippable'] = $productVariant->is_shippable;
-                    $item = Item::create([
-                                'product_variant_id' => $productVariant->id,
-                                'name' => $product->name,
-                                'user_id' => $user->id,
-                                'price' => $productVariant->price,
-                                'quantity' => (int) $data['quantity'],
-                                'attributes' => json_encode($losAttributes)
-                    ]);
-                    Cart::add(array(
-                        'id' => $item->id,
-                        'name' => $product->name,
-                        'price' => $productVariant->price,
-                        'quantity' => (int) $data['quantity'],
-                        'attributes' => $losAttributes,
-                        'conditions' => $applyConditions
-                    ));
+                $resultCheck = $this->checkCartMerchant($user, $variant);
+                if ($resultCheck) {
+                    if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
+                        $conditions = $productVariant->conditions()->where('isActive', true)->get();
+                        $applyConditions = array();
+                        foreach ($conditions as $condition) {
+                            $itemCondition = new CartCondition(array(
+                                'name' => $condition->name,
+                                'type' => $condition->type,
+                                'target' => $condition->target,
+                                'value' => $condition->value,
+                            ));
+                            array_push($applyConditions, $itemCondition);
+                        }
+                        $product = $productVariant->product;
+                        $conditions = $product->conditions()->where('isActive', true)->get();
+                        foreach ($conditions as $condition) {
+                            $itemCondition = new CartCondition(array(
+                                'name' => $condition->name,
+                                'type' => $condition->type,
+                                'target' => $condition->target,
+                                'value' => $condition->value,
+                            ));
+                            array_push($applyConditions, $itemCondition);
+                        }
+                        $losAttributes = json_decode($productVariant->attributes, true);
+                        if (!$losAttributes) {
+                            $losAttributes = array();
+                        }
+                        if(array_key_exists("etras", $data)){
+                            $losAttributes['extras'] = $data['extras'];
+                        }
+                        $losAttributes['is_digital'] = $productVariant->is_digital;
+                        $losAttributes['is_shippable'] = $productVariant->is_shippable;
+                        $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                        if (array_key_exists("extras", $data)) {
+                            foreach ($age as $x => $x_value) {
+                                $losAttributes[$x] = $x_value;
+                            }
+                        }
 
-                    return array("status" => "success", "message" => "item added to cart successfully");
+                        $item = Item::create([
+                                    'product_variant_id' => $productVariant->id,
+                                    'name' => $product->name,
+                                    'user_id' => $user->id,
+                                    'price' => $productVariant->price,
+                                    'quantity' => (int) $data['quantity'],
+                                    'attributes' => json_encode($losAttributes),
+                                    'status' => 'active'
+                        ]);
+                        Cart::add(array(
+                            'id' => $item->id,
+                            'name' => $product->name,
+                            'price' => $productVariant->price,
+                            'quantity' => (int) $data['quantity'],
+                            'attributes' => $losAttributes,
+                            'conditions' => $applyConditions
+                        ));
+
+                        return array("status" => "success", "message" => "item added to cart successfully");
+                    } else {
+                        return array("status" => "error", "message" => "No more stock of that product");
+                    }
                 } else {
-                    return array("status" => "error", "message" => "No more stock of that product");
+                    return array("status" => "error", "message" => "You must clear your cart to add products from a different merchant");
                 }
             }
             return array("status" => "error", "message" => "product does not exist");
@@ -677,7 +712,7 @@ class EditOrder {
      * 
      */
     public function updateCartItem(User $user, array $data) {
-        $item = Item::where('product_variant_id', intval($data['product_variant_id']))
+        $item = Item::where('id', intval($data['item_id']))
                         ->where('user_id', $user->id)
                         ->where('order_id', null)->first();
         if ($item) {

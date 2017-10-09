@@ -16,7 +16,7 @@ class ProductVariant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['sku','product_id','ref2','is_digital','is_shippable','price','sale','tax','quantity'];
+    protected $fillable = ['sku','product_id','ref2','is_digital','is_shippable','price','sale','tax','quantity','merchant_id','requires_authorization'];
 
     public function product() {
         return $this->belongsTo('App\Models\Product');
@@ -26,6 +26,9 @@ class ProductVariant extends Model {
     }
     public function plan() {
         return $this->hasOne('App\Models\Plan');
+    }
+    public function merchant() {
+        return $this->hasOne('App\Models\Merchant');
     }
     public function conditions() {
         return $this->hasMany('App\Models\Condition');

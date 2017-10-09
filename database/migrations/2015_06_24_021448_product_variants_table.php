@@ -20,6 +20,7 @@ class ProductVariantsTable extends Migration {
                                 ->on('products');
                         $table->string('sku');
                         $table->boolean('isActive');
+                        $table->boolean('requires_authorization');
                         $table->boolean('is_shippable');
                         $table->boolean('is_digital');
                         $table->string('ref2');
@@ -27,6 +28,9 @@ class ProductVariantsTable extends Migration {
                         $table->double('sale', 15, 2);
                         $table->integer('quantity');
                         $table->text('attributes'); 
+                        $table->integer('merchant_id')->unsigned()->nullable();
+                        $table->foreign('merchant_id')->references('id')
+                                ->on('merchants');
 			$table->timestamps();
 		});
 	}

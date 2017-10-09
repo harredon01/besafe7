@@ -48,9 +48,9 @@
 
                         });
             }
-            $scope.updateCartItem = function (product_variant_id) {
-                var quantity = angular.element(document.querySelector('input[name=check-quantity-' + product_variant_id + ']')).val();
-                Products.updateCartItem(product_variant_id, quantity).then(function (data) {
+            $scope.updateCartItem = function (item_id) {
+                var quantity = angular.element(document.querySelector('input[name=check-quantity-' + item_id + ']')).val();
+                Products.updateCartItem(item_id, quantity).then(function (data) {
                     if (data.status == 'error') {
                         alert(data.message);
                     }
@@ -68,8 +68,8 @@
 
                         });
             }
-            $scope.deleteCartItem = function (product_variant_id) {
-                Products.updateCartItem(product_variant_id, 0).then(function (data) {
+            $scope.deleteCartItem = function (item_id) {
+                Products.updateCartItem(item_id, 0).then(function (data) {
                     if (data.status == 'error') {
                         alert(data.message);
                     }

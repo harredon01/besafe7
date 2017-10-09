@@ -18,7 +18,7 @@ class Transaction extends Model
      *
      * @var array
      */
-    protected $fillable = ['orderId','type', 'description', 'state','paymentNetworkResponseCode', 'paymentNetworkResponseErrorMessage', 'trazabilityCode', 'pendingReason', 'responseCode', 'errorCode',
+    protected $fillable = ['order_id','type', 'description', 'state','paymentNetworkResponseCode', 'paymentNetworkResponseErrorMessage', 'trazabilityCode', 'pendingReason', 'responseCode', 'errorCode',
         'operationDate','transactionDate','transactionTime','order_id','user_id','extras','transactionId','authorizationCode','responseMessage','currency','gateway'];
 
     public function user() {

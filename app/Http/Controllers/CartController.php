@@ -140,7 +140,7 @@ class CartController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postUpdateCartItem(Request $request) {
-        $user = $this->auth->user();
+        $user = $request->user();
         $status = $this->editOrder->updateCartItem($user, $request->all());
         return response()->json($status);
     }

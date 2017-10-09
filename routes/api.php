@@ -35,8 +35,14 @@ Route::get('sources/{source?}/{id?}', 'SourceApiController@show');
 Route::post('sources/{source?}/default', 'SourceApiController@setAsDefault');
 
 Route::get('plans', 'SourceApiController@getPlans');
-Route::post('stripe', 'WebhookController@handleWebhookStripe');
-Route::post('payu', 'WebhookController@handleWebhookPayu');
+Route::post('hife_webhooks/stripe', 'WebhookController@handleWebhookStripe');
+Route::post('hife_webhooks/payu', 'WebhookController@handleWebhookPayu');
+
+Route::get('payu/banks', 'PayuController@getBanks');
+Route::get('payu/payment_methods', 'PayuController@getPaymentMethods');
+Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
+Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
+Route::post('payu/pay_cash', 'PayuController@postPayCash');
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');

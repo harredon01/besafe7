@@ -1,7 +1,7 @@
 angular.module('besafe')
         .service('Products', function ($q, $http) {
 
-            var addCartItem = function (product_variant_id,quantity) {
+            var addCartItem = function (product_variant_id,quantity,extras) {
 
                 var def = $q.defer();
 
@@ -10,7 +10,8 @@ angular.module('besafe')
                     url: "/cart/add",
                     data: {
                         product_variant_id:product_variant_id,
-                        quantity:quantity
+                        quantity:quantity,
+                        extras: extras
                     }
                 })
                         .success(function (data) {
@@ -23,7 +24,7 @@ angular.module('besafe')
 
                 return def.promise;
             };
-            var updateCartItem = function (product_variant_id,quantity) {
+            var updateCartItem = function (item_id,quantity) {
 
                 var def = $q.defer();
 
@@ -31,7 +32,7 @@ angular.module('besafe')
                     method: "post",
                     url: "/cart/update",
                     data: {
-                        product_variant_id:product_variant_id,
+                        item_id:item_id,
                         quantity:quantity
                     }
                 })

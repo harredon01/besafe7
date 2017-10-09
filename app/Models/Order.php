@@ -16,11 +16,14 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status','subtotal','shipping','discount','tax','total','comments','total','user_id','is_digital','is_shippable','referenceCode'];
+    protected $fillable = ['status','payment','execution','subtotal','shipping','discount','tax','total','comments','total','user_id','is_digital','is_shippable','requires_authorization','referenceCode','extras'];
 
 
     public function user() {
         return $this->belongsTo('App\Models\User');
+    }
+    public function merchant() {
+        return $this->belongsTo('App\Models\Merchant');
     }
     public function items() {
         return $this->hasMany('App\Models\Item');
