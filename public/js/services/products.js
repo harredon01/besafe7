@@ -1,5 +1,5 @@
 angular.module('besafe')
-        .service('Products', function ($q, $http) {
+        .service('Cart', function ($q, $http) {
 
             var addCartItem = function (product_variant_id,quantity,extras) {
 
@@ -50,7 +50,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: "GET",
-                    url: "/carts"
+                    url: "/cart"
                 })
                         .success(function (data) {
                             def.resolve(data);

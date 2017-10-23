@@ -14,6 +14,7 @@ use DB;
 class ReportApiController extends Controller {
 
     const OBJECT_REPORT = 'Report';
+
     /**
      * The edit profile implementation.
      *
@@ -43,13 +44,13 @@ class ReportApiController extends Controller {
         $this->cleanSearch = $cleanSearch;
         $this->middleware('auth:api');
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $request2 = $this->cleanSearch->handleReport($request);
         if ($request2) {
             $queryBuilder = new ReportQueryBuilder(new Report, $request2);
@@ -67,7 +68,7 @@ class ReportApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 401);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -84,16 +85,26 @@ class ReportApiController extends Controller {
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function updateObjectStatus(Request $request, $code) {
+        $user = $request->user();
+        $data = $request->only(['status']);
+        $data['id'] = $code;
+        return $this->editMerchant->updateObjectStatus($user, $data, self::OBJECT_REPORT);
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         //
     }
-
-    
 
     /**
      * Display the specified resource.
@@ -101,8 +112,7 @@ class ReportApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, Request $request)
-    {
+    public function show($id, Request $request) {
         $user = $request->user();
         return response()->json($this->editMerchant->getObjectUser($user, $id, self::OBJECT_REPORT));
     }
@@ -113,9 +123,8 @@ class ReportApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-
+    public function edit($id) {
+        
     }
 
     /**
@@ -124,8 +133,7 @@ class ReportApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $user = $request->user();
         $data = $request->only([
             'id',
@@ -146,7 +154,7 @@ class ReportApiController extends Controller {
         ]);
         return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *
@@ -154,8 +162,7 @@ class ReportApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $user = $request->user();
         $data = $request->only([
             'id',
@@ -174,7 +181,7 @@ class ReportApiController extends Controller {
             'region_id',
             'country_id'
         ]);
-        $data['id']=$id;
+        $data['id'] = $id;
         return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
 
@@ -184,12 +191,11 @@ class ReportApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, Request $request)
-    {
+    public function destroy($id, Request $request) {
         $user = $request->user();
         return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_REPORT));
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -199,7 +205,6 @@ class ReportApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editMerchant->getObjectUser($user, $reportId, self::OBJECT_REPORT));
     }
-    
 
     /**
      * Display a listing of the resource.
@@ -215,4 +220,5 @@ class ReportApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_REPORT));
     }
+
 }

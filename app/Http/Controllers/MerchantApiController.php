@@ -154,6 +154,19 @@ class MerchantApiController extends Controller {
         $user = $request->user();
         return $this->editMerchant->getObjectUser($user, $id, self::OBJECT_MERCHANT);
     }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function updateObjectStatus(Request $request,$code) {
+        $user = $request->user();
+        $data = $request->only(['status']);
+        $data['id'] = $code;
+        return $this->editMerchant->updateObjectStatus($user, $data, self::OBJECT_MERCHANT);
+    }
 
     /**
      * Show the form for editing the specified resource.

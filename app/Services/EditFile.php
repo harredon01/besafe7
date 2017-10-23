@@ -66,6 +66,24 @@ class EditFile {
                 } else {
                     return array("status" => "error", "message" => "File invalid");
                 }
+            } else if ($type == "Product") {
+                $object = "App\\Models\\".$type;
+                $trigger = $object::find($intended_id);
+                $path = 'images/reports/';
+                if ($trigger) {
+                    if ($trigger->merchant_id == $user->id) {
+                        if ($filetype == "photo") {
+                            $trigger_id = $trigger->id;
+                            $path = Storage::putFile('public/'. strtolower($type), $file);
+                            $filename = $path;
+                            $saved = true;
+                        }
+                    } else {
+                        return array("status" => "error", "message" => "File does not belong to user");
+                    }
+                } else {
+                    return array("status" => "error", "message" => "File invalid");
+                }
             } else if ($type == "user_avatar") {
                 if ($filetype == "photo") {
                     if ($user->avatar || $user->avatar != "") {

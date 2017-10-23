@@ -30,6 +30,7 @@
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
@@ -41,7 +42,7 @@
         <script src="{{ asset('/js/services/billing.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script src="{{ asset('/js/services/groups.js')}}"></script>
-        <script src="https://js.stripe.com/v2/"></script>
+        <script src="{{ asset('/js/services/address.js')}}"></script>
         <script src="https://js.stripe.com/v3/"></script>
 
         <script>

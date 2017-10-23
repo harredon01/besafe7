@@ -79,6 +79,7 @@ Route::post('emergency/stop', 'AlertsApiController@postStopEmergency');
 
 Route::post('reports/share', 'AlertsApiController@postAddFollower');
 Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
+Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
 Route::resource('reports', 'ReportApiController');
@@ -94,20 +95,29 @@ Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
 Route::post('merchants/search', 'MerchantApiController@findMerchant');
+Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
 Route::resource('merchants', 'MerchantApiController');
 
 
 Route::post('imagesapi', 'FileApiController@postFile');
 Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 
-Route::post('ordersapi/add_item', 'OrderApiController@addCartItem');
-Route::post('ordersapi/update_item', 'OrderApiController@updateItem');
-Route::get('ordersapi/cart', 'OrderApiController@getCart');
-Route::get('ordersapi/clear', 'OrderApiController@clearCart');
-Route::post('ordersapi/shipping', 'OrderApiController@setShippingAddress');
-Route::post('ordersapi/set_details', 'OrderApiController@setOrderDetails');
-Route::get('ordersapi/confirm/{code?}', 'OrderApiController@confirmOrder');
-Route::get('ordersapi/deny/{code?}', 'OrderApiController@denyOrder');
+Route::resource('products', 'ProductApiController');
+Route::post('products/variant', 'ProductVariantApiController@store');
+Route::post('products/variant/{variant?}', 'ProductVariantApiController@update');
+Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
+Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
+
+Route::post('cart/add_item', 'CartApiController@addCartItem');
+Route::post('cart/update_item', 'CartApiController@updateItem');
+Route::get('cart/cart', 'CartApiController@getCart');
+Route::get('cart/clear', 'CartApiController@clearCart');
+
+Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
+Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
+Route::get('orders/confirm/{code?}', 'OrderApiController@confirmOrder');
+Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
+Route::resource('orders', 'OrderApiController');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
+
 class CleanSearch {
 
     public function handle(User $user, Request $request) {
@@ -19,9 +20,8 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
                 $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
             } else {
                 return null;
@@ -42,9 +42,8 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
                 $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
             } else {
                 return null;
@@ -69,15 +68,13 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
                 if ($user) {
                     $finalString = $mystring . "&user_id=" . $user->id;
                 } else {
-                    $findme = 'hash_id=';
-                    $pos = strpos($mystring, $findme);
-                    if ($pos === false) {
+                    $data = $request->only("hash_id");
+                    if (!$data['hash_id']) {
                         return null;
                     } else {
                         $mystring = $mystring . "&order_by=report_time,asc";
@@ -87,9 +84,8 @@ class CleanSearch {
             } else {
                 return null;
             }
-            $findme = 'order_by';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("order_by");
+            if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,desc";
             } else {
                 
@@ -115,28 +111,24 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
 
                 return null;
             }
-            $findme = 'target_id=';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("target_id");
+            if (!$data['target_id']) {
 
                 return null;
             }
-            $findme = 'trip_id=';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("trip_id");
+            if (!$data['trip_id']) {
                 return null;
             }
-            $findme = 'order_by';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("order_by");
+            if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,desc";
             } else {
                 
@@ -159,16 +151,14 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
                 return null;
             }
-            $findme = 'order_by';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
+            $data = $request->only("order_by");
+            if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=users.id,desc";
             } else {
                 
@@ -178,61 +168,71 @@ class CleanSearch {
         return $request2;
     }
 
-    public function handleReport($request) {
+    public function handleObject($request, $type) {
         $user = $request->user();
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
         $pos = strpos($mystring, $findme);
         if ($pos === false) {
-            $finalString = $mystring . "?order_by=reports.id,desc&user_id=" . $user->id;
+            $finalString = $mystring . "?order_by=$type.id,desc&user_id=" . $user->id;
         } else {
             $check = explode("?", $mystring);
             if (count($check) != 2) {
                 return null;
             }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
-                $findme = 'private=0';
-                $pos = strpos($mystring, $findme);
-                if ($pos === false) {
-                    $findme = 'group_id';
-                    $pos = strpos($mystring, $findme);
-                    if ($pos === false) {
-                        $findme = 'shared_id=';
-                        $pos = strpos($mystring, $findme);
-                        if ($pos === false) {
-                            $findme = 'shared=true';
-                            $pos = strpos($mystring, $findme);
-                            if ($pos === false) {
-                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
+            $data = $request->only("user_id");
+            if (!$data['user_id']) {
+                $data = $request->only("group_id");
+                if ($data['group_id']) {
+                    $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
+                    if (sizeof($members) == 0) {
+                        return null;
+                    } else {
+                        if ($members[0]->is_admin) {
+                            $data = $request->only("status");
+                            if ($data['status']) {
+                                if ($data['status'] == "active" || $data['status'] == "pending" || $data['status'] == "deleted") {
+                                    $finalString = $mystring;
+                                } else {
+                                    return null;
+                                }
                             } else {
-                                $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=reports.id,desc";
+                                $finalString = $mystring . "&status=active";
                             }
                         } else {
-                            return null;
-                        }
-                    } else {
-                        $data = $request->only("group_id");
-                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
-                        if (sizeof($members) == 0) {
-                            return null;
-                        } else {
-                            $finalString = $mystring . "&status=active";
+                            $data = $request->only("status");
+                            if (!$data['status']) {
+                                $finalString = $mystring . "&status=active";
+                            } else {
+                                return null;
+                            }
                         }
                     }
                 } else {
-                    $finalString = $mystring . "&order_by=id,desc";
+                    $data = $request->only("shared_id");
+                    if (!$data['shared_id']) {
+                        $data = $request->only("shared");
+                        if (!$data['shared']) {
+                            $finalString = $mystring . "&user_id=" . $user->id . "&order_by=$type.id,desc";
+                        } else {
+                            if ($data['shared'] == 'true') {
+                                $mystring = str_replace("shared=true", "", $mystring);
+                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=$type.id,desc";
+                            } else {
+                                return null;
+                            }
+                        }
+                    } else {
+                        return null;
+                    }
                 }
             } else {
                 return null;
             }
-            $findme = 'order_by';
-            $pos = strpos($finalString, $findme);
-            if ($pos === false) {
-                $finalString = $finalString . "&order_by=reports.id,desc";
+            $data = $request->only("order_by");
+            if (!$data['order_by']) {
+                $finalString = $finalString . "&order_by=$type.id,desc";
             } else {
                 
             }
@@ -241,67 +241,12 @@ class CleanSearch {
         return $request2;
     }
 
+    public function handleReport($request) {
+        return $this->handleObject($request, "reports");
+    }
+
     public function handleMerchant($request) {
-        $user = $request->user();
-        $mystring = $request->getRequestUri();
-        $findme = '?';
-        $finalString = "";
-        $pos = strpos($mystring, $findme);
-        if ($pos === false) {
-            $finalString = $mystring . "?order_by=merchants.id,desc&user_id=" . $user->id;
-        } else {
-            $check = explode("?", $mystring);
-            if (count($check) != 2) {
-                return null;
-            }
-            $findme = 'user_id';
-            $pos = strpos($mystring, $findme);
-            if ($pos === false) {
-                $findme = 'private=0';
-                $pos = strpos($mystring, $findme);
-                if ($pos === false) {
-                    $findme = 'group_id';
-                    $pos = strpos($mystring, $findme);
-                    if ($pos === false) {
-                        $findme = 'shared_id=';
-                        $pos = strpos($mystring, $findme);
-                        if ($pos === false) {
-                            $findme = 'shared=true';
-                            $pos = strpos($mystring, $findme);
-                            if ($pos === false) {
-                                $finalString = $mystring . "&user_id=" . $user->id . "&order_by=id,desc";
-                            } else {
-                                $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=merchants.id,desc";
-                            }
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        $data = $request->only("group_id");
-                        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
-                        if (sizeof($members) == 0) {
-                            return null;
-                        } else {
-                            $finalString = $mystring . "&status=active";
-                        }
-                    }
-                } else {
-                    $finalString = $mystring . "&order_by=id,desc";
-                }
-            } else {
-                return null;
-            }
-            $findme = 'order_by';
-            $pos = strpos($finalString, $findme);
-            if ($pos === false) {
-                $finalString = $finalString . "&order_by=merchants.id,desc";
-            } else {
-                
-            }
-        }
-        $request2 = Request::create($finalString, 'GET');
-        return $request2;
+        return $this->handleObject($request, "merchants");
     }
 
 }

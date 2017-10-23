@@ -16,8 +16,10 @@ class CreateOrdersTable extends Migration {
 		{
 			$table->increments('id');
                         $table->string('status');
-                        $table->string('payment')->nullable();
-                        $table->string('execution')->nullable();
+                        $table->string('merchant_status')->nullable();
+                        $table->string('owner_status')->nullable();
+                        $table->string('payment_status')->nullable();
+                        $table->string('execution_status')->nullable();
                         $table->string('referenceCode');
                         $table->string('comments')->nullable();
                         $table->double('subtotal', 15, 2);

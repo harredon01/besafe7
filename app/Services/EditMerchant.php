@@ -55,6 +55,8 @@ class EditMerchant {
         return $target;
     }
 
+    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -128,6 +130,7 @@ class EditMerchant {
                     $data = [
                         "merchant" => $object,
                         "files" => $files,
+                        "products" => $object->products()->with("productVariants")->get()
                     ];
                 }
 
@@ -415,20 +418,17 @@ class EditMerchant {
                 }
             }
         }
-
         if ($data['group_id']) {
             $group = Group::find($data["group_id"]);
             if ($group) {
                 $data = $this->checkGroupStatus($user, $group, $data);
                 if (!$data) {
-                    return null;
+                    return ['status' => 'error', "message" => "Access check for this group failed"];
                 }
                 $data['private'] = true;
             }
         } else {
-            if ($data['id']) {
-                $data['status'] = "pending";
-            }
+            $data['status']='active';
         }
         if ($data['id']) {
             foreach ($data as $key => $value) {
@@ -443,14 +443,13 @@ class EditMerchant {
                 if ($validator->fails()) {
                     return $validator->getMessageBag();
                 }
-                $object = $this->createObject($user, $data, $type);
             } else if ($type == self::OBJECT_REPORT) {
                 $validator = $this->validatorReport($data);
                 if ($validator->fails()) {
                     return $validator->getMessageBag();
                 }
-                $object = $this->createObject($user, $data, $type);
             }
+            $object = $this->createObject($user, $data, $type);
         }
         if ($group) {
             $this->notifyGroup($group, $user, $data, $type, $object);
@@ -466,7 +465,7 @@ class EditMerchant {
     public function updateObject(User $user, array $data, $object) {
         $object = "App\\Models\\" . $object;
         $object::where('user_id', $user->id)
-                ->where('id', $data['id'])->update($data);
+                ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
         $result = $object::find($data['id']);
         if ($result) {
             return $result;
@@ -480,9 +479,42 @@ class EditMerchant {
      *
      * @return Location
      */
+    public function updateObjectStatus(User $user, array $data, $object) {
+        $object = "App\\Models\\" . $object;
+        $result = $object::find($data['id']);
+        if ($result && $data['status']) {
+            if ($result->user_id == $user->id) {
+                $result->status = $data['status'];
+                $result->save();
+                return ['status' => 'success', "message" => "status updated"];
+            } else {
+                if ($result->group_id) {
+                    $group = $result->group;
+                    $targetStatus = $data['status'];
+                    $data = $this->checkGroupStatus($user, $group, $data);
+                    if ($data['status'] == 'active') {
+                        $result->status = $targetStatus;
+                        $result->save();
+                        return ['status' => 'success', "message" => "status updated"];
+                    } else {
+                        return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+                    }
+                } else {
+                    return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+                }
+            }
+        } else {
+            return ['status' => 'error', "message" => "please submit valid object and status"];
+        }
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
     public function createObject(User $user, array $data, $object) {
         $data["user_id"] = $user->id;
-        $data["status"] = "pending";
         $object = "App\\Models\\" . $object;
         $result = $object::create($data);
         return $result;

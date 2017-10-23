@@ -30,10 +30,7 @@ class PayU {
 
             $billingCountry = Country::find($billing->country_id);
             $billingRegion = Region::find($billing->region_id);
-            $billingCity = City::find($billing->city_id);
-            $shippingCountry = Country::find($billing->country_id);
-            $shippingRegion = Region::find($billing->region_id);
-            $shippingCity = City::find($billing->city_id);
+
             $deviceSessionId = md5(session_id() . microtime());
             $accountId = "512321";
             $apiLogin = env('PAYU_LOGIN');
@@ -60,7 +57,7 @@ class PayU {
             $buyerAddress = [
                 "street1" => $billing->address,
                 "street2" => "",
-                "city" => $billingCity->name,
+                "city" => $billing->city,
                 "state" => $billingRegion->name,
                 "country" => $billingCountry->code,
                 "postalCode" => $billing->postal,
@@ -68,7 +65,7 @@ class PayU {
             ];
             $buyer = [
                 "merchantBuyerId" => "1",
-                "fullName" => $billingCity->name,
+                "fullName" => $billing->name,
                 "emailAddress" => $data['payer_email'],
                 "contactPhone" => $billing->phone,
                 "dniNumber" => $data['payer_id'],
@@ -76,10 +73,12 @@ class PayU {
             ];
             $shipping = $order->orderAddresses()->where('type', "shipping")->first();
             if ($shipping) {
+                $shippingCountry = Country::find($shipping->country_id);
+                $shippingRegion = Region::find($shipping->region_id);
                 $ShippingAddress = [
                     "street1" => $shipping->address,
                     "street2" => "",
-                    "city" => $shippingCity->name,
+                    "city" => $shipping->city,
                     "state" => $shippingRegion->name,
                     "country" => $shippingCountry->code,
                     "postalCode" => $shipping->postal,
@@ -89,7 +88,7 @@ class PayU {
                 $ShippingAddress = [
                     "street1" => $billing->address,
                     "street2" => "",
-                    "city" => $billingCity->name,
+                    "city" => $billing->city,
                     "state" => $billingRegion->name,
                     "country" => $billingCountry->code,
                     "postalCode" => $billing->postal,
@@ -111,7 +110,7 @@ class PayU {
             $payerAddress = [
                 "street1" => $billing->address,
                 "street2" => "",
-                "city" => $billingCity->name,
+                "city" => $billing->city,
                 "state" => $billingRegion->name,
                 "country" => $billingCountry->code,
                 "postalCode" => $billing->postal,
@@ -119,7 +118,7 @@ class PayU {
             ];
             $payer = [
                 "merchantPayerId" => "1",
-                "fullName" => $billingCity->name,
+                "fullName" => $billing->city,
                 "emailAddress" => $data['payer_email'],
                 "contactPhone" => $billing->phone,
                 "dniNumber" => $data['payer_id'],
@@ -129,7 +128,7 @@ class PayU {
                 "number" => $data['cc_number'],
                 "securityCode" => $data['cc_security_code'],
                 "expirationDate" => $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
-                "name" => $data['cc_name']
+                "name" => $billing->name
             ];
             $extraParams = [
                 "INSTALLMENTS_NUMBER" => 1
@@ -173,10 +172,7 @@ class PayU {
 
             $billingCountry = Country::find($billing->country_id);
             $billingRegion = Region::find($billing->region_id);
-            $billingCity = City::find($billing->city_id);
-            $shippingCountry = Country::find($billing->country_id);
-            $shippingRegion = Region::find($billing->region_id);
-            $shippingCity = City::find($billing->city_id);
+
             $deviceSessionId = md5(session_id() . microtime());
             $accountId = "512321";
             $apiLogin = env('PAYU_LOGIN');
@@ -203,7 +199,7 @@ class PayU {
             $buyerAddress = [
                 "street1" => $billing->address,
                 "street2" => "",
-                "city" => $billingCity->name,
+                "city" => $billing->city,
                 "state" => $billingRegion->name,
                 "country" => $billingCountry->code,
                 "postalCode" => $billing->postal,
@@ -211,7 +207,7 @@ class PayU {
             ];
             $buyer = [
                 "merchantBuyerId" => "1",
-                "fullName" => $billingCity->name,
+                "fullName" => $billing->name,
                 "emailAddress" => $data['payer_email'],
                 "contactPhone" => $billing->phone,
                 "dniNumber" => $data['payer_id'],
@@ -219,10 +215,12 @@ class PayU {
             ];
             $shipping = $order->orderAddresses()->where('type', "shipping")->first();
             if ($shipping) {
+                $shippingCountry = Country::find($shipping->country_id);
+                $shippingRegion = Region::find($shipping->region_id);
                 $ShippingAddress = [
                     "street1" => $shipping->address,
                     "street2" => "",
-                    "city" => $shippingCity->name,
+                    "city" => $shipping->city,
                     "state" => $shippingRegion->name,
                     "country" => $shippingCountry->code,
                     "postalCode" => $shipping->postal,
@@ -232,7 +230,7 @@ class PayU {
                 $ShippingAddress = [
                     "street1" => $billing->address,
                     "street2" => "",
-                    "city" => $billingCity->name,
+                    "city" => $billing->city,
                     "state" => $billingRegion->name,
                     "country" => $billingCountry->code,
                     "postalCode" => $billing->postal,
@@ -254,7 +252,7 @@ class PayU {
             $payerAddress = [
                 "street1" => $billing->address,
                 "street2" => "",
-                "city" => $billingCity->name,
+                "city" => $billing->city,
                 "state" => $billingRegion->name,
                 "country" => $billingCountry->code,
                 "postalCode" => $billing->postal,
@@ -262,7 +260,7 @@ class PayU {
             ];
             $payer = [
                 "merchantPayerId" => "1",
-                "fullName" => $billingCity->name,
+                "fullName" => $billing->name,
                 "emailAddress" => $data['payer_email'],
                 "contactPhone" => $billing->phone,
                 "dniNumber" => $data['payer_id'],
@@ -318,7 +316,6 @@ class PayU {
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
             $billingCountry = Country::find($billing->country_id);
-            $billingCity = City::find($billing->city_id);
             $deviceSessionId = md5(session_id() . microtime());
             $accountId = "512321";
             $apiLogin = env('PAYU_LOGIN');
@@ -358,7 +355,7 @@ class PayU {
             ];
 
             $payer = [
-                "fullName" => $billingCity->name,
+                "fullName" => $billing->name,
                 "emailAddress" => $data['payer_email'],
                 "contactPhone" => $billing->phone,
             ];
@@ -485,8 +482,8 @@ class PayU {
         }
         $address = [
             "line1" => $data['line1'],
-            "line2" => $data['line2'],
-            "line3" => $data['line3'],
+            "line2" => "",
+            "line3" => "",
             "postalCode" => $data['postalCode'],
             "city" => $data['city'],
             "state" => $data['state'],
@@ -499,7 +496,8 @@ class PayU {
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
             "expYear" => $data['expYear'],
-            "type" => $data['branch']
+            "type" => $data['branch'],
+            "address" => $address
         ];
         $response = $this->sendPost($datasent, env('PAYU_REST') . 'customers/' . $source->client_id . '/creditCards');
         if (array_key_exists("token", $response)) {
@@ -678,7 +676,7 @@ class PayU {
                 $subscription->interval = $planL->interval;
                 $subscription->interval_type = $planL->interval_type;
                 $subscription->quantity = $data['quantity'];
-                $subscription->ends_at = Date($response['currentPeriodEnd']/1000);
+                $subscription->ends_at = Date($response['currentPeriodEnd'] / 1000);
                 $subscription->save();
                 return $response['id'];
             }
@@ -726,7 +724,7 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd']/1000)
+                "ends_at" => Date($response['currentPeriodEnd'] / 1000)
             ]);
             $user->subscriptions()->save($subscription);
             $response["status"] = "success";
@@ -799,7 +797,7 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd']/1000)
+                "ends_at" => Date($response['currentPeriodEnd'] / 1000)
             ]);
             $user->subscriptions()->save($subscription);
             $response["status"] = "success";
@@ -819,8 +817,8 @@ class PayU {
         ];
         $address = [
             "line1" => $data['line1'],
-            "line2" => $data['line2'],
-            "line3" => $data['line3'],
+            "line2" => "",
+            "line3" => "",
             "postalCode" => $data['postalCode'],
             "city" => $data['city'],
             "state" => $data['state'],
@@ -865,7 +863,7 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd']/1000)
+                "ends_at" => Date($response['currentPeriodEnd'] / 1000)
             ]);
             $user->subscriptions()->save($subscription);
         }

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Services\EditProduct;
+use App\Services\EditMerchant;
 use Illuminate\Http\Request;
 
-class ProductApiController extends Controller {
+class ProductVariantApiController extends Controller {
 
     const OBJECT_MERCHANT = 'Merchant';
+
 
     /**
      * The edit profile implementation.
@@ -22,7 +24,7 @@ class ProductApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditProduct $editProduct) {
+    public function __construct( EditProduct $editProduct) {
         $this->editProduct = $editProduct;
         $this->middleware('auth:api');
     }
@@ -38,7 +40,7 @@ class ProductApiController extends Controller {
         $request2 = null;
         $result = null;
         if ($data['merchant_id']) {
-            $result = $this->editProduct->checkAccess($user,$data['merchant_id'], self::OBJECT_MERCHANT);
+            $result = $this->editProduct->checkAccess($user, $data['merchant_id'], self::OBJECT_MERCHANT);
         }
         if ($result) {
             $data2 = $request->only("order_by");
@@ -82,15 +84,21 @@ class ProductApiController extends Controller {
     public function store(Request $request) {
         $user = $request->user();
         $data = $request->only([
-            'merchant_id',
             'id',
-            'name',
-            'description',
-            'availability',
-            'slug',
-            'isActive',
+            'sku',
+            'product_id',
+            'ref2',
+            'type',
+            'is_digital',
+            'is_shippable',
+            'price',
+            'sale',
+            'tax',
+            'quantity',
+            'merchant_id',
+            'requires_authorization'
         ]);
-        return response()->json($this->editProduct->createOrUpdateProduct($user,$data));
+        return response()->json($this->editProduct->createOrUpdateVariant($user, $data));
     }
 
     /**
@@ -99,9 +107,9 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function show($id,Request $request) {
+    public function show($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->getProduct($user,$id));
+        return response()->json($this->editProduct->getVariant($user, $id));
     }
 
     /**
@@ -120,19 +128,25 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function update($id,Request $request) {
+    public function update($id, Request $request) {
         $user = $request->user();
         $data = $request->only([
-            'merchant_id',
             'id',
-            'name',
-            'description',
-            'availability',
-            'slug',
-            'isActive',
+            'sku',
+            'product_id',
+            'ref2',
+            'type',
+            'is_digital',
+            'is_shippable',
+            'price',
+            'sale',
+            'tax',
+            'quantity',
+            'merchant_id',
+            'requires_authorization'
         ]);
-        $data['id']=$id;
-        return response()->json($this->editProduct->createOrUpdateProduct($user,$data));
+        $data['id'] = $id;
+        return response()->json($this->editProduct->createOrUpdateVariant($user, $data));
     }
 
     /**
@@ -141,9 +155,9 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id,Request $request) {
+    public function destroy($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->deleteProduct($user,$id));
+        return response()->json($this->editProduct->deleteVariant($user, $id));
     }
 
 }

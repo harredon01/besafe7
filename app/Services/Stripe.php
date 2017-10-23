@@ -207,7 +207,11 @@ class Stripe {
                 $token = $data['source'];
                 $subscription = \Stripe\Subscription::create(array(
                             "customer" => $customer->id,
-                            "plan" => $planL->plan_id,
+                            "items" => array(
+                                array(
+                                    "plan" => $planL->plan_id,
+                                ),
+                            ),
                             "metadata" => $data,
                 ));
                 $source = new Source([
@@ -279,7 +283,11 @@ class Stripe {
                 unset($data['source']);
                 $subscription = \Stripe\Subscription::create(array(
                             "customer" => $customer->id,
-                            "plan" => $planL->plan_id,
+                            "items" => array(
+                                array(
+                                    "plan" => $planL->plan_id,
+                                ),
+                            ),
                             'source' => $token,
                             "metadata" => $data,
                 ));
@@ -350,7 +358,11 @@ class Stripe {
                 $subscription = \Stripe\Subscription::create(array(
                             "customer" => $customer->id,
                             'source' => $token,
-                            "plan" => $planL->plan_id,
+                            "items" => array(
+                                array(
+                                    "plan" => $planL->plan_id,
+                                ),
+                            ),
                             "metadata" => $data,
                 ));
 
@@ -416,8 +428,12 @@ class Stripe {
 
                     $subscription = \Stripe\Subscription::create(array(
                                 "customer" => $customer->id,
-                                "plan" => $planL->plan_id,
                                 "metadata" => $data,
+                                "items" => array(
+                                    array(
+                                        "plan" => $planL->plan_id,
+                                    ),
+                                ),
                     ));
                     $subscriptionL = new Subscription([
                         "gateway" => "Stripe",

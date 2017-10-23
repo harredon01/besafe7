@@ -10,8 +10,8 @@ class CreateOrderAddressesTable extends Migration
         Schema::create('order_addresses', function(Blueprint $table) {
             $table->increments('id');
 
-            $table->string('firstName');
-            $table->string('lastName');
+            $table->string('name');
+            $table->string('city');
             $table->string('address');
             $table->string('type')->nullable();
             $table->string('postal')->nullable();

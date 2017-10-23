@@ -52,8 +52,8 @@ class AddressApiController extends Controller {
         }
         $data = $request->only([
             'address_id',
-            'firstName',
-            'lastName',
+            'name',
+            'city',
             'address',
             'type',
             'postal',
@@ -84,8 +84,8 @@ class AddressApiController extends Controller {
         }
         $data = $request->only([
             'address_id',
-            'firstName',
-            'lastName',
+            'name',
+            'city',
             'address',
             'type',
             'postal',
@@ -128,8 +128,8 @@ class AddressApiController extends Controller {
         }
         $data = $request->only([
             'address_id',
-            'firstName',
-            'lastName',
+            'name',
+            'city',
             'address',
             'type',
             'postal',
@@ -161,8 +161,8 @@ class AddressApiController extends Controller {
         }
         $data = $request->only([
             'address_id',
-            'firstName',
-            'lastName',
+            'name',
+            'city',
             'address',
             'type',
             'postal',

@@ -14,7 +14,7 @@ class CreateRegionsTable extends Migration {
         Schema::create('regions', function(Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->string('code')->unique()->nullable();
+            $table->string('code')->nullable();
             $table->index('code');
             $table->string('facebook_id')->unique()->nullable();
             $table->string('facebook_country_id')->unique()->nullable();

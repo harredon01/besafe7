@@ -30,7 +30,7 @@ class Merchant extends Model {
         return $this->hasOne('App\Models\City');
     }
     public function group() {
-        return $this->hasOne('App\Models\Group');
+        return $this->belongsTo('App\Models\Group');
     }
     public function region() {
         return $this->hasOne('App\Models\Region');

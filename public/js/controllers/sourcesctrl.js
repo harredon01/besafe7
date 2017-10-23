@@ -14,6 +14,7 @@
             $scope.sources = [];
             $scope.buying = false;
             $scope.editSource = false;
+            $scope.showStripe = false;
             $scope.hideDefault = false;
             $scope.config = {};
             angular.element(document).ready(function () {
@@ -23,7 +24,7 @@
                 $scope.submitted = true;
                 console.log("Saving: " + isvalid);
                 if (isvalid) {
-                    $scope.stripeCreateToken();
+                    $scope.showStripe = true;
                 }
             }
             $scope.edit = function () {
@@ -33,38 +34,80 @@
                     $scope.editSource = true;
                 }
             }
+            // Create an instance of Elements
+            var elements = stripe.elements({locale: $translate.use()});
+
+            // Custom styling can be passed to options when creating an Element.
+            // (Note that this demo uses a wider set of styles than the guide below.)
+            var style = {
+                base: {
+                    color: '#32325d',
+                    lineHeight: '24px',
+                    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+                    fontSmoothing: 'antialiased',
+                    fontSize: '16px',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            };
+
+            // Create an instance of the card Element
+            var card = elements.create('card', {style: style});
+
+            // Add an instance of the card Element into the `card-element` <div>
+            card.mount('#card-element');
+
+            // Handle real-time validation errors from the card Element.
+            card.addEventListener('change', function (event) {
+                var displayError = document.getElementById('card-errors');
+                if (event.error) {
+                    displayError.textContent = event.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+
+            // Handle form submission
+            var form = document.getElementById('payment-form');
+            var ownerInfo = {
+                owner: {
+                    name: $scope.data.name,
+                    address: {
+                        line1: $scope.data.address,
+                        city: $scope.data.city,
+                        postal_code: $scope.data.postal,
+                        country: $scope.data.country,
+                    },
+                    email: $scope.data.email
+                },
+            };
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                stripe.createSource(card, ownerInfo).then(function (result) {
+                    if (result.error) {
+                        // Inform the user if there was an error
+                        var errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        // Send the source to your server
+                        stripeSourceHandler(result.source);
+                    }
+                });
+            });
 
             $scope.stripeCreateToken = function () {
-                Stripe.source.create({
-                    type: 'card',
-                    card: {
-                        number: $scope.data.number,
-                        cvc: $scope.data.cvc,
-                        exp_month: $scope.data.expMonth,
-                        exp_year: $scope.data.expYear,
-                    },
-                    owner: {
-                        address: {
-                            postal_code: $scope.data.postal
-                        }
-                    }
-                }, stripeResponseHandler);
+                
             }
 
-            function stripeResponseHandler(status, response) {
-
-
-                if (response.error) { // Problem!
-
-                    // Show the errors on the form
-                    //$form.find('.payment-errors').text(response.error.message);
-                    //$form.find('button').prop('disabled', false); // Re-enable submission
-
-                } else { // Source was created!
-                    // Get the source ID:
-                    $scope.data.source = response.id;
-                    $scope.saveSource();
-                }
+            function stripeSourceHandler(token) {
+                $scope.data.source = token;
+                $scope.saveSource();
             }
             $scope.loadMonths = function () {
                 console.log("Loading months");

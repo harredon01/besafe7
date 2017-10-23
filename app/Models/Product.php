@@ -16,7 +16,7 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id','merchant_id', 'name','description','slug','isActive'];
+    protected $fillable = ['id','merchant_id', 'name','description','availability','slug','isActive'];
 
 
     public function merchant() {

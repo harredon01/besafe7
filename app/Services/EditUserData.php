@@ -91,8 +91,8 @@ class EditUserData {
      */
     public function validatorAddress(array $data) {
         return Validator::make($data, [
-                    'firstName' => 'required|max:255',
-                    'lastName' => 'required|max:255',
+                    'name' => 'required|max:255',
+                    'city' => 'required|max:255',
                     'address' => 'required|max:255',
                     'city_id' => 'required|max:255',
                     'region_id' => 'required|max:255',

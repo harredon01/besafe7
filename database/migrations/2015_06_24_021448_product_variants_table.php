@@ -24,8 +24,10 @@ class ProductVariantsTable extends Migration {
                         $table->boolean('is_shippable');
                         $table->boolean('is_digital');
                         $table->string('ref2');
+                        $table->string('type');
                         $table->double('price', 15, 2);
                         $table->double('sale', 15, 2);
+                        $table->double('tax', 15, 2);
                         $table->integer('quantity');
                         $table->text('attributes'); 
                         $table->integer('merchant_id')->unsigned()->nullable();
