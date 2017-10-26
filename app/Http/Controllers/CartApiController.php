@@ -91,6 +91,17 @@ class CartApiController extends Controller {
         $items = $this->editCart->loadActiveCart($user);
         return response()->json($items);
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function loadCartOrder($id, Request $request) {
+        $user = $request->user();
+        $items = $this->editCart->loadCartOrder($user,$id);
+        return response()->json($items);
+    }
 
     /**
      * Handle a login request to the application.

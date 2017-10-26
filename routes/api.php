@@ -108,10 +108,12 @@ Route::post('products/variant/{variant?}', 'ProductVariantApiController@update')
 Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
 Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
 
-Route::post('cart/add_item', 'CartApiController@addCartItem');
-Route::post('cart/update_item', 'CartApiController@updateItem');
-Route::get('cart/cart', 'CartApiController@getCart');
-Route::get('cart/clear', 'CartApiController@clearCart');
+Route::post('cart/add', 'CartApiController@postAddCartItem');
+Route::post('cart/update', 'CartApiController@postUpdateItem');
+Route::get('cart/get', 'CartApiController@getCart');
+Route::post('cart/clear', 'CartApiController@postClearCart');
+Route::get('cart/load', 'CartApiController@loadActiveCart');
+Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
 
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
 Route::post('orders/set_details', 'OrderApiController@setOrderDetails');

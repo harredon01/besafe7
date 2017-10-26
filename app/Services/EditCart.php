@@ -17,7 +17,6 @@ class EditCart {
      */
     protected $auth;
 
-
     public function getCart() {
         $items = Cart::getContent();
         $data = array();
@@ -115,10 +114,6 @@ class EditCart {
         return $data;
     }
 
-
-
-
-
     /**
      * Store a newly created resource in storage.
      *
@@ -135,7 +130,7 @@ class EditCart {
      * @return Response
      */
     public function checkCartMerchant(User $user, ProductVariant $variant) {
-        $item = Item::where('user_id', $user->id)->first();
+        $item = Item::where('user_id', $user->id)->where('order_id', null)->first();
         if (!$item) {
             return true;
         } else {
@@ -213,9 +208,13 @@ class EditCart {
         if ((int) $data['quantity'] <= 0) {
             return array("status" => "error", "message" => "amount must be a positive integer");
         }
-        $item = Item::where('id', intval($data['item_id']))
-                        ->where('user_id', $user->id)
-                        ->where('order_id', null)->first();
+        $item = null;
+        if (array_key_exists('item_id',$data)) {
+            $item = Item::where('id', intval($data['item_id']))
+                            ->where('user_id', $user->id)
+                            ->where('order_id', null)->first();
+        }
+
         if ($item) {
             $quantity = $item->quantity + (int) $data['quantity'];
             $productVariant = $item->productVariant;
@@ -232,7 +231,7 @@ class EditCart {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                $resultCheck = $this->checkCartMerchant($user, $variant);
+                $resultCheck = $this->checkCartMerchant($user, $productVariant);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
                         $conditions = $productVariant->conditions()->where('isActive', true)->get();
@@ -261,7 +260,7 @@ class EditCart {
                         if (!$losAttributes) {
                             $losAttributes = array();
                         }
-                        if(array_key_exists("etras", $data)){
+                        if (array_key_exists("etras", $data)) {
                             $losAttributes['extras'] = $data['extras'];
                         }
                         $losAttributes['is_digital'] = $productVariant->is_digital;

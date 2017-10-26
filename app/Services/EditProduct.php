@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Validator;
-use App\Models\Order;
+use App\Models\FileM;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Product;
@@ -48,7 +48,7 @@ class EditProduct {
             if ($result) {
                 if ($product->merchant_id == $user->id) {
                     $product->mine = true;
-                }
+                } 
                 $data['product'] = $product;
                 $data['variants'] = $product->productVariants;
                 $data['files'] = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
@@ -91,6 +91,9 @@ class EditProduct {
                 if ($user) {
                     $members = DB::select('select user_id as id from userables where user_id  = ? and userable_type = ? and object_id = ? ', [$user->id, $type, $merchant->id]);
                     if (sizeof($members) > 0) {
+                        return true;
+                    }
+                    if ($user->id == $merchant->user_id) {
                         return true;
                     }
                 }

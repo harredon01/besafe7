@@ -214,11 +214,11 @@ class CleanSearch {
                     if (!$data['shared_id']) {
                         $data = $request->only("shared");
                         if (!$data['shared']) {
-                            $finalString = $mystring . "&user_id=" . $user->id . "&order_by=$type.id,desc";
+                            $finalString = $mystring . "&user_id=" . $user->id ;
                         } else {
                             if ($data['shared'] == 'true') {
                                 $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active&order_by=$type.id,desc";
+                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active";
                             } else {
                                 return null;
                             }
