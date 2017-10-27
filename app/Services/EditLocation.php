@@ -234,11 +234,14 @@ class EditLocation {
         $data["trip"] = $user->trip;
         if (array_key_exists("extras", $location)) {
             $extras = $location['extras'];
+            if (array_key_exists("extras", $extras)) {
+                $extras = $extras['extras'];
+            }
             if (array_key_exists("islast", $extras)) {
                 if (array_key_exists("code", $extras)) {
                     $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                     $code = $extras['code'];
-
+                    
                     if ($code) {
                         $result = $this->editAlerts->checkUserCode($user, $code);
                         if ($result['status'] == "success") {
