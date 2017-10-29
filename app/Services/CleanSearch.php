@@ -62,7 +62,7 @@ class CleanSearch {
 
 
         if ($pos === false) {
-            $finalString = $mystring . "?order_by=report_time,desc&user_id=" . $user->id;
+            $finalString = $mystring . "?order_by=locations.id,asc&user_id=" . $user->id;
         } else {
             $check = explode("?", $mystring);
             if (count($check) != 2) {
@@ -77,7 +77,7 @@ class CleanSearch {
                     if (!$data['hash_id']) {
                         return null;
                     } else {
-                        $mystring = $mystring . "&order_by=report_time,asc";
+                        $mystring = $mystring . "&order_by=locations.id,asc";
                         $finalString = $mystring;
                     }
                 }
@@ -86,7 +86,7 @@ class CleanSearch {
             }
             $data = $request->only("order_by");
             if (!$data['order_by']) {
-                $finalString = $finalString . "&order_by=report_time,desc";
+                $finalString = $finalString . "&order_by=locations.id,asc";
             } else {
                 
             }
@@ -130,9 +130,7 @@ class CleanSearch {
             $data = $request->only("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,desc";
-            } else {
-                
-            }
+            } 
         }
         $request2 = Request::create($finalString, 'GET');
         return $request2;
