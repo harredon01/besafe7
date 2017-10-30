@@ -267,7 +267,7 @@ class EditCart {
                         $losAttributes['is_shippable'] = $productVariant->is_shippable;
                         $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
                         if (array_key_exists("extras", $data)) {
-                            foreach ($age as $x => $x_value) {
+                            foreach ($data as $x => $x_value) {
                                 $losAttributes[$x] = $x_value;
                             }
                         }
@@ -290,15 +290,15 @@ class EditCart {
                             'conditions' => $applyConditions
                         ));
 
-                        return array("status" => "success", "message" => "item added to cart successfully");
+                        return array("status" => "success", "message" => "item added to cart successfully","cart"=>Cart::getContent());
                     } else {
-                        return array("status" => "error", "message" => "No more stock of that product");
+                        return array("status" => "error", "message" => "SOLD_OUT");
                     }
                 } else {
-                    return array("status" => "error", "message" => "You must clear your cart to add products from a different merchant");
+                    return array("status" => "error", "message" => "CLEAR_CART");
                 }
             }
-            return array("status" => "error", "message" => "product does not exist");
+            return array("status" => "error", "message" => "NO_PRODUCT");
         }
     }
 
