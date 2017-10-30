@@ -54,6 +54,18 @@ class CartApiController extends Controller {
         $status = $this->editCart->addCartItem($user, $request->all());
         return response()->json($status);
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postAddCartItemStateless(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->addCartItemStateless($user, $request->all());
+        return response()->json($status);
+    }
 
 
     /**
@@ -65,6 +77,18 @@ class CartApiController extends Controller {
     public function postUpdateCartItem(Request $request) {
         $user = $request->user();
         $status = $this->editCart->updateCartItem($user, $request->all());
+        return response()->json($status);
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postUpdateCartItemStateless(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->updateCartItemStateless($user, $request->all());
         return response()->json($status);
     }
 
@@ -113,6 +137,31 @@ class CartApiController extends Controller {
         $items = $this->editCart->getCart();
         return response()->json($items);
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCartStateless(Request $request) {
+        $user = $request->user();
+        $items = $this->editCart->getCartStateless($user);
+        return response()->json($items);
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCheckoutCartStateless(Request $request) {
+        $user = $request->user();
+        $items = $this->editCart->getCheckoutCartStateless($user);
+        return response()->json($items);
+    }
+
 
     /**
      * Handle a login request to the application.

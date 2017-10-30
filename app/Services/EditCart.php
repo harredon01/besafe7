@@ -113,6 +113,30 @@ class EditCart {
         $data['total'] = $total;
         return $data;
     }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getCartStateless(User $user) {
+        $this->loadActiveCart($user);
+        $data = $this->getCart();
+        Cart::clear();
+        return $data;
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getCheckoutCartStateless(User $user) {
+        $this->loadActiveCart($user);
+        $data = $this->getCheckoutCart();
+        Cart::clear();
+        return $data;
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -301,6 +325,98 @@ class EditCart {
             return array("status" => "error", "message" => "NO_PRODUCT");
         }
     }
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function addCartItemStateless(User $user, array $data) {
+
+        if ((int) $data['quantity'] <= 0) {
+            return array("status" => "error", "message" => "amount must be a positive integer");
+        }
+        $item = null;
+        if (array_key_exists('item_id',$data)) {
+            $item = Item::where('id', intval($data['item_id']))
+                            ->where('user_id', $user->id)
+                            ->where('order_id', null)->first();
+        }
+
+        if ($item) {
+            $quantity = $item->quantity + (int) $data['quantity'];
+            $productVariant = $item->productVariant;
+            if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
+                $item->quantity = $quantity;
+                $item->save();
+                return array("status" => "success", "message" => "item added to cart successfully");
+            } else {
+                return array("status" => "error", "message" => "No more stock of that product");
+            }
+        } else {
+            $productVariant = ProductVariant::find(intval($data['product_variant_id']));
+            if ($productVariant) {
+                $resultCheck = $this->checkCartMerchant($user, $productVariant);
+                if ($resultCheck) {
+                    if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
+                        $conditions = $productVariant->conditions()->where('isActive', true)->get();
+                        $applyConditions = array();
+                        foreach ($conditions as $condition) {
+                            $itemCondition = new CartCondition(array(
+                                'name' => $condition->name,
+                                'type' => $condition->type,
+                                'target' => $condition->target,
+                                'value' => $condition->value,
+                            ));
+                            array_push($applyConditions, $itemCondition);
+                        }
+                        $product = $productVariant->product;
+                        $conditions = $product->conditions()->where('isActive', true)->get();
+                        foreach ($conditions as $condition) {
+                            $itemCondition = new CartCondition(array(
+                                'name' => $condition->name,
+                                'type' => $condition->type,
+                                'target' => $condition->target,
+                                'value' => $condition->value,
+                            ));
+                            array_push($applyConditions, $itemCondition);
+                        }
+                        $losAttributes = json_decode($productVariant->attributes, true);
+                        if (!$losAttributes) {
+                            $losAttributes = array();
+                        }
+                        if (array_key_exists("etras", $data)) {
+                            $losAttributes['extras'] = $data['extras'];
+                        }
+                        $losAttributes['is_digital'] = $productVariant->is_digital;
+                        $losAttributes['is_shippable'] = $productVariant->is_shippable;
+                        $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                        if (array_key_exists("extras", $data)) {
+                            foreach ($data as $x => $x_value) {
+                                $losAttributes[$x] = $x_value;
+                            }
+                        }
+
+                        $item = Item::create([
+                                    'product_variant_id' => $productVariant->id,
+                                    'name' => $product->name,
+                                    'user_id' => $user->id,
+                                    'price' => $productVariant->price,
+                                    'quantity' => (int) $data['quantity'],
+                                    'attributes' => json_encode($losAttributes),
+                                    'status' => 'active'
+                        ]);
+                        return array("status" => "success", "message" => "item added to cart successfully","cart"=>Cart::getContent());
+                    } else {
+                        return array("status" => "error", "message" => "SOLD_OUT");
+                    }
+                } else {
+                    return array("status" => "error", "message" => "CLEAR_CART");
+                }
+            }
+            return array("status" => "error", "message" => "NO_PRODUCT");
+        }
+    }
 
     /**
      * Create a new user instance after a valid registration.
@@ -330,6 +446,37 @@ class EditCart {
                 }
             } else if ((int) $data['quantity'] == 0) {
                 Cart::remove($productVariant->id);
+                $item->delete();
+                return array("status" => "success", "message" => "Item deleted from cart");
+            } else if ((int) $data['quantity'] < 0) {
+                return array("status" => "error", "message" => "amount must be positive");
+            }
+        } else {
+            return array("status" => "error", "message" => "item does not exist on the cart");
+        }
+    }
+    
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function updateCartItemStateless(User $user, array $data) {
+        $item = Item::where('id', intval($data['item_id']))
+                        ->where('user_id', $user->id)
+                        ->where('order_id', null)->first();
+        if ($item) {
+            $productVariant = $item->productVariant;
+            if ((int) $data['quantity'] > 0) {
+                if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
+                    $item->quantity = (int) $data['quantity'];
+                    $item->save();
+                    return array("status" => "success", "message" => "item updated successfully");
+                } else {
+                    return array("status" => "error", "message" => "No more stock of that product");
+                }
+            } else if ((int) $data['quantity'] == 0) {
                 $item->delete();
                 return array("status" => "success", "message" => "Item deleted from cart");
             } else if ((int) $data['quantity'] < 0) {
