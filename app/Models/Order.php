@@ -1,4 +1,6 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,32 +18,39 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status','owner_status','merchant_status','payment_status','execution_status','subtotal','shipping','discount','tax','total','comments','total','user_id','is_digital','is_shippable','requires_authorization','referenceCode','extras'];
-
+    protected $fillable = ['status', 'owner_status', 'merchant_status', 'payment_status', 'execution_status', 'subtotal', 'shipping', 'discount', 'tax', 'total', 'comments', 'total', 'user_id', 'supplier_id', 'is_digital', 'is_shippable', 'requires_authorization', 'referenceCode', 'extras'];
+    protected $hidden = ['user_id', 'supplier_id'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
     }
+
     public function merchant() {
         return $this->belongsTo('App\Models\Merchant');
     }
+
     public function items() {
         return $this->hasMany('App\Models\Item');
     }
+
     public function transactions() {
         return $this->hasMany('App\Models\Transaction');
     }
+
     public function orderAddresses() {
         return $this->hasMany('App\Models\OrderAddress');
     }
+
     public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');
     }
+
     public function paymentMethod() {
         return $this->belongsTo('App\Models\PaymentMethod');
     }
+
     public function conditions() {
-        return $this->belongsToMany('App\Models\Condition','condition_order','order_id','condition_id');
+        return $this->belongsToMany('App\Models\Condition', 'condition_order', 'order_id', 'condition_id');
     }
 
 }

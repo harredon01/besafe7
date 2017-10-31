@@ -36,6 +36,8 @@ class CreateOrdersTable extends Migration {
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
+                        $table->integer('supplier_id')->unsigned()->nullable();
+                        $table->index('supplier_id');
                         $table->text('extras')->nullable();
                         $table->integer('merchant_id')->unsigned()->nullable();
                         $table->foreign('merchant_id')->references('id')
