@@ -12,7 +12,7 @@
                     var html = "";
                     for (x in obj) {
                         html += x + ": " + obj[x] + " <br/>";
-                    }
+            }
                     a.html(html)
                     a.css("display", "block");
                 });

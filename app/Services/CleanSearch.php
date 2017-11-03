@@ -62,7 +62,7 @@ class CleanSearch {
 
 
         if ($pos === false) {
-            $finalString = $mystring . "?order_by=report_time,asc&user_id=" . $user->id;
+            $finalString = $mystring . "?order_by=report_time,asc&limit=30&user_id=" . $user->id;
         } else {
             $check = explode("?", $mystring);
             if (count($check) != 2) {
@@ -87,9 +87,11 @@ class CleanSearch {
             $data = $request->only("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,asc";
-            } else {
-                
             }
+            $data = $request->only("limit");
+            if (!$data['limit']) {
+                $finalString = $finalString . "&limit=30";
+            } 
         }
         $request2 = Request::create($finalString, 'GET');
         return $request2;
