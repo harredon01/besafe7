@@ -129,6 +129,47 @@ class OrderApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editOrder->setShippingAddress($user, $request->only("address_id")));
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setShippingCondition(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id"),true));
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setShippingConditionStateless(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id"),false));
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setBillingAddress(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id"),true));
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setBillingAddressStateless(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id"),false));
+    }
 
     /**
      * Display a listing of the resource.

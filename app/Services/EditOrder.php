@@ -27,6 +27,7 @@ class EditOrder {
      *
      */
     protected $auth;
+
     /**
      * The Auth implementation.
      *
@@ -57,7 +58,6 @@ class EditOrder {
         $this->payU = $payU;
         $this->stripe = $stripe;
         $this->editCart = $editCart;
-        
     }
 
     public function getOrder(User $user) {
@@ -78,10 +78,23 @@ class EditOrder {
             return $order;
         }
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getCheckoutCartStateless(User $user) {
+        
+        $data = $this->getCheckoutCart();
+        Cart::clear();
+        return $data;
+    }
 
     public function prepareOrder(User $user) {
         $order = $this->getOrder($user);
-        $data = $this->editCart->getCheckoutCart($order);
+        $this->editCart->loadActiveCart($user);
+        $this->loadOrderConditions($order);
+        $data = $this->editCart->getCheckoutCart();
         //$this->addItemsOrder($user, $order);
 
         $order->is_shippable = $data['is_shippable'];
@@ -126,11 +139,11 @@ class EditOrder {
         Item::where('user_id', $user->id)
                 ->update(['order_id' => $order->id]);
         $order->status = "holding";
-            if ($data['use_default']) {
-                
-            }
-        
-        
+        if ($data['use_default']) {
+            
+        }
+
+
         $order->save();
         return array("status" => "error", "message" => "Empty Cart");
     }
@@ -141,7 +154,7 @@ class EditOrder {
      * @return Response
      */
     public function setShippingAddress(User $user, $address) {
-
+        $address = $address['address_id'];
         $theAddress = Address::find(intval($address));
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
@@ -165,8 +178,9 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setBillingAddress(User $user, $address) {
+    public function setBillingAddress(User $user, $address, boolean $hasState) {
         $order = $this->getOrder($user);
+        $address = $address['address_id'];
         $theAddress = Address::find(intval($address));
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
@@ -176,6 +190,14 @@ class EditOrder {
                 unset($orderAddresses['id']);
                 $orderAddresses['order_id'] = $order->id;
                 $orderAddresses['type'] = "billing";
+                $data = [];
+                if ($theAddress->country_id) {
+                    $data["country_id"] = $theAddress->country_id;
+                }
+                if ($theAddress->region_id) {
+                    $data["region_id"] = $theAddress->region_id;
+                }
+                $this->setTaxesCondition($user, $data, $hasState);
                 $order->orderAddresses()->where('type', "billing")->delete();
                 OrderAddress::insert($orderAddresses);
                 return array("status" => "success", "message" => "Billing Address added to order");
@@ -191,9 +213,12 @@ class EditOrder {
      * @return Response
      */
     public function setShippingCondition(User $user, $condition) {
+        $condition = $condition['condition_id'];
         $theCondition = Condition::find(intval($condition));
         if ($theCondition) {
-            Cart::removeConditionsByType("shipping");
+            if ($hasState) {
+                Cart::removeConditionsByType("shipping");
+            }
             $order = $this->getOrder($user);
             // add single condition on a cart bases
             $condition = new CartCondition(array(
@@ -208,7 +233,9 @@ class EditOrder {
             $insertCondition['order_id'] = $order->id;
             $order->conditions()->where('type', "shipping")->delete();
             Condition::insert($insertCondition);
-            Cart::condition($condition);
+            if ($hasState) {
+                Cart::condition($condition);
+            }
             return array("status" => "success", "message" => "Shipping condition set on the cart");
         }
         return array("status" => "error", "message" => "Address does not exist");
@@ -219,9 +246,12 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setTaxesCondition(User $user, array $data) {
+    public function setTaxesCondition(User $user, array $data, boolean $hasState) {
         $order = $this->getOrder($user);
-        Cart::removeConditionsByType("tax");
+        if ($hasState) {
+            Cart::removeConditionsByType("tax");
+        }
+
         if (array_key_exists("country_id", $data)) {
             if ($data['country_id']) {
                 $conditions = Condition::where('country_id', $data['country_id'])
@@ -240,7 +270,9 @@ class EditOrder {
                     $insertCondition['order_id'] = $order->id;
                     $order->conditions()->where('type', "tax")->delete();
                     Condition::insert($insertCondition);
-                    Cart::condition($condition);
+                    if ($hasState) {
+                        Cart::condition($condition);
+                    }
                 }
             }
         }
@@ -262,11 +294,41 @@ class EditOrder {
                     $insertCondition['order_id'] = $order->id;
                     $order->conditions()->where('type', "tax")->delete();
                     Condition::insert($insertCondition);
-                    Cart::condition($condition);
+                    if ($hasState) {
+                        Cart::condition($condition);
+                    }
                 }
             }
         }
         return array("status" => "success", "message" => "Tax conditions set on the cart");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function loadOrderConditions(Order $order) {
+        $conditions = $order->conditions()->get();
+        $applyConditions = array();
+        foreach ($conditions as $condition) {
+            $itemCondition = new CartCondition(array(
+                'name' => $condition->name,
+                'type' => $condition->type,
+                'target' => $condition->target,
+                'value' => $condition->value,
+            ));
+            array_push($applyConditions, $itemCondition);
+        }
+        $attrs = json_decode($item->attributes, true);
+        Cart::add(array(
+            'id' => $productVariant->id,
+            'name' => $product->name,
+            'price' => $productVariant->price,
+            'quantity' => $item->quantity,
+            'attributes' => $attrs,
+            'conditions' => $applyConditions
+        ));
     }
 
     public function approveOrder(Order $order) {
@@ -330,9 +392,11 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setCouponCondition(User $user, $coupon) {
+    public function setCouponCondition(User $user, $coupon, boolean $hasState) {
         $theCondition = Condition::where('coupon', $coupon)->where('status', 'active')->first();
-        Cart::removeConditionsByType("coupon");
+        if ($hasState) {
+            Cart::removeConditionsByType("coupon");
+        }
         if ($theCondition) {
             // add single condition on a cart bases
             if ($theCondition->isReusable || (!$theCondition->isReusable && !$theCondition->used)) {
@@ -349,7 +413,9 @@ class EditOrder {
                 $insertCondition['order_id'] = $order->id;
                 $order->conditions()->where('type', "coupon")->delete();
                 Condition::insert($insertCondition);
-                Cart::condition($condition);
+                if ($hasState) {
+                    Cart::condition($condition);
+                }
                 return array("status" => "success", "message" => "Shipping condition set on the cart");
             }
         }
@@ -431,7 +497,6 @@ class EditOrder {
         }
     }
 
-
     /**
      * Get a validator for an incoming edit profile request.
      *
@@ -444,4 +509,5 @@ class EditOrder {
                     'quantity' => 'required|max:255',
         ]);
     }
+
 }

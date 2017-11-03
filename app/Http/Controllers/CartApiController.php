@@ -51,7 +51,7 @@ class CartApiController extends Controller {
      */
     public function postAddCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->addCartItem($user, $request->all());
+        $status = $this->editCart->addCartItem($user, $request->all(),true);
         return response()->json($status);
     }
     
@@ -63,7 +63,7 @@ class CartApiController extends Controller {
      */
     public function postAddCartItemStateless(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->addCartItemStateless($user, $request->all());
+        $status = $this->editCart->addCartItem($user, $request->all(), false);
         return response()->json($status);
     }
 
@@ -76,7 +76,7 @@ class CartApiController extends Controller {
      */
     public function postUpdateCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->updateCartItem($user, $request->all());
+        $status = $this->editCart->updateCartItem($user, $request->all(),true);
         return response()->json($status);
     }
     
@@ -88,7 +88,7 @@ class CartApiController extends Controller {
      */
     public function postUpdateCartItemStateless(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->updateCartItemStateless($user, $request->all());
+        $status = $this->editCart->updateCartItem($user, $request->all(), false);
         return response()->json($status);
     }
 
