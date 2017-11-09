@@ -56,8 +56,8 @@ class EditFile {
                     if ($trigger->user_id == $user->id) {
                         if ($filetype == "photo") {
                             $trigger_id = $trigger->id;
-                            $path = Storage::putFile('public/'. strtolower($type), $file);
-                            $filename = $path;
+                            $path = Storage::putFile('public/'. strtolower($type), $file, 'public');
+                            $filename = Storage::url($path);
                             $saved = true;
                         }
                     } else {
@@ -74,8 +74,8 @@ class EditFile {
                     if ($trigger->merchant_id == $user->id) {
                         if ($filetype == "photo") {
                             $trigger_id = $trigger->id;
-                            $path = Storage::putFile('public/'. strtolower($type), $file);
-                            $filename = $path;
+                            $path = Storage::putFile('public/'. strtolower($type), $file, 'public');
+                            $filename = Storage::url($path);
                             $saved = true;
                         }
                     } else {
@@ -94,8 +94,8 @@ class EditFile {
                     /* $image = $request->file('photo'); */
                     //$filename = "user-" . time() . '.' . $image->getClientOriginalExtension();
 
-                    $path = Storage::putFile('public/avatars', $file);
-                    $filename = $path;
+                    $path = Storage::putFile('public/avatars', $file, 'public');
+                    $filename = Storage::url($path);
                     $user->avatar = $path;
                     $user->save();
                     $trigger_id = $user->id;
@@ -115,8 +115,8 @@ class EditFile {
                                 FileM::where("file", $trigger->avatar)->delete();
                                 Storage::delete($trigger->avatar);
                             }
-                            $path = Storage::putFile('public/groups', $file);
-                            $filename = $path;
+                            $path = Storage::putFile('public/groups', $file, 'public');
+                            $filename = Storage::url($path);
                             $trigger->avatar = $filename;
                             $trigger->save();
                             $trigger_id = $trigger->id;
