@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_DRIVER', 'database'),
+    'default' => env('QUEUE_DRIVER'),
 
     /*
     |--------------------------------------------------------------------------
@@ -50,11 +50,11 @@ return [
 
         'sqs' => [
             'driver' => 'sqs',
-            'key' => 'your-public-key',
-            'secret' => 'your-secret-key',
-            'prefix' => 'https://sqs.us-east-1.amazonaws.com/your-account-id',
-            'queue' => 'your-queue-name',
-            'region' => 'us-east-1',
+            'key' => env('AWS_SQS_KEY'),
+            'secret' => env('AWS_SQS_SECRET'),
+            'prefix' => 'https://sqs.us-east-2.amazonaws.com/569172663555',
+            'queue' => 'gohife-standard-queue',
+            'region' => 'us-east-2',
         ],
 
         'redis' => [
