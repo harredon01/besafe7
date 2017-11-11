@@ -96,7 +96,7 @@ class EditFile {
 
                     $path = Storage::putFile('public/avatars', $file, 'public');
                     $filename = Storage::url($path);
-                    $user->avatar = $path;
+                    $user->avatar = $filename;
                     $user->save();
                     $trigger_id = $user->id;
                     //$path = public_path($path . $filename);
