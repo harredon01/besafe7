@@ -76,7 +76,8 @@ class EditGroup {
                                 "group_id" => $group->id
                             ];
                             $this->setAdminGroup($data);
-                            $this->editAlerts->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
+//                            $this->editAlerts->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
+                            dispatch(new NotifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE));
                         } else {
                             $deleteGroup = true;
                         }

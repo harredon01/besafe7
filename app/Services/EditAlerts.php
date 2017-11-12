@@ -298,24 +298,31 @@ class EditAlerts {
         $notification = null;
         if ($userSending->id > 0) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
+            $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
+            $data['subject_es'] = str_replace("{user}", $userSending->name, $translationEsp->value);
             $pos = strpos("e" . $data['type'], 'Report');
             if ($pos) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'], $data['subject']);
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type']. " ".$arrayPayload['object_name'], $data['subject']);
+                $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type']. " ".$arrayPayload['object_name'], $data['subject_es']);
             }
-            $pos = strpos("e" . $data['type'], 'group');
+            $pos = strpos("e" . $data['type'], 'Merchant');
             if ($pos) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['group_name'], $data['subject']);
+                $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type']. " ".$arrayPayload['object_name'], $data['subject']);
+                $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type']. " ".$arrayPayload['object_name'], $data['subject_es']);
             }
             $pos = strpos($data['subject'], '{group}');
             if ($pos) {
                 $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
+                $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
             }
         } else {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
+            $translationesp = Translation::where('language', 'ec-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             $data['subject'] = $translation->value;
+            $data['subject_es'] = $translationesp->value;
         }
 
         $data['notification_id'] = time();
@@ -530,7 +537,7 @@ class EditAlerts {
     }
 
     public function notifyObjectFollowers(User $user, array $followers, $object, $type) {
-        $daobject = array("object_id" => $object->id, "object_type" => $object->type, "first_name" => $user->firstName, "last_name" => $user->lastName
+        $daobject = array("object_id" => $object->id, "object_type" => $object->type, "object_name" => $object->name, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
         $notification = [
             "trigger_id" => $user->id,
@@ -980,7 +987,8 @@ class EditAlerts {
 
         if (count($userPush) > 0) {
             $content = array(
-                "en" => 'English Message'
+                "en" => $msg['subject'],
+                "es" => $msg['subject_es']
             );
             if ($platform == "android") {
                 $fields = array(

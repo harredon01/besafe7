@@ -5,6 +5,7 @@ namespace App\Services;
 use Validator;
 use App\Models\User;
 use App\Models\Item;
+use App\Models\Order;
 use App\Models\ProductVariant;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -126,8 +127,6 @@ class EditCart {
         return $data;
     }
 
-    
-
     /**
      * Store a newly created resource in storage.
      *
@@ -174,6 +173,32 @@ class EditCart {
      */
     public function loadActiveCart(User $user) {
         $items = Item::where('user_id', $user->id)->whereNull('order_id')->get();
+        $this->loadItemsToCart($items);
+        return array("status" => "success", "message" => "Cart Loaded");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function loadOrderToCart(User $user, $order_id) {
+        $order = Order::find($order_id);
+        if ($order) {
+            if ($order->user_id == $user->id) {
+                $items = Item::where('order_id', $order->id)->get();
+            } else {
+                $merchant = $order->merchant;
+                if($merchant->user_id == $user->id){
+                    $items = Item::where('order_id', $order->id)->get();
+                }
+            }
+        }
+        $this->loadItemsToCart($items);
+        return array("status" => "success", "message" => "Cart Loaded");
+    }
+
+    public function loadItemsToCart(array $items) {
         foreach ($items as $item) {
             $productVariant = $item->productVariant;
             $product = $productVariant->product;

@@ -6,6 +6,7 @@ use Validator;
 use App\Models\FileM;
 use App\Models\Merchant;
 use App\Models\User;
+use App\Jobs\NotifyGroupObject;
 use App\Models\Group;
 use App\Models\Report;
 use Illuminate\Http\Response;
@@ -384,7 +385,7 @@ class EditMerchant {
             } else {
                 return null;
             }
-            $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
+            $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_name" => $object->name,"object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
             if ($type == "Report") {
                 $type = self::OBJECT_REPORT_GROUP;
             } else if ($type == "Merchant") {
@@ -452,7 +453,8 @@ class EditMerchant {
             $object = $this->createObject($user, $data, $type);
         }
         if ($group) {
-            $this->notifyGroup($group, $user, $data, $type, $object);
+            dispatch(new NotifyGroupObject($group, $user, $data, $type, $object));
+            //$this->notifyGroup($group, $user, $data, $type, $object);
         }
         return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
     }
