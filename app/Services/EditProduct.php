@@ -45,10 +45,10 @@ class EditProduct {
         $product = Product::find($product_id);
         if ($product) {
             $result = $this->checkAccess($user, $product->merchant_id, self::OBJECT_MERCHANT);
-            if ($result) {
-                if ($product->merchant_id == $user->id) {
+            if ($result['access']) {
+                if ($result['owner_id']== $user->id) {
                     $product->mine = true;
-                } 
+                }
                 $data['product'] = $product;
                 $data['variants'] = $product->productVariants;
                 $data['files'] = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
@@ -57,12 +57,33 @@ class EditProduct {
         return $data;
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getProductsMerchant(User $user, $merchant_id) {
+        $data = [];
+        $result = $this->checkAccess($user, $merchant_id, self::OBJECT_MERCHANT);
+        if ($result['access']) {
+            $data = Cache::remember('products_merchant_' . $merchant_id, 100, function ()use ($merchant_id) {
+                        return DB::table('products')
+                                        ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                                        ->where('products.merchant_id', $merchant_id)
+                                        ->select('products.*', 'product_variant.*')
+                                        ->get();
+                    });
+        }
+
+        return $data;
+    }
+
     public function getVariant(User $user, $variantId) {
         $data = [];
         $variant = ProductVariant::find($variantId);
         if ($variant) {
             $result = $this->checkAccess($user, $variant->merchant_id, self::OBJECT_MERCHANT);
-            if ($result) {
+            if ($result['access']) {
                 $data['variant'] = $variant;
             }
         }
@@ -76,30 +97,35 @@ class EditProduct {
      */
     public function checkAccess(User $user, $merchant_id, $type) {
         $merchant = Merchant::find($merchant_id);
+        $access = false;
         if ($merchant) {
             if ($merchant->is_public) {
-                return true;
+                $access = true;
             } else {
                 $group = $merchant->group;
                 if ($group) {
                     $data = [];
                     $data = $this->checkGroupStatus($user, $group, $data);
                     if ($data) {
-                        return true;
+                        $access = true;
                     }
                 }
                 if ($user) {
                     $members = DB::select('select user_id as id from userables where user_id  = ? and userable_type = ? and object_id = ? ', [$user->id, $type, $merchant->id]);
                     if (sizeof($members) > 0) {
-                        return true;
+                        $access = true;
                     }
                     if ($user->id == $merchant->user_id) {
-                        return true;
+                        $access = true;
                     }
                 }
             }
         }
-        return false;
+        $data = [
+            "access" => $access,
+            "owner_id" => $merchant->user_id
+        ];
+        return $data;
     }
 
     /**

@@ -36,11 +36,11 @@ class ProductApiController extends Controller {
         $user = $request->user();
         $data = $request->only("merchant_id");
         $request2 = null;
-        $result = null;
+        $result['access'] = null;
         if ($data['merchant_id']) {
             $result = $this->editProduct->checkAccess($user,$data['merchant_id'], self::OBJECT_MERCHANT);
         }
-        if ($result) {
+        if ($result['access']) {
             $data2 = $request->only("order_by");
             if ($data2['order_by']) {
                 $request2 = Request::create("?merchant_id=" . $data['merchant_id'] . "&order_by=" . $data2['order_by'], 'GET');
@@ -102,6 +102,17 @@ class ProductApiController extends Controller {
     public function show($id,Request $request) {
         $user = $request->user();
         return response()->json($this->editProduct->getProduct($user,$id));
+    }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProductsMerchant($id,Request $request) {
+        $user = $request->user();
+        return response()->json($this->editProduct->getProductsMerchant($user,$id));
     }
 
     /**

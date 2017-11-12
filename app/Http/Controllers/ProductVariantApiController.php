@@ -38,11 +38,11 @@ class ProductVariantApiController extends Controller {
         $user = $request->user();
         $data = $request->only("merchant_id");
         $request2 = null;
-        $result = null;
+        $result['access'] = null;
         if ($data['merchant_id']) {
             $result = $this->editProduct->checkAccess($user, $data['merchant_id'], self::OBJECT_MERCHANT);
         }
-        if ($result) {
+        if ($result['access']) {
             $data2 = $request->only("order_by");
             if ($data2['order_by']) {
                 $request2 = Request::create("?merchant_id=" . $data['merchant_id'] . "&order_by=" . $data2['order_by'], 'GET');

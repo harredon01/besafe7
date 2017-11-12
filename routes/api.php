@@ -106,6 +106,7 @@ Route::resource('products', 'ProductApiController');
 Route::post('products/variant', 'ProductVariantApiController@store');
 Route::post('products/variant/{variant?}', 'ProductVariantApiController@update');
 Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
+Route::get('products/merchant/{merchant?}', 'ProductApiController@getProductsMerchant');
 Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
 
 Route::post('cart/add', 'CartApiController@postAddCartItem');

@@ -459,12 +459,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/darryldecode/laravelshoppingcart.git",
-                "reference": "43f672e4890f0402cf67293b5c96d43c4ea5736a"
+                "reference": "e28f6829c49d85943049cf3ba4ce11801553cd07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/darryldecode/laravelshoppingcart/zipball/43f672e4890f0402cf67293b5c96d43c4ea5736a",
-                "reference": "43f672e4890f0402cf67293b5c96d43c4ea5736a",
+                "url": "https://api.github.com/repos/darryldecode/laravelshoppingcart/zipball/e28f6829c49d85943049cf3ba4ce11801553cd07",
+                "reference": "e28f6829c49d85943049cf3ba4ce11801553cd07",
                 "shasum": ""
             },
             "require": {
@@ -510,7 +510,7 @@
                 "laravel",
                 "shopping cart"
             ],
-            "time": "2017-10-28T03:10:05+00:00"
+            "time": "2017-11-12T02:17:37+00:00"
         },
         {
             "name": "davibennun/laravel-push-notification",
