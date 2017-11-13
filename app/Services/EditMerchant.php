@@ -11,6 +11,7 @@ use App\Models\Group;
 use App\Models\Report;
 use Illuminate\Http\Response;
 use DB;
+use Cache;
 
 class EditMerchant {
 
@@ -56,8 +57,6 @@ class EditMerchant {
         return $target;
     }
 
-    
-
     /**
      * Store a newly created resource in storage.
      *
@@ -98,43 +97,54 @@ class EditMerchant {
      * @return Response
      */
     public function getObjectUser(User $user, $objectId, $type) {
-        $target = "App\\Models\\" . $type;
-        $object = $target::find($objectId);
+
+        $data = Cache::remember($type . '_' . $objectId, 100, function ()use ($type, $objectId) {
+                    $target = "App\\Models\\" . $type;
+                    $object = $target::find($objectId);
+                    $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+                    if ($type == self::OBJECT_REPORT) {
+                        if ($object->private == true && $type == "Report") {
+                            $object->email == "";
+                            $object->telephone == "";
+                        }
+                        $data = [
+                            "report" => $object,
+                            "files" => $files,
+                        ];
+                    } else if ($type == self::OBJECT_MERCHANT) {
+                        $data = [
+                            "merchant" => $object,
+                            "files" => $files,
+                        ];
+                    }
+                    return $data;
+                });
+        $object = null;        
+        if ($type == self::OBJECT_REPORT) {
+            $object = $data['report'];
+        } else if ($type == self::OBJECT_MERCHANT) {
+            $object = $data['merchant'];
+        }
+
         if ($object) {
             $send = false;
             if ($object->user_id == $user->id) {
                 $object->mine = true;
                 $send = true;
-            } else if ($object->private) {
-                $group = DB::table('userables')
-                                ->where('user_id', $user->id)
-                                ->where('userable_type', $type)
-                                ->where("object_id", $object->id)->first();
-                if ($group) {
+            } else {
+                if ($object->private) {
+                    $test = DB::table('userables')
+                                    ->where('user_id', $user->id)
+                                    ->where('userable_type', $type)
+                                    ->where("object_id", $object->id)->first();
+                    if ($test) {
+                        $send = true;
+                    }
+                } else {
                     $send = true;
                 }
-            } else if (!$object->private) {
-                $send = true;
             }
             if ($send == true) {
-                $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
-                if ($type == self::OBJECT_REPORT) {
-                    if ($object->private == true && $type == "Report") {
-                        $object->email == "";
-                        $object->telephone == "";
-                    }
-                    $data = [
-                        "report" => $object,
-                        "files" => $files,
-                    ];
-                } else if ($type == self::OBJECT_MERCHANT) {
-                    $data = [
-                        "merchant" => $object,
-                        "files" => $files,
-                        "products" => $object->products()->with("productVariants")->get()
-                    ];
-                }
-
 
                 return $data;
             }
@@ -385,7 +395,7 @@ class EditMerchant {
             } else {
                 return null;
             }
-            $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_name" => $object->name,"object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
+            $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_name" => $object->name, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
             if ($type == "Report") {
                 $type = self::OBJECT_REPORT_GROUP;
             } else if ($type == "Merchant") {
@@ -429,7 +439,7 @@ class EditMerchant {
                 $data['private'] = true;
             }
         } else {
-            $data['status']='active';
+            $data['status'] = 'active';
         }
         if ($data['id']) {
             foreach ($data as $key => $value) {

@@ -189,7 +189,7 @@ class EditCart {
                 $items = Item::where('order_id', $order->id)->get();
             } else {
                 $merchant = $order->merchant;
-                if($merchant->user_id == $user->id){
+                if ($merchant->user_id == $user->id) {
                     $items = Item::where('order_id', $order->id)->get();
                 }
             }
@@ -198,7 +198,7 @@ class EditCart {
         return array("status" => "success", "message" => "Cart Loaded");
     }
 
-    public function loadItemsToCart(array $items) {
+    public function loadItemsToCart( $items) {
         foreach ($items as $item) {
             $productVariant = $item->productVariant;
             $product = $productVariant->product;
@@ -305,9 +305,6 @@ class EditCart {
                         if (!$losAttributes) {
                             $losAttributes = array();
                         }
-                        if (array_key_exists("etras", $data)) {
-                            $losAttributes['extras'] = $data['extras'];
-                        }
                         $losAttributes['is_digital'] = $productVariant->is_digital;
                         $losAttributes['is_shippable'] = $productVariant->is_shippable;
                         $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
@@ -336,7 +333,7 @@ class EditCart {
                                 'conditions' => $applyConditions
                             ));
                         }
-                        return array("status" => "success", "message" => "item added to cart successfully", "cart" => Cart::getContent());
+                        return array("status" => "success", "message" => "item added to cart successfully", "cart" => Cart::getContent(),"item" =>$item);
                     } else {
                         return array("status" => "error", "message" => "SOLD_OUT");
                     }

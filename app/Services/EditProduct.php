@@ -10,7 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Services\EditFile;
-use Mail;
+use Cache;
 use DB;
 
 class EditProduct {
@@ -46,7 +46,7 @@ class EditProduct {
         if ($product) {
             $result = $this->checkAccess($user, $product->merchant_id, self::OBJECT_MERCHANT);
             if ($result['access']) {
-                if ($result['owner_id']== $user->id) {
+                if ($result['owner_id'] == $user->id) {
                     $product->mine = true;
                 }
                 $data['product'] = $product;
@@ -67,11 +67,18 @@ class EditProduct {
         $result = $this->checkAccess($user, $merchant_id, self::OBJECT_MERCHANT);
         if ($result['access']) {
             $data = Cache::remember('products_merchant_' . $merchant_id, 100, function ()use ($merchant_id) {
-                        return DB::table('products')
+                        $data['products_variants'] = DB::table('products')
                                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                                         ->where('products.merchant_id', $merchant_id)
                                         ->select('products.*', 'product_variant.*')
                                         ->get();
+                        $data['products_files'] = DB::table('products')
+                                        ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
+                                        ->where('files.type', "Product")
+                                        ->where('products.merchant_id', $merchant_id)
+                                        ->select('products.*', 'files.*')
+                                        ->get();
+                        return $data;
                     });
         }
 
