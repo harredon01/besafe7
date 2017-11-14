@@ -476,9 +476,11 @@ class EditMerchant {
      */
     public function updateObject(User $user, array $data, $object) {
         $object = "App\\Models\\" . $object;
+        Cache::forget($object . '_' . $data['id']);
         $object::where('user_id', $user->id)
                 ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
         $result = $object::find($data['id']);
+        
         if ($result) {
             return $result;
         } else {

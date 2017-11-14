@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Services\EditFile;
+use App\Services\EditMerchant;
 use Cache;
 use DB;
 
@@ -24,6 +25,12 @@ class EditProduct {
      * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $editFile;
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $editMerchant;
 
     /**
      * Create a new class instance.
@@ -31,8 +38,9 @@ class EditProduct {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditFile $editFile) {
+    public function __construct(EditFile $editFile,EditMerchant $editMerchant) {
         $this->editFile = $editFile;
+        $this->editMerchant = $editMerchant;
     }
 
     /**
@@ -68,16 +76,16 @@ class EditProduct {
         if ($result['access']) {
             $data = Cache::remember('products_merchant_' . $merchant_id, 100, function ()use ($merchant_id) {
                         $data['products_variants'] = DB::table('products')
-                                        ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                                        ->where('products.merchant_id', $merchant_id)
-                                        ->select('products.*', 'product_variant.*')
-                                        ->get();
+                                ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                                ->where('products.merchant_id', $merchant_id)
+                                ->select('products.*', 'product_variant.*')
+                                ->get();
                         $data['products_files'] = DB::table('products')
-                                        ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
-                                        ->where('files.type', "Product")
-                                        ->where('products.merchant_id', $merchant_id)
-                                        ->select('products.*', 'files.*')
-                                        ->get();
+                                ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
+                                ->where('files.type', "Product")
+                                ->where('products.merchant_id', $merchant_id)
+                                ->select('products.*', 'files.*')
+                                ->get();
                         return $data;
                     });
         }
@@ -112,7 +120,7 @@ class EditProduct {
                 $group = $merchant->group;
                 if ($group) {
                     $data = [];
-                    $data = $this->checkGroupStatus($user, $group, $data);
+                    $data = $this->editMerchant->checkGroupStatus($user, $group, $data);
                     if ($data) {
                         $access = true;
                     }
@@ -153,8 +161,10 @@ class EditProduct {
                 }
                 foreach ($variants as $variant) {
                     Item::where('product_variant_id', $variant->id)->delete();
+                    $variant->delete();
                 }
-                $variants->delete();
+                
+                Cache::forget('products_merchant_' . $merchant->id);
             }
         }
     }
@@ -174,6 +184,7 @@ class EditProduct {
                     $variant->conditions()->delete();
                     $variant->items()->delete();
                 }
+                Cache::forget('products_merchant_' . $merchant->id);
             }
         }
     }
@@ -183,23 +194,29 @@ class EditProduct {
             $merchant = Merchant::find($data['merchant_id']);
             if ($merchant) {
                 if ($merchant->user_id == $user->id) {
-                    $data = (object) array_filter((array) $data, function ($val) {
-                                return !is_null($val);
-                            });
-                    $data = (array) $data;
                     if ($data["id"]) {
                         $productid = $data['id'];
                         $merchantid = $data['merchant_id'];
                         unset($data['id']);
                         unset($data['merchant_id']);
+                        $data = (object) array_filter((array) $data, function ($val) {
+                                    return !is_null($val);
+                                });
+                        $data = (array) $data;
                         Product::where('id', $productid)->where('merchant_id', $merchantid)->update($data);
                         $product = Product::find($productid);
                         if ($product) {
                             return array("status" => "success", "message" => "product updated", "product" => $product);
+                            Cache::forget('products_merchant_' . $merchantid);
                         }
                     } else {
                         $data['isActive'] = false;
+                        $data = (object) array_filter((array) $data, function ($val) {
+                                    return !is_null($val);
+                                });
+                        $data = (array) $data;
                         $product = Product::create($data);
+                        Cache::forget('products_merchant_' . $merchant->id);
                         return array("status" => "success", "message" => "product created", "product" => $product);
                     }
                 }
@@ -217,10 +234,7 @@ class EditProduct {
                 if ($merchant->user_id == $user->id) {
                     $results = $merchant->products()->where('id', $data['product_id'])->get();
                     if (count($results) > 0) {
-                        $data = (object) array_filter((array) $data, function ($val) {
-                                    return !is_null($val);
-                                });
-                        $data = (array) $data;
+
                         if ($data["id"]) {
                             $variantid = $data['id'];
                             $productid = $data['product_id'];
@@ -228,17 +242,26 @@ class EditProduct {
                             unset($data['id']);
                             unset($data['merchant_id']);
                             unset($data['product_id']);
-
+                            $data = (object) array_filter((array) $data, function ($val) {
+                                        return !is_null($val);
+                                    });
+                            $data = (array) $data;
                             ProductVariant::where('id', $variantid)
                                     ->where('product_id', $productid)
                                     ->where('merchant_id', $merchantid)
                                     ->update($data);
                             $variant = ProductVariant::find($variantid);
                             if ($variant) {
+                                Cache::forget('products_merchant_' . $merchantid);
                                 return array("status" => "success", "message" => "variant updated", "variant" => $variant);
                             }
                         } else {
+                            $data = (object) array_filter((array) $data, function ($val) {
+                                        return !is_null($val);
+                                    });
+                            $data = (array) $data;
                             $variant = ProductVariant::create($data);
+                            Cache::forget('products_merchant_' . $merchant->id);
                             return array("status" => "success", "message" => "variant created", "variant" => $variant);
                         }
                     }
