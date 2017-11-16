@@ -206,8 +206,8 @@ class EditProduct {
                         Product::where('id', $productid)->where('merchant_id', $merchantid)->update($data);
                         $product = Product::find($productid);
                         if ($product) {
-                            return array("status" => "success", "message" => "product updated", "product" => $product);
                             Cache::forget('products_merchant_' . $merchantid);
+                            return array("status" => "success", "message" => "product updated", "product" => $product);
                         }
                     } else {
                         $data['isActive'] = false;

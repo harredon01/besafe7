@@ -13,7 +13,7 @@ use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use DB;
-use Image;
+use Cache;
 use Illuminate\Support\Facades\Storage;
 use File;
 
@@ -49,14 +49,15 @@ class EditFile {
             $filetypeff = $request->only("filetype");
             $filetype = $filetypeff['filetype'];
             if ($type == "Report" || $type == "Merchant") {
-                $object = "App\\Models\\".$type;
+                $object = "App\\Models\\" . $type;
                 $trigger = $object::find($intended_id);
                 $path = 'images/reports/';
                 if ($trigger) {
                     if ($trigger->user_id == $user->id) {
                         if ($filetype == "photo") {
                             $trigger_id = $trigger->id;
-                            $path = Storage::putFile('public/'. strtolower($type), $file, 'public');
+                            Cache::forget($type . '_' . $trigger->id);
+                            $path = Storage::putFile('public/' . strtolower($type), $file, 'public');
                             $filename = Storage::url($path);
                             $saved = true;
                         }
@@ -67,19 +68,25 @@ class EditFile {
                     return array("status" => "error", "message" => "File invalid");
                 }
             } else if ($type == "Product") {
-                $object = "App\\Models\\".$type;
+                $object = "App\\Models\\" . $type;
                 $trigger = $object::find($intended_id);
                 $path = 'images/reports/';
                 if ($trigger) {
-                    if ($trigger->merchant_id == $user->id) {
-                        if ($filetype == "photo") {
-                            $trigger_id = $trigger->id;
-                            $path = Storage::putFile('public/'. strtolower($type), $file, 'public');
-                            $filename = Storage::url($path);
-                            $saved = true;
+                    $merchant = $trigger->merchant;
+                    if ($merchant) {
+                        if ($merchant->user_id == $user->id) {
+                            if ($filetype == "photo") {
+                                $trigger_id = $trigger->id;
+                                $path = Storage::putFile('public/' . strtolower($type), $file, 'public');
+                                $filename = Storage::url($path);
+                                Cache::forget('products_merchant_' . $merchant->id);
+                                $saved = true;
+                            }
+                        } else {
+                            return array("status" => "error", "message" => "File does not belong to user");
                         }
                     } else {
-                        return array("status" => "error", "message" => "File does not belong to user");
+                        return array("status" => "error", "message" => "No merchant with product");
                     }
                 } else {
                     return array("status" => "error", "message" => "File invalid");
