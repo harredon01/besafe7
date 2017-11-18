@@ -8,7 +8,7 @@ use App\Jobs\NotifyGroup;
 use App\Jobs\NotifyContacts;
 use App\Models\User;
 use App\Models\Group;
-use App\Models\Report;
+use App\Models\Product;
 use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -168,6 +168,13 @@ class EditFile {
 
         if ($file) {
             if ($file->user_id == $user->id) {
+                if($file->type=="Merchant" || $file->type=="Report"){
+                    Cache::forget($file->type . '_' . $file->trigger_id);
+                }
+                if($file->type=="Product" ){
+                    $product = Product::find($file->trigger_id);
+                    Cache::forget('products_merchant_' . $product->merchant_id);
+                }
                 Storage::delete($file->file);
                 $file->delete();
                 $data = [
