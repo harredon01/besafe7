@@ -142,14 +142,14 @@ class EditCart {
      *
      * @return Response
      */
-    public function checkCartMerchant(User $user, ProductVariant $variant) {
-        $item = Item::where('user_id', $user->id)->where('order_id', null)->first();
+    public function checkCartMerchant(User $user, $merchant_id, $order_id) {
+        $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->whereNotNull('product_variant_id')->first();
         if (!$item) {
             return true;
         } else {
             $tester = $item->productVariant;
             if ($tester) {
-                if ($tester->merchant_id == $variant->merchant_id) {
+                if ($tester->merchant_id == $merchant_id) {
                     return true;
                 }
             }
@@ -185,20 +185,40 @@ class EditCart {
     public function loadOrderToCart(User $user, $order_id) {
         $order = Order::find($order_id);
         if ($order) {
-            if ($order->user_id == $user->id) {
-                $items = Item::where('order_id', $order->id)->get();
-            } else {
-                $merchant = $order->merchant;
-                if ($merchant->user_id == $user->id) {
+            if ($order->is_editable) {
+                if ($order->user_id == $user->id || $order->supplier_id == $user->id) {
                     $items = Item::where('order_id', $order->id)->get();
+                    $this->loadItemsToCart($items);
+                    $data = $this->getCart();
+                    return array("status" => "success", "message" => "Cart Loaded", 'cart' => $data);
+                }
+                return array("status" => "error", "message" => "Access to order denied");
+            }
+            return array("status" => "error", "message" => "Order not editable");
+        }
+        return array("status" => "error", "message" => "Order not found");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function checkAddToOrder(User $user, array $data) {
+        if (array_key_exists('order_id', $data)) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                if ($order->is_editable) {
+                    if ($order->user_id == $user->id || $order->supplier_id == $user->id) {
+                        return $order->id;
+                    }
                 }
             }
         }
-        $this->loadItemsToCart($items);
-        return array("status" => "success", "message" => "Cart Loaded");
+        return null;
     }
 
-    public function loadItemsToCart( $items) {
+    public function loadItemsToCart($items) {
         foreach ($items as $item) {
             $productVariant = $item->productVariant;
             $product = $productVariant->product;
@@ -242,16 +262,21 @@ class EditCart {
      * @param  User, array  $data
      * 
      */
-    public function addCartItem(User $user, array $data, boolean $hasState) {
-
-        if ((int) $data['quantity'] <= 0) {
-            return array("status" => "error", "message" => "amount must be a positive integer");
+    public function addCartItem(User $user, array $data, $hasState) {
+        if (array_key_exists('quantity', $data)) {
+            if ((int) $data['quantity'] <= 0) {
+                return array("status" => "error", "message" => "amount must be a positive integer");
+            }
+        } else {
+            $data['quantity'] = 1;
         }
+        $order_id = $this->checkAddToOrder($user, $data);
+
         $item = null;
         if (array_key_exists('item_id', $data)) {
             $item = Item::where('id', intval($data['item_id']))
                             ->where('user_id', $user->id)
-                            ->where('order_id', null)->first();
+                            ->where('order_id', $order_id)->first();
         }
 
         if ($item) {
@@ -260,20 +285,20 @@ class EditCart {
             if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
                 if ($hasState) {
                     Cart::update($item->id, array(
-                        'quantity' => (int) $data['quantity'], // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
+                        'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
                     ));
                 }
 
                 $item->quantity = $quantity;
                 $item->save();
-                return array("status" => "success", "message" => "item added to cart successfully");
+                return array("status" => "success", "message" => "item added to cart successfully", "item" => $item);
             } else {
                 return array("status" => "error", "message" => "No more stock of that product");
             }
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                $resultCheck = $this->checkCartMerchant($user, $productVariant);
+                $resultCheck = $this->checkCartMerchant($user, $productVariant->merchant_id, $order_id);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
                         if ($hasState) {
@@ -309,7 +334,7 @@ class EditCart {
                         $losAttributes['is_shippable'] = $productVariant->is_shippable;
                         $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
                         if (array_key_exists("extras", $data)) {
-                            foreach ($data as $x => $x_value) {
+                            foreach ($data["extras"] as $x => $x_value) {
                                 $losAttributes[$x] = $x_value;
                             }
                         }
@@ -321,7 +346,8 @@ class EditCart {
                                     'price' => $productVariant->price,
                                     'quantity' => (int) $data['quantity'],
                                     'attributes' => json_encode($losAttributes),
-                                    'status' => 'active'
+                                    'status' => 'active',
+                                    'order_id' => $order_id,
                         ]);
                         if ($hasState) {
                             Cart::add(array(
@@ -332,8 +358,9 @@ class EditCart {
                                 'attributes' => $losAttributes,
                                 'conditions' => $applyConditions
                             ));
+                            return array("status" => "success", "message" => "item added to cart successfully", "cart" => Cart::getContent(), "item" => $item);
                         }
-                        return array("status" => "success", "message" => "item added to cart successfully", "cart" => Cart::getContent(),"item" =>$item);
+                        return array("status" => "success", "message" => "item added to cart successfully", "item" => $item);
                     } else {
                         return array("status" => "error", "message" => "SOLD_OUT");
                     }
@@ -345,21 +372,74 @@ class EditCart {
         }
     }
 
+    public function addCustomCartItem(User $user, array $data, $hasState) {
+        if (array_key_exists('merchant_id', $data)) {
+            if ($data['merchant_id']) {
+                if (array_key_exists('quantity', $data)) {
+                    if ((int) $data['quantity'] <= 0) {
+                        return array("status" => "error", "message" => "amount must be a positive integer");
+                    }
+                } else {
+                    $data['quantity'] = 1;
+                }
+                $order_id = $this->checkAddToOrder($user, $data);
+                $resultCheck = $this->checkCartMerchant($user, $data['merchant_id'], $order_id);
+                if ($resultCheck) {
+
+                    $losAttributes = array();
+                    $losAttributes['is_digital'] = 1;
+                    $losAttributes['is_shippable'] = 0;
+                    $losAttributes['requires_authorization'] = 1;
+                    if (array_key_exists("extras", $data)) {
+                        foreach ($data["extras"] as $x => $x_value) {
+                            $losAttributes[$x] = $x_value;
+                        }
+                    }
+                    $item = Item::create([
+                                'name' => $losAttributes['name'],
+                                'user_id' => $user->id,
+                                'price' => $losAttributes['price'],
+                                'quantity' => (int) $data['quantity'],
+                                'attributes' => json_encode($losAttributes),
+                                'status' => 'active',
+                                'order_id' => $order_id
+                    ]);
+                    if ($hasState) {
+                        Cart::add(array(
+                            'id' => $item->id,
+                            'name' => $losAttributes['name'],
+                            'price' => $losAttributes['price'],
+                            'quantity' => (int) $data['quantity'],
+                            'attributes' => $losAttributes
+                        ));
+                        return array("status" => "success", "message" => "item added to cart successfully", "cart" => Cart::getContent(), "item" => $item);
+                    }
+                    return array("status" => "success", "message" => "item added to cart successfully", "item" => $item);
+                } else {
+                    return array("status" => "error", "message" => "CLEAR_CART");
+                }
+            }
+            return array("status" => "error", "message" => "NO_MERCHANT");
+        }
+        return array("status" => "error", "message" => "NO_MERCHANT");
+    }
+
     /**
      * Create a new user instance after a valid registration.
      *
      * @param  User, array  $data
      * 
      */
-    public function updateCartItem(User $user, array $data, boolean $hasState) {
+    public function updateCartItem(User $user, array $data, $hasState) {
+        $order_id = $this->checkAddToOrder($user, $data);
         $item = Item::where('id', intval($data['item_id']))
                         ->where('user_id', $user->id)
-                        ->where('order_id', null)->first();
+                        ->where('order_id', $order_id)->first();
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
-                    $item->quantity = (int) $data['quantity'];
+                    $item->quantity = (int) $data['quantity'] + $item->quantity;
                     $item->save();
                     if ($hasState) {
                         Cart::update($item->id, array(
@@ -369,7 +449,7 @@ class EditCart {
                             ),
                         ));
                     }
-                    return array("status" => "success", "message" => "item updated successfully");
+                    return array("status" => "success", "message" => "item updated successfully", "item" => $item);
                 } else {
                     return array("status" => "error", "message" => "No more stock of that product");
                 }

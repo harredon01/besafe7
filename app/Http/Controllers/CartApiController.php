@@ -12,7 +12,6 @@ use Illuminate\Http\RedirectResponse;
 
 class CartApiController extends Controller {
 
-
     /**
      * The edit order implementation.
      *
@@ -51,10 +50,34 @@ class CartApiController extends Controller {
      */
     public function postAddCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->addCartItem($user, $request->all(),true);
+        $status = $this->editCart->addCartItem($user, $request->all(), true);
         return response()->json($status);
     }
-    
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postAddCustomCartItem(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->addCustomCartItem($user, $request->all(), true);
+        return response()->json($status);
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postAddCustomCartItemStateless(Request $request) {
+
+        $user = $request->user();
+        $status = $this->editCart->addCustomCartItem($user, $request->all(), false);
+        return response()->json($status);
+    }
+
     /**
      * Handle a login request to the application.
      *
@@ -67,7 +90,6 @@ class CartApiController extends Controller {
         return response()->json($status);
     }
 
-
     /**
      * Handle a login request to the application.
      *
@@ -76,10 +98,10 @@ class CartApiController extends Controller {
      */
     public function postUpdateCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->updateCartItem($user, $request->all(),true);
+        $status = $this->editCart->updateCartItem($user, $request->all(), true);
         return response()->json($status);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -115,6 +137,7 @@ class CartApiController extends Controller {
         $items = $this->editCart->loadActiveCart($user);
         return response()->json($items);
     }
+
     /**
      * Handle a login request to the application.
      *
@@ -123,7 +146,7 @@ class CartApiController extends Controller {
      */
     public function loadCartOrder($id, Request $request) {
         $user = $request->user();
-        $items = $this->editCart->loadCartOrder($user,$id);
+        $items = $this->editCart->loadCartOrder($user, $id);
         return response()->json($items);
     }
 
@@ -137,7 +160,7 @@ class CartApiController extends Controller {
         $items = $this->editCart->getCart();
         return response()->json($items);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -149,7 +172,7 @@ class CartApiController extends Controller {
         $items = $this->editCart->getCartStateless($user);
         return response()->json($items);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -161,7 +184,6 @@ class CartApiController extends Controller {
         $items = $this->editCart->getCheckoutCartStateless($user);
         return response()->json($items);
     }
-
 
     /**
      * Handle a login request to the application.
@@ -182,7 +204,7 @@ class CartApiController extends Controller {
     public function getCheckout() {
         $user = $this->auth->user();
         return view('products.checkout')
-               ->with('user', $user);
+                        ->with('user', $user);
     }
 
 }

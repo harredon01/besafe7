@@ -18,7 +18,7 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status', 'owner_status', 'merchant_status', 'payment_status', 'execution_status', 'subtotal', 'shipping', 'discount', 'tax', 'total', 'comments', 'total', 'user_id', 'supplier_id', 'is_digital', 'is_shippable', 'requires_authorization', 'referenceCode', 'extras'];
+    protected $fillable = ['status', 'owner_status', 'merchant_status', 'payment_status', 'execution_status', 'subtotal', 'shipping', 'discount', 'tax', 'total', 'comments', 'total', 'user_id', 'supplier_id','is_editable', 'is_digital', 'is_shippable', 'requires_authorization', 'referenceCode', 'extras'];
     protected $hidden = ['user_id', 'supplier_id'];
 
     public function user() {
