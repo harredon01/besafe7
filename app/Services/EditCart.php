@@ -221,37 +221,49 @@ class EditCart {
     public function loadItemsToCart($items) {
         foreach ($items as $item) {
             $productVariant = $item->productVariant;
-            $product = $productVariant->product;
-            $conditions = $productVariant->conditions()->where('isActive', true)->get();
-            $applyConditions = array();
-            foreach ($conditions as $condition) {
-                $itemCondition = new CartCondition(array(
-                    'name' => $condition->name,
-                    'type' => $condition->type,
-                    'target' => $condition->target,
-                    'value' => $condition->value,
+            if ($productVariant) {
+                $product = $productVariant->product;
+                $conditions = $productVariant->conditions()->where('isActive', true)->get();
+                $applyConditions = array();
+                foreach ($conditions as $condition) {
+                    $itemCondition = new CartCondition(array(
+                        'name' => $condition->name,
+                        'type' => $condition->type,
+                        'target' => $condition->target,
+                        'value' => $condition->value,
+                    ));
+                    array_push($applyConditions, $itemCondition);
+                }
+                $conditions = $product->conditions()->where('isActive', true)->get();
+                foreach ($conditions as $condition) {
+                    $itemCondition = new CartCondition(array(
+                        'name' => $condition->name,
+                        'type' => $condition->type,
+                        'target' => $condition->target,
+                        'value' => $condition->value,
+                    ));
+                    array_push($applyConditions, $itemCondition);
+                }
+                $attrs = json_decode($item->attributes, true);
+                Cart::add(array(
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'attributes' => $attrs,
+                    'conditions' => $applyConditions
                 ));
-                array_push($applyConditions, $itemCondition);
-            }
-            $conditions = $product->conditions()->where('isActive', true)->get();
-            foreach ($conditions as $condition) {
-                $itemCondition = new CartCondition(array(
-                    'name' => $condition->name,
-                    'type' => $condition->type,
-                    'target' => $condition->target,
-                    'value' => $condition->value,
+            } else {
+                $attrs = json_decode($item->attributes, true);
+                Cart::add(array(
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'quantity' => $item->quantity,
+                    'attributes' => $attrs,
+                    'conditions' => $applyConditions
                 ));
-                array_push($applyConditions, $itemCondition);
             }
-            $attrs = json_decode($item->attributes, true);
-            Cart::add(array(
-                'id' => $productVariant->id,
-                'name' => $product->name,
-                'price' => $productVariant->price,
-                'quantity' => $item->quantity,
-                'attributes' => $attrs,
-                'conditions' => $applyConditions
-            ));
         }
         return array("status" => "success", "message" => "Cart Loaded");
     }
