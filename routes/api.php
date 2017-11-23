@@ -110,11 +110,14 @@ Route::get('products/merchant/{merchant?}', 'ProductApiController@getProductsMer
 Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
 
 Route::post('cart/add', 'CartApiController@postAddCartItem');
-Route::post('cart/update', 'CartApiController@postUpdateCartItem');
+Route::post('cart/add/stateless', 'CartApiController@postAddCartItem');
 Route::post('cart/add/custom', 'CartApiController@postAddCustomCartItem');
 Route::post('cart/add/stateless/custom', 'CartApiController@postAddCustomCartItem');
-Route::post('cart/add/stateless', 'CartApiController@postAddCartItem');
+Route::post('cart/update', 'CartApiController@postUpdateCartItem');
 Route::post('cart/update/stateless', 'CartApiController@postUpdateCartItem');
+Route::post('cart/update_custom', 'CartApiController@postUpdateCustomCartItem');
+Route::post('cart/update_custom/stateless', 'CartApiController@postUpdateCustomCartItem');
+Route::post('cart/mass_update', 'CartApiController@postUpdateCartItems');
 Route::get('cart/get', 'CartApiController@getCart');
 Route::get('cart/get/stateless', 'CartApiController@getCartStateless');
 Route::post('cart/clear', 'CartApiController@postClearCart');

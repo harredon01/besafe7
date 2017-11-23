@@ -188,6 +188,7 @@ class EditCart {
             if ($order->is_editable) {
                 if ($order->user_id == $user->id || $order->supplier_id == $user->id) {
                     $items = Item::where('order_id', $order->id)->get();
+                    $this->clearCartSession();
                     $this->loadItemsToCart($items);
                     $data = $this->getCart();
                     return array("status" => "success", "message" => "Cart Loaded", 'cart' => $data);
@@ -344,6 +345,7 @@ class EditCart {
                         }
                         $losAttributes['is_digital'] = $productVariant->is_digital;
                         $losAttributes['is_shippable'] = $productVariant->is_shippable;
+                        $losAttributes['product_variant_id'] = $productVariant->id;
                         $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
                         if (array_key_exists("extras", $data)) {
                             foreach ($data["extras"] as $x => $x_value) {
@@ -477,6 +479,71 @@ class EditCart {
         } else {
             return array("status" => "error", "message" => "item does not exist on the cart");
         }
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function updateCustomCartItem(User $user, array $data, $hasState) {
+        $order_id = $this->checkAddToOrder($user, $data);
+        $item = Item::where('id', intval($data['item_id']))
+                        ->where('user_id', $user->id)
+                        ->where('order_id', $order_id)->first();
+        if ($item) {
+            if($item->productVariant){
+                return array("status" => "error", "message" => "This is not a custom item");
+            }
+            $result = [];
+            $result['id'] = $item->id;
+            $losAttributes = array();
+            $losAttributes['is_digital'] = 1;
+            $losAttributes['is_shippable'] = 0;
+            $losAttributes['requires_authorization'] = 1;
+            if (array_key_exists("extras", $data)) {
+                foreach ($data["extras"] as $x => $x_value) {
+                    $losAttributes[$x] = $x_value;
+                }
+            }
+            if (array_key_exists('name', $losAttributes)) {
+                $item->name = $losAttributes['name'];
+                $result['name'] = $losAttributes['name'];
+            }
+            if (array_key_exists('quantity', $data)) {
+                $item->quantity = $data['quantity'];
+                $result['quantity'] = $data['quantity'];
+            }
+            if (array_key_exists('price', $losAttributes)) {
+                $item->quantity = $losAttributes['price'];
+                $result['price'] = $losAttributes['price'];
+            }
+            
+            $result['attributes'] = $losAttributes;
+            $item->save();
+            if ($hasState) {
+                Cart::update($item->id,$result);
+            }
+            return array("status" => "success", "message" => "item updated successfully", "item" => $item);
+        } else {
+            return array("status" => "error", "message" => "item does not exist on the cart");
+        }
+    }
+    
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function updateCartItems(User $user, array $data) {
+        $items = $data['items'];
+        foreach ($items as $value) {
+            $value['order_id'] = $data['order_id'];
+            $this->updateCartItem($user, $value, false);
+        }
+        return $this->getCart();
     }
 
     /**

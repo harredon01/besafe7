@@ -89,6 +89,18 @@ class CartApiController extends Controller {
         $status = $this->editCart->addCartItem($user, $request->all(), false);
         return response()->json($status);
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postUpdateCartItems(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->updateCartItems($user, $request->all() );
+        return response()->json($status);
+    }
 
     /**
      * Handle a login request to the application.
@@ -111,6 +123,30 @@ class CartApiController extends Controller {
     public function postUpdateCartItemStateless(Request $request) {
         $user = $request->user();
         $status = $this->editCart->updateCartItem($user, $request->all(), false);
+        return response()->json($status);
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postUpdateCustomCartItem(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->updateCustomCartItem($user, $request->all(), true);
+        return response()->json($status);
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function postUpdateCustomCartItemStateless(Request $request) {
+        $user = $request->user();
+        $status = $this->editCart->updateCustomCartItem($user, $request->all(), false);
         return response()->json($status);
     }
 

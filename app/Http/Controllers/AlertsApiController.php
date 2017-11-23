@@ -69,6 +69,7 @@ class AlertsApiController extends Controller {
     public function postAddFollower(Request $request) {
         $user = $request->user();
         dispatch(new AddFollower($user, $request->all()));
+        //return $this->editAlerts->addFollower($request->all(), $user);
         return response()->json(['status' => 'success', 'message' => 'postAddFollower queued']);
     }
 
@@ -155,8 +156,8 @@ class AlertsApiController extends Controller {
                     $request, $validator
             );
         }
-        //dispatch(new PostMessage($user, $request->all()));
-        $this->editAlerts->postMessage($user, $request->all());
+        dispatch(new PostMessage($user, $request->all()));
+        //$this->editAlerts->postMessage($user, $request->all());
         return response()->json(['status' => 'success', 'message' => 'postMessage queued']);
     }
 

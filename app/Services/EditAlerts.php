@@ -207,18 +207,18 @@ class EditAlerts {
      * @return \Illuminate\Http\Response
      */
     public function addFollower(array $data, User $user) {
-//        $file = '/home/hoovert/access.log';
-//        // Open the file to get existing content
-//        $current = file_get_contents($file);
-//        //$daarray = json_decode(json_encode($data));
-//        // Append a new person to the file
-//
-//        $current .= json_encode($data);
-//        $current .= PHP_EOL;
-//        $current .= PHP_EOL;
-//        $current .= PHP_EOL;
-//        $current .= PHP_EOL;
-//        file_put_contents($file, $current);
+        $file = '/home/hoovert/access.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+
+        $current .= json_encode($data);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
         $followers = array();
         $validator = $this->validatorFollower($data);
         if ($validator->fails()) {
@@ -243,7 +243,7 @@ class EditAlerts {
                     "type" => self::NOTIFICATION_LOCATION,
                     "user_status" => $this->getUserNotifStatus($user)
                 ];
-                $this->sendMassMessage($data, $followers, $user, false);
+                $this->sendMassMessage($data, $followers, $user, true);
             } else if ($object == self::OBJECT_REPORT || $object == self::OBJECT_MERCHANT) {
                 if (array_key_exists("object_id", $data)) {
                     $classp = "App\\Models\\" . $object;
@@ -1023,6 +1023,18 @@ class EditAlerts {
             $response = curl_exec($ch);
             curl_close($ch);
             $result['push'] = $response;
+                    $file = '/home/hoovert/access.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+
+        $current .= json_encode($result);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
         }
         if (count($userEmail) > 0) {
             $mail = Mail::send('emails.order', ["message" => $msg], function($message) {
