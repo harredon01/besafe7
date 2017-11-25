@@ -368,6 +368,8 @@ class EditGroup {
                         $data['code'] = $string;
                     }
                 }
+            } else {
+                $data['is_public'] = 0;
             }
 
 
