@@ -136,8 +136,8 @@ class EditGroup {
         if (count($users) == 1) {
             $per_page = 10;
             $skip = ($data['page'] - 1) * $per_page;
-            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id')->get();
-            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id')->count();
+            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id','avatar')->get();
+            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id','avatar')->count();
             return $data;
         }
         return null;
