@@ -441,7 +441,7 @@ class EditMerchant {
         } else {
             $data['status'] = 'active';
         }
-        if ($data['id']) {
+        if ($data['id'] && $data['id'] > 0) {
             foreach ($data as $key => $value) {
                 if (!$value) {
                     unset($data[$key]);

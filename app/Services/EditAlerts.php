@@ -322,7 +322,9 @@ class EditAlerts {
             $translationesp = Translation::where('language', 'ec-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             $data['subject'] = $translation->value;
-            $data['subject_es'] = $translationesp->value;
+            if($translationesp->value){
+                $data['subject_es'] = $translationesp->value;
+            }
         }
 
         $data['notification_id'] = time();
@@ -710,7 +712,7 @@ class EditAlerts {
         }
         $data = [
             "trigger_id" => $group->id,
-            "message" => $message,
+            "message" => "",
             "type" => $type,
             "payload" => $payload,
             "user_status" => $this->getUserNotifStatus($user)
