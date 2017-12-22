@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Services;
+
+use Validator;
+use App\Models\Group;
+use App\Models\User;
+use App\Jobs\PostEmergencyEnd;
+use App\Jobs\PostEmergency;
+use App\Models\Report;
+use App\Models\Translation;
+use App\Models\Message;
+use App\Models\Notification;
+use Mail;
+use DB;
+use PushNotification;
+
+class CleanTrash {
+
+    const GROUP_AVATAR = 'group_avatar';
+    const GROUP_LEAVE = 'group_leave';
+    const GROUP_REMOVED = 'group_removed';
+    const GROUP_ACTIVE = 'group_active';
+    const GROUP_PENDING = 'group_pending';
+    const GROUP_EXPELLED = 'group_expelled';
+    const USER_AVATAR = 'user_avatar';
+    const USER_MESSAGE_TYPE = 'user_message';
+    const GROUP_MESSAGE_TYPE = 'group_message';
+    const GROUP_PRIVATE_MESSAGE_TYPE = 'group_private_message';
+    const GROUP_ADMIN = 'group_admin';
+    const GROUP_ADMIN_NEW = 'group_admin_new';
+    const NEW_CONTACT = 'new_contact';
+    const CONTACT_BLOCKED = 'contact_blocked';
+    const NEW_GROUP = 'new_group';
+    const GROUP_TYPE = 'group';
+    const USER_TYPE = 'user';
+    const RED_MESSAGE_TYPE = 'emergency';
+    const RED_SECRET_TYPE = 'emergency_secret';
+    const OBJECT_USER = 'user';
+    const OBJECT_LOCATION = 'Location';
+    const OBJECT_REPORT = 'Report';
+    const OBJECT_MERCHANT = 'Merchant';
+    const RED_MESSAGE_END = 'emergency_end';
+    const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
+    const NOTIFICATION_LOCATION = 'notification_location';
+    const LOCATION_FIRST = 'location_first';
+    const LOCATION_LAST = 'location_last';
+    const TRACKING_LIMIT_FOLLOWER = 'tracking_limit_follower';
+    const TRACKING_LIMIT_TRACKING = 'tracking_limit_tracking';
+    const NOTIFICATION_APP = 'notification_app';
+    const ACCESS_USER_OBJECT = 'userables';
+    const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';
+    const ACCESS_USER_OBJECT_ID = 'userable_id';
+    const ACCESS_USER_OBJECT_TYPE = 'userable_type';
+    const MESSAGE_AUTHOR_ID = 'user_id';
+    const MESSAGE_RECIPIENT_ID = 'messageable_id';
+    const MESSAGE_RECIPIENT_TYPE = 'messageable_type';
+    const REQUEST_PING = "request_ping";
+    const REPLY_PING = "reply_ping";
+
+
+
+
+    /**
+     * Show the application registration form.userable_id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function moveUserFollowing($user) {
+        $following = DB::table(self::ACCESS_USER_OBJECT)->where(self::ACCESS_USER_OBJECT_ID, '=', $user->id)
+                        ->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_LOCATION)->get();
+        $total = array();
+        foreach ($following as $value) {
+            $item = [
+                'user_id' => $value->user_id,
+                'object_id' => $value->object_id,
+                self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_LOCATION,
+                self::ACCESS_USER_OBJECT_ID => $value->userable_id,
+                'created_at' => $value->created_at,
+                'updated_at' => $value->updated_at,
+            ];
+            array_push($total, $item);
+        }
+        if (sizeof($following) > 0) {
+            DB::table(self::ACCESS_USER_OBJECT_HISTORIC)->insert($total);
+            $following = DB::table(self::ACCESS_USER_OBJECT)->where(self::ACCESS_USER_OBJECT_ID, '=', $user->id)->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_LOCATION)->delete();
+        }
+    }
+
+    public function moveOldUserFollowing() {
+        $following = DB::select("SELECT user_id as id,user_id,object_id,userable_id,created_at,updated_at from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' order by user_id");
+        if (sizeof($following) > 0) {
+            $tracking = DB::select("SELECT userable_id as id from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  group by " . self::ACCESS_USER_OBJECT_ID . " ");
+            $this->notifyFollowers($following, $tracking);
+        }
+        $total = array();
+        foreach ($following as $value) {
+            $item = [
+                'user_id' => $value->user_id,
+                'object_id' => $value->object_id,
+                self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_LOCATION,
+                self::ACCESS_USER_OBJECT_ID => $value->userable_id,
+                'created_at' => $value->created_at,
+                'updated_at' => $value->updated_at,
+            ];
+            array_push($total, $item);
+        }
+        if (sizeof($following) > 0) {
+            DB::table(self::ACCESS_USER_OBJECT_HISTORIC)->insert($total);
+            $following = DB::table(self::ACCESS_USER_OBJECT)->whereRaw(" DATEDIFF(CURDATE(),created_at) > 1")->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_LOCATION)->delete();
+        }
+    }
+
+    public function moveOldReportsSharing() {
+        $following = DB::select("SELECT * from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 5 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_REPORT . "'");
+        $total = array();
+        foreach ($following as $value) {
+            $item = [
+                'user_id' => $value->user_id,
+                'object_id' => $value->object_id,
+                self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_REPORT,
+                self::ACCESS_USER_OBJECT_ID => $value->userable_id,
+                'created_at' => $value->created_at,
+                'updated_at' => $value->updated_at,
+            ];
+            array_push($total, $item);
+        }
+        if (sizeof($following) > 0) {
+            DB::table(self::ACCESS_USER_OBJECT_HISTORIC)->insert($total);
+            $following = DB::table(self::ACCESS_USER_OBJECT)->whereRaw(" DATEDIFF(CURDATE(),created_at) > 5")->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_REPORT)->delete();
+        }
+    }
+}

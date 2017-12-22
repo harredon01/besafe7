@@ -14,6 +14,7 @@ use App\Models\Region;
 use App\Models\City;
 use App\Services\EditAlerts;
 use App\Services\EditMerchant;
+use App\Services\CleanTrash;
 
 class EditLocation {
 
@@ -30,6 +31,7 @@ class EditLocation {
 
     protected $editAlerts;
     protected $editMerchant;
+    protected $cleanTrash;
 
     /**
      * Create a new class instance.
@@ -37,9 +39,10 @@ class EditLocation {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant) {
+    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant,CleanTrash $cleanTrash) {
         $this->editAlerts = $editAlerts;
         $this->editMerchant = $editMerchant;
+        $this->cleanTrash = $cleanTrash;
     }
 
     /**
@@ -84,8 +87,8 @@ class EditLocation {
           HistoricLocation2::insert($locations);
           DB::delete("DELETE from historic_location where DATEDIFF(CURDATE(),created_at) > 4");
           }
-          $this->editAlerts->moveOldUserFollowing();
-          $this->editAlerts->moveOldReportsSharing(); 
+          $this->cleanTrash->moveOldUserFollowing();
+          $this->cleanTrash->moveOldReportsSharing(); 
     }
 
     /**
@@ -144,7 +147,7 @@ class EditLocation {
                     ->delete();
             HistoricLocation::insert($locations);
         }
-        $this->editAlerts->moveUserFollowing($user);
+        $this->cleanTrash->moveUserFollowing($user);
     }
 
     /**
@@ -223,7 +226,7 @@ class EditLocation {
         $data["name"] = $user->name;
         $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
         if ($user->is_tracking != 1 || $user->trip == 0) {
-            $user = $this->editAlerts->makeUserTrip($user);
+            $user->makeTrip();
             $saveuser = true;
         }
         if ($user->write_report) {
@@ -252,7 +255,7 @@ class EditLocation {
                                 "message" => "",
                                 "payload" => $payload,
                                 "type" => self::LOCATION_LAST,
-                                "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                                "user_status" => $user->getUserNotifStatus()
                             ];
                             $this->editAlerts->sendMassMessage($message, $followers, $user, true);
                             $data["status"] = "stopped";

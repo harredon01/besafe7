@@ -1061,7 +1061,7 @@ class MerchantImport {
             $user = User::find($sheet['user_id']);
             if ($user) {
                 unset($sheet['user_id']);
-                $this->editAlerts->postMessage($user, $sheet);
+                $this->editMessages->postMessage($user, $sheet);
                 //dispatch(new PostMessage($user, $sheet));
             }
         }

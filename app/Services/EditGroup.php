@@ -76,16 +76,16 @@ class EditGroup {
                                 "group_id" => $group->id
                             ];
                             $this->setAdminGroup($data);
-//                            $this->editAlerts->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
+//                            $this->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
                             dispatch(new NotifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE));
                         } else {
                             $deleteGroup = true;
                         }
                     } else {
-                        $this->editAlerts->notifyGroup($user, $group, null, false);
+                        $this->notifyGroup($user, $group, null, false);
                     }
                 } else {
-                    $this->editAlerts->notifyGroup($user, $group, null, false);
+                    $this->notifyGroup($user, $group, null, false);
                 }
                 $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                 if ($deleteGroup) {
@@ -98,6 +98,134 @@ class EditGroup {
                 }
             }
         }
+    }
+    public function notifyGroup(User $user, Group $group, $filename, $type) {
+        if ($group->isPublicActive()) {
+            
+        } else if (!$group->is_public) {
+            
+        } else {
+            return null;
+        }
+        $payload = array(
+            "group_id" => $group->id,
+            "group_name" => $group->name,
+            "first_name" => $user->firstName,
+            "last_name" => $user->lastName,
+            "user_id" => $user->id
+        );
+        $push = true;
+        if ($type == self::GROUP_AVATAR) {
+            $payload["filename"] = $filename;
+            $group->avatar = $filename;
+            $group->save();
+            $message = "";
+            $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active' ;");
+            //$push = false;
+        } else if ($type == self::GROUP_LEAVE) {
+            if ($filename) {
+                $payload["admin_id"] = $filename;
+            }
+            $message = "";
+            $followers = DB::select("select 
+                        user_id as id
+                    from
+                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active';");
+            //$push = false;
+        } else if ($type == self::GROUP_REMOVED) {
+            if (count($filename) > 0) {
+                $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                $followers = DB::select($sql, $filename);
+                $message = "";
+                $data = [
+                    "trigger_id" => $group->id,
+                    "message" => $message,
+                    "type" => $type,
+                    "payload" => $payload,
+                    "user_status" => $user->getUserNotifStatus()
+                ];
+                $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+                if ($group->isPublicActive()) {
+                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                } else {
+                    $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                }
+
+                DB::statement($sql, $filename);
+                if ($group->is_public) {
+                    $followers = array();
+                } else {
+                    $sql = "SELECT user_id as id FROM group_user WHERE  group_id = $group->id AND status = 'active'; ";
+                    $followers = DB::select($sql, $filename);
+                }
+            } else {
+                $followers = array();
+            }
+            $type = self::GROUP_EXPELLED;
+            $payload["party"] = $filename;
+            $message = "";
+        } else if ($type == self::GROUP_ACTIVE) {
+            $followers = array();
+            if (count($filename) > 0) {
+                if ($group->isPublicActive()) {
+                    $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $followers = DB::select($sql, $filename);
+                    $sql = "UPDATE group_user set status = 'active' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    DB::statement($sql, $filename);
+                }
+            }
+            $message = "";
+            $push = true;
+        } else if ($type == self::GROUP_PENDING) {
+            $followers = array();
+            if ($group->isPublicActive()) {
+                $sql = "SELECT user_id as id FROM group_user WHERE group_id = $group->id and is_admin = true; ";
+                $followers = DB::select($sql);
+                $message = "";
+            }
+            $message = "";
+            $push = true;
+        } else if ($type == self::GROUP_ADMIN) {
+            if (count($filename) > 0) {
+                if (!$group->is_public) {
+                    $bindingsString = trim(str_repeat('?,', count($filename)), ',');
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $followers = DB::select($sql, $filename);
+                    $message = "";
+                    $data = [
+                        "trigger_id" => $group->id,
+                        "message" => $message,
+                        "type" => $type,
+                        "payload" => $payload,
+                        "user_status" => $user->getUserNotifStatus()
+                    ];
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+                    $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    DB::statement($sql, $filename);
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status = 'active'; ";
+                    $followers = DB::select($sql, $filename);
+                }
+            } else {
+                $followers = array();
+            }
+            $type = self::GROUP_ADMIN_NEW;
+            $payload["party"] = $filename;
+            $message = "";
+        }
+        $data = [
+            "trigger_id" => $group->id,
+            "message" => "",
+            "type" => $type,
+            "payload" => $payload,
+            "user_status" => $user->getUserNotifStatus()
+        ];
+        return $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+        return ['success' => 'members notified'];
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
@@ -116,7 +244,7 @@ class EditGroup {
                     $invitesLength = count($data["party"]);
                     if (($i + $invitesLength) <= $group->max_users) {
                         dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
-                        //return $this->editAlerts->notifyGroup($user, $group, $data["party"], $data["status"]);
+                        //return $this->notifyGroup($user, $group, $data["party"], $data["status"]);
                         return ['status' => 'success', "message" => 'Request queued for active'];
                     } else {
                         $max = $group->max_users - $i;
@@ -124,7 +252,7 @@ class EditGroup {
                     }
                 } else {
                     dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
-                    //return $this->editAlerts->notifyGroup($user, $group, $data["party"], $data["status"]);
+                    //return $this->notifyGroup($user, $group, $data["party"], $data["status"]);
                     return ['status' => 'success', "message" => 'Request queued'];
                 }
             }
@@ -189,7 +317,7 @@ class EditGroup {
     public function getGroupByCode($code) {
         $group = Group::where('code', '=', $code)->first();
         if ($group) {
-            if ($group->isActive() && $group->is_public) {
+            if ($group->isPublicActive()) {
                 return ['status' => 'success', "group" => $group];
             }
             return ['status' => 'error', "message" => 'Group not found or inactive'];
@@ -201,7 +329,7 @@ class EditGroup {
         $group = Group::where('code', '=', $code)->first();
 
         if ($group) {
-            if ($group->is_public && $group->isActive()) {
+            if ($group->isPublicActive()) {
                 $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
 
                 if (count($members) >= $group->max_users) {
@@ -217,7 +345,7 @@ class EditGroup {
                 $user->groups()->save($group, ["status" => "pending", "is_admin" => false]);
                 $group->is_authorized = false;
                 dispatch(new NotifyGroup($user, $group, null, self::GROUP_PENDING));
-                //$this->editAlerts->notifyGroup($user, $group, null, self::GROUP_PENDING);
+                //$this->notifyGroup($user, $group, null, self::GROUP_PENDING);
                 return ['status' => 'success', "message" => 'Group joined', "group" => $group];
             }
             return ['status' => 'error', "message" => 'Group not public'];
@@ -285,7 +413,7 @@ class EditGroup {
                 "message" => "",
                 "payload" => $payload,
                 "type" => self::NEW_GROUP,
-                "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                "user_status" => $user->getUserNotifStatus()
             ];
             $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
             $i++;
@@ -305,7 +433,7 @@ class EditGroup {
                         "message" => "",
                         "payload" => $payload,
                         "type" => self::GROUP_INVITE,
-                        "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                        "user_status" => $user->getUserNotifStatus()
                     ];
                     $this->editAlerts->sendMassMessage($notification, $members, $user, true);
                 }

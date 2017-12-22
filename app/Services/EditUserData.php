@@ -337,7 +337,7 @@ class EditUserData {
             "message" => "",
             "payload" => $payload,
             "type" => self::NEW_CONTACT,
-            "user_status" => $this->editAlerts->getUserNotifStatus($user)
+            "user_status" => $user->getUserNotifStatus()
         ];
         $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
         DB::table('contacts')->insert($imports);
@@ -573,7 +573,7 @@ class EditUserData {
                     "message" => "Has sido agregado como contacto por: " . $user->name,
                     "payload" => $payload,
                     "type" => self::NEW_CONTACT,
-                    "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                    "user_status" => $user->getUserNotifStatus()
                 ];
                 $recipients = array($contact);
                 $this->editAlerts->sendMassMessage($notification, $recipients, $user, true);

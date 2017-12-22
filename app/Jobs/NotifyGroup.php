@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use App\Models\User;
 use App\Models\Group;
-use App\Services\EditAlerts;
+use App\Services\EditGroup;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -37,8 +37,8 @@ class NotifyGroup implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EditAlerts $editAlerts)
+    public function handle(EditGroup $editGroup)
     {
-        $editAlerts->notifyGroup($this->user,$this->group, $this->filename,$this->type ); 
+        $editGroup->notifyGroup($this->user,$this->group, $this->filename,$this->type ); 
     }
 }

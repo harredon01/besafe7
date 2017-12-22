@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Cache;
 
 class Merchant extends Model {
 
@@ -49,6 +50,13 @@ class Merchant extends Model {
     }
     public function user() {
         return $this->hasOne('App\Models\User');
+    }
+    public function checkAddImg($user,$type) {
+        if ($this->user_id == $user->id) {
+            Cache::forget('Report_' . $this->id);
+            return $this->id;
+        }
+        return null;
     }
 
 }

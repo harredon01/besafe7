@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 use App\Models\User;
-use App\Services\EditAlerts;
+use App\Services\EditMessages;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,8 +33,8 @@ class PostMessage implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EditAlerts $editAlerts)
+    public function handle(EditMessages $editMessages)
     {
-        $editAlerts->postMessage($this->user, $this->data); 
+        $editMessages->postMessage($this->user, $this->data); 
     }
 }

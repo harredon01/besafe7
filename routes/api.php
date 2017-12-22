@@ -154,6 +154,6 @@ Route::get('regions', 'LocationController@getRegions');
 Route::get('cities', 'LocationController@getCities');
 Route::post('cities/from', 'LocationController@getCitiesFrom');
 
-Route::get('messages/user/{code?}', 'AlertsApiController@getMessagesUser');
-Route::get('messages/group/{code?}', 'AlertsApiController@getMessagesGroup');
-Route::post('messages/send', 'AlertsApiController@postMessage');
+Route::get('messages/user/{code?}', 'MessagesApiController@getMessagesUser');
+Route::get('messages/group/{code?}', 'MessagesApiController@getMessagesGroup');
+Route::post('messages/send', 'MessagesApiController@postMessage');

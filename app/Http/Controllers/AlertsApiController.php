@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Jobs\AddFollower;
 use App\Jobs\RequestPing;
 use App\Jobs\ReplyPing;
-use App\Jobs\PostMessage;
 use App\Jobs\PostEmergency;
 use App\Jobs\PostEmergencyEnd;
 use App\Jobs\PostMarkAsDownloaded;
@@ -125,41 +124,6 @@ class AlertsApiController extends Controller {
                         ], 401);
     }
 
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getChat(Request $request) {
-        $user = $request->user();
-        $validator = $this->editAlerts->validatorGetMessage($request->all());
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
-        return response()->json($this->editAlerts->getChat($user, $request->all()));
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postMessage(Request $request) {
-        $user = $request->user();
-        $validator = $this->editAlerts->validatorMessage($request->all());
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
-        dispatch(new PostMessage($user, $request->all()));
-        //$this->editAlerts->postMessage($user, $request->all());
-        return response()->json(['status' => 'success', 'message' => 'postMessage queued']);
-    }
 
     /**
      * Handle a registration request for the application.
@@ -194,32 +158,6 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         dispatch(new PostEmergencyEnd($user, $request->only("code")));
         return response()->json(['status' => 'success', 'message' => 'postStopEmergency queued']);
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getMessagesUser($id, Request $request) {
-        $user = $request->user();
-        $data['to_id'] = $id;
-        $data["type"] = "user";
-        return response()->json($this->editAlerts->getChat($user, $data));
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getMessagesGroup($id, Request $request) {
-        $user = $request->user();
-        $data['recipient_id'] = $id;
-        $data["type"] = "group";
-        return response()->json($this->editAlerts->getChat($user, $data));
     }
 
     /**

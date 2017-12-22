@@ -25,6 +25,11 @@ class EditMerchant {
      *
      */
     protected $editAlerts;
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $editGroup;
 
     /**
      * Create a new class instance.
@@ -32,8 +37,9 @@ class EditMerchant {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
+    public function __construct(EditAlerts $editAlerts, EditGroup $editGroup) {
         $this->editAlerts = $editAlerts;
+        $this->editGroup = $editGroup;
     }
 
     /**
@@ -325,7 +331,7 @@ class EditMerchant {
     }
 
     function checkGroupStatus(User $user, Group $group, array $data) {
-        if ($group->is_public && $group->isActive()) {
+        if ($group->isPublicActive()) {
             $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? AND status <> "blocked" ', [$user->id, $group->id]);
             if (sizeof($members) == 0) {
                 return null;
@@ -382,7 +388,7 @@ class EditMerchant {
 
     public function notifyGroup(Group $group, User $user, array $data, $type, $object) {
         if ($group) {
-            if ($group->is_public && $group->isActive()) {
+            if ($group->isPublicActive()) {
                 if ($data['status'] == "pending") {
                     $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=?  AND is_admin = 1 AND status <> 'blocked' and user_id <>? ", [intval($data["group_id"]), $user->id]);
                 } elseif ($data['status'] == "active") {
@@ -407,7 +413,7 @@ class EditMerchant {
                 "subject" => "",
                 "payload" => $payload,
                 "type" => $type,
-                "user_status" => $this->editAlerts->getUserNotifStatus($user)
+                "user_status" => $user->getUserNotifStatus()
             ];
             $this->editAlerts->sendMassMessage($data, $followers, $user, true);
         }

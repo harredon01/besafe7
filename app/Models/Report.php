@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
-
+use Cache;
 class Report extends Model {
 
     use Searchable;
@@ -22,7 +22,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous","object",'report_time','group_id'];
+        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous", "object", 'report_time', 'group_id'];
     protected $hidden = ['user_id'];
 
     public function hours() {
@@ -47,6 +47,14 @@ class Report extends Model {
 
     public function group() {
         return $this->belongsTo('App\Models\Group');
+    }
+
+    public function checkAddImg($user,$type) {
+        if ($this->user_id == $user->id) {
+            Cache::forget('Report_' . $this->id);
+            return $this->id;
+        }
+        return null;
     }
 
 }
