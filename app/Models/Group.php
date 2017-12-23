@@ -79,7 +79,7 @@ class Group extends Model {
     }
 
     public function checkMemberType($user) {
-        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 2', [$user->id, $this->id]);
+        $users = DB::select('select user_id as id, is_admin from group_user where user_id = ? and group_id = ? AND status <> "blocked" limit 1', [$user->id, $this->id]);
         if (count($users) == 1) {
             return $users[0];
         }
@@ -107,6 +107,22 @@ class Group extends Model {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
                         . "WHERE group_id=? AND status = 'active' ", [$this->id]);
         return $recipients;
+    }
+    public function getAllAdminMembersButActive($user) {
+        $followers = DB::select("SELECT user_id as id FROM group_user "
+                . "WHERE group_id=?  "
+                . "AND is_admin = 1 "
+                . "AND status <> '" . self::CONTACT_BLOCKED . "' "
+                . "and user_id <>? ", [intval($this->id), $user->id]);
+        return $followers;
+    }
+
+    public function getAllMembersButActive($user) {
+        $followers = DB::select("SELECT user_id as id FROM group_user "
+                . "WHERE group_id=?  "
+                . "AND status <> '" . self::CONTACT_BLOCKED . "' "
+                . "and user_id <>? ", [intval($this->id), $user->id]);
+        return $followers;
     }
 
     public function getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id) {

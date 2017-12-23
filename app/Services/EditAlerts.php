@@ -7,9 +7,7 @@ use App\Models\Group;
 use App\Models\User;
 use App\Jobs\PostEmergencyEnd;
 use App\Jobs\PostEmergency;
-use App\Models\Report;
 use App\Models\Translation;
-use App\Models\Message;
 use App\Models\Notification;
 use Mail;
 use DB;
@@ -327,70 +325,7 @@ class EditAlerts {
         }
     }
 
-    public function notifyFollowers(array $followers, array $tracking) {
-
-        $stop = array();
-        $counter = 0;
-        $length = count($followers);
-        $model = new User(['name' => 'foo', 'id' => -1]);
-        if ($length > 0) {
-            $activeuser = $followers[0]->user_id;
-            $stop[] = [
-                "user_id" => $followers[0]->user_id,
-                "trip" => $followers[0]->object_id
-            ];
-            foreach ($followers as $follower) {
-                $counter++;
-                if ($activeuser == $follower->user_id) {
-                    if ($counter > 1) {
-                        $stop[] = [
-                            "user_id" => $follower->userable_id,
-                            "trip" => $follower->object_id
-                        ];
-                    }
-                } else {
-                    $notification = [
-                        "trigger_id" => -1,
-                        "message" => "",
-                        "payload" => $stop,
-                        "type" => self::TRACKING_LIMIT_FOLLOWER,
-                        "user_status" => "normal"
-                    ];
-                    $recipients = array($follower);
-                    $this->sendMassMessage($notification, $recipients, $model, false);
-                    $activeuser = $follower->user_id;
-                    $stop = array();
-                    $stop[] = [
-                        "user_id" => $follower->userable_id,
-                        "trip" => $follower->object_id
-                    ];
-                }
-                if ($counter == $length) {
-                    $notification = [
-                        "trigger_id" => -1,
-                        "message" => "",
-                        "payload" => $stop,
-                        "type" => self::TRACKING_LIMIT_FOLLOWER,
-                        "user_status" => "normal"
-                    ];
-                    $recipients = array($follower);
-
-                    $this->sendMassMessage($notification, $recipients, $model, false);
-                }
-            }
-        }
-
-
-        $notification = [
-            "trigger_id" => -1,
-            "message" => "",
-            "payload" => "",
-            "type" => self::TRACKING_LIMIT_TRACKING,
-            "user_status" => "normal"
-        ];
-        $this->sendMassMessage($notification, $tracking, $model, false);
-        return ['success' => 'followers notified'];
-    }
+    
 
     public function notifyObjectFollowers(User $user, array $followers, $object, $type) {
         $daobject = array("object_id" => $object->id, "object_type" => $object->type, "object_name" => $object->name, "first_name" => $user->firstName, "last_name" => $user->lastName
@@ -447,8 +382,7 @@ class EditAlerts {
     }
 
     public function notifyContacts(User $user, $filename) {
-        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level <> '" .
-                        self::CONTACT_BLOCKED . "'   ");
+        $followers = $user->getNonBlockedContacts();
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -517,16 +451,7 @@ class EditAlerts {
         $user->makeTrip();
         $user->write_report = true;
         $user->save();
-        $followers = DB::select("select 
-                        contact_id as id,object_id
-                    from
-                        contacts c
-                            left join
-                        userables u ON c.contact_id = u.user_id
-                            and u.userable_type = '" . self::OBJECT_LOCATION . "'
-                            and userable_id = $user->id where c.user_id = $user->id  and level='" . self::RED_MESSAGE_TYPE . "' "
-                        . " and c.contact_id NOT IN ( SELECT user_id FROM contacts WHERE contact_id = $user->id and level = '" . self::CONTACT_BLOCKED . "');  ");
-        $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
+        $followers = $user->getEmergencyContacts();
         $followersInsert = array();
         $followersPush = array();
         $data = [

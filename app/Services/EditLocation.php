@@ -76,26 +76,6 @@ class EditLocation {
      *
      * @return Location
      */
-    public function moveOldLocations() {
-         $locations = Location::whereRaw(" DATEDIFF(CURDATE(),created_at) > 1")->get()->toarray();
-          if (sizeof($locations) > 0) {
-          HistoricLocation::insert($locations);
-          DB::delete("DELETE from locations where DATEDIFF(CURDATE(),created_at) > 1");
-          }
-          $locations = HistoricLocation::whereRaw(" DATEDIFF(CURDATE(),created_at) > 4")->get()->toarray();
-          if (sizeof($locations) > 0) {
-          HistoricLocation2::insert($locations);
-          DB::delete("DELETE from historic_location where DATEDIFF(CURDATE(),created_at) > 4");
-          }
-          $this->cleanTrash->moveOldUserFollowing();
-          $this->cleanTrash->moveOldReportsSharing(); 
-    }
-
-    /**
-     * returns all current shared locations for the user
-     *
-     * @return Location
-     */
     public function getUserHash(User $user) {
         $hashExists = true;
         while ($hashExists) {

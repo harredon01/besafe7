@@ -58,5 +58,15 @@ class Merchant extends Model {
         }
         return null;
     }
+    public function checkUserAccess($user) {
+        $test = DB::table('userables')
+                        ->where('user_id', $user->id)
+                        ->where('userable_type', "Merchant")
+                        ->where("object_id", $this->id)->first();
+        if ($test) {
+            return true;
+        }
+        return false;
+    }
 
 }

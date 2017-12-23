@@ -5,6 +5,7 @@ namespace App\Models;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
+
 class Report extends Model {
 
     use Searchable;
@@ -49,12 +50,23 @@ class Report extends Model {
         return $this->belongsTo('App\Models\Group');
     }
 
-    public function checkAddImg($user,$type) {
+    public function checkAddImg($user, $type) {
         if ($this->user_id == $user->id) {
             Cache::forget('Report_' . $this->id);
             return $this->id;
         }
         return null;
+    }
+
+    public function checkUserAccess($user) {
+        $test = DB::table('userables')
+                        ->where('user_id', $user->id)
+                        ->where('userable_type', "Report")
+                        ->where("object_id", $this->id)->first();
+        if ($test) {
+            return true;
+        }
+        return false;
     }
 
 }

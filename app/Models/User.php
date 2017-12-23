@@ -21,6 +21,8 @@ class User extends Authenticatable {
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
     const CONTACT_BLOCKED = 'contact_blocked';
+    const OBJECT_LOCATION = 'Location';
+    const RED_MESSAGE_TYPE = 'emergency';
 
     /**
      * The attributes that are mass assignable.
@@ -168,6 +170,29 @@ class User extends Authenticatable {
                 . "where contact_id = $this->id "
                 . "and user_id = $objectActive_id "
                 . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
+        return $followers;
+    }
+    public function getNonBlockedContacts() {
+        $followers = DB::select("select user_id as id from contacts "
+                . "where user_id = $this->id "
+                . "and contact_id not in ( "
+                . " select user_id from contacts"
+                . " where contact_id = $this->id"
+                . " and level = '" . self::CONTACT_BLOCKED ."' )"
+                . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
+        return $followers;
+    }
+    public function getEmergencyContacts() {
+        $followers = DB::select("select 
+                        contact_id as id,object_id
+                    from
+                        contacts c
+                            left join
+                        userables u ON c.contact_id = u.user_id
+                            and u.userable_type = '" . self::OBJECT_LOCATION . "'
+                            and userable_id = $this->id where c.user_id = $this->id  and level='" . self::RED_MESSAGE_TYPE . "' "
+                        . " and c.contact_id NOT IN ( "
+                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "');  ");
         return $followers;
     }
     public function isBlocked($destination) {

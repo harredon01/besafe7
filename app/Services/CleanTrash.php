@@ -2,18 +2,11 @@
 
 namespace App\Services;
 
-use Validator;
-use App\Models\Group;
 use App\Models\User;
-use App\Jobs\PostEmergencyEnd;
-use App\Jobs\PostEmergency;
-use App\Models\Report;
-use App\Models\Translation;
-use App\Models\Message;
-use App\Models\Notification;
-use Mail;
+use App\Models\Location;
+use App\Models\HistoricLocation;
 use DB;
-use PushNotification;
+use App\Services\EditAlerts;
 
 class CleanTrash {
 
@@ -58,8 +51,21 @@ class CleanTrash {
     const REQUEST_PING = "request_ping";
     const REPLY_PING = "reply_ping";
 
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $editAlerts;
 
-
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(EditAlerts $editAlerts) {
+        $this->editAlerts = $editAlerts;
+    }
 
     /**
      * Show the application registration form.userable_id
@@ -85,6 +91,71 @@ class CleanTrash {
             DB::table(self::ACCESS_USER_OBJECT_HISTORIC)->insert($total);
             $following = DB::table(self::ACCESS_USER_OBJECT)->where(self::ACCESS_USER_OBJECT_ID, '=', $user->id)->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_LOCATION)->delete();
         }
+    }
+
+    public function notifyFollowers(array $followers, array $tracking) {
+
+        $stop = array();
+        $counter = 0;
+        $length = count($followers);
+        $model = new User(['name' => 'foo', 'id' => -1]);
+        if ($length > 0) {
+            $activeuser = $followers[0]->user_id;
+            $stop[] = [
+                "user_id" => $followers[0]->user_id,
+                "trip" => $followers[0]->object_id
+            ];
+            foreach ($followers as $follower) {
+                $counter++;
+                if ($activeuser == $follower->user_id) {
+                    if ($counter > 1) {
+                        $stop[] = [
+                            "user_id" => $follower->userable_id,
+                            "trip" => $follower->object_id
+                        ];
+                    }
+                } else {
+                    $notification = [
+                        "trigger_id" => -1,
+                        "message" => "",
+                        "payload" => $stop,
+                        "type" => self::TRACKING_LIMIT_FOLLOWER,
+                        "user_status" => "normal"
+                    ];
+                    $recipients = array($follower);
+                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false);
+                    $activeuser = $follower->user_id;
+                    $stop = array();
+                    $stop[] = [
+                        "user_id" => $follower->userable_id,
+                        "trip" => $follower->object_id
+                    ];
+                }
+                if ($counter == $length) {
+                    $notification = [
+                        "trigger_id" => -1,
+                        "message" => "",
+                        "payload" => $stop,
+                        "type" => self::TRACKING_LIMIT_FOLLOWER,
+                        "user_status" => "normal"
+                    ];
+                    $recipients = array($follower);
+
+                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false);
+                }
+            }
+        }
+
+
+        $notification = [
+            "trigger_id" => -1,
+            "message" => "",
+            "payload" => "",
+            "type" => self::TRACKING_LIMIT_TRACKING,
+            "user_status" => "normal"
+        ];
+        $this->editAlerts->sendMassMessage($notification, $tracking, $model, false);
+        return ['success' => 'followers notified'];
     }
 
     public function moveOldUserFollowing() {
@@ -130,4 +201,34 @@ class CleanTrash {
             $following = DB::table(self::ACCESS_USER_OBJECT)->whereRaw(" DATEDIFF(CURDATE(),created_at) > 5")->where(self::ACCESS_USER_OBJECT_TYPE, '=', self::OBJECT_REPORT)->delete();
         }
     }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function moveOld() {
+        $this->moveOldLocations();
+        $this->moveOldUserFollowing();
+        $this->moveOldReportsSharing();
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function moveOldLocations() {
+        $locations = Location::whereRaw(" DATEDIFF(CURDATE(),created_at) > 1")->get()->toarray();
+        if (sizeof($locations) > 0) {
+            HistoricLocation::insert($locations);
+            DB::delete("DELETE from locations where DATEDIFF(CURDATE(),created_at) > 1");
+        }
+        $locations = HistoricLocation::whereRaw(" DATEDIFF(CURDATE(),created_at) > 4")->get()->toarray();
+        if (sizeof($locations) > 0) {
+            HistoricLocation2::insert($locations);
+            DB::delete("DELETE from historic_location where DATEDIFF(CURDATE(),created_at) > 4");
+        }
+    }
+
 }

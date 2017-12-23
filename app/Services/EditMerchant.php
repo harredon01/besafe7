@@ -25,6 +25,7 @@ class EditMerchant {
      *
      */
     protected $editAlerts;
+
     /**
      * The EditAlert implementation.
      *
@@ -125,7 +126,7 @@ class EditMerchant {
                     }
                     return $data;
                 });
-        $object = null;        
+        $object = null;
         if ($type == self::OBJECT_REPORT) {
             $object = $data['report'];
         } else if ($type == self::OBJECT_MERCHANT) {
@@ -139,19 +140,12 @@ class EditMerchant {
                 $send = true;
             } else {
                 if ($object->private) {
-                    $test = DB::table('userables')
-                                    ->where('user_id', $user->id)
-                                    ->where('userable_type', $type)
-                                    ->where("object_id", $object->id)->first();
-                    if ($test) {
-                        $send = true;
-                    }
+                    $send = $object->checkUserAccess($user);
                 } else {
                     $send = true;
                 }
             }
             if ($send == true) {
-
                 return $data;
             }
             return ['status' => "error", "message" => $type . ' not found for user'];
@@ -332,20 +326,19 @@ class EditMerchant {
 
     function checkGroupStatus(User $user, Group $group, array $data) {
         if ($group->isPublicActive()) {
-            $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? AND status <> "blocked" ', [$user->id, $group->id]);
-            if (sizeof($members) == 0) {
-                return null;
-            } else {
-                $member = $members[0];
+            $member = $group->checkMemberType($user);
+            if ($member) {
                 if ($member->is_admin) {
                     $data['status'] = "active";
                 } else {
                     $data['status'] = "pending";
                 }
+            } else {
+                return null;
             }
         } else if (!$group->is_public) {
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? ', [$user->id, $group->id]);
-            if (sizeof($members) > 0) {
+            $member = $group->checkMemberType($user);
+            if ($member) {
                 $data['status'] = "active";
             } else {
                 return null;
@@ -356,48 +349,19 @@ class EditMerchant {
         return $data;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function saveOrCreateMerchant(array $data) {
-        $validator = $this->validatorMerchant($data);
-        if ($validator->fails()) {
-            return $validator->getMessageBag();
-        }
-        if (array_key_exists("merchant_id", $data)) {
-            if ($data['merchant_id'] > 0) {
-                $merchantid = $data['merchant_id'];
-                unset($data['merchant_id']);
-                Merchant::where('id', $merchantid)->update($data);
-                $merchant = Merchant::find($merchantid);
-                if ($merchant) {
-                    return ['status' => "success", "message" => 'Merchant saved', "name" => $merchant->name];
-                }
-                return ['status' => "error", "message" => 'Merchant not found'];
-            }
-            return ['status' => "error", "message" => 'Merchant id invalid'];
-        } else {
-            $data["status"] = "active";
-            $data["icon"] = "default";
-            $merchant = Merchant::create($data);
-            return ['status' => "", "message" => 'Merchant saved', "name" => $merchant->name];
-        }
-    }
 
     public function notifyGroup(Group $group, User $user, array $data, $type, $object) {
         if ($group) {
             if ($group->isPublicActive()) {
                 if ($data['status'] == "pending") {
-                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=?  AND is_admin = 1 AND status <> 'blocked' and user_id <>? ", [intval($data["group_id"]), $user->id]);
+                    $followers = $group->getAllAdminMembersButActive($user);
                 } elseif ($data['status'] == "active") {
-                    $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=?  AND status <> 'blocked' and user_id <>? ", [intval($data["group_id"]), $user->id]);
+                    $followers = $group->getAllMembersButActive($user);
                 } else {
                     return null;
                 }
             } else if (!$group->is_public) {
-                $followers = DB::select("SELECT user_id as id FROM group_user WHERE group_id=? and user_id <>? ", [intval($data["group_id"]), $user->id]);
+                $followers = $group->getAllMembersButActive($user);
             } else {
                 return null;
             }
@@ -486,7 +450,7 @@ class EditMerchant {
         $object::where('user_id', $user->id)
                 ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
         $result = $object::find($data['id']);
-        
+
         if ($result) {
             return $result;
         } else {

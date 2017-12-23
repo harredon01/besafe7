@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Jobs;
-use App\Services\EditLocation;
+use App\Services\CleanTrash;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -30,8 +30,8 @@ class MoveOld implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EditLocation $editLocation)
+    public function handle(CleanTrash $cleanTrash)
     {
-        $editLocation->moveOldLocations();
+        $cleanTrash->moveOld();
     }
 }
