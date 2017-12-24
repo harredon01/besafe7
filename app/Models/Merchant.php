@@ -53,7 +53,7 @@ class Merchant extends Model {
     }
     public function checkAddImg($user,$type) {
         if ($this->user_id == $user->id) {
-            Cache::forget('Report_' . $this->id);
+            Cache::forget('Merchant_' . $this->id); 
             return $this->id;
         }
         return null;
@@ -67,6 +67,9 @@ class Merchant extends Model {
             return true;
         }
         return false;
+    }
+    public function postAddImg() {
+        return null;
     }
 
 }

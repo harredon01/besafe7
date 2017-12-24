@@ -40,15 +40,16 @@ class Product extends Model {
     public function attributes() {
         return $this->belongsToMany('App\Models\Attribute', 'product_variant_attribute_option', 'product_id', 'attribute_id')->withTimestamps();
     }
+    public function postAddImg() {
+        return null;
+    }
 
     public function checkAddImg($user,$type) {
         $merchant = $this->merchant;
         if ($merchant) {
             if ($merchant->user_id == $user->id) {
-                if ($filetype == "photo") {
-                    Cache::forget('products_merchant_' . $merchant->id);
-                    return $this->id;
-                }
+                Cache::forget('products_merchant_' . $merchant->id);
+                return $this->id;
             }
         }
         return null;

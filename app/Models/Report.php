@@ -68,5 +68,8 @@ class Report extends Model {
         }
         return false;
     }
+    public function postAddImg() {
+        return null;
+    }
 
 }
