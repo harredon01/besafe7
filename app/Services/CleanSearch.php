@@ -20,7 +20,7 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
                 $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
             } else {
@@ -42,7 +42,7 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
                 $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
             } else {
@@ -68,12 +68,12 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
                 if ($user) {
                     $finalString = $mystring . "&user_id=" . $user->id;
                 } else {
-                    $data = $request->only("hash_id");
+                    $data = $request->all("hash_id");
                     if (!$data['hash_id']) {
                         return null;
                     } else {
@@ -84,11 +84,11 @@ class CleanSearch {
             } else {
                 return null;
             }
-            $data = $request->only("order_by");
+            $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,asc";
             }
-            $data = $request->only("limit");
+            $data = $request->all("limit");
             if (!$data['limit']) {
                 $finalString = $finalString . "&limit=30";
             } 
@@ -113,23 +113,23 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
 
                 return null;
             }
-            $data = $request->only("target_id");
+            $data = $request->all("target_id");
             if (!$data['target_id']) {
 
                 return null;
             }
-            $data = $request->only("trip_id");
+            $data = $request->all("trip_id");
             if (!$data['trip_id']) {
                 return null;
             }
-            $data = $request->only("order_by");
+            $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,desc";
             } 
@@ -151,13 +151,13 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
                 $finalString = $mystring . "&user_id=" . $user->id;
             } else {
                 return null;
             }
-            $data = $request->only("order_by");
+            $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=users.id,desc";
             } else {
@@ -181,16 +181,16 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->only("user_id");
+            $data = $request->all("user_id");
             if (!$data['user_id']) {
-                $data = $request->only("group_id");
+                $data = $request->all("group_id");
                 if ($data['group_id']) {
                     $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
                     if (sizeof($members) == 0) {
                         return null;
                     } else {
                         if ($members[0]->is_admin) {
-                            $data = $request->only("status");
+                            $data = $request->all("status");
                             if ($data['status']) {
                                 if ($data['status'] == "active" || $data['status'] == "pending" || $data['status'] == "deleted") {
                                     $finalString = $mystring;
@@ -201,7 +201,7 @@ class CleanSearch {
                                 $finalString = $mystring . "&status=active";
                             }
                         } else {
-                            $data = $request->only("status");
+                            $data = $request->all("status");
                             if (!$data['status']) {
                                 $finalString = $mystring . "&status=active";
                             } else {
@@ -210,9 +210,9 @@ class CleanSearch {
                         }
                     }
                 } else {
-                    $data = $request->only("shared_id");
+                    $data = $request->all("shared_id");
                     if (!$data['shared_id']) {
-                        $data = $request->only("shared");
+                        $data = $request->all("shared");
                         if (!$data['shared']) {
                             $finalString = $mystring . "&user_id=" . $user->id ;
                         } else {
@@ -230,7 +230,7 @@ class CleanSearch {
             } else {
                 return null;
             }
-            $data = $request->only("order_by");
+            $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=$type.id,desc";
             } else {

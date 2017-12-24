@@ -95,7 +95,7 @@ class OrderApiController extends Controller {
      */
     public function sendProposal(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             "order_id",
             "proposed_time",
             "proposed_discount",
@@ -111,7 +111,7 @@ class OrderApiController extends Controller {
      */
     public function acceptProposal(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             "order_id",
             "proposed_time",
             "proposed_discount",

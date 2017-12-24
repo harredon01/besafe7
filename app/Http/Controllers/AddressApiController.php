@@ -50,7 +50,7 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        $data = $request->only([
+        $data = $request->all([
             'address_id',
             'name',
             'city',
@@ -82,7 +82,7 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        $data = $request->only([
+        $data = $request->all([
             'address_id',
             'name',
             'city',
@@ -126,7 +126,7 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        $data = $request->only([
+        $data = $request->all([
             'address_id',
             'name',
             'city',
@@ -159,7 +159,7 @@ class AddressApiController extends Controller {
                     $request, $validator
             );
         }
-        $data = $request->only([
+        $data = $request->all([
             'address_id',
             'name',
             'city',

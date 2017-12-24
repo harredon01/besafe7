@@ -283,7 +283,7 @@ class UserApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'id',
             'docNum',
             'docType',

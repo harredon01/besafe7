@@ -200,7 +200,7 @@ class GroupController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'group_id',
             'contacts',
             'is_public',

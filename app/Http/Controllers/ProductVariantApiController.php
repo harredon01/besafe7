@@ -83,7 +83,7 @@ class ProductVariantApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'id',
             'sku',
             'product_id',
@@ -130,7 +130,7 @@ class ProductVariantApiController extends Controller {
      */
     public function update($id, Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'id',
             'sku',
             'product_id',

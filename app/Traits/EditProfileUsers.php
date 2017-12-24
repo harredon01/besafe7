@@ -42,7 +42,7 @@ trait EditProfileUsers {
      */
     public function postEditProfile(Request $request) {
         $user = $this->auth->user();
-        $data = $request->only([
+        $data = $request->all([
             'id',
             'firstName',
             'lastName',

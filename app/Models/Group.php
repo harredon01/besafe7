@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use DB;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\NotifyGroup;
 use App\Models\FileM;

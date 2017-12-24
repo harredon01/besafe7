@@ -186,7 +186,7 @@ class MerchantApiController extends Controller {
      */
     public function store(Request $request) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'id',
             'type',
             'name',
@@ -212,7 +212,7 @@ class MerchantApiController extends Controller {
      */
     public function update(Request $request, $id) {
         $user = $request->user();
-        $data = $request->only([
+        $data = $request->all([
             'type',
             'name',
             'email',

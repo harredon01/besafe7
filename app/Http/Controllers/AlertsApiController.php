@@ -144,7 +144,7 @@ class AlertsApiController extends Controller {
      */
     public function postEmergency(Request $request) {
         $user = $request->user();
-        dispatch(new PostEmergency($user, $request->only("type"),false));
+        dispatch(new PostEmergency($user, $request->all("type"),false));
         return response()->json(['status' => 'success', 'message' => 'postEmergency queued']);
     }
 
@@ -156,7 +156,7 @@ class AlertsApiController extends Controller {
      */
     public function postStopEmergency(Request $request) {
         $user = $request->user();
-        dispatch(new PostEmergencyEnd($user, $request->only("code")));
+        dispatch(new PostEmergencyEnd($user, $request->all("code")));
         return response()->json(['status' => 'success', 'message' => 'postStopEmergency queued']);
     }
 
