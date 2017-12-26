@@ -3,27 +3,36 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use App\Querybuilders\ProductQueryBuilder;
 use App\Http\Controllers\Controller;
 use App\Services\EditProduct;
+use App\Services\ShareObject;
 use Illuminate\Http\Request;
 
 class ProductApiController extends Controller {
 
     const OBJECT_MERCHANT = 'Merchant';
+    const OBJECT_PRODUCT = 'Product';
 
     /**
      * The edit profile implementation.
      *
      */
     protected $editProduct;
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $shareObject;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditProduct $editProduct) {
+    public function __construct(EditProduct $editProduct,ShareObject $shareObject) {
         $this->editProduct = $editProduct;
+        $this->shareObject = $shareObject;
         $this->middleware('auth:api');
     }
 
@@ -37,19 +46,19 @@ class ProductApiController extends Controller {
         $data = $request->only("merchant_id");
         $request2 = null;
         $result['access'] = null;
-        if ($data['merchant_id']) {
+        if ($data) {
             $result = $this->editProduct->checkAccess($user,$data['merchant_id'], self::OBJECT_MERCHANT);
         }
         if ($result['access']) {
             $data2 = $request->only("order_by");
-            if ($data2['order_by']) {
+            if ($data2) {
                 $request2 = Request::create("?merchant_id=" . $data['merchant_id'] . "&order_by=" . $data2['order_by'], 'GET');
             } else {
                 $request2 = Request::create("?merchant_id=" . $data['merchant_id'], 'GET');
             }
         }
         if ($request2) {
-            $queryBuilder = new QueryBuilder(new Product, $request2);
+            $queryBuilder = new ProductQueryBuilder(new Product, $request2);
             $result = $queryBuilder->build()->paginate();
             return response()->json([
                         'data' => $result->items(),
@@ -87,10 +96,14 @@ class ProductApiController extends Controller {
             'name',
             'description',
             'availability',
-            'slug',
+            'hash',
             'isActive',
         ]);
         return response()->json($this->editProduct->createOrUpdateProduct($user,$data));
+    }
+    public function getProductHash($productId, Request $request) {
+        $user = $request->user();
+        return response()->json($this->shareObject->getObjectHash($user, $productId, self::OBJECT_PRODUCT));
     }
 
     /**
@@ -139,7 +152,7 @@ class ProductApiController extends Controller {
             'name',
             'description',
             'availability',
-            'slug',
+            'hash',
             'isActive',
         ]);
         $data['id']=$id;

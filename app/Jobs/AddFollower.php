@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 use App\Models\User;
-use App\Services\EditAlerts;
+use App\Services\ShareObject;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,8 +33,8 @@ class AddFollower implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EditAlerts $editAlerts)
+    public function handle(ShareObject $shareObject)
     {
-        $editAlerts->addFollower($this->data, $this->user); 
+        $shareObject->addFollower($this->data, $this->user); 
     }
 }

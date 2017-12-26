@@ -19,7 +19,7 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'slug', 'isActive'];
+    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive'];
 
     public function merchant() {
         return $this->belongsTo('App\Models\Merchant');

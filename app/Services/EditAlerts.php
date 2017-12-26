@@ -56,104 +56,6 @@ class EditAlerts {
     const REQUEST_PING = "request_ping";
     const REPLY_PING = "reply_ping";
 
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function addFollower(array $data, User $user) {
-        $file = '/home/hoovert/access.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-
-        $current .= json_encode($data);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
-        $followers = array();
-        $validator = $this->validatorFollower($data);
-        if ($validator->fails()) {
-            return $validator->getMessageBag();
-        }
-
-        if ($user->id == intval($data["follower"]) && $data["type"] == self::USER_TYPE) {
-            
-        } else {
-
-            $object = $data["object"];
-            $object_id;
-            if ($object == self::OBJECT_LOCATION) {
-                $user->makeTrip();
-                $object_id = $user->trip;
-                $type = $data["type"];
-                if ($type == self::GROUP_TYPE) {
-                    $group = Group::find($data["follower"]);
-                    if ($group) {
-                        $followers = $group->getRecipientsObject($user, $object, $object_id);
-                    }
-                } else if ($type == self::USER_TYPE) {
-                    $followers = $user->getRecipientsObject($user, $object, $object_id);
-                }
-
-                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                $data = [
-                    "trigger_id" => $user->id,
-                    "message" => "",
-                    "payload" => $payload,
-                    "type" => self::NOTIFICATION_LOCATION,
-                    "user_status" => $user->getUserNotifStatus()
-                ];
-                $this->sendMassMessage($data, $followers, $user, true);
-            } else if ($object == self::OBJECT_REPORT || $object == self::OBJECT_MERCHANT) {
-                if (array_key_exists("object_id", $data)) {
-                    $classp = "App\\Models\\" . $object;
-                    $objectActive = $classp::find($data['object_id']);
-                    if ($objectActive) {
-                        if ($objectActive->user_id == $user->id || !$objectActive->private) {
-                            $object_id = $objectActive->id;
-                            $type = $data["type"];
-                            if ($type == self::GROUP_TYPE) {
-                                $group = Group::find($data["follower"]);
-                                if ($group) {
-                                    $followers = $group->getRecipientsObject($user, $object, $object_id);
-                                }
-                            } else if ($type == self::USER_TYPE) {
-                                $followers = $user->getRecipientsObject($data["follower"], $object, $object_id);
-                            }
-                            $this->notifyObjectFollowers($user, $followers, $objectActive, $object);
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
-                }
-            }
-            $dafollowers = array();
-            foreach ($followers as $follower) {
-                $dafollower = $follower->id;
-                if ($user->id == intval($dafollower)) {
-                    
-                } else {
-                    $item = ['user_id' => $dafollower, 'object_id' => $object_id, self::ACCESS_USER_OBJECT_TYPE => $object, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
-                    array_push($dafollowers, $item);
-                }
-            }
-            if (count($dafollowers) > 0) {
-                DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
-                return ['status' => 'success', 'message' => 'followers saved'];
-            } else {
-                return ['status' => 'error', 'message' => 'no followers saved'];
-            }
-        }
-    }
-
     public function markAsDownloaded(User $user, array $data) {
         $numbers = explode(",", $data["read"]);
         $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
@@ -323,22 +225,6 @@ class EditAlerts {
         } else {
             return ['status' => 'info', "message" => "Code received"];
         }
-    }
-
-    
-
-    public function notifyObjectFollowers(User $user, array $followers, $object, $type) {
-        $daobject = array("object_id" => $object->id, "object_type" => $object->type, "object_name" => $object->name, "first_name" => $user->firstName, "last_name" => $user->lastName
-        );
-        $notification = [
-            "trigger_id" => $user->id,
-            "message" => "",
-            "type" => $type,
-            "payload" => $daobject,
-            "user_status" => $user->getUserNotifStatus()
-        ];
-        $this->sendMassMessage($notification, $followers, $user, true);
-        return ['success' => 'followers notified'];
     }
 
     public function deleteGroupNotifs(User $user, $group_id) {

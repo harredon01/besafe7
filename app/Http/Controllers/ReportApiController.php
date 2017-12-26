@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditMerchant;
+use App\Services\ShareObject;
 use App\Services\MerchantImport;
 use App\Services\CleanSearch;
 use App\Querybuilders\ReportQueryBuilder;
@@ -32,16 +33,22 @@ class ReportApiController extends Controller {
      *
      */
     protected $cleanSearch;
+     /**
+     * The edit profile implementation.
+     *
+     */
+    protected $shareObject;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch) {
+    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
         $this->editMerchant = $editMerchant;
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
+        $this->shareObject = $shareObject;
         $this->middleware('auth:api');
     }
 
@@ -218,7 +225,7 @@ class ReportApiController extends Controller {
 
     public function getReportHash($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_REPORT));
+        return response()->json($this->shareObject->getObjectHash($user, $reportId, self::OBJECT_REPORT));
     }
 
 }

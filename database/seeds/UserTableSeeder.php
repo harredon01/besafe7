@@ -10,6 +10,7 @@ use App\Services\MerchantImport;
 use App\Services\EditGroup;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
+use App\Services\ShareObject;
 
 class UserTableSeeder extends Seeder {
 
@@ -36,6 +37,11 @@ class UserTableSeeder extends Seeder {
      *
      */
     protected $editAlerts;
+    /**
+     * The edit alerts implementation.
+     *
+     */
+    protected $shareObject;
     
     /**
      * The edit alerts implementation.
@@ -44,11 +50,12 @@ class UserTableSeeder extends Seeder {
     protected $merchantImport;
 
 
-    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, MerchantImport $merchantImport) {
+    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport) {
         $this->editGroup = $editGroup;
         $this->editLocation = $editLocation;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
+        $this->shareObject = $shareObject;
         $this->merchantImport = $merchantImport;
     }
 
@@ -280,7 +287,7 @@ class UserTableSeeder extends Seeder {
                 'type' => "group",
                 'follower' => $group->id,
             );
-            $this->editAlerts->addFollower($data, $user);
+            $this->shareObject->addFollower($data, $user);
         }
     }
 
@@ -320,7 +327,7 @@ class UserTableSeeder extends Seeder {
                         'follower' => $user2->id,
                     );
 
-                    $this->editAlerts->addFollower($data, $user);
+                    $this->shareObject->addFollower($data, $user);
                 }
             }
         }

@@ -744,10 +744,10 @@ class MerchantImport {
                 $product = Product::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
-                            'description' => $sheet['slug'],
+                            'description' => $sheet['hash'],
                             'merchant_id' => $code,
                             'isActive' => $sheet['isactive'],
-                            'slug' => $sheet['slug'],
+                            'hash' => $sheet['hash'],
                 ]);
             }
         }

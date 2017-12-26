@@ -146,7 +146,7 @@ class EditBilling {
         $subsc = array();
         if ($type == "user") {
             $subsc = Subscription::where("object_id", $user->id)->where("type", $type)->get();
-        } else if ($type == "group") {
+        } else if ($type == "Group") {
             $users = $this->editGroup->checkAdminGroup($user->id, $object);
             if (count($users) == 1) {
                 $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();

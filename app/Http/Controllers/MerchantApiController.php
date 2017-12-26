@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditMerchant;
 use App\Services\MerchantImport;
+use App\Services\ShareObject;
 use App\Services\CleanSearch;
 use App\Querybuilders\MerchantQueryBuilder;
 use App\Models\Merchant;
@@ -31,16 +32,22 @@ class MerchantApiController extends Controller {
      *
      */
     protected $cleanSearch;
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $shareObject;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch) {
+    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
         $this->editMerchant = $editMerchant;
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
+        $this->shareObject = $shareObject;
         $this->middleware('auth:api');
     }
 
@@ -240,8 +247,8 @@ class MerchantApiController extends Controller {
         return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_MERCHANT));
     }
 
-    public function getMerchantHash($reportId, Request $request) {
+    public function getMerchantHash($merchantId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getObjectHash($user, $reportId, self::OBJECT_MERCHANT));
+        return response()->json($this->shareObject->getObjectHash($user, $merchantId, self::OBJECT_MERCHANT));
     }
 }

@@ -77,7 +77,7 @@ Route::post('alerts/reply_ping', 'AlertsApiController@postReplyPing');
 Route::post('emergency', 'AlertsApiController@postEmergency');
 Route::post('emergency/stop', 'AlertsApiController@postStopEmergency');
 
-Route::post('reports/share', 'AlertsApiController@postAddFollower');
+Route::post('reports/share', 'ShareApiController@postAddFollower');
 Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
@@ -86,7 +86,7 @@ Route::resource('reports', 'ReportApiController');
 
 
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
-Route::post('merchants/share', 'AlertsApiController@postAddFollower');
+Route::post('merchants/share', 'ShareApiController@postAddFollower');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
@@ -103,7 +103,10 @@ Route::post('imagesapi', 'FileApiController@postFile');
 Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 
 Route::resource('products', 'ProductApiController');
+Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
 Route::post('products/variant', 'ProductVariantApiController@store');
+Route::post('products/share', 'ShareApiController@postAddFollower');
+
 Route::post('products/variant/{variant?}', 'ProductVariantApiController@update');
 Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
 Route::get('products/merchant/{merchant?}', 'ProductApiController@getProductsMerchant');
@@ -140,7 +143,7 @@ Route::post('auth/update_codes', 'AuthApiController@updateCodes');
 Route::post('auth/register', 'AuthApiController@create');
 
 Route::post('locations/user', 'LocationController@postLocation');
-Route::post('locations/follower', 'AlertsApiController@postAddFollower');
+Route::post('locations/follower', 'ShareApiController@postAddFollower');
 Route::get('locations', 'LocationController@index');
 
 Route::get('historic_locations', 'LocationController@historicLocations');

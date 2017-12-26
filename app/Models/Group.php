@@ -107,7 +107,24 @@ class Group extends Model {
                         . "WHERE group_id=? AND status = 'active' ", [$this->id]);
         return $recipients;
     }
+    public function countAllMembers() {
+        return DB::table('group_user')->where('group_id', $this->id)->where('status', 'active')->count();
+    }
     public function getAllAdminMembersButActive($user) {
+        $followers = DB::select("SELECT user_id as id FROM group_user "
+                . "WHERE group_id=?  "
+                . "AND is_admin = 1 "
+                . "and user_id <>? ", [intval($this->id), $user->id]);
+        return $followers;
+    }
+
+    public function getAllMembersButActive($user) {
+        $followers = DB::select("SELECT user_id as id FROM group_user "
+                . "WHERE group_id=?  "
+                . "and user_id <>? ", [intval($this->id), $user->id]);
+        return $followers;
+    }
+    public function getAllAdminMembersNonUserBlockedButActive($user) {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                 . "WHERE group_id=?  "
                 . "AND is_admin = 1 "
@@ -116,7 +133,7 @@ class Group extends Model {
         return $followers;
     }
 
-    public function getAllMembersButActive($user) {
+    public function getAllMembersNonUserBlockedButActive($user) {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                 . "WHERE group_id=?  "
                 . "AND status <> '" . self::CONTACT_BLOCKED . "' "

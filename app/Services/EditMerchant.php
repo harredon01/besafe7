@@ -354,14 +354,14 @@ class EditMerchant {
         if ($group) {
             if ($group->isPublicActive()) {
                 if ($data['status'] == "pending") {
-                    $followers = $group->getAllAdminMembersButActive($user);
+                    $followers = $group->getAllAdminMembersNonUserBlockedButActive($user);
                 } elseif ($data['status'] == "active") {
-                    $followers = $group->getAllMembersButActive($user);
+                    $followers = $group->getAllMembersNonUserBlockedButActive($user);
                 } else {
                     return null;
                 }
             } else if (!$group->is_public) {
-                $followers = $group->getAllMembersButActive($user);
+                $followers = $group->getAllMembersNonUserBlockedButActive($user);
             } else {
                 return null;
             }
@@ -504,37 +504,7 @@ class EditMerchant {
         return $result;
     }
 
-    /**
-     * returns all current shared locations for the user
-     *
-     * @return Location
-     */
-    public function getObjectHash(User $user, $id, $type) {
-        $type = "App\\Models\\" . $type;
-        $object = $type::find($id);
-        if ($object) {
-            if ($object->user_id == $user->id || !$object->private) {
-                if ($object->hash) {
-                    return ['status' => 'success', "hash" => $object->hash];
-                }
-                $hashExists = true;
-                while ($hashExists) {
-                    $hash = str_random(40);
-                    $objects = $type::where("hash", $hash)->first();
-                    if ($objects) {
-                        $hashExists = true;
-                    } else {
-                        $hashExists = false;
-                        $object->hash = $hash;
-                        $object->save();
-                        return ['status' => 'success', "hash" => $hash];
-                    }
-                }
-            }
-            return ['status' => 'error', "message" => "report does not belong to user"];
-        }
-        return ['status' => 'error', "message" => "report id invalid"];
-    }
+    
 
     /**
      * Get a validator for an incoming edit profile request.

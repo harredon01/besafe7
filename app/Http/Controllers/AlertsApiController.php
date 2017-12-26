@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Jobs\AddFollower;
 use App\Jobs\RequestPing;
 use App\Jobs\ReplyPing;
 use App\Jobs\PostEmergency;
@@ -58,18 +57,6 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         dispatch(new PostMarkAsDownloaded($user, $request->all()));
         return response()->json(['status' => 'success', 'message' => 'postMarkAsDownloaded queued']);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function postAddFollower(Request $request) {
-        $user = $request->user();
-        dispatch(new AddFollower($user, $request->all()));
-        //return $this->editAlerts->addFollower($request->all(), $user);
-        return response()->json(['status' => 'success', 'message' => 'postAddFollower queued']);
     }
 
     /**

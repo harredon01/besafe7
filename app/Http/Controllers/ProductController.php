@@ -24,8 +24,8 @@ class ProductController extends Controller {
      *
      * @return Response
      */
-    public function getProduct($slug) {
-        $product = Product::where('slug', '=', $slug)->firstOrFail();
+    public function getProduct($hash) {
+        $product = Product::where('hash', '=', $hash)->firstOrFail();
         $product->productVariants;
         return view('products.products', ['products' => $product]);
     }

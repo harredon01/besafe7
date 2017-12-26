@@ -57,7 +57,7 @@ class MerchantTableSeeder extends Seeder {
                 $product1 = new Product([
                     'name' => "plan " . $x . "-" . $y,
                     'description' => " plan de seguridad " . $x . "-" . $y,
-                    'slug' => "plan-de-seguridad-" . $x . "-" . $y,
+                    'hash' => "plan-de-seguridad-" . $x . "-" . $y,
                     'isActive' => true,
                 ]);
                 $category1->products()->save($product1);

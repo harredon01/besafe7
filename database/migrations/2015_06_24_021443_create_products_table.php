@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration {
                         $table->string('name');
                         $table->string('description');
                         $table->string('availability');
-                        $table->string('slug');
+                        $table->string('hash');
                         $table->boolean('isActive');
                         $table->integer('merchant_id')->unsigned()->nullable();
                         $table->foreign('merchant_id')->references('id')

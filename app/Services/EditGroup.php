@@ -52,13 +52,9 @@ class EditGroup {
     public function checkAdminGroup($userId, $groupId) {
         return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND status = "active"', [$groupId, $userId]);
     }
-
-    public function checkUserGroup($userId, $groupId) {
-        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? AND status = "active" limit 1', [$groupId, $userId]);
-    }
-
+    
     public function deleteGroupUser(User $user, Group $group) {
-        $users = $this->checkUserGroup($user->id, $group->id);
+        $users = $group->checkMemberType($user);
         $deleteGroup = false;
         if (count($users) > 0) {
 
@@ -236,11 +232,9 @@ class EditGroup {
         $group = Group::find($data["group_id"]);
 
         if ($group) {
-            $users = $this->checkAdminGroup($user->id, $group->id);
-            if (count($users) == 1) {
+            if ($group->checkAdmin($user)) {
                 if ($data['status'] == "group_active") {
-                    $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
-                    $i = sizeof($members) - 1;
+                    $i = $group->countAllMembers();
                     $invitesLength = count($data["party"]);
                     if (($i + $invitesLength) <= $group->max_users) {
                         dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
@@ -294,7 +288,7 @@ class EditGroup {
     public function joinGroupById(User $user, $code) {
         $group = Group::where('id', '=', $code)->first();
         if ($group) {
-            $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
+            $members = $group->countAllMembers();
             if (count($members) >= $group->max_users) {
                 return null;
             }
@@ -330,13 +324,11 @@ class EditGroup {
 
         if ($group) {
             if ($group->isPublicActive()) {
-                $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active" ', [$group->id]);
-
-                if (count($members) >= $group->max_users) {
+                if ($group->countAllMembers() >= $group->max_users) {
                     return ['status' => 'error', "message" => 'Group Full'];
                 }
 
-                $members = DB::select('select user_id as id from group_user where group_id = ? AND user_id = ? ', [$group->id, $user->id]);
+                $members = $group->checkMemberType($user);
 
                 if (count($members) > 0) {
                     return ['status' => 'error', "message" => 'User cant join'];
@@ -356,7 +348,15 @@ class EditGroup {
     public function inviteUsers($user, $data, $isNew, $group) {
         $invites = array();
         $notifs = array();
-        $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
+        if ($group->isPublicActive()) {
+            
+        } else if (!$group->is_public) {
+            
+        } else {
+            return null;
+        }
+        $members = $group->checkMemberType($user);
+        $profile = $members[0];
         if (sizeof($members) == 0) {
             return null;
         }
@@ -364,16 +364,15 @@ class EditGroup {
         if ($isNew) {
             $i = 0;
         } else {
-            $members = DB::select('select user_id as id from group_user where user_id  <> ? and group_id = ? AND status = "active"', [$user->id, $group->id]);
-            $i = sizeof($members) + 1;
+            $i = $group->countAllMembers();
         }
         if ($group->max_users <= $i) {
             return null;
         }
         $is_admin = false;
-        if ($group->is_public) {
+        if ($profile->is_admin) {
             $is_admin = true;
-        }
+        } 
         if (array_key_exists("contacts", $data)) {
             $inviteUsers = array();
             foreach ($data['contacts'] as $value) {
@@ -435,7 +434,7 @@ class EditGroup {
                         "type" => self::GROUP_INVITE,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($notification, $members, $user, true);
+                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true);
                 }
             }
             DB::table('group_user')->insert(
