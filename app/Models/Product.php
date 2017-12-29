@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cache;
+use Carbon\Carbon; 
 
 class Product extends Model {
 
@@ -19,7 +20,17 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive'];
+    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive','rating','ends_at'];
+    
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at'
+    ];
+    
+    public function isActive() {
+        return $this->ends_at && Carbon::now()->lt($this->ends_at);
+    }
 
     public function merchant() {
         return $this->belongsTo('App\Models\Merchant');

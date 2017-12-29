@@ -5,6 +5,7 @@ namespace App\Models;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
+use Carbon\Carbon; 
 
 class Report extends Model {
 
@@ -23,8 +24,17 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous", "object", 'report_time', 'group_id'];
+        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous", "object", 'report_time', 'group_id','rating','ends_at'];
     protected $hidden = ['user_id'];
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at'
+    ];
+    
+    public function isActive() {
+        return $this->ends_at && Carbon::now()->lt($this->ends_at);
+    }
 
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');

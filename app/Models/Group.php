@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Jobs\NotifyGroup;
 use App\Models\FileM;
 use DB;
-
+ 
 class Group extends Model {
 
     const ACCESS_USER_OBJECT = 'userables';
@@ -21,18 +21,20 @@ class Group extends Model {
      * @var string
      */
     protected $table = 'groups';
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'ends_at'
-    ];
+    
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at', 'level'];
+    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at', 'level', 'rating'];
+    
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at'
+    ];
 
     public function users() {
         return $this->belongsToMany('App\Models\User')->withPivot('color')->withPivot('status')->withPivot('is_admin')->withTimestamps();

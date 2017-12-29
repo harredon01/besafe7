@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRatingsTable extends Migration {
+class AddEndsAtToSubscriptionObjects extends Migration {
 
     /**
      * Run the migrations.
@@ -12,60 +12,48 @@ class CreateRatingsTable extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create('ratings', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('user_id')->unsigned();
-            $table->integer('object_id')->unsigned()->nullable();
-            $table->index('object_id');
-            $table->text('comment');
-            $table->double('rating');
-            $table->string('type')->nullable();
-            $table->foreign('user_id')->references('id')
-                    ->on('users');
-            $table->timestamps();
-        });
         if (Schema::hasTable('users')) {
-            if (Schema::hasColumn('users', 'rating')) {
+            if (Schema::hasColumn('users', 'ends_at')) {
                 //
             } else {
                 Schema::table('users', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->timestamp('ends_at');
                 });
             }
         }
         if (Schema::hasTable('products')) {
-            if (Schema::hasColumn('products', 'rating')) {
+            if (Schema::hasColumn('products', 'ends_at')) {
                 //
             } else {
                 Schema::table('products', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->timestamp('ends_at');
                 });
             }
         }
         if (Schema::hasTable('merchants')) {
-            if (Schema::hasColumn('merchants', 'rating')) {
+            if (Schema::hasColumn('merchants', 'ends_at')) {
                 //
             } else {
                 Schema::table('merchants', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->timestamp('ends_at');
                 });
-            }
+            } 
         }
         if (Schema::hasTable('reports')) {
-            if (Schema::hasColumn('reports', 'rating')) {
+            if (Schema::hasColumn('reports', 'ends_at')) {
                 //
             } else {
                 Schema::table('reports', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->timestamp('ends_at');
                 });
             }
         }
         if (Schema::hasTable('groups')) {
-            if (Schema::hasColumn('groups', 'rating')) {
+            if (Schema::hasColumn('groups', 'ends_at')) {
                 //
             } else {
                 Schema::table('groups', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->timestamp('ends_at');
                 });
             }
         }
@@ -77,42 +65,41 @@ class CreateRatingsTable extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('ratings');
         if (Schema::hasTable('users')) {
-            if (Schema::hasColumn('users', 'rating')) {
+            if (Schema::hasColumn('users', 'ends_at')) {
                 Schema::table('users', function (Blueprint $table) {
-                    $table->dropColumn('rating');
+                    $table->dropColumn('ends_at');
                 });
             }
         }
         if (Schema::hasTable('products')) {
-            if (Schema::hasColumn('products', 'rating')) {
+            if (Schema::hasColumn('products', 'ends_at')) {
                 Schema::table('products', function (Blueprint $table) {
-                    $table->dropColumn('rating');
+                    $table->dropColumn('ends_at');
                 });
             }
         }
         if (Schema::hasTable('merchants')) {
-            if (Schema::hasColumn('merchants', 'rating')) {
+            if (Schema::hasColumn('merchants', 'ends_at')) {
                 Schema::table('merchants', function (Blueprint $table) {
-                    $table->dropColumn('rating');
+                    $table->dropColumn('ends_at');
                 });
             }
         }
-        if (Schema::hasTable('reports')) {
-            if (Schema::hasColumn('reports', 'rating')) {
+        if (Schema::hasTable('reports')) { 
+            if (Schema::hasColumn('reports', 'ends_at')) {
                 Schema::table('reports', function (Blueprint $table) {
-                    $table->dropColumn('rating');
+                    $table->dropColumn('ends_at');
                 });
             }
         }
         if (Schema::hasTable('groups')) {
-            if (Schema::hasColumn('groups', 'rating')) {
+            if (Schema::hasColumn('groups', 'ends_at')) {
                 Schema::table('groups', function (Blueprint $table) {
-                    $table->dropColumn('rating');
+                    $table->dropColumn('ends_at');
                 });
             }
-        } 
+        }
     }
 
 }

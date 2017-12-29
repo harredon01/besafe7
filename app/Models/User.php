@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Jobs\NotifyContacts;
 use App\Models\FileM;
 use DB;
+use Carbon\Carbon; 
 
 class User extends Authenticatable {
 
@@ -38,12 +39,17 @@ class User extends Authenticatable {
      * @var array
      */
     protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'docType', 'docNum', 'write_report',
-        'emailNotifications', 'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four'];
+        'emailNotifications', 'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
     protected $encryptable = [
         'green',
         'red',
         'card_brand',
         'card_last_four'
+    ];
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'ends_at'
     ];
 
     public function userSocials() {
@@ -104,6 +110,10 @@ class User extends Authenticatable {
 
     public function messages() {
         return $this->morphMany('App\Models\Message', 'messageable');
+    }
+    
+    public function isActive() {
+        return $this->ends_at && Carbon::now()->lt($this->ends_at);
     }
 
     public function checkAddImg() {
