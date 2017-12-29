@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Jobs\AddFollower;
 use App\Services\ShareObject;
 
-class AlertsApiController extends Controller {
+class ShareApiController extends Controller {
 
     /**
      * The Guard implementation.
