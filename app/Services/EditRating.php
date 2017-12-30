@@ -19,20 +19,30 @@ class EditRating {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
+                if (array_key_exists('pseudo', $data)) {
+                    if ($data['pseudo']) {
+                        
+                    } else {
+                        $data['pseudonim'] = $user->name;
+                    }
+                }
+
                 Rating::create([
                     'user_id' => $user->id,
                     'rating' => $data['rating'],
                     'type' => $data['type'],
                     'object_id' => $data['rating'],
+                    'pseudonim' => $data['pseudonim'],
+                    'is_report' => $data['is_report'],
                 ]);
 
                 $rating = Rating::where('type', $type)->where('object_id', $data['object_id'])->avg('rating');
-                if( $type == "Report" ){
+                if ($type == "Report") {
                     $reports = Rating::where('type', $type)
                             ->where('object_id', $data['object_id'])
                             ->where('is_report', true)
                             ->count();
-                    if($reports > 10 ){
+                    if ($reports > 10) {
                         $object->status = "verifying";
                     }
                 }
