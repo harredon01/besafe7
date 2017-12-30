@@ -160,3 +160,6 @@ Route::post('cities/from', 'LocationController@getCitiesFrom');
 Route::get('messages/user/{code?}', 'MessagesApiController@getMessagesUser');
 Route::get('messages/group/{code?}', 'MessagesApiController@getMessagesGroup');
 Route::post('messages/send', 'MessagesApiController@postMessage');
+
+Route::get('ratings', 'RatingController@getRatingsObject');
+Route::post('ratings', 'RatingController@postAddRatingObject');

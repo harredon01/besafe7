@@ -19,7 +19,9 @@ class CreateRatingsTable extends Migration {
             $table->index('object_id');
             $table->text('comment');
             $table->double('rating');
+            $table->boolean('is_report')->default(false);
             $table->string('type')->nullable();
+            $table->string('pseudonim')->nullable();
             $table->foreign('user_id')->references('id')
                     ->on('users');
             $table->timestamps();

@@ -18,7 +18,7 @@ class ShareObject {
     const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
-    
+
     /**
      * The EditAlert implementation.
      *
@@ -134,6 +134,7 @@ class ShareObject {
             }
         }
     }
+
     /**
      * returns all current shared locations for the user
      *
@@ -141,31 +142,34 @@ class ShareObject {
      */
     public function getObjectHash(User $user, $id, $type) {
         $type = "App\\Models\\" . $type;
-        $object = $type::find($id);
-        if ($object) {
-            if ($object->user_id == $user->id || !$object->private) {
-                if ($object->hash) {
-                    return ['status' => 'success', "hash" => $object->hash];
-                }
-                $hashExists = true;
-                while ($hashExists) {
-                    $hash = str_random(40);
-                    $objects = $type::where("hash", $hash)->first();
-                    if ($objects) {
-                        $hashExists = true;
-                    } else {
-                        $hashExists = false;
-                        $object->hash = $hash;
-                        $object->save();
-                        return ['status' => 'success', "hash" => $hash];
+        if (class_exists($type)) {
+            $object = $type::find($id);
+            if ($object) {
+                if ($object->user_id == $user->id || !$object->private) {
+                    if ($object->hash) {
+                        return ['status' => 'success', "hash" => $object->hash];
+                    }
+                    $hashExists = true;
+                    while ($hashExists) {
+                        $hash = str_random(40);
+                        $objects = $type::where("hash", $hash)->first();
+                        if ($objects) {
+                            $hashExists = true;
+                        } else {
+                            $hashExists = false;
+                            $object->hash = $hash;
+                            $object->save();
+                            return ['status' => 'success', "hash" => $hash];
+                        }
                     }
                 }
+                return ['status' => 'error', "message" => "report does not belong to user"];
             }
-            return ['status' => 'error', "message" => "report does not belong to user"];
+            return ['status' => 'error', "message" => "report id invalid"];
         }
-        return ['status' => 'error', "message" => "report id invalid"];
+        return ['status' => 'error', "message" => "type not supported"];
     }
-    
+
     public function notifyObjectFollowers(User $user, array $followers, $object, $type) {
         $daobject = array("object_id" => $object->id, "object_type" => $object->type, "object_name" => $object->name, "first_name" => $user->firstName, "last_name" => $user->lastName
         );
@@ -179,6 +183,7 @@ class ShareObject {
         $this->editAlerts->sendMassMessage($notification, $followers, $user, true);
         return ['success' => 'followers notified'];
     }
+
     /**
      * Get a validator for an incoming edit profile request.
      *
@@ -192,4 +197,5 @@ class ShareObject {
                     'follower' => 'required|max:255',
         ]);
     }
+
 }
