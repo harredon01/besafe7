@@ -91,7 +91,7 @@ class CleanSearch {
             $data = $request->all("limit");
             if (!$data['limit']) {
                 $finalString = $finalString . "&limit=30";
-            } 
+            }
         }
         $request2 = Request::create($finalString, 'GET');
         return $request2;
@@ -132,7 +132,7 @@ class CleanSearch {
             $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=report_time,desc";
-            } 
+            }
         }
         $request2 = Request::create($finalString, 'GET');
         return $request2;
@@ -212,19 +212,33 @@ class CleanSearch {
                 } else {
                     $data = $request->all("shared_id");
                     if (!$data['shared_id']) {
-                        $data = $request->all("shared");
-                        if (!$data['shared']) {
-                            $finalString = $mystring . "&user_id=" . $user->id ;
-                        } else {
-                            if ($data['shared'] == 'true') {
-                                $mystring = str_replace("shared=true", "", $mystring);
-                                $finalString = $mystring . "shared_id=" . $user->id . "&status=active";
-                            } else {
-                                return null;
-                            }
-                        }
+                        
                     } else {
                         return null;
+                    }
+                    $data = $request->all("favorite_id");
+                    if (!$data['favorite_id']) {
+                        
+                    } else {
+                        return null;
+                    }
+                    $data = $request->all("shared","favorite");
+                    if (!$data['shared']&&!$data['favorite']) {
+                        $finalString = $mystring . "&user_id=" . $user->id;
+                    } else {
+                        if ($data['shared'] == 'true') {
+                            $mystring = str_replace("shared=true", "", $mystring);
+                            $mystring = $mystring . "shared_id=" . $user->id;
+                        } else {
+                            return null;
+                        }
+                        if ($data['favorite'] == 'true') {
+                            $mystring = str_replace("favorite=true", "", $mystring);
+                            $mystring = $mystring . "favorite_id=" . $user->id . "&status=active";
+                        } else {
+                            return null;
+                        }
+                        $finalString = $mystring . "&status=active";
                     }
                 }
             } else {

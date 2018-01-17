@@ -34,7 +34,7 @@ class EditAlerts {
     const USER_TYPE = 'user';
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_SECRET_TYPE = 'emergency_secret';
-    const OBJECT_USER = 'user';
+    const OBJECT_USER = 'User';
     const OBJECT_LOCATION = 'Location';
     const OBJECT_REPORT = 'Report';
     const OBJECT_MERCHANT = 'Merchant';
@@ -70,6 +70,8 @@ class EditAlerts {
         $arrayEmail = array();
         $arrayContent = array();
         $notification = null;
+        $sign = $data['sign'];
+        unset($data['sign']);
         if ($userSending->id > 0) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
@@ -161,6 +163,8 @@ class EditAlerts {
             $data = [
                 "trigger_id" => $user->id,
                 "message" => "",
+                "object" => self::OBJECT_USER,
+                "sign" => true,
                 "payload" => $payload,
                 "type" => self::REQUEST_PING,
                 "user_status" => $user->getUserNotifStatus()
@@ -186,6 +190,8 @@ class EditAlerts {
                             "trigger_id" => $user->id,
                             "message" => "",
                             "payload" => $payload,
+                            "object" => self::OBJECT_USER,
+                            "sign" => true,
                             "type" => self::REPLY_PING,
                             "user_status" => $user->getUserNotifStatus()
                         ];
@@ -195,6 +201,8 @@ class EditAlerts {
                         $data = [
                             "trigger_id" => $user->id,
                             "message" => "",
+                            "object" => self::OBJECT_USER,
+                            "sign" => true,
                             "payload" => $payload,
                             "type" => self::REPLY_PING,
                             "user_status" => $user->getUserNotifStatus()
@@ -269,6 +277,7 @@ class EditAlerts {
 
     public function notifyContacts(User $user, $filename) {
         $followers = $user->getNonBlockedContacts();
+        $user->updateAllContactsDate();
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -278,6 +287,8 @@ class EditAlerts {
             "trigger_id" => $user->id,
             "message" => "",
             "type" => self::USER_AVATAR,
+            "object" => self::OBJECT_USER,
+            "sign" => true,
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
@@ -337,13 +348,16 @@ class EditAlerts {
         $user->makeTrip();
         $user->write_report = true;
         $user->save();
-        $followers = $user->getEmergencyContacts();
+        $followers = $user->getEmergencyAndCurrentFollowerContacts();
         $followersInsert = array();
         $followersPush = array();
+        $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
             "payload" => $payload,
+            "object" => self::OBJECT_USER,
+            "sign" => true,
             "type" => $data['type'],
             "user_status" => $user->getUserNotifStatus()
         ];
@@ -358,6 +372,7 @@ class EditAlerts {
                 }
             }
         }
+        $user->updateAllEmergencyContactsDate();
         $this->sendMassMessage($data, $followersPush, $user, true);
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
@@ -368,6 +383,8 @@ class EditAlerts {
                 "trigger_id" => $user->id,
                 "message" => "",
                 "payload" => $payload,
+                "object" => self::OBJECT_USER,
+                "sign" => true,
                 "type" => self::RED_SECRET_TYPE,
                 "user_status" => $user->getUserNotifStatus()
             ];
@@ -456,12 +473,15 @@ class EditAlerts {
         } else {
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
-        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $user->id and level = 'emergency' and contacts.contact_id NOT IN ( SELECT user_id FROM contacts WHERE contact_id = $user->id and level = '" . self::CONTACT_BLOCKED . "') ");
+        $followers = $user->getEmergencyContacts();
+        $user->updateAllEmergencyContactsDate();
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
             "payload" => $payload,
             "type" => self::RED_MESSAGE_END,
+            "object" => self::OBJECT_USER,
+            "sign" => true,
             "user_status" => $user->getUserNotifStatus()
         ];
         $this->sendMassMessage($data, $followers, $user, true);

@@ -21,6 +21,7 @@ class EditGroup {
     const GROUP_ACTIVE = 'group_active';
     const GROUP_INVITE = 'group_invite';
     const GROUP_PENDING = 'group_pending';
+    const OBJECT_GROUP = 'Group';
 
     /**
      * The EditAlert implementation.
@@ -52,7 +53,7 @@ class EditGroup {
     public function checkAdminGroup($userId, $groupId) {
         return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND status = "active"', [$groupId, $userId]);
     }
-    
+
     public function deleteGroupUser(User $user, Group $group) {
         $users = $group->checkMemberType($user);
         $deleteGroup = false;
@@ -95,6 +96,7 @@ class EditGroup {
             }
         }
     }
+
     public function notifyGroup(User $user, Group $group, $filename, $type) {
         if ($group->isPublicActive()) {
             
@@ -141,6 +143,8 @@ class EditGroup {
                     "trigger_id" => $group->id,
                     "message" => $message,
                     "type" => $type,
+                    "object" => self::OBJECT_GROUP,
+                    "sign" => true,
                     "payload" => $payload,
                     "user_status" => $user->getUserNotifStatus()
                 ];
@@ -197,6 +201,8 @@ class EditGroup {
                         "trigger_id" => $group->id,
                         "message" => $message,
                         "type" => $type,
+                        "object" => self::OBJECT_GROUP,
+                        "sign" => true,
                         "payload" => $payload,
                         "user_status" => $user->getUserNotifStatus()
                     ];
@@ -213,10 +219,13 @@ class EditGroup {
             $payload["party"] = $filename;
             $message = "";
         }
+        $group->save();
         $data = [
             "trigger_id" => $group->id,
             "message" => "",
             "type" => $type,
+            "object" => self::OBJECT_GROUP,
+            "sign" => true,
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
@@ -258,8 +267,8 @@ class EditGroup {
         if (count($users) == 1) {
             $per_page = 10;
             $skip = ($data['page'] - 1) * $per_page;
-            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id','avatar')->get();
-            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id','avatar')->count();
+            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar')->get();
+            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id', 'avatar')->count();
             return $data;
         }
         return null;
@@ -372,7 +381,7 @@ class EditGroup {
         $is_admin = false;
         if ($profile->is_admin) {
             $is_admin = true;
-        } 
+        }
         if (array_key_exists("contacts", $data)) {
             $inviteUsers = array();
             foreach ($data['contacts'] as $value) {
@@ -411,6 +420,8 @@ class EditGroup {
                 "trigger_id" => $group->id,
                 "message" => "",
                 "payload" => $payload,
+                "object" => self::OBJECT_GROUP,
+                "sign" => true,
                 "type" => self::NEW_GROUP,
                 "user_status" => $user->getUserNotifStatus()
             ];
@@ -430,6 +441,8 @@ class EditGroup {
                     $notification = [
                         "trigger_id" => $group->id,
                         "message" => "",
+                        "object" => self::OBJECT_GROUP,
+                        "sign" => true,
                         "payload" => $payload,
                         "type" => self::GROUP_INVITE,
                         "user_status" => $user->getUserNotifStatus()
@@ -440,6 +453,7 @@ class EditGroup {
             DB::table('group_user')->insert(
                     $invites
             );
+            $group->save();
         }
         return $group;
     }

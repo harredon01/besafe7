@@ -20,6 +20,7 @@ class CreateNotificationsTable extends Migration {
                         $table->integer('notification_id');
                         $table->text('payload');
                         $table->string('type');
+                        $table->string('object');
                         $table->string('user_status');
                         $table->integer('trigger_id')->unsigned();
                         $table->index('trigger_id');

@@ -25,7 +25,8 @@ class EditLocation {
     const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
-    const OBJECT_USER = 'user';
+    const OBJECT_GROUP = 'Group';
+    const OBJECT_USER = 'User';
     const OBJECT_LOCATION = 'Location';
     const OBJECT_REPORT = 'Report';
 
@@ -228,13 +229,16 @@ class EditLocation {
                     if ($code) {
                         $result = $this->editAlerts->checkUserCode($user, $code);
                         if ($result['status'] == "success") {
-                            $followers = DB::select("SELECT user_id as id FROM " . self::ACCESS_USER_OBJECT . " WHERE " . self::ACCESS_USER_OBJECT_ID . "=? and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$user->id]);
+                            $followers = $user->getCurrentFollowers();
+                            $user->updateFollowersDate();
                             $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                             $message = [
                                 "trigger_id" => $user->id,
                                 "message" => "",
                                 "payload" => $payload,
                                 "type" => self::LOCATION_LAST,
+                                "object" => self::OBJECT_USER,
+                                "sign" => true,
                                 "user_status" => $user->getUserNotifStatus()
                             ];
                             $this->editAlerts->sendMassMessage($message, $followers, $user, true);

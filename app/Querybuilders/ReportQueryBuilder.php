@@ -1,15 +1,22 @@
 <?php
+
 namespace App\Querybuilders;
+
 use Unlu\Laravel\Api\QueryBuilder;
 
-class ReportQueryBuilder extends QueryBuilder 
-{
-   public function filterBySharedId($query, $id)
-   {
+class ReportQueryBuilder extends QueryBuilder {
+
+    public function filterBySharedId($query, $id) {
         return $query->join('userables', 'reports.id', '=', 'userables.object_id')
-           ->where('userables.user_id', '=', $id)
-           ->where('userable_type', '=', "Report");
+                        ->where('userables.user_id', '=', $id)
+                        ->where('userable_type', '=', "Report");
     }
+    
+    public function filterByFavoritesId($query, $id) {
+        return $query->join('favorites', 'reports.id', '=', 'favorites.object_id')
+                        ->where('favorites.type', '=', "Report");
+    }
+
 }
 
 /* 

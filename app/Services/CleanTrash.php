@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Location;
 use App\Models\HistoricLocation;
+use App\Models\HistoricLocation2; 
 use DB;
 use App\Services\EditAlerts;
 
@@ -119,6 +120,8 @@ class CleanTrash {
                         "trigger_id" => -1,
                         "message" => "",
                         "payload" => $stop,
+                        "object" => "System",
+                        "sign" => true,
                         "type" => self::TRACKING_LIMIT_FOLLOWER,
                         "user_status" => "normal"
                     ];
@@ -136,6 +139,8 @@ class CleanTrash {
                         "trigger_id" => -1,
                         "message" => "",
                         "payload" => $stop,
+                        "object" => "System",
+                        "sign" => true,
                         "type" => self::TRACKING_LIMIT_FOLLOWER,
                         "user_status" => "normal"
                     ];
@@ -151,6 +156,8 @@ class CleanTrash {
             "trigger_id" => -1,
             "message" => "",
             "payload" => "",
+            "object" => "System",
+            "sign" => true,
             "type" => self::TRACKING_LIMIT_TRACKING,
             "user_status" => "normal"
         ];

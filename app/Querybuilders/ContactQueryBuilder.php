@@ -9,9 +9,9 @@ class ContactQueryBuilder extends QueryBuilder
       return $query->join('contacts', 'users.id', '=', 'contacts.contact_id')
            ->where('contacts.user_id', '=', $id);
    }
-   public function filterByIdAfter($query, $id)
+   public function filterByDateAfter($query, $id)
    {
-      return $query->where('contacts.id', '>', $id);
+      return $query->where('contacts.updated_at', '>', $id);
    }
 }
 

@@ -18,6 +18,7 @@ class EditUserData {
 
     const CONTACT_BLOCKED = 'contact_blocked';
     const NEW_CONTACT = 'new_contact';
+    const OBJECT_USER = 'User';
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
@@ -66,7 +67,6 @@ class EditUserData {
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['salt'] = str_random(40);
-        $data['language'] = 'en-us';
         $user = User::create($data);
         return ['status' => 'success'];
     }
@@ -337,6 +337,8 @@ class EditUserData {
             "message" => "",
             "payload" => $payload,
             "type" => self::NEW_CONTACT,
+            "object" =>self::OBJECT_USER,
+            "sign" => true,
             "user_status" => $user->getUserNotifStatus()
         ];
         $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
@@ -361,8 +363,7 @@ class EditUserData {
                 $status = $value['level'];
             }
         }
-        $users = DB::table('contacts')->whereIn('contact_id', $importsget)->where('user_id', $user->id)->update(array('level' => $status));
-        ;
+        $users = DB::table('contacts')->whereIn('contact_id', $importsget)->where('user_id', $user->id)->update(array('level' => $status,"updated_at" => date("Y-m-d H:i:s")));
         return array("status" => "success", "message" => "contacts imported", "result" => $users);
     }
 
@@ -381,12 +382,15 @@ class EditUserData {
                     'level' => self::CONTACT_BLOCKED,
                     'user_id' => $user->id,
                     'contact_id' => $contactId,
+                    "created_at" => date("Y-m-d H:i:s"),
+                    "updated_at" => date("Y-m-d H:i:s")
                 ));
             } else {
                 $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array(
                     'level' => self::CONTACT_BLOCKED,
                     'user_id' => $user->id,
                     'contact_id' => $contactId,
+                    "updated_at" => date("Y-m-d H:i:s")
                 ));
             }
 
@@ -406,6 +410,7 @@ class EditUserData {
             'level' => 'normal',
             'user_id' => $user->id,
             'contact_id' => $contactId,
+            "updated_at" => date("Y-m-d H:i:s")
         ));
         return array("status" => "success", "message" => "contact  unblocked");
     }
@@ -573,6 +578,8 @@ class EditUserData {
                     "message" => "Has sido agregado como contacto por: " . $user->name,
                     "payload" => $payload,
                     "type" => self::NEW_CONTACT,
+                    "object" =>self::OBJECT_USER,
+                    "sign" => true,
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $recipients = array($contact);
@@ -589,7 +596,7 @@ class EditUserData {
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)
-                        ->delete();
+                        ->update(array('level' => 'deleted',"updated_at" => date("Y-m-d H:i:s")));
     }
 
     public function getUserId($user_id) {

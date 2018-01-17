@@ -163,3 +163,6 @@ Route::post('messages/send', 'MessagesApiController@postMessage');
 
 Route::get('ratings', 'RatingController@getRatingsObject');
 Route::post('ratings', 'RatingController@postAddRatingObject');
+
+Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
+Route::delete('favorites', 'FavoriteController@postDeleteFavoriteObject');

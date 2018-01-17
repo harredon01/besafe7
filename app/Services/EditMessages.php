@@ -31,7 +31,8 @@ class EditMessages {
     const USER_TYPE = 'user';
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_SECRET_TYPE = 'emergency_secret';
-    const OBJECT_USER = 'user';
+    const OBJECT_USER = 'User';
+    const OBJECT_GROUP = 'Group';
     const OBJECT_LOCATION = 'Location';
     const OBJECT_REPORT = 'Report';
     const OBJECT_MERCHANT = 'Merchant';
@@ -146,6 +147,8 @@ class EditMessages {
                     "message" => $data['message'],
                     "payload" => $dauser,
                     "type" => self::USER_MESSAGE_TYPE,
+                    "object" => self::OBJECT_USER,
+                    "sign" => true,
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $confirm['id'] = $message->id;
@@ -195,9 +198,11 @@ class EditMessages {
                         "message" => $data['message'],
                         "payload" => $dauser,
                         "type" => self::GROUP_MESSAGE_TYPE,
+                        "object" =>self::OBJECT_GROUP,
+                        "sign" => true,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->sendMassMessage($data, $followers, $user, true);
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true);
                     return $message;
                 }
             }

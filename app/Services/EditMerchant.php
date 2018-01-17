@@ -18,6 +18,8 @@ class EditMerchant {
     const OBJECT_REPORT_GROUP = 'Report_Group';
     const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
     const OBJECT_REPORT = 'Report';
+    const OBJECT_GROUP = 'Group';
+    const OBJECT_USER = 'User';
     const OBJECT_MERCHANT = 'Merchant';
 
     /**
@@ -376,6 +378,8 @@ class EditMerchant {
                 "message" => "",
                 "subject" => "",
                 "payload" => $payload,
+                "object" => self::OBJECT_GROUP,
+                "sign" => true,
                 "type" => $type,
                 "user_status" => $user->getUserNotifStatus()
             ];

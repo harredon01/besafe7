@@ -52,17 +52,15 @@ class GroupController extends Controller {
                 $group->admin_id = 0;
                 if (!$group->is_public) {
                     $group->users;
-                } else {
-                    $results = $this->editGroup->checkAdminGroup($user->id, $group->id);
-                    if (count($results) > 0) {
+                } 
+                $member = $group->checkMemberType($user);
+                if ($member) {
+                    $group->is_authorized = true;
+                    if ($member->is_admin == 1) {
                         $group->admin_id = 1;
                     }
-                    $results = $this->editGroup->checkUserGroup($user->id, $group->id);
-                    if (count($results) > 0) {
-                        $group->is_authorized = true;
-                    } else {
-                        $group->is_authorized = false;
-                    }
+                } else {
+                    $group->is_authorized = false;
                 }
                 array_push($data, $group);
             }
@@ -171,7 +169,7 @@ class GroupController extends Controller {
             $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active"', [$group->id]);
             $i = sizeof($members);
             if (array_key_exists("contacts", $data)) {
-                $i = $i+count($data['contacts']);
+                $i = $i + count($data['contacts']);
             }
             if ($group->max_users < $i) {
                 return response()->json(['status' => 'error', 'message' => "too many invites"]);

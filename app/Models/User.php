@@ -182,6 +182,18 @@ class User extends Authenticatable {
                 . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
         return $followers;
     }
+    public function getCurrentFollowers() {
+        $followers = DB::select("SELECT user_id as id FROM " . self::ACCESS_USER_OBJECT 
+                . " WHERE " . self::ACCESS_USER_OBJECT_ID . "=? "
+                . " and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$this->id]);
+        return $followers;
+    }
+    public function updateFollowersDate(){
+        DB::table('contacts')
+                        ->where('contacts.contact_id',  $this->id)
+                        ->whereIn('contacts.user_id', $this->getCurrentFollowers())
+                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
+    }
     public function getNonBlockedContacts() {
         $followers = DB::select("select user_id as id from contacts "
                 . "where user_id = $this->id "
@@ -192,7 +204,7 @@ class User extends Authenticatable {
                 . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
         return $followers;
     }
-    public function getEmergencyContacts() {
+    public function getEmergencyAndCurrentFollowerContacts() {
         $followers = DB::select("select 
                         contact_id as id,object_id
                     from
@@ -205,6 +217,13 @@ class User extends Authenticatable {
                 . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "');  ");
         return $followers;
     }
+    public function getEmergencyContacts(){
+        $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $this->id "
+                . "and level = 'emergency' and contacts.contact_id NOT IN ( "
+                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "'"
+                . ") ");
+        return $followers;
+    }
     public function isBlocked($destination) {
         $followers = DB::select("select *
                     from
@@ -215,8 +234,20 @@ class User extends Authenticatable {
         return false;
     }
     
+    public function updateAllContactsDate(){
+        DB::table('contacts')
+                        ->where('contacts.contact_id', '=', $this->id)
+                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
+    }
+    public function updateAllEmergencyContactsDate(){
+        DB::table('contacts')
+                        ->where('contacts.contact_id', $this->id)
+                        ->where('contacts.level',  "emergency")
+                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
+    }
 
-    public function getRecipientsMessage($objectActive_id) {
+
+        public function getRecipientsMessage($objectActive_id) {
         return $this->getNonBlockedUser($objectActive_id);
     }
 
