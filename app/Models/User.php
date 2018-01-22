@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Jobs\NotifyContacts;
 use App\Models\FileM;
 use DB;
+use DateTime;
 use Carbon\Carbon; 
 
 class User extends Authenticatable {
@@ -189,9 +190,13 @@ class User extends Authenticatable {
         return $followers;
     }
     public function updateFollowersDate(){
+        //$date = DateTime::createFromFormat('d-m-Y H:i:s');
+        $followers = DB::table(self::ACCESS_USER_OBJECT )
+                        ->where(self::ACCESS_USER_OBJECT_ID,  $this->id)
+                        ->where(self::ACCESS_USER_OBJECT_TYPE, self::OBJECT_LOCATION)->pluck('id');
         DB::table('contacts')
                         ->where('contacts.contact_id',  $this->id)
-                        ->whereIn('contacts.user_id', $this->getCurrentFollowers())
+                        ->whereIn('contacts.user_id', $followers)
                         ->update(array("updated_at" => date("Y-m-d H:i:s")));
     }
     public function getNonBlockedContacts() {

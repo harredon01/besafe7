@@ -186,7 +186,7 @@ class AuthApiController extends Controller {
      */
     public function validateCodes(Request $request) {
         $user = $request->user();
-        $data = $request->only('code');
+        $data = $request->all('code');
         return response()->json($this->editAlerts->checkUserCode($user, $data['code']));
     }
 
