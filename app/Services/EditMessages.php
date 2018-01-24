@@ -169,6 +169,7 @@ class EditMessages {
                     $dauser['group_name'] = $group->name;
                     $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
+                    $dauser['is_admin'] = $data['is_admin'];
 
                     $dauser['public'] = $group->is_public;
                     if (array_key_exists("target_id", $data)) {

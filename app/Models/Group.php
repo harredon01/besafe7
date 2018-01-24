@@ -207,6 +207,7 @@ class Group extends Model {
         if (count($res) > 0) {
             if ($this->isPublicActive()) {
                 if ($res[0]->is_admin) {
+                    $data['is_admin'] = true;
                     if (array_key_exists("target_id", $data)) {
                         $followers = DB::select("select 
                                 user_id as id
@@ -216,6 +217,7 @@ class Group extends Model {
                         $followers = $this->getAllMembers();
                     }
                 } else {
+                    $data['is_admin'] = false;
                     $followers = $this->getAllAdminMembers();
                     $data['target_id'] = $user->id;
                 }
