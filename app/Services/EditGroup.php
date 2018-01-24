@@ -21,6 +21,7 @@ class EditGroup {
     const GROUP_ACTIVE = 'group_active';
     const GROUP_INVITE = 'group_invite';
     const GROUP_PENDING = 'group_pending';
+    const GROUP_EXPIRED = 'group_expired';
     const OBJECT_GROUP = 'Group';
 
     /**
@@ -43,6 +44,30 @@ class EditGroup {
         $group = Group::find($group_id);
         $group->users;
         return $group;
+    }
+
+    public function updateExpiredGroups() {
+        $groups = Group::where('is_public', true)->where('status', 'active')->whereRaw(" CURDATE() > ends_at")->get();
+
+        foreach ($groups as $group) {
+            $group->status = 'suspended';
+            $payload = array(
+                "group_id" => $group->id,
+                "group_name" => $group->name,
+            );
+            $followers = $group->getAllMembers();
+            $data = [
+                "trigger_id" => $group->id,
+                "message" => "",
+                "type" => self::GROUP_EXPIRED,
+                "object" => self::OBJECT_GROUP,
+                "sign" => true,
+                "payload" => $payload,
+                "user_status" => "useless"
+            ];
+            return $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+        }
+        return true;
     }
 
     public function getActiveAdminGroups(User $user) {
@@ -118,20 +143,14 @@ class EditGroup {
             $group->avatar = $filename;
             $group->save();
             $message = "";
-            $followers = DB::select("select 
-                        user_id as id
-                    from
-                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active' ;");
+            $followers = $group->getAllMembersButActive($user);
             //$push = false;
         } else if ($type == self::GROUP_LEAVE) {
             if ($filename) {
                 $payload["admin_id"] = $filename;
             }
             $message = "";
-            $followers = DB::select("select 
-                        user_id as id
-                    from
-                        group_user where group_id = $group->id and user_id <> $user->id AND status = 'active';");
+            $followers = $group->getAllMembersButActive($user);
             //$push = false;
         } else if ($type == self::GROUP_REMOVED) {
             if (count($filename) > 0) {
@@ -159,8 +178,7 @@ class EditGroup {
                 if ($group->is_public) {
                     $followers = array();
                 } else {
-                    $sql = "SELECT user_id as id FROM group_user WHERE  group_id = $group->id AND status = 'active'; ";
-                    $followers = DB::select($sql, $filename);
+                    $followers = $group->getAllMembersButActive($user);
                 }
             } else {
                 $followers = array();
@@ -184,8 +202,7 @@ class EditGroup {
         } else if ($type == self::GROUP_PENDING) {
             $followers = array();
             if ($group->isPublicActive()) {
-                $sql = "SELECT user_id as id FROM group_user WHERE group_id = $group->id and is_admin = true; ";
-                $followers = DB::select($sql);
+                $followers = $group->getAllAdminMembers();
                 $message = "";
             }
             $message = "";
@@ -263,15 +280,17 @@ class EditGroup {
     }
 
     public function getAdminGroupUsers(User $user, array $data) {
-        $users = $this->checkAdminGroup($user->id, $data["group_id"]);
-        if (count($users) == 1) {
-            $per_page = 10;
-            $skip = ($data['page'] - 1) * $per_page;
-            $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar')->get();
-            $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->select('name', 'user_id as contact_id', 'avatar')->count();
-            return $data;
+        $group = Group::find($data['group_id']);
+        if ($group) {
+            if ($group->checkAdmin($user)) {
+                $per_page = 10;
+                $skip = ($data['page'] - 1) * $per_page;
+                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar')->get();
+                $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->count();
+                return $data;
+            }
+            return null;
         }
-        return null;
     }
 
     public function setAdminGroup(User $user, array $data) {

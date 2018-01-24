@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->call('App\Http\Controllers\LocationController@moveOldLocations')->hourly();
+        $schedule->call('App\Http\Controllers\GroupController@updateExpiredGroups')->daily();
         $schedule->call('App\Http\Controllers\PayuController@cronPayU')->hourly();
     }
 

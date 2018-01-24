@@ -126,6 +126,15 @@ class Group extends Model {
                 . "and user_id <>? ", [intval($this->id), $user->id]);
         return $followers;
     }
+    public function getSubSetMembersButActive($user,$set) {
+        $bindingsString = trim(str_repeat('?,', count($set)), ',');
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) "
+                    . "AND status <> '" . self::CONTACT_BLOCKED . "' "
+                    . "AND user_id <> $user->id "
+                    . "AND group_id = $this->id; ";
+                    $followers = DB::select($sql, $set);
+        return $followers;
+    }
     public function getAllAdminMembersNonUserBlockedButActive($user) {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                 . "WHERE group_id=?  "
@@ -170,8 +179,8 @@ class Group extends Model {
     }
 
     public function checkAdmin($user) {
-        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 2', [$user->id, $this->id]);
-        if (count($users) == 1) {
+        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND status <> "blocked" limit 1', [$user->id, $this->id]);
+        if (count($users) >0) {
             return true;
         }
         return false;

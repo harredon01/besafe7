@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Models\Message;
 use DB;
 
-
 class EditMessages {
 
     const GROUP_AVATAR = 'group_avatar';
@@ -69,6 +68,7 @@ class EditMessages {
     public function __construct(EditAlerts $editAlerts) {
         $this->editAlerts = $editAlerts;
     }
+
     /**
      * Gets the messages between two users.
      *
@@ -85,20 +85,20 @@ class EditMessages {
                             group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status = 'active';");
                     if (count($recipients) > 0) {
                         $messages = DB::select('select * from messages '
-                                . 'where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" '
-                                . 'AND ( '
-                                . '(' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) '
-                                . 'OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )'
-                                . ') order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
+                                        . 'where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" '
+                                        . 'AND ( '
+                                        . '(' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) '
+                                        . 'OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )'
+                                        . ') order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
                         return array_reverse($messages);
                     } else {
                         $messages = DB::select('select * from messages '
-                                . 'where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" '
-                                . 'AND is_public = 1 '
-                                . 'AND ( '
-                                . '(' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) '
-                                . 'OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )'
-                                . ') order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
+                                        . 'where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" '
+                                        . 'AND is_public = 1 '
+                                        . 'AND ( '
+                                        . '(' . self::MESSAGE_RECIPIENT_ID . ' = ? AND ' . self::MESSAGE_AUTHOR_ID . ' = ? ) '
+                                        . 'OR ( ' . self::MESSAGE_AUTHOR_ID . ' = ? AND ' . self::MESSAGE_RECIPIENT_ID . ' = ? )'
+                                        . ') order by id desc limit 10 ', [$data['to_id'], $user->id, $data['to_id'], $user->id]);
                         return array_reverse($messages);
                     }
                 } else if (!$group->is_public) {
@@ -113,8 +113,6 @@ class EditMessages {
             return array_reverse($messages);
         }
     }
-
-
 
     /**
      * Store a newly created resource in storage.
@@ -157,7 +155,7 @@ class EditMessages {
                 $confirm['result'] = $this->editAlerts->sendMassMessage($data, $followers, $user, true);
                 return $confirm;
             }
-        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
+        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
                 $fetched = $group->getRecipientsMessage($user, $data);
@@ -172,17 +170,30 @@ class EditMessages {
                     $dauser['is_admin'] = $data['is_admin'];
 
                     $dauser['public'] = $group->is_public;
-                    if (array_key_exists("target_id", $data)) {
-                        $dauser['target_id'] = $data['target_id'];
-                        $message = Message::create([
-                                    "status" => 'unread',
-                                    "message" => $data['message'],
-                                    self::MESSAGE_RECIPIENT_TYPE => self::GROUP_MESSAGE_TYPE,
-                                    self::MESSAGE_AUTHOR_ID => $user->id,
-                                    self::MESSAGE_RECIPIENT_ID => $group->id,
-                                    'is_public' => $group->is_public,
-                                    'target_id' => $data['target_id']
-                        ]);
+                    if ($group->is_public) {
+                        if (array_key_exists("target_id", $data)) {
+                            $dauser['target_id'] = $data['target_id'];
+                            $message = Message::create([
+                                        "status" => 'unread',
+                                        "message" => $data['message'],
+                                        self::MESSAGE_RECIPIENT_TYPE => self::GROUP_PRIVATE_MESSAGE_TYPE,
+                                        self::MESSAGE_AUTHOR_ID => $user->id,
+                                        self::MESSAGE_RECIPIENT_ID => $group->id,
+                                        'is_public' => $group->is_public,
+                                        'target_id' => $data['target_id']
+                            ]);
+                        } else {
+                            $message = Message::create([
+                                        "status" => 'unread',
+                                        "message" => $data['message'],
+                                        self::MESSAGE_RECIPIENT_TYPE => self::GROUP_PRIVATE_MESSAGE_TYPE,
+                                        self::MESSAGE_AUTHOR_ID => $user->id,
+                                        self::MESSAGE_RECIPIENT_ID => $group->id,
+                                        'is_public' => $group->is_public,
+                                        'target_id' => $user->id
+                            ]);
+                            $dauser['target_id'] = $user->id;
+                        }
                     } else {
                         $message = Message::create([
                                     "status" => 'unread',
@@ -199,7 +210,7 @@ class EditMessages {
                         "message" => $data['message'],
                         "payload" => $dauser,
                         "type" => self::GROUP_MESSAGE_TYPE,
-                        "object" =>self::OBJECT_GROUP,
+                        "object" => self::OBJECT_GROUP,
                         "sign" => true,
                         "user_status" => $user->getUserNotifStatus()
                     ];
@@ -209,8 +220,6 @@ class EditMessages {
             }
         }
     }
-
-
 
     /**
      * Get a validator for an incoming edit profile request.
@@ -224,7 +233,6 @@ class EditMessages {
                     'message' => 'required|max:255',
         ]);
     }
-
 
     /**
      * Get a validator for an incoming edit profile request.

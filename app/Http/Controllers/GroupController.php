@@ -113,6 +113,16 @@ class GroupController extends Controller {
         $results = $this->editGroup->requestChangeStatusGroup($user, $request->all());
         return response()->json($results);
     }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function updateExpiredGroups(Request $request) {
+        $results = $this->editGroup->updateExpiredGroups();
+        return response()->json($results);
+    }
 
     /**
      * Display the specified resource.
