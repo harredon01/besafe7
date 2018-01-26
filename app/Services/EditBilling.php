@@ -192,6 +192,7 @@ class EditBilling {
                     }
                     if ($result['status'] == "success") {
                         $subscription = $result['subscription'];
+                        $model->plan = $subscription->plan;
                         $model->ends_at = $subscription->ends_at;
                         $model->save();
                     }

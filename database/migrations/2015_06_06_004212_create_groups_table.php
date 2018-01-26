@@ -18,6 +18,7 @@ class CreateGroupsTable extends Migration {
                         $table->string('name');
                         $table->string('code')->nullable();
                         $table->string('status');
+                        $table->string('plan')->nullable();
                         $table->string('type')->nullable();
                         $table->string('avatar')->nullable();
                         $table->timestamp('ends_at')->nullable();

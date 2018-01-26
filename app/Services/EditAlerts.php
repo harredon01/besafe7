@@ -72,53 +72,57 @@ class EditAlerts {
         $notification = null;
         $sign = $data['sign'];
         unset($data['sign']);
-        if ($userSending->id > 0) {
+        if ($userSending ) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
-            $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
-            $data['subject_es'] = str_replace("{user}", $userSending->name, $translationEsp->value);
-            $pos = strpos("e" . $data['type'], 'Report');
-            if ($pos) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
-                $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
+            if ($translationEsp) {
+                $data['subject_es'] = str_replace("{user}", $userSending->name, $translationEsp->value);
             }
-            $pos = strpos("e" . $data['type'], 'Merchant');
-            if ($pos) {
-                $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
-                $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
-            }
-            $pos = strpos($data['subject'], '{group}');
-            if ($pos) {
-                $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
-                $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
+            if ($translation) {
+                $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
             }
         } else {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $translationesp = Translation::where('language', 'ec-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
-            $data['subject'] = $translation->value;
-            if ($translationesp->value) {
+            if ($translation) {
+                $data['subject'] = $translation->value;
+            }
+            if ($translationesp) {
                 $data['subject_es'] = $translationesp->value;
             }
+        }
+        $pos = strpos("e" . $data['type'], 'Report');
+        if ($pos) {
+            $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
+            $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
+        }
+        $pos = strpos("e" . $data['type'], 'Merchant');
+        if ($pos) {
+            $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
+            $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{group}');
+        if ($pos) {
+            $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
+            $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
         }
 
         $data['notification_id'] = time();
         $data['status'] = "unread";
-        $checkSame = false;
         $data['payload'] = json_encode($data['payload']);
         //$daarray = json_decode(json_encode($data));
         // Append a new person to the file
 
-        if ($userSending) {
-            $checkSame = true;
-        }
         if (count($recipients) > 0) {
             foreach ($recipients as $recipient) {
                 $user = User::find($recipient->id);
                 if ($user) {
-                    if ($checkSame && $user->id == $userSending->id && $data['type'] != self::RED_SECRET_TYPE) {
-                        continue;
+                    if ($userSending) {
+                        if ($user->id == $userSending->id && $data['type'] != self::RED_SECRET_TYPE) {
+                            continue;
+                        }
                     }
                     $data['user_id'] = $user->id;
                     $notification = new Notification($data);
@@ -144,7 +148,11 @@ class EditAlerts {
                 $data['created_at'] = $notification->created_at;
                 $data['updated_at'] = $notification->created_at;
                 $data['msg'] = $data['message'];
-                $data['name'] = $userSending->firstName . " " . $userSending->lastName;
+                if ($userSending) {
+                    $data['name'] = $userSending->firstName . " " . $userSending->lastName;
+                } else {
+                    $data['name'] = "Gohife";
+                }
                 if (count($arrayPushAndroid) > 0) {
                     $this->sendMessage($data, $arrayPushAndroid, $arrayEmail, 'android');
                 }

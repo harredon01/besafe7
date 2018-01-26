@@ -48,7 +48,6 @@ class EditGroup {
 
     public function updateExpiredGroups() {
         $groups = Group::where('is_public', true)->where('status', 'active')->whereRaw(" CURDATE() > ends_at")->get();
-
         foreach ($groups as $group) {
             $group->status = 'suspended';
             $payload = array(
@@ -56,6 +55,7 @@ class EditGroup {
                 "group_name" => $group->name,
             );
             $followers = $group->getAllMembers();
+            $group->save();
             $data = [
                 "trigger_id" => $group->id,
                 "message" => "",
@@ -65,9 +65,8 @@ class EditGroup {
                 "payload" => $payload,
                 "user_status" => "useless"
             ];
-            return $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+            $this->editAlerts->sendMassMessage($data, $followers, null, true);
         }
-        return true;
     }
 
     public function getActiveAdminGroups(User $user) {
@@ -83,9 +82,7 @@ class EditGroup {
         $users = $group->checkMemberType($user);
         $deleteGroup = false;
         if (count($users) > 0) {
-
             if (!$group->is_public) {
-
                 $profile = $users[0];
                 if ($profile->is_admin) {
                     $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 AND status = "active" limit 1', [$user->id, $group->id]);

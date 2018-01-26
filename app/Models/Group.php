@@ -28,7 +28,7 @@ class Group extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at', 'level', 'rating'];
+    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at','plan', 'level', 'rating'];
     
     protected $dates = [
         'created_at',

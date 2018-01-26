@@ -30,7 +30,7 @@ class HistoricLocationsTable extends Migration {
                         $table->string('confidence')->nullable();
                         $table->string('is_charging')->nullable();
                         $table->string('is_moving')->nullable();
-                        $table->string('islast');
+                        $table->string('islast')->nullable();
                         $table->integer('trip')->unsigned()->nullable();
                         $table->index('trip');
                         $table->string('phone')->nullable();

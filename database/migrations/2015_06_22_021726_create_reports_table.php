@@ -48,6 +48,7 @@ class CreateReportsTable extends Migration {
             $table->double('minimum', 15, 2)->nullable();
             $table->dateTime('report_time')->nullable();
             $table->string('status')->nullable();
+            $table->string('plan')->nullable();
             $table->timestamps();
         });
     }

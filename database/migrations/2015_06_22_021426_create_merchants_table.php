@@ -49,6 +49,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('delivery_time')->nullable();
             $table->double('delivery_price', 15, 2)->nullable();
             $table->string('status')->nullable();
+            $table->string('plan')->nullable();
             $table->timestamps();
         });
     }

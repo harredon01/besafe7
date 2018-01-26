@@ -58,9 +58,12 @@ class GroupController extends Controller {
                     $group->is_authorized = true;
                     if ($member->is_admin == 1) {
                         $group->admin_id = 1;
+                    } else {
+                        $group->plan="";
                     }
                 } else {
                     $group->is_authorized = false;
+                    $group->plan="";
                 }
                 array_push($data, $group);
             }
