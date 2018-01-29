@@ -24,7 +24,6 @@ class CleanTrash {
     const GROUP_ADMIN = 'group_admin';
     const GROUP_ADMIN_NEW = 'group_admin_new';
     const NEW_CONTACT = 'new_contact';
-    const CONTACT_BLOCKED = 'contact_blocked';
     const NEW_GROUP = 'new_group';
     const GROUP_TYPE = 'group';
     const USER_TYPE = 'user';

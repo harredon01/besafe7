@@ -60,6 +60,7 @@ class ShareObject {
         if ($validator->fails()) {
             return $validator->getMessageBag();
         }
+        $userStatus = $user->getUserNotifStatus();
 
         if ($user->id == intval($data["follower"]) && $data["type"] == self::USER_TYPE) {
             
@@ -90,7 +91,7 @@ class ShareObject {
                     "object" => $triggerName,
                     "sign" => true,
                     "type" => self::NOTIFICATION_LOCATION,
-                    "user_status" => $user->getUserNotifStatus()
+                    "user_status" => $userStatus
                 ];
                 $this->editAlerts->sendMassMessage($data, $followers, $user, true);
             } else {
@@ -142,7 +143,7 @@ class ShareObject {
             if (count($dafollowers) > 0) {
                 DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
                 if ($object == self::OBJECT_LOCATION) {
-                    $user->updateFollowersDate();
+                    $user->updateFollowersDate($userStatus);
                 }
                 return ['status' => 'success', 'message' => 'followers saved'];
             } else {

@@ -363,7 +363,7 @@ class EditUserData {
                 $status = $value['level'];
             }
         }
-        $users = DB::table('contacts')->whereIn('contact_id', $importsget)->where('user_id', $user->id)->update(array('level' => $status,"updated_at" => date("Y-m-d H:i:s")));
+        $users = DB::table('contacts')->whereIn('contact_id', $importsget)->where('user_id', $user->id)->update(array('is_emergency' => true,"updated_at" => date("Y-m-d H:i:s")));
         return array("status" => "success", "message" => "contacts imported", "result" => $users);
     }
 

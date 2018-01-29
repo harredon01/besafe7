@@ -30,6 +30,27 @@ class CleanSearch {
 
         return $request2;
     }
+    public function handleGroup(User $user, Request $request) {
+        $mystring = $request->getRequestUri();
+        $findme = '?';
+        $pos = strpos($mystring, $findme);
+        if ($pos === false) {
+            $request2 = Request::create($mystring . "?user_id=" . $user->id."&order_by=groups.id,asc", 'GET');
+        } else {
+            $check = explode("?", $mystring);
+            if (count($check) != 2) {
+                return null;
+            }
+            $data = $request->all("user_id");
+            if (!$data['user_id']) {
+                $request2 = Request::create($mystring . "&user_id=" . $user->id."&order_by=groups.id,asc", 'GET');
+            } else {
+                return null;
+            }
+        }
+
+        return $request2;
+    }
 
     public function handleReportImgs(User $user, Request $request) {
         $mystring = $request->getRequestUri();

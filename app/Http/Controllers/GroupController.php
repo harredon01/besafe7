@@ -43,27 +43,15 @@ class GroupController extends Controller {
 
     public function index(Request $request) {
         $user = $request->user();
-        $request2 = $this->cleanSearch->handle($user, $request);
+        $request2 = $this->cleanSearch->handleGroup($user, $request);
         if ($request2) {
             $data = array();
             $queryBuilder = new GroupQueryBuilder(new Group, $request2);
             $result = $queryBuilder->build()->paginate();
             foreach ($result->items() as $group) {
-                $group->admin_id = 0;
+//                $group->admin_id = 0;
                 if (!$group->is_public) {
                     $group->users;
-                } 
-                $member = $group->checkMemberType($user);
-                if ($member) {
-                    $group->is_authorized = true;
-                    if ($member->is_admin == 1) {
-                        $group->admin_id = 1;
-                    } else {
-                        $group->plan="";
-                    }
-                } else {
-                    $group->is_authorized = false;
-                    $group->plan="";
                 }
                 array_push($data, $group);
             }
@@ -116,6 +104,7 @@ class GroupController extends Controller {
         $results = $this->editGroup->requestChangeStatusGroup($user, $request->all());
         return response()->json($results);
     }
+
     /**
      * Display the specified resource.
      *
@@ -175,12 +164,15 @@ class GroupController extends Controller {
             } else {
                 return response()->json(['status' => 'error', 'message' => 'inviteUsers failed group inactive']);
             }
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $group->id]);
-            if (sizeof($members) == 0) {
+            $member = $group->checkMemberType($user);
+            if ($member) {
+                if ($member->is_admin == false) {
+                    return response()->json(['status' => 'error', 'message' => 'User not admin']);
+                }
+            } else {
                 return response()->json(['status' => 'error', 'message' => 'User not admin']);
             }
-            $members = DB::select('select user_id as id from group_user where group_id = ? AND status = "active"', [$group->id]);
-            $i = sizeof($members);
+            $i = $group->countAllMembers();
             if (array_key_exists("contacts", $data)) {
                 $i = $i + count($data['contacts']);
             }

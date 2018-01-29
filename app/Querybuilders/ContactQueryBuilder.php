@@ -1,7 +1,6 @@
 <?php
 namespace App\Querybuilders;
 use Unlu\Laravel\Api\QueryBuilder;
-
 class ContactQueryBuilder extends QueryBuilder 
 {
    public function filterByUserId($query, $id)
@@ -11,7 +10,7 @@ class ContactQueryBuilder extends QueryBuilder
    }
    public function filterByDateAfter($query, $id)
    {
-      return $query->where('contacts.updated_at', '>', $id);
+      return $query->where('contacts.last_significant', '>', $id);
    }
 }
 

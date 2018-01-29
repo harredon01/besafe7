@@ -4,11 +4,14 @@ use Unlu\Laravel\Api\QueryBuilder;
 
 class GroupQueryBuilder extends QueryBuilder 
 {
+   public function filterByDateAfter($query, $id)
+   {
+      return $query->where('group_user.last_significant', '>', $id)->where('group_user.last_significant', '>', $id)->where('groups.updated_at', '>', $id);
+   }
    public function filterByUserId($query, $id)
    {
-      return $query->whereHas('users', function($q) use ($id) {
-         return $q->where('users.id', $id);
-      });
+      return $query->join('group_user', 'groups.id', '=', 'group_user.group_id')
+           ->where('group_user.user_id', '=', $id);
    }
 }
 

@@ -24,7 +24,6 @@ class EditMessages {
     const GROUP_ADMIN = 'group_admin';
     const GROUP_ADMIN_NEW = 'group_admin_new';
     const NEW_CONTACT = 'new_contact';
-    const CONTACT_BLOCKED = 'contact_blocked';
     const NEW_GROUP = 'new_group';
     const GROUP_TYPE = 'group';
     const USER_TYPE = 'user';
@@ -82,7 +81,7 @@ class EditMessages {
                     $recipients = DB::select("select 
                         user_id as id
                             from
-                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and status = 'active';");
+                            group_user where group_id = $group->id and user_id = $user->id and is_admin = 1 and level = 'active';");
                     if (count($recipients) > 0) {
                         $messages = DB::select('select * from messages '
                                         . 'where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "group_message" '

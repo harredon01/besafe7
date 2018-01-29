@@ -15,12 +15,12 @@ use DB;
 class EditGroup {
 
     const GROUP_REMOVE = 'group_remove';
-    const CONTACT_BLOCKED = 'contact_blocked';
+    const GROUP_PENDING = 'group_pending';
+    const GROUP_BLOCKED = 'group_blocked';
     const GROUP_LEAVE = 'group_leave';
     const NEW_GROUP = 'new_group';
     const GROUP_ACTIVE = 'group_active';
     const GROUP_INVITE = 'group_invite';
-    const GROUP_PENDING = 'group_pending';
     const GROUP_EXPIRED = 'group_expired';
     const OBJECT_GROUP = 'Group';
 
@@ -71,49 +71,51 @@ class EditGroup {
 
     public function getActiveAdminGroups(User $user) {
         return DB::select('select g.* from groups g join group_user gu on g.id = gu.group_id'
-                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.status = "active";', [$user->id]);
+                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.level <> "'. self::GROUP_BLOCKED .'"  && level <> "'. self::GROUP_PENDING .'";', [$user->id]);
     }
 
     public function checkAdminGroup($userId, $groupId) {
-        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND status = "active"', [$groupId, $userId]);
+        return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND level = "active"', [$groupId, $userId]);
     }
 
     public function deleteGroupUser(User $user, Group $group) {
-        $users = $group->checkMemberType($user);
+        $profile = $group->checkMemberType($user);
         $deleteGroup = false;
-        if (count($users) > 0) {
-            if (!$group->is_public) {
-                $profile = $users[0];
-                if ($profile->is_admin) {
-                    $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 AND status = "active" limit 1', [$user->id, $group->id]);
-                    if (count($users2) == 0) {
-                        $usersf = DB::select('select user_id from group_user where user_id  <> ? and group_id = ? limit 1', [$user->id, $group->id]);
-                        if (count($usersf) > 0) {
-                            $canditate = $usersf[0];
-                            $data = [
-                                "user_id" => $canditate->user_id,
-                                "group_id" => $group->id
-                            ];
-                            $this->setAdminGroup($data);
+        if ($profile) {
+            if ($profile->level != "blocked") {
+                if (!$group->is_public) {
+                    $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
+                    if ($profile->is_admin) {
+                        $users2 = DB::select('select * from group_user where user_id  <> ? and group_id = ? and is_admin = 1 AND level = "active" limit 1', [$user->id, $group->id]);
+                        if (count($users2) == 0) {
+                            $usersf = DB::select('select user_id from group_user where user_id  <> ? and group_id = ? limit 1', [$user->id, $group->id]);
+                            if (count($usersf) > 0) {
+                                $canditate = $usersf[0];
+                                $data = [
+                                    "user_id" => $canditate->user_id,
+                                    "group_id" => $group->id
+                                ];
+                                $this->setAdminGroup($data);
 //                            $this->notifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE);
-                            dispatch(new NotifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE));
+                                dispatch(new NotifyGroup($user, $group, $canditate->user_id, self::GROUP_LEAVE));
+                            } else {
+                                $deleteGroup = true;
+                            }
                         } else {
-                            $deleteGroup = true;
+                            $this->notifyGroup($user, $group, null, self::GROUP_LEAVE);
                         }
                     } else {
-                        $this->notifyGroup($user, $group, null, false);
+                        $this->notifyGroup($user, $group, null, self::GROUP_LEAVE);
                     }
-                } else {
-                    $this->notifyGroup($user, $group, null, false);
-                }
-                $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
-                if ($deleteGroup) {
-                    $group->delete();
-                }
-            } else {
-                $profile = $users[0];
-                if ($profile->is_admin) {
-                    return null;
+                    
+                    if ($deleteGroup) {
+                        $group->delete();
+                    }
+                } else if ($group->isPublicActive()) {
+                    if ($profile->is_admin) {
+                        return null;
+                    }
+                    $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                 }
             }
         }
@@ -135,6 +137,7 @@ class EditGroup {
             "user_id" => $user->id
         );
         $push = true;
+        $followers = [];
         if ($type == self::GROUP_AVATAR) {
             $payload["filename"] = $filename;
             $group->avatar = $filename;
@@ -147,7 +150,11 @@ class EditGroup {
                 $payload["admin_id"] = $filename;
             }
             $message = "";
-            $followers = $group->getAllMembersButActive($user);
+
+            if (!$group->is_public) {
+                $followers = $group->getAllMembersButActive($user);
+                $group->save();
+            }
             //$push = false;
         } else if ($type == self::GROUP_REMOVED) {
             if (count($filename) > 0) {
@@ -166,16 +173,17 @@ class EditGroup {
                 ];
                 $this->editAlerts->sendMassMessage($data, $followers, $user, true);
                 if ($group->isPublicActive()) {
-                    $sql = "UPDATE group_user set status = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
-                } else {
+                    $sql = "UPDATE group_user set level = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                } else if (!$group->is_public) {
                     $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                } else {
+                    return null;
                 }
 
                 DB::statement($sql, $filename);
-                if ($group->is_public) {
-                    $followers = array();
-                } else {
+                if (!$group->is_public) {
                     $followers = $group->getAllMembersButActive($user);
+                    $group->save();
                 }
             } else {
                 $followers = array();
@@ -190,7 +198,7 @@ class EditGroup {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     $followers = DB::select($sql, $filename);
-                    $sql = "UPDATE group_user set status = 'active' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $sql = "UPDATE group_user set level = 'active' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
                     DB::statement($sql, $filename);
                 }
             }
@@ -223,9 +231,14 @@ class EditGroup {
                     $this->editAlerts->sendMassMessage($data, $followers, $user, true);
                     $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND status = 'active'; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."'; ";
                     $followers = DB::select($sql, $filename);
+                    $group->save();
+                }else if ($group->isPublicActive()) {
+                    $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    DB::statement($sql, $filename);
                 }
+                
             } else {
                 $followers = array();
             }
@@ -233,7 +246,7 @@ class EditGroup {
             $payload["party"] = $filename;
             $message = "";
         }
-        $group->save();
+
         $data = [
             "trigger_id" => $group->id,
             "message" => "",
@@ -244,7 +257,6 @@ class EditGroup {
             "user_status" => $user->getUserNotifStatus()
         ];
         return $this->editAlerts->sendMassMessage($data, $followers, $user, true);
-        return ['success' => 'members notified'];
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
@@ -267,7 +279,7 @@ class EditGroup {
                         $max = $group->max_users - $i;
                         return ['status' => 'error', "message" => 'Max users exceeded', "max" => $max];
                     }
-                } else {
+                } else if ($data['status'] == "group_pending"||$data['status'] == "group_blocked") {
                     dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
                     //return $this->notifyGroup($user, $group, $data["party"], $data["status"]);
                     return ['status' => 'success', "message" => 'Request queued'];
@@ -282,8 +294,8 @@ class EditGroup {
             if ($group->checkAdmin($user)) {
                 $per_page = 10;
                 $skip = ($data['page'] - 1) * $per_page;
-                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar')->get();
-                $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('status', $data['level'])->count();
+                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('level', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar','status','level')->get();
+                $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('level', $data['level'])->count();
                 return $data;
             }
             return null;
@@ -353,13 +365,13 @@ class EditGroup {
                     return ['status' => 'error', "message" => 'Group Full'];
                 }
 
-                $members = $group->checkMemberType($user);
+                $member = $group->checkMemberType($user);
 
-                if (count($members) > 0) {
+                if ($member) {
                     return ['status' => 'error', "message" => 'User cant join'];
                 }
 
-                $user->groups()->save($group, ["status" => "pending", "is_admin" => false]);
+                $user->groups()->save($group, ["level" => self::GROUP_PENDING, "is_admin" => false]);
                 $group->is_authorized = false;
                 dispatch(new NotifyGroup($user, $group, null, self::GROUP_PENDING));
                 //$this->notifyGroup($user, $group, null, self::GROUP_PENDING);
@@ -380,9 +392,16 @@ class EditGroup {
         } else {
             return null;
         }
-        $members = $group->checkMemberType($user);
-        $profile = $members[0];
-        if (sizeof($members) == 0) {
+        $profile = $group->checkMemberType($user);
+        if ($profile) {
+            
+        } else {
+            return null;
+        }
+        if ($profile->level == "blocked") {
+            return null;
+        }
+        if ($profile->is_admin == 0) {
             return null;
         }
         $members = array();
@@ -395,7 +414,7 @@ class EditGroup {
             return null;
         }
         $is_admin = false;
-        if ($profile->is_admin) {
+        if ($group->is_public) {
             $is_admin = true;
         }
         if (array_key_exists("contacts", $data)) {
@@ -413,7 +432,7 @@ class EditGroup {
                     $invite['group_id'] = $group->id;
                     $invite['user_id'] = $value;
                     $invite['color'] = $i;
-                    $invite['status'] = "active";
+                    $invite['level'] = "active";
                     $invite['is_admin'] = $is_admin;
                     $invite['created_at'] = date("Y-m-d H:i:s");
                     $invite['updated_at'] = date("Y-m-d H:i:s");
@@ -486,7 +505,7 @@ class EditGroup {
         }
         if ($data["group_id"]) {
             $groupid = $data['group_id'];
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND status = "active" ', [$user->id, $groupid]);
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND level = "active" ', [$user->id, $groupid]);
             if (sizeof($members) == 0) {
                 return null;
             }
@@ -536,7 +555,7 @@ class EditGroup {
             $invite['group_id'] = $group->id;
             $invite['user_id'] = $user->id;
             $invite['color'] = 1;
-            $invite['status'] = "active";
+            $invite['level'] = "active";
             $invite['is_admin'] = true;
             $invite['created_at'] = date("Y-m-d H:i:s");
             $invite['updated_at'] = date("Y-m-d H:i:s");

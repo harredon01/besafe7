@@ -28,7 +28,6 @@ class EditAlerts {
     const GROUP_ADMIN = 'group_admin';
     const GROUP_ADMIN_NEW = 'group_admin_new';
     const NEW_CONTACT = 'new_contact';
-    const CONTACT_BLOCKED = 'contact_blocked';
     const NEW_GROUP = 'new_group';
     const GROUP_TYPE = 'group';
     const USER_TYPE = 'user';
@@ -64,7 +63,7 @@ class EditAlerts {
         return ['success' => 'notifications updated'];
     }
 
-    public function sendMassMessage(array $data, array $recipients, User $userSending, $push) {
+    public function sendMassMessage(array $data, array $recipients, $userSending, $push) {
         $arrayPushAndroid = array();
         $arrayPushIos = array();
         $arrayEmail = array();
@@ -72,7 +71,7 @@ class EditAlerts {
         $notification = null;
         $sign = $data['sign'];
         unset($data['sign']);
-        if ($userSending ) {
+        if ($userSending) {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
             $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
@@ -285,7 +284,7 @@ class EditAlerts {
 
     public function notifyContacts(User $user, $filename) {
         $followers = $user->getNonBlockedContacts();
-        $user->updateAllContactsDate();
+        $user->updateAllContactsDate(null);
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -380,7 +379,7 @@ class EditAlerts {
                 }
             }
         }
-        $user->updateAllEmergencyContactsDate();
+        $user->updateAllEmergencyContactsDate($data['type']);
         $this->sendMassMessage($data, $followersPush, $user, true);
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
@@ -399,6 +398,59 @@ class EditAlerts {
             $this->sendMassMessage($data, $recipient, $user, true);
         }
 
+        return ['success' => 'Message sent to all contacts'];
+    }
+
+    public function postGroupEmergency(User $user, array $data) {
+        $group = Group::find($data['group_id']);
+        if ($group) {
+            $profile = $group->checkMemberType($user);
+            if ($profile) {
+                if ($profile->level != "blocked") {
+                    $followersInsert = array();
+                    $followersPush = array();
+                    $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => $data['message'],
+                        "payload" => $payload,
+                        "object" => self::OBJECT_USER,
+                        "sign" => true,
+                        "type" => $data['type'],
+                        "user_status" => $user->getUserNotifStatus()
+                    ];
+                    $user->is_alerting = 1;
+                    $user->alert_type = $data['type'];
+                    $user->makeTrip();
+                    $user->write_report = true;
+                    $user->save();
+                    if ($profile->is_admin == 1) {
+                        $followers = $group->getAllMembersNonUserBlockedButActive($user);
+                        foreach ($followers as $follower) {
+                            array_push($followersPush, $follower);
+                        }
+                        $group->status = $data['type'];
+                        $group->save();
+                    } else {
+                        $followers = $group->getAllAdminMembersNonUserBlockedButActive($user);
+                        foreach ($followers as $follower) {
+                            array_push($followersPush, $follower);
+                            if (!property_exists('follower', 'object_id')) {
+                                $dafollower = $follower->id;
+                                if ($user->id != intval($dafollower)) {
+                                    $item = ['user_id' => $dafollower, 'object_id' => $user->trip, self::ACCESS_USER_OBJECT_TYPE => self::OBJECT_LOCATION, self::ACCESS_USER_OBJECT_ID => $user->id, 'created_at' => date("Y-m-d h:i:sa"), 'updated_at' => date("Y-m-d h:i:sa")];
+                                    array_push($followersInsert, $item);
+                                }
+                            }
+                        }
+                        if (count($followersInsert) > 0) {
+                            DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
+                        }
+                    }
+                    $this->sendMassMessage($data, $followersPush, $user, true);
+                }
+            }
+        }
         return ['success' => 'Message sent to all contacts'];
     }
 
@@ -482,7 +534,7 @@ class EditAlerts {
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
         $followers = $user->getEmergencyContacts();
-        $user->updateAllEmergencyContactsDate();
+        $user->updateAllEmergencyContactsDate("normal");
         $data = [
             "trigger_id" => $user->id,
             "message" => "",

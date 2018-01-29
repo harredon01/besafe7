@@ -23,6 +23,7 @@ class User extends Authenticatable {
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
     const CONTACT_BLOCKED = 'contact_blocked';
+    const CONTACT_TRACKING = 'tracking';
     const OBJECT_LOCATION = 'Location';
     const RED_MESSAGE_TYPE = 'emergency';
 
@@ -78,7 +79,7 @@ class User extends Authenticatable {
     }
 
     public function groups() {
-        return $this->belongsToMany('App\Models\Group')->withPivot('color')->withTimestamps();
+        return $this->belongsToMany('App\Models\Group')->withPivot('color')->withPivot('level')->withPivot('is_admin')->withTimestamps();
     }
 
     public function vehicles() {
@@ -189,16 +190,7 @@ class User extends Authenticatable {
                 . " and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'; ", [$this->id]);
         return $followers;
     }
-    public function updateFollowersDate(){
-        //$date = DateTime::createFromFormat('d-m-Y H:i:s');
-        $followers = DB::table(self::ACCESS_USER_OBJECT )
-                        ->where(self::ACCESS_USER_OBJECT_ID,  $this->id)
-                        ->where(self::ACCESS_USER_OBJECT_TYPE, self::OBJECT_LOCATION)->pluck('id');
-        DB::table('contacts')
-                        ->where('contacts.contact_id',  $this->id)
-                        ->whereIn('contacts.user_id', $followers)
-                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
-    }
+    
     public function getNonBlockedContacts() {
         $followers = DB::select("select user_id as id from contacts "
                 . "where user_id = $this->id "
@@ -239,20 +231,39 @@ class User extends Authenticatable {
         return false;
     }
     
-    public function updateAllContactsDate(){
+    public function updateAllContactsDate($level){
+        $data = array("last_significant" => date("Y-m-d H:i:s"));
+        if($level){
+            $data["level"] = $level;
+        }
         DB::table('contacts')
                         ->where('contacts.contact_id', '=', $this->id)
-                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
+                        ->update($data);
     }
-    public function updateAllEmergencyContactsDate(){
+    public function updateAllEmergencyContactsDate($level){
         DB::table('contacts')
                         ->where('contacts.contact_id', $this->id)
-                        ->where('contacts.level',  "emergency")
-                        ->update(array("updated_at" => date("Y-m-d H:i:s")));
+                        ->where('contacts.level',  self::RED_MESSAGE_TYPE)
+                        ->update(array("last_significant" => date("Y-m-d H:i:s"),"level" =>$level));
+    }
+    public function updateFollowersDate($level){
+        //$date = DateTime::createFromFormat('d-m-Y H:i:s');
+        $followers = DB::table(self::ACCESS_USER_OBJECT )
+                        ->where(self::ACCESS_USER_OBJECT_ID,  $this->id)
+                        ->where(self::ACCESS_USER_OBJECT_TYPE, self::OBJECT_LOCATION)->pluck('id');
+        DB::table('contacts')
+                        ->where('contacts.contact_id',  $this->id)
+                        ->whereIn('contacts.user_id', $followers)
+                        ->update(array("last_significant" => date("Y-m-d H:i:s")));
+        DB::table('contacts')
+                        ->where('contacts.contact_id',  $this->id)
+                ->where('contacts.level','<>',  self::CONTACT_BLOCKED)
+                        ->where('contacts.level','<>',  self::RED_MESSAGE_TYPE)
+                        ->whereIn('contacts.user_id', $followers)
+                        ->update(array("level" => $level));
     }
 
-
-        public function getRecipientsMessage($objectActive_id) {
+    public function getRecipientsMessage($objectActive_id) {
         return $this->getNonBlockedUser($objectActive_id);
     }
 

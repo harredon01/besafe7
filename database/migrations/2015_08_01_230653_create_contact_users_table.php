@@ -21,7 +21,9 @@ class CreateContactUsersTable extends Migration {
                         $table->integer('contact_id')->unsigned();
                         $table->foreign('contact_id')->references('id')
                                 ->on('users');
+                        $table->boolean('is_emergency')->default(false);
                         $table->string('level');
+                        $table->timestamp('last_significant')->nullable();
 			$table->timestamps();
 		});
 	}

@@ -230,7 +230,7 @@ class EditLocation {
                         $result = $this->editAlerts->checkUserCode($user, $code);
                         if ($result['status'] == "success") {
                             $followers = $user->getCurrentFollowers();
-                            $user->updateFollowersDate();
+                            $user->updateFollowersDate("normal");
                             $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                             $message = [
                                 "trigger_id" => $user->id,

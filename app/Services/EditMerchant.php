@@ -21,6 +21,8 @@ class EditMerchant {
     const OBJECT_GROUP = 'Group';
     const OBJECT_USER = 'User';
     const OBJECT_MERCHANT = 'Merchant';
+    const GROUP_PENDING = 'group_pending';
+    const GROUP_BLOCKED = 'group_blocked';
 
     /**
      * The EditAlert implementation.
@@ -89,7 +91,7 @@ class EditMerchant {
             $object->delete();
         } else {
             if ($object->group_id) {
-                $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and status <> "blocked" and is_admin = true ', [$user->id, $object->group_id]);
+                $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and level <> "'. self::GROUP_BLOCKED .'"  && level <> "'. self::GROUP_PENDING .'" and is_admin = true ', [$user->id, $object->group_id]);
                 if (sizeof($members) == 0) {
                     return null;
                 } else {
@@ -330,6 +332,9 @@ class EditMerchant {
         if ($group->isPublicActive()) {
             $member = $group->checkMemberType($user);
             if ($member) {
+                if ($member->level == "blocked") {
+                    return null;
+                }
                 if ($member->is_admin) {
                     $data['status'] = "active";
                 } else {
@@ -341,6 +346,9 @@ class EditMerchant {
         } else if (!$group->is_public) {
             $member = $group->checkMemberType($user);
             if ($member) {
+                if ($member->level == "blocked") {
+                    return null;
+                }
                 $data['status'] = "active";
             } else {
                 return null;
@@ -350,7 +358,6 @@ class EditMerchant {
         }
         return $data;
     }
-
 
     public function notifyGroup(Group $group, User $user, array $data, $type, $object) {
         if ($group) {
@@ -507,8 +514,6 @@ class EditMerchant {
         $result = $object::create($data);
         return $result;
     }
-
-    
 
     /**
      * Get a validator for an incoming edit profile request.
