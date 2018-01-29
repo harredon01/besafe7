@@ -71,7 +71,7 @@ class EditGroup {
 
     public function getActiveAdminGroups(User $user) {
         return DB::select('select g.* from groups g join group_user gu on g.id = gu.group_id'
-                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.level <> "'. self::GROUP_BLOCKED .'"  && level <> "'. self::GROUP_PENDING .'";', [$user->id]);
+                        . ' where gu.user_id  = ? and gu.is_admin = 1 and g.ends_at > CURDATE() AND gu.level <> "' . self::GROUP_BLOCKED . '"  && level <> "' . self::GROUP_PENDING . '";', [$user->id]);
     }
 
     public function checkAdminGroup($userId, $groupId) {
@@ -107,7 +107,7 @@ class EditGroup {
                     } else {
                         $this->notifyGroup($user, $group, null, self::GROUP_LEAVE);
                     }
-                    
+
                     if ($deleteGroup) {
                         $group->delete();
                     }
@@ -231,14 +231,13 @@ class EditGroup {
                     $this->editAlerts->sendMassMessage($data, $followers, $user, true);
                     $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
-                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."'; ";
+                    $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '" . self::GROUP_BLOCKED . "' && level <> '" . self::GROUP_PENDING . "'; ";
                     $followers = DB::select($sql, $filename);
                     $group->save();
-                }else if ($group->isPublicActive()) {
+                } else if ($group->isPublicActive()) {
                     $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                 }
-                
             } else {
                 $followers = array();
             }
@@ -279,7 +278,7 @@ class EditGroup {
                         $max = $group->max_users - $i;
                         return ['status' => 'error', "message" => 'Max users exceeded', "max" => $max];
                     }
-                } else if ($data['status'] == "group_pending"||$data['status'] == "group_blocked") {
+                } else if ($data['status'] == "group_pending" || $data['status'] == "group_blocked") {
                     dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
                     //return $this->notifyGroup($user, $group, $data["party"], $data["status"]);
                     return ['status' => 'success', "message" => 'Request queued'];
@@ -294,7 +293,7 @@ class EditGroup {
             if ($group->checkAdmin($user)) {
                 $per_page = 10;
                 $skip = ($data['page'] - 1) * $per_page;
-                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('level', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar','status','level')->get();
+                $data['result'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('level', $data['level'])->skip($skip)->take($per_page)->select('name', 'user_id as contact_id', 'avatar', 'status', 'level')->get();
                 $data['total'] = DB::table('group_user')->join('users', 'group_user.user_id', '=', 'users.id')->where('group_id', $data["group_id"])->where('user_id', "<>", $user->id)->where('level', $data['level'])->count();
                 return $data;
             }
@@ -329,13 +328,17 @@ class EditGroup {
             if (count($members) >= $group->max_users) {
                 return null;
             }
+            $member = $group->checkMemberType($user);
+            if ($member) {
+                return ['status' => 'error', "message" => 'User cant join'];
+            }
             if ($value->color == "") {
                 $color = 0;
             } else {
                 $color = intval($value->color);
             }
             $color ++;
-            $user->groups()->save($group, ['color' => $color, "status" => "pending", "is_admin" => false]);
+            $user->groups()->save($group, ['color' => $color, "level" => self::GROUP_PENDING, "is_admin" => false]);
         }
         return $group;
     }
@@ -422,6 +425,10 @@ class EditGroup {
             foreach ($data['contacts'] as $value) {
                 $contact = User::find($value);
                 if ($contact) {
+                    $test = $group->checkMemberType($contact);
+                    if ($test) {
+                        continue;
+                    }
                     $i++;
                     $invite = array();
                     $notif = array();
