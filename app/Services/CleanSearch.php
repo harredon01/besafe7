@@ -30,12 +30,13 @@ class CleanSearch {
 
         return $request2;
     }
+
     public function handleGroup(User $user, Request $request) {
         $mystring = $request->getRequestUri();
         $findme = '?';
         $pos = strpos($mystring, $findme);
         if ($pos === false) {
-            $request2 = Request::create($mystring . "?user_id=" . $user->id."&order_by=groups.id,asc", 'GET');
+            $request2 = Request::create($mystring . "?user_id=" . $user->id . "&order_by=groups.id,asc", 'GET');
         } else {
             $check = explode("?", $mystring);
             if (count($check) != 2) {
@@ -43,7 +44,7 @@ class CleanSearch {
             }
             $data = $request->all("user_id");
             if (!$data['user_id']) {
-                $request2 = Request::create($mystring . "&user_id=" . $user->id."&order_by=groups.id,asc", 'GET');
+                $request2 = Request::create($mystring . "&user_id=" . $user->id . "&order_by=groups.id,asc", 'GET');
             } else {
                 return null;
             }
@@ -206,7 +207,7 @@ class CleanSearch {
             if (!$data['user_id']) {
                 $data = $request->all("group_id");
                 if ($data['group_id']) {
-                    $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? and status <> "blocked" ', [$user->id, $data['group_id']]);
+                    $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? and level <> "group_blocked" and level <> "group_pending"', [$user->id, $data['group_id']]);
                     if (sizeof($members) == 0) {
                         return null;
                     } else {
@@ -238,27 +239,34 @@ class CleanSearch {
                         return null;
                     }
                     $data = $request->all("favorite_id");
+
                     if (!$data['favorite_id']) {
                         
                     } else {
                         return null;
                     }
-                    $data = $request->all("shared","favorite");
-                    if (!$data['shared']&&!$data['favorite']) {
+
+                    $data = $request->all("shared", "favorite");
+                    if (!$data['shared'] && !$data['favorite']) {
                         $finalString = $mystring . "&user_id=" . $user->id;
                     } else {
-                        if ($data['shared'] == 'true') {
-                            $mystring = str_replace("shared=true", "", $mystring);
-                            $mystring = $mystring . "shared_id=" . $user->id;
-                        } else {
-                            return null;
+                        if ($data['shared']) {
+                            if ($data['shared'] == 'true') {
+                                $mystring = str_replace("shared=true", "", $mystring);
+                                $mystring = $mystring . "shared_id=" . $user->id;
+                            } else {
+                                return null;
+                            }
                         }
-                        if ($data['favorite'] == 'true') {
-                            $mystring = str_replace("favorite=true", "", $mystring);
-                            $mystring = $mystring . "favorite_id=" . $user->id . "&status=active";
-                        } else {
-                            return null;
+                        if ($data['favorite']) {
+                            if ($data['favorite'] == 'true') {
+                                $mystring = str_replace("favorite=true", "", $mystring);
+                                $mystring = $mystring . "favorite_id=" . $user->id . "&status=active";
+                            } else {
+                                return null;
+                            }
                         }
+
                         $finalString = $mystring . "&status=active";
                     }
                 }

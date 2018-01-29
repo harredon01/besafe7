@@ -83,7 +83,7 @@ class EditAlerts {
             }
         } else {
             $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
-            $translationesp = Translation::where('language', 'ec-co')->where("code", $data['type'])->first();
+            $translationesp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
             $arrayPayload = $data['payload'];
             if ($translation) {
                 $data['subject'] = $translation->value;
@@ -135,8 +135,7 @@ class EditAlerts {
 
                         if ($user->platform == "android") {
                             array_push($arrayPushAndroid, $user->token);
-                        }
-                        if ($user->platform == "ios") {
+                        } else if ($user->platform == "ios") {
                             array_push($arrayPushIos, $user->token);
                         }
                     }
