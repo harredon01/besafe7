@@ -328,7 +328,7 @@ class EditUserData {
                     
                 } else {
                     array_push($inviteUsers, $contact);
-                    array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s")));
+                    array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "last_significant" => date("Y-m-d H:i:s")));
                 }
             }
         }
@@ -354,16 +354,11 @@ class EditUserData {
      * 
      */
     public function updateContactsLevel(User $user, array $data) {
-        $importsget = array();
-        $status = "";
-        foreach ($data as $value) {
-            $contact = User::find($value['contact_id']);
-            if ($contact) {
-                array_push($importsget, $value['contact_id']);
-                $status = $value['level'];
-            }
+        $is_emergency = false;
+        if($data["level"]=="emergency"){
+            $is_emergency = true;
         }
-        $users = DB::table('contacts')->whereIn('contact_id', $importsget)->where('user_id', $user->id)->update(array('is_emergency' => true,"updated_at" => date("Y-m-d H:i:s")));
+        $users = DB::table('contacts')->whereIn('contact_id', $data["contacts"])->where('user_id', $user->id)->update(array('is_emergency' => $is_emergency,"last_significant" => date("Y-m-d H:i:s")));
         return array("status" => "success", "message" => "contacts imported", "result" => $users);
     }
 
@@ -383,14 +378,14 @@ class EditUserData {
                     'user_id' => $user->id,
                     'contact_id' => $contactId,
                     "created_at" => date("Y-m-d H:i:s"),
-                    "updated_at" => date("Y-m-d H:i:s")
+                    "last_significant" => date("Y-m-d H:i:s")
                 ));
             } else {
                 $users = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->update(array(
                     'level' => self::CONTACT_BLOCKED,
                     'user_id' => $user->id,
                     'contact_id' => $contactId,
-                    "updated_at" => date("Y-m-d H:i:s")
+                    "last_significant" => date("Y-m-d H:i:s")
                 ));
             }
 
@@ -570,7 +565,7 @@ class EditUserData {
             $followers = DB::select("SELECT * FROM contacts WHERE user_id=? AND contact_id=? ", [$user->id, $contactId]);
             if (count($followers) == 0) {
                 $id = DB::table('contacts')->insert(
-                        array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "updated_at" => date("Y-m-d H:i:s"))
+                        array('user_id' => $user->id, 'contact_id' => $contactId, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "last_significant" => date("Y-m-d H:i:s"))
                 );
                 $payload = array('first_name' => $user->firstName, 'last_name' => $user->lastName);
                 $notification = [
@@ -596,7 +591,7 @@ class EditUserData {
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)
-                        ->update(array('level' => 'deleted',"updated_at" => date("Y-m-d H:i:s")));
+                        ->update(array('level' => 'deleted',"last_significant" => date("Y-m-d H:i:s")));
     }
 
     public function getUserId($user_id) {

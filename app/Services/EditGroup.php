@@ -16,13 +16,18 @@ class EditGroup {
 
     const GROUP_REMOVE = 'group_remove';
     const GROUP_PENDING = 'group_pending';
+    const GROUP_EXPELLED = 'group_expelled';
     const GROUP_BLOCKED = 'group_blocked';
+    const GROUP_REMOVED = 'group_removed';
+    const GROUP_AVATAR = 'group_avatar';
     const GROUP_LEAVE = 'group_leave';
     const NEW_GROUP = 'new_group';
     const GROUP_ACTIVE = 'group_active';
     const GROUP_INVITE = 'group_invite';
     const GROUP_EXPIRED = 'group_expired';
     const OBJECT_GROUP = 'Group';
+    const GROUP_ADMIN = 'group_admin';
+    const GROUP_ADMIN_NEW = 'group_admin_new';
 
     /**
      * The EditAlert implementation.
@@ -442,7 +447,7 @@ class EditGroup {
                     $invite['level'] = "active";
                     $invite['is_admin'] = $is_admin;
                     $invite['created_at'] = date("Y-m-d H:i:s");
-                    $invite['updated_at'] = date("Y-m-d H:i:s");
+                    $invite['last_significant'] = date("Y-m-d H:i:s");
                     array_push($invites, $invite);
                     array_push($inviteUsers, $contact);
                     if ($group->max_users <= $i) {
@@ -565,7 +570,7 @@ class EditGroup {
             $invite['level'] = "active";
             $invite['is_admin'] = true;
             $invite['created_at'] = date("Y-m-d H:i:s");
-            $invite['updated_at'] = date("Y-m-d H:i:s");
+            $invite['last_significant'] = date("Y-m-d H:i:s");
             array_push($admin, $invite);
             DB::table('group_user')->insert(
                     $admin

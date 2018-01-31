@@ -98,7 +98,10 @@ class MessagesApiController extends Controller {
         }
         dispatch(new PostMessage($user, $request->all()));
         //$this->editMessages->postMessage($user, $request->all());
-        return response()->json($this->editMessages->postMessage($user, $request->all()));
+        return response()->json([
+                    'status' => "success",
+                    'message' => "message queued for sending"
+                        ]);
     }
 
 

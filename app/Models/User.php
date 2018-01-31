@@ -79,7 +79,7 @@ class User extends Authenticatable {
     }
 
     public function groups() {
-        return $this->belongsToMany('App\Models\Group')->withPivot('color')->withPivot('level')->withPivot('is_admin')->withTimestamps();
+        return $this->belongsToMany('App\Models\Group')->withPivot('color')->withPivot('level')->withPivot('is_admin')->withPivot('last_significant');
     }
 
     public function vehicles() {

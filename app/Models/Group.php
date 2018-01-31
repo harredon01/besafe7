@@ -39,7 +39,7 @@ class Group extends Model {
     ];
 
     public function users() {
-        return $this->belongsToMany('App\Models\User')->withPivot('color')->withPivot('level')->withPivot('is_admin')->withTimestamps();
+        return $this->belongsToMany('App\Models\User')->withPivot('color')->withPivot('level')->withPivot('is_admin')->withPivot('last_significant');
     }
 
     public function reports() {
