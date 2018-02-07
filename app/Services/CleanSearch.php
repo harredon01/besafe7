@@ -49,7 +49,6 @@ class CleanSearch {
                 return null;
             }
         }
-
         return $request2;
     }
 

@@ -46,8 +46,10 @@ class GroupController extends Controller {
         $request2 = $this->cleanSearch->handleGroup($user, $request);
         if ($request2) {
             $data = array();
+            DB::enableQueryLog();  
             $queryBuilder = new GroupQueryBuilder(new Group, $request2);
             $result = $queryBuilder->build()->paginate();
+            dd(DB::getQueryLog());
             foreach ($result->items() as $group) {
 //                $group->admin_id = 0;
                 if (!$group->is_public) {

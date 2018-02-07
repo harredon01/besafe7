@@ -6,12 +6,15 @@ class GroupQueryBuilder extends QueryBuilder
 {
    public function filterByDateAfter($query, $id)
    {
-      return $query->where('group_user.last_significant', '>', $id)->orWhere('groups.updated_at', '>', $id);
+      return $query->where(function ($query) use ($id) {
+                $query->where('group_user.last_significant', '>', $id)
+                      ->orWhere('groups.updated_at', '>', $id);
+            });
    }
    public function filterByUserId($query, $id)
    {
       return $query->join('group_user', 'groups.id', '=', 'group_user.group_id')
-           ->where('group_user.user_id', '=', $id);
+           ->where('group_user.user_id',$id);
    }
 }
 

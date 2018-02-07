@@ -10,7 +10,10 @@ class ContactQueryBuilder extends QueryBuilder
    }
    public function filterByDateAfter($query, $id)
    {
-      return $query->where('contacts.last_significant', '>', $id)->orWhere('users.updated_at', '>', $id);
+      return $query->where(function ($query) use ($id) {
+                $query->where('contacts.last_significant', '>', $id)
+                      ->orWhere('users.updated_at', '>', $id);
+            });
    }
 }
 
