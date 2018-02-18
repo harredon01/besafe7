@@ -87,7 +87,7 @@ class EditGroup {
         $profile = $group->checkMemberType($user);
         $deleteGroup = false;
         if ($profile) {
-            if ($profile->level != "blocked") {
+            if ($profile->level != "contact_blocked") {
                 if (!$group->is_public) {
                     $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                     if ($profile->is_admin) {
@@ -406,7 +406,7 @@ class EditGroup {
         } else {
             return null;
         }
-        if ($profile->level == "blocked") {
+        if ($profile->level == "contact_blocked") {
             return null;
         }
         if ($profile->is_admin == 0) {

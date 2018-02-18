@@ -332,7 +332,7 @@ class EditMerchant {
         if ($group->isPublicActive()) {
             $member = $group->checkMemberType($user);
             if ($member) {
-                if ($member->level == "blocked") {
+                if ($member->level == "contact_blocked") {
                     return null;
                 }
                 if ($member->is_admin) {
@@ -346,7 +346,7 @@ class EditMerchant {
         } else if (!$group->is_public) {
             $member = $group->checkMemberType($user);
             if ($member) {
-                if ($member->level == "blocked") {
+                if ($member->level == "contact_blocked") {
                     return null;
                 }
                 $data['status'] = "active";

@@ -405,7 +405,7 @@ class EditAlerts {
         if ($group) {
             $profile = $group->checkMemberType($user);
             if ($profile) {
-                if ($profile->level != "blocked") {
+                if ($profile->level != "contact_blocked") {
                     $followersInsert = array();
                     $followersPush = array();
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);

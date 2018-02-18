@@ -30,8 +30,7 @@ class Group extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at','plan', 'level', 'rating'];
-    
+    protected $fillable = ['name', 'status', 'avatar', 'code', 'max_users', 'is_public', 'ends_at', 'plan', 'level', 'rating'];
     protected $dates = [
         'created_at',
         'updated_at',
@@ -82,7 +81,8 @@ class Group extends Model {
     }
 
     public function checkMemberType($user) {
-        $users = DB::select('select user_id as id, is_admin, status, last_significant from group_user where user_id = ? and group_id = ? limit 1', [$user->id, $this->id]);
+        $users = DB::select("select user_id as id, is_admin, level, last_significant from group_user where user_id = ? and group_id = ? "
+                        . " AND level <> '" . self::GROUP_PENDING . "' limit 1", [$user->id, $this->id]);
         if (count($users) == 1) {
             return $users[0];
         }
@@ -91,7 +91,7 @@ class Group extends Model {
 
     public function getAllNewFollowers($user, $object, $objectActive_id) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' AND user_id NOT IN ("
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND user_id NOT IN ("
                         . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
                         . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
                         . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
@@ -102,27 +102,27 @@ class Group extends Model {
 
     public function getAllAdminMembers() {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' AND is_admin = 1 ", [$this->id]);
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND is_admin = 1 ", [$this->id]);
         return $recipients;
     }
 
     public function getAllMembers() {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' ", [$this->id]);
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' ", [$this->id]);
         return $recipients;
     }
 
     public function countAllMembers() {
         return DB::table('group_user')->where('group_id', $this->id)
-                ->where('level','<>', self::GROUP_BLOCKED)
-                ->where('level','<>', self::GROUP_PENDING)->count();
+                        ->where('level', '<>', self::GROUP_BLOCKED)
+                        ->where('level', '<>', self::GROUP_PENDING)->count();
     }
 
     public function getAllAdminMembersButActive($user) {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                         . "WHERE group_id=?  "
                         . "AND is_admin = 1 "
-                        . "and user_id <>? ", [intval($this->id), $user->id]);
+                        . "and user_id <> ? ", [intval($this->id), $user->id]);
         return $followers;
     }
 
@@ -136,7 +136,7 @@ class Group extends Model {
     public function getSubSetMembersButActive($user, $set) {
         $bindingsString = trim(str_repeat('?,', count($set)), ',');
         $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) "
-                . "AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' "
+                . "AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
                 . "AND user_id <> $user->id "
                 . "AND group_id = $this->id; ";
         $followers = DB::select($sql, $set);
@@ -147,7 +147,7 @@ class Group extends Model {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                         . "WHERE group_id=?  "
                         . "AND is_admin = 1 "
-                        . "AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' "
+                        . "AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
                         . "and user_id <>? ", [intval($this->id), $user->id]);
         return $followers;
     }
@@ -155,14 +155,14 @@ class Group extends Model {
     public function getAllMembersNonUserBlockedButActive($user) {
         $followers = DB::select("SELECT user_id as id FROM group_user "
                         . "WHERE group_id=?  "
-                        . "AND level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' "
+                        . "AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
                         . "and user_id <>? ", [intval($this->id), $user->id]);
         return $followers;
     }
 
     public function getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND  level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' AND group_user.user_id NOT IN ("
+                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND group_user.user_id NOT IN ("
                         . "SELECT user_id FROM contacts "
                         . "where contact_id = $user->id "
                         . "AND level = '" . self::CONTACT_BLOCKED . "'"
@@ -178,7 +178,8 @@ class Group extends Model {
 
     public function getAllNonUserBlocked($user) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND  level <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' AND group_user.user_id NOT IN ("
+                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
+                        . "AND group_user.user_id NOT IN ("
                         . "SELECT user_id FROM contacts "
                         . "where contact_id = $user->id "
                         . "AND level = '" . self::CONTACT_BLOCKED . "'"
@@ -187,7 +188,10 @@ class Group extends Model {
     }
 
     public function checkAdmin($user) {
-        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? AND level <> "'. self::GROUP_BLOCKED .'" AND level <> "'. self::GROUP_PENDING .'" limit 1', [$user->id, $this->id]);
+        $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? '
+                        . 'AND level <> "' . self::GROUP_BLOCKED . '" '
+                        . 'AND level <> "' . self::GROUP_PENDING . '" '
+                        . 'limit 1', [$user->id, $this->id]);
         if (count($users) > 0) {
             return true;
         }
@@ -195,25 +199,28 @@ class Group extends Model {
     }
 
     public function getRecipientsObject($user, $object, $objectActive_id) {
-        $res = $this->users()->where('user_id', $user->id)->where('level','<>', self::GROUP_BLOCKED)
-                ->where('level','<>', self::GROUP_PENDING)->get();
-        if (count($res) > 0) {
-            if ($res[0]->is_admin) {
-                if ($this->isPublicActive()) {
-                    return $this->getAllNewFollowers($user, $object, $objectActive_id);
-                } else if (!$this->is_public) {
-                    return $this->getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
+        $res = $this->checkMemberType($user);
+        if ($res) {
+            if ($res->level != "contact_blocked") {
+                if ($res->is_admin) {
+                    if ($this->isPublicActive()) {
+                        return $this->getAllNewFollowers($user, $object, $objectActive_id);
+                    } else if (!$this->is_public) {
+                        return $this->getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
+                    } else {
+                        return null;
+                    }
                 } else {
-                    return null;
+                    if ($this->isPublicActive()) {
+                        return $this->getAllNewFollowers($user, $object, $objectActive_id);
+                    } else if (!$this->is_public) {
+                        return $this->getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
+                    } else {
+                        return null;
+                    }
                 }
             } else {
-                if ($this->isPublicActive()) {
-                    return $this->getAllNewFollowers($user, $object, $objectActive_id);
-                } else if (!$this->is_public) {
-                    return $this->getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
-                } else {
-                    return null;
-                }
+                return null;
             }
         } else {
             return null;
@@ -221,27 +228,31 @@ class Group extends Model {
     }
 
     public function getRecipientsMessage($user, $data) {
-        $res = $this->users()->where('user_id', $user->id)->where('level','<>', self::GROUP_BLOCKED)
-                ->where('level','<>', self::GROUP_PENDING)->get();
-        if (count($res) > 0) {
-            if ($this->isPublicActive()) {
-                if ($res[0]->is_admin) {
-                    $data['is_admin'] = true;
-                    if (array_key_exists("target_id", $data)) {
-                        $followers = DB::select("select 
+        $res = $this->checkMemberType($user);
+        if ($res) {
+            if ($res->level != "contact_blocked") {
+                if ($this->isPublicActive()) {
+                    if ($res->is_admin) {
+                        $data['is_admin'] = true;
+                        if (array_key_exists("target_id", $data)) {
+                            $followers = DB::select("select 
                                 user_id as id
                                     from
-                                    group_user where group_id = $this->id AND evel <> '". self::GROUP_BLOCKED ."' && level <> '". self::GROUP_PENDING ."' and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
+                                    group_user where group_id = $this->id AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
+                                            . " and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
+                        } else {
+                            $followers = $this->getAllMembers();
+                        }
                     } else {
-                        $followers = $this->getAllMembers();
+                        $data['is_admin'] = false;
+                        $followers = $this->getAllAdminMembers();
+                        $data['target_id'] = $user->id;
                     }
+                } else if (!$this->is_public) {
+                    $followers = $this->getAllNonUserBlocked($user);
                 } else {
-                    $data['is_admin'] = false;
-                    $followers = $this->getAllAdminMembers();
-                    $data['target_id'] = $user->id;
+                    return null;
                 }
-            } else if (!$this->is_public) {
-                $followers = $this->getAllNonUserBlocked($user);
             } else {
                 return null;
             }
@@ -256,8 +267,8 @@ class Group extends Model {
         }
         DB::table('group_user')
                 ->where('group_user.group_id', '=', $this->id)
-                ->where('level','<>', self::GROUP_BLOCKED)
-                ->where('level','<>', self::GROUP_PENDING)
+                ->where('level', '<>', self::GROUP_BLOCKED)
+                ->where('level', '<>', self::GROUP_PENDING)
                 ->update($data);
     }
 
@@ -268,8 +279,8 @@ class Group extends Model {
         }
         DB::table('group_user')
                 ->where('group_user.group_id', '=', $this->id)
-                ->where('level','<>', self::GROUP_BLOCKED)
-                ->where('level','<>', self::GROUP_PENDING)
+                ->where('level', '<>', self::GROUP_BLOCKED)
+                ->where('level', '<>', self::GROUP_PENDING)
                 ->where('is_admin', true)
                 ->update($data);
     }
