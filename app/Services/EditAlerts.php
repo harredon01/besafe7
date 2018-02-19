@@ -159,6 +159,7 @@ class EditAlerts {
                 }
             }
         }
+        return $notification;
     }
 
     public function requestPing(User $user, $pingee) {
@@ -283,7 +284,7 @@ class EditAlerts {
 
     public function notifyContacts(User $user, $filename) {
         $followers = $user->getNonBlockedContacts();
-        $user->updateAllContactsDate(null);
+        
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -298,7 +299,9 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
-        return $this->sendMassMessage($data, $followers, $user, true);
+        $notification = $this->sendMassMessage($data, $followers, $user, true);
+        $user->updateAllContactsDate(null,$notification->created_at);
+        return $notification;
     }
 
     /**
@@ -378,8 +381,12 @@ class EditAlerts {
                 }
             }
         }
-        $user->updateAllEmergencyContactsDate($data['type']);
-        $this->sendMassMessage($data, $followersPush, $user, true);
+        
+        $notification= $this->sendMassMessage($data, $followersPush, $user, true);
+        if($notification){
+            $user->updateAllEmergencyContactsDate($data['type'],$notification->created_at);
+        }
+        
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
         }
@@ -533,7 +540,7 @@ class EditAlerts {
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
         $followers = $user->getEmergencyContacts();
-        $user->updateAllEmergencyContactsDate("normal");
+        
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -543,7 +550,11 @@ class EditAlerts {
             "sign" => true,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $this->sendMassMessage($data, $followers, $user, true);
+        $notification = $this->sendMassMessage($data, $followers, $user, true);
+        if($notification){
+            $user->updateAllEmergencyContactsDate("normal",$notification->created_at);
+        }
+        
         if ($user->green == $code['code']) {
             return array("status" => "success", "message" => "Emergency Ended");
         } else if ($user->red == $code['code']) {

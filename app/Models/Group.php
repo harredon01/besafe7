@@ -260,8 +260,8 @@ class Group extends Model {
         return array("followers" => $followers, "data" => $data);
     }
 
-    public function updatAllMembersDate($level) {
-        $data = array("last_significant" => date("Y-m-d H:i:s"));
+    public function updatAllMembersDate($level,$date) {
+        $data = array("last_significant" => $date);
         if ($level) {
             $data["level"] = $level;
         }
@@ -272,8 +272,8 @@ class Group extends Model {
                 ->update($data);
     }
 
-    public function updatAllAdminMembersDate($level) {
-        $data = array("last_significant" => date("Y-m-d H:i:s"));
+    public function updatAllAdminMembersDate($level,$date) {
+        $data = array("last_significant" => $date);
         if ($level) {
             $data["level"] = $level;
         }

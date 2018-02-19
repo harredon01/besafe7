@@ -37,8 +37,6 @@ class EditMessages {
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
     const NOTIFICATION_LOCATION = 'notification_location';
-    const LOCATION_FIRST = 'location_first';
-    const LOCATION_LAST = 'location_last';
     const TRACKING_LIMIT_FOLLOWER = 'tracking_limit_follower';
     const TRACKING_LIMIT_TRACKING = 'tracking_limit_tracking';
     const NOTIFICATION_APP = 'notification_app';

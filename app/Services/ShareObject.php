@@ -43,19 +43,20 @@ class ShareObject {
      * @return \Illuminate\Http\Response
      */
     public function addFollower(array $data, User $user) {
-        $file = '/home/hoovert/access.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-
-        $current .= json_encode($data);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
+//        $file = '/home/hoovert/access.log';
+//        // Open the file to get existing content
+//        $current = file_get_contents($file);
+//        //$daarray = json_decode(json_encode($data));
+//        // Append a new person to the file
+//
+//        $current .= json_encode($data);
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        file_put_contents($file, $current);
         $followers = array();
+        $notification = null;
         $validator = $this->validatorFollower($data);
         if ($validator->fails()) {
             return $validator->getMessageBag();
@@ -93,7 +94,7 @@ class ShareObject {
                     "type" => self::NOTIFICATION_LOCATION,
                     "user_status" => $userStatus
                 ];
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+                $notification = $this->editAlerts->sendMassMessage($data, $followers, $user, true);
             } else {
                 if (array_key_exists("object_id", $data)) {
                     $classp = "App\\Models\\" . $object;
@@ -113,7 +114,8 @@ class ShareObject {
                                     $triggerName = self::OBJECT_USER;
                                     $followers = $user->getRecipientsObject($data["follower"], $object, $object_id);
                                 }
-                                $this->notifyObjectFollowers($user, $followers, $objectActive, $object,$triggerName);
+                                $result = $this->notifyObjectFollowers($user, $followers, $objectActive, $object,$triggerName);
+                                $notification = $result['notification'];
                             } else {
                                 return null;
                             }
@@ -140,10 +142,10 @@ class ShareObject {
                     array_push($dafollowers, $item);
                 }
             }
-            if (count($dafollowers) > 0) {
+            if (count($dafollowers) > 0 && $notification) {
                 DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
                 if ($object == self::OBJECT_LOCATION) {
-                    $user->updateFollowersDate($userStatus);
+                    $user->updateFollowersDate($userStatus,$notification->created_at);
                 }
                 return ['status' => 'success', 'message' => 'followers saved'];
             } else {
@@ -204,8 +206,8 @@ class ShareObject {
             "payload" => $daobject,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $this->editAlerts->sendMassMessage($notification, $followers, $user, true);
-        return ['success' => 'followers notified'];
+        $notif = $this->editAlerts->sendMassMessage($notification, $followers, $user, true);
+        return ['success' => 'followers notified','notification'=>$notif];
     }
 
     /**

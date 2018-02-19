@@ -230,7 +230,6 @@ class EditLocation {
                         $result = $this->editAlerts->checkUserCode($user, $code);
                         if ($result['status'] == "success") {
                             $followers = $user->getCurrentFollowers();
-                            $user->updateFollowersDate("normal");
                             $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                             $message = [
                                 "trigger_id" => $user->id,
@@ -239,9 +238,14 @@ class EditLocation {
                                 "type" => self::LOCATION_LAST,
                                 "object" => self::OBJECT_USER,
                                 "sign" => true,
-                                "user_status" => $user->getUserNotifStatus()
+                                "user_status" => "normal"
                             ];
-                            $this->editAlerts->sendMassMessage($message, $followers, $user, true);
+                            $user->is_tracking = 0;
+                            $notification = $this->editAlerts->sendMassMessage($message, $followers, $user, true);
+                            if($notification){
+                                $user->updateFollowersDate("normal",$notification->created_at);
+                            }
+                            
                             $data["status"] = "stopped";
                             $data["islast"] = true;
                             $storeTripCall = true;

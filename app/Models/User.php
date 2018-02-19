@@ -231,8 +231,8 @@ class User extends Authenticatable {
         return false;
     }
     
-    public function updateAllContactsDate($level){
-        $data = array("last_significant" => date("Y-m-d H:i:s"));
+    public function updateAllContactsDate($level,$date){
+        $data = array("last_significant" => $date);
         if($level){
             $data["level"] = $level;
         }
@@ -240,13 +240,13 @@ class User extends Authenticatable {
                         ->where('contacts.contact_id', '=', $this->id)
                         ->update($data);
     }
-    public function updateAllEmergencyContactsDate($level){
+    public function updateAllEmergencyContactsDate($level,$date){
         DB::table('contacts')
                         ->where('contacts.contact_id', $this->id)
                         ->where('contacts.level',  self::RED_MESSAGE_TYPE)
-                        ->update(array("last_significant" => date("Y-m-d H:i:s"),"level" =>$level));
+                        ->update(array("last_significant" => $date,"level" =>$level));
     }
-    public function updateFollowersDate($level){
+    public function updateFollowersDate($level,$date){
         //$date = DateTime::createFromFormat('d-m-Y H:i:s');
         $followers = DB::table(self::ACCESS_USER_OBJECT )
                         ->where(self::ACCESS_USER_OBJECT_ID,  $this->id)
@@ -254,7 +254,7 @@ class User extends Authenticatable {
         DB::table('contacts')
                         ->where('contacts.contact_id',  $this->id)
                         ->whereIn('contacts.user_id', $followers)
-                        ->update(array("last_significant" => date("Y-m-d H:i:s")));
+                        ->update(array("last_significant" => $date));
         DB::table('contacts')
                         ->where('contacts.contact_id',  $this->id)
                 ->where('contacts.level','<>',  self::CONTACT_BLOCKED)
