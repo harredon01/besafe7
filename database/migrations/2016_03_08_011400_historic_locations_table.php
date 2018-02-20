@@ -20,10 +20,11 @@ class HistoricLocationsTable extends Migration {
                         $table->index('lat');
                         $table->index('long');
                         $table->string('name');
-                        $table->string('status');
-                        $table->string('speed');
-                        $table->string('activity');
-                        $table->string('battery');
+                        $table->string('status')->nullable();
+                        $table->string('uuid')->nullable();
+                        $table->string('speed')->nullable();
+                        $table->string('activity')->nullable();
+                        $table->string('battery')->nullable();
                         $table->string('accuracy')->nullable();
                         $table->string('heading')->nullable();
                         $table->string('altitude')->nullable();

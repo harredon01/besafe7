@@ -40,7 +40,7 @@ class EditLocation {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant,CleanTrash $cleanTrash) {
+    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant, CleanTrash $cleanTrash) {
         $this->editAlerts = $editAlerts;
         $this->editMerchant = $editMerchant;
         $this->cleanTrash = $cleanTrash;
@@ -164,6 +164,7 @@ class EditLocation {
     public function parseLocation($location) {
         $data = [];
         $data["lat"] = $location['coords']['latitude'];
+        $data['uuid'] = $location['uuid'];
         $time = strtotime($location['timestamp']);
         $data["report_time"] = date("Y-m-d H:i:s", $time);
         $data["long"] = $location['coords']['longitude'];
@@ -196,76 +197,82 @@ class EditLocation {
         $saveuser = false;
         $location = $data2['location'];
         $data = $this->parseLocation($location);
-        unset($data['location']);
-        if (array_key_exists("extras", $location)) {
-            $extras = $location['extras'];
-            if (array_key_exists("isLocation", $extras)) {
-                return true;
+        $results = Location::where('uuid', $data['uuid'])->first();
+        if ($results) {
+            return ['error' => 'location exists']; 
+        } else {
+            unset($data['location']);
+            if (array_key_exists("extras", $location)) {
+                $extras = $location['extras'];
+                if (array_key_exists("isLocation", $extras)) {
+                    return true;
+                }
             }
-        }
-        $data["user_id"] = $user->id;
-        $data["name"] = $user->name;
-        $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
-        if ($user->is_tracking != 1 || $user->trip == 0) {
-            $user->makeTrip();
-            $saveuser = true;
-        }
-        if ($user->write_report) {
-            $saveuser = true;
-            $user->write_report = false;
-            $this->writeReport($user, $data);
-        }
-        $data["trip"] = $user->trip;
-        if (array_key_exists("extras", $location)) {
-            $extras = $location['extras'];
-            if (array_key_exists("extras", $extras)) {
-                $extras = $extras['extras'];
+            $data["user_id"] = $user->id;
+            $data["name"] = $user->name;
+            $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
+            if ($user->is_tracking != 1 || $user->trip == 0) {
+                $user->makeTrip();
+                $saveuser = true;
             }
-            if (array_key_exists("islast", $extras)) {
-                if (array_key_exists("code", $extras)) {
-                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                    $code = $extras['code'];
-                    
-                    if ($code) {
-                        $result = $this->editAlerts->checkUserCode($user, $code);
-                        if ($result['status'] == "success") {
-                            $followers = $user->getCurrentFollowers();
-                            $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                            $message = [
-                                "trigger_id" => $user->id,
-                                "message" => "",
-                                "payload" => $payload,
-                                "type" => self::LOCATION_LAST,
-                                "object" => self::OBJECT_USER,
-                                "sign" => true,
-                                "user_status" => "normal"
-                            ];
-                            $user->is_tracking = 0;
-                            $notification = $this->editAlerts->sendMassMessage($message, $followers, $user, true);
-                            if($notification){
-                                $user->updateFollowersDate("normal",$notification->created_at);
+            if ($user->write_report) {
+                $saveuser = true;
+                $user->write_report = false;
+                $this->writeReport($user, $data);
+            }
+            $data["trip"] = $user->trip;
+            if (array_key_exists("extras", $location)) {
+                $extras = $location['extras'];
+                if (array_key_exists("extras", $extras)) {
+                    $extras = $extras['extras'];
+                }
+                if (array_key_exists("islast", $extras)) {
+                    if (array_key_exists("code", $extras)) {
+                        $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                        $code = $extras['code'];
+
+                        if ($code) {
+                            $result = $this->editAlerts->checkUserCode($user, $code);
+                            if ($result['status'] == "success") {
+                                $followers = $user->getCurrentFollowers();
+                                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                                $message = [
+                                    "trigger_id" => $user->id,
+                                    "message" => "",
+                                    "payload" => $payload,
+                                    "type" => self::LOCATION_LAST,
+                                    "object" => self::OBJECT_USER,
+                                    "sign" => true,
+                                    "user_status" => "normal"
+                                ];
+                                $user->is_tracking = 0;
+                                $notification = $this->editAlerts->sendMassMessage($message, $followers, $user, true);
+                                if ($notification) {
+                                    $user->updateFollowersDate("normal", $notification->created_at);
+                                }
+
+                                $data["status"] = "stopped";
+                                $data["islast"] = true;
+                                $storeTripCall = true;
                             }
-                            
-                            $data["status"] = "stopped";
-                            $data["islast"] = true;
-                            $storeTripCall = true;
                         }
                     }
                 }
             }
+            Location::create($data);
+            if ($storeTripCall) {
+                $user->is_tracking = 0;
+                $user->hash = "";
+                $user->trip = 0;
+                $saveuser = true;
+                $this->saveEndTrip($user);
+            }
+            if ($saveuser) {
+                $user->save();
+            }
+            return ['success' => 'location saved'];
         }
-        Location::create($data);
-        if ($storeTripCall) {
-            $user->is_tracking = 0;
-            $user->hash = "";
-            $user->trip = 0;
-            $saveuser = true;
-            $this->saveEndTrip($user);
-        }
-        if ($saveuser) {
-            $user->save();
-        }
-        return ['success' => 'location saved'];
+        
     }
 
     /**

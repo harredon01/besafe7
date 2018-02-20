@@ -20,6 +20,7 @@ class CreateHistoricLocationTable extends Migration {
                         $table->index('lat');
                         $table->index('long');
                         $table->string('name');
+                        $table->string('uuid')->nullable();
                         $table->string('status')->nullable();
                         $table->string('speed')->nullable();
                         $table->string('accuracy')->nullable();

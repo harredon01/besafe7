@@ -21,6 +21,7 @@ class CreateLocationsTable extends Migration {
                         $table->index('long');
                         $table->string('name');
                         $table->string('status');
+                        $table->string('uuid')->nullable();
                         $table->string('speed')->nullable();
                         $table->string('activity')->nullable();
                         $table->string('battery')->nullable();
