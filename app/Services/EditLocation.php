@@ -197,9 +197,13 @@ class EditLocation {
         $saveuser = false;
         $location = $data2['location'];
         $data = $this->parseLocation($location);
-        $results = Location::where('uuid', $data['uuid'])->first();
+        $results = Location::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
         if ($results) {
-            return ['error' => 'location exists']; 
+            return ['error' => 'location exists'];
+        }
+        $results = HistoricLocation::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
+        if ($results) {
+            return ['error' => 'location exists'];
         } else {
             unset($data['location']);
             if (array_key_exists("extras", $location)) {
@@ -235,7 +239,7 @@ class EditLocation {
                             $result = $this->editAlerts->checkUserCode($user, $code);
                             if ($result['status'] == "success") {
                                 $followers = $user->getCurrentFollowers();
-                                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName, "status" => "success");
                                 $message = [
                                     "trigger_id" => $user->id,
                                     "message" => "",
@@ -272,7 +276,6 @@ class EditLocation {
             }
             return ['success' => 'location saved'];
         }
-        
     }
 
     /**
