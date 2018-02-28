@@ -124,9 +124,9 @@ class EditLocation {
         $locations = Location::where('user_id', '=', $user->id)
                         ->get()->toArray();
         if (sizeof($locations) > 0) {
+            HistoricLocation::insert($locations);
             Location::where('user_id', '=', $user->id)
                     ->delete();
-            HistoricLocation::insert($locations);
         }
         $this->cleanTrash->moveUserFollowing($user);
     }
@@ -161,7 +161,7 @@ class EditLocation {
      *
      * @return Location
      */
-    public function parseLocation($location) {
+    public function parseLocation($location, User $user) {
         $data = [];
         $data["lat"] = $location['coords']['latitude'];
         $data['uuid'] = $location['uuid'];
@@ -183,6 +183,9 @@ class EditLocation {
                 $data["confidence"] = $activity['confidence'];
             }
         }
+        $data["user_id"] = $user->id;
+        $data["name"] = $user->name;
+        $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
         return $data;
     }
 
@@ -196,8 +199,9 @@ class EditLocation {
         $storeTripCall = false;
         $saveuser = false;
         $location = $data2['location'];
-        $data = $this->parseLocation($location);
+        $data = $this->parseLocation($location, $user);
         $results = Location::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
+
         if ($results) {
             return ['error' => 'location exists'];
         }
@@ -212,19 +216,14 @@ class EditLocation {
                     return true;
                 }
             }
-            $data["user_id"] = $user->id;
-            $data["name"] = $user->name;
-            $data["phone"] = "+" . $user->area_code . " " . $user->cellphone;
+
             if ($user->is_tracking != 1 || $user->trip == 0) {
                 $user->makeTrip();
                 $saveuser = true;
             }
-            if ($user->write_report) {
-                $saveuser = true;
-                $user->write_report = false;
-                $this->writeReport($user, $data);
-            }
+
             $data["trip"] = $user->trip;
+            $dalocation = Location::create($data);
             if (array_key_exists("extras", $location)) {
                 $extras = $location['extras'];
                 if (array_key_exists("extras", $extras)) {
@@ -250,30 +249,35 @@ class EditLocation {
                                     "user_status" => "normal"
                                 ];
                                 $user->is_tracking = 0;
+                                $user->hash = "";
+                                $user->trip = 0;
+                                $saveuser = true;
                                 $notification = $this->editAlerts->sendMassMessage($message, $followers, $user, true);
                                 if ($notification) {
                                     $user->updateFollowersDate("normal", $notification->created_at);
                                 }
-
-                                $data["status"] = "stopped";
-                                $data["islast"] = true;
+                                $dalocation->status = "stopped";
+                                $dalocation->islast = true;
+                                $dalocation->save();
                                 $storeTripCall = true;
                             }
                         }
                     }
                 }
             }
-            Location::create($data);
-            if ($storeTripCall) {
-                $user->is_tracking = 0;
-                $user->hash = "";
-                $user->trip = 0;
+
+            if ($user->write_report) {
                 $saveuser = true;
-                $this->saveEndTrip($user);
+                $user->write_report = false;
+                $this->writeReport($user, $data);
             }
             if ($saveuser) {
                 $user->save();
             }
+            if ($storeTripCall) {
+                $this->saveEndTrip($user);
+            }
+            
             return ['success' => 'location saved'];
         }
     }
