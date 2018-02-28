@@ -209,14 +209,14 @@ class User extends Authenticatable {
                             left join
                         userables u ON c.contact_id = u.user_id
                             and u.userable_type = '" . self::OBJECT_LOCATION . "'
-                            and userable_id = $this->id where c.user_id = $this->id  and level='" . self::RED_MESSAGE_TYPE . "' "
+                            and userable_id = $this->id where c.user_id = $this->id  and  c.is_emergency = true "
                         . " and c.contact_id NOT IN ( "
                 . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "');  ");
         return $followers;
     }
     public function getEmergencyContacts(){
         $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $this->id "
-                . "and level = 'emergency' and contacts.contact_id NOT IN ( "
+                . "and is_emergency = true and contacts.contact_id NOT IN ( "
                 . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "'"
                 . ") ");
         return $followers;

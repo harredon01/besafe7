@@ -227,7 +227,8 @@ class EditAlerts {
         $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
         if ($user->green == $code) {
             $data = array('code' => $code);
-            if ($user->is_alerting == 1) {
+            if ($user->is_alerting) {
+                //$this->postStopEmergency($user, $data);
                 dispatch(new PostEmergencyEnd($user, $data));
             }
 
@@ -284,7 +285,7 @@ class EditAlerts {
 
     public function notifyContacts(User $user, $filename) {
         $followers = $user->getNonBlockedContacts();
-        
+
         $payload = array(
             "user_id" => $user->id,
             "first_name" => $user->firstName,
@@ -300,7 +301,7 @@ class EditAlerts {
             "user_status" => $user->getUserNotifStatus()
         ];
         $notification = $this->sendMassMessage($data, $followers, $user, true);
-        $user->updateAllContactsDate(null,$notification->created_at);
+        $user->updateAllContactsDate(null, $notification->created_at);
         return $notification;
     }
 
@@ -381,14 +382,12 @@ class EditAlerts {
                 }
             }
         }
-        
-        $notification= $this->sendMassMessage($data, $followersPush, $user, true);
-        if($notification){
-            $user->updateAllEmergencyContactsDate($data['type'],$notification->created_at);
-        }
-        
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
+        }
+        $notification = $this->sendMassMessage($data, $followersPush, $user, true);
+        if ($notification) {
+            $user->updateFollowersDate($data['type'], $notification->created_at);
         }
         if ($secret) {
             $recipient = array($user);
@@ -551,10 +550,10 @@ class EditAlerts {
             "user_status" => $user->getUserNotifStatus()
         ];
         $notification = $this->sendMassMessage($data, $followers, $user, true);
-        if($notification){
-            $user->updateAllEmergencyContactsDate("normal",$notification->created_at);
+        if ($notification) {
+            $user->updateAllEmergencyContactsDate("normal", $notification->created_at);
         }
-        
+
         if ($user->green == $code['code']) {
             return array("status" => "success", "message" => "Emergency Ended");
         } else if ($user->red == $code['code']) {
