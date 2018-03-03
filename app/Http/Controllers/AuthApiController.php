@@ -204,5 +204,15 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function cleanServer(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->cleanServer($user));
+    }
 
 }

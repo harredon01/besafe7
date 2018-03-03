@@ -228,7 +228,7 @@ class EditUserData {
     public function getMedical($user_id) {
         $medical = Medical::where("user_id", $user_id)->first();
         if ($medical) {
-            $data["age"]= date_diff(date_create($medical->birth), date_create('now'))->y;
+            $data["age"] = date_diff(date_create($medical->birth), date_create('now'))->y;
             $data["gender"] = $medical->gender;
             $data["weight"] = $medical->weight;
             $data["blood_type"] = $medical->blood_type;
@@ -271,6 +271,26 @@ class EditUserData {
             $user->red = $data['red'];
         }
         $user->save();
+        return array("status" => "success", "message" => "User Codes Updated");
+    }
+
+    /**
+     * Update profile data.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function cleanServer(User $user) {
+        $followers = DB::select("SELECT * FROM userables WHERE userable_id = $user->id and userable_type='Location' limit 1;  ");
+        if (sizeof($followers) < 1) {
+            $locations = DB::select("SELECT * FROM locations WHERE user_id = $user->id and userable_type='Location' limit 1;  ");
+            if (sizeof($locations) > 0) {
+                $user->is_tracking = 0;
+                $user->hash = "";
+                $user->trip = 0;
+                $user->save();
+            }
+        }
         return array("status" => "success", "message" => "User Codes Updated");
     }
 
@@ -337,7 +357,7 @@ class EditUserData {
             "message" => "",
             "payload" => $payload,
             "type" => self::NEW_CONTACT,
-            "object" =>self::OBJECT_USER,
+            "object" => self::OBJECT_USER,
             "sign" => true,
             "user_status" => $user->getUserNotifStatus()
         ];
@@ -355,10 +375,10 @@ class EditUserData {
      */
     public function updateContactsLevel(User $user, array $data) {
         $is_emergency = false;
-        if($data["level"]=="emergency"){
+        if ($data["level"] == "emergency") {
             $is_emergency = true;
         }
-        $users = DB::table('contacts')->whereIn('contact_id', $data["contacts"])->where('user_id', $user->id)->update(array('is_emergency' => $is_emergency,"last_significant" => date("Y-m-d H:i:s")));
+        $users = DB::table('contacts')->whereIn('contact_id', $data["contacts"])->where('user_id', $user->id)->update(array('is_emergency' => $is_emergency, "last_significant" => date("Y-m-d H:i:s")));
         return array("status" => "success", "message" => "contacts imported", "result" => $users);
     }
 
@@ -573,7 +593,7 @@ class EditUserData {
                     "message" => "Has sido agregado como contacto por: " . $user->name,
                     "payload" => $payload,
                     "type" => self::NEW_CONTACT,
-                    "object" =>self::OBJECT_USER,
+                    "object" => self::OBJECT_USER,
                     "sign" => true,
                     "user_status" => $user->getUserNotifStatus()
                 ];
@@ -591,7 +611,7 @@ class EditUserData {
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)
-                        ->update(array('level' => 'deleted',"last_significant" => date("Y-m-d H:i:s")));
+                        ->update(array('level' => 'deleted', "last_significant" => date("Y-m-d H:i:s")));
     }
 
     public function getUserId($user_id) {

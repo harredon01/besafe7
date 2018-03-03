@@ -140,6 +140,7 @@ Route::post('auth/update_medical', 'AuthApiController@updateMedical');
 Route::post('auth/verify_codes', 'AuthApiController@verifyCodes');
 Route::post('auth/validate_codes', 'AuthApiController@validateCodes');
 Route::post('auth/update_codes', 'AuthApiController@updateCodes');
+Route::post('auth/clean', 'AuthApiController@cleanServer');
 Route::post('auth/register', 'AuthApiController@create');
 
 Route::post('locations/user', 'LocationController@postLocation');
