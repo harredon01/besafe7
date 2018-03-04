@@ -283,7 +283,7 @@ class EditUserData {
     public function cleanServer(User $user) {
         $followers = DB::select("SELECT * FROM userables WHERE userable_id = $user->id and userable_type='Location' limit 1;  ");
         if (sizeof($followers) < 1) {
-            $locations = DB::select("SELECT * FROM locations WHERE user_id = $user->id and userable_type='Location' limit 1;  ");
+            $locations = DB::select("SELECT * FROM locations WHERE user_id = $user->id limit 1;  ");
             if (sizeof($locations) > 0) {
                 $user->is_tracking = 0;
                 $user->hash = "";
