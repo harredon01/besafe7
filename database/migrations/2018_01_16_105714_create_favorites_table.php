@@ -18,6 +18,7 @@ class CreateFavoritesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('object_id')->unsigned()->nullable();
             $table->index('object_id');
+            $table->string('type')->nullable();
             $table->foreign('user_id')->references('id')
                     ->on('users');
             $table->timestamps();

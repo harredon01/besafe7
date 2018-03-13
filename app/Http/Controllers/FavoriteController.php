@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\EditRating;
+use Illuminate\Contracts\Auth\Guard;
 class FavoriteController extends Controller
 {
     /**
@@ -36,13 +37,7 @@ class FavoriteController extends Controller
      * @return Response
      */
     public function postAddFavoriteObject(Request $request) {
-        $validator = $this->editRating->validatorFavorite($request->all());
-
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
+        $request->validate($this->editRating->validatorFavorite());
         $user = $request->user();
         return $this->editRating->addFavoriteObject($request->all(), $user);
     }

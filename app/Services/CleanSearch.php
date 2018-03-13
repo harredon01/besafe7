@@ -260,7 +260,7 @@ class CleanSearch {
                         if ($data['favorite']) {
                             if ($data['favorite'] == 'true') {
                                 $mystring = str_replace("favorite=true", "", $mystring);
-                                $mystring = $mystring . "favorite_id=" . $user->id . "&status=active";
+                                $mystring = $mystring . "favorites_id=" . $user->id . "&status=active";
                             } else {
                                 return null;
                             }

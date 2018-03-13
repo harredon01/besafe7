@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Services\EditRating;
 use App\Models\Rating;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Auth\Guard;
+use Unlu\Laravel\Api\QueryBuilder;
 
 class RatingController extends Controller
 {
@@ -38,13 +40,7 @@ class RatingController extends Controller
      * @return Response
      */
     public function postAddRatingObject(Request $request) {
-        $validator = $this->editRating->validatorRating($request->all());
-
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
+        $request->validate($this->editRating->validatorRating());
         $user = $request->user();
         return $this->editRating->addRatingObject($request->all(), $user);
     }

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Jobs\NotifyGroupObject;
 use App\Models\Group;
 use App\Models\Report;
+use App\Models\Favorite;
 use Illuminate\Http\Response;
 use DB;
 use Cache;
@@ -150,6 +151,12 @@ class EditMerchant {
                 }
             }
             if ($send == true) {
+                $favor = Favorite::where('user_id',$user->id)->where("type",$type)->where("object_id",$object->id)->first();
+                if($favor){
+                    $data['favorite'] = true;
+                } else {
+                    $data['favorite'] = false;
+                }
                 return $data;
             }
             return ['status' => "error", "message" => $type . ' not found for user'];

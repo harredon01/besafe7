@@ -27,14 +27,21 @@ class EditRating {
                         $data['pseudonim'] = $user->name;
                     }
                 }
+                $isReport = false;
+                if(array_key_exists('is_report', $data)){
+                    if($data['is_report'] == true ){
+                        $isReport = false;
+                    }
+                }
 
-                Rating::create([
+                $result = Rating::create([
                     'user_id' => $user->id,
                     'rating' => $data['rating'],
-                    'type' => $data['type'],
+                    'type' => $type,
                     'object_id' => $object->id,
                     'pseudonim' => $data['pseudonim'],
-                    'is_report' => $data['is_report'],
+                    'comment' => $data['comment'],
+                    'is_report' => $isReport,
                 ]);
 
                 $rating = Rating::where('type', $type)->where('object_id', $data['object_id'])->avg('rating');
@@ -49,6 +56,12 @@ class EditRating {
                 }
                 $object->rating = $rating;
                 $object->save();
+                return array(
+                    "object_id"=>$data['object_id'],
+                    "type" => $type,
+                    "ratings"=>$rating,
+                    "result" => $result
+                        );
             }
         }
     }
@@ -90,13 +103,13 @@ class EditRating {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorRating(array $data) {
-        return Validator::make($data, [
+    public function validatorRating() {
+        return [
                     'type' => 'required|max:255',
                     'comment' => 'required',
                     'object_id' => 'required|integer|min:1',
                     'rating' => 'required|integer|min:0|max:5'
-        ]);
+        ];
     }
     
     /**
@@ -105,11 +118,11 @@ class EditRating {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorFavorite(array $data) {
-        return Validator::make($data, [
+    public function validatorFavorite( ) {
+        return  [
                     'type' => 'required|max:255',
                     'object_id' => 'required|integer|min:1',
-        ]);
+        ];
     }
 
 }
