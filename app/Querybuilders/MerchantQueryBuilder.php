@@ -14,7 +14,7 @@ class MerchantQueryBuilder extends QueryBuilder {
 
     public function filterByFavoritesId($query, $id) {
         return $query->join('favorites', 'merchants.id', '=', 'favorites.object_id')
-                        ->where('favorites.type', '=', "Merchant");
+                        ->where('favorites.favorite_type', '=', "Merchant");
     }
 
 }

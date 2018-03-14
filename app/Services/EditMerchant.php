@@ -151,7 +151,7 @@ class EditMerchant {
                 }
             }
             if ($send == true) {
-                $favor = Favorite::where('user_id',$user->id)->where("type",$type)->where("object_id",$object->id)->first();
+                $favor = Favorite::where('user_id',$user->id)->where("favorite_type",$type)->where("object_id",$object->id)->first();
                 if($favor){
                     $data['favorite'] = true;
                 } else {

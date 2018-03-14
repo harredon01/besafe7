@@ -14,7 +14,7 @@ class ReportQueryBuilder extends QueryBuilder {
     
     public function filterByFavoritesId($query, $id) {
         return $query->join('favorites', 'reports.id', '=', 'favorites.object_id')
-                        ->where('favorites.type', '=', "Report");
+                        ->where('favorites.favorite_type', '=', "Report");
     }
 
 }

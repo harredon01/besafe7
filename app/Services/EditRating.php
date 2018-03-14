@@ -79,7 +79,7 @@ class EditRating {
             if ($object) {
                 Favorite::create([
                     'user_id' => $user->id,
-                    'type' => $data['type'],
+                    'favorite_type' => $data['type'],
                     'object_id' => $object->id,
                 ]);
             }
@@ -93,7 +93,7 @@ class EditRating {
      */
     public function deleteFavoriteObject(array $data, User $user) {
         Favorite::where('user_id',$user->id)
-                ->where('type',$data['type'])
+                ->where('favorite_type',$data['type'])
                 ->where('object_id',$data['object_id'])->delete();
     }
 
