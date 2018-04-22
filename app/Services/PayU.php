@@ -127,7 +127,7 @@ class PayU {
             $creditCard = [
                 "number" => $data['cc_number'],
                 "securityCode" => $data['cc_security_code'],
-                "expirationDate" => $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
+                "expirationDate" => "20".$data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
                 "name" => $billing->name
             ];
             $extraParams = [
@@ -495,7 +495,7 @@ class PayU {
             "document" => $data['document'],
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
-            "expYear" => $data['expYear'],
+            "expYear" => "20".$data['expYear'],
             "type" => $data['branch'],
             "address" => $address
         ];
@@ -830,7 +830,7 @@ class PayU {
             "document" => $data['document'],
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
-            "expYear" => $data['expYear'],
+            "expYear" => "20".$data['expYear'],
             "type" => $data['branch'],
             "address" => $address
         ];
