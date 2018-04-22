@@ -88,7 +88,7 @@ class SubscriptionApiController extends Controller {
         $data['ip_address'] = $request->ip();
         $data['user_agent'] = $request->header('User-Agent');
         $data['cookie'] = $request->cookie('name');
-        return response()->json($this->editBilling->UpdateSubscription($user, $source, $id, $data));
+        return response()->json($this->editBilling->editSubscription($user, $source, $id, $data));
     }
 
     /**

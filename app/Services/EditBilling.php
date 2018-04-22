@@ -155,9 +155,9 @@ class EditBilling {
         return $subsc;
     }
 
-    public function deleteSubscription(User $user, $source, $id) {
-        $className = "App\\Services\\" . $source;
-        $source = $user->sources()->where('gateway', strtolower($source))->first();
+    public function deleteSubscription(User $user, $gateway, $id) {
+        $className = "App\\Services\\" . $gateway;
+        $source = $user->sources()->where('gateway', strtolower($gateway))->first();
         if ($source) {
             $gateway = new $className;
             return $gateway->deleteSubscription($user, $id);
@@ -170,6 +170,13 @@ class EditBilling {
         if (array_key_exists("plan_id", $data)) {
             $plan = Plan::where("plan_id", $data['plan_id'])->first();
             if ($plan) {
+                if (array_key_exists("object_id", $data)) {
+                    $subs = Subscription::where("object_id", $data['object_id'])
+                        ->where("type", $plan->type)->where("status", "active")->first();
+                    if ($subs) {
+                        return response()->json(['status' => 'error', 'message' => "Object subscription exists"]);
+                    }
+                }
                 //$reply = $gateway->createPlan($plan);
                 $class = "App\\Models\\" . $plan->type;
                 $model = $class::find($data['object_id']);
@@ -190,11 +197,14 @@ class EditBilling {
                     } else {
                         $result = $gateway->createSubscriptionSourceClient($user, $plan, $data);
                     }
-                    if ($result['status'] == "success") {
-                        $subscription = $result['subscription'];
-                        $model->plan = $subscription->plan;
-                        $model->ends_at = $subscription->ends_at;
-                        $model->save();
+                    if (array_key_exists("status", $result)) {
+                        if ($result['status'] == "success") {
+                            $subscription = $result['subscription'];
+                            $model->plan = $subscription->plan;
+                            $model->status = "active";
+                            $model->ends_at = $subscription->ends_at;
+                            $model->save();
+                        }
                     }
                     return $result;
                 }
@@ -205,14 +215,14 @@ class EditBilling {
         return response()->json(['status' => 'error', 'message' => "Plan id is required"]);
     }
 
-    public function editSubscription(User $user, $source, $id, array $data) {
-        $className = "App\\Services\\" . $source;
+    public function editSubscription(User $user, $gateway, $id, array $data) {
+        $className = "App\\Services\\" . $gateway;
         $data['trialDays'] = 0;
         $data['quantity'] = 1;
         if (array_key_exists("plan_id", $data)) {
             $plan = Plan::where("plan_id", $data['plan_id'])->first();
             if ($plan) {
-                $source = $user->sources()->where('gateway', strtolower($source))->first();
+                $source = $user->sources()->where('gateway', strtolower($gateway))->first();
                 if ($source) {
                     $gateway = new $className;
                     return $gateway->editSubscription($user, $source, $plan, $id, $data);

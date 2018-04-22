@@ -101,7 +101,7 @@ class PayU {
                 "description" => "besafe payment test",
                 "language" => "es",
                 "signature" => $sig,
-                "notifyUrl" => "http://www.tes.com/confirmation",
+                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
                 "additionalValues" => $additionalValuesCont,
                 "buyer" => $buyer,
                 "shippingAddress" => $ShippingAddress
@@ -243,7 +243,7 @@ class PayU {
                 "description" => "besafe payment test",
                 "language" => "es",
                 "signature" => $sig,
-                "notifyUrl" => "http://www.tes.com/confirmation",
+                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
                 "additionalValues" => $additionalValuesCont,
                 "buyer" => $buyer,
                 "shippingAddress" => $ShippingAddress
@@ -349,7 +349,7 @@ class PayU {
                 "description" => "besafe payment test",
                 "language" => "es",
                 "signature" => $sig,
-                "notifyUrl" => "http://www.tes.com/confirmation",
+                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
                 "additionalValues" => $additionalValuesCont,
                 "buyer" => $buyer
             ];
@@ -360,7 +360,7 @@ class PayU {
                 "contactPhone" => $billing->phone,
             ];
             $extraParams = [
-                "RESPONSE_URL" => "http://www.test.com/response",
+                "RESPONSE_URL" => "http://hoovert.com/payu/return",
                 "PSE_REFERENCE1" => $data['ip_address'],
                 "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
                 "USER_TYPE" => $data['user_type'],
@@ -431,7 +431,7 @@ class PayU {
             "description" => "besafe payment test",
             "language" => "es",
             "signature" => $sig,
-            "notifyUrl" => "http://www.tes.com/confirmation",
+            "notifyUrl" => "http://hoovert.com/api/payu/webhook",
             "additionalValues" => $additionalValuesCont,
             "buyer" => $buyer
         ];
@@ -640,9 +640,8 @@ class PayU {
                 $datetime2 = strtotime("now");
                 $secs = $datetime2 - $datetime1; // == return sec in difference
                 $days = $secs / 86400;
-                $data['trialDays'] = $days;
             } else {
-                $data['trialDays'] = 0;
+                $days = 0;
             }
             $url = env('PAYU_REST');
             $plan = [
@@ -1258,20 +1257,36 @@ class PayU {
         $firma = $data['signature'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
             $transaction = $this->saveTransaction($data);
-            if ($data['transactionState'] == 4) {
-                dispatch(new ApproveOrder($order));
-                $transaction->description = "Transacción aprobada";
-            } else if ($data['transactionState'] == 6) {
-                dispatch(new DenyOrder($order));
-                $transaction->description = "Transacción rechazada";
-            } else if ($data['transactionState'] == 104) {
-                dispatch(new DenyOrder($order));
-                $transaction->description = "Error";
-            } else if ($data['transactionState'] == 7) {
-                dispatch(new PendingOrder($order));
+            $order = Order::where("referenceCode", $referenceCode)->first();
+            if ($order) {
+                if ($data['transactionState'] == 4) {
+                    dispatch(new ApproveOrder($order));
+                    $transaction->description = "Transacción aprobada";
+                } else if ($data['transactionState'] == 6) {
+                    dispatch(new DenyOrder($order));
+                    $transaction->description = "Transacción rechazada";
+                } else if ($data['transactionState'] == 104) {
+                    dispatch(new DenyOrder($order));
+                    $transaction->description = "Error";
+                } else if ($data['transactionState'] == 7) {
+                    dispatch(new PendingOrder($order));
+                } else {
+                    $transaction->description = $data['mensaje'];
+                }
             } else {
-                $transaction->description = $data['mensaje'];
+                if (array_key_exists("reference_recurring_payment", $data)) {
+                    $results = explode("_", $data["reference_recurring_payment"]);
+                    $subscriptionL = Subscription::find("source_id", $results[0]);
+                    $subscriptionL->ends_at = Date($data['date_next_payment']);
+                    $objectType = "App\\Models\\" . $subscriptionL->type;
+                    $object = new $objectType;
+                    $target = $object->find($subscriptionL->object_id);
+                    $target->ends_at = $subscriptionL->ends_at;
+                    $target->save();
+                    $subscriptionL->save();
+                }
             }
+
             return ["status" => "success", "message" => "transaction processed", "data" => $data];
         } else {
             
@@ -1452,9 +1467,7 @@ class PayU {
      */
     public function validatorEditSubscription(array $data) {
         return Validator::make($data, [
-                    'source' => 'required|max:255',
-//                    'installments' => 'required|max:255',
-                    'plan_id' => 'required|max:255',
+                    'installments' => 'required|max:255',
         ]);
     }
 

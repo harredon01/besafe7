@@ -10,8 +10,6 @@ use Illuminate\Http\RedirectResponse;
 
 class PayuController extends Controller {
 
-
-
     /**
      * The edit order implementation.
      *
@@ -23,9 +21,9 @@ class PayuController extends Controller {
      *
      * @return void
      */
-    public function __construct( PayU $payU) {
+    public function __construct(PayU $payU) {
         $this->payU = $payU;
-        $this->middleware('auth', ['except' => [ 'cartTest','cronPayU','webhookPayU','returnPayU']]);
+        $this->middleware('auth', ['except' => ['cartTest', 'cronPayU', 'webhookPayU', 'returnPayU']]);
     }
 
     /**
@@ -89,7 +87,6 @@ class PayuController extends Controller {
         return response()->json($status);
     }
 
-
     /**
      * Handle a login request to the application.
      *
@@ -100,18 +97,45 @@ class PayuController extends Controller {
         $status = $this->payU->ping();
         return response()->json($status);
     }
-    
-    public function cronPayU(){
+
+    public function cronPayU() {
         $this->payU->checkOrders();
         //dispatch(new PayUCron());
     }
-    public function webhookPayU(Request $request){
-        $this->payU->checkOrders($request->all());
-        //dispatch(new PayUCron());
-    }
-    public function returnPayU(Request $request){
+
+    public function webhookPayU(Request $request) {
         $this->payU->webhookPayU($request->all());
         //dispatch(new PayUCron());
+    }
+
+    public function returnPayU(Request $request) {
+        $data = $request->all();
+        $ApiKey = env('PAYU_KEY');
+        $merchant_id = $data['merchantId'];
+        $referenceCode = $data['referenceCode'];
+        $TX_VALUE = $data['TX_VALUE'];
+        $New_value = number_format($TX_VALUE, 1, '.', '');
+        $currency = $data['currency'];
+        $transactionState = $data['transactionState'];
+        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
+        $firmacreada = md5($firma_cadena);
+        $firma = $data['signature'];
+        $estadoTx = "";
+        if (true) {//if (strtoupper($firma) == strtoupper($firmacreada)) {
+            if ($data['transactionState'] == 4) {
+                $estadoTx = "Transaction approved";
+            } else if ($data['transactionState'] == 6) {
+                $estadoTx = "Transaction rejected";
+            } else if ($data['transactionState'] == 104) {
+                $estadoTx = "Error";
+            } else if ($data['transactionState'] == 7) {
+                $estadoTx = "Pending payment";
+            } else {
+                $estadoTx = $data['mensaje'];
+            }
+            $data['estadoTx'] = $estadoTx;
+            return view('billing.PayU.return', $data);
+        }
     }
 
 }
