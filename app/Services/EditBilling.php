@@ -172,7 +172,7 @@ class EditBilling {
             if ($plan) {
                 if (array_key_exists("object_id", $data)) {
                     $subs = Subscription::where("object_id", $data['object_id'])
-                        ->where("type", $plan->type)->where("status", "active")->first();
+                                    ->where("type", $plan->type)->where("status", "active")->first();
                     if ($subs) {
                         return response()->json(['status' => 'error', 'message' => "Object subscription exists"]);
                     }
@@ -181,18 +181,20 @@ class EditBilling {
                 $class = "App\\Models\\" . $plan->type;
                 $model = $class::find($data['object_id']);
                 if ($model) {
-                    $source = $user->sources()->where('gateway', strtolower($source))->first();
+                    $source = $user->sources()->where('gateway', $source)->first();
                     if ($source) {
-                        if ($source->has_default) {
-                            if (array_key_exists("source", $data)) {
-                                $result = $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
-                            } if (array_key_exists("new", $data)) {
+                        if (array_key_exists("source", $data)) {
+                            $result = $gateway->createSubscriptionExistingSource($user, $source, $plan, $data);
+                        } else {
+                            if (array_key_exists("new", $data)) {
                                 $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
                             } else {
-                                $result = $gateway->createSubscription($user, $source, $plan, $data);
+                                if ($source->has_default) {
+                                    $result = $gateway->createSubscription($user, $source, $plan, $data);
+                                } else {
+                                    $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
+                                }
                             }
-                        } else {
-                            $result = $gateway->createSubscriptionSource($user, $source, $plan, $data);
                         }
                     } else {
                         $result = $gateway->createSubscriptionSourceClient($user, $plan, $data);

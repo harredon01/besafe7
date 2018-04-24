@@ -629,13 +629,9 @@ class PayU {
     }
 
     public function editSubscription(User $user, Source $source, Plan $planL, $id, array $data) {
-        $validator = $this->validatorEditSubscription($data);
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
-        }
-        $subscription = $user->subscriptions()->where('gateway', 'payu')->where('source_id', $id)->first();
+        $subscription = $user->subscriptions()->where('gateway', 'PayU')->where('source_id', $id)->first();
         if ($subscription) {
-            if ($subscription->is_active()) {
+            if ($subscription->isActive()) {
                 $datetime1 = strtotime($subscription->ends_at);
                 $datetime2 = strtotime("now");
                 $secs = $datetime2 - $datetime1; // == return sec in difference
@@ -643,13 +639,13 @@ class PayU {
             } else {
                 $days = 0;
             }
-            $url = env('PAYU_REST');
+            $url = env('PAYU_REST') . 'subscriptions/';
             $plan = [
                 "planCode" => $planL->plan_id
             ];
 
             $creditCard = [
-                "token" => $source->source
+                "token" => $subscription->other
             ];
             $creditCards = array($creditCard);
             $customer = [
@@ -658,18 +654,24 @@ class PayU {
             ];
             $dataSent = [
                 "quantity" => 1,
-                "installments" => $data['installments'],
                 "trialDays" => $data['trialDays'],
                 "customer" => $customer,
                 "plan" => $plan
             ];
-            $response = $this->sendRequest($dataSent, $url);
+            if(array_key_exists("installments", $data)){
+                $dataSent["installments"]=$data['installments'];
+            }
+            
+            $response = $this->sendPost($dataSent, $url);
             if (array_key_exists("id", $response)) {
-                $this->deleteSubscription($user, $subscription->source_id);
+                $url = env('PAYU_REST') . 'subscriptions/'. $subscription->source_id;
+                $this->sendDelete($url);
                 $subscription->gateway = "PayU";
                 $subscription->status = "active";
                 $subscription->type = $planL->type;
                 $subscription->name = $planL->name;
+                $subscription->plan_id = $planL->id;
+                $subscription->plan = $planL->plan_id;
                 $subscription->source_id = $response['id'];
                 $subscription->client_id = $source->client_id;
                 $subscription->interval = $planL->interval;
@@ -711,9 +713,10 @@ class PayU {
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
-                "status" => "createSubscription" . $response['currentPeriodEnd'],
+                "status" => "active",
                 "type" => $planL->type,
                 "name" => $planL->name,
+                "other" => $source->source,
                 "plan" => $planL->plan_id,
                 "plan_id" => $planL->id,
                 "level" => $planL->level,
@@ -784,10 +787,11 @@ class PayU {
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
-                "status" => "createSubscriptionExistingSource" . $response['currentPeriodEnd'],
+                "status" => "active" ,
                 "type" => $planL->type,
                 "name" => $planL->name,
                 "plan" => $planL->plan_id,
+                "other" => $data['source'],
                 "plan_id" => $planL->id,
                 "level" => $planL->level,
                 "source_id" => $response['id'],
@@ -847,25 +851,7 @@ class PayU {
             "plan" => $plan
         ];
         $response = $this->sendPost($dataSent, $url);
-        if (array_key_exists("id", $response)) {
-            $subscription = new Subscription([
-                "gateway" => "PayU",
-                "status" => "active",
-                "type" => $planL->type,
-                "name" => $planL->name,
-                "plan" => $planL->plan_id,
-                "plan_id" => $planL->id,
-                "level" => $planL->level,
-                "source_id" => $response['id'],
-                "client_id" => $source->client_id,
-                "object_id" => $data['object_id'],
-                "interval" => $planL->interval,
-                "interval_type" => $planL->interval_type,
-                "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd'] / 1000)
-            ]);
-            $user->subscriptions()->save($subscription);
-        }
+        $tokenCreated = "";
         if (array_key_exists("customer", $response)) {
             $customerReply = $response['customer'];
             $response['status'] = "success";
@@ -873,6 +859,7 @@ class PayU {
             if (array_key_exists("creditCards", $customerReply)) {
                 $card = $customerReply['creditCards'][0];
                 if ($card) {
+                    $tokenCreated = $card['token'];
                     if (array_key_exists("default", $data)) {
                         if ($data["default"]) {
                             $source->source = $card['token'];
@@ -883,6 +870,27 @@ class PayU {
                 }
             }
         }
+        if (array_key_exists("id", $response)) {
+            $subscription = new Subscription([
+                "gateway" => "PayU",
+                "status" => "active",
+                "type" => $planL->type,
+                "name" => $planL->name,
+                "plan" => $planL->plan_id,
+                "plan_id" => $planL->id,
+                "level" => $planL->level,
+                "other" => $tokenCreated,
+                "source_id" => $response['id'],
+                "client_id" => $source->client_id,
+                "object_id" => $data['object_id'],
+                "interval" => $planL->interval,
+                "interval_type" => $planL->interval_type,
+                "quantity" => 1,
+                "ends_at" => Date($response['currentPeriodEnd'] / 1000)
+            ]);
+            $user->subscriptions()->save($subscription);
+        }
+        
         return $response;
     }
 
@@ -999,9 +1007,10 @@ class PayU {
     }
 
     public function deleteSubscription(User $user, $subscription) {
-        $url = env('PAYU_PAYMENTS') . "/rest/v4.9/subscriptions/" . $subscription;
-        $this->sendDelete($url);
-        return $user->subscriptions()->where('gateway', "PayU")->where('source_id', $subscription)->delete();
+        $url = env('PAYU_REST') . 'subscriptions/'. $subscription;
+        $result = $this->sendDelete($url);
+        $user->subscriptions()->where('gateway', "PayU")->where('source_id', $subscription)->delete();
+        return $result;
     }
 
     public function getPaymentMethods() {
