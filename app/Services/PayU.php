@@ -1255,33 +1255,26 @@ class PayU {
      */
     public function webhook(array $data) {
         $ApiKey = env('PAYU_KEY');
-        $merchant_id = $data['merchantId'];
-        $referenceCode = $data['referenceCode'];
-        $TX_VALUE = $data['TX_VALUE'];
+        $merchant_id = $data['merchant_id'];
+        $referenceCode = $data['reference_sale'];
+        $TX_VALUE = $data['value'];
         $New_value = number_format($TX_VALUE, 1, '.', '');
         $currency = $data['currency'];
-        $transactionState = $data['transactionState'];
+        $transactionState = $data['state_pol'];
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
         $firmacreada = md5($firma_cadena);
-        $firma = $data['signature'];
+        $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
             $transaction = $this->saveTransaction($data);
             $order = Order::where("referenceCode", $referenceCode)->first();
             if ($order) {
-                if ($data['transactionState'] == 4) {
+                if ($data['state_pol'] == 4) {
                     dispatch(new ApproveOrder($order));
                     $transaction->description = "Transacción aprobada";
-                } else if ($data['transactionState'] == 6) {
+                } else {
                     dispatch(new DenyOrder($order));
                     $transaction->description = "Transacción rechazada";
-                } else if ($data['transactionState'] == 104) {
-                    dispatch(new DenyOrder($order));
-                    $transaction->description = "Error";
-                } else if ($data['transactionState'] == 7) {
-                    dispatch(new PendingOrder($order));
-                } else {
-                    $transaction->description = $data['mensaje'];
-                }
+                } 
             } else {
                 if (array_key_exists("reference_recurring_payment", $data)) {
                     $results = explode("_", $data["reference_recurring_payment"]);
@@ -1302,30 +1295,33 @@ class PayU {
         }
     }
 
-    public function saveTransaction(User $user, array $data) {
-        $transactionId = $data['transactionId'];
-        $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
+    private function saveTransaction(User $user, array $data) {
+        $transactionId = $data['transaction_id'];
+        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayY')->first();
         if ($transaction) {
             $transaction->currency = $data['currency'];
-            $transaction->state = $data['transactionState'];
-            $transaction->description = $data['description'];
-            $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
-            $transaction->trazabilityCode = $data['cus'];
-            $transaction->transactionDate = $data['processingDate'];
-            $transaction->authorizationCode = $data['authorizationCode'];
+            $transaction->transaction_state = $data['state_pol'];
+            $transaction->description = $data['response_message_pol'];
+            $transaction->reference_sale = $data['reference_sale'];
+            $transaction->payment_method = $data['payment_method_id'];
+            $transaction->transaction_id = $data['transaction_id'];
+            $transaction->transaction_date = $data['date'];
+            $transaction->response_code = $data['response_code_pol'];
             $transaction->extras = json_encode($data);
             $transaction->save();
         } else {
-            $data["state"] = $data["transactionState"];
-            unset($data["transactionState"]);
-            $data["paymentNetworkResponseCode"] = $data["polResponseCode"];
-            unset($data["polResponseCode"]);
-            $data["trazabilityCode"] = $data["cus"];
-            unset($data["cus"]);
-            $data["transactionDate"] = $data["processingDate"];
-            unset($data["processingDate"]);
-            $data["extras"] = json_encode($data);
-            $transaction = Transaction::create($data);
+            $insert = [];
+            $insert["reference_sale"] = $data["reference_sale"];
+            $insert["response_code"] = $data["response_code_pol"];
+            $insert["currency"] = $data["currency"];
+            $insert["payment_method"] = $data["payment_method_id"];
+            $insert["transaction_id"] = $data["transaction_id"];
+            $insert["gateway"] = "PayU";
+            $insert["description"] = $data["response_message_pol"];
+            $insert["transaction_date"] = $data["transaction_date"];
+            $insert["transaction_state"] = $data["state_pol"];
+            $insert["extras"] = json_encode($data);
+            $transaction = Transaction::create($insert);
         }
         return $transaction;
     }

@@ -18,8 +18,8 @@ class Transaction extends Model
      *
      * @var array
      */
-    protected $fillable = ['order_id','type', 'description', 'state','paymentNetworkResponseCode', 'paymentNetworkResponseErrorMessage', 'trazabilityCode', 'pendingReason', 'responseCode', 'errorCode',
-        'operationDate','transactionDate','transactionTime','order_id','user_id','extras','transactionId','authorizationCode','responseMessage','currency','gateway'];
+    protected $fillable = ['order_id','type', 'gateway', 'description','payment_method', 'currency',
+        'transaction_state', 'reference_sale', 'transaction_id', 'transaction_date','response_code' ];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
