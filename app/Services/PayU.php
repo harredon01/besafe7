@@ -127,7 +127,7 @@ class PayU {
             $creditCard = [
                 "number" => $data['cc_number'],
                 "securityCode" => $data['cc_security_code'],
-                "expirationDate" => "20".$data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
+                "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
                 "name" => $billing->name
             ];
             $extraParams = [
@@ -301,7 +301,7 @@ class PayU {
         $method = 'pay' . studly_case(str_replace('.', '_', $payload['type']));
         if (method_exists($this, $method)) {
             $result = $this->{$method}($user, $payload, $order);
-            return $this->saveTransaction($user, $result);
+            return $this->saveTransaction($result);
             ;
         } else {
             return $this->missingMethod();
@@ -495,7 +495,7 @@ class PayU {
             "document" => $data['document'],
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
-            "expYear" => "20".$data['expYear'],
+            "expYear" => "20" . $data['expYear'],
             "type" => $data['branch'],
             "address" => $address
         ];
@@ -658,13 +658,13 @@ class PayU {
                 "customer" => $customer,
                 "plan" => $plan
             ];
-            if(array_key_exists("installments", $data)){
-                $dataSent["installments"]=$data['installments'];
+            if (array_key_exists("installments", $data)) {
+                $dataSent["installments"] = $data['installments'];
             }
-            
+
             $response = $this->sendPost($dataSent, $url);
             if (array_key_exists("id", $response)) {
-                $url = env('PAYU_REST') . 'subscriptions/'. $subscription->source_id;
+                $url = env('PAYU_REST') . 'subscriptions/' . $subscription->source_id;
                 $this->sendDelete($url);
                 $subscription->gateway = "PayU";
                 $subscription->status = "active";
@@ -787,7 +787,7 @@ class PayU {
         if (array_key_exists("id", $response)) {
             $subscription = new Subscription([
                 "gateway" => "PayU",
-                "status" => "active" ,
+                "status" => "active",
                 "type" => $planL->type,
                 "name" => $planL->name,
                 "plan" => $planL->plan_id,
@@ -834,7 +834,7 @@ class PayU {
             "document" => $data['document'],
             "number" => $data['number'],
             "expMonth" => $data['expMonth'],
-            "expYear" => "20".$data['expYear'],
+            "expYear" => "20" . $data['expYear'],
             "type" => $data['branch'],
             "address" => $address
         ];
@@ -890,15 +890,13 @@ class PayU {
             ]);
             $user->subscriptions()->save($subscription);
         }
-        
+
         return $response;
     }
 
-    public function createAll(User $user, Source $source, Plan $planL, array $data) {
-        $validator = $this->validatorSubscriptionSource($data);
-        if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
-        }
+    public function createAll(User $user, array $data) {
+        $planL = Plan::where("plan_id", $data['plan_id'])->first();
+        $source = $user->sources()->where("gateway", "PayU")->first();
         $url = env('PAYU_REST') . 'subscriptions/';
         $additionalValues = [
             "name" => "PLAN_VALUE",
@@ -908,8 +906,8 @@ class PayU {
 
         $plan = [
             "accountId" => "512321",
-            "planCode" => "Plan-id",
-            "description" => "Plan-id",
+            "planCode" => $planL->plan_id,
+            "description" => $planL->name,
             "interval" => "MONTH",
             "intervalCount" => "1",
             "maxPaymentsAllowed" => "12",
@@ -931,9 +929,9 @@ class PayU {
         ];
 
         $creditCard = [
-            "name" => "Hoovert Arredondo",
+            "name" => "APPROVED",
             "document" => "1231231232",
-            "number" => "4242424242424242",
+            "number" => "4111111111111111",
             "expMonth" => "12",
             "expYear" => "2020",
             "type" => "VISA",
@@ -956,7 +954,7 @@ class PayU {
             "customer" => $customer,
             "plan" => $plan,
             "deliveryAddress" => $address,
-            "notifyUrl" => "http://hoovert.com/api/payu",
+            "notifyUrl" => "http://hoovert.com/api/payu/webhook",
         ];
         $response = $this->sendPost($dataSent, $url);
         if (array_key_exists("id", $response)) {
@@ -974,7 +972,7 @@ class PayU {
                 "interval" => $planL->interval,
                 "interval_type" => $planL->interval_type,
                 "quantity" => 1,
-                "ends_at" => Date($response['currentPeriodEnd'])
+                "ends_at" => date("Y-m-d")
             ]);
             $user->subscriptions()->save($subscription);
         }
@@ -1007,7 +1005,7 @@ class PayU {
     }
 
     public function deleteSubscription(User $user, $subscription) {
-        $url = env('PAYU_REST') . 'subscriptions/'. $subscription;
+        $url = env('PAYU_REST') . 'subscriptions/' . $subscription;
         $result = $this->sendDelete($url);
         $user->subscriptions()->where('gateway', "PayU")->where('source_id', $subscription)->delete();
         return $result;
@@ -1228,23 +1226,23 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function checkOrders() {
-        $transactions = Transaction::where("state", "pending")->get();
-        foreach ($transactions as $transaction) {
-            $response = $this->getStatusOrderId($transaction->orderId);
-            if ($response['code'] == "SUCCESS") {
-                $result = $response['result'];
-                $payload = $result['payload'];
-                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
-                $order = $transaction->order;
-                if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApproveOrder($order));
-                } else if ($transactionResponse['state'] == 'PENDING') {
-                    continue;
-                } else {
-                    dispatch(new DenyOrder($order));
-                }
-            }
-        }
+//        $transactions = Transaction::where("state", "pending")->get();
+//        foreach ($transactions as $transaction) {
+//            $response = $this->getStatusOrderId($transaction->orderId);
+//            if ($response['code'] == "SUCCESS") {
+//                $result = $response['result'];
+//                $payload = $result['payload'];
+//                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
+//                $order = $transaction->order;
+//                if ($transactionResponse['state'] == 'APPROVED') {
+//                    dispatch(new ApproveOrder($order));
+//                } else if ($transactionResponse['state'] == 'PENDING') {
+//                    continue;
+//                } else {
+//                    dispatch(new DenyOrder($order));
+//                }
+//            }
+//        }
     }
 
     /**
@@ -1254,6 +1252,18 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function webhook(array $data) {
+        $file = '/home/hoovert/access.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
+
+        $current .= json_encode($data);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
         $ApiKey = env('PAYU_KEY');
         $merchant_id = $data['merchant_id'];
         $referenceCode = $data['reference_sale'];
@@ -1265,6 +1275,10 @@ class PayU {
         $firmacreada = md5($firma_cadena);
         $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
+            $transactionExists = Transaction::where("transaction_id", $data['transaction_id'])->first();
+            if ($transactionExists) {
+                return ["status" => "success", "message" => "transaction already processed", "data" => $data];
+            }
             $transaction = $this->saveTransaction($data);
             $order = Order::where("referenceCode", $referenceCode)->first();
             if ($order) {
@@ -1274,18 +1288,20 @@ class PayU {
                 } else {
                     dispatch(new DenyOrder($order));
                     $transaction->description = "Transacción rechazada";
-                } 
+                }
             } else {
                 if (array_key_exists("reference_recurring_payment", $data)) {
-                    $results = explode("_", $data["reference_recurring_payment"]);
-                    $subscriptionL = Subscription::find("source_id", $results[0]);
-                    $subscriptionL->ends_at = Date($data['date_next_payment']);
-                    $objectType = "App\\Models\\" . $subscriptionL->type;
-                    $object = new $objectType;
-                    $target = $object->find($subscriptionL->object_id);
-                    $target->ends_at = $subscriptionL->ends_at;
-                    $target->save();
-                    $subscriptionL->save();
+                    if ($data['state_pol'] == 4) {
+                        $results = explode("_", $data["reference_recurring_payment"]);
+                        $subscriptionL = Subscription::where("source_id", $results[0])->first();
+                        $subscriptionL->ends_at = Date($data['date_next_payment']);
+                        $objectType = "App\\Models\\" . $subscriptionL->type;
+                        $object = new $objectType;
+                        $target = $object->find($subscriptionL->object_id);
+                        $target->ends_at = $subscriptionL->ends_at;
+                        $target->save();
+                        $subscriptionL->save();
+                    }
                 }
             }
 
@@ -1295,7 +1311,7 @@ class PayU {
         }
     }
 
-    private function saveTransaction(User $user, array $data) {
+    private function saveTransaction(array $data) {
         $transactionId = $data['transaction_id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayY')->first();
         if ($transaction) {
@@ -1305,7 +1321,7 @@ class PayU {
             $transaction->reference_sale = $data['reference_sale'];
             $transaction->payment_method = $data['payment_method_id'];
             $transaction->transaction_id = $data['transaction_id'];
-            $transaction->transaction_date = $data['date'];
+            $transaction->transaction_date = $data['transaction_date'];
             $transaction->response_code = $data['response_code_pol'];
             $transaction->extras = json_encode($data);
             $transaction->save();

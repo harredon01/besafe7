@@ -43,6 +43,7 @@ Route::get('payu/payment_methods', 'PayuController@getPaymentMethods');
 Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
+Route::post('payu/all', 'PayuController@postcreateAll');
 Route::post('payu/webhook', 'PayuController@webhookPayU');
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
