@@ -32,8 +32,11 @@ class Product extends Model {
         return $this->ends_at && Carbon::now()->lt($this->ends_at);
     }
 
-    public function merchant() {
-        return $this->belongsTo('App\Models\Merchant');
+    public function merchants() {
+        return $this->belongsToMany('App\Models\Merchant')->withTimestamps();
+    }
+    public function groups() {
+        return $this->belongsToMany('App\Models\Group')->withTimestamps();
     }
 
     public function category() {

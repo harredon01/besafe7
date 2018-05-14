@@ -211,20 +211,20 @@ class CleanSearch {
                         return null;
                     } else {
                         if ($members[0]->is_admin) {
-                            $data = $request->all("status");
-                            if ($data['status']) {
-                                if ($data['status'] == "active" || $data['status'] == "pending" || $data['status'] == "deleted") {
+                            $data = $request->all("group_status");
+                            if ($data['group_status']) {
+                                if ($data['group_status'] == "active" || $data['group_status'] == "pending" || $data['group_status'] == "deleted") {
                                     $finalString = $mystring;
                                 } else {
                                     return null;
                                 }
                             } else {
-                                $finalString = $mystring . "&status=active";
+                                $finalString = $mystring . "&group_status=active";
                             }
                         } else {
                             $data = $request->all("status");
                             if (!$data['status']) {
-                                $finalString = $mystring . "&status=active";
+                                $finalString = $mystring . "&group_status=active";
                             } else {
                                 return null;
                             }

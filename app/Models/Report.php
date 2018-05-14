@@ -25,7 +25,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "hash", "anonymous", "object", 'report_time', 'group_id','rating','ends_at','plan'];
+        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "anonymous", "object", 'report_time', 'ends_at','plan'];
     protected $hidden = ['user_id'];
     protected $dates = [
         'created_at',
@@ -57,8 +57,8 @@ class Report extends Model {
         return $this->belongsToMany('App\Models\Category')->withTimestamps();
     }
 
-    public function group() {
-        return $this->belongsTo('App\Models\Group');
+    public function groups() {
+        return $this->belongsToMany('App\Models\Group')->withPivot('status')->withTimestamps();
     }
 
     public function checkAddImg($user, $type) {

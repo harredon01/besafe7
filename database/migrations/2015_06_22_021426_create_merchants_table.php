@@ -33,9 +33,6 @@ class CreateMerchantsTable extends Migration {
             $table->integer('city_id')->unsigned()->nullable();
             $table->foreign('city_id')->references('id')
                     ->on('cities');
-            $table->integer('group_id')->unsigned()->nullable();
-            $table->foreign('group_id')->references('id')
-                    ->on('groups');
             $table->integer('region_id')->unsigned()->nullable();
             $table->foreign('region_id')->references('id')
                     ->on('regions');

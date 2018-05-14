@@ -23,6 +23,9 @@ class CreateOrdersTable extends Migration {
                         $table->string('referenceCode');
                         $table->string('comments')->nullable();
                         $table->double('subtotal', 15, 2);
+                        $table->integer('object_id')->unsigned()->nullable();
+                        $table->index('object_id');
+                        $table->string('type')->nullable();
                         $table->double('tax', 15, 2);
                         $table->double('shipping', 15, 2);
                         $table->double('discount', 15, 2);

@@ -19,7 +19,7 @@ class Merchant extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id','city_id','region_id','country_id','name','type', 'email','telephone','address', 'description',
-        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id',"hash",'private','group_id','rating','ends_at','plan'];
+        'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id','private','ends_at','plan'];
     protected $dates = [
         'created_at',
         'updated_at',
@@ -31,7 +31,7 @@ class Merchant extends Model {
     }
 
     public function products() {
-        return $this->hasMany('App\Models\Product');
+        return $this->belongsToMany('App\Models\Product')->withTimestamps();
     }
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');
@@ -39,8 +39,8 @@ class Merchant extends Model {
     public function city() {
         return $this->hasOne('App\Models\City');
     }
-    public function group() {
-        return $this->belongsTo('App\Models\Group');
+    public function groups() {
+        return $this->belongsToMany('App\Models\Group')->withPivot('status')->withTimestamps();
     }
     public function region() {
         return $this->hasOne('App\Models\Region');

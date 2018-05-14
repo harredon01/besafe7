@@ -84,6 +84,7 @@ Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
+Route::delete('reports/group/{groupId?}/{objectId?}', 'ReportApiController@removeObjectGroup');
 Route::resource('reports', 'ReportApiController');
 
 
@@ -98,6 +99,7 @@ Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
 Route::post('merchants/search', 'MerchantApiController@findMerchant');
 Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
+Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::resource('merchants', 'MerchantApiController');
 
 

@@ -99,7 +99,7 @@ class ReportApiController extends Controller {
      */
     public function updateObjectStatus(Request $request, $code) {
         $user = $request->user();
-        $data = $request->only(['status']);
+        $data = $request->only(['status',"group_id"]);
         $data['id'] = $code;
         return $this->editMerchant->updateObjectStatus($user, $data, self::OBJECT_REPORT);
     }
@@ -192,6 +192,16 @@ class ReportApiController extends Controller {
         return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function removeObjectGroup($group,$object, Request $request) {
+        $user = $request->user();
+        return response()->json($this->editMerchant->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
+    }
     /**
      * Remove the specified resource from storage.
      *

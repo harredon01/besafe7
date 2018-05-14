@@ -6,7 +6,7 @@ use Validator;
 use App\Models\FileM;
 use App\Models\Merchant;
 use App\Models\User;
-use App\Jobs\NotifyGroupObject;
+use App\Jobs\SaveGroupsObject;
 use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
@@ -18,12 +18,16 @@ class EditMerchant {
 
     const OBJECT_REPORT_GROUP = 'Report_Group';
     const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
+    const OBJECT_REPORT_ACCESS_GROUP = 'Report_Access_Group';
+    const OBJECT_MERCHANT_ACCESS_GROUP = 'Merchant_Access_Group';
     const OBJECT_REPORT = 'Report';
     const OBJECT_GROUP = 'Group';
     const OBJECT_USER = 'User';
     const OBJECT_MERCHANT = 'Merchant';
     const GROUP_PENDING = 'group_pending';
     const GROUP_BLOCKED = 'group_blocked';
+    const GROUP_MERCHANT_TABLE = 'group_merchant';
+    const GROUP_REPORT_TABLE = 'group_report';
 
     /**
      * The EditAlert implementation.
@@ -90,14 +94,26 @@ class EditMerchant {
         $object = $type::find($reportId);
         if ($user->id == $object->user_id) {
             $object->delete();
-        } else {
-            if ($object->group_id) {
-                $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and level <> "'. self::GROUP_BLOCKED .'"  && level <> "'. self::GROUP_PENDING .'" and is_admin = true ', [$user->id, $object->group_id]);
-                if (sizeof($members) == 0) {
-                    return null;
-                } else {
-                    $object->group_id = null;
-                    $object->save();
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function deleteObjectFromGroup(User $user, $objectId, $groupId, $type) {
+        $type = "App\\Models\\" . $type;
+        $object = $type::find($objectId);
+        if ($object) {
+            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and level <> "' . self::GROUP_BLOCKED . '"  && level <> "' . self::GROUP_PENDING . '" and is_admin = true ', [$user->id, $object->group_id]);
+            if (sizeof($members) == 0) {
+                return null;
+            } else {
+                if ($type == "Report") {
+                    DB::table('group_report')->where('report_id', $objectId)->where('group_id', $groupId)->delete();
+                } else if ($type == "Merchant") {
+                    DB::table('group_merchant')->where('merchant_id', $objectId)->where('group_id', $groupId)->delete();
                 }
             }
         }
@@ -151,8 +167,8 @@ class EditMerchant {
                 }
             }
             if ($send == true) {
-                $favor = Favorite::where('user_id',$user->id)->where("favorite_type",$type)->where("object_id",$object->id)->first();
-                if($favor){
+                $favor = Favorite::where('user_id', $user->id)->where("favorite_type", $type)->where("object_id", $object->id)->first();
+                if ($favor) {
                     $data['favorite'] = true;
                 } else {
                     $data['favorite'] = false;
@@ -166,29 +182,32 @@ class EditMerchant {
     }
 
     public function getObjectByHash($code, $type) {
-        $target = "App\\Models\\" . $type;
-        $object = $target::where('hash', $code)->first();
-        if ($object) {
-            $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
-            if ($type == self::OBJECT_REPORT) {
-                if ($object->private == true && $type == "Report") {
-                    $object->email == "";
-                    $object->telephone == "";
-                }
-                $data = [
-                    "report" => $object,
-                    "files" => $files,
-                ];
-            } else if ($type == self::OBJECT_MERCHANT) {
-                $data = [
-                    "merchant" => $object,
-                    "files" => $files,
-                ];
-            }
-            return $data;
-        } else {
-            return ['status' => "error", "message" => $type . ' not found'];
-        }
+        $data = Cache::remember($type . '_hash_' . $code, 100, function ()use ($type, $code) {
+                    $target = "App\\Models\\" . $type;
+                    $object = $target::where('hash', $code)->first();
+                    if ($object) {
+                        $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+                        if ($type == self::OBJECT_REPORT) {
+                            if ($object->private == true && $type == "Report") {
+                                $object->email == "";
+                                $object->telephone == "";
+                            }
+                            $data = [
+                                "report" => $object,
+                                "files" => $files,
+                            ];
+                        } else if ($type == self::OBJECT_MERCHANT) {
+                            $data = [
+                                "merchant" => $object,
+                                "files" => $files,
+                            ];
+                        }
+                        return $data;
+                    } else {
+                        return ['status' => "error", "message" => $type . ' not found'];
+                    }
+                });
+        return $data;
     }
 
     /**
@@ -382,10 +401,14 @@ class EditMerchant {
                 return null;
             }
             $payload = array("class" => $type, "type" => $object->type, "object_type" => $object->type, "object_name" => $object->name, "object_id" => $object->id, "first_name" => $user->firstName, "last_name" => $user->lastName, "group_name" => $group->name, "group_id" => $group->id);
-            if ($type == "Report") {
+            if ($type == "Report" && $data['status'] == "active") {
                 $type = self::OBJECT_REPORT_GROUP;
-            } else if ($type == "Merchant") {
+            } else if ($type == "Report" && $data['status'] == "pending") {
+                $type = self::OBJECT_REPORT_ACCESS_GROUP;
+            } else if ($type == "Merchant" && $data['status'] == "active") {
                 $type = self::OBJECT_MERCHANT_GROUP;
+            } else if ($type == "Merchant" && $data['status'] == "pending") {
+                $type = self::OBJECT_MERCHANT_ACCESS_GROUP;
             }
             $data = [
                 "trigger_id" => $user->id,
@@ -398,6 +421,68 @@ class EditMerchant {
                 "user_status" => $user->getUserNotifStatus()
             ];
             $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+        }
+    }
+
+    public function notifyGroups(User $user, array $data, $type, $object, $groups) {
+        foreach ($groups as $item) {
+            $group = Group::find($item);
+            if ($group) {
+                $this->notifyGroup($group, $user, $data, $type, $object);
+            }
+        }
+    }
+
+    public function saveToGroups(User $user, array $data, $type, $object) {
+        if ($data['groups']) {
+            $groups = $data['groups'];
+            if ($type == self::OBJECT_MERCHANT) {
+                DB::table(self::GROUP_MERCHANT_TABLE)->where("merchant_id", $object->id)
+                        ->whereNotIn("group_id", $groups)->delete();
+            } else if ($type == self::OBJECT_REPORT) {
+                DB::table(self::GROUP_REPORT_TABLE)->where("report_id", $object->id)
+                        ->whereNotIn("group_id", $groups)->delete();
+            }
+
+            $result = [];
+            $finalgroups = [];
+
+            foreach ($groups as $item) {
+                $group = Group::find($item);
+                if ($group) {
+                    $total = 0;
+                    if ($type == self::OBJECT_MERCHANT) {
+                        $total = $group->merchants()->where('merchants.id', $object->id)->count();
+                    } else if ($type == self::OBJECT_REPORT) {
+                        $total = $group->merchants()->where('merchants.id', $object->id)->count();
+                    }
+                    if ($total > 0) {
+                        continue;
+                    }
+                    $data = $this->checkGroupStatus($user, $group, $data);
+                    if ($data) {
+                        $prospect['group_id'] = $item;
+                        $prospect['status'] = $data['status'];
+                        $prospect['created_at'] = date("Y-m-d h:i:sa"); 
+                        $prospect['updated_at'] = date("Y-m-d h:i:sa");
+                        if ($type == self::OBJECT_MERCHANT) {
+                            $prospect['merchant_id'] = $object->id;
+                        } else if ($type == self::OBJECT_REPORT) {
+                            $prospect['report_id'] = $object->id;
+                        }
+                        array_push($result, $prospect);
+                        array_push($finalgroups, $item);
+                    }
+                }
+            }
+            if (count($result) > 0) {
+                if ($type == self::OBJECT_MERCHANT) {
+                    DB::table(self::GROUP_MERCHANT_TABLE)->insert($result);
+                } else if ($type == self::OBJECT_REPORT) {
+                    DB::table(self::GROUP_REPORT_TABLE)->insert($result);
+                }
+                $this->notifyGroups($user, $data, $type, $object, $finalgroups);
+            }
         }
     }
 
@@ -417,18 +502,7 @@ class EditMerchant {
                 }
             }
         }
-        if ($data['group_id']) {
-            $group = Group::find($data["group_id"]);
-            if ($group) {
-                $data = $this->checkGroupStatus($user, $group, $data);
-                if (!$data) {
-                    return ['status' => 'error', "message" => "Access check for this group failed"];
-                }
-                $data['private'] = true;
-            }
-        } else {
-            $data['status'] = 'active';
-        }
+
         if ($data['id'] && $data['id'] > 0) {
             foreach ($data as $key => $value) {
                 if (!$value) {
@@ -437,6 +511,7 @@ class EditMerchant {
             }
             $object = $this->updateObject($user, $data, $type);
         } else {
+            $data['status'] = 'active';
             if ($type == self::OBJECT_MERCHANT) {
                 $validator = $this->validatorMerchant($data);
                 if ($validator->fails()) {
@@ -450,10 +525,6 @@ class EditMerchant {
             }
             $object = $this->createObject($user, $data, $type);
         }
-        if ($group) {
-            dispatch(new NotifyGroupObject($group, $user, $data, $type, $object));
-            //$this->notifyGroup($group, $user, $data, $type, $object);
-        }
         return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
     }
 
@@ -462,9 +533,14 @@ class EditMerchant {
      *
      * @return Location
      */
-    public function updateObject(User $user, array $data, $object) {
-        $object = "App\\Models\\" . $object;
-        Cache::forget($object . '_' . $data['id']);
+    public function updateObject(User $user, array $data, $type) {
+        $object = "App\\Models\\" . $type;
+        Cache::forget($type . '_' . $data['id']);
+        if (array_key_exists("groups", $data)) {
+            //$this->saveToGroups($user, $data, $type,$object);
+            dispatch(new SaveGroupsObject($user, $data, $type, $object));
+        }
+
         $object::where('user_id', $user->id)
                 ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
         $result = $object::find($data['id']);
@@ -485,21 +561,20 @@ class EditMerchant {
         $object = "App\\Models\\" . $object;
         $result = $object::find($data['id']);
         if ($result && $data['status']) {
-            if ($result->user_id == $user->id) {
-                $result->status = $data['status'];
-                $result->save();
-                return ['status' => 'success', "message" => "status updated"];
-            } else {
-                if ($result->group_id) {
-                    $group = $result->group;
-                    $targetStatus = $data['status'];
-                    $data = $this->checkGroupStatus($user, $group, $data);
-                    if ($data['status'] == 'active') {
-                        $result->status = $targetStatus;
-                        $result->save();
-                        return ['status' => 'success', "message" => "status updated"];
-                    } else {
-                        return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+            if (array_key_exists("group_id", $data)) {
+                if ($data['group_id']) {
+
+                    $group = Group::find($data['group_id']);
+                    if ($group) {
+                        $targetStatus = $data['status'];
+                        $data = $this->checkGroupStatus($user, $group, $data);
+                        if ($data['status'] == 'active') {
+                            $attributes['status'] = $targetStatus;
+                            $result->groups()->updateExistingPivot($group->id, $attributes);
+                            return ['status' => 'success', "message" => "status updated"];
+                        } else {
+                            return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+                        }
                     }
                 } else {
                     return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
@@ -515,10 +590,15 @@ class EditMerchant {
      *
      * @return Location
      */
-    public function createObject(User $user, array $data, $object) {
+    public function createObject(User $user, array $data, $type) {
         $data["user_id"] = $user->id;
-        $object = "App\\Models\\" . $object;
+        $object = "App\\Models\\" . $type;
         $result = $object::create($data);
+        if (array_key_exists("groups", $data)) {
+            //$this->saveToGroups($user, $data, $type, $result);
+            dispatch(new SaveGroupsObject($user, $data, $type, $result));
+        }
+
         return $result;
     }
 

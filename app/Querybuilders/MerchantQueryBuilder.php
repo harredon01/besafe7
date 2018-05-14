@@ -11,10 +11,17 @@ class MerchantQueryBuilder extends QueryBuilder {
                         ->where('userables.user_id', '=', $id)
                         ->where('userable_type', '=', "Merchant");
     }
+    public function filterByGroupId($query, $id) {
+        return $query->join('group_merchant', 'merchants.id', '=', 'group_merchant.merchant_id')
+                        ->where('group_merchant.group_id', '=', $id);
+    }
 
     public function filterByFavoritesId($query, $id) {
         return $query->join('favorites', 'merchants.id', '=', 'favorites.object_id')
                         ->where('favorites.favorite_type', '=', "Merchant");
+    }
+    public function filterByGroupStatus($query, $id) {
+        return $query->where('group_merchant.status', '=', $id);
     }
 
 }

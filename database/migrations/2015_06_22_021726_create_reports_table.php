@@ -13,9 +13,6 @@ class CreateReportsTable extends Migration {
     public function up() {
         Schema::create('reports', function(Blueprint $table) {
             $table->increments('id');
-            $table->integer('group_id')->unsigned()->nullable();
-            $table->foreign('group_id')->references('id')
-                ->on('groups');
             $table->string('name')->nullable();
             $table->string('type')->nullable();
             $table->index('type');

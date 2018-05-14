@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Models\User;
-use App\Models\Group;
 use App\Services\EditMerchant;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -11,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class NotifyGroupObject implements ShouldQueue {
+class SaveGroupsObject implements ShouldQueue {
 
     use Dispatchable,
         InteractsWithQueue,
@@ -19,7 +18,6 @@ class NotifyGroupObject implements ShouldQueue {
         SerializesModels;
 
     protected $user;
-    protected $group;
     protected $data;
     protected $type;
     protected $object;
@@ -29,9 +27,8 @@ class NotifyGroupObject implements ShouldQueue {
      *
      * @return void
      */
-    public function __construct(Group $group, User $user, array $data, $type, $object) {
+    public function __construct(User $user, array $data, $type, $object) {
         $this->user = $user;
-        $this->group = $group;
         $this->data = $data;
         $this->type = $type;
         $this->object = $object;
@@ -43,7 +40,7 @@ class NotifyGroupObject implements ShouldQueue {
      * @return void
      */
     public function handle(EditMerchant $editMerchant) {
-        $editMerchant->notifyGroup($this->group, $this->user, $this->data, $this->type, $this->object);
+        $editMerchant->saveToGroups($this->user, $this->data, $this->type, $this->object);
     }
 
 }

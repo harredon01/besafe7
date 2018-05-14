@@ -16,7 +16,15 @@ class ReportQueryBuilder extends QueryBuilder {
         return $query->join('favorites', 'reports.id', '=', 'favorites.object_id')
                         ->where('favorites.favorite_type', '=', "Report");
     }
-
+    
+    public function filterByGroupId($query, $id) {
+        return $query->join('group_report', 'reports.id', '=', 'group_report.report_id')
+                        ->where('group_report.group_id', '=', $id);
+    }
+    
+    public function filterByGroupStatus($query, $id) {
+        return $query->where('group_report.status', '=', $id);
+    }
 }
 
 /* 

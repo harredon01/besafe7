@@ -42,7 +42,13 @@ class Group extends Model {
     }
 
     public function reports() {
-        return $this->hasMany('App\Models\Group');
+        return $this->belongsToMany('App\Models\Report')->withPivot('status')->withTimestamps();
+    }
+    public function merchants() {
+        return $this->belongsToMany('App\Models\Merchant')->withPivot('status')->withTimestamps();
+    }
+    public function products() {
+        return $this->belongsToMany('App\Models\Product')->withPivot('status')->withTimestamps();
     }
 
     public function subscription() {

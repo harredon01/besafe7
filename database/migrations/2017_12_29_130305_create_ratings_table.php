@@ -31,7 +31,7 @@ class CreateRatingsTable extends Migration {
                 //
             } else {
                 Schema::table('users', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->double('rating')->nullable();
                 });
             }
         }
@@ -40,7 +40,7 @@ class CreateRatingsTable extends Migration {
                 //
             } else {
                 Schema::table('products', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->double('rating')->nullable();
                 });
             }
         }
@@ -49,7 +49,7 @@ class CreateRatingsTable extends Migration {
                 //
             } else {
                 Schema::table('merchants', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->double('rating')->nullable();
                 });
             }
         }
@@ -58,7 +58,7 @@ class CreateRatingsTable extends Migration {
                 //
             } else {
                 Schema::table('reports', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->double('rating')->nullable();
                 });
             }
         }
@@ -67,7 +67,7 @@ class CreateRatingsTable extends Migration {
                 //
             } else {
                 Schema::table('groups', function (Blueprint $table) {
-                    $table->double('rating');
+                    $table->double('rating')->nullable();
                 });
             }
         }
