@@ -16,7 +16,7 @@ class ProductVariant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['sku','product_id','ref2','type','is_digital','is_shippable','price','sale','tax','quantity','merchant_id','requires_authorization'];
+    protected $fillable = ['sku','product_id','ref2','type','description','is_digital','is_shippable','price','sale','tax','quantity','merchant_id','requires_authorization'];
 
     public function product() {
         return $this->belongsTo('App\Models\Product');

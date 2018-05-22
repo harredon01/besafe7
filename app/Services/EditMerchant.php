@@ -10,6 +10,7 @@ use App\Jobs\SaveGroupsObject;
 use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
+use App\Models\Rating;
 use Illuminate\Http\Response;
 use DB;
 use Cache;
@@ -130,6 +131,7 @@ class EditMerchant {
                     $target = "App\\Models\\" . $type;
                     $object = $target::find($objectId);
                     $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+                    $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
                     if ($type == self::OBJECT_REPORT) {
                         if ($object->private == true && $type == "Report") {
                             $object->email == "";
@@ -138,11 +140,13 @@ class EditMerchant {
                         $data = [
                             "report" => $object,
                             "files" => $files,
+                            "ratings" => $ratings
                         ];
                     } else if ($type == self::OBJECT_MERCHANT) {
                         $data = [
                             "merchant" => $object,
                             "files" => $files,
+                            "ratings" => $ratings
                         ];
                     }
                     return $data;
@@ -187,6 +191,7 @@ class EditMerchant {
                     $object = $target::where('hash', $code)->first();
                     if ($object) {
                         $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+                        $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
                         if ($type == self::OBJECT_REPORT) {
                             if ($object->private == true && $type == "Report") {
                                 $object->email == "";
@@ -195,11 +200,13 @@ class EditMerchant {
                             $data = [
                                 "report" => $object,
                                 "files" => $files,
+                                "ratings" => $ratings
                             ];
                         } else if ($type == self::OBJECT_MERCHANT) {
                             $data = [
                                 "merchant" => $object,
                                 "files" => $files,
+                                "ratings" => $ratings
                             ];
                         }
                         return $data;

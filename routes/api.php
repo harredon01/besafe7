@@ -106,6 +106,10 @@ Route::resource('merchants', 'MerchantApiController');
 Route::post('imagesapi', 'FileApiController@postFile');
 Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 
+Route::get('products/group/{group?}/{page?}', 'ProductApiController@getProductsGroup');
+Route::get('products/merchant/private/{merchant?}/{page?}', 'ProductApiController@getProductsPrivateMerchant');
+Route::get('products/merchant/{merchant?}/{page?}', 'ProductApiController@getProductsMerchant');
+
 Route::resource('products', 'ProductApiController');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
 Route::post('products/variant', 'ProductVariantApiController@store');

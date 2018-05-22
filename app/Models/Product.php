@@ -20,7 +20,7 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive','rating','ends_at'];
+    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive','rating','ends_at','user_id'];
     
     protected $dates = [
         'created_at',
@@ -41,6 +41,9 @@ class Product extends Model {
 
     public function category() {
         return $this->belongsToMany('App\Models\Category')->withTimestamps();
+    }
+    public function user() {
+        return $this->belongsTo('App\Models\Category')->withTimestamps();
     }
 
     public function conditions() {

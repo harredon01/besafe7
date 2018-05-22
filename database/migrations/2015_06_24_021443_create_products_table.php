@@ -26,6 +26,9 @@ class CreateProductsTable extends Migration {
                         $table->integer('merchant_id')->unsigned()->nullable();
                         $table->foreign('merchant_id')->references('id')
                                 ->on('merchants');
+                        $table->integer('user_id')->unsigned()->nullable();
+                        $table->foreign('user_id')->references('id')
+                                ->on('users');
 			$table->timestamps();
 		});
 	}

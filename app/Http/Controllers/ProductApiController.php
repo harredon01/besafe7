@@ -19,6 +19,7 @@ class ProductApiController extends Controller {
      *
      */
     protected $editProduct;
+
     /**
      * The edit profile implementation.
      *
@@ -30,7 +31,7 @@ class ProductApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditProduct $editProduct,ShareObject $shareObject) {
+    public function __construct(EditProduct $editProduct, ShareObject $shareObject) {
         $this->editProduct = $editProduct;
         $this->shareObject = $shareObject;
         $this->middleware('auth:api');
@@ -43,30 +44,29 @@ class ProductApiController extends Controller {
      */
     public function index(Request $request) {
         $user = $request->user();
-        $data = $request->only("merchant_id");
+        $data = $request->only("mine");
         $request2 = null;
         $result['access'] = null;
         if ($data) {
-            $result = $this->editProduct->checkAccess($user,$data['merchant_id'], self::OBJECT_MERCHANT);
-        }
-        if ($result['access']) {
-            $data2 = $request->only("order_by");
-            if ($data2) {
-                $request2 = Request::create("?merchant_id=" . $data['merchant_id'] . "&order_by=" . $data2['order_by'], 'GET');
-            } else {
-                $request2 = Request::create("?merchant_id=" . $data['merchant_id'], 'GET');
+            if ($data["mine"]) {
+                $data2 = $request->only("order_by");
+                if ($data2) {
+                    $request2 = Request::create("?user_id=" . $user->id . "&order_by=" . $data2['order_by'], 'GET');
+                } else {
+                    $request2 = Request::create("?user_id=" . $user->id, 'GET');
+                }
             }
-        }
-        if ($request2) {
-            $queryBuilder = new ProductQueryBuilder(new Product, $request2);
-            $result = $queryBuilder->build()->paginate();
-            return response()->json([
-                        'data' => $result->items(),
-                        "total" => $result->total(),
-                        "per_page" => $result->perPage(),
-                        "page" => $result->currentPage(),
-                        "last_page" => $result->lastPage(),
-            ]);
+            if ($request2) {
+                $queryBuilder = new ProductQueryBuilder(new Product, $request2);
+                $result = $queryBuilder->build()->paginate();
+                return response()->json([
+                            'data' => $result->items(),
+                            "total" => $result->total(),
+                            "per_page" => $result->perPage(),
+                            "page" => $result->currentPage(),
+                            "last_page" => $result->lastPage(),
+                ]);
+            }
         }
         return response()->json([
                     'status' => "error",
@@ -80,7 +80,16 @@ class ProductApiController extends Controller {
      * @return Response
      */
     public function create() {
-        //
+        $user = $request->user();
+        $data = $request->all([
+            'merchant_id',
+            'name',
+            'description',
+            'availability',
+            'hash',
+            'isActive',
+        ]);
+        return response()->json($this->editProduct->createOrUpdateProduct($user, $data));
     }
 
     /**
@@ -99,8 +108,9 @@ class ProductApiController extends Controller {
             'hash',
             'isActive',
         ]);
-        return response()->json($this->editProduct->createOrUpdateProduct($user,$data));
+        return response()->json($this->editProduct->createOrUpdateProduct($user, $data));
     }
+
     public function getProductHash($productId, Request $request) {
         $user = $request->user();
         return response()->json($this->shareObject->getObjectHash($user, $productId, self::OBJECT_PRODUCT));
@@ -112,20 +122,40 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function show($id,Request $request) {
+    public function show($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->getProduct($user,$id));
+        return response()->json($this->editProduct->getProduct($user, $id));
     }
-    
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function getProductsMerchant($id,Request $request) {
+    public function getProductsMerchant($merchant,$page, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->getProductsMerchant($user,$id));
+        return response()->json($this->editProduct->getProductsMerchant($user, $merchant,$page));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProductsPrivateMerchant($merchant,$page, Request $request) {
+        $user = $request->user();
+        return response()->json($this->editProduct->getProductsPrivateMerchant($user, $merchant,$page));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProductsGroup($group,$page, Request $request) {
+        $user = $request->user();
+        return response()->json($this->editProduct->getProductsGroup($user, $group,$page));
     }
 
     /**
@@ -144,7 +174,7 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function update($id,Request $request) {
+    public function update($id, Request $request) {
         $user = $request->user();
         $data = $request->all([
             'merchant_id',
@@ -155,8 +185,24 @@ class ProductApiController extends Controller {
             'hash',
             'isActive',
         ]);
-        $data['id']=$id;
-        return response()->json($this->editProduct->createOrUpdateProduct($user,$data));
+        $data['id'] = $id;
+        return response()->json($this->editProduct->createOrUpdateProduct($user, $data));
+    }
+    
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function changeProductOwners($id, Request $request) {
+        $user = $request->user();
+        $data = $request->all([
+            'merchants',
+            'operation',
+        ]);
+        $data['product_id'] = $id;
+        return response()->json($this->editProduct->changeProductOwners($user, $data));
     }
 
     /**
@@ -165,9 +211,9 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id,Request $request) {
+    public function destroy($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->deleteProduct($user,$id));
+        return response()->json($this->editProduct->deleteProduct($user, $id));
     }
 
 }
