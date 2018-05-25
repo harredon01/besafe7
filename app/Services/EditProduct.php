@@ -97,23 +97,27 @@ class EditProduct {
                                             ->select('products.*')
                                             ->skip($skip)->take($take)->get();
                             $data['products_total'] = DB::table('products')->groupBy('products.id')
-                                            ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                                            ->where('merchant_product.merchant_id', $merchant_id)
-                                            ->where('products.isActive', true)
-                                            ->count();
+                                    ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                                    ->where('merchant_product.merchant_id', $merchant_id)
+                                    ->where('products.isActive', true)
+                                    ->count();
                             $products = [];
                             foreach ($variants as $value) {
-                                if (in_array($value['product_id'], $products)) {
+                                if (in_array($value->id, $products)) {
                                     
                                 } else {
-                                    array_push($products, $value['product_id']);
+                                    array_push($products, $value->id);
                                 }
                             }
                             $data['products_variants'] = $variants;
                             $data['products_variants'] = DB::table('products')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                                    ->whereIn('product_variant.product_id', $products)
-                                    ->select('product_variant.*')
+                                    ->whereIn('products.id', $products)
+                                    ->select('product_variant.*',
+                                'products.id as prod_id',
+                                'products.name as prod_name',
+                                'products.description as prod_desc',
+                                'products.availability as prod_avail')
                                     ->get();
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -134,17 +138,21 @@ class EditProduct {
                                 ->skip($skip)->take($take)->get();
                 $products = [];
                 foreach ($variants as $value) {
-                    if (in_array($value['product_id'], $products)) {
+                    if (in_array($value->id, $products)) {
                         
                     } else {
-                        array_push($products, $value['product_id']);
+                        array_push($products, $value->id);
                     }
                 }
                 $data['products_variants'] = $variants;
                 $data['products_variants'] = DB::table('products')
                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                        ->whereIn('product_variant.product_id', $products)
-                        ->select('product_variant.*')
+                        ->whereIn('products.id', $products)
+                        ->select('product_variant.*',
+                                'products.id as prod_id',
+                                'products.name as prod_name',
+                                'products.description as prod_desc',
+                                'products.availability as prod_avail')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -177,22 +185,26 @@ class EditProduct {
                                 ->select('products.*')
                                 ->skip($skip)->take($take)->get();
                 $data['products_total'] = DB::table('products')->groupBy('products.id')
-                                ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                                ->where('merchant_product.merchant_id', $merchant_id)
-                                ->count();
+                        ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                        ->where('merchant_product.merchant_id', $merchant_id)
+                        ->count();
                 $products = [];
                 foreach ($variants as $value) {
-                    if (in_array($value['product_id'], $products)) {
+                    if (in_array($value->id, $products)) {
                         
                     } else {
-                        array_push($products, $value['product_id']);
+                        array_push($products, $value->id);
                     }
                 }
                 $data['products_variants'] = $variants;
                 $data['products_variants'] = DB::table('products')
-                        ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                        ->whereIn('product_variant.product_id', $products)
-                        ->select('product_variant.*')
+                        ->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
+                        ->whereIn('products.id', $products)
+                        ->select('product_variant.*',
+                                'products.id as prod_id',
+                                'products.name as prod_name',
+                                'products.description as prod_desc',
+                                'products.availability as prod_avail')
                         ->get();
                 return $data;
             }
@@ -224,26 +236,30 @@ class EditProduct {
                                             ->select('products.*')
                                             ->skip($skip)->take($take)->get();
                             $data['products_total'] = DB::table('products')->groupBy('products.id')
-                                            ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                                            ->join('mechants', 'mechants.id', '=', 'merchant_product.mechant_id')
-                                            ->join('group_merchant', 'mechants.id', '=', 'group_merchant.mechant_id')
-                                            ->where('group_merchant.group_id', $group_id)
-                                            ->where('merchants.status', 'active')
-                                            ->where('products.isActive', true)
-                                            ->count();
+                                    ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                                    ->join('mechants', 'mechants.id', '=', 'merchant_product.mechant_id')
+                                    ->join('group_merchant', 'mechants.id', '=', 'group_merchant.mechant_id')
+                                    ->where('group_merchant.group_id', $group_id)
+                                    ->where('merchants.status', 'active')
+                                    ->where('products.isActive', true)
+                                    ->count();
                             $products = [];
                             foreach ($variants as $value) {
-                                if (in_array($value['product_id'], $products)) {
+                                if (in_array($value->id, $products)) {
                                     
                                 } else {
-                                    array_push($products, $value['product_id']);
+                                    array_push($products, $value->id);
                                 }
                             }
                             $data['products_variants'] = $variants;
                             $data['products_variants'] = DB::table('products')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                                    ->whereIn('product_variant.product_id', $products)
-                                    ->select('product_variant.*')
+                                    ->whereIn('products.id', $products)
+                                    ->select('product_variant.*',
+                                'products.id as prod_id',
+                                'products.name as prod_name',
+                                'products.description as prod_desc',
+                                'products.availability as prod_avail')
                                     ->get();
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -268,17 +284,21 @@ class EditProduct {
                                 ->skip($skip)->take($take)->get();
                 $products = [];
                 foreach ($variants as $value) {
-                    if (in_array($value['product_id'], $products)) {
+                    if (in_array($value->id, $products)) {
                         
                     } else {
-                        array_push($products, $value['product_id']);
+                        array_push($products, $value->id);
                     }
                 }
                 $data['products_variants'] = $variants;
                 $data['products_variants'] = DB::table('products')
                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                        ->whereIn('product_variant.product_id', $products)
-                        ->select('product_variant.*')
+                        ->whereIn('products.id', $products)
+                        ->select('product_variant.*',
+                                'products.id as prod_id',
+                                'products.name as prod_name',
+                                'products.description as prod_desc',
+                                'products.availability as prod_avail')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -476,9 +496,14 @@ class EditProduct {
     public function writeAccessProduct(User $user, $product_id) {
         $access = false;
         $product = Product::find($product_id);
-        if ($product->user_id == $user->id) {
+        if ($product) {
+            if ($product->user_id == $user->id) {
+                $access = true;
+            }
+        } else {
             $access = true;
         }
+
         $data = [
             "access" => $access
         ];
@@ -596,6 +621,7 @@ class EditProduct {
                 $merchantid = $data['merchant_id'];
                 unset($data['merchant_id']);
                 $data['isActive'] = false;
+                $data['user_id'] = $user->id;
                 $data = (object) array_filter((array) $data, function ($val) {
                             return !is_null($val);
                         });

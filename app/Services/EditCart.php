@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Validator;
 use App\Models\User;
+use App\Models\Merchant;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\ProductVariant;
@@ -142,16 +143,13 @@ class EditCart {
      *
      * @return Response
      */
-    public function checkCartMerchant(User $user, $merchant_id, $order_id) {
-        $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->whereNotNull('product_variant_id')->first();
+    public function checkCartAuth(User $user, $requires_authorization, $order_id) {
+        $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
         if (!$item) {
             return true;
         } else {
-            $tester = $item->productVariant;
-            if ($tester) {
-                if ($tester->merchant_id == $merchant_id) {
-                    return true;
-                }
+            if ($item->requires_authorization == $requires_authorization) {
+                return true;
             }
             return false;
         }
@@ -283,11 +281,23 @@ class EditCart {
         } else {
             $data['quantity'] = 1;
         }
+        if (array_key_exists('merchant_id', $data)) {
+            $merchant = Merchant::find($data['merchant_id']);
+            if (!$merchant) {
+                return array("status" => "error", "message" => "invalid merchant");
+            }
+        } else {
+            return array("status" => "error", "message" => "missing merchant id");
+        }
         $order_id = $this->checkAddToOrder($user, $data);
 
         $item = null;
         if (array_key_exists('item_id', $data)) {
             $item = Item::where('id', intval($data['item_id']))
+                            ->where('user_id', $user->id)
+                            ->where('order_id', $order_id)->first();
+        } else if (array_key_exists('product_variant_id', $data)) {
+            $item = Item::where('product_variant_id', intval($data['product_variant_id']))
                             ->where('user_id', $user->id)
                             ->where('order_id', $order_id)->first();
         }
@@ -311,7 +321,7 @@ class EditCart {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                $resultCheck = $this->checkCartMerchant($user, $productVariant->merchant_id, $order_id);
+                $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
                         if ($hasState) {
@@ -345,6 +355,8 @@ class EditCart {
                         }
                         $losAttributes['is_digital'] = $productVariant->is_digital;
                         $losAttributes['is_shippable'] = $productVariant->is_shippable;
+                        $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                        $losAttributes['merchant_id'] = $data['merchant_id'];
                         $losAttributes['product_variant_id'] = $productVariant->id;
                         $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
                         if (array_key_exists("extras", $data)) {
@@ -358,7 +370,11 @@ class EditCart {
                                     'name' => $product->name,
                                     'user_id' => $user->id,
                                     'price' => $productVariant->price,
+                                    'requires_authorization' => $productVariant->requires_authorization,
+                                    'paid_status' => "unpaid",
+                                    'fulfillment' => "unfulfilled",
                                     'quantity' => (int) $data['quantity'],
+                                    'merchant_id' => $data['merchant_id'],
                                     'attributes' => json_encode($losAttributes),
                                     'status' => 'active',
                                     'order_id' => $order_id,
@@ -389,6 +405,10 @@ class EditCart {
     public function addCustomCartItem(User $user, array $data, $hasState) {
         if (array_key_exists('merchant_id', $data)) {
             if ($data['merchant_id']) {
+                $merchant = Merchant::find($data['merchant_id']);
+                if (!$merchant) {
+                    return array("status" => "error", "message" => "invalid merchant");
+                }
                 if (array_key_exists('quantity', $data)) {
                     if ((int) $data['quantity'] <= 0) {
                         return array("status" => "error", "message" => "amount must be a positive integer");
@@ -397,13 +417,15 @@ class EditCart {
                     $data['quantity'] = 1;
                 }
                 $order_id = $this->checkAddToOrder($user, $data);
-                $resultCheck = $this->checkCartMerchant($user, $data['merchant_id'], $order_id);
+                $resultCheck = $this->checkCartAuth($user, true, $order_id);
                 if ($resultCheck) {
 
                     $losAttributes = array();
                     $losAttributes['is_digital'] = 1;
                     $losAttributes['is_shippable'] = 0;
                     $losAttributes['requires_authorization'] = 1;
+                    $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                    $losAttributes['merchant_id'] = $data['merchant_id'];
                     if (array_key_exists("extras", $data)) {
                         foreach ($data["extras"] as $x => $x_value) {
                             $losAttributes[$x] = $x_value;
@@ -413,7 +435,10 @@ class EditCart {
                                 'name' => $losAttributes['name'],
                                 'user_id' => $user->id,
                                 'price' => $losAttributes['price'],
+                                'paid_status' => "unpaid",
+                                'fulfillment' => "unfulfilled",
                                 'quantity' => (int) $data['quantity'],
+                                'merchant_id' => $data['merchant_id'],
                                 'attributes' => json_encode($losAttributes),
                                 'status' => 'active',
                                 'order_id' => $order_id
@@ -493,7 +518,7 @@ class EditCart {
                         ->where('user_id', $user->id)
                         ->where('order_id', $order_id)->first();
         if ($item) {
-            if($item->productVariant){
+            if ($item->productVariant) {
                 return array("status" => "error", "message" => "This is not a custom item");
             }
             $result = [];
@@ -519,18 +544,18 @@ class EditCart {
                 $item->quantity = $losAttributes['price'];
                 $result['price'] = $losAttributes['price'];
             }
-            
+
             $result['attributes'] = $losAttributes;
             $item->save();
             if ($hasState) {
-                Cart::update($item->id,$result);
+                Cart::update($item->id, $result);
             }
             return array("status" => "success", "message" => "item updated successfully", "item" => $item);
         } else {
             return array("status" => "error", "message" => "item does not exist on the cart");
         }
     }
-    
+
     /**
      * Get a validator for an incoming edit profile request.
      *

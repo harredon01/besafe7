@@ -51,6 +51,9 @@ class Merchant extends Model {
     public function orders() {
         return $this->hasMany('App\Models\Order');
     }
+    public function items() {
+        return $this->hasMany('App\Models\Item');
+    }
     public function categories() {
         return $this->belongsToMany('App\Models\Category')->withTimestamps();
     }

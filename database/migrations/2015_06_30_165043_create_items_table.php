@@ -23,6 +23,9 @@ class CreateItemsTable extends Migration {
                         $table->double('priceConditions', 15, 2);
                         $table->double('priceSumConditions', 15, 2);
                         $table->boolean('is_subscription');
+                        $table->string('paid_status');
+                        $table->string('fulfillment');
+                        $table->boolean('requires_authorization');
                         $table->integer('quantity');
                         $table->integer('product_variant_id')->unsigned()->nullable();
                         $table->foreign('product_variant_id')->references('id')
@@ -33,6 +36,9 @@ class CreateItemsTable extends Migration {
                         $table->integer('order_id')->unsigned()->nullable();
                         $table->foreign('order_id')->references('id')
                                 ->on('orders');
+                        $table->integer('merchant_id')->unsigned()->nullable();
+                        $table->foreign('merchant_id')->references('id')
+                                ->on('merchants');
                         $table->text('attributes');
 			$table->timestamps();
 		});

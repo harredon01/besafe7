@@ -16,7 +16,8 @@ class Item extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','sku','ref2','price','priceSum','priceConditions','priceSumConditions','is_subscription','quantity','user_id','product_variant_id','order_id','attributes'];
+    protected $fillable = ['name','sku','ref2','price','priceSum','priceConditions','priceSumConditions','paid_status','fulfillment',
+        'is_subscription','quantity','user_id','product_variant_id','order_id','requires_authorization','merchant_id','attributes'];
 
 
     public function productVariant() {
@@ -27,5 +28,8 @@ class Item extends Model {
     }
     public function user() {
         return $this->belongsTo('App\Models\User');
+    }
+    public function merchant() {
+        return $this->belongsTo('App\Models\Merchant');
     }
 }
