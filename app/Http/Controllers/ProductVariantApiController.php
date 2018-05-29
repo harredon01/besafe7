@@ -95,6 +95,7 @@ class ProductVariantApiController extends Controller {
             'sale',
             'tax',
             'quantity',
+            'description',
             'merchant_id',
             'requires_authorization'
         ]);
@@ -139,6 +140,7 @@ class ProductVariantApiController extends Controller {
             'is_digital',
             'is_shippable',
             'price',
+            'description',
             'sale',
             'tax',
             'quantity',

@@ -2,10 +2,8 @@
 
 namespace App\Services;
 
-use Validator;
 use App\Models\FileM;
 use App\Models\User;
-use App\Models\Item;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
@@ -341,7 +339,7 @@ class EditProduct {
                 if ($user) {
                     $members = DB::select('select u.user_id as id '
                                     . 'from userables u '
-                                    . 'JOIN merchants m ON m.id = mp.merchant_id '
+                                    . 'JOIN merchants m ON m.id =u.object_id '
                                     . 'where u.user_id  = ? '
                                     . 'and u.userable_type = "Merchant" '
                                     . 'and m.status = "active" '
@@ -365,7 +363,7 @@ class EditProduct {
                                                 AND gm.status = "active"
                                                 AND gu.level = "active"
                                                 AND m.status = "active"
-                                                AND m.is_public = true
+                                                AND m.private = false
                                                 AND gu.user_id = ?
                                                 AND gm.merchant_id = ?;', [$user->id, $merchant->id]);
                     if (sizeof($groups) > 0) {
@@ -395,15 +393,15 @@ class EditProduct {
         $damerchant = DB::select('SELECT 
                                             DISTINCT(m.id),m.user_id
                                         FROM
-                                            merchants 
+                                            merchants m
                                         WHERE
-                                                AND m.status = "active"
-                                                AND m.is_public = true
-                                                id IN ( 
+                                                m.status = "active"
+                                                AND m.private = false
+                                                AND m.id IN ( 
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 
                                                 )
 
-                ?;', [$product_id]);
+                ;', [$product_id]);
         if (sizeof($damerchant) > 0) {
             $access = true;
             if ($damerchant[0]->user_id == $user->id) {
@@ -439,13 +437,13 @@ class EditProduct {
                                                 AND gm.status = "active"
                                                 AND gu.level = "active"
                                                 AND m.status = "active"
-                                                AND m.is_public = true
+                                                AND m.private = false
                                                 AND gu.user_id = ?
                                                 AND gm.merchant_id IN ( 
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 
                                                 )
 
-                    ?;', [$user->id, $product_id]);
+                    ;', [$user->id, $product_id]);
                 if (sizeof($groups) > 0) {
                     $access = true;
                 } else {
@@ -473,12 +471,12 @@ class EditProduct {
                                                 JOIN
                                             group_user gu ON gu.group_id = g.id
                                         WHERE
-                                                AND g.status = "active"
+                                                g.status = "active"
                                                 AND gu.level = "active"
                                                 AND gu.user_id = ?
                                                 AND g.id = ?
 
-                    ?;', [$user->id, $group_id]);
+                   ;', [$user->id, $group_id]);
         if (sizeof($groups) > 0) {
             $access = true;
         }
@@ -520,21 +518,21 @@ class EditProduct {
         $merchants = DB::select('SELECT 
                                             DISTINCT(m.id) as merchant_id,m.user_id
                                         FROM
-                                            merchants 
+                                            merchants m
                                         WHERE
-                                                AND m.status = "active"
-                                                id IN ( 
+                                                m.status = "active"
+                                                AND m.id IN ( 
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 
                                                 )
 
-                ?;', [$product_id]);
+                ;', [$product_id]);
         foreach ($merchants as $value) {
-            Cache::forget('products_merchant_' . $value['merchant_id'] . "_1");
-            Cache::forget('products_merchant_' . $value['merchant_id'] . "_2");
-            Cache::forget('products_merchant_' . $value['merchant_id'] . "_3");
+            Cache::forget('products_merchant_' . $value->merchant_id . "_1");
+            Cache::forget('products_merchant_' . $value->merchant_id . "_2");
+            Cache::forget('products_merchant_' . $value->merchant_id . "_3");
         }
         $groups = DB::select('SELECT 
-                                            DISTINCT(m.id) as group_id,m.user_id
+                                            DISTINCT(g.id) as group_id,m.user_id
                                         FROM
                                             groups g
                                                 JOIN
@@ -549,11 +547,11 @@ class EditProduct {
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 
                                                 )
 
-                    ?;', [$product_id]);
+                    ;', [$product_id]);
         foreach ($groups as $value) {
-            Cache::forget('products_group_' . $value['group_id'] . "_1");
-            Cache::forget('products_group_' . $value['group_id'] . "_2");
-            Cache::forget('products_group_' . $value['group_id'] . "_3");
+            Cache::forget('products_group_' . $value->group_id . "_1");
+            Cache::forget('products_group_' . $value->group_id . "_2");
+            Cache::forget('products_group_' . $value->group_id . "_3");
         }
     }
 
@@ -569,6 +567,7 @@ class EditProduct {
             if ($write['access'] == true) {
                 $variants = $product->productVariants;
                 $product->conditions()->delete();
+                $product->merchants()->detach();
                 $files = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
                 foreach ($files as $file) {
                     $this->editFile->delete($user, $file->id);
