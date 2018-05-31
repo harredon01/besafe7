@@ -231,7 +231,7 @@ class EditProduct {
                                             ->where('group_merchant.group_id', $group_id)
                                             ->where('merchants.status', 'active')
                                             ->where('products.isActive', true)
-                                            ->select('products.*')
+                                            ->select('products.*', 'mechants.id as merchant_id')
                                             ->skip($skip)->take($take)->get();
                             $data['products_total'] = DB::table('products')->groupBy('products.id')
                                     ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')

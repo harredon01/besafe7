@@ -143,13 +143,15 @@ class EditCart {
      *
      * @return Response
      */
-    public function checkCartAuth(User $user, $requires_authorization, $order_id) {
+    public function checkCartAuth(User $user, $requires_authorization, $order_id,$merchant_id) {
         $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
         if (!$item) {
             return true;
         } else {
             if ($item->requires_authorization == $requires_authorization) {
-                return true;
+                if($item->merchant_id == $merchant_id){
+                    return true;
+                }
             }
             return false;
         }
@@ -321,7 +323,7 @@ class EditCart {
         } else {
             $productVariant = ProductVariant::find(intval($data['product_variant_id']));
             if ($productVariant) {
-                $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id);
+                $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id,$data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
                         if ($hasState) {
@@ -417,7 +419,7 @@ class EditCart {
                     $data['quantity'] = 1;
                 }
                 $order_id = $this->checkAddToOrder($user, $data);
-                $resultCheck = $this->checkCartAuth($user, true, $order_id);
+                $resultCheck = $this->checkCartAuth($user, true, $order_id,$data['merchant_id']);
                 if ($resultCheck) {
 
                     $losAttributes = array();

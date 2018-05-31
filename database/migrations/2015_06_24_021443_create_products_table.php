@@ -23,9 +23,6 @@ class CreateProductsTable extends Migration {
                         $table->index('object_id');
                         $table->string('type')->nullable();
                         $table->boolean('isActive');
-                        $table->integer('merchant_id')->unsigned()->nullable();
-                        $table->foreign('merchant_id')->references('id')
-                                ->on('merchants');
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');

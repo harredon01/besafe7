@@ -20,7 +20,7 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id', 'merchant_id', 'name', 'description', 'availability', 'hash', 'isActive','rating','ends_at','user_id'];
+    protected $fillable = ['id', 'name', 'description', 'availability', 'hash', 'isActive','rating','ends_at','user_id'];
     
     protected $dates = [
         'created_at',
