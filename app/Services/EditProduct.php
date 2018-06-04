@@ -83,8 +83,8 @@ class EditProduct {
 
         $result = $this->checkAccessMerchant($user, $merchant_id);
         if ($result['access'] == true) {
-            if ($page < 4) {
-                $data = Cache::rememberForever('products_merchant_' . $merchant_id . "_" . $page, 100, function ()use ($merchant_id, $page) {
+            if (false) {
+                $data = Cache::rememberForever('products_merchant_' . $merchant_id . "_" . $page, function ()use ($merchant_id, $page) {
                             $data = [];
                             $take = self::OBJECT_PAGESIZE;
                             $skip = ($page - 1 ) * ($take);
@@ -111,11 +111,7 @@ class EditProduct {
                             $data['products_variants'] = DB::table('products')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                                     ->whereIn('products.id', $products)
-                                    ->select('product_variant.*',
-                                'products.id as prod_id',
-                                'products.name as prod_name',
-                                'products.description as prod_desc',
-                                'products.availability as prod_avail')
+                                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                                     ->get();
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -132,8 +128,14 @@ class EditProduct {
                 $variants = DB::table('products')->groupBy('products.id')
                                 ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                                 ->where('merchant_product.merchant_id', $merchant_id)
+                                ->where('products.isActive', true)
                                 ->select('products.*')
                                 ->skip($skip)->take($take)->get();
+                $data['products_total'] = DB::table('products')->groupBy('products.id')
+                        ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                        ->where('merchant_product.merchant_id', $merchant_id)
+                        ->where('products.isActive', true)
+                        ->count();
                 $products = [];
                 foreach ($variants as $value) {
                     if (in_array($value->id, $products)) {
@@ -146,11 +148,7 @@ class EditProduct {
                 $data['products_variants'] = DB::table('products')
                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                         ->whereIn('products.id', $products)
-                        ->select('product_variant.*',
-                                'products.id as prod_id',
-                                'products.name as prod_name',
-                                'products.description as prod_desc',
-                                'products.availability as prod_avail')
+                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -198,11 +196,7 @@ class EditProduct {
                 $data['products_variants'] = DB::table('products')
                         ->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
                         ->whereIn('products.id', $products)
-                        ->select('product_variant.*',
-                                'products.id as prod_id',
-                                'products.name as prod_name',
-                                'products.description as prod_desc',
-                                'products.availability as prod_avail')
+                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                         ->get();
                 return $data;
             }
@@ -253,11 +247,7 @@ class EditProduct {
                             $data['products_variants'] = DB::table('products')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                                     ->whereIn('products.id', $products)
-                                    ->select('product_variant.*',
-                                'products.id as prod_id',
-                                'products.name as prod_name',
-                                'products.description as prod_desc',
-                                'products.availability as prod_avail')
+                                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                                     ->get();
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -292,11 +282,7 @@ class EditProduct {
                 $data['products_variants'] = DB::table('products')
                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                         ->whereIn('products.id', $products)
-                        ->select('product_variant.*',
-                                'products.id as prod_id',
-                                'products.name as prod_name',
-                                'products.description as prod_desc',
-                                'products.availability as prod_avail')
+                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')

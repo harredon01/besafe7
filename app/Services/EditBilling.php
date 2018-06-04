@@ -151,6 +151,8 @@ class EditBilling {
             if (count($users) == 1) {
                 $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();
             }
+        } else if ($type == "Merchant") {
+            $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();
         }
         return $subsc;
     }
