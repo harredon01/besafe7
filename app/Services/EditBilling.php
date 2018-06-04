@@ -208,6 +208,7 @@ class EditBilling {
                             $model->status = "active";
                             $model->ends_at = $subscription->ends_at;
                             $model->save();
+                            $result['model'] = $model;
                         }
                     }
                     return $result;

@@ -22,7 +22,6 @@ class EditRating {
             if ($object) {
                 if (array_key_exists('pseudo', $data)) {
                     if ($data['pseudo']) {
-                        $data['pseudonim'] = $data['pseudo'];
                     } else {
                         $data['pseudonim'] = $user->name;
                     }

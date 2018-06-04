@@ -603,9 +603,12 @@ class Stripe {
         try {
             $sub = \Stripe\SubscriptionItem::retrieve($subscription);
             $subMain = \Stripe\Subscription::retrieve($sub->subscription);
+            $subItemsTemp = $subMain->metadata;
             if ($sub) {
                 $sublocal = $user->subscriptions()->where('gateway', "Stripe")->where('other', $subscription)->first();
                 if ($sublocal) {
+                    $theType = $sublocal->type;
+                    $theObjectId = $sublocal->object_id;
                     if ($sub->quantity > 1) {
                         $quant = $sub->quantity;
                         $quant--;
@@ -614,14 +617,11 @@ class Stripe {
                     } else {
                         $sub->delete();
                     }
-                    $theType = $sublocal->type;
-                    $theObjectId = $sublocal->object_id;
                     $sublocal->delete();
                 }
             }
             
             if ($subMain) {
-                $subItemsTemp = $subMain->metadata;
                 if (array_key_exists("items", $subItemsTemp)) {
                     $subItems = json_decode($subItemsTemp['items'], true);
                 } else {
