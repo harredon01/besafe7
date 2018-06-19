@@ -679,7 +679,8 @@ class PayU {
                 $subscription->quantity = $data['quantity'];
                 $subscription->ends_at = Date($response['currentPeriodEnd'] / 1000);
                 $subscription->save();
-                return $response['id'];
+                $result = array("status" => "success", "message" => "Subscription Created", "subscription" => $subscription);
+                return $result;
             }
         }
     }

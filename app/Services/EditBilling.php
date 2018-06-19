@@ -133,11 +133,11 @@ class EditBilling {
 
     public function getSubscriptions(User $user) {
         $subsc = $user->subscriptions;
-        foreach ($subsc as $item) {
+        /*foreach ($subsc as $item) {
             $objectType = "App\\Models\\" . $item->type;
             $object = new $objectType;
             $item->object = $object->find($item->object_id);
-        }
+        }*/
         return $subsc;
     }
 
@@ -151,7 +151,7 @@ class EditBilling {
             if (count($users) == 1) {
                 $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();
             }
-        } else if ($type == "Merchant") {
+        } else {
             $subsc = Subscription::where("object_id", $object)->where("type", $type)->get();
         }
         return $subsc;
@@ -230,7 +230,21 @@ class EditBilling {
                 $source = $user->sources()->where('gateway', strtolower($gateway))->first();
                 if ($source) {
                     $gateway = new $className;
-                    return $gateway->editSubscription($user, $source, $plan, $id, $data);
+                    $result = $gateway->editSubscription($user, $source, $plan, $id, $data);
+                    if (array_key_exists("status", $result)) {
+                        if ($result['status'] == "success") {
+                            $class = "App\\Models\\" . $plan->type;
+                            $model = $class::find($data['object_id']);
+                            if ($model) {
+                                $subscription = $result['subscription'];
+                                $model->plan = $subscription->plan;
+                                $model->status = "active";
+                                $model->ends_at = $subscription->ends_at;
+                                $model->save();
+                                $result['model'] = $model;
+                            }
+                        }
+                    }
                 }
                 return response()->json(['status' => 'error', 'message' => "Model not found"]);
             }

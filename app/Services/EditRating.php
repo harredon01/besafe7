@@ -31,7 +31,7 @@ class EditRating {
                 $isReport = false;
                 if(array_key_exists('is_report', $data)){
                     if($data['is_report'] == true ){
-                        $isReport = false;
+                        $isReport = true;
                     }
                 }
 
@@ -46,7 +46,7 @@ class EditRating {
                 ]);
 
                 $rating = Rating::where('type', $type)->where('object_id', $data['object_id'])->avg('rating');
-                if ($type == "Report") {
+                if ($isReport) {
                     $reports = Rating::where('type', $type)
                             ->where('object_id', $data['object_id'])
                             ->where('is_report', true)
