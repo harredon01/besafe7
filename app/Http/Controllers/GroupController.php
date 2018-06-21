@@ -188,8 +188,20 @@ class GroupController extends Controller {
     }
 
     public function getGroupByCode($code) {
-        $response = $this->editGroup->getGroupByCode($code);
-        return response()->json($response);
+        //return "?code=" . $code . "*&limit=3";
+        //DB::enableQueryLog();
+        $request2 = Request::create("?code=" . $code . "*&limit=3", 'GET');
+        $queryBuilder = new GroupQueryBuilder(new Group, $request2);
+        $result = $queryBuilder->build()->paginate();
+        
+        //dd(DB::getQueryLog());
+        return response()->json([
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+        ]);
     }
 
     public function joinGroupByCode(Request $request, $code) {

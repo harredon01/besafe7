@@ -53,6 +53,7 @@ Route::post('contacts', 'UserApiController@importContactsId');
 Route::post('contacts/level', 'UserApiController@updateContactsLevel');
 Route::post('contacts/add/{code?}', 'UserApiController@addContact');
 Route::get('contacts/block/{code?}', 'UserApiController@blockContact');
+Route::get('contacts/code/{code?}', 'UserApiController@getContactByCode');
 Route::get('contacts/unblock/{code?}', 'UserApiController@unblockContact');
 Route::get('user/medical/{code?}', 'UserApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');

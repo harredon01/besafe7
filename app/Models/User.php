@@ -40,7 +40,7 @@ class User extends Authenticatable {
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'docType', 'docNum', 'write_report',
+    protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'docType', 'docNum', 'write_report','code',
         'emailNotifications', 'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
     protected $encryptable = [
         'green',

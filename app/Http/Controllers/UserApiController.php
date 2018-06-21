@@ -20,6 +20,7 @@ class UserApiController extends Controller {
     const ACCESS_USER_OBJECT = 'userables';
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
+
     /**
      * The Guard implementation.
      *
@@ -204,6 +205,24 @@ class UserApiController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
+    public function getContactByCode($code) {
+        $request2 = Request::create("?code=" . $code . "*&limit=3", 'GET');
+        $queryBuilder = new ContactQueryBuilder(new User, $request2);
+        $result = $queryBuilder->build()->paginate();
+        return response()->json([
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+        ]);
+    }
+
+    /**
+     * Get Registered addresses.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function deleteContact($contactId, Request $request) {
         $user = $request->user();
         return response()->json($this->editUserData->deleteContact($user, $contactId));
@@ -300,9 +319,9 @@ class UserApiController extends Controller {
             'region_id',
             'country_id',
         ]);
-        
+
         if ($data['id']) {
-            return response()->json($this->editUserData->update($user,$data));
+            return response()->json($this->editUserData->update($user, $data));
         } else {
             $validator = $this->editUserData->validatorRegister($data);
 

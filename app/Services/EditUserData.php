@@ -68,7 +68,28 @@ class EditUserData {
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['salt'] = str_random(40);
         $user = User::create($data);
+        $this->getUserCode($user);
         return ['status' => 'success'];
+    }
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function getUserCode(User $user) {
+        $hashExists = true;
+        while ($hashExists) {
+            $hash = str_random(20);
+            $users = DB::select("SELECT * from users where code = ? ", [$hash]);
+            if ($users) {
+                $hashExists = true;
+            } else {
+                $hashExists = false;
+                $user->code = $hash;
+                $user->save();
+            }
+        }
+        return $hash;
     }
 
     /**

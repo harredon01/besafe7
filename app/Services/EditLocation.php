@@ -93,7 +93,7 @@ class EditLocation {
         }
         return $hash;
     }
-
+    
     /**
      * returns all current shared locations for the user
      *

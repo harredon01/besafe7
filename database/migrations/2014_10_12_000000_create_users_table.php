@@ -41,6 +41,7 @@ class CreateUsersTable extends Migration {
             $table->string('token')->nullable();
             $table->string('language')->nullable();
             $table->string('avatar')->default("");
+            $table->string('code')->nullable();
             $table->string('platform')->nullable();
             $table->string('name')->nullable();
             $table->string('docType')->nullable();
