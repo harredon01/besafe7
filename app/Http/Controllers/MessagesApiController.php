@@ -75,9 +75,7 @@ class MessagesApiController extends Controller {
         $user = $request->user();
         $validator = $this->editMessages->validatorGetMessage($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editMessages->getChat($user, $request->all()));
     }
@@ -92,9 +90,7 @@ class MessagesApiController extends Controller {
         $user = $request->user();
         $validator = $this->editMessages->validatorMessage($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         dispatch(new PostMessage($user, $request->all()));
         //$this->editMessages->postMessage($user, $request->all());

@@ -64,9 +64,7 @@ class UserApiController extends Controller {
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['old_password']])) {
             $validator = $this->editUserData->validatorPassword($request->all());
             if ($validator->fails()) {
-                $this->throwValidationException(
-                        $request, $validator
-                );
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
             }
             return response()->json($this->editUserData->updatePassword($user, $request->only("password")));
         }
@@ -239,9 +237,7 @@ class UserApiController extends Controller {
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editUserData->importContacts($user, $request->all()));
     }
@@ -326,9 +322,7 @@ class UserApiController extends Controller {
             $validator = $this->editUserData->validatorRegister($data);
 
             if ($validator->fails()) {
-                $this->throwValidationException(
-                        $request, $validator
-                );
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
             }
             return response()->json($this->editUserData->create($user, $data));
         }

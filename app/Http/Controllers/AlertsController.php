@@ -44,9 +44,7 @@ class AlertsController extends Controller {
         $user = $this->auth->user();
         $validator = $this->editAlerts->validatorGetMessage($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editAlerts->getChat($user, $request->all()));
     }
@@ -62,9 +60,7 @@ class AlertsController extends Controller {
         $user = $this->auth->user();
         $validator = $this->editAlerts->validatorMessage($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         dispatch(new PostMessage($user, $request->all()));
         return response()->json(['status' => 'success', 'message' => 'postMessage queued']);

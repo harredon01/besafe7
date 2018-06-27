@@ -77,7 +77,7 @@ class AuthApiController extends Controller {
         $validator = $this->editUserData->validatorRegister($request->all());
 
         if ($validator->fails()) {
-            return response()->json(['statuss' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $verifyemail = DB::select('select * from users where email = ?', [$credentials['email']]);
         if ($verifyemail) {

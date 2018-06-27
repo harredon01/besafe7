@@ -120,7 +120,7 @@ class EditMessages {
 
         $validator = $this->validatorMessage($data);
         if ($validator->fails()) {
-            return $validator->getMessageBag();
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         if ($data['type'] == self::USER_MESSAGE_TYPE) {
             $followers = $user->getRecipientsMessage($data['to_id']);

@@ -266,7 +266,7 @@ class EditGroup {
     public function requestChangeStatusGroup(User $user, array $data) {
         $validator = $this->validatorStatus($data);
         if ($validator->fails()) {
-            return $validator->getMessageBag();
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $group = Group::find($data["group_id"]);
 
@@ -513,7 +513,7 @@ class EditGroup {
     public function saveOrCreateGroup(array $data, User $user) {
         $validator = $this->validatorGroup($data);
         if ($validator->fails()) {
-            return $validator->getMessageBag();
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         if ($data["group_id"]) {
             $groupid = $data['group_id'];

@@ -22,7 +22,7 @@ class PayU {
     public function payCreditCard(User $user, array $data, Order $order) {
         $validator = $this->validatorCC($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
@@ -163,7 +163,7 @@ class PayU {
     public function useSource(User $user, array $data, Order $order) {
         $validator = $this->validatorUseSource($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
@@ -311,7 +311,7 @@ class PayU {
     public function payDebitCard(User $user, array $data, Order $order) {
         $validator = $this->validatorDebit($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $billing = $order->orderAddresses()->where('type', "billing")->first();
         if ($billing) {
@@ -395,7 +395,7 @@ class PayU {
     public function payCash(User $user, array $data, Order $order) {
         $validator = $this->validatorCash($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $accountId = "512321";
         $apiLogin = env('PAYU_LOGIN');
@@ -478,7 +478,7 @@ class PayU {
     public function createSource(Source $source, array $data) {
         $validator = $this->validatorSource($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $address = [
             "line1" => $data['line1'],
@@ -580,7 +580,7 @@ class PayU {
         // Get the payment token submitted by the form:
         $validator = $this->validatorDefault($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $token = $data['source'];
         $source->source = $token;
@@ -688,7 +688,7 @@ class PayU {
     public function createSubscription(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscription($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [
@@ -762,7 +762,7 @@ class PayU {
     public function createSubscriptionExistingSource(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscriptionExisting($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [
@@ -813,7 +813,7 @@ class PayU {
     public function createSubscriptionSource(User $user, Source $source, Plan $planL, array $data) {
         $validator = $this->validatorSubscriptionSource($data);
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->getMessageBag()]);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $url = env('PAYU_REST') . 'subscriptions/';
         $plan = [

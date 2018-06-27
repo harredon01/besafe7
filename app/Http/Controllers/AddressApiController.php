@@ -46,9 +46,7 @@ class AddressApiController extends Controller {
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $data = $request->all([
             'address_id',
@@ -78,9 +76,7 @@ class AddressApiController extends Controller {
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $data = $request->all([
             'address_id',
@@ -122,9 +118,7 @@ class AddressApiController extends Controller {
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $data = $request->all([
             'address_id',
@@ -155,9 +149,7 @@ class AddressApiController extends Controller {
         $validator = $this->editUserData->validatorAddress($request->all());
 
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $data = $request->all([
             'address_id',

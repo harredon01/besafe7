@@ -35,7 +35,7 @@ class FileApiController extends Controller {
         $user = $request->user();
         $validator = $this->editFile->validatorFile($request->all());
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => "validation failed"), 401);
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editFile->postFile($user, $request));
     }

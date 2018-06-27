@@ -111,9 +111,7 @@ class MerchantApiController extends Controller {
         $user = $request->user();
         $validator = $this->editMerchant->validatorLat($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editMerchant->getNearby( $request->all()));
     }
@@ -126,9 +124,7 @@ class MerchantApiController extends Controller {
     public function getNearbyMerchants(Request $request) {
         $validator = $this->editMerchant->validatorLat($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editMerchant->getNearbyMerchants($request->all()));
     }

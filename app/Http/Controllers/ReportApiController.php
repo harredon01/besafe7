@@ -84,9 +84,7 @@ class ReportApiController extends Controller {
     public function getNearbyReports(Request $request) {
         $validator = $this->editMerchant->validatorLat($request->all());
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editMerchant->getNearbyReports($request->all()));
     }

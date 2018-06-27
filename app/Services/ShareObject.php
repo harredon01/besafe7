@@ -59,7 +59,7 @@ class ShareObject {
         $notification = null;
         $validator = $this->validatorFollower($data);
         if ($validator->fails()) {
-            return $validator->getMessageBag();
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $userStatus = $user->getUserNotifStatus();
 

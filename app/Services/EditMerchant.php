@@ -470,7 +470,7 @@ class EditMerchant {
                     if ($data) {
                         $prospect['group_id'] = $item;
                         $prospect['status'] = $data['status'];
-                        $prospect['created_at'] = date("Y-m-d h:i:sa"); 
+                        $prospect['created_at'] = date("Y-m-d h:i:sa");
                         $prospect['updated_at'] = date("Y-m-d h:i:sa");
                         if ($type == self::OBJECT_MERCHANT) {
                             $prospect['merchant_id'] = $object->id;
@@ -522,12 +522,12 @@ class EditMerchant {
             if ($type == self::OBJECT_MERCHANT) {
                 $validator = $this->validatorMerchant($data);
                 if ($validator->fails()) {
-                    return $validator->getMessageBag();
+                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
                 }
             } else if ($type == self::OBJECT_REPORT) {
                 $validator = $this->validatorReport($data);
                 if ($validator->fails()) {
-                    return $validator->getMessageBag();
+                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
                 }
             }
             $object = $this->createObject($user, $data, $type);
