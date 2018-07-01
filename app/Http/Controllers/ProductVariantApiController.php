@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Services\EditProduct;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use Illuminate\Http\Request;
 
 class ProductVariantApiController extends Controller {

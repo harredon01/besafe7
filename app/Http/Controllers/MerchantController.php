@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use App\Services\MerchantImport;
 /*use Excel;
 use App\Models\Category;
@@ -28,7 +28,7 @@ class MerchantController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editMerchant;
+    protected $editMapObject;
 
     /**
      * The edit profile implementation.
@@ -41,8 +41,8 @@ class MerchantController extends Controller {
      *
      * @return void
      */
-    public function __construct(Guard $auth, EditMerchant $editMerchant, MerchantImport $merchantImport) {
-        $this->editMerchant = $editMerchant;
+    public function __construct(Guard $auth, EditMapObject $editMapObject, MerchantImport $merchantImport) {
+        $this->editMapObject = $editMapObject;
         $this->merchantImport = $merchantImport;
         $this->auth = $auth;
         $this->middleware('auth');
@@ -88,13 +88,13 @@ class MerchantController extends Controller {
      * @return Response
      */
     public function getNearbyMerchants(Request $request) {
-        $validator = $this->editMerchant->validatorGetMerchant($request->all());
+        $validator = $this->editMapObject->validatorGetMerchant($request->all());
         if ($validator->fails()) {
             $this->throwValidationException(
                     $request, $validator
             );
         }
-        return response()->json($this->editMerchant->getNearbyMerchants($request->all()));
+        return response()->json($this->editMapObject->getNearbyMerchants($request->all()));
     }
 
     /**
@@ -103,7 +103,7 @@ class MerchantController extends Controller {
      * @return Response
      */
     public function getPaymentMethodsMerchant($id) {
-        return response()->json($this->editMerchant->getPaymentMethodsMerchant($id));
+        return response()->json($this->editMapObject->getPaymentMethodsMerchant($id));
     }
     
     /**
@@ -113,7 +113,7 @@ class MerchantController extends Controller {
      */
     public function getMerchantOrders($id) {
         $user = $this->auth->user();
-        return view('merchants.merchant')->with('merchant', $this->editMerchant->getMerchantOrders($user,$id));
+        return view('merchants.merchant')->with('merchant', $this->editMapObject->getMerchantOrders($user,$id));
     }
 
     /**
@@ -141,7 +141,7 @@ class MerchantController extends Controller {
      * @return Response
      */
     public function show($id) {
-        return $this->editMerchant->getMerchantOrders($id);
+        return $this->editMapObject->getMerchantOrders($id);
     }
 
     /**

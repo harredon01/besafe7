@@ -15,7 +15,7 @@ use Illuminate\Http\Response;
 use DB;
 use Cache;
 
-class EditMerchant {
+class EditMapObject {
 
     const OBJECT_REPORT_GROUP = 'Report_Group';
     const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
@@ -660,7 +660,7 @@ class EditMerchant {
      *
      * @return string
      */
-    protected function getFailedEditMerchantMessage() {
+    protected function getFailedEditMapObjectMessage() {
         return 'There was a problem editing the merchant';
     }
 

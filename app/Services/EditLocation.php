@@ -13,7 +13,7 @@ use Hash;
 use App\Models\Region;
 use App\Models\City;
 use App\Services\EditAlerts;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use App\Services\CleanTrash;
 
 class EditLocation {
@@ -31,7 +31,7 @@ class EditLocation {
     const OBJECT_REPORT = 'Report';
 
     protected $editAlerts;
-    protected $editMerchant;
+    protected $editMapObject;
     protected $cleanTrash;
 
     /**
@@ -40,9 +40,9 @@ class EditLocation {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts, EditMerchant $editMerchant, CleanTrash $cleanTrash) {
+    public function __construct(EditAlerts $editAlerts, EditMapObject $editMapObject, CleanTrash $cleanTrash) {
         $this->editAlerts = $editAlerts;
-        $this->editMerchant = $editMerchant;
+        $this->editMapObject = $editMapObject;
         $this->cleanTrash = $cleanTrash;
     }
 
@@ -153,7 +153,7 @@ class EditLocation {
             "group_id" => null,
             "id" => null
         ];
-        $this->editMerchant->saveOrCreateObject($user, $sheet, self::OBJECT_REPORT);
+        $this->editMapObject->saveOrCreateObject($user, $sheet, self::OBJECT_REPORT);
     }
 
     /**

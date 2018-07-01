@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\User;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -39,8 +39,8 @@ class SaveGroupsObject implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(EditMerchant $editMerchant) {
-        $editMerchant->saveToGroups($this->user, $this->data, $this->type, $this->object);
+    public function handle(EditMapObject $editMapObject) {
+        $editMapObject->saveToGroups($this->user, $this->data, $this->type, $this->object);
     }
 
 }

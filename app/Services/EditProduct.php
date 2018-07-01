@@ -8,7 +8,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Services\EditFile;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use Cache;
 use DB;
 
@@ -30,7 +30,7 @@ class EditProduct {
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
-    protected $editMerchant;
+    protected $editMapObject;
 
     /**
      * Create a new class instance.
@@ -38,9 +38,9 @@ class EditProduct {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditFile $editFile, EditMerchant $editMerchant) {
+    public function __construct(EditFile $editFile, EditMapObject $editMapObject) {
         $this->editFile = $editFile;
-        $this->editMerchant = $editMerchant;
+        $this->editMapObject = $editMapObject;
     }
 
     /**

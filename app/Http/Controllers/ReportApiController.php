@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use App\Services\ShareObject;
 use App\Services\MerchantImport;
 use App\Services\CleanSearch;
@@ -20,7 +20,7 @@ class ReportApiController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editMerchant;
+    protected $editMapObject;
 
     /**
      * The edit profile implementation.
@@ -44,8 +44,8 @@ class ReportApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
-        $this->editMerchant = $editMerchant;
+    public function __construct(EditMapObject $editMapObject, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
+        $this->editMapObject = $editMapObject;
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
@@ -82,11 +82,11 @@ class ReportApiController extends Controller {
      * @return Response
      */
     public function getNearbyReports(Request $request) {
-        $validator = $this->editMerchant->validatorLat($request->all());
+        $validator = $this->editMapObject->validatorLat($request->all());
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMerchant->getNearbyReports($request->all()));
+        return response()->json($this->editMapObject->getNearbyReports($request->all()));
     }
 
     /**
@@ -99,7 +99,7 @@ class ReportApiController extends Controller {
         $user = $request->user();
         $data = $request->only(['status',"group_id"]);
         $data['id'] = $code;
-        return $this->editMerchant->updateObjectStatus($user, $data, self::OBJECT_REPORT);
+        return $this->editMapObject->updateObjectStatus($user, $data, self::OBJECT_REPORT);
     }
 
     /**
@@ -119,7 +119,7 @@ class ReportApiController extends Controller {
      */
     public function show($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getObjectUser($user, $id, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->getObjectUser($user, $id, self::OBJECT_REPORT));
     }
 
     /**
@@ -157,7 +157,7 @@ class ReportApiController extends Controller {
             'region_id',
             'country_id'
         ]);
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
 
     /**
@@ -187,7 +187,7 @@ class ReportApiController extends Controller {
             'country_id'
         ]);
         $data['id'] = $id;
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_REPORT));
     }
 
     /**
@@ -198,7 +198,7 @@ class ReportApiController extends Controller {
      */
     public function removeObjectGroup($group,$object, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
     }
     /**
      * Remove the specified resource from storage.
@@ -208,7 +208,7 @@ class ReportApiController extends Controller {
      */
     public function destroy($id, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->deleteObject($user, $id, self::OBJECT_REPORT));
     }
 
     /**
@@ -218,7 +218,7 @@ class ReportApiController extends Controller {
      */
     public function getObjectUser($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->getObjectUser($user, $reportId, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->getObjectUser($user, $reportId, self::OBJECT_REPORT));
     }
 
     /**
@@ -228,7 +228,7 @@ class ReportApiController extends Controller {
      */
     public function approveReport($reportId, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->approveReport($user, $reportId));
+        return response()->json($this->editMapObject->approveReport($user, $reportId));
     }
 
     public function getReportHash($reportId, Request $request) {

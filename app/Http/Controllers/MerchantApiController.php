@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use App\Services\MerchantImport;
 use App\Services\ShareObject;
 use App\Services\CleanSearch;
@@ -19,7 +19,7 @@ class MerchantApiController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editMerchant;
+    protected $editMapObject;
 
     /**
      * The edit profile implementation.
@@ -43,8 +43,8 @@ class MerchantApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditMerchant $editMerchant, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
-        $this->editMerchant = $editMerchant;
+    public function __construct(EditMapObject $editMapObject, MerchantImport $merchantImport, CleanSearch $cleanSearch, ShareObject $shareObject) {
+        $this->editMapObject = $editMapObject;
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
@@ -109,11 +109,11 @@ class MerchantApiController extends Controller {
      */
     public function getNearby(Request $request) {
         $user = $request->user();
-        $validator = $this->editMerchant->validatorLat($request->all());
+        $validator = $this->editMapObject->validatorLat($request->all());
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMerchant->getNearby( $request->all()));
+        return response()->json($this->editMapObject->getNearby( $request->all()));
     }
 
     /**
@@ -122,11 +122,11 @@ class MerchantApiController extends Controller {
      * @return Response
      */
     public function getNearbyMerchants(Request $request) {
-        $validator = $this->editMerchant->validatorLat($request->all());
+        $validator = $this->editMapObject->validatorLat($request->all());
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMerchant->getNearbyMerchants($request->all()));
+        return response()->json($this->editMapObject->getNearbyMerchants($request->all()));
     }
 
     /**
@@ -135,7 +135,7 @@ class MerchantApiController extends Controller {
      * @return Response
      */
     public function getPaymentMethodsMerchant($id) {
-        return response()->json($this->editMerchant->getPaymentMethodsMerchant($id));
+        return response()->json($this->editMapObject->getPaymentMethodsMerchant($id));
     }
 
     /**
@@ -155,7 +155,7 @@ class MerchantApiController extends Controller {
      */
     public function show($id, Request $request) {
         $user = $request->user();
-        return $this->editMerchant->getObjectUser($user, $id, self::OBJECT_MERCHANT);
+        return $this->editMapObject->getObjectUser($user, $id, self::OBJECT_MERCHANT);
     }
     
     /**
@@ -168,7 +168,7 @@ class MerchantApiController extends Controller {
         $user = $request->user();
         $data = $request->only(['status',"group_id"]);
         $data['id'] = $code;
-        return $this->editMerchant->updateObjectStatus($user, $data, self::OBJECT_MERCHANT);
+        return $this->editMapObject->updateObjectStatus($user, $data, self::OBJECT_MERCHANT);
     }
 
     /**
@@ -203,7 +203,7 @@ class MerchantApiController extends Controller {
             'region_id',
             'country_id'
         ]);
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
+        return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
 
     /**
@@ -229,7 +229,7 @@ class MerchantApiController extends Controller {
             'country_id'
         ]);
         $data['id'] = $id;
-        return response()->json($this->editMerchant->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
+        return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
     /**
      * Remove the specified resource from storage.
@@ -239,7 +239,7 @@ class MerchantApiController extends Controller {
      */
     public function removeObjectGroup($group,$object, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
     }
 
     /**
@@ -250,7 +250,7 @@ class MerchantApiController extends Controller {
      */
     public function destroy($id,Request $request) {
         $user = $request->user();
-        return response()->json($this->editMerchant->deleteObject($user, $id, self::OBJECT_MERCHANT));
+        return response()->json($this->editMapObject->deleteObject($user, $id, self::OBJECT_MERCHANT));
     }
 
     public function getMerchantHash($merchantId, Request $request) {

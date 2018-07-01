@@ -113,7 +113,7 @@ class EditFile {
      *
      * @return string
      */
-    protected function getFailedEditMerchantMessage() {
+    protected function getFailedEditMapObjectMessage() {
         return 'There was a problem editing the merchant';
     }
 

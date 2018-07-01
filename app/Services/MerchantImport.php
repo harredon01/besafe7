@@ -28,7 +28,7 @@ use App\Services\EditUserData;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
 use App\Services\EditGroup;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use DB;
 
 class MerchantImport {
@@ -39,17 +39,17 @@ class MerchantImport {
     protected $editUserData;
     protected $editLocation;
     protected $editAlerts;
-    protected $editMerchant;
+    protected $editMapObject;
     protected $editGroup;
 
     const OBJECT_LOCATION = 'Location';
     const OBJECT_REPORT = 'Report';
 
-    public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMerchant $editMerchant, EditGroup $editGroup) {
+    public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMapObject $editMapObject, EditGroup $editGroup) {
         $this->editUserData = $editUserData;
         $this->editLocation = $editLocation;
         $this->editAlerts = $editAlerts;
-        $this->editMerchant = $editMerchant;
+        $this->editMapObject = $editMapObject;
         $this->editGroup = $editGroup;
     }
 
@@ -460,7 +460,7 @@ class MerchantImport {
                 $user = User::find($row['user_id']);
                 if ($user) {
                     $coords = ["lat" => $row['lat'], "long" => $row['long']];
-                    $results = $this->editMerchant->saveOrCreateObject($user, $coords, "Merchant");
+                    $results = $this->editMapObject->saveOrCreateObject($user, $coords, "Merchant");
                     $merchant = $results['object'];
                     $row['telephone'] = $row['phone_number'];
                     if(!$row['telephone']){
@@ -480,7 +480,7 @@ class MerchantImport {
                     unset($row['schedule_search']);
                     unset($row[0]);
                     $row['id'] = $merchant->id;
-                    $this->editMerchant->saveOrCreateObject($user, $row, "Merchant");
+                    $this->editMapObject->saveOrCreateObject($user, $row, "Merchant");
                 }
             } else {
                 if ($row['id']) {
@@ -976,11 +976,11 @@ class MerchantImport {
             $user = User::find($sheet['user_id']);
             if ($user) {
                 $coords = ["lat" => $sheet['lat'], "long" => $sheet['long']];
-                $results = $this->editMerchant->saveOrCreateObject($user, $coords, self::OBJECT_REPORT);
+                $results = $this->editMapObject->saveOrCreateObject($user, $coords, self::OBJECT_REPORT);
                 $report = $results['object'];
                 $sheet['id'] = $report->id;
                 $sheet['report_time'] = date("Y-m-d h:i:sa");
-                $this->editMerchant->saveOrCreateObject($user, $sheet, self::OBJECT_REPORT);
+                $this->editMapObject->saveOrCreateObject($user, $sheet, self::OBJECT_REPORT);
             }
         }
     }

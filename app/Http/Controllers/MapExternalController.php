@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Services\CleanSearch;
-use App\Services\EditMerchant;
+use App\Services\EditMapObject;
 use App\Querybuilders\ReportQueryBuilder;
 use App\Querybuilders\LocationQueryBuilder;
 use App\Models\User;
@@ -39,7 +39,7 @@ class MapExternalController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editMerchant;
+    protected $editMapObject;
     
     
     /**
@@ -47,9 +47,9 @@ class MapExternalController extends Controller {
      *
      * @return void
      */
-    public function __construct(CleanSearch $cleanSearch, EditMerchant $editMerchant) {
+    public function __construct(CleanSearch $cleanSearch, EditMapObject $editMapObject) {
         $this->cleanSearch = $cleanSearch;
-        $this->editMerchant = $editMerchant;
+        $this->editMapObject = $editMapObject;
         $this->middleware('guest');
     }
 
@@ -69,7 +69,7 @@ class MapExternalController extends Controller {
      * @return Response
      */
     public function report($code = null) {
-        $report = $this->editMerchant->getObjectByHash($code,self::OBJECT_REPORT);
+        $report = $this->editMapObject->getObjectByHash($code,self::OBJECT_REPORT);
         return view('report')->with('report', $report['report'])->with('images', $report['files']);
     }
     
@@ -79,7 +79,7 @@ class MapExternalController extends Controller {
      * @return Response
      */
     public function merchant($code = null) {
-        $object = $this->editMerchant->getObjectByHash($code,self::OBJECT_MERCHANT);
+        $object = $this->editMapObject->getObjectByHash($code,self::OBJECT_MERCHANT);
         return view('merchant')->with('merchant', $object['merchant'])->with('images', $object['files']);
     }
 
