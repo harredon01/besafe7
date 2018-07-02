@@ -29,6 +29,7 @@ class EditMapObject {
     const GROUP_BLOCKED = 'group_blocked';
     const GROUP_MERCHANT_TABLE = 'group_merchant';
     const GROUP_REPORT_TABLE = 'group_report';
+    const CONTACT_BLOCKED = 'contact_blocked';
 
     /**
      * The EditAlert implementation.
@@ -365,7 +366,7 @@ class EditMapObject {
         if ($group->isPublicActive()) {
             $member = $group->checkMemberType($user);
             if ($member) {
-                if ($member->level == "contact_blocked") {
+                if ($member->level == self::CONTACT_BLOCKED) {
                     return null;
                 }
                 if ($member->is_admin) {
@@ -379,7 +380,7 @@ class EditMapObject {
         } else if (!$group->is_public) {
             $member = $group->checkMemberType($user);
             if ($member) {
-                if ($member->level == "contact_blocked") {
+                if ($member->level == self::CONTACT_BLOCKED) {
                     return null;
                 }
                 $data['status'] = "active";

@@ -15,6 +15,7 @@ class Group extends Model {
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
     const CONTACT_BLOCKED = 'contact_blocked';
+    const CONTACT_DELETED = 'contact_deleted';
     const GROUP_PENDING = 'group_pending';
     const GROUP_BLOCKED = 'group_blocked';
 
@@ -168,10 +169,11 @@ class Group extends Model {
 
     public function getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND group_user.user_id NOT IN ("
+                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING
+                        . "' AND group_user.user_id NOT IN ("
                         . "SELECT user_id FROM contacts "
                         . "where contact_id = $user->id "
-                        . "AND level = '" . self::CONTACT_BLOCKED . "'"
+                        . "AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') "
                         . ") "
                         . "AND user_id NOT IN ("
                         . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
@@ -188,7 +190,7 @@ class Group extends Model {
                         . "AND group_user.user_id NOT IN ("
                         . "SELECT user_id FROM contacts "
                         . "where contact_id = $user->id "
-                        . "AND level = '" . self::CONTACT_BLOCKED . "'"
+                        . "AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') "
                         . "); ", [$this->id]);
         return $recipients;
     }
@@ -207,7 +209,7 @@ class Group extends Model {
     public function getRecipientsObject($user, $object, $objectActive_id) {
         $res = $this->checkMemberType($user);
         if ($res) {
-            if ($res->level != "contact_blocked") {
+            if ($res->level != self::CONTACT_BLOCKED ) {
                 if ($res->is_admin) {
                     if ($this->isPublicActive()) {
                         return $this->getAllNewFollowers($user, $object, $objectActive_id);
@@ -236,7 +238,7 @@ class Group extends Model {
     public function getRecipientsMessage($user, $data) {
         $res = $this->checkMemberType($user);
         if ($res) {
-            if ($res->level != "contact_blocked") {
+            if ($res->level != self::CONTACT_BLOCKED ) {
                 if ($this->isPublicActive()) {
                     if ($res->is_admin) {
                         $data['is_admin'] = true;

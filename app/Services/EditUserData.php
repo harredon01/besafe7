@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Group;
 use App\Models\Medical;
 use App\Models\Address;
-use App\Models\Notification;
 use DB;
 use Validator;
 use App\Models\Region;
@@ -17,6 +15,7 @@ use App\Services\EditAlerts;
 class EditUserData {
 
     const CONTACT_BLOCKED = 'contact_blocked';
+    const CONTACT_DELETED = 'contact_deleted';
     const NEW_CONTACT = 'new_contact';
     const OBJECT_USER = 'User';
     const RED_MESSAGE_TYPE = 'emergency';
@@ -71,6 +70,7 @@ class EditUserData {
         $this->getUserCode($user);
         return ['status' => 'success'];
     }
+
     /**
      * returns all current shared locations for the user
      *
@@ -332,59 +332,46 @@ class EditUserData {
      * @param  User, array  $data
      * 
      */
-    public function importContacts(User $user, array $data) {
-        $imports = array();
-        foreach ($data as $value) {
-            $contact = User::where("cellphone", "=", $value);
-            if ($contact) {
-                $id = DB::table('contacts')->select('id')
-                        ->where("user_id", "=", $user->id)
-                        ->where("contact_id", "=", $contact->id);
-                if ($id) {
-                    
-                } else {
-                    array_push($imports, array('user_id' => $user->id, 'contact_id' => $contact->id), array('user_id' => $contact->id, 'contact_id' => $user->id));
-                }
-            }
-        }
-        DB::table('contacts')->insert($imports);
-        return array("status" => "success", "message" => "Contacts imported", "last_id" => DB::getPdo()->lastInsertId());
-    }
-
-    /**
-     * Import Contacts.
-     *
-     * @param  User, array  $data
-     * 
-     */
     public function importContactsId(User $user, array $data) {
         $imports = array();
         $inviteUsers = array();
+        $updates = array();
         $payload = array('first_name' => $user->firstName, 'last_name' => $user->lastName);
         foreach ($data as $value) {
             $contact = User::find($value);
             if ($contact) {
-                $exists = DB::select("SELECT user_id FROM contacts WHERE user_id = $user->id and contact_id = $contact->id ; ");
+                $exists = DB::select("SELECT * FROM contacts WHERE user_id = $user->id and contact_id = $contact->id LIMIT 1; ");
                 if ($exists) {
-                    
+                    $candidate = $exists[0];
+                    if ($candidate->level == self::CONTACT_DELETED) {
+                        $candidate->level = "normal";
+                        array_push($updates, $candidate->id);
+                    }
                 } else {
                     array_push($inviteUsers, $contact);
                     array_push($imports, array('user_id' => $user->id, 'contact_id' => $value, 'level' => 'normal', "created_at" => date("Y-m-d H:i:s"), "last_significant" => date("Y-m-d H:i:s")));
                 }
             }
         }
-        $notification = [
-            "trigger_id" => $user->id,
-            "message" => "",
-            "payload" => $payload,
-            "type" => self::NEW_CONTACT,
-            "object" => self::OBJECT_USER,
-            "sign" => true,
-            "user_status" => $user->getUserNotifStatus()
-        ];
-        $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
-        DB::table('contacts')->insert($imports);
-        $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
+        if (count($updates) > 0) {
+            DB::table('contacts')->whereIn('id',$updates)->update(["level"=>"normal"]);
+        }
+        $lastId = 0 ;
+        if (count($imports) > 0) {
+            $notification = [
+                "trigger_id" => $user->id,
+                "message" => "",
+                "payload" => $payload,
+                "type" => self::NEW_CONTACT,
+                "object" => self::OBJECT_USER,
+                "sign" => true,
+                "user_status" => $user->getUserNotifStatus()
+            ];
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
+            DB::table('contacts')->insert($imports);
+            $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
+        }
+
         return array("status" => "success", "message" => "contacts imported", "last_id" => $lastId);
     }
 
@@ -412,6 +399,7 @@ class EditUserData {
     public function blockContact(User $user, $contactId) {
         $contact = User::find($contactId);
         if ($contact) {
+            $this->editAlerts->deleteObjectNotifs($user, $contactId,"User");
             $count = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->count();
             if ($count == 0) {
                 DB::table('contacts')->insert(array(
@@ -446,7 +434,7 @@ class EditUserData {
             'level' => 'normal',
             'user_id' => $user->id,
             'contact_id' => $contactId,
-            "updated_at" => date("Y-m-d H:i:s")
+            'last_significant' => date("Y-m-d H:i:s")
         ));
         return array("status" => "success", "message" => "contact  unblocked");
     }
@@ -458,7 +446,7 @@ class EditUserData {
      * 
      */
     public function checkContacts(User $user, array $data) {
-        $query = "select id, firstName, lastName, email, cellphone, area_code from users where id not in (select contact_id from contacts where user_id = $user->id ) and id <> $user->id and ( ";
+        $query = "select id, firstName, lastName, email, cellphone, area_code from users where id not in (select contact_id from contacts where user_id = $user->id and level <>'contact_deleted' ) and id <> $user->id and ( ";
         $i = 0;
         $a = 0;
         $len = count($data);
@@ -628,11 +616,11 @@ class EditUserData {
     }
 
     public function deleteContact(User $user, $contactId) {
-        $this->editAlerts->deleteUserNotifs($user, $contactId);
+        $this->editAlerts->deleteObjectNotifs($user, $contactId,"User");
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)
-                        ->update(array('level' => 'deleted', "last_significant" => date("Y-m-d H:i:s")));
+                        ->update(array('level' => self::CONTACT_DELETED, "last_significant" => date("Y-m-d H:i:s")));
     }
 
     public function getUserId($user_id) {

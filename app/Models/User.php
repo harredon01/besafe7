@@ -25,6 +25,7 @@ class User extends Authenticatable {
     const CONTACT_BLOCKED = 'contact_blocked';
     const CONTACT_TRACKING = 'tracking';
     const OBJECT_LOCATION = 'Location';
+    const CONTACT_DELETED = 'contact_deleted';
     const RED_MESSAGE_TYPE = 'emergency';
 
     /**
@@ -171,7 +172,7 @@ class User extends Authenticatable {
         $numbers = explode(",", $followers);
         $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
         $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString}) AND id NOT IN ("
-        . "SELECT user_id FROM contacts where contact_id = $this->id AND level = '" . self::CONTACT_BLOCKED . "')  "
+        . "SELECT user_id FROM contacts where contact_id = $this->id AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') )  "
                 . "AND id NOT IN ("
                 . "SELECT user_id FROM ". self::ACCESS_USER_OBJECT . " "
                 . "where " . self::ACCESS_USER_OBJECT_ID . " = $this->id "
@@ -183,8 +184,9 @@ class User extends Authenticatable {
     public function getNonBlockedUser($objectActive_id) {
         $followers = DB::select("select user_id as id from contacts "
                 . "where contact_id = $this->id "
-                . "and user_id = $objectActive_id "
-                . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
+                . " and user_id = $objectActive_id "
+                . " and level <> '" . self::CONTACT_BLOCKED . "' "
+                . " AND level <> '" . self::CONTACT_DELETED . "' ;");
         return $followers;
     }
     public function getCurrentFollowers() {
@@ -200,8 +202,9 @@ class User extends Authenticatable {
                 . "and contact_id not in ( "
                 . " select user_id from contacts"
                 . " where contact_id = $this->id"
-                . " and level = '" . self::CONTACT_BLOCKED ."' )"
-                . "and level <> '" . self::CONTACT_BLOCKED . "' ;");
+                . " and (level = '" . self::CONTACT_BLOCKED ."' OR level = '" . self::CONTACT_DELETED ."' ) )"
+                . " and level <> '" . self::CONTACT_BLOCKED . "' "
+                . " and level <> '" . self::CONTACT_DELETED . "';");
         return $followers;
     }
     public function getEmergencyAndCurrentFollowerContacts() {
@@ -214,20 +217,20 @@ class User extends Authenticatable {
                             and u.userable_type = '" . self::OBJECT_LOCATION . "'
                             and userable_id = $this->id where c.user_id = $this->id  and  c.is_emergency = true "
                         . " and c.contact_id NOT IN ( "
-                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "');  ");
+                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and (level = '" . self::CONTACT_BLOCKED ."' OR level = '" . self::CONTACT_DELETED ."' ) );  ");
         return $followers;
     }
     public function getEmergencyContacts(){
         $followers = DB::select("SELECT contact_id as id FROM contacts WHERE user_id= $this->id "
                 . "and is_emergency = true and contacts.contact_id NOT IN ( "
-                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and level = '" . self::CONTACT_BLOCKED . "'"
+                . "SELECT user_id FROM contacts WHERE contact_id = $this->id and (level = '" . self::CONTACT_BLOCKED ."' OR level = '" . self::CONTACT_DELETED ."' ) "
                 . ") ");
         return $followers;
     }
     public function isBlocked($destination) {
         $followers = DB::select("select *
                     from
-                        contacts where contact_id = ? and user_id = ? and level = '" . self::CONTACT_BLOCKED . "' ;", [$this->id, $destination]);
+                        contacts where contact_id = ? and user_id = ? and (level = '" . self::CONTACT_BLOCKED ."' OR level = '" . self::CONTACT_DELETED ."' ) ;", [$this->id, $destination]);
         if (count($followers > 0)) {
             return true;
         }
@@ -261,6 +264,7 @@ class User extends Authenticatable {
         DB::table('contacts')
                         ->where('contacts.contact_id',  $this->id)
                 ->where('contacts.level','<>',  self::CONTACT_BLOCKED)
+                ->where('contacts.level','<>',  self::CONTACT_DELETED)
                         ->where('contacts.level','<>',  self::RED_MESSAGE_TYPE)
                         ->whereIn('contacts.user_id', $followers)
                         ->update(array("level" => $level));

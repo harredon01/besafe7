@@ -28,6 +28,7 @@ class EditGroup {
     const OBJECT_GROUP = 'Group';
     const GROUP_ADMIN = 'group_admin';
     const GROUP_ADMIN_NEW = 'group_admin_new';
+    const CONTACT_BLOCKED = 'contact_blocked';
 
     /**
      * The EditAlert implementation.
@@ -87,7 +88,8 @@ class EditGroup {
         $profile = $group->checkMemberType($user);
         $deleteGroup = false;
         if ($profile) {
-            if ($profile->level != "contact_blocked") {
+            if ($profile->level != self::CONTACT_BLOCKED ) {
+                $this->editAlerts->deleteObjectNotifs($user, $group->id,"Group");
                 if (!$group->is_public) {
                     $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                     if ($profile->is_admin) {
@@ -406,7 +408,7 @@ class EditGroup {
         } else {
             return null;
         }
-        if ($profile->level == "contact_blocked") {
+        if ($profile->level == self::CONTACT_BLOCKED) {
             return null;
         }
         if ($profile->is_admin == 0) {

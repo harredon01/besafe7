@@ -232,22 +232,6 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function importContacts(Request $request) {
-        $user = $request->user();
-        $validator = $this->editUserData->validatorAddress($request->all());
-
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        return response()->json($this->editUserData->importContacts($user, $request->all()));
-    }
-
-    /**
-     * creates or updates user address.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function addContact($contact_id, Request $request) {
         $user = $request->user();
         dispatch(new AddContact($user, $contact_id));

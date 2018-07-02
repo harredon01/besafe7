@@ -54,6 +54,7 @@ class EditAlerts {
     const MESSAGE_RECIPIENT_TYPE = 'messageable_type';
     const REQUEST_PING = "request_ping";
     const REPLY_PING = "reply_ping";
+    const CONTACT_BLOCKED = 'contact_blocked';
 
     public function markAsDownloaded(User $user, array $data) {
         $numbers = explode(",", $data["read"]);
@@ -243,32 +244,9 @@ class EditAlerts {
         }
     }
 
-    public function deleteGroupNotifs(User $user, $group_id) {
-
-        DB::delete('delete from notifications where user_id = ? and trigger_id = ? and ( '
-                . 'type = "' . self::GROUP_LEAVE . '" OR '
-                . 'type = "' . self::GROUP_AVATAR . '" OR '
-                . 'type = "' . self::GROUP_MESSAGE_TYPE . '" OR '
-                . 'type = "' . self::NEW_GROUP . '" '
-                . ')', [$user->id, $group_id]);
-        return ['status' => 'success', "message" => 'Group deleted'];
-    }
-
-    public function deleteUserNotifs(User $user, $trigger_id) {
-        DB::delete('delete from notifications where user_id = ? and trigger_id = ? and ( '
-                . 'type = "' . self::USER_AVATAR . '" OR '
-                . 'type = "' . self::USER_MESSAGE_TYPE . '" OR '
-                . 'type = "' . self::NEW_CONTACT . '" OR '
-                . 'type = "' . self::RED_MESSAGE_TYPE . '" OR '
-                . 'type = "' . self::RED_MESSAGE_END . '" OR '
-                . 'type = "' . self::RED_MESSAGE_MEDICAL_TYPE . '" OR '
-                . 'type = "' . self::NOTIFICATION_LOCATION . '" OR '
-                . 'type = "' . self::LOCATION_FIRST . '" OR '
-                . 'type = "' . self::LOCATION_LAST . '" OR '
-                . 'type = "' . self::TRACKING_LIMIT_FOLLOWER . '" OR '
-                . 'type = "' . self::TRACKING_LIMIT_TRACKING . '" '
-                . ')', [$user->id, $trigger_id]);
-        return ['status' => 'success', "message" => 'Group deleted'];
+    public function deleteObjectNotifs(User $user, $trigger_id,$object) {
+        DB::delete('delete from notifications where user_id = ? and trigger_id = ? and object="?" ', [$user->id, $trigger_id, $object]);
+        return ['status' => 'success', "message" => $object.' '.$trigger_id.  ' notifs deleted'];
     }
 
     public function deleteNotification(User $user, $trigger_id) {
@@ -411,7 +389,7 @@ class EditAlerts {
         if ($group) {
             $profile = $group->checkMemberType($user);
             if ($profile) {
-                if ($profile->level != "contact_blocked") {
+                if ($profile->level != self::CONTACT_BLOCKED) {
                     $followersInsert = array();
                     $followersPush = array();
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
