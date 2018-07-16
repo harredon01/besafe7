@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Services\EditAlerts;
 use App\Models\User;
 use App\Models\Message;
+use App\Jobs\SendChat;
 use DB;
 
 class EditMessages {
@@ -123,8 +124,8 @@ class EditMessages {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         if ($data['type'] == self::USER_MESSAGE_TYPE) {
-            $followers = $user->getRecipientsMessage($data['to_id']);
-            if (count($followers) > 0) {
+            $followers = $user->countRecipientsMessage($data['to_id']);
+            if ($followers > 0) {
                 $confirm = [
                     "message" => $data['message'],
                     self::MESSAGE_RECIPIENT_TYPE => self::USER_MESSAGE_TYPE,
@@ -138,6 +139,7 @@ class EditMessages {
                 $dauser['last_name'] = $user->lastName;
                 $dauser['message_id'] = $message->id;
                 $data = [
+                    "to_id" => $data['to_id'],
                     "trigger_id" => $user->id,
                     "message" => $data['message'],
                     "payload" => $dauser,
@@ -146,26 +148,20 @@ class EditMessages {
                     "sign" => true,
                     "user_status" => $user->getUserNotifStatus()
                 ];
-                $confirm['id'] = $message->id;
-                $confirm['created_at'] = $message->created_at;
-                $confirm['updated_at'] = $message->updated_at;
-                $confirm['result'] = $this->editAlerts->sendMassMessage($data, $followers, $user, true);
-                return $confirm;
+                //dispatch(new SendChat($data, $user, true));
+                $this->sendChat($data, $user, true);
+                return $message;
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
-                $fetched = $group->getRecipientsMessage($user, $data);
-                $followers = $fetched['followers'];
-                $data = $fetched['data'];
-                if (count($followers) > 0) {
+                $fetched = $group->countRecipientsMessage($user, $data);
+                if ($fetched > 0) {
                     $dauser = array();
                     $dauser['first_name'] = $user->firstName;
                     $dauser['group_name'] = $group->name;
                     $dauser['last_name'] = $user->lastName;
                     $dauser['from_user'] = $user->id;
-                    $dauser['is_admin'] = $data['is_admin'];
-
                     $dauser['public'] = $group->is_public;
                     if ($group->is_public) {
                         if (array_key_exists("target_id", $data)) {
@@ -203,6 +199,7 @@ class EditMessages {
                     }
                     $dauser['message_id'] = $message->id;
                     $data = [
+                        "to_id" => $data['to_id'],
                         "trigger_id" => $group->id,
                         "message" => $data['message'],
                         "payload" => $dauser,
@@ -211,11 +208,43 @@ class EditMessages {
                         "sign" => true,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+                    //dispatch(new SendChat($data, $user, true));
+                    $this->sendChat($data, $user, true);
                     return $message;
                 }
             }
         }
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function sendChat(array $data, User $user, bool $notif) {
+        if ($data['type'] == self::USER_MESSAGE_TYPE) {
+            $followers = $user->getRecipientsMessage($data['to_id']);
+            if (count($followers) > 0) {
+                unset($data['to_id']);
+                $this->editAlerts->sendMassMessage($data, $followers, $user, $notif);
+            }
+        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
+            $group = Group::find(intval($data['to_id']));
+            if ($group) {
+                $fetched = $group->getRecipientsMessage($user, $data);
+                $followers = $fetched['followers'];
+                $data = $fetched['data'];
+                if (count($followers) > 0) {
+                    unset($data['to_id']);
+                    $dauser = $data['payload'];
+                    $dauser['is_admin'] = $data['is_admin'];
+                    $data['payload'] = $dauser;
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif);
+                }
+            }
+        }
+        
     }
 
     /**

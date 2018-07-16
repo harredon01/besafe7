@@ -9,22 +9,24 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class PostMessage implements ShouldQueue
+class SendChat implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $user;
     protected $data;
+    protected $push;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user, array $data )
+    public function __construct(array $data,User $user, bool $push )
     {
         $this->user = $user;
         $this->data = $data;
+        $this->push = $push;
 
     }
 
@@ -35,6 +37,6 @@ class PostMessage implements ShouldQueue
      */
     public function handle(EditMessages $editMessages)
     {
-        $editMessages->postMessage($this->user, $this->data); 
+        $editMessages->sendChat($this->data,$this->user, $this->push); 
     }
 }

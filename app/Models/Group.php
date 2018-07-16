@@ -45,9 +45,11 @@ class Group extends Model {
     public function reports() {
         return $this->belongsToMany('App\Models\Report')->withPivot('status')->withTimestamps();
     }
+
     public function merchants() {
         return $this->belongsToMany('App\Models\Merchant')->withPivot('status')->withTimestamps();
     }
+
     public function products() {
         return $this->belongsToMany('App\Models\Product')->withPivot('status')->withTimestamps();
     }
@@ -113,6 +115,13 @@ class Group extends Model {
         return $recipients;
     }
 
+    public function countAllAdminMembers() {
+        $recipients = DB::select("SELECT count(id) as total FROM group_user "
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND is_admin = 1 ", [$this->id]);
+        $res = $recipients[0];
+        return $res->total;
+    }
+
     public function getAllMembers() {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
                         . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' ", [$this->id]);
@@ -120,9 +129,10 @@ class Group extends Model {
     }
 
     public function countAllMembers() {
-        return DB::table('group_user')->where('group_id', $this->id)
-                        ->where('level', '<>', self::GROUP_BLOCKED)
-                        ->where('level', '<>', self::GROUP_PENDING)->count();
+        $recipients = DB::select("SELECT count(id) as total FROM group_user "
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' ", [$this->id]);
+        $res = $recipients[0];
+        return $res->total;
     }
 
     public function getAllAdminMembersButActive($user) {
@@ -195,6 +205,18 @@ class Group extends Model {
         return $recipients;
     }
 
+    public function countAllNonUserBlocked($user) {
+        $recipients = DB::select("SELECT count(id) as total FROM group_user "
+                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
+                        . "AND group_user.user_id NOT IN ("
+                        . "SELECT user_id FROM contacts "
+                        . "where contact_id = $user->id "
+                        . "AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') "
+                        . "); ", [$this->id]);
+        $res = $recipients[0];
+        return $res->total;
+    }
+
     public function checkAdmin($user) {
         $users = DB::select('select * from group_user where user_id = ? and is_admin = 1 and group_id = ? '
                         . 'AND level <> "' . self::GROUP_BLOCKED . '" '
@@ -209,7 +231,7 @@ class Group extends Model {
     public function getRecipientsObject($user, $object, $objectActive_id) {
         $res = $this->checkMemberType($user);
         if ($res) {
-            if ($res->level != self::CONTACT_BLOCKED ) {
+            if ($res->level != self::CONTACT_BLOCKED) {
                 if ($res->is_admin) {
                     if ($this->isPublicActive()) {
                         return $this->getAllNewFollowers($user, $object, $objectActive_id);
@@ -238,7 +260,7 @@ class Group extends Model {
     public function getRecipientsMessage($user, $data) {
         $res = $this->checkMemberType($user);
         if ($res) {
-            if ($res->level != self::CONTACT_BLOCKED ) {
+            if ($res->level != self::CONTACT_BLOCKED) {
                 if ($this->isPublicActive()) {
                     if ($res->is_admin) {
                         $data['is_admin'] = true;
@@ -257,6 +279,11 @@ class Group extends Model {
                         $data['target_id'] = $user->id;
                     }
                 } else if (!$this->is_public) {
+                    if ($res->is_admin) {
+                        $data['is_admin'] = true;
+                    } else {
+                        $data['is_admin'] = false;
+                    }
                     $followers = $this->getAllNonUserBlocked($user);
                 } else {
                     return null;
@@ -268,7 +295,44 @@ class Group extends Model {
         return array("followers" => $followers, "data" => $data);
     }
 
-    public function updatAllMembersDate($level,$date) {
+    public function countRecipientsMessage($user, $data) {
+        $res = $this->checkMemberType($user);
+        if ($res) {
+            if ($res->level != self::CONTACT_BLOCKED) {
+                if ($this->isPublicActive()) {
+                    if ($res->is_admin) {
+                        $data['is_admin'] = true;
+                        if (array_key_exists("target_id", $data)) {
+                            $followers = DB::select("select 
+                                count(id) as total
+                                    from
+                                    group_user where group_id = $this->id "
+                                            . "AND level <> '" . self::GROUP_BLOCKED . "' "
+                                            . "AND level <> '" . self::GROUP_PENDING . "' "
+                                            . " and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
+                            $res = $followers[0];
+                            $followers = $res->total;
+                        } else {
+                            $followers = $this->countAllMembers();
+                        }
+                    } else {
+                        $data['is_admin'] = false;
+                        $followers = $this->countAllAdminMembers();
+                        $data['target_id'] = $user->id;
+                    }
+                } else if (!$this->is_public) {
+                    $followers = $this->countAllNonUserBlocked($user);
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }
+        return $followers;
+    }
+
+    public function updatAllMembersDate($level, $date) {
         $data = array("last_significant" => $date);
         if ($level) {
             $data["level"] = $level;
@@ -280,7 +344,7 @@ class Group extends Model {
                 ->update($data);
     }
 
-    public function updatAllAdminMembersDate($level,$date) {
+    public function updatAllAdminMembersDate($level, $date) {
         $data = array("last_significant" => $date);
         if ($level) {
             $data["level"] = $level;

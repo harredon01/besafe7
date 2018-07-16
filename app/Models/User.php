@@ -273,5 +273,12 @@ class User extends Authenticatable {
     public function getRecipientsMessage($objectActive_id) {
         return $this->getNonBlockedUser($objectActive_id);
     }
+    public function countRecipientsMessage($objectActive_id) {
+        $res = $this->getNonBlockedUser($objectActive_id);
+        if(count($res)>0){
+            return 1;
+        }
+        return 0;
+    }
 
 }

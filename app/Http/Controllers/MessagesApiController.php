@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Jobs\PostMessage;
 use App\Services\EditMessages;
 use App\Services\CleanSearch;
 use App\Querybuilders\NotificationQueryBuilder;
@@ -92,11 +91,10 @@ class MessagesApiController extends Controller {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        dispatch(new PostMessage($user, $request->all()));
-        //$this->editMessages->postMessage($user, $request->all());
         return response()->json([
                     'status' => "success",
-                    'message' => "message queued for sending"
+                    'message' => "message queued for sending",
+                    'result' => $this->editMessages->postMessage($user, $request->all())
                         ]);
     }
 
