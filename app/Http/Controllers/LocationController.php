@@ -134,7 +134,7 @@ class LocationController extends Controller {
 
         $user = $request->user();
         //dispatch(new PostLocation($user, $request->all()));
-        $this->editLocation->postLocation($request->all(),$user);
+        return response()->json($this->editLocation->postLocation($request->all(),$user));
         return response()->json([
                     'status' => "success",
                     "message" => "Location queued",

@@ -93,7 +93,7 @@ class EditLocation {
         }
         return $hash;
     }
-    
+
     /**
      * returns all current shared locations for the user
      *
@@ -196,9 +196,32 @@ class EditLocation {
      */
     public function postLocation(array $data2, User $user) {
 
+//                $file = '/home/hoovert/access.log';
+//        // Open the file to get existing content
+//        $current = file_get_contents($file);
+//        //$daarray = json_decode(json_encode($data));
+//        // Append a new person to the file
+//
+//        $current .= json_encode($data2);
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        file_put_contents($file, $current);
         $storeTripCall = false;
         $saveuser = false;
+        $extras = null;
         $location = $data2['location'];
+        if (array_key_exists("extras", $location)) {
+            $extras = $location['extras'];
+            if (array_key_exists("trackingStatus", $extras)) {
+                if ($extras['trackingStatus'] == "active" || $extras['trackingStatus'] == "finishing") {
+                    
+                } else {
+                    return ['error' => 'User not tracking'];
+                }
+            }
+        }
         $data = $this->parseLocation($location, $user);
         $results = Location::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
 
@@ -210,26 +233,14 @@ class EditLocation {
             return ['error' => 'location exists'];
         } else {
             unset($data['location']);
-            if (array_key_exists("extras", $location)) {
-                $extras = $location['extras'];
-                if (array_key_exists("isLocation", $extras)) {
-                    return true;
-                }
-            }
-
             if ($user->is_tracking != 1 || $user->trip == 0) {
                 $user->makeTrip();
                 $saveuser = true;
             }
-
             $data["trip"] = $user->trip;
             $dalocation = Location::create($data);
-            if (array_key_exists("extras", $location)) {
-                $extras = $location['extras'];
-                if (array_key_exists("extras", $extras)) {
-                    $extras = $extras['extras'];
-                }
-                if (array_key_exists("islast", $extras)) {
+            if ($extras) {
+                if ($extras['trackingStatus'] == "finishing") {
                     if (array_key_exists("code", $extras)) {
                         $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
                         $code = $extras['code'];
@@ -277,7 +288,7 @@ class EditLocation {
             if ($storeTripCall) {
                 $this->saveEndTrip($user);
             }
-            
+
             return ['success' => 'location saved'];
         }
     }
