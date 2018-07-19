@@ -16,6 +16,10 @@ class GroupQueryBuilder extends QueryBuilder
       return $query->join('group_user', 'groups.id', '=', 'group_user.group_id')
            ->where('group_user.user_id',$id);
    }
+   public function filterByGroupId($query, $id)
+   {
+      return $query->where('groups.id',$id);
+   }
 }
 
 /* 

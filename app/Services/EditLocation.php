@@ -234,6 +234,9 @@ class EditLocation {
         } else {
             unset($data['location']);
             if ($user->is_tracking != 1 || $user->trip == 0) {
+                if ($extras['trackingStatus'] == "finishing") {
+                    return ['error' => 'Trip ended'];
+                }
                 $user->makeTrip();
                 $saveuser = true;
             }
