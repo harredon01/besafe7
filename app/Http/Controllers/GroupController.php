@@ -129,6 +129,28 @@ class GroupController extends Controller {
         $groups = $this->editGroup->getActiveAdminGroups($user);
         return response()->json(compact('groups'));
     }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getGroupCode(Request $request,$id) {
+        $user = $request->user();
+        return response()->json($this->editGroup->getGroupCode($user,$id));
+    }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function regenerateGroupCode(Request $request,$id) {
+        $user = $request->user();
+        return response()->json($this->editGroup->regenerateGroupCode($user,$id));
+    }
 
     /**
      * Display the specified resource.

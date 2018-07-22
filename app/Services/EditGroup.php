@@ -84,12 +84,54 @@ class EditGroup {
         return $results = DB::select(' select * from group_user where group_id = ? and user_id = ? and is_admin = 1 AND level = "active"', [$groupId, $userId]);
     }
 
+    public function getGroupCode(User $user, $group_id) {
+        $data = [];
+        $group = Group::find($group_id);
+        if ($group) {
+            $users = $this->checkAdminGroup($user->id, $group_id);
+            if (count($users) == 1) {
+                $data['code'] = $group->code;
+                return $data;
+            }
+            return ['status' => 'error', "message" => 'User not admin'];
+        }
+        return ['status' => 'error', "message" => 'Group doesnt exist'];
+    }
+
+    public function regenerateGroupCode(User $user, $group_id) {
+
+        $data = [];
+        $group = Group::find($group_id);
+        if ($group) {
+            $users = $this->checkAdminGroup($user->id, $group_id);
+            if (count($users) == 1) {
+                $exists = true;
+                $string = "";
+                while ($exists) {
+                    $string = str_random(20);
+                    $test = Group::where("code", $string)->first();
+                    if ($test) {
+                        $exists = true;
+                    } else {
+                        $exists = false;
+                    }
+                }
+                $group->code = $string;
+                $data['code'] = $string;
+                $group->save();
+                return $data;
+            }
+            return ['status' => 'error', "message" => 'User not admin'];
+        }
+        return ['status' => 'error', "message" => 'Group doesnt exist'];
+    }
+
     public function deleteGroupUser(User $user, Group $group) {
         $profile = $group->checkMemberType($user);
         $deleteGroup = false;
         if ($profile) {
-            if ($profile->level != self::CONTACT_BLOCKED ) {
-                $this->editAlerts->deleteObjectNotifs($user, $group->id,"Group");
+            if ($profile->level != self::CONTACT_BLOCKED) {
+                $this->editAlerts->deleteObjectNotifs($user, $group->id, "Group");
                 if (!$group->is_public) {
                     $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                     if ($profile->is_admin) {
@@ -549,7 +591,7 @@ class EditGroup {
                 $again = true;
                 $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
                 while ($again) {
-                    $string = str_random(12);
+                    $string = str_random(20);
                     $group = Group::where("code", $string)->first();
                     if ($group) {
                         

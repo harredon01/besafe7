@@ -62,6 +62,8 @@ Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
 
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
+Route::get('groups/code/auth/{id?}', 'GroupController@getGroupCode');
+Route::post('groups/code/refresh/{id?}', 'GroupController@regenerateGroupCode');
 Route::get('groups/code/{code?}', 'GroupController@getGroupByCode');
 Route::post('groups/code/{code?}', 'GroupController@joinGroupByCode');
 Route::post('groups/admin_users', 'GroupController@getAdminGroupUsers');
