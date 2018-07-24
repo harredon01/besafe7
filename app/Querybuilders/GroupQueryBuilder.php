@@ -6,6 +6,7 @@ class GroupQueryBuilder extends QueryBuilder
 {
    public function filterByDateAfter($query, $id)
    {
+      $id = date('Y-m-d H:i:s', $id);
       return $query->where(function ($query) use ($id) {
                 $query->where('group_user.last_significant', '>', $id)
                       ->orWhere('groups.updated_at', '>', $id);

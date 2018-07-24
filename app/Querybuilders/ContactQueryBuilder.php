@@ -11,6 +11,8 @@ class ContactQueryBuilder extends QueryBuilder
    }
    public function filterByDateAfter($query, $id)
    {
+      $id = date('Y-m-d H:i:s', $id);
+      
       return $query->where('contacts.level', '<>', "contact_deleted")
               ->where(function ($query) use ($id) {
                 $query->where('contacts.last_significant', '>', $id)

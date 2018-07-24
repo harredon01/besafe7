@@ -182,10 +182,16 @@ class UserApiController extends Controller {
     public function getContacts(Request $request) {
         $request2 = $this->cleanSearch->handleContact($request);
         if ($request2) {
+            $data = array();
             $queryBuilder = new ContactQueryBuilder(new User, $request2);
             $result = $queryBuilder->build()->paginate();
+            foreach ($result->items() as $user) {
+                $user->last_significant = strtotime($user->last_significant);
+                $user->updated_at2 = strtotime($user->updated_at);
+                array_push($data, $user);
+            }
             return response()->json([
-                        'data' => $result->items(),
+                        'data' => $data,
                         "total" => $result->total(),
                         "per_page" => $result->perPage(),
                         "page" => $result->currentPage(),

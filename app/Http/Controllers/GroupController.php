@@ -55,6 +55,8 @@ class GroupController extends Controller {
                 if (!$group->is_public) {
                     $group->users;
                 }
+                $group->last_significant = strtotime($group->last_significant);
+                $group->updated_at2 = strtotime($group->updated_at);
                 array_push($data, $group);
             }
 
