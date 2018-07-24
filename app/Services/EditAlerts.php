@@ -146,6 +146,7 @@ class EditAlerts {
                 $data['payload'] = $arrayPayload;
                 $data['created_at'] = $notification->created_at;
                 $data['updated_at'] = $notification->created_at;
+                $notification->updated_at = date('Y-m-d H:i:s', $data['notification_id']);
                 $data['msg'] = $data['message'];
                 if ($userSending) {
                     $data['name'] = $userSending->firstName . " " . $userSending->lastName;
