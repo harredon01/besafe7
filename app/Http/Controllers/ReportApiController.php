@@ -142,6 +142,7 @@ class ReportApiController extends Controller {
         $user = $request->user();
         $data = $request->all([
             'id',
+            'groups',
             'type',
             'name',
             'email',

@@ -64,7 +64,7 @@ class EditAlerts {
         return ['success' => 'notifications updated'];
     }
 
-    public function sendMassMessage(array $data, array $recipients, $userSending, $push) {
+    public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date) {
         $arrayPushAndroid = array();
         $arrayPushIos = array();
         $arrayEmail = array();
@@ -108,8 +108,12 @@ class EditAlerts {
             $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
             $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
         }
+        if ($data) {
+            $data['notification_id'] = strtotime($date);
+        } else {
+            $data['notification_id'] = strtotime(date("Y-m-d H:i:s"));
+        }
 
-        $data['notification_id'] = time();
         $data['status'] = "unread";
         $data['payload'] = json_encode($data['payload']);
         //$daarray = json_decode(json_encode($data));
@@ -167,6 +171,8 @@ class EditAlerts {
     public function requestPing(User $user, $pingee) {
         $pingingUser = User::find($pingee);
         if (!$user->isBlocked($pingingUser->id)) {
+            $date = null;
+            $date = $user->updateContactDate($pingingUser->id);
             $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName);
             $followers = array($pingingUser);
             $data = [
@@ -178,7 +184,7 @@ class EditAlerts {
                 "type" => self::REQUEST_PING,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            return $this->sendMassMessage($data, $followers, $user, true);
+            return $this->sendMassMessage($data, $followers, $user, true, $date);
         }
     }
 
@@ -191,6 +197,8 @@ class EditAlerts {
 
                     $code = $data['code'];
                     $reply = $this->checkUserCode($user, $code);
+                    $date = null;
+                    $date = $user->updateContactDate($pingingUser->id);
 
                     $payload = array("first_name" => $user->firstName, "last_name" => $user->lastName, "status" => $reply['status']);
                     if ($reply['status'] == "success") {
@@ -204,7 +212,7 @@ class EditAlerts {
                             "type" => self::REPLY_PING,
                             "user_status" => $user->getUserNotifStatus()
                         ];
-                        return $this->sendMassMessage($data, $followers, $user, true);
+                        return $this->sendMassMessage($data, $followers, $user, true, $date);
                     } else if ($reply['status'] == "info") {
                         $followers = array($pingingUser);
                         $data = [
@@ -216,7 +224,7 @@ class EditAlerts {
                             "type" => self::REPLY_PING,
                             "user_status" => $user->getUserNotifStatus()
                         ];
-                        return $this->sendMassMessage($data, $followers, $user, true);
+                        return $this->sendMassMessage($data, $followers, $user, true, $date);
                     } else if ($reply['status'] == "alert") {
                         
                     }
@@ -245,9 +253,9 @@ class EditAlerts {
         }
     }
 
-    public function deleteObjectNotifs(User $user, $trigger_id,$object) {
+    public function deleteObjectNotifs(User $user, $trigger_id, $object) {
         DB::delete('delete from notifications where user_id = ? and trigger_id = ? and object="?" ', [$user->id, $trigger_id, $object]);
-        return ['status' => 'success', "message" => $object.' '.$trigger_id.  ' notifs deleted'];
+        return ['status' => 'success', "message" => $object . ' ' . $trigger_id . ' notifs deleted'];
     }
 
     public function deleteNotification(User $user, $trigger_id) {
@@ -279,8 +287,8 @@ class EditAlerts {
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $notification = $this->sendMassMessage($data, $followers, $user, true);
-        $user->updateAllContactsDate(null, $notification->created_at);
+        $date = $user->updateAllContactsDate(null);
+        $notification = $this->sendMassMessage($data, $followers, $user, true, $date);
         return $notification;
     }
 
@@ -364,10 +372,8 @@ class EditAlerts {
         if (count($followersInsert) > 0) {
             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
         }
-        $notification = $this->sendMassMessage($data, $followersPush, $user, true);
-        if ($notification) {
-            $user->updateFollowersDate($data['type'], $notification->created_at);
-        }
+        $date = $user->updateFollowersDate($data['type']);
+        $notification = $this->sendMassMessage($data, $followersPush, $user, true, $date);
         if ($secret) {
             $recipient = array($user);
             $data = [
@@ -379,7 +385,7 @@ class EditAlerts {
                 "type" => self::RED_SECRET_TYPE,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->sendMassMessage($data, $recipient, $user, true);
+            $this->sendMassMessage($data, $recipient, $user, true, null);
         }
 
         return ['success' => 'Message sent to all contacts'];
@@ -408,6 +414,7 @@ class EditAlerts {
                     $user->makeTrip();
                     $user->write_report = true;
                     $user->save();
+                    $date = null;
                     if ($profile->is_admin == 1) {
                         $followers = $group->getAllMembersNonUserBlockedButActive($user);
                         foreach ($followers as $follower) {
@@ -415,6 +422,7 @@ class EditAlerts {
                         }
                         $group->status = $data['type'];
                         $group->save();
+                        $date = $group->updated_at;
                     } else {
                         $followers = $group->getAllAdminMembersNonUserBlockedButActive($user);
                         foreach ($followers as $follower) {
@@ -427,11 +435,12 @@ class EditAlerts {
                                 }
                             }
                         }
+                        $date = $group->updateDateAllAdminMembersNonUserBlockedButActive($user);
                         if (count($followersInsert) > 0) {
                             DB::table(self::ACCESS_USER_OBJECT)->insert($followersInsert);
                         }
                     }
-                    $this->sendMassMessage($data, $followersPush, $user, true);
+                    $this->sendMassMessage($data, $followersPush, $user, true, $date);
                 }
             }
         }
@@ -518,7 +527,7 @@ class EditAlerts {
             $payload = array("status" => "info", "first_name" => $user->firstName, "last_name" => $user->lastName);
         }
         $followers = $user->getEmergencyContacts();
-        
+
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -528,11 +537,8 @@ class EditAlerts {
             "sign" => true,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $notification = $this->sendMassMessage($data, $followers, $user, true);
-        if ($notification) {
-            $user->updateAllEmergencyContactsDate("normal", $notification->created_at);
-        }
-
+        $date = $user->updateAllEmergencyContactsDate("normal");
+        $this->sendMassMessage($data, $followers, $user, true, $date);
         if ($user->green == $code['code']) {
             return array("status" => "success", "message" => "Emergency Ended");
         } else if ($user->red == $code['code']) {

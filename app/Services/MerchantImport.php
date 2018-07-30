@@ -463,11 +463,11 @@ class MerchantImport {
                     $results = $this->editMapObject->saveOrCreateObject($user, $coords, "Merchant");
                     $merchant = $results['object'];
                     $row['telephone'] = $row['phone_number'];
-                    if(!$row['telephone']){
+                    if (!$row['telephone']) {
                         $row['telephone'] = 111111;
                     }
 
-                    
+
                     $row['description'] = $row['location'];
                     unset($row['minimum']);
                     unset($row['location']);
@@ -1029,6 +1029,8 @@ class MerchantImport {
                 $contacts = explode(",", $sheet['contacts']);
                 $sheet['contacts'] = $contacts;
                 $group = Group::find($sheet['group_id']);
+                $group->updated_at = date("Y-m-d H:i:s");
+                $group->save();
                 //$this->editGroup->inviteUsers($user, $sheet, false);
                 dispatch(new InviteUsers($user, $sheet, false, $group));
             }

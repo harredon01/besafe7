@@ -93,9 +93,10 @@ class CleanTrash {
         }
     }
 
-    public function notifyFollowers(array $followers, array $tracking) {
+    public function notifyFollowers(array $followers, array $tracking,$date) {
 
         $stop = array();
+        $contacts = array();
         $counter = 0;
         $length = count($followers);
         $model = new User(['name' => 'foo', 'id' => -1]);
@@ -105,6 +106,7 @@ class CleanTrash {
                 "user_id" => $followers[0]->user_id,
                 "trip" => $followers[0]->object_id
             ];
+            $contacts = [$follower->userable_id];
             foreach ($followers as $follower) {
                 $counter++;
                 if ($activeuser == $follower->user_id) {
@@ -113,6 +115,7 @@ class CleanTrash {
                             "user_id" => $follower->userable_id,
                             "trip" => $follower->object_id
                         ];
+                        $contacts = [$follower->userable_id];
                     }
                 } else {
                     $notification = [
@@ -125,13 +128,19 @@ class CleanTrash {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
-                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false);
+                    DB::table('contacts')
+                        ->where('contacts.contact_id',  $activeuser)
+                        ->whereIn('contacts.user_id', $contacts)
+                        ->update(array("last_significant" => $date));
+                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false,$date);
                     $activeuser = $follower->user_id;
                     $stop = array();
+                    $contacts = array();
                     $stop[] = [
                         "user_id" => $follower->userable_id,
                         "trip" => $follower->object_id
                     ];
+                    $contacts = [$follower->userable_id];
                 }
                 if ($counter == $length) {
                     $notification = [
@@ -144,8 +153,12 @@ class CleanTrash {
                         "user_status" => "normal"
                     ];
                     $recipients = array($follower);
+                    DB::table('contacts')
+                        ->where('contacts.contact_id',  $activeuser)
+                        ->whereIn('contacts.user_id', $contacts)
+                        ->update(array("last_significant" => $date));
 
-                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false);
+                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false,$date);
                 }
             }
         }
@@ -160,7 +173,7 @@ class CleanTrash {
             "type" => self::TRACKING_LIMIT_TRACKING,
             "user_status" => "normal"
         ];
-        $this->editAlerts->sendMassMessage($notification, $tracking, $model, false);
+        $this->editAlerts->sendMassMessage($notification, $tracking, $model, false,null);
         return ['success' => 'followers notified'];
     }
 
@@ -168,7 +181,7 @@ class CleanTrash {
         $following = DB::select("SELECT user_id as id,user_id,object_id,userable_id,created_at,updated_at from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' order by user_id");
         if (sizeof($following) > 0) {
             $tracking = DB::select("SELECT userable_id as id from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  group by " . self::ACCESS_USER_OBJECT_ID . " ");
-            $this->notifyFollowers($following, $tracking);
+            $this->notifyFollowers($following, $tracking,$date);
         }
         $total = array();
         foreach ($following as $value) {

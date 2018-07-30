@@ -266,10 +266,8 @@ class EditLocation {
                                 $user->hash = "";
                                 $user->trip = 0;
                                 $saveuser = true;
-                                $notification = $this->editAlerts->sendMassMessage($message, $followers, $user, true);
-                                if ($notification) {
-                                    $user->updateFollowersDate("normal", $notification->created_at);
-                                }
+                                $date = $user->updateFollowersDate("normal");
+                                $this->editAlerts->sendMassMessage($message, $followers, $user, true,$date);
                                 $dalocation->status = "stopped";
                                 $dalocation->islast = true;
                                 $dalocation->save();

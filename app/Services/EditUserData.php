@@ -367,7 +367,7 @@ class EditUserData {
                 "sign" => true,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true,null);
             DB::table('contacts')->insert($imports);
             $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
         }
@@ -607,7 +607,7 @@ class EditUserData {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $recipients = array($contact);
-                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true);
+                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true,null);
                 return $contact;
             }
             return $contact;

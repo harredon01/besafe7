@@ -41,8 +41,8 @@ class ShareApiController extends Controller {
      */
     public function postAddFollower(Request $request) {
         $user = $request->user();
-        dispatch(new AddFollower($user, $request->all()));
-        //return $this->shareObject->addFollower($request->all(), $user);
+        //dispatch(new AddFollower($user, $request->all()));
+        return $this->shareObject->addFollower($request->all(), $user);
         return response()->json(['status' => 'success', 'message' => 'postAddFollower queued']);
     }
 

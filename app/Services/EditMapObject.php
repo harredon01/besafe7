@@ -428,7 +428,7 @@ class EditMapObject {
                 "type" => $type,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+            $this->editAlerts->sendMassMessage($data, $followers, $user, true,null);
         }
     }
 

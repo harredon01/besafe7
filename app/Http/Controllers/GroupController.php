@@ -205,6 +205,7 @@ class GroupController extends Controller {
             if ($group->max_users < $i) {
                 return response()->json(['status' => 'error', 'message' => "too many invites"]);
             }
+            $group->save();
             dispatch(new InviteUsers($user, $data, false, $group));
             return response()->json(['status' => 'success', 'message' => 'inviteUsers queued', 'is_public' => $group->is_public]);
         }

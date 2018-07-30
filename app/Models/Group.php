@@ -100,7 +100,26 @@ class Group extends Model {
 
     public function getAllNewFollowers($user, $object, $objectActive_id) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND user_id NOT IN ("
+                        . "WHERE group_id=? "
+                        . " AND level <> '" . self::GROUP_BLOCKED . "' "
+                        . " AND level <> '" . self::GROUP_PENDING . "' "
+                        . " AND user_id NOT IN "
+                        . "("
+                        . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
+                        . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
+                        . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
+                        . "and object_id = $objectActive_id "
+                        . "); ", [$this->id]);
+        return $recipients;
+    }
+
+    public function getAllNewAdminFollowers($user, $object, $objectActive_id) {
+        $recipients = DB::select("SELECT user_id as id FROM group_user "
+                        . " WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "'"
+                        . " AND level <> '" . self::GROUP_PENDING . "'"
+                        . " AND is_admin = true "
+                        . " AND user_id NOT IN "
+                        . "("
                         . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
                         . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
                         . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
@@ -179,8 +198,11 @@ class Group extends Model {
 
     public function getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id) {
         $recipients = DB::select("SELECT user_id as id FROM group_user "
-                        . "WHERE group_id=? AND  level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING
-                        . "' AND group_user.user_id NOT IN ("
+                        . "WHERE group_id=? "
+                        . " AND level <> '" . self::GROUP_BLOCKED . "'"
+                        . " AND level <> '" . self::GROUP_PENDING . "'"
+                        . " AND is_admin = true "
+                        . " AND group_user.user_id NOT IN ("
                         . "SELECT user_id FROM contacts "
                         . "where contact_id = $user->id "
                         . "AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') "
@@ -242,7 +264,7 @@ class Group extends Model {
                     }
                 } else {
                     if ($this->isPublicActive()) {
-                        return $this->getAllNewFollowers($user, $object, $objectActive_id);
+                        return $this->getAllNewAdminFollowers($user, $object, $objectActive_id);
                     } else if (!$this->is_public) {
                         return $this->getAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
                     } else {
@@ -332,7 +354,8 @@ class Group extends Model {
         return $followers;
     }
 
-    public function updatAllMembersDate($level, $date) {
+    public function updateAllMembersDate($level ) {
+        $date = date("Y-m-d H:i:s");
         $data = array("last_significant" => $date);
         if ($level) {
             $data["level"] = $level;
@@ -342,19 +365,121 @@ class Group extends Model {
                 ->where('level', '<>', self::GROUP_BLOCKED)
                 ->where('level', '<>', self::GROUP_PENDING)
                 ->update($data);
+        return $date;
     }
 
-    public function updatAllAdminMembersDate($level, $date) {
+    public function updateAllAdminMembersDate( ) {
+        $date = date("Y-m-d H:i:s");
         $data = array("last_significant" => $date);
-        if ($level) {
-            $data["level"] = $level;
-        }
         DB::table('group_user')
                 ->where('group_user.group_id', '=', $this->id)
                 ->where('level', '<>', self::GROUP_BLOCKED)
                 ->where('level', '<>', self::GROUP_PENDING)
                 ->where('is_admin', true)
                 ->update($data);
+        return $date;
+    }
+
+    public function updateAllNewFollowersDate($user, $object, $objectActive_id) {
+        $date = date("Y-m-d H:i:s");
+        $recipients = DB::select("SELECT user_id as id FROM group_user "
+                        . "WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' AND user_id NOT IN ("
+                        . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
+                        . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
+                        . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
+                        . "and object_id = $objectActive_id "
+                        . "); ", [$this->id]);
+        DB::table('group_user')
+                ->where('group_user.group_id', $this->id)
+                ->whereIn('group_user.user_id', array_pluck($recipients, 'id'))
+                ->update(array("last_significant" => $date));
+        return $date;
+    }
+
+    public function updateAllMembersButActiveDate($user) {
+        $date = date("Y-m-d H:i:s");
+        $followers = DB::select("SELECT user_id as id FROM group_user "
+                        . "WHERE group_id=?  "
+                        . "and user_id <>? ", [intval($this->id), $user->id]);
+        DB::table('group_user')
+                ->where('group_user.group_id', $this->id)
+                ->whereIn('group_user.user_id', array_pluck($followers, 'id'))
+                ->update(array("last_significant" => $date));
+        return $date;
+    }
+
+    public function updateAllAdminFollowersDate($user, $object, $objectActive_id) {
+        $date = date("Y-m-d H:i:s");
+        $recipients = DB::select("SELECT user_id as id FROM group_user "
+                        . " WHERE group_id=? AND level <> '" . self::GROUP_BLOCKED . "'"
+                        . " AND level <> '" . self::GROUP_PENDING . "'"
+                        . " AND is_admin = true "
+                        . " AND user_id NOT IN "
+                        . "("
+                        . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
+                        . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
+                        . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
+                        . "and object_id = $objectActive_id "
+                        . "); ", [$this->id]);
+        DB::table('group_user')
+                ->where('group_user.group_id', $this->id)
+                ->whereIn('group_user.user_id', array_pluck($recipients, 'id'))
+                ->update(array("last_significant" => $date));
+        return $date;
+    }
+
+    public function updateAllNewNonUserBlockedFollowersDate($user, $object, $objectActive_id) {
+        $date = date("Y-m-d H:i:s");
+        $recipients = DB::select("SELECT user_id as id FROM group_user "
+                        . "WHERE group_id=? "
+                        . " AND level <> '" . self::GROUP_BLOCKED . "'"
+                        . " AND level <> '" . self::GROUP_PENDING . "'"
+                        . " AND is_admin = true "
+                        . " AND group_user.user_id NOT IN ("
+                        . "SELECT user_id FROM contacts "
+                        . "where contact_id = $user->id "
+                        . "AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') "
+                        . ") "
+                        . "AND user_id NOT IN ("
+                        . "SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " "
+                        . "where " . self::ACCESS_USER_OBJECT_ID . " = $user->id "
+                        . "and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "' "
+                        . "and object_id = $objectActive_id "
+                        . "); ", [$this->id]);
+        DB::table('group_user')
+                ->where('group_user.group_id', $this->id)
+                ->whereIn('group_user.user_id', array_pluck($recipients, 'id'))
+                ->update(array("last_significant" => $date));
+        return $date;
+    }
+
+    public function updateRecipientsObjectDate($user, $object, $objectActive_id) {
+        $res = $this->checkMemberType($user);
+        if ($res) {
+            if ($res->level != self::CONTACT_BLOCKED) {
+                if ($res->is_admin) {
+                    if ($this->isPublicActive()) {
+                        return $this->updateAllNewFollowersDate($user, $object, $objectActive_id);
+                    } else if (!$this->is_public) {
+                        return $this->updateAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
+                    } else {
+                        return null;
+                    }
+                } else {
+                    if ($this->isPublicActive()) {
+                        return $this->updateAllAdminFollowersDate($user, $object, $objectActive_id);
+                    } else if (!$this->is_public) {
+                        return $this->updateAllNewNonUserBlockedFollowers($user, $object, $objectActive_id);
+                    } else {
+                        return null;
+                    }
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
 }

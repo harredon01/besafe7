@@ -237,7 +237,8 @@ class User extends Authenticatable {
         return false;
     }
     
-    public function updateAllContactsDate($level,$date){
+    public function updateAllContactsDate($level){
+        $date = date("Y-m-d H:i:s");
         $data = array("last_significant" => $date);
         if($level){
             $data["level"] = $level;
@@ -245,15 +246,18 @@ class User extends Authenticatable {
         DB::table('contacts')
                         ->where('contacts.contact_id', '=', $this->id)
                         ->update($data);
+        return $date;
     }
-    public function updateAllEmergencyContactsDate($level,$date){
+    public function updateAllEmergencyContactsDate($level){
+        $date = date("Y-m-d H:i:s");
         DB::table('contacts')
                         ->where('contacts.contact_id', $this->id)
                         ->where('contacts.level',  self::RED_MESSAGE_TYPE)
                         ->update(array("last_significant" => $date,"level" =>$level));
+        return $date;
     }
-    public function updateFollowersDate($level,$date){
-        //$date = DateTime::createFromFormat('d-m-Y H:i:s');
+    public function updateFollowersDate($level){
+        $date = date("Y-m-d H:i:s");
         $followers = DB::table(self::ACCESS_USER_OBJECT )
                         ->where(self::ACCESS_USER_OBJECT_ID,  $this->id)
                         ->where(self::ACCESS_USER_OBJECT_TYPE, self::OBJECT_LOCATION)->pluck('id');
@@ -268,6 +272,33 @@ class User extends Authenticatable {
                         ->where('contacts.level','<>',  self::RED_MESSAGE_TYPE)
                         ->whereIn('contacts.user_id', $followers)
                         ->update(array("level" => $level));
+        return $date;
+    }
+    public function updateRecipientsObjectDate($followers,$object,$objectActive_id) {
+        $date = date("Y-m-d H:i:s");
+        $numbers = explode(",", $followers);
+        $bindingsString = trim(str_repeat('?,', count($numbers)), ',');
+        $sql = "SELECT id FROM users WHERE  id IN ({$bindingsString}) AND id NOT IN ("
+        . "SELECT user_id FROM contacts where contact_id = $this->id AND (level = '" . self::CONTACT_BLOCKED . "' OR level = '" . self::CONTACT_DELETED . "') )  "
+                . "AND id NOT IN ("
+                . "SELECT user_id FROM ". self::ACCESS_USER_OBJECT . " "
+                . "where " . self::ACCESS_USER_OBJECT_ID . " = $this->id "
+                . "and ". self::ACCESS_USER_OBJECT_TYPE . " = '" . $object . "'  "
+                . "and object_id = $objectActive_id  ); ";
+        $recipients = DB::select($sql, $numbers);
+        DB::table('contacts')
+                        ->where('contacts.contact_id',  $this->id)
+                        ->whereIn('contacts.user_id', array_pluck($recipients, 'id'))
+                        ->update(array("last_significant" => $date));
+        return $date;
+    }
+    public function updateContactDate( $objectActive_id) {
+        $date = date("Y-m-d H:i:s");
+        DB::table('contacts')
+                        ->where('contacts.contact_id',  $this->id)
+                        ->where('contacts.user_id', $objectActive_id)
+                        ->update(array("last_significant" => $date));
+        return $date;
     }
 
     public function getRecipientsMessage($objectActive_id) {

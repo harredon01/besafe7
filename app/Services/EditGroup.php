@@ -71,7 +71,7 @@ class EditGroup {
                 "payload" => $payload,
                 "user_status" => "useless"
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, null, true);
+            $this->editAlerts->sendMassMessage($data, $followers, null, true,$group->updated_at);
         }
     }
 
@@ -187,6 +187,7 @@ class EditGroup {
         );
         $push = true;
         $followers = [];
+        $date = null;
         if ($type == self::GROUP_AVATAR) {
             $payload["filename"] = $filename;
             $group->avatar = $filename;
@@ -220,7 +221,8 @@ class EditGroup {
                     "payload" => $payload,
                     "user_status" => $user->getUserNotifStatus()
                 ];
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+                $date = date("Y-m-d H:i:s");
+                $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
                 if ($group->isPublicActive()) {
                     $sql = "UPDATE group_user set level = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else if (!$group->is_public) {
@@ -232,6 +234,7 @@ class EditGroup {
                 DB::statement($sql, $filename);
                 if (!$group->is_public) {
                     $followers = $group->getAllMembersButActive($user);
+                    $date = $group->updateAllMembersButActiveDate($user);
                     $group->save();
                 }
             } else {
@@ -247,7 +250,8 @@ class EditGroup {
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     $followers = DB::select($sql, $filename);
-                    $sql = "UPDATE group_user set level = 'active' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
+                    $date = date("Y-m-d H:i:s");
+                    $sql = "UPDATE group_user set level = 'active',last_significant = '{$date}' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
                     DB::statement($sql, $filename);
                 }
             }
@@ -258,12 +262,14 @@ class EditGroup {
             if ($group->isPublicActive()) {
                 $followers = $group->getAllAdminMembers();
                 $message = "";
+                $date = $group->updateAllAdminMembersDate();
             }
             $message = "";
             $push = true;
         } else if ($type == self::GROUP_ADMIN) {
             if (count($filename) > 0) {
                 if (!$group->is_public) {
+                    $date = date("Y-m-d H:i:s");
                     $bindingsString = trim(str_repeat('?,', count($filename)), ',');
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id; ";
                     $followers = DB::select($sql, $filename);
@@ -277,14 +283,15 @@ class EditGroup {
                         "payload" => $payload,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true);
-                    $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
+                    $sql = "UPDATE group_user set is_admin = true,last_significant = '{$date}' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '" . self::GROUP_BLOCKED . "' && level <> '" . self::GROUP_PENDING . "'; ";
                     $followers = DB::select($sql, $filename);
                     $group->save();
                 } else if ($group->isPublicActive()) {
-                    $sql = "UPDATE group_user set is_admin = true WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $date = date("Y-m-d H:i:s");
+                    $sql = "UPDATE group_user set is_admin = true,last_significant = '{$date}' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                 }
             } else {
@@ -304,7 +311,7 @@ class EditGroup {
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
-        return $this->editAlerts->sendMassMessage($data, $followers, $user, true);
+        return $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
@@ -490,8 +497,8 @@ class EditGroup {
                     $invite['color'] = $i;
                     $invite['level'] = "active";
                     $invite['is_admin'] = $is_admin;
-                    $invite['created_at'] = date("Y-m-d H:i:s");
-                    $invite['last_significant'] = date("Y-m-d H:i:s");
+                    $invite['created_at'] = $group->updated_at;
+                    $invite['last_significant'] = $group->updated_at;
                     array_push($invites, $invite);
                     array_push($inviteUsers, $contact);
                     if ($group->max_users <= $i) {
@@ -516,7 +523,7 @@ class EditGroup {
                 "type" => self::NEW_GROUP,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true);
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true,$group->updated_at);
             $i++;
             if ($isNew) {
                 
@@ -538,7 +545,7 @@ class EditGroup {
                         "type" => self::GROUP_INVITE,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true);
+                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true,null);
                 }
             }
             DB::table('group_user')->insert(
@@ -622,9 +629,12 @@ class EditGroup {
             $i = 0;
             $data['contacts'] = $invites;
             $data["group_id"] = $group->id;
+            
             dispatch(new InviteUsers($user, $data, true, $group));
+            
             //$this->inviteUsers($user, $data, true);
-            return ['status' => 'success', 'message' => 'Group saved', "group" => $group];
+            $group->updated_at = strtotime($group->updated_at);
+            return ['status' => 'success', 'message' => 'Group saved', "group" => $group,"strtotime"=>strtotime($group->updated_at)];
         }
     }
 

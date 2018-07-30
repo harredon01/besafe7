@@ -227,7 +227,7 @@ class EditMessages {
             $followers = $user->getRecipientsMessage($data['to_id']);
             if (count($followers) > 0) {
                 unset($data['to_id']);
-                $this->editAlerts->sendMassMessage($data, $followers, $user, $notif);
+                $this->editAlerts->sendMassMessage($data, $followers, $user, $notif,null);
             }
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
@@ -240,7 +240,7 @@ class EditMessages {
                     $dauser = $data['payload'];
                     $dauser['is_admin'] = $data['is_admin'];
                     $data['payload'] = $dauser;
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif);
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif,null);
                 }
             }
         }
