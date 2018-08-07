@@ -202,16 +202,16 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
-            $data = $request->all("user_id");
+            $data = $request->all(
+                    "user_id", "group_id", "group_status", 'shared_id', "favorite_id", "shared", "favorite", "private", "order_by"
+            );
             if (!$data['user_id']) {
-                $data = $request->all("group_id");
                 if ($data['group_id']) {
                     $members = DB::select('select user_id as id, is_admin from group_user where user_id  = ? and group_id = ? and level <> "group_blocked" and level <> "group_pending"', [$user->id, $data['group_id']]);
                     if (sizeof($members) == 0) {
                         return null;
                     } else {
                         if ($members[0]->is_admin) {
-                            $data = $request->all("group_status");
                             if ($data['group_status']) {
                                 if ($data['group_status'] == "active" || $data['group_status'] == "pending" || $data['group_status'] == "deleted") {
                                     $finalString = $mystring;
@@ -231,21 +231,16 @@ class CleanSearch {
                         }
                     }
                 } else {
-                    $data = $request->all("shared_id");
                     if (!$data['shared_id']) {
                         
                     } else {
                         return null;
                     }
-                    $data = $request->all("favorite_id");
-
                     if (!$data['favorite_id']) {
                         
                     } else {
                         return null;
                     }
-
-                    $data = $request->all("shared", "favorite");
                     if (!$data['shared'] && !$data['favorite']) {
                         $finalString = $mystring . "&user_id=" . $user->id;
                     } else {
@@ -270,9 +265,12 @@ class CleanSearch {
                     }
                 }
             } else {
-                return null;
+                if (!$data['private']) {
+                    $finalString = $mystring . "&private=0";
+                } else {
+                    return null;
+                }
             }
-            $data = $request->all("order_by");
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=$type.id,desc";
             } else {

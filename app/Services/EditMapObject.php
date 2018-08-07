@@ -428,7 +428,7 @@ class EditMapObject {
                 "type" => $type,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, $user, true,null);
+            $this->editAlerts->sendMassMessage($data, $followers, $user, true, null);
         }
     }
 
@@ -501,7 +501,6 @@ class EditMapObject {
      * @return Response
      */
     public function saveOrCreateObject(User $user, array $data, $type) {
-
         $group = null;
         if ($type == self::OBJECT_REPORT) {
             if ($data['anonymous']) {
@@ -511,7 +510,6 @@ class EditMapObject {
                 }
             }
         }
-
         if ($data['id'] && $data['id'] > 0) {
             foreach ($data as $key => $value) {
                 if (!$value) {
@@ -520,6 +518,9 @@ class EditMapObject {
             }
             $object = $this->updateObject($user, $data, $type);
         } else {
+            if (!$data["private"]) {
+                $data["private"] = 0;
+            }
             $data['status'] = 'active';
             if ($type == self::OBJECT_MERCHANT) {
                 $validator = $this->validatorMerchant($data);

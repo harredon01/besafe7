@@ -201,7 +201,8 @@ class MerchantApiController extends Controller {
             'long',
             'city_id',
             'region_id',
-            'country_id'
+            'country_id',
+            'private'
         ]);
         return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
