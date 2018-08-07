@@ -462,15 +462,16 @@ class EditMapObject {
                     if ($type == self::OBJECT_MERCHANT) {
                         $total = $group->merchants()->where('merchants.id', $object->id)->count();
                     } else if ($type == self::OBJECT_REPORT) {
-                        $total = $group->merchants()->where('merchants.id', $object->id)->count();
+                        $total = $group->reports()->where('reports.id', $object->id)->count();
                     }
                     if ($total > 0) {
                         continue;
                     }
-                    $data = $this->checkGroupStatus($user, $group, $data);
-                    if ($data) {
+                    $statcheck = [];
+                    $statcheck = $this->checkGroupStatus($user, $group, $data);
+                    if ($statcheck) {
                         $prospect['group_id'] = $item;
-                        $prospect['status'] = $data['status'];
+                        $prospect['status'] = $statcheck['status'];
                         $prospect['created_at'] = date("Y-m-d h:i:sa");
                         $prospect['updated_at'] = date("Y-m-d h:i:sa");
                         if ($type == self::OBJECT_MERCHANT) {

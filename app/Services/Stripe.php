@@ -31,9 +31,17 @@ class Stripe {
         // Create a Customer:
         try {
             // Use Stripe's library to make requests...
-            $customer = \Stripe\Customer::create(array(
-                        "email" => $user->email
-            ));
+            $response = \Stripe\Customer::all(["limit" => 1, "email" => $user->email]);
+            $customers = $response->data;
+            $customer = null;
+            if (count($customers) > 0) {
+                $customer = $customers[0];
+            } else {
+                $customer = \Stripe\Customer::create(array(
+                            "email" => $user->email
+                ));
+            }
+
             if ($customer->id) {
                 $preitems = ["items" => json_encode([])];
                 $subscription = \Stripe\Subscription::create(array(
@@ -83,8 +91,8 @@ class Stripe {
         try {
             $validator = $this->validatorSource($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $token = $data['source'];
             $customer = \Stripe\Customer::retrieve($source->client_id);
             $customer->default_source = $token;
@@ -205,8 +213,8 @@ class Stripe {
         try {
             $validator = $this->validatorSubscriptionSource($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $customer = \Stripe\Customer::create(array(
                         "email" => $user->email,
             ));
@@ -269,8 +277,8 @@ class Stripe {
         try {
             $validator = $this->validatorSubscriptionSource($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $customer = \Stripe\Customer::retrieve($source->client_id);
             if ($customer) {
 
@@ -315,8 +323,8 @@ class Stripe {
         try {
             $validator = $this->validatorSubscriptionSource($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $customer = \Stripe\Customer::retrieve($source->client_id);
             if ($customer) {
                 $token = $data['source'];
@@ -447,8 +455,8 @@ class Stripe {
         try {
             $validator = $this->validatorSubscription($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $customer = \Stripe\Customer::retrieve($source->client_id);
             if ($customer) {
                 if ($customer->default_source) {
@@ -620,7 +628,7 @@ class Stripe {
                     $sublocal->delete();
                 }
             }
-            
+
             if ($subMain) {
                 if (array_key_exists("items", $subItemsTemp)) {
                     $subItems = json_decode($subItemsTemp['items'], true);
@@ -671,8 +679,8 @@ class Stripe {
         try {
             $validator = $this->validatorUseSource($data);
             if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
             $sources = $user->sources()->where('gateway', "Stripe")->get();
             if ($sources) {
                 $customer = \Stripe\Customer::retrieve($sources[0]->client_id);

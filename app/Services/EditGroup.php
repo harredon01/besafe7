@@ -14,7 +14,6 @@ use DB;
 
 class EditGroup {
 
-    const GROUP_REMOVE = 'group_remove';
     const GROUP_PENDING = 'group_pending';
     const GROUP_EXPELLED = 'group_expelled';
     const GROUP_BLOCKED = 'group_blocked';
@@ -71,7 +70,7 @@ class EditGroup {
                 "payload" => $payload,
                 "user_status" => "useless"
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, null, true,$group->updated_at);
+            $this->editAlerts->sendMassMessage($data, $followers, null, true, $group->updated_at);
         }
     }
 
@@ -130,7 +129,7 @@ class EditGroup {
         $profile = $group->checkMemberType($user);
         $deleteGroup = false;
         if ($profile) {
-            if ($profile->level != self::CONTACT_BLOCKED) {
+            if ($profile->level != self::GROUP_BLOCKED) {
                 $this->editAlerts->deleteObjectNotifs($user, $group->id, "Group");
                 if (!$group->is_public) {
                     $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
@@ -222,9 +221,9 @@ class EditGroup {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $date = date("Y-m-d H:i:s");
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
+                $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
                 if ($group->isPublicActive()) {
-                    $sql = "UPDATE group_user set level = 'blocked' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
+                    $sql = "UPDATE group_user set level = '" . self::GROUP_REMOVED . "' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else if (!$group->is_public) {
                     $sql = "DELETE FROM group_user WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else {
@@ -236,6 +235,8 @@ class EditGroup {
                     $followers = $group->getAllMembersButActive($user);
                     $date = $group->updateAllMembersButActiveDate($user);
                     $group->save();
+                } else {
+                    $followers = array();
                 }
             } else {
                 $followers = array();
@@ -283,7 +284,7 @@ class EditGroup {
                         "payload" => $payload,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
                     $sql = "UPDATE group_user set is_admin = true,last_significant = '{$date}' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '" . self::GROUP_BLOCKED . "' && level <> '" . self::GROUP_PENDING . "'; ";
@@ -311,7 +312,7 @@ class EditGroup {
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
-        return $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
+        return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
@@ -334,7 +335,7 @@ class EditGroup {
                         $max = $group->max_users - $i;
                         return ['status' => 'error', "message" => 'Max users exceeded', "max" => $max];
                     }
-                } else if ($data['status'] == "group_pending" || $data['status'] == "group_blocked") {
+                } else if ($data['status'] == self::GROUP_PENDING || $data['status'] == self::GROUP_REMOVED) {
                     dispatch(new NotifyGroup($user, $group, $data["party"], $data["status"]));
                     //return $this->notifyGroup($user, $group, $data["party"], $data["status"]);
                     return ['status' => 'success', "message" => 'Request queued'];
@@ -432,6 +433,7 @@ class EditGroup {
 
                 $user->groups()->save($group, ["level" => self::GROUP_PENDING, "is_admin" => false]);
                 $group->is_authorized = false;
+                $group->level = self::GROUP_PENDING;
                 dispatch(new NotifyGroup($user, $group, null, self::GROUP_PENDING));
                 //$this->notifyGroup($user, $group, null, self::GROUP_PENDING);
                 return ['status' => 'success', "message" => 'Group joined', "group" => $group];
@@ -523,7 +525,7 @@ class EditGroup {
                 "type" => self::NEW_GROUP,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true,$group->updated_at);
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true, $group->updated_at);
             $i++;
             if ($isNew) {
                 
@@ -545,7 +547,7 @@ class EditGroup {
                         "type" => self::GROUP_INVITE,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true,null);
+                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true, null);
                 }
             }
             DB::table('group_user')->insert(
@@ -629,12 +631,12 @@ class EditGroup {
             $i = 0;
             $data['contacts'] = $invites;
             $data["group_id"] = $group->id;
-            
+
             dispatch(new InviteUsers($user, $data, true, $group));
-            
+
             //$this->inviteUsers($user, $data, true);
             $group->updated_at = strtotime($group->updated_at);
-            return ['status' => 'success', 'message' => 'Group saved', "group" => $group,"strtotime"=>strtotime($group->updated_at)];
+            return ['status' => 'success', 'message' => 'Group saved', "group" => $group, "strtotime" => strtotime($group->updated_at)];
         }
     }
 
