@@ -84,7 +84,7 @@ class ShareObject {
                 } else if ($type == self::USER_TYPE) {
                     $triggerName = self::OBJECT_USER;
                     $followers = $user->getRecipientsObject($data["follower"], $object, $object_id);
-                    $date =$user->updateRecipientsObjectDate($data["follower"], $object, $object_id);
+                    $date = $user->updateRecipientsObjectDate($data["follower"], $object, $object_id);
                 }
 
                 $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
@@ -97,7 +97,9 @@ class ShareObject {
                     "type" => self::NOTIFICATION_LOCATION,
                     "user_status" => $userStatus
                 ];
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true,$date);
+                if ($followers) {
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
+                }
             } else {
                 if (array_key_exists("object_id", $data)) {
                     $classp = "App\\Models\\" . $object;
@@ -117,9 +119,9 @@ class ShareObject {
                                 } else if ($type == self::USER_TYPE) {
                                     $triggerName = self::OBJECT_USER;
                                     $followers = $user->getRecipientsObject($data["follower"], $object, $object_id);
-                                    $date =$user->updateRecipientsObjectDate($data["follower"], $object, $object_id);
+                                    $date = $user->updateRecipientsObjectDate($data["follower"], $object, $object_id);
                                 }
-                                $result = $this->notifyObjectFollowers($user, $followers, $objectActive, $object,$triggerName,$date);
+                                $result = $this->notifyObjectFollowers($user, $followers, $objectActive, $object, $triggerName, $date);
                                 $notification = $result['notification'];
                             } else {
                                 return null;
@@ -132,25 +134,29 @@ class ShareObject {
                     return null;
                 }
             }
-            $dafollowers = array();
-            foreach ($followers as $follower) {
-                $dafollower = $follower->id;
-                if ($user->id == intval($dafollower)) {
-                    
-                } else {
-                    $item = ['user_id' => $dafollower, 
-                        'object_id' => $object_id, 
-                        self::ACCESS_USER_OBJECT_TYPE => $object, 
-                        self::ACCESS_USER_OBJECT_ID => $user->id, 
-                        'created_at' => date("Y-m-d h:i:sa"), 
-                        'updated_at' => date("Y-m-d h:i:sa")];
-                    array_push($dafollowers, $item);
+            if ($followers) {
+                $dafollowers = array();
+                foreach ($followers as $follower) {
+                    $dafollower = $follower->id;
+                    if ($user->id == intval($dafollower)) {
+                        
+                    } else {
+                        $item = ['user_id' => $dafollower,
+                            'object_id' => $object_id,
+                            self::ACCESS_USER_OBJECT_TYPE => $object,
+                            self::ACCESS_USER_OBJECT_ID => $user->id,
+                            'created_at' => date("Y-m-d h:i:sa"),
+                            'updated_at' => date("Y-m-d h:i:sa")];
+                        array_push($dafollowers, $item);
+                    }
                 }
-            }
-            
-            if (count($dafollowers) > 0 ) {
-                DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);              
-                return ['status' => 'success', 'message' => 'followers saved'];
+
+                if (count($dafollowers) > 0) {
+                    DB::table(self::ACCESS_USER_OBJECT)->insert($dafollowers);
+                    return ['status' => 'success', 'message' => 'followers saved'];
+                } else {
+                    return ['status' => 'error', 'message' => 'no followers saved'];
+                }
             } else {
                 return ['status' => 'error', 'message' => 'no followers saved'];
             }
@@ -192,25 +198,25 @@ class ShareObject {
         return ['status' => 'error', "message" => "type not supported"];
     }
 
-    public function notifyObjectFollowers(User $user, array $followers, $object, $type, $triggerName,$date) {
+    public function notifyObjectFollowers(User $user, array $followers, $object, $type, $triggerName, $date) {
         $daobject = array(
-            "object_id" => $object->id, 
-            "object_type" => $object->type, 
-            "object_name" => $object->name, 
-            "first_name" => $user->firstName, 
+            "object_id" => $object->id,
+            "object_type" => $object->type,
+            "object_name" => $object->name,
+            "first_name" => $user->firstName,
             "last_name" => $user->lastName
         );
         $notification = [
             "trigger_id" => $user->id,
             "message" => "",
             "type" => $type,
-            "object" =>$triggerName,
+            "object" => $triggerName,
             "sign" => true,
             "payload" => $daobject,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $notif = $this->editAlerts->sendMassMessage($notification, $followers, $user, true,$date);
-        return ['success' => 'followers notified','notification'=>$notif];
+        $notif = $this->editAlerts->sendMassMessage($notification, $followers, $user, true, $date);
+        return ['success' => 'followers notified', 'notification' => $notif];
     }
 
     /**

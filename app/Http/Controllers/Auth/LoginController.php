@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\EditOrder;
+use App\Services\EditCart;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller {
@@ -28,19 +28,19 @@ use AuthenticatesUsers;
      */
     protected $redirectTo = '/home';
 
-    protected $editOrder;
+    protected $editCart;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditOrder $editOrder) {
-        $this->editOrder = $editOrder;
+    public function __construct(EditCart $editCart) {
+        $this->editCart = $editCart;
         $this->middleware('guest', ['except' => 'logout']);
     }
 
     protected function authenticated(Request $request, $user) {
-        $this->editOrder->loadActiveCart($user);
+        $this->editCart->loadActiveCart($user);
     }
 
 }

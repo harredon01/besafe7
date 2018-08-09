@@ -49,7 +49,7 @@ class EditProduct {
      * @return Response
      */
     public function getProduct(User $user, $product_id) {
-
+$data = [];
 
         $result = $this->checkAccessProduct($user, $product_id);
         if ($result['access'] == true) {
@@ -80,7 +80,7 @@ class EditProduct {
      * @return Response
      */
     public function getProductsMerchant(User $user, $merchant_id, $page) {
-
+        $data = [];
         $result = $this->checkAccessMerchant($user, $merchant_id);
         if ($result['access'] == true) {
             if (false) {
@@ -122,7 +122,7 @@ class EditProduct {
                             return $data;
                         });
             } else {
-                $data = [];
+
                 $take = self::OBJECT_PAGESIZE;
                 $skip = ($page - 1 ) * ($take);
                 $variants = DB::table('products')->groupBy('products.id')
@@ -169,6 +169,7 @@ class EditProduct {
      * @return Response
      */
     public function getProductsPrivateMerchant(User $user, $merchant_id, $page) {
+        $data = [];
         $merchant = Merchant::find($merchant_id);
         if ($merchant) {
             if ($merchant->user_id == $user->id) {
@@ -210,7 +211,7 @@ class EditProduct {
      * @return Response
      */
     public function getProductsGroup(User $user, $group_id, $page) {
-
+$data = [];
         $result = $this->checkAccessGroup($user, $group_id);
         if ($result['access'] == true) {
             if ($page < 4) {
@@ -298,7 +299,7 @@ class EditProduct {
     }
 
     public function getVariant(User $user, $product_id, $variantId) {
-
+$data = [];
         $result = $this->checkAccessProduct($user, $product_id);
         if ($result['access'] == true) {
             $data = Cache::rememberForever('products_' . $product_id . '_variant_' . $variantId, 100, function ()use ( $variantId) {
@@ -317,6 +318,7 @@ class EditProduct {
      */
     public function checkAccessMerchant(User $user, $merchant_id) {
         $merchant = Merchant::find($merchant_id);
+        $data = [];
         $access = false;
         if ($merchant) {
             if ($merchant->is_public) {
@@ -376,6 +378,7 @@ class EditProduct {
     public function checkAccessProduct(User $user, $product_id) {
         $access = false;
         $owner = false;
+        $data = [];
         $damerchant = DB::select('SELECT 
                                             DISTINCT(m.id),m.user_id
                                         FROM
