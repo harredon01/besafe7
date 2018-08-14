@@ -71,7 +71,7 @@ class EditFile {
                 }
                 if ($file->type == "Product") {
                     $product = Product::find($file->trigger_id);
-                    Cache::forget('products_merchant_' . $product->merchant_id);
+                    $product->clearCache();
                 }
                 Storage::delete($file->file);
                 $file->delete();

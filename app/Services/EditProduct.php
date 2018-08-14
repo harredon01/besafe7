@@ -53,7 +53,7 @@ $data = [];
 
         $result = $this->checkAccessProduct($user, $product_id);
         if ($result['access'] == true) {
-            $data = Cache::rememberForever('products_' . $product_id, 100, function ()use ($product_id) {
+            $data = Cache::remember('products_' . $product_id,100, function ()use ($product_id) {
                         $product = Product::find($product_id);
                         $data = [];
                         if ($product) {
@@ -63,7 +63,7 @@ $data = [];
                         }
                         return $data;
                     });
-            if ($result['owner_id'] == true) {
+            if ($result['owner'] == true) {
                 $product = $data['product'];
                 $product->mine = true;
                 $data['product'] = $product;
@@ -84,7 +84,7 @@ $data = [];
         $result = $this->checkAccessMerchant($user, $merchant_id);
         if ($result['access'] == true) {
             if (false) {
-                $data = Cache::rememberForever('products_merchant_' . $merchant_id . "_" . $page, function ()use ($merchant_id, $page) {
+                $data = Cache::remember('products_merchant_' . $merchant_id . "_" . $page,100, function ()use ($merchant_id, $page) {
                             $data = [];
                             $take = self::OBJECT_PAGESIZE;
                             $skip = ($page - 1 ) * ($take);
@@ -199,6 +199,12 @@ $data = [];
                         ->whereIn('products.id', $products)
                         ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                         ->get();
+                $data['products_files'] = DB::table('products')
+                                    ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
+                                    ->whereIn('files.trigger_id', $products)
+                                    ->where('files.type', "Product")
+                                    ->select('products.*', 'files.*')
+                                    ->get();
                 return $data;
             }
         }
@@ -215,7 +221,7 @@ $data = [];
         $result = $this->checkAccessGroup($user, $group_id);
         if ($result['access'] == true) {
             if ($page < 4) {
-                $data = Cache::rememberForever('products_group_' . $group_id . "_" . $page, 100, function ()use ($group_id, $page) {
+                $data = Cache::remember('products_group_' . $group_id . "_" . $page, 100, function ()use ($group_id, $page) {
                             $data = [];
                             $take = self::OBJECT_PAGESIZE;
                             $skip = ($page - 1 ) * ($take);
@@ -302,7 +308,7 @@ $data = [];
 $data = [];
         $result = $this->checkAccessProduct($user, $product_id);
         if ($result['access'] == true) {
-            $data = Cache::rememberForever('products_' . $product_id . '_variant_' . $variantId, 100, function ()use ( $variantId) {
+            $data = Cache::remember('products_' . $product_id . '_variant_' . $variantId, 100, function ()use ( $variantId) {
                         $data = [];
                         $data['variant'] = ProductVariant::find($variantId);
                         return $data;
@@ -441,7 +447,8 @@ $data = [];
             }
         }
         $data = [
-            "access" => $access
+            "access" => $access,
+            "owner" => $owner
         ];
         return $data;
     }
@@ -502,53 +509,6 @@ $data = [];
      *
      * @return Response
      */
-    public function clearProductCache($product_id) {
-        $access = false;
-        $merchants = DB::select('SELECT 
-                                            DISTINCT(m.id) as merchant_id,m.user_id
-                                        FROM
-                                            merchants m
-                                        WHERE
-                                                m.status = "active"
-                                                AND m.id IN ( 
-                                                SELECT merchant_id from merchant_product WHERE product_id = ? 
-                                                )
-
-                ;', [$product_id]);
-        foreach ($merchants as $value) {
-            Cache::forget('products_merchant_' . $value->merchant_id . "_1");
-            Cache::forget('products_merchant_' . $value->merchant_id . "_2");
-            Cache::forget('products_merchant_' . $value->merchant_id . "_3");
-        }
-        $groups = DB::select('SELECT 
-                                            DISTINCT(g.id) as group_id,m.user_id
-                                        FROM
-                                            groups g
-                                                JOIN
-                                            group_merchant gm ON gm.group_id = g.id
-                                                JOIN
-                                            merchants m ON gm.merchant_id = m.id
-                                        WHERE
-                                            m.status = "active"
-                                                AND g.status = "active"
-                                                AND m.status = "active"
-                                                AND gm.merchant_id IN ( 
-                                                SELECT merchant_id from merchant_product WHERE product_id = ? 
-                                                )
-
-                    ;', [$product_id]);
-        foreach ($groups as $value) {
-            Cache::forget('products_group_' . $value->group_id . "_1");
-            Cache::forget('products_group_' . $value->group_id . "_2");
-            Cache::forget('products_group_' . $value->group_id . "_3");
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function deleteProduct(User $user, $productId) {
         $product = Product::find($productId);
         if ($product) {
@@ -566,8 +526,8 @@ $data = [];
                     $variant->items()->delete();
                     $variant->delete();
                 }
+                $product->clearCache();
                 $product->delete();
-                $this->clearProductCache($productId);
             }
         }
     }
@@ -591,6 +551,7 @@ $data = [];
 
     public function createOrUpdateProduct(User $user, array $data) {
         $result = $this->writeAccessProduct($user, $data["id"]);
+        $product = null;
         if ($result['access'] == true) {
             if ($data["id"]) {
                 $productid = $data['id'];
@@ -602,6 +563,7 @@ $data = [];
                 $data = (array) $data;
                 Product::where('id', $productid)->update($data);
                 $product = Product::find($productid);
+                $product->clearCache();
                 if ($product) {
                     return array("status" => "success", "message" => "product updated", "product" => $product);
                 }
@@ -623,7 +585,6 @@ $data = [];
                 }
                 return array("status" => "success", "message" => "product created", "product" => $product);
             }
-            $this->clearProductCache($data['id']);
         } else {
             return array("status" => "error", "message" => "access denied");
         }
