@@ -570,7 +570,7 @@ $data = [];
             } else {
                 $merchantid = $data['merchant_id'];
                 unset($data['merchant_id']);
-                $data['isActive'] = false;
+                $data['isActive'] = true;
                 $data['user_id'] = $user->id;
                 $data = (object) array_filter((array) $data, function ($val) {
                             return !is_null($val);
