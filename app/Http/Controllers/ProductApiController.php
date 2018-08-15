@@ -79,7 +79,7 @@ class ProductApiController extends Controller {
      *
      * @return Response
      */
-    public function create() {
+    public function create(Request $request) {
         $user = $request->user();
         $data = $request->all([
             'merchant_id',

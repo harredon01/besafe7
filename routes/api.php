@@ -117,7 +117,7 @@ Route::resource('products', 'ProductApiController');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
 Route::post('products/variant', 'ProductVariantApiController@store');
 Route::post('products/share', 'ShareApiController@postAddFollower');
-
+Route::patch('products/variant/{variant?}', 'ProductVariantApiController@update');
 Route::post('products/variant/{variant?}', 'ProductVariantApiController@update');
 Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
 Route::get('products/merchant/{merchant?}', 'ProductApiController@getProductsMerchant');
