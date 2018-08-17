@@ -327,7 +327,7 @@ class EditCart {
                             array_push($applyConditions, $itemCondition);
                         }
 
-
+                        $losAttributes = json_decode($productVariant->attributes, true);
                         if (!$losAttributes) {
                             $losAttributes = array();
                         }
@@ -434,7 +434,6 @@ class EditCart {
                         "cart" => Cart::session($user->id)->getContent(),
                         "item" => $item
                     );
-                    return array("status" => "success", "message" => "item added to cart successfully", "item" => $item);
                 } else {
                     return array("status" => "error", "message" => "CLEAR_CART");
                 }
