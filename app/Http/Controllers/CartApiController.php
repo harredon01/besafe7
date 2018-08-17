@@ -50,7 +50,7 @@ class CartApiController extends Controller {
      */
     public function postAddCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->addCartItem($user, $request->all(), true);
+        $status = $this->editCart->addCartItem($user, $request->all());
         return response()->json($status);
     }
 
@@ -62,33 +62,11 @@ class CartApiController extends Controller {
      */
     public function postAddCustomCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->addCustomCartItem($user, $request->all(), true);
-        return response()->json($status);
-    }
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postAddCustomCartItemStateless(Request $request) {
-
-        $user = $request->user();
-        $status = $this->editCart->addCustomCartItem($user, $request->all(), false);
+        $status = $this->editCart->addCustomCartItem($user, $request->all());
         return response()->json($status);
     }
 
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postAddCartItemStateless(Request $request) {
-        $user = $request->user();
-        $status = $this->editCart->addCartItem($user, $request->all(), false);
-        return response()->json($status);
-    }
+
     
     /**
      * Handle a login request to the application.
@@ -110,21 +88,10 @@ class CartApiController extends Controller {
      */
     public function postUpdateCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->updateCartItem($user, $request->all(), true);
+        $status = $this->editCart->updateCartItem($user, $request->all());
         return response()->json($status);
     }
 
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postUpdateCartItemStateless(Request $request) {
-        $user = $request->user();
-        $status = $this->editCart->updateCartItem($user, $request->all(), false);
-        return response()->json($status);
-    }
     
     /**
      * Handle a login request to the application.
@@ -134,21 +101,10 @@ class CartApiController extends Controller {
      */
     public function postUpdateCustomCartItem(Request $request) {
         $user = $request->user();
-        $status = $this->editCart->updateCustomCartItem($user, $request->all(), true);
+        $status = $this->editCart->updateCustomCartItem($user, $request->all());
         return response()->json($status);
     }
 
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function postUpdateCustomCartItemStateless(Request $request) {
-        $user = $request->user();
-        $status = $this->editCart->updateCustomCartItem($user, $request->all(), false);
-        return response()->json($status);
-    }
 
     /**
      * Handle a login request to the application.
@@ -192,22 +148,12 @@ class CartApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getCart() {
-        $items = $this->editCart->getCart();
-        return response()->json($items);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getCartStateless(Request $request) {
+    public function getCart(Request $request) {
         $user = $request->user();
-        $items = $this->editCart->getCartStateless($user);
+        $items = $this->editCart->getCart($user);
         return response()->json($items);
     }
+
 
     /**
      * Handle a login request to the application.
@@ -215,20 +161,9 @@ class CartApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getCheckoutCartStateless(Request $request) {
+    public function getCheckoutCart(Request $request) {
         $user = $request->user();
-        $items = $this->editCart->getCheckoutCartStateless($user);
-        return response()->json($items);
-    }
-
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getCheckoutCart() {
-        $data = $this->editCart->getCheckoutCart();
+        $data = $this->editCart->getCheckoutCart($user);
         return response()->json($data);
     }
 

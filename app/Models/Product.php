@@ -71,6 +71,7 @@ class Product extends Model {
         return null;
     }
 
+
     public function clearCache() {
         $access = false;
         $merchants = DB::select('SELECT 

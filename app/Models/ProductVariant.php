@@ -1,7 +1,7 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\FileM;
 class ProductVariant extends Model {
 
 	/**
@@ -16,7 +16,7 @@ class ProductVariant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['sku','product_id','ref2','type','description','is_digital','is_shippable','price','sale','tax','quantity','merchant_id','requires_authorization'];
+    protected $fillable = ['sku','product_id','ref2','type','description','is_digital','is_on_sale','is_shippable','price','sale','tax','quantity','merchant_id','requires_authorization'];
 
     public function product() {
         return $this->belongsTo('App\Models\Product');
@@ -38,5 +38,23 @@ class ProductVariant extends Model {
     }
     public function attributeOptions() {
         return $this->belongsToMany('App\Models\AttributeOption','product_variant_attribute_option','product_variant_id','attribute_option_id')->withTimestamps();
+    }
+    
+    public function getCartImg() {
+        $file = FileM::where("type","Variant")->where("trigger_id", $this->id)->first();
+        if($file){
+            return $file;
+        }
+        $file = FileM::where("type","Product")->where("trigger_id", $this->product_id)->first();
+        if($file){
+            return $file;
+        }
+        return null;
+    }
+    public function getActivePrice() {
+        if($this->is_on_sale){
+            return $this->sale;
+        }
+        return $this->price;
     }
 }

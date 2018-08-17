@@ -8,4 +8,13 @@ return [
     'dec_point' => env('SHOPPING_DEC_POINT', '.'),
 
     'thousands_sep' => env('SHOPPING_THOUSANDS_SEP', ','),
+    
+        /*
+     * ---------------------------------------------------------------
+     * persistence
+     * ---------------------------------------------------------------
+     *
+     * the configuration for persisting cart
+     */
+    'storage' => \App\Cart\CartDBStorage::class,
 ];

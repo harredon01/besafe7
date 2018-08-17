@@ -137,18 +137,9 @@ class OrderApiController extends Controller {
      */
     public function setShippingCondition(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id"),true));
+        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id") ));
     }
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function setShippingConditionStateless(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id"),false));
-    }
+     
     /**
      * Handle a login request to the application.
      *
@@ -157,19 +148,8 @@ class OrderApiController extends Controller {
      */
     public function setBillingAddress(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id"),true));
-    }
-    
-    /**
-     * Handle a login request to the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function setBillingAddressStateless(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id"),false));
-    }
+        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id") ));
+    } 
 
     /**
      * Display a listing of the resource.
@@ -249,7 +229,7 @@ class OrderApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id) {
+    public function destroy($id,Request $request) {
         $user = $request->user();
         return response()->json($this->editOrder->deleteOrder($user));
     }
