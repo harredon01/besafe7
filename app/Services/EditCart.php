@@ -24,12 +24,13 @@ class EditCart {
         $data = array();
         $result = array();
         foreach ($items as $item) {
-            $item->priceSum = $item->getPriceSum(); // the subtotal without conditions applied
-            $item->priceWithConditions = $item->getPriceWithConditions(); // the single price with conditions applied
-            $item->priceSumWithConditions = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
+            $dataitem = $item->toArray();
+            $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
+            $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
+            $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
             // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
             // so you can do things like below:
-            array_push($data, $item);
+            array_push($data, $dataitem);
         }
         $result['items'] = $data;
         $result['totalItems'] = count($data);
@@ -44,13 +45,14 @@ class EditCart {
         $is_subscription = false;
         $requires_authorization = false;
         foreach ($items as $item) {
-            $dataitem = array();
-            $item->priceSum = $item->getPriceSum(); // the subtotal without conditions applied
-            $item->priceWithConditions = $item->getPriceWithConditions(); // the single price with conditions applied
-            $item->priceSumWithConditions = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
+            $dataitem = $item->toArray();
+            $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
+            $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
+            $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
             // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
             // so you can do things like below:
-            array_push($data, $item);
+            array_push($data, $dataitem);
+            $dataitem = array();
             $attrs = json_decode($item->attributes, true);
             if ($attrs) {
                 if (array_key_exists("is_shippable", $attrs)) {
@@ -402,7 +404,6 @@ class EditCart {
                     $losAttributes['is_digital'] = 1;
                     $losAttributes['is_shippable'] = 0;
                     $losAttributes['requires_authorization'] = 1;
-                    $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
                     $losAttributes['merchant_id'] = $data['merchant_id'];
                     if (array_key_exists("extras", $data)) {
                         foreach ($data["extras"] as $x => $x_value) {
@@ -472,7 +473,7 @@ class EditCart {
                     return array("status" => "error", "message" => "No more stock of that product");
                 }
             } else if ((int) $data['quantity'] == 0) {
-                Cart::session($user->id)->remove($productVariant->id);
+                Cart::session($user->id)->remove($item->id);
                 $item->delete();
                 return array("status" => "success", "message" => "Item deleted from cart");
             } else if ((int) $data['quantity'] < 0) {
