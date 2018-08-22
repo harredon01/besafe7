@@ -32,27 +32,32 @@ class EditCart {
             // so you can do things like below:
             array_push($data, $dataitem);
         }
+        $result["subtotal"] = Cart::session($user->id)->getSubTotal();
+        $result["total"] = Cart::session($user->id)->getTotal();
         $result['items'] = $data;
         $result['totalItems'] = count($data);
         return $result;
     }
 
     public function getCheckoutCart(User $user) {
+//        Cart::session($user->id)->removeConditionsByType("coupon");
+//        Cart::session($user->id)->removeConditionsByType("tax");
         $data = array();
         $items = Cart::session($user->id)->getContent();
         $result = array();
         $is_shippable = false;
         $is_subscription = false;
         $requires_authorization = false;
+        $totalItems = 0;
         foreach ($items as $item) {
+            $totalItems++;
             $dataitem = $item->toArray();
             $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
             $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
             $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
             // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
             // so you can do things like below:
-            array_push($data, $dataitem);
-            $dataitem = array();
+            array_push($result, $dataitem);
             $attrs = json_decode($item->attributes, true);
             if ($attrs) {
                 if (array_key_exists("is_shippable", $attrs)) {
@@ -71,20 +76,9 @@ class EditCart {
                     }
                 }
             }
-            array_push($result, $dataitem);
         }
         $subTotal = Cart::session($user->id)->getSubTotal();
-        $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
-        $shippingTotal = 0;
-        foreach ($shippingItems as $item) {
-            $shippingTotal += $item->getCalculatedValue($subTotal);
-        }
-        $taxItems = Cart::session($user->id)->getConditionsByType("tax");
-        $taxTotal = 0;
-        foreach ($taxItems as $item) {
-            $taxTotal += $item->getCalculatedValue($subTotal);
-        }
-        $saleItems = Cart::session($user->id)->getConditionsByType("sale");
+        /*$saleItems = Cart::session($user->id)->getConditionsByType("sale");
         $saleTotal = 0;
         foreach ($saleItems as $item) {
             $saleTotal += $item->getCalculatedValue($subTotal);
@@ -94,19 +88,46 @@ class EditCart {
         foreach ($couponItems as $item) {
             $couponTotal += $item->getCalculatedValue($subTotal);
         }
-        $total = Cart::session($user->id)->getTotal();
-        $data['items'] = $result;
+        $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
+        $shippingTotal = 0;
+        foreach ($shippingItems as $item) {
+            $shippingTotal += $item->getCalculatedValue($subTotal);
+        }
+        $taxItems = Cart::session($user->id)->getConditionsByType("tax");
+        $taxTotal = 0;
+        
+        foreach ($taxItems as $item) {
+            $taxTotal += $item->getCalculatedValue($subTotal-$couponTotal-$saleTotal );
+        }*/
         $data['subtotal'] = $subTotal;
-        $data['shipping'] = $shippingTotal;
+        $cartConditions = Cart::session($user->id)->getConditions();
+        $resultConditions = [];
+        foreach ($cartConditions as $condition) {
+            $cond = array();
+            $cond['getTarget'] = $condition->getTarget(); // the target of which the condition was applied
+            $cond['getName'] = $condition->getName(); // the name of the condition
+            $cond['getType'] = $condition->getType(); // the type
+            $cond['getValue'] = $condition->getValue(); // the value of the condition
+            $cond['getOrder'] = $condition->getOrder(); // the order of the condition
+            $cond['getAttributes'] = $condition->getAttributes(); // the attributes of the condition, returns an empty [] if no attributes added
+            $value = $condition->getCalculatedValue($subTotal );
+            $cond['total'] = $value; 
+            if(substr($condition->getValue(), 0, 1)=="-"){
+                $subTotal = $subTotal - $value;
+            } else {
+                $subTotal = $subTotal + $value;
+            }
+
+            array_push($resultConditions, $cond);
+        }
+        $data['items'] = $result;
+        $data['conditions'] = $resultConditions;
         $data['is_shippable'] = $is_shippable;
         $data['requires_authorization'] = $requires_authorization;
         $data['is_subscription'] = $is_subscription;
-        $data['tax'] = $taxTotal;
-        $data['sale'] = $saleTotal;
-        $data['coupon'] = $couponTotal;
-        $data['discount'] = $saleTotal + $couponTotal;
-        $data['totalItems'] = count($result);
-        $data['total'] = $total;
+        $data['totalItems'] = $totalItems;
+        $data['total'] = Cart::session($user->id)->getTotal();
+        
         return $data;
     }
 
@@ -206,7 +227,7 @@ class EditCart {
             $productVariant = $item->productVariant;
             if ($productVariant) {
                 $product = $productVariant->product;
-                $conditions = $productVariant->conditions()->where('isActive', true)->get();
+                $conditions = $productVariant->conditions()->where('status', 'active')->get();
                 $applyConditions = array();
                 foreach ($conditions as $condition) {
                     $itemCondition = new CartCondition(array(
@@ -217,7 +238,7 @@ class EditCart {
                     ));
                     array_push($applyConditions, $itemCondition);
                 }
-                $conditions = $product->conditions()->where('isActive', true)->get();
+                $conditions = $product->conditions()->where('status', 'active')->get();
                 foreach ($conditions as $condition) {
                     $itemCondition = new CartCondition(array(
                         'name' => $condition->name,
@@ -306,24 +327,22 @@ class EditCart {
                 $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
-                        $conditions = $productVariant->conditions()->where('isActive', true)->get();
+                        $conditions = $productVariant->conditions()->where('status', 'active')->get();
                         $applyConditions = array();
                         foreach ($conditions as $condition) {
                             $itemCondition = new CartCondition(array(
                                 'name' => $condition->name,
                                 'type' => $condition->type,
-                                'target' => $condition->target,
                                 'value' => $condition->value,
                             ));
                             array_push($applyConditions, $itemCondition);
                         }
                         $product = $productVariant->product;
-                        $conditions = $product->conditions()->where('isActive', true)->get();
+                        $conditions = $product->conditions()->where('status', true)->get();
                         foreach ($conditions as $condition) {
                             $itemCondition = new CartCondition(array(
                                 'name' => $condition->name,
                                 'type' => $condition->type,
-                                'target' => $condition->target,
                                 'value' => $condition->value,
                             ));
                             array_push($applyConditions, $itemCondition);
@@ -490,7 +509,7 @@ class EditCart {
      * @param  User, array  $data
      * 
      */
-    public function updateCustomCartItem(User $user, array $data ) {
+    public function updateCustomCartItem(User $user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
         $item = Item::where('id', intval($data['item_id']))
                         ->where('user_id', $user->id)

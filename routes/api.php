@@ -129,11 +129,14 @@ Route::post('cart/update', 'CartApiController@postUpdateCartItem');
 Route::post('cart/update_custom', 'CartApiController@postUpdateCustomCartItem');
 Route::post('cart/mass_update', 'CartApiController@postUpdateCartItems');
 Route::get('cart/get', 'CartApiController@getCart');
+Route::get('cart/checkout', 'CartApiController@getCheckoutCart');
 Route::post('cart/clear', 'CartApiController@postClearCart');
 Route::get('cart/load', 'CartApiController@loadActiveCart');
 Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
 
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
+Route::post('orders/tax', 'OrderApiController@setTaxesCondition');
+Route::post('orders/coupon', 'OrderApiController@setCouponCondition');
 Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
 Route::get('orders/confirm/{code?}', 'OrderApiController@confirmOrder');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');

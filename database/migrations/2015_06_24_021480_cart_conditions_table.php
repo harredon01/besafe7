@@ -21,9 +21,8 @@ class CartConditionsTable extends Migration {
                         $table->string('value');
                         $table->string('coupon')->nullable();
                         $table->boolean('isReusable');
-                        $table->boolean('used');
-                        $table->boolean('isActive');
-                        $table->integer('order')->unsigned()->nullable()->default(0);
+                        $table->integer('used');
+                        $table->string('status');
                         $table->integer('product_id')->unsigned()->nullable();
                         $table->foreign('product_id')->references('id')
                                 ->on('products');
@@ -39,6 +38,7 @@ class CartConditionsTable extends Migration {
                         $table->integer('country_id')->unsigned()->nullable();
                         $table->foreign('country_id')->references('id')
                                 ->on('countries');
+                        $table->integer('order')->unsigned()->default(0);
                         $table->text('attributes')->nullable();
 			$table->timestamps();
 		});

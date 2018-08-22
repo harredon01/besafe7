@@ -98,7 +98,7 @@ class EditOrder {
         return $order;
     }
 
-    public function processModel( array $data) {
+    public function processModel(array $data) {
         $class = "App\\Models\\" . $data["model"];
         $model = $class::find($data['id']);
         $interval = $data['interval'];
@@ -218,8 +218,34 @@ class EditOrder {
             $insertCondition['order_id'] = $order->id;
             $order->conditions()->where('type', "shipping")->delete();
             Condition::insert($insertCondition);
-            Cart::condition($condition);
+            Cart::session($user->id)->condition($condition);
             return array("status" => "success", "message" => "Shipping condition set on the cart");
+        }
+        return array("status" => "error", "message" => "Address does not exist");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    private function setHifeCondition(User $user, Order $order) {
+        Cart::session($user->id)->removeConditionsByType("misc");
+        $order->conditions()->wherePivot('type', "misc")->detach();
+        $theCondition = Condition::find(11);
+        if ($theCondition) {
+            $insertCondition = array(
+                'name' => $theCondition->name,
+                'type' => "misc",
+                'target' => $theCondition->target,
+                'value' => $theCondition->value,
+                'order' => $theCondition->order
+            );
+            $condition = new CartCondition($insertCondition);
+            $insertCondition['order_id'] = $order->id;
+            $insertCondition['condition_id'] = $theCondition->id;
+            Cart::session($user->id)->condition($condition);
+            DB::table('condition_order')->insert($insertCondition);
         }
         return array("status" => "error", "message" => "Address does not exist");
     }
@@ -231,24 +257,26 @@ class EditOrder {
      */
     public function setTaxesCondition(User $user, array $data) {
         $order = $this->getOrder($user);
-        Cart::removeConditionsByType("tax");
-        $order->conditions()->where('type', "tax")->delete();
+        $this->setHifeCondition($user, $order);
+        Cart::session($user->id)->removeConditionsByType("tax");
+        $order->conditions()->wherePivot('type', "tax")->detach();
+
 
         if (array_key_exists("country_id", $data)) {
             if ($data['country_id']) {
                 $conditions = Condition::where('country_id', $data['country_id'])
-                                ->where('type', 'tax')->get();
-                $this->setOrderConditions($order, $conditions, "tax");
+                                ->where('type', 'tax')->whereNull('region_id')->get();
+                $this->setOrderConditions($user, $order, $conditions, "tax");
             }
         }
         if (array_key_exists("region_id", $data)) {
             if ($data['region_id']) {
                 $conditions = Condition::where('region_id', $data['region_id'])
                                 ->where('type', 'tax')->get();
-                $this->setOrderConditions($order, $conditions, "tax");
+                $this->setOrderConditions($user, $order, $conditions, "tax");
             }
         }
-        return array("status" => "success", "message" => "Tax conditions set on the cart");
+        return array("status" => "success", "message" => "Tax conditions set on the cart", "cart" => $this->editCart->getCheckoutCart($user));
     }
 
     /**
@@ -256,30 +284,7 @@ class EditOrder {
      *
      * @return Response
      */
-    private function setOrderConditions(Order $order,$conditions,$type) {
-        foreach ($conditions as $value) {
-            // add single condition on a cart bases
-            $condition = new CartCondition(array(
-                'name' => $value->name,
-                'type' => $type,
-                'target' => $value->target,
-                'value' => $value->value,
-                'order' => $value->order
-            ));
-            $insertCondition = $value->toArray();
-            unset($insertCondition['id']);
-            $insertCondition['order_id'] = $order->id;
-            Condition::insert($insertCondition);
-            Cart::condition($condition);
-        }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function loadOrderConditions(Order $order) {
+    public function loadOrderConditions(User $user, Order $order) {
         $conditions = $order->conditions()->get();
         $applyConditions = array();
         foreach ($conditions as $condition) {
@@ -289,7 +294,7 @@ class EditOrder {
                 'target' => $condition->target,
                 'value' => $condition->value,
             ));
-            Cart::condition($itemCondition);
+            Cart::session($user->id)->condition($itemCondition);
         }
     }
 
@@ -339,30 +344,64 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setCouponCondition(User $user, $coupon) {
-        $theCondition = Condition::where('coupon', $coupon)->where('status', 'active')->first();
-        Cart::removeConditionsByType("coupon");
+    public function setCouponCondition(User $user, $data) {
+        $theCondition = Condition::where('coupon', $data['coupon'])->where('status', 'active')->first();
+
         if ($theCondition) {
             // add single condition on a cart bases
-            if ($theCondition->isReusable || (!$theCondition->isReusable && !$theCondition->used)) {
-                $condition = new CartCondition(array(
+            if ($theCondition->isReusable || (!$theCondition->isReusable && $theCondition->used < 1)) {
+                $order = $this->getOrder($user);
+                $theConditionApplied = $order->conditions()->wherePivot('condition_id', $theCondition->id)->first();
+                if ($theConditionApplied) {
+                    //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
+                }
+                Cart::session($user->id)->removeConditionsByType("coupon");
+                $order->conditions()->wherePivot('type', "coupon")->detach();
+                $insertCondition = array(
                     'name' => $theCondition->name,
                     'type' => 'coupon',
                     'target' => $theCondition->target,
                     'value' => $theCondition->value,
-                    'order' => $theCondition->order
-                ));
-                $order = $this->getOrder($user);
-                $insertCondition = $theCondition->toArray();
-                unset($insertCondition['id']);
+                    'order' => $theCondition->order,
+                );
+                $condition = new CartCondition($insertCondition);
+                Cart::session($user->id)->condition($condition);
+                $theCondition->used = $theCondition->used + 1;
+                $theCondition->save();
                 $insertCondition['order_id'] = $order->id;
-                $order->conditions()->where('type', "coupon")->delete();
-                Condition::insert($insertCondition);
-                Cart::condition($condition);
-                return array("status" => "success", "message" => "Shipping condition set on the cart");
+                $insertCondition['condition_id'] = $theCondition->id;
+                DB::table('condition_order')->insert($insertCondition);
+
+
+                return array("status" => "success", "message" => "Cart condition set on the cart", "cart" => $this->editCart->getCheckoutCart($user));
             }
         }
-        return array("status" => "error", "message" => "Address does not exist");
+        return array("status" => "error", "message" => "Coupon does not exist");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    private function setOrderConditions(User $user, Order $order, $conditions, $type) {
+
+        foreach ($conditions as $value) {
+            $insertCondition = array(
+                'name' => $value->name,
+                'type' => $type,
+                'target' => $value->target,
+                'value' => $value->value,
+                'order' => $value->order
+            );
+            $condition = new CartCondition($insertCondition);
+            $insertCondition['order_id'] = $order->id;
+            $insertCondition['condition_id'] = $value->id;
+
+            Cart::session($user->id)->condition($condition);
+
+            DB::table('condition_order')->insert($insertCondition);
+        }
     }
 
     /**

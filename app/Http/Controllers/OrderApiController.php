@@ -27,10 +27,9 @@ class OrderApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditOrder $editOrder, CleanSearch $cleanSearch, Guard $auth) {
+    public function __construct(EditOrder $editOrder, CleanSearch $cleanSearch) {
         $this->editOrder = $editOrder;
         $this->cleanSearch = $cleanSearch;
-        $this->auth = $auth;
         $this->middleware('auth:api', ['except' => ['confirmOrder', 'denyOrder']]);
     }
 
@@ -149,6 +148,27 @@ class OrderApiController extends Controller {
     public function setBillingAddress(Request $request) {
         $user = $request->user();
         return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id") ));
+    } 
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setCouponCondition(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setCouponCondition($user, $request->only("coupon") ));
+    } 
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setTaxesCondition(Request $request) {
+        $user = $request->user();
+        $data = $request->all("country_id","region_id");
+        return response()->json($this->editOrder->setTaxesCondition($user, $data ));
     } 
 
     /**
