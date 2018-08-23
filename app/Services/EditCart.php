@@ -109,6 +109,7 @@ class EditCart {
             $cond['getType'] = $condition->getType(); // the type
             $cond['getValue'] = $condition->getValue(); // the value of the condition
             $cond['getOrder'] = $condition->getOrder(); // the order of the condition
+            $cond['getEffect'] = substr($condition->getValue(), 0, 1); // the order of the condition
             $cond['getAttributes'] = $condition->getAttributes(); // the attributes of the condition, returns an empty [] if no attributes added
             $value = $condition->getCalculatedValue($subTotal );
             $cond['total'] = $value; 
