@@ -19,412 +19,19 @@ use App\Models\Transaction;
 
 class PayU {
 
-    public function payCreditCard(User $user, array $data, Order $order) {
-        $validator = $this->validatorCC($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $billing = $order->orderAddresses()->where('type', "billing")->first();
-        if ($billing) {
+    
 
-
-            $billingCountry = Country::find($billing->country_id);
-            $billingRegion = Region::find($billing->region_id);
-
-            $deviceSessionId = md5(session_id() . microtime());
-            $accountId = "512321";
-            $apiLogin = env('PAYU_LOGIN');
-            $apiKey = env('PAYU_KEY');
-            $reference = "besafe_test_1_" . $order->id;
-            $order->referenceCode = $reference;
-            $order->save();
-            $currency = "COP";
-            $merchantId = "508029";
-            $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
-            $sig = sha1($str);
-            $merchant = [
-                'apiLogin' => $apiLogin,
-                'apiKey' => $apiKey
-            ];
-            $additionalValues = [
-                'value' => number_format($order->total, 2, '.', ''),
-                'currency' => $currency
-            ];
-            $additionalValuesCont = [
-                'TX_VALUE' => $additionalValues
-            ];
-
-            $buyerAddress = [
-                "street1" => $billing->address,
-                "street2" => "",
-                "city" => $billing->city,
-                "state" => $billingRegion->name,
-                "country" => $billingCountry->code,
-                "postalCode" => $billing->postal,
-                "phone" => $billing->phone
-            ];
-            $buyer = [
-                "merchantBuyerId" => "1",
-                "fullName" => $billing->name,
-                "emailAddress" => $data['payer_email'],
-                "contactPhone" => $billing->phone,
-                "dniNumber" => $data['payer_id'],
-                "shippingAddress" => $buyerAddress
-            ];
-            $shipping = $order->orderAddresses()->where('type', "shipping")->first();
-            if ($shipping) {
-                $shippingCountry = Country::find($shipping->country_id);
-                $shippingRegion = Region::find($shipping->region_id);
-                $ShippingAddress = [
-                    "street1" => $shipping->address,
-                    "street2" => "",
-                    "city" => $shipping->city,
-                    "state" => $shippingRegion->name,
-                    "country" => $shippingCountry->code,
-                    "postalCode" => $shipping->postal,
-                    "phone" => $shipping->phone
-                ];
-            } else {
-                $ShippingAddress = [
-                    "street1" => $billing->address,
-                    "street2" => "",
-                    "city" => $billing->city,
-                    "state" => $billingRegion->name,
-                    "country" => $billingCountry->code,
-                    "postalCode" => $billing->postal,
-                    "phone" => $billing->phone
-                ];
-            }
-            $orderCont = [
-                "accountId" => $accountId,
-                "referenceCode" => $reference,
-                "description" => "besafe payment test",
-                "language" => "es",
-                "signature" => $sig,
-                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
-                "additionalValues" => $additionalValuesCont,
-                "buyer" => $buyer,
-                "shippingAddress" => $ShippingAddress
-            ];
-
-            $payerAddress = [
-                "street1" => $billing->address,
-                "street2" => "",
-                "city" => $billing->city,
-                "state" => $billingRegion->name,
-                "country" => $billingCountry->code,
-                "postalCode" => $billing->postal,
-                "phone" => $billing->phone
-            ];
-            $payer = [
-                "merchantPayerId" => "1",
-                "fullName" => $billing->city,
-                "emailAddress" => $data['payer_email'],
-                "contactPhone" => $billing->phone,
-                "dniNumber" => $data['payer_id'],
-                "billingAddress" => $payerAddress
-            ];
-            $creditCard = [
-                "number" => $data['cc_number'],
-                "securityCode" => $data['cc_security_code'],
-                "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
-                "name" => $billing->name
-            ];
-            $extraParams = [
-                "INSTALLMENTS_NUMBER" => 1
-            ];
-            $transaction = [
-                "order" => $orderCont,
-                "payer" => $payer,
-                "creditCard" => $creditCard,
-                "extraParameters" => $extraParams,
-                "type" => "AUTHORIZATION_AND_CAPTURE",
-                "paymentMethod" => $data['cc_branch'],
-                "paymentCountry" => $billingCountry->code,
-                "deviceSessionId" => $deviceSessionId,
-                "ipAddress" => $data['ip_address'],
-                "cookie" => "pt1t38347bs6jc9ruv2ecpv7o2",
-                "userAgent" => $data['user_agent']
-            ];
-            $dataSent = [
-                "language" => "es",
-                "command" => "SUBMIT_TRANSACTION",
-                "merchant" => $merchant,
-                "transaction" => $transaction,
-                "test" => false,
-            ];
-//        return $dataSent;
-            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-            return $this->handleTransactionResponse($result, $user, $order);
-        }
-        return array("status" => "error", "message" => "missing billing Address");
-    }
-
-    public function useSource(User $user, array $data, Order $order) {
-        $validator = $this->validatorUseSource($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $billing = $order->orderAddresses()->where('type', "billing")->first();
-        if ($billing) {
-            $creditCardTokenId = $data['source'];
-
-
-            $billingCountry = Country::find($billing->country_id);
-            $billingRegion = Region::find($billing->region_id);
-
-            $deviceSessionId = md5(session_id() . microtime());
-            $accountId = "512321";
-            $apiLogin = env('PAYU_LOGIN');
-            $apiKey = env('PAYU_KEY');
-            $reference = "besafe_test_1_" . $order->id;
-            $order->referenceCode = $reference;
-            $order->save();
-            $currency = "COP";
-            $merchantId = "508029";
-            $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
-            $sig = sha1($str);
-            $merchant = [
-                'apiLogin' => $apiLogin,
-                'apiKey' => $apiKey
-            ];
-            $additionalValues = [
-                'value' => number_format($order->total, 2, '.', ''),
-                'currency' => $currency
-            ];
-            $additionalValuesCont = [
-                'TX_VALUE' => $additionalValues
-            ];
-
-            $buyerAddress = [
-                "street1" => $billing->address,
-                "street2" => "",
-                "city" => $billing->city,
-                "state" => $billingRegion->name,
-                "country" => $billingCountry->code,
-                "postalCode" => $billing->postal,
-                "phone" => $billing->phone
-            ];
-            $buyer = [
-                "merchantBuyerId" => "1",
-                "fullName" => $billing->name,
-                "emailAddress" => $data['payer_email'],
-                "contactPhone" => $billing->phone,
-                "dniNumber" => $data['payer_id'],
-                "shippingAddress" => $buyerAddress
-            ];
-            $shipping = $order->orderAddresses()->where('type', "shipping")->first();
-            if ($shipping) {
-                $shippingCountry = Country::find($shipping->country_id);
-                $shippingRegion = Region::find($shipping->region_id);
-                $ShippingAddress = [
-                    "street1" => $shipping->address,
-                    "street2" => "",
-                    "city" => $shipping->city,
-                    "state" => $shippingRegion->name,
-                    "country" => $shippingCountry->code,
-                    "postalCode" => $shipping->postal,
-                    "phone" => $shipping->phone
-                ];
-            } else {
-                $ShippingAddress = [
-                    "street1" => $billing->address,
-                    "street2" => "",
-                    "city" => $billing->city,
-                    "state" => $billingRegion->name,
-                    "country" => $billingCountry->code,
-                    "postalCode" => $billing->postal,
-                    "phone" => $billing->phone
-                ];
-            }
-            $orderCont = [
-                "accountId" => $accountId,
-                "referenceCode" => $reference,
-                "description" => "besafe payment test",
-                "language" => "es",
-                "signature" => $sig,
-                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
-                "additionalValues" => $additionalValuesCont,
-                "buyer" => $buyer,
-                "shippingAddress" => $ShippingAddress
-            ];
-
-            $payerAddress = [
-                "street1" => $billing->address,
-                "street2" => "",
-                "city" => $billing->city,
-                "state" => $billingRegion->name,
-                "country" => $billingCountry->code,
-                "postalCode" => $billing->postal,
-                "phone" => $billing->phone
-            ];
-            $payer = [
-                "merchantPayerId" => "1",
-                "fullName" => $billing->name,
-                "emailAddress" => $data['payer_email'],
-                "contactPhone" => $billing->phone,
-                "dniNumber" => $data['payer_id'],
-                "billingAddress" => $payerAddress
-            ];
-
-            $extraParams = [
-                "INSTALLMENTS_NUMBER" => 1
-            ];
-            $transaction = [
-                "order" => $orderCont,
-                "payer" => $payer,
-                "creditCardTokenId" => $creditCardTokenId,
-                "extraParameters" => $extraParams,
-                "type" => "AUTHORIZATION_AND_CAPTURE",
-                "paymentMethod" => $data['cc_branch'],
-                "paymentCountry" => $billingCountry->code,
-                "deviceSessionId" => $deviceSessionId,
-                "ipAddress" => $data['ip_address'],
-                "cookie" => "pt1t38347bs6jc9ruv2ecpv7o2",
-                "userAgent" => $data['user_agent']
-            ];
-            $dataSent = [
-                "language" => "es",
-                "command" => "SUBMIT_TRANSACTION",
-                "merchant" => $merchant,
-                "transaction" => $transaction,
-                "test" => false,
-            ];
-//        return $dataSent;
-            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-            return $this->handleTransactionResponse($result, $user, $order);
-        }
-        return array("status" => "error", "message" => "missing billing Address");
-    }
-
-    public function makeCharge(User $user, Order $order, array $payload) {
-        $method = 'pay' . studly_case(str_replace('.', '_', $payload['type']));
-        if (method_exists($this, $method)) {
-            $result = $this->{$method}($user, $payload, $order);
-            return $this->saveTransaction($result);
-            ;
-        } else {
-            return $this->missingMethod();
-        }
-    }
-
-    public function payDebitCard(User $user, array $data, Order $order) {
-        $validator = $this->validatorDebit($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $billing = $order->orderAddresses()->where('type', "billing")->first();
-        if ($billing) {
-            $billingCountry = Country::find($billing->country_id);
-            $deviceSessionId = md5(session_id() . microtime());
-            $accountId = "512321";
-            $apiLogin = env('PAYU_LOGIN');
-            $apiKey = env('PAYU_KEY');
-            $reference = "besafe_test_1_" . $order->id;
-            $order->referenceCode = $reference;
-            $order->save();
-            $currency = "COP";
-            $merchantId = "508029";
-            $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
-            $sig = sha1($str);
-            $merchant = [
-                'apiLogin' => $apiLogin,
-                'apiKey' => $apiKey
-            ];
-            $additionalValues = [
-                'value' => number_format($order->total, 2, '.', ''),
-                'currency' => $currency
-            ];
-            $additionalValuesCont = [
-                'TX_VALUE' => $additionalValues
-            ];
-
-            $buyer = [
-                "emailAddress" => $data['payer_email'],
-            ];
-
-            $orderCont = [
-                "accountId" => $accountId,
-                "referenceCode" => $reference,
-                "description" => "besafe payment test",
-                "language" => "es",
-                "signature" => $sig,
-                "notifyUrl" => "http://hoovert.com/api/payu/webhook",
-                "additionalValues" => $additionalValuesCont,
-                "buyer" => $buyer
-            ];
-
-            $payer = [
-                "fullName" => $billing->name,
-                "emailAddress" => $data['payer_email'],
-                "contactPhone" => $billing->phone,
-            ];
-            $extraParams = [
-                "RESPONSE_URL" => "http://hoovert.com/payu/return",
-                "PSE_REFERENCE1" => $data['ip_address'],
-                "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
-                "USER_TYPE" => $data['user_type'],
-                "PSE_REFERENCE2" => $data['pse_reference2'],
-                "PSE_REFERENCE3" => $data['pse_reference3']
-            ];
-            $transaction = [
-                "order" => $orderCont,
-                "payer" => $payer,
-                "extraParameters" => $extraParams,
-                "type" => "AUTHORIZATION_AND_CAPTURE",
-                "paymentMethod" => "PSE",
-                "paymentCountry" => $billingCountry->code,
-                "deviceSessionId" => $deviceSessionId,
-                "ipAddress" => $data['ip_address'],
-                "cookie" => $data['cookie'],
-                "userAgent" => $data['user_agent']
-            ];
-            $dataSent = [
-                "language" => "es",
-                "command" => "SUBMIT_TRANSACTION",
-                "merchant" => $merchant,
-                "transaction" => $transaction,
-                "test" => false,
-            ];
-
-            return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        }
-        return array("status" => "error", "message" => "missing billing Address");
-    }
-
-    public function payCash(User $user, array $data, Order $order) {
-        $validator = $this->validatorCash($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $accountId = "512321";
-        $apiLogin = env('PAYU_LOGIN');
+    private function populateOrderContent(Order $order) {
+        $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
         $reference = "besafe_test_1_" . $order->id;
+        $paymentTotal = $order->total;
         $order->referenceCode = $reference;
         $order->save();
         $currency = "COP";
-        $merchantId = "508029";
-        $date = date_create();
-        date_add($date, date_interval_create_from_date_string("7 days"));
-        $date = date_format($date, "Y-m-d") . "T" . date_format($date, "G:i:s");
-        $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($order->total, 0, '.', '') . "~" . $currency;
+        $merchantId = env('PAYU_MERCHANT', "508029");
+        $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($paymentTotal, 0, '.', '') . "~" . $currency;
         $sig = sha1($str);
-        $merchant = [
-            'apiLogin' => $apiLogin,
-            'apiKey' => $apiKey
-        ];
-        $additionalValues = [
-            'value' => number_format($order->total, 2, '.', ''),
-            'currency' => $currency
-        ];
-        $additionalValuesCont = [
-            'TX_VALUE' => $additionalValues
-        ];
-
-        $buyer = [
-            "emailAddress" => $data['payer_email'],
-        ];
         $orderCont = [
             "accountId" => $accountId,
             "referenceCode" => $reference,
@@ -432,13 +39,302 @@ class PayU {
             "language" => "es",
             "signature" => $sig,
             "notifyUrl" => "http://hoovert.com/api/payu/webhook",
-            "additionalValues" => $additionalValuesCont,
-            "buyer" => $buyer
+        ];
+        return $orderCont;
+    }
+
+    private function populateBilling(array $data) {
+        $validator = $this->validatorBilling($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $buyerAddress = [
+            "street1" => $data['buyer_address'],
+            "street2" => "",
+            "city" => $data['buyer_city'],
+            "state" => $data['buyer_state'],
+            "country" => $data['buyer_country'],
+            "postalCode" => $data['buyer_postal'],
+            "phone" => $data['buyer_phone']
+        ];
+        $buyer = [
+            "merchantBuyerId" => "1",
+            "fullName" => $data['buyer_name'],
+            "emailAddress" => $data['buyer_email'],
+            "contactPhone" => $data['buyer_phone'],
+            "dniNumber" => $data['buyer_id'],
+            "shippingAddress" => $buyerAddress
+        ];
+        return $buyer;
+    }
+
+    private function populateMerchant() {
+        $apiLogin = env('PAYU_LOGIN');
+        $apiKey = env('PAYU_KEY');
+        $merchant = [
+            'apiLogin' => $apiLogin,
+            'apiKey' => $apiKey
+        ];
+        return $merchant;
+    }
+
+    private function populatePayer(array $data) {
+        $validator = $this->validatorPayer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $payerAddress = [
+            "street1" => $data['payer_address'],
+            "street2" => "",
+            "city" => $data['payer_city'],
+            "state" => $data['payer_state'],
+            "country" => $data['payer_country'],
+            "postalCode" => $data['payer_postal'],
+            "phone" => $data['payer_phone']
+        ];
+        $payer = [
+            "merchantPayerId" => "1",
+            "fullName" => $data['payer_name'],
+            "emailAddress" => $data['payer_email'],
+            "contactPhone" => $data['payer_phone'],
+            "dniNumber" => $data['payer_id'],
+            "billingAddress" => $payerAddress
+        ];
+        return $payer;
+    }
+
+    private function populatePayerSimple(array $data) {
+        $validator = $this->validatorPayerSimple($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $payer = [
+            "merchantPayerId" => "1",
+            "fullName" => $data['payer_name'],
+            "emailAddress" => $data['payer_email'],
+            "contactPhone" => $data['payer_phone'],
+        ];
+        return $payer;
+    }
+
+    private function populateBillingSimple(array $data) {
+        $validator = $this->validatorBillingSimple($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $buyer = [
+            "fullName" => $data['buyer_name'],
+            "emailAddress" => $data['buyer_email'],
+            "contactPhone" => $data['buyer_phone'],
+        ];
+        return $buyer;
+    }
+
+    private function populateShipping(array $data) {
+        $validator = $this->validatorShipping($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $ShippingAddress = [
+            "street1" => $data['shipping_address'],
+            "street2" => "",
+            "city" => $data['shipping_city'],
+            "state" => $data['shipping_state'],
+            "country" => $data['shipping_country'],
+            "postalCode" => $data['shipping_postal'],
+            "phone" => $data['shipping_phone']
+        ];
+        return $ShippingAddress;
+    }
+
+    private function populateCC(array $data) {
+        $validator = $this->validatorCC($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $creditCard = [
+            "number" => $data['cc_number'],
+            "securityCode" => $data['cc_security_code'],
+            "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
+            "name" => $data['cc_name']
+        ];
+        return $creditCard;
+    }
+
+    private function populateTotals(Order $order, $currency) {
+        $additionalValues = [
+            'value' => number_format($order->total, 2, '.', ''),
+            'currency' => $currency
+        ];
+        $additionalValuesTax = [
+            'value' => number_format($order->tax, 2, '.', ''),
+            'currency' => $currency
+        ];
+        $return = $order->total - $order->tax;
+        $additionalValuesReturnBase = [
+            'value' => number_format($return, 2, '.', ''),
+            'currency' => $currency
+        ];
+        $additionalValuesCont = [
+            'TX_VALUE' => $additionalValues,
+            'TX_TAX' => $additionalValuesTax,
+            'TX_TAX_RETURN_BASE' => $additionalValuesReturnBase,
+        ];
+        return $additionalValuesCont;
+    }
+    
+    public function payCreditCard(User $user, array $data, Order $order) {
+        $buyer = $this->populateBilling($data);
+        $ShippingAddress = $this->populateShipping($data);
+        $payer = $this->populatePayer($data);
+        $creditCard = $this->populateCC($data);
+        $merchant = $this->populateMerchant();
+        $orderCont = $this->populateOrderContent($order);
+        $additionalValuesCont = $this->populateTotals($order, "COP");
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+        $orderCont["shippingAddress"] = $ShippingAddress;
+        $extraParams = [
+            "INSTALLMENTS_NUMBER" => 1
+        ];
+        $deviceSessionId = md5(session_id() . microtime());
+        $transaction = [
+            "order" => $orderCont,
+            "payer" => $payer,
+            "creditCard" => $creditCard,
+            "extraParameters" => $extraParams,
+            "type" => "AUTHORIZATION_AND_CAPTURE",
+            "paymentMethod" => $data['cc_branch'],
+            "paymentCountry" => $data['payer_country'],
+            "deviceSessionId" => $deviceSessionId,
+            "ipAddress" => $data['ip_address'],
+            "cookie" => $data['cookie'],
+            "userAgent" => $data['user_agent']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "SUBMIT_TRANSACTION",
+            "merchant" => $merchant,
+            "transaction" => $transaction,
+            "test" => false,
+        ];
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->handleTransactionResponse($result, $user, $order);
+    }
+
+    public function useSource(User $user, array $data, Order $order) {
+        $buyer = $this->populateBilling($data);
+        $ShippingAddress = $this->populateShipping($data);
+        $payer = $this->populatePayer($data);
+        $validator = $this->validatorUseSource($data);
+
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $merchant = $this->populateMerchant();
+
+        $creditCardTokenId = $data['source'];
+        $deviceSessionId = md5(session_id() . microtime());
+        $additionalValuesCont = $this->populateTotals($order, "COP");
+        $orderCont = $this->populateOrderContent($order);
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+        $orderCont["shippingAddress"] = $ShippingAddress;
+        $extraParams = [
+            "INSTALLMENTS_NUMBER" => 1
         ];
         $transaction = [
             "order" => $orderCont,
+            "payer" => $payer,
+            "creditCardTokenId" => $creditCardTokenId,
+            "extraParameters" => $extraParams,
             "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => "BALOTO",
+            "paymentMethod" => $data['cc_branch'],
+            "paymentCountry" => $data['payer_country'],
+            "deviceSessionId" => $deviceSessionId,
+            "ipAddress" => $data['ip_address'],
+            "cookie" => $data['cookie'],
+            "userAgent" => $data['user_agent']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "SUBMIT_TRANSACTION",
+            "merchant" => $merchant,
+            "transaction" => $transaction,
+            "test" => false,
+        ];
+//        return $dataSent;
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->handleTransactionResponse($result, $user, $order);
+    }
+
+    
+
+    public function payDebitCard(User $user,array $data, Order $order) {
+        $payer = $this->populatePayerSimple($data);
+        $buyer = $this->populateBillingSimple($data);
+        $validator = $this->validatorDebit($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $merchant = $this->populateMerchant();
+        $deviceSessionId = md5(session_id() . microtime());
+        $additionalValuesCont = $this->populateTotals($order, "COP");
+        $orderCont = $this->populateOrderContent($order);
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+
+
+        $extraParams = [
+            "RESPONSE_URL" => "http://hoovert.com/payu/return",
+            "PSE_REFERENCE1" => $data['ip_address'],
+            "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
+            "USER_TYPE" => $data['user_type'],
+            "PSE_REFERENCE2" => $data['pse_reference2'],
+            "PSE_REFERENCE3" => $data['pse_reference3']
+        ];
+        $transaction = [
+            "order" => $orderCont,
+            "payer" => $payer,
+            "extraParameters" => $extraParams,
+            "type" => "AUTHORIZATION_AND_CAPTURE",
+            "paymentMethod" => "PSE",
+            "paymentCountry" => $data['payer_country'],
+            "deviceSessionId" => $deviceSessionId,
+            "ipAddress" => $data['ip_address'],
+            "cookie" => $data['cookie'],
+            "userAgent" => $data['user_agent']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "SUBMIT_TRANSACTION",
+            "merchant" => $merchant,
+            "transaction" => $transaction,
+            "test" => false,
+        ];
+
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->handleTransactionResponse($result, $user, $order);
+    }
+
+    public function payCash(array $data, Order $order) {
+        $validator = $this->validatorCash($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $additionalValuesCont = $this->populateTotals($order, "COP");
+        $merchant = $this->populateMerchant();
+        $buyer = $this->populateBillingSimple($data);
+        $orderCont = $this->populateOrderContent($order);
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+        $date = date_create();
+        date_add($date, date_interval_create_from_date_string("7 days"));
+        $date = date_format($date, "Y-m-d") . "T" . date_format($date, "G:i:s");
+        $transaction = [
+            "order" => $orderCont,
+            "type" => "AUTHORIZATION_AND_CAPTURE",
+            "paymentMethod" => $data['payment_method'],
             "paymentCountry" => "CO",
             "ipAddress" => $data['ip_address'],
             "expirationDate" => $date,
@@ -452,14 +348,20 @@ class PayU {
         ];
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
+    
+    public function makeCharge(User $user, Order $order, array $payload) {
+        $method = 'pay' . studly_case(str_replace('.', '_', $payload['type']));
+        if (method_exists($this, $method)) {
+            $result = $this->{$method}($user, $payload, $order);
+            return $this->saveTransaction($result);
+            ;
+        } else {
+            return $this->missingMethod();
+        }
+    }
 
     public function getBanks() {
-        $apiLogin = env('PAYU_LOGIN');
-        $apiKey = env('PAYU_KEY');
-        $merchant = [
-            'apiLogin' => $apiLogin,
-            'apiKey' => $apiKey
-        ];
+        $merchant = $this->populateMerchant();
 
         $bankListInformation = [
             "paymentMethod" => "PSE",
@@ -1395,24 +1297,6 @@ class PayU {
         }
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorCC(array $data) {
-        return Validator::make($data, [
-                    'cc_branch' => 'required|max:255',
-                    'cc_expiration_month' => 'required|max:255',
-                    'cc_expiration_year' => 'required|max:255',
-                    'cc_name' => 'required|max:255',
-                    'cc_number' => 'required|max:255',
-                    'cc_security_code' => 'required|max:255',
-                    'payer_id' => 'required|max:255',
-                    'payer_email' => 'required|email|max:255',
-        ]);
-    }
 
     /**
      * Get a validator for an incoming registration request.
@@ -1439,6 +1323,7 @@ class PayU {
     public function validatorCash(array $data) {
         return Validator::make($data, [
                     'payer_email' => 'required|email|max:255',
+                    'payment_method' => 'required|max:255',
         ]);
     }
 
@@ -1518,6 +1403,114 @@ class PayU {
                     'expMonth' => 'required|max:255',
                     'expYear' => 'required|max:255',
                     'branch' => 'required|max:255'
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorBilling(array $data) {
+        return Validator::make($data, [
+                    'buyer_address' => 'required|max:255',
+                    'buyer_city' => 'required|max:255',
+                    'buyer_state' => 'required|max:255',
+                    'buyer_country' => 'required|max:255',
+                    'buyer_postal' => 'required|max:255',
+                    'buyer_phone' => 'required|max:255',
+                    'buyer_name' => 'required|max:255',
+                    'buyer_email' => 'required|max:255',
+                    'buyer_id' => 'required|max:255'
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorBillingSimple(array $data) {
+        return Validator::make($data, [
+                    'buyer_phone' => 'required|max:255',
+                    'buyer_name' => 'required|max:255',
+                    'buyer_email' => 'required|max:255',
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorCC(array $data) {
+        return Validator::make($data, [
+                    'cc_branch' => 'required|max:255',
+                    'cc_expiration_month' => 'required|max:255',
+                    'cc_expiration_year' => 'required|max:255',
+                    'cc_name' => 'required|max:255',
+                    'cc_number' => 'required|max:255',
+                    'cc_security_code' => 'required|max:255',
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorPayer(array $data) {
+        return Validator::make($data, [
+                    'payer_address' => 'required|max:255',
+                    'payer_city' => 'required|max:255',
+                    'payer_state' => 'required|max:255',
+                    'payer_country' => 'required|max:255',
+                    'payer_postal' => 'required|max:255',
+                    'payer_phone' => 'required|max:255',
+                    'payer_name' => 'required|max:255',
+                    'payer_email' => 'required|max:255',
+                    'payer_id' => 'required|max:255',
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorPayerSimple(array $data) {
+        return Validator::make($data, [
+                    'payer_phone' => 'required|max:255',
+                    'payer_name' => 'required|max:255',
+                    'payer_email' => 'required|max:255',
+                        ]
+        );
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorShipping(array $data) {
+        return Validator::make($data, [
+                    'shipping_address' => 'required|max:255',
+                    'shipping_city' => 'required|max:255',
+                    'shipping_state' => 'required|max:255',
+                    'shipping_country' => 'required|max:255',
+                    'shipping_postal' => 'required|max:255',
+                    'shipping_phone' => 'required|max:255',
                         ]
         );
     }
