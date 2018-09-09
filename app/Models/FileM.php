@@ -18,4 +18,8 @@ class FileM extends Model {
      */
     protected $fillable = ['type','trigger_id','file','extension','user_id'];
 
+
+    public function article() {
+	return $this->hasMany('App\Models\Article');
+    }	
 }

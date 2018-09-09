@@ -60,6 +60,11 @@ Route::post('user/token', 'UserApiController@registerToken');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
+Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
+Route::resource('deliveries', 'DeliveryController');
+Route::resource('articles', 'ArticleController');
+
+Route::resource('routes', 'RouteController');
 
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
 Route::get('groups/code/auth/{id?}', 'GroupController@getGroupCode');

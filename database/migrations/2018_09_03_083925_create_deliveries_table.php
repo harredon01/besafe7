@@ -15,6 +15,22 @@ class CreateDeliveriesTable extends Migration
     {
         Schema::create('deliveries', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('type_id')->unsigned()->nullable();
+            $table->integer('starter_id')->unsigned()->nullable();
+            $table->integer('main_id')->unsigned()->nullable();
+            $table->integer('dessert_id')->unsigned()->nullable();
+            $table->string('code')->nullable();
+            $table->string('observation')->nullable();
+            $table->integer('group_id')->unsigned()->nullable();
+            $table->foreign('group_id')->references('id')
+                    ->on('groups');
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')
+                    ->on('users');
+            $table->integer('route_id')->unsigned();
+            $table->foreign('route_id')->references('id')
+                    ->on('routes');
+            $table->dateTime('delivery');
             $table->timestamps();
         });
     }

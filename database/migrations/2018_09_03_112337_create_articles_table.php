@@ -15,6 +15,19 @@ class CreateArticlesTable extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->increments('id');
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
+            $table->text('body')->nullable();
+            $table->string('status')->nullable();
+            $table->string('pagetitle')->nullable();
+            $table->string('metadescription')->nullable();
+            $table->string('slug')->nullable();
+            $table->text('attributes')->nullable();
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
+            $table->integer('file_id')->unsigned()->nullable();
+            $table->foreign('file_id')->references('id')
+                    ->on('files');
             $table->timestamps();
         });
     }
