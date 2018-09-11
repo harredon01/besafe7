@@ -327,7 +327,7 @@ $data = [];
         $data = [];
         $access = false;
         if ($merchant) {
-            if ($merchant->is_public) {
+            if (!$merchant->private) {
                 $access = true;
             } else {
                 if ($user) {

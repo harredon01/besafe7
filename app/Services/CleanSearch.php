@@ -34,6 +34,18 @@ class CleanSearch {
     public function handleGroup(User $user, Request $request) {
         $mystring = $request->getRequestUri();
         $findme = '?';
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         $pos = strpos($mystring, $findme);
         if ($pos === false) {
             $request2 = Request::create($mystring . "?user_id=" . $user->id . "&order_by=groups.id,asc", 'GET');
@@ -55,6 +67,18 @@ class CleanSearch {
     public function handleReportImgs(User $user, Request $request) {
         $mystring = $request->getRequestUri();
         $findme = '?';
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         $pos = strpos($mystring, $findme);
         if ($pos === false) {
             $request2 = Request::create($mystring . "?user_id=" . $user->id, 'GET');
@@ -76,6 +100,18 @@ class CleanSearch {
 
     public function handleLocation($request) {
         $user = $request->user();
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
@@ -120,6 +156,18 @@ class CleanSearch {
 
     public function handleHistoricLocation($request) {
         $user = $request->user();
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         $mystring = $request->getRequestUri();
         $findme = '?';
         $finalString = "";
@@ -165,6 +213,18 @@ class CleanSearch {
         $findme = '?';
         $finalString = "";
         $pos = strpos($mystring, $findme);
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         if ($pos === false) {
             $finalString = $mystring . "?order_by=users.id,desc&user_id=" . $user->id;
         } else {
@@ -192,6 +252,18 @@ class CleanSearch {
     public function handleObject($request, $type) {
         $user = $request->user();
         $mystring = $request->getRequestUri();
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            return null;
+        } 
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
         $findme = '?';
         $finalString = "";
         $pos = strpos($mystring, $findme);
