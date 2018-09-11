@@ -457,20 +457,20 @@ class EditAlerts {
             );
             if ($platform == "android") {
                 $fields = array(
-                    'app_id' => env('ONESIGNAL_APP_ID_ANDROID'),
+                    'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
                     'include_player_ids' => $userPush,
                     'data' => $msg,
                     'contents' => $content
                 );
-                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_ANDROID');
+                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_HIFE');
             } elseif ($platform == "ios") {
                 $fields = array(
-                    'app_id' => env('ONESIGNAL_APP_ID_ANDROID'),
+                    'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
                     'include_player_ids' => $userPush,
                     'data' => $msg,
                     'contents' => $content
                 );
-                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_IOS');
+                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_HIFE');
             }
 
             $fields = json_encode($fields);

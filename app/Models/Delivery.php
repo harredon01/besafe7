@@ -18,7 +18,7 @@ class Delivery extends Model{
      *
      * @var array
      */
-    protected $fillable = ['type_id','starter_id','main_id','dessert_id','code','observation','group_id','user_id','route_id','delivery'];
+    protected $fillable = ['type_id','starter_id','main_id','dessert_id','code','observation','group_id','user_id','route_id','delivery','details'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
