@@ -83,6 +83,7 @@ class DeliveryController extends Controller
             'main_id',
             'dessert_id',
             'observation',
+            'details'
         ]);
         return response()->json($this->editDelivery->postDeliveryOptions($user, $data));
 

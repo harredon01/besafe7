@@ -70,7 +70,6 @@ class EditDelivery {
      * @return Response
      */
     public function postDeliveryOptions(User $user, array $data) {
-
         $validator = $this->validatorDelivery($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);

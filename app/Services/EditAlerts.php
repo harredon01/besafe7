@@ -455,7 +455,7 @@ class EditAlerts {
                 "en" => $msg['subject'],
                 "es" => $msg['subject_es']
             );
-            if ($platform == "android") {
+            if ($platform == "gohife") {
                 $fields = array(
                     'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
                     'include_player_ids' => $userPush,
@@ -463,14 +463,14 @@ class EditAlerts {
                     'contents' => $content
                 );
                 $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_HIFE');
-            } elseif ($platform == "ios") {
+            } elseif ($platform == "food") {
                 $fields = array(
-                    'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
+                    'app_id' => env('ONESIGNAL_APP_ID_FOOD'),
                     'include_player_ids' => $userPush,
                     'data' => $msg,
                     'contents' => $content
                 );
-                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_HIFE');
+                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_FOOD');
             }
 
             $fields = json_encode($fields);
