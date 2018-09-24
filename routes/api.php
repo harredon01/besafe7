@@ -43,6 +43,9 @@ Route::get('payu/payment_methods', 'PayuController@getPaymentMethods');
 Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
+Route::post('billing/pay_cc/{source?}', 'PayuController@postPayCreditCard');
+Route::post('billing/pay_debit/{source?}', 'PayuController@postPayDebitCard');
+Route::post('billing/pay_cash/{source?}', 'PayuController@postPayCash');
 Route::post('payu/all', 'PayuController@postcreateAll');
 Route::post('payu/webhook', 'PayuController@webhookPayU');
 
@@ -60,6 +63,7 @@ Route::post('user/token', 'UserApiController@registerToken');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
 Route::resource('user', 'UserApiController');
+
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
 Route::resource('deliveries', 'DeliveryController');
 Route::resource('articles', 'ArticleController');

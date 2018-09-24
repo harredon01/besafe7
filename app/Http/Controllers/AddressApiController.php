@@ -32,7 +32,12 @@ class AddressApiController extends Controller {
      */
     public function index(Request $request) {
         $user = $request->user();
-        $addresses = $this->editUserData->getAddresses($user);
+        $data = $request->all();
+        $type = null;
+        if (array_key_exists('type', $data) ) {
+            $type = $data['type'];
+        }
+        $addresses = $this->editUserData->getAddresses($user, $type);
         return response()->json(array("user" => $user, "addresses" => $addresses));
     }
 
@@ -81,7 +86,6 @@ class AddressApiController extends Controller {
         $data = $request->all([
             'address_id',
             'name',
-            'city',
             'address',
             'type',
             'postal',

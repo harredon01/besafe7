@@ -41,7 +41,7 @@ class User extends Authenticatable {
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'docType', 'docNum', 'write_report','code',
+    protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'write_report','code',
         'emailNotifications', 'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
     protected $encryptable = [
         'green',
@@ -65,6 +65,9 @@ class User extends Authenticatable {
 
     public function addresses() {
         return $this->hasMany('App\Models\Address');
+    }
+    public function push() {
+        return $this->hasMany('App\Models\Push');
     }
 
     public function locations() {

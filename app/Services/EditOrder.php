@@ -153,7 +153,7 @@ class EditOrder {
                 $orderAddresses['type'] = "shipping";
                 $order->orderAddresses()->where('type', "shipping")->delete();
                 OrderAddress::insert($orderAddresses);
-                return array("status" => "success", "message" => "Address added to order");
+                return array("status" => "success", "message" => "Address added to order", "order" =>$order);
             }
             return array("status" => "error", "message" => "Address does not belong to user");
         }
@@ -187,7 +187,7 @@ class EditOrder {
                 $this->setTaxesCondition($user, $data);
                 $order->orderAddresses()->where('type', "billing")->delete();
                 OrderAddress::insert($orderAddresses);
-                return array("status" => "success", "message" => "Billing Address added to order");
+                return array("status" => "success", "message" => "Billing Address added to order", "order" =>$order);
             }
             return array("status" => "error", "message" => "Address does not belong to user");
         }
@@ -219,7 +219,7 @@ class EditOrder {
             $order->conditions()->where('type', "shipping")->delete();
             Condition::insert($insertCondition);
             Cart::session($user->id)->condition($condition);
-            return array("status" => "success", "message" => "Shipping condition set on the cart");
+            return array("status" => "success", "message" => "Shipping condition set on the cart", "order" =>$order);
         }
         return array("status" => "error", "message" => "Address does not exist");
     }

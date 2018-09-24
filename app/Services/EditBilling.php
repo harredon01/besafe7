@@ -133,11 +133,11 @@ class EditBilling {
 
     public function getSubscriptions(User $user) {
         $subsc = $user->subscriptions;
-        /*foreach ($subsc as $item) {
-            $objectType = "App\\Models\\" . $item->type;
-            $object = new $objectType;
-            $item->object = $object->find($item->object_id);
-        }*/
+        /* foreach ($subsc as $item) {
+          $objectType = "App\\Models\\" . $item->type;
+          $object = new $objectType;
+          $item->object = $object->find($item->object_id);
+          } */
         return $subsc;
     }
 
@@ -312,6 +312,60 @@ class EditBilling {
      */
     protected function getFailedEditGroupMessage() {
         return 'There was a problem editing your group';
+    }
+
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    protected function checkOrder(Order $order) {
+        return $order;
+    }
+
+    public function payCreditCard(User $user, $source, array $data) {
+        if (array_key_exists("order_id", $data)) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                $order = $this->checkOrder($order);
+                if ($order) {
+                    $className = "App\\Services\\" . $source;
+                    $gateway = new $className; //// <--- this thing will be autoloaded
+                    return $gateway->payCreditCard($user, $data, $order);
+                }
+            }
+        }
+        return array("status" => "error", "message" => "Invalid order");
+    }
+
+    public function payDebitCard(User $user, $source, array $data) {
+        if (array_key_exists("order_id", $data)) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                $order = $this->checkOrder($order);
+                if ($order) {
+                    $className = "App\\Services\\" . $source;
+                    $gateway = new $className; //// <--- this thing will be autoloaded
+                    return $gateway->payDebitCard($user, $data);
+                }
+            }
+        }
+        return array("status" => "error", "message" => "Invalid order");
+    }
+
+    public function payCash(User $user, $source, array $data) {
+        if (array_key_exists("order_id", $data)) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                $order = $this->checkOrder($order);
+                if ($order) {
+                    $className = "App\\Services\\" . $source;
+                    $gateway = new $className; //// <--- this thing will be autoloaded
+                    return $gateway->payCreditCard($user, $data);
+                }
+            }
+        }
+        return array("status" => "error", "message" => "Invalid order");
     }
 
 }

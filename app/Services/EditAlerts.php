@@ -64,9 +64,9 @@ class EditAlerts {
         return ['success' => 'notifications updated'];
     }
 
-    public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date) {
-        $arrayPushAndroid = array();
-        $arrayPushIos = array();
+    public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date, $platform = NULL) {
+        $arrayPushHife = array();
+        $arrayPushFood = array();
         $arrayEmail = array();
         $arrayContent = array();
         $notification = null;
@@ -137,11 +137,18 @@ class EditAlerts {
                     }
 
                     if ($user->pushNotifications && $push) {
-
-                        if ($user->platform == "android") {
-                            array_push($arrayPushAndroid, $user->token);
-                        } else if ($user->platform == "ios") {
-                            array_push($arrayPushIos, $user->token);
+                        if ($platform) {
+                            
+                        } else {
+                            $platform = "hife";
+                        }
+                        $result = $user->push()->where('platform', $platform)->get();
+                        if ($result) {
+                            if($result->platform == "hife"){
+                                array_push($arrayPushHife, $result->object_id);
+                            } else if($result->platform == "food"){
+                                array_push($arrayPushFood, $result->object_id);
+                            } 
                         }
                     }
                 }
@@ -157,11 +164,11 @@ class EditAlerts {
                 } else {
                     $data['name'] = "Gohife";
                 }
-                if (count($arrayPushAndroid) > 0) {
-                    $this->sendMessage($data, $arrayPushAndroid, $arrayEmail, 'android');
+                if (count($arrayPushHife) > 0) {
+                    $this->sendMessage($data, $arrayPushHife, $arrayEmail, 'hife');
                 }
-                if (count($arrayPushIos) > 0) {
-                    $this->sendMessage($data, $arrayPushIos, $arrayEmail, 'ios');
+                if (count($arrayPushFood) > 0) {
+                    $this->sendMessage($data, $arrayPushFood, $arrayEmail, 'food');
                 }
             }
         }
@@ -455,7 +462,7 @@ class EditAlerts {
                 "en" => $msg['subject'],
                 "es" => $msg['subject_es']
             );
-            if ($platform == "gohife") {
+            if ($platform == "hife") {
                 $fields = array(
                     'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
                     'include_player_ids' => $userPush,

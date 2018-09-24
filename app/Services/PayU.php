@@ -19,8 +19,6 @@ use App\Models\Transaction;
 
 class PayU {
 
-    
-
     private function populateOrderContent(Order $order) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
@@ -43,7 +41,7 @@ class PayU {
         return $orderCont;
     }
 
-    private function populateBilling(array $data) {
+    private function populateBuyer(User $user, array $data) {
         $validator = $this->validatorBilling($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -59,10 +57,10 @@ class PayU {
         ];
         $buyer = [
             "merchantBuyerId" => "1",
-            "fullName" => $data['buyer_name'],
-            "emailAddress" => $data['buyer_email'],
-            "contactPhone" => $data['buyer_phone'],
-            "dniNumber" => $data['buyer_id'],
+            "fullName" => $user->firstName,
+            "emailAddress" => $user->email,
+            "contactPhone" => $user->cellphone,
+            "dniNumber" => $user->docNum,
             "shippingAddress" => $buyerAddress
         ];
         return $buyer;
@@ -117,15 +115,12 @@ class PayU {
         return $payer;
     }
 
-    private function populateBillingSimple(array $data) {
-        $validator = $this->validatorBillingSimple($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+    private function populateBuyerSimple(User $user) {
         $buyer = [
-            "fullName" => $data['buyer_name'],
-            "emailAddress" => $data['buyer_email'],
-            "contactPhone" => $data['buyer_phone'],
+            "fullName" => $user->firstName + " " + $user->lastName,
+            "emailAddress" => $user->email,
+            "contactPhone" => $user->cellphone,
+            "dniNumber" => $user->docNum,
         ];
         return $buyer;
     }
@@ -182,9 +177,9 @@ class PayU {
         ];
         return $additionalValuesCont;
     }
-    
+
     public function payCreditCard(User $user, array $data, Order $order) {
-        $buyer = $this->populateBilling($data);
+        $buyer = $this->populateBuyer($user, $data);
         $ShippingAddress = $this->populateShipping($data);
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
@@ -223,7 +218,7 @@ class PayU {
     }
 
     public function useSource(User $user, array $data, Order $order) {
-        $buyer = $this->populateBilling($data);
+        $buyer = $this->populateBuyer($user, $data);
         $ShippingAddress = $this->populateShipping($data);
         $payer = $this->populatePayer($data);
         $validator = $this->validatorUseSource($data);
@@ -268,11 +263,9 @@ class PayU {
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
-    
-
-    public function payDebitCard(User $user,array $data, Order $order) {
+    public function payDebitCard(User $user, array $data, Order $order) {
         $payer = $this->populatePayerSimple($data);
-        $buyer = $this->populateBillingSimple($data);
+        $buyer = $this->populateBuyerSimple($user);
         $validator = $this->validatorDebit($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -290,8 +283,8 @@ class PayU {
             "PSE_REFERENCE1" => $data['ip_address'],
             "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
             "USER_TYPE" => $data['user_type'],
-            "PSE_REFERENCE2" => $data['pse_reference2'],
-            "PSE_REFERENCE3" => $data['pse_reference3']
+            "PSE_REFERENCE2" => $data['doc_type'],
+            "PSE_REFERENCE3" => $data['payer_id']
         ];
         $transaction = [
             "order" => $orderCont,
@@ -317,14 +310,14 @@ class PayU {
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
-    public function payCash(array $data, Order $order) {
+    public function payCash(User $user, array $data, Order $order) {
         $validator = $this->validatorCash($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $additionalValuesCont = $this->populateTotals($order, "COP");
         $merchant = $this->populateMerchant();
-        $buyer = $this->populateBillingSimple($data);
+        $buyer = $this->populateBuyerSimple($user);
         $orderCont = $this->populateOrderContent($order);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
@@ -348,7 +341,7 @@ class PayU {
         ];
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
-    
+
     public function makeCharge(User $user, Order $order, array $payload) {
         $method = 'pay' . studly_case(str_replace('.', '_', $payload['type']));
         if (method_exists($this, $method)) {
@@ -1297,7 +1290,6 @@ class PayU {
         }
     }
 
-
     /**
      * Get a validator for an incoming registration request.
      *
@@ -1308,9 +1300,7 @@ class PayU {
         return Validator::make($data, [
                     'financial_institution_code' => 'required|max:255',
                     'user_type' => 'required|max:255',
-                    'pse_reference2' => 'required|max:255',
-                    'pse_reference3' => 'required|max:255',
-                    'payer_email' => 'required|email|max:255',
+                    'doc_type' => 'required|max:255',
         ]);
     }
 
@@ -1420,25 +1410,6 @@ class PayU {
                     'buyer_state' => 'required|max:255',
                     'buyer_country' => 'required|max:255',
                     'buyer_postal' => 'required|max:255',
-                    'buyer_phone' => 'required|max:255',
-                    'buyer_name' => 'required|max:255',
-                    'buyer_email' => 'required|max:255',
-                    'buyer_id' => 'required|max:255'
-                        ]
-        );
-    }
-
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorBillingSimple(array $data) {
-        return Validator::make($data, [
-                    'buyer_phone' => 'required|max:255',
-                    'buyer_name' => 'required|max:255',
-                    'buyer_email' => 'required|max:255',
                         ]
         );
     }
@@ -1493,6 +1464,7 @@ class PayU {
                     'payer_phone' => 'required|max:255',
                     'payer_name' => 'required|max:255',
                     'payer_email' => 'required|max:255',
+                    'payer_id' => 'required|max:255',
                         ]
         );
     }

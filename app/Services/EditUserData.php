@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Medical;
 use App\Models\Address;
+use App\Models\Push;
 use DB;
 use Validator;
 use App\Models\Region;
@@ -113,7 +114,6 @@ class EditUserData {
     public function validatorAddress(array $data) {
         return Validator::make($data, [
                     'name' => 'required|max:255',
-                    'city' => 'required|max:255',
                     'address' => 'required|max:255',
                     'city_id' => 'required|max:255',
                     'region_id' => 'required|max:255',
@@ -354,9 +354,9 @@ class EditUserData {
             }
         }
         if (count($updates) > 0) {
-            DB::table('contacts')->whereIn('id',$updates)->update(["level"=>"normal"]);
+            DB::table('contacts')->whereIn('id', $updates)->update(["level" => "normal"]);
         }
-        $lastId = 0 ;
+        $lastId = 0;
         if (count($imports) > 0) {
             $notification = [
                 "trigger_id" => $user->id,
@@ -367,7 +367,7 @@ class EditUserData {
                 "sign" => true,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true,null);
+            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true, null);
             DB::table('contacts')->insert($imports);
             $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
         }
@@ -399,7 +399,7 @@ class EditUserData {
     public function blockContact(User $user, $contactId) {
         $contact = User::find($contactId);
         if ($contact) {
-            $this->editAlerts->deleteObjectNotifs($user, $contactId,"User");
+            $this->editAlerts->deleteObjectNotifs($user, $contactId, "User");
             $count = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->count();
             if ($count == 0) {
                 DB::table('contacts')->insert(array(
@@ -506,10 +506,19 @@ class EditUserData {
      */
     public function registerToken(User $user, array $data) {
         if (array_key_exists("platform", $data) && array_key_exists("token", $data)) {
-            $user->platform = $data['platform'];
-            $user->token = $data['token'];
-            $user->pushNotifications = 1;
-            $user->save();
+            $result = $user->push()->where('platform', $data['platform'])->first();
+            if ($result) {
+                $result->object_id = $data['token'];
+                $result->save();
+            } else {
+                Push::create([
+                    "user_id" => $user->id,
+                    "platform" => $data['platform'],
+                    "object_id" => $data['token']
+                ]);
+                $user->pushNotifications = 1;
+                $user->save();
+            }
             return array("status" => "success", "message" => "User Gcm Token Registered");
         }
         return array("status" => "error", "message" => "Bad request");
@@ -519,13 +528,14 @@ class EditUserData {
         if ($data["address_id"]) {
             $addressid = $data['address_id'];
             unset($data['address_id']);
+            $city = City::find($data['city_id']);
+            $data['city'] = $city->name;
             Address::where('user_id', $user->id)
                     ->where('id', $addressid)->update($data);
             $address = Address::find($addressid);
             if ($address) {
                 $region = Region::find($address->region_id);
                 $country = Country::find($address->country_id);
-                $city = City::find($address->city_id);
                 if ($city) {
                     $address->cityName = $city->name;
                 }
@@ -538,11 +548,12 @@ class EditUserData {
                 return array("status" => "success", "message" => "address updated", "address" => $address);
             }
         } else {
+            $city = City::find($data['city_id']);
+            $data['city'] = $city->name;
             $address = new Address($data);
             $user->addresses()->save($address);
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);
-            $city = City::find($address->city_id);
             if ($city) {
                 $address->cityName = $city->name;
             }
@@ -607,7 +618,7 @@ class EditUserData {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $recipients = array($contact);
-                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true,null);
+                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true, null);
                 return $contact;
             }
             return $contact;
@@ -616,7 +627,7 @@ class EditUserData {
     }
 
     public function deleteContact(User $user, $contactId) {
-        $this->editAlerts->deleteObjectNotifs($user, $contactId,"User");
+        $this->editAlerts->deleteObjectNotifs($user, $contactId, "User");
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)
@@ -633,8 +644,13 @@ class EditUserData {
                         ->first();
     }
 
-    public function getAddresses(User $user) {
-        $addresses = $user->addresses;
+    public function getAddresses(User $user,$type = null) {
+        if($type){
+            $addresses = $user->addresses()->where("type",$type)->get();
+        } else {
+            $addresses = $user->addresses;
+        }
+        
         foreach ($addresses as $address) {
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);
