@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\EditGroup;
+use App\Services\EditOrder;
 
 class EditBilling {
 
@@ -16,6 +17,12 @@ class EditBilling {
      *
      */
     protected $editGroup;
+    
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $editOrder;
 
     /**
      * Create a new class instance.
@@ -23,8 +30,9 @@ class EditBilling {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditGroup $editGroup) {
+    public function __construct(EditGroup $editGroup,EditOrder $editOrder) {
         $this->editGroup = $editGroup;
+        $this->editOrder = $editOrder;
     }
 
     public function processModel(User $user, array $data) {
@@ -322,6 +330,16 @@ class EditBilling {
     protected function checkOrder(Order $order) {
         return $order;
     }
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    protected function prepareOrder(Order $order) {
+        $order->status = "in_gateway";
+        $order = $this->editOrder->prepareOrder($order);
+        return $order;
+    }
 
     public function payCreditCard(User $user, $source, array $data) {
         if (array_key_exists("order_id", $data)) {
@@ -329,7 +347,7 @@ class EditBilling {
             if ($order) {
                 $order = $this->checkOrder($order);
                 if ($order) {
-                    
+                    $order = $this->prepareOrder($order);
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
                     $result = $gateway->payCreditCard($user, $data, $order);
@@ -346,6 +364,7 @@ class EditBilling {
             if ($order) {
                 $order = $this->checkOrder($order);
                 if ($order) {
+                    $order = $this->prepareOrder($order);
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
                     return $gateway->payDebitCard($user, $data,$order);
@@ -361,6 +380,7 @@ class EditBilling {
             if ($order) {
                 $order = $this->checkOrder($order);
                 if ($order) {
+                    $order = $this->prepareOrder($order);
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
                     return $gateway->payCash($user, $data,$order);

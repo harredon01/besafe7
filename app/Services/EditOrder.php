@@ -79,8 +79,8 @@ class EditOrder {
         }
     }
 
-    public function prepareOrder(User $user) {
-        $order = $this->getOrder($user);
+    public function prepareOrder(Order $order) {
+        
         $data = $this->editCart->getCheckoutCart();
         //$this->addItemsOrder($user, $order);
 
@@ -327,6 +327,8 @@ class EditOrder {
                     
                 }
             }
+            $order->status="approved";
+            $order->save();
         }
         return array("status" => "error", "message" => "Address does not exist");
     }

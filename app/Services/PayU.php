@@ -1023,12 +1023,13 @@ class PayU {
                 $transaction = Transaction::create($transactionResponse);
                 if ($transactionResponse['state'] == 'APPROVED') {
                     dispatch(new ApproveOrder($order));
-                } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new DenyOrder($order));
-                } else {
+                } else if ($transactionResponse['state'] == 'PENDING' ) {
                     dispatch(new PendingOrder($order));
+                } else {
+                    dispatch(new DenyOrder($order));
+                    
                 }
-                return ["status" => "success", "transaction" => $transaction, "response" => $response];
+                return ["status" => "success", "transaction" => $transaction, "response" => $response,"message"=>$transactionResponse['responseCode']];
             } 
         }
         return $response;
@@ -1142,23 +1143,35 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function checkOrders() {
-//        $transactions = Transaction::where("state", "pending")->get();
-//        foreach ($transactions as $transaction) {
-//            $response = $this->getStatusOrderId($transaction->orderId);
-//            if ($response['code'] == "SUCCESS") {
-//                $result = $response['result'];
-//                $payload = $result['payload'];
-//                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
-//                $order = $transaction->order;
-//                if ($transactionResponse['state'] == 'APPROVED') {
-//                    dispatch(new ApproveOrder($order));
-//                } else if ($transactionResponse['state'] == 'PENDING') {
-//                    continue;
-//                } else {
-//                    dispatch(new DenyOrder($order));
-//                }
-//            }
-//        }
+        $orders = Order::where("status", "in_gateway")->get();
+        foreach ($orders as $order) {
+            $response = $this->getStatusOrderId($order->id);
+            if ($response['code'] == "SUCCESS") {
+                $result = $response['result'];
+                $payload = $result['payload'];
+                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
+                $transactionResponse['order_id'] = $order->id;
+                $transactionResponse['referenceCode'] = $order->referenceCode;
+                $transactionResponse['gateway'] = 'payu';
+                /* if (array_key_exists("extras", $transactionResponse)) {
+                  $extras = $transactionResponse['extras'];
+                  unset($transactionResponse['extras']);
+                  $transactionResponse['extras'] = json_encode($extras);
+                  } */
+                
+                if ($transactionResponse['state'] == 'APPROVED') {
+                    $transaction = Transaction::create($transactionResponse);
+                    dispatch(new ApproveOrder($order));
+                } else if ($transactionResponse['state'] == 'PENDING' ) {
+                    dispatch(new PendingOrder($order));
+                } else {
+                    $transaction = Transaction::create($transactionResponse);
+                    dispatch(new DenyOrder($order));
+                    
+                }
+                //return ["status" => "success", "transaction" => $transaction, "response" => $response];
+            }
+        }
     }
 
     /**
