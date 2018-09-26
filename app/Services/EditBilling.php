@@ -329,9 +329,11 @@ class EditBilling {
             if ($order) {
                 $order = $this->checkOrder($order);
                 if ($order) {
+                    
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
-                    return $gateway->payCreditCard($user, $data, $order);
+                    $result = $gateway->payCreditCard($user, $data, $order);
+                    return $result;
                 }
             }
         }
@@ -346,7 +348,7 @@ class EditBilling {
                 if ($order) {
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
-                    return $gateway->payDebitCard($user, $data);
+                    return $gateway->payDebitCard($user, $data,$order);
                 }
             }
         }
@@ -361,7 +363,7 @@ class EditBilling {
                 if ($order) {
                     $className = "App\\Services\\" . $source;
                     $gateway = new $className; //// <--- this thing will be autoloaded
-                    return $gateway->payCreditCard($user, $data);
+                    return $gateway->payCash($user, $data,$order);
                 }
             }
         }

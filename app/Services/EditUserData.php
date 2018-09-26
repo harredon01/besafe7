@@ -657,6 +657,7 @@ class EditUserData {
             $city = City::find($address->city_id);
             $address->cityName = $city->name;
             $address->countryName = $country->name;
+            $address->countryCode = $country->code;
             $address->regionName = $region->name;
         }
         return $addresses;

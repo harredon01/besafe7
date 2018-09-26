@@ -22,7 +22,7 @@ class PayU {
     private function populateOrderContent(Order $order) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
-        $reference = "besafe_test_1_" . $order->id;
+        $reference = "besafe_test_rty_" . $order->id;
         $paymentTotal = $order->total;
         $order->referenceCode = $reference;
         $order->save();
@@ -42,10 +42,7 @@ class PayU {
     }
 
     private function populateBuyer(User $user, array $data) {
-        $validator = $this->validatorBilling($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+        
         $buyerAddress = [
             "street1" => $data['buyer_address'],
             "street2" => "",
@@ -57,7 +54,7 @@ class PayU {
         ];
         $buyer = [
             "merchantBuyerId" => "1",
-            "fullName" => $user->firstName,
+            "fullName" => $user->firstName . " " .$user->lastName,
             "emailAddress" => $user->email,
             "contactPhone" => $user->cellphone,
             "dniNumber" => $user->docNum,
@@ -77,10 +74,7 @@ class PayU {
     }
 
     private function populatePayer(array $data) {
-        $validator = $this->validatorPayer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+        
         $payerAddress = [
             "street1" => $data['payer_address'],
             "street2" => "",
@@ -96,16 +90,14 @@ class PayU {
             "emailAddress" => $data['payer_email'],
             "contactPhone" => $data['payer_phone'],
             "dniNumber" => $data['payer_id'],
+            "dniType" => "CC",
             "billingAddress" => $payerAddress
         ];
         return $payer;
     }
 
     private function populatePayerSimple(array $data) {
-        $validator = $this->validatorPayerSimple($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+        
         $payer = [
             "merchantPayerId" => "1",
             "fullName" => $data['payer_name'],
@@ -126,10 +118,6 @@ class PayU {
     }
 
     private function populateShipping(array $data) {
-        $validator = $this->validatorShipping($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
         $ShippingAddress = [
             "street1" => $data['shipping_address'],
             "street2" => "",
@@ -143,10 +131,7 @@ class PayU {
     }
 
     private function populateCC(array $data) {
-        $validator = $this->validatorCC($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
+        
         $creditCard = [
             "number" => $data['cc_number'],
             "securityCode" => $data['cc_security_code'],
@@ -179,6 +164,22 @@ class PayU {
     }
 
     public function payCreditCard(User $user, array $data, Order $order) {
+        
+        $validator = $this->validatorBuyer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorPayer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorShipping($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }$validator = $this->validatorCC($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
         $buyer = $this->populateBuyer($user, $data);
         $ShippingAddress = $this->populateShipping($data);
         $payer = $this->populatePayer($data);
@@ -193,6 +194,7 @@ class PayU {
             "INSTALLMENTS_NUMBER" => 1
         ];
         $deviceSessionId = md5(session_id() . microtime());
+        $cookie = md5($deviceSessionId);
         $transaction = [
             "order" => $orderCont,
             "payer" => $payer,
@@ -203,7 +205,7 @@ class PayU {
             "paymentCountry" => $data['payer_country'],
             "deviceSessionId" => $deviceSessionId,
             "ipAddress" => $data['ip_address'],
-            "cookie" => $data['cookie'],
+            "cookie" => $cookie,
             "userAgent" => $data['user_agent']
         ];
         $dataSent = [
@@ -211,13 +213,25 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => false,
+            "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
     public function useSource(User $user, array $data, Order $order) {
+        $validator = $this->validatorBuyer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorPayer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorShipping($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
         $buyer = $this->populateBuyer($user, $data);
         $ShippingAddress = $this->populateShipping($data);
         $payer = $this->populatePayer($data);
@@ -264,6 +278,11 @@ class PayU {
     }
 
     public function payDebitCard(User $user, array $data, Order $order) {
+        
+        $validator = $this->validatorPayerSimple($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
         $payer = $this->populatePayerSimple($data);
         $buyer = $this->populateBuyerSimple($user);
         $validator = $this->validatorDebit($data);
@@ -292,7 +311,7 @@ class PayU {
             "extraParameters" => $extraParams,
             "type" => "AUTHORIZATION_AND_CAPTURE",
             "paymentMethod" => "PSE",
-            "paymentCountry" => $data['payer_country'],
+            "paymentCountry" => "CO",
             "deviceSessionId" => $deviceSessionId,
             "ipAddress" => $data['ip_address'],
             "cookie" => $data['cookie'],
@@ -315,6 +334,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
+        
         $additionalValuesCont = $this->populateTotals($order, "COP");
         $merchant = $this->populateMerchant();
         $buyer = $this->populateBuyerSimple($user);
@@ -1009,10 +1029,9 @@ class PayU {
                     dispatch(new PendingOrder($order));
                 }
                 return ["status" => "success", "transaction" => $transaction, "response" => $response];
-            } else {
-                return $response;
-            }
+            } 
         }
+        return $response;
     }
 
     public function sendRequest(array $data, $query) {
@@ -1024,7 +1043,8 @@ class PayU {
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
             'Content-Type: application/json; charset=utf-8',
             'Content-Length: ' . strlen($data_string),
-            'Accept: application/json')
+            'Accept: application/json'
+            )
         );
         $response = curl_exec($curl);
         curl_close($curl);
@@ -1403,7 +1423,7 @@ class PayU {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorBilling(array $data) {
+    public function validatorBuyer(array $data) {
         return Validator::make($data, [
                     'buyer_address' => 'required|max:255',
                     'buyer_city' => 'required|max:255',
