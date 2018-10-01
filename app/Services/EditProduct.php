@@ -108,12 +108,12 @@ $data = [];
                                 }
                             }
                             $data['products_variants'] = $variants;
-                            $data['products_variants'] = DB::table('products')
+                            $data['products_variants'] = DB::table('products')->groupBy('products.id')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                                     ->whereIn('products.id', $products)
                                     ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
                                     ->get();
-                            $data['products_files'] = DB::table('products')
+                            $data['products_files'] = DB::table('products')->groupBy('products.id')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
                                     ->whereIn('files.trigger_id', $products)
                                     ->where('files.type', "Product")

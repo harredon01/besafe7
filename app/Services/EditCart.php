@@ -328,6 +328,7 @@ class EditCart {
                 $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
+                        
                         $conditions = $productVariant->conditions()->where('status', 'active')->get();
                         $applyConditions = array();
                         foreach ($conditions as $condition) {
@@ -339,6 +340,7 @@ class EditCart {
                             array_push($applyConditions, $itemCondition);
                         }
                         $product = $productVariant->product;
+                        $itemName = $product->name ." ".$productVariant->description;
                         $conditions = $product->conditions()->where('status', true)->get();
                         foreach ($conditions as $condition) {
                             $itemCondition = new CartCondition(array(
