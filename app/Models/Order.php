@@ -18,7 +18,7 @@ class Order extends Model {
      *
      * @var array
      */
-    protected $fillable = ['status', 'owner_status', 'merchant_status', 'payment_status', 'execution_status', 'subtotal', 'shipping', 'discount', 'tax', 'total', 'comments', 'total', 'user_id', 'supplier_id','is_editable', 'is_digital', 'is_shippable', 'requires_authorization', 'referenceCode', 'extras'];
+    protected $fillable = ['status', 'owner_status', 'merchant_status', 'payment_status','attributes','execution_status', 'subtotal', 'shipping', 'discount', 'tax', 'total', 'comments', 'total', 'user_id', 'supplier_id','is_editable', 'is_digital', 'is_shippable', 'requires_authorization', 'referenceCode', 'extras'];
     protected $hidden = ['user_id', 'supplier_id', 'object_id', 'type'];
 
     public function user() {
@@ -40,17 +40,19 @@ class Order extends Model {
     public function orderAddresses() {
         return $this->hasMany('App\Models\OrderAddress');
     }
+    public function orderConditions() {
+        return $this->hasMany('App\Models\OrderCondition');
+    }
 
     public function subscriptions() {
         return $this->hasMany('App\Models\Subscription');
     }
+    public function payments() {
+        return $this->hasMany('App\Models\Payment');
+    }
 
     public function paymentMethod() {
         return $this->belongsTo('App\Models\PaymentMethod');
-    }
-
-    public function conditions() {
-        return $this->belongsToMany('App\Models\Condition', 'condition_order', 'order_id', 'condition_id');
     }
 
 }

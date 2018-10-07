@@ -106,6 +106,16 @@ class UserApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editUserData->registerToken($user, $request->all()));
     }
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkUserCredits(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->checkUserCredits($user, $request->all()));
+    }
 
     /**
      * Handle a registration request for the application.
@@ -221,6 +231,23 @@ class UserApiController extends Controller {
                     "last_page" => $result->lastPage(),
         ]);
     }
+    /**
+     * Get Registered addresses.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getContactByEmail($email) {
+        $request2 = Request::create("?email=" . $email . "*&limit=3", 'GET');
+        $queryBuilder = new ContactQueryBuilder(new User, $request2);
+        $result = $queryBuilder->build()->paginate();
+        return response()->json([
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+        ]);
+    }
 
     /**
      * Get Registered addresses.
@@ -265,6 +292,7 @@ class UserApiController extends Controller {
         $count = Medical::where('user_id', $user->id)->count();
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
+        $data['push'] = $user->push;
         $data['count'] = $count;
         $data['green'] = $green;
         //$data['followers'] = count($users2);

@@ -17,7 +17,7 @@ class EditBilling {
      *
      */
     protected $editGroup;
-    
+
     /**
      * The EditAlert implementation.
      *
@@ -30,7 +30,7 @@ class EditBilling {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditGroup $editGroup,EditOrder $editOrder) {
+    public function __construct(EditGroup $editGroup, EditOrder $editOrder) {
         $this->editGroup = $editGroup;
         $this->editOrder = $editOrder;
     }
@@ -322,69 +322,53 @@ class EditBilling {
         return 'There was a problem editing your group';
     }
 
-    /**
-     * Get the failed login message.
-     *
-     * @return string
-     */
-    protected function checkOrder(Order $order) {
-        return $order;
-    }
-    /**
-     * Get the failed login message.
-     *
-     * @return string
-     */
-    protected function prepareOrder(Order $order) {
-        $order->status = "in_gateway";
-        $order = $this->editOrder->prepareOrder($order);
-        return $order;
-    }
-
     public function payCreditCard(User $user, $source, array $data) {
-        if (array_key_exists("order_id", $data)) {
-            $order = Order::find($data['order_id']);
-            if ($order) {
-                $order = $this->checkOrder($order);
-                if ($order) {
-                    $order = $this->prepareOrder($order);
-                    $className = "App\\Services\\" . $source;
-                    $gateway = new $className; //// <--- this thing will be autoloaded
-                    $result = $gateway->payCreditCard($user, $data, $order);
-                    return $result;
-                }
+        if (array_key_exists("payment_id", $data)) {
+            $payment = Payment::find($data['payment_id']);
+            if ($payment) {
+                $this->changeOrderStatus($payment->order_id);
+                $className = "App\\Services\\" . $source;
+                $gateway = new $className; //// <--- this thing will be autoloaded
+                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
+                return $gateway->payCreditCard($user, $data, $payment);
             }
         }
         return array("status" => "error", "message" => "Invalid order");
     }
 
+    private function changeOrderStatus($order_id) {
+        $order = Order::find($order_id);
+        if ($order) {
+            if ($order->status == "pending") {
+                $order->status = "payment_created";
+                $order->save();
+            }
+        }
+    }
+
     public function payDebitCard(User $user, $source, array $data) {
-        if (array_key_exists("order_id", $data)) {
-            $order = Order::find($data['order_id']);
-            if ($order) {
-                $order = $this->checkOrder($order);
-                if ($order) {
-                    $order = $this->prepareOrder($order);
-                    $className = "App\\Services\\" . $source;
-                    $gateway = new $className; //// <--- this thing will be autoloaded
-                    return $gateway->payDebitCard($user, $data,$order);
-                }
+        if (array_key_exists("payment_id", $data)) {
+            $payment = Payment::find($data['payment_id']);
+            if ($payment) {
+                $this->changeOrderStatus($payment->order_id);
+                $className = "App\\Services\\" . $source;
+                $gateway = new $className; //// <--- this thing will be autoloaded
+                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
+                return $gateway->payDebitCard($user, $data, $payment);
             }
         }
         return array("status" => "error", "message" => "Invalid order");
     }
 
     public function payCash(User $user, $source, array $data) {
-        if (array_key_exists("order_id", $data)) {
-            $order = Order::find($data['order_id']);
-            if ($order) {
-                $order = $this->checkOrder($order);
-                if ($order) {
-                    $order = $this->prepareOrder($order);
-                    $className = "App\\Services\\" . $source;
-                    $gateway = new $className; //// <--- this thing will be autoloaded
-                    return $gateway->payCash($user, $data,$order);
-                }
+        if (array_key_exists("payment_id", $data)) {
+            $payment = Payment::find($data['payment_id']);
+            if ($payment) {
+                $this->changeOrderStatus($payment->order_id);
+                $className = "App\\Services\\" . $source;
+                $gateway = new $className; //// <--- this thing will be autoloaded
+                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
+                return $gateway->payCash($user, $data, $payment);
             }
         }
         return array("status" => "error", "message" => "Invalid order");

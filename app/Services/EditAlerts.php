@@ -142,7 +142,7 @@ class EditAlerts {
                         } else {
                             $platform = "hife";
                         }
-                        $result = $user->push()->where('platform', $platform)->get();
+                        $result = $user->push()->where('platform', $platform)->first();
                         if ($result) {
                             if($result->platform == "hife"){
                                 array_push($arrayPushHife, $result->object_id);

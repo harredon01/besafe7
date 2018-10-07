@@ -20,10 +20,9 @@ class AddColumnsToPayments extends Migration
             $table->integer('order_id')->unsigned()->nullable();
             $table->foreign('order_id')->references('id')
                                 ->on('orders');
-            $table->integer('payer_id')->unsigned()->nullable();
-            $table->index('payer_id');
-            $table->integer('buyer_id')->unsigned()->nullable();
-            $table->index('buyer_id');
+            $table->integer('address_id')->unsigned()->nullable();
+            $table->foreign('address_id')->references('id')
+                                ->on('addresses');
             $table->string('status');
             $table->string('referenceCode');
             $table->string('transactionId');

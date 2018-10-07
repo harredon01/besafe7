@@ -4,9 +4,9 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Order;
-use App\Models\Transaction;
+use App\Models\OrderCondition;
 use App\Models\OrderAddress;
-use App\Models\OrderPayment;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Condition;
@@ -15,12 +15,18 @@ use App\Models\Address;
 use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\Stripe;
+use App\Services\EditAlerts;
 use Mail;
 use Darryldecode\Cart\CartCondition;
 use Cart;
 use DB;
 
 class EditOrder {
+
+    const OBJECT_ORDER = 'Order';
+    const OBJECT_ORDER_REQUEST = 'OrderRequest';
+    const ORDER_PAYMENT = 'order_payment';
+    const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
     /**
      * The Auth implementation.
@@ -49,13 +55,21 @@ class EditOrder {
     protected $stripe;
 
     /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $editAlerts;
+
+    /**
      * Create a new class instance.
      *
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart) {
+    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, EditAlerts $editAlerts) {
         $this->payU = $payU;
+        $this->editAlerts = $editAlerts;
         $this->stripe = $stripe;
         $this->editCart = $editCart;
     }
@@ -79,23 +93,47 @@ class EditOrder {
         }
     }
 
-    public function prepareOrder(Order $order) {
-        
-        $data = $this->editCart->getCheckoutCart();
-        //$this->addItemsOrder($user, $order);
+    public function addItemsToOrder(User $user, Order $order) {
+        Item::where('user_id', $user->id)
+                ->whereNull('order_id')
+                ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
+        $cartConditions = Cart::session($user->id)->getConditions();
+        $resultConditions = [];
+        $order->orderConditions()->delete();
+        $cart = $this->editCart->getCart($user);
+        foreach ($cartConditions as $condition) {
+            $cond = array();
+            $cond['target'] = $condition->getTarget(); // the target of which the condition was applied
+            $cond['name'] = $condition->getName(); // the name of the condition
+            $cond['type'] = $condition->getType(); // the type
+            $cond['value'] = $condition->getValue(); // the value of the condition
+            $cond['order'] = $condition->getOrder(); // the order of the condition
+            $cond['attributes'] = json_encode($condition->getAttributes()); // the attributes of the condition, returns an empty [] if no attributes added
+            $value = $condition->getCalculatedValue($cart['subtotal']);
+            $cond['order_id'] = $order->id; // the name of the condition
+            $cond['total'] = $value;
+            OrderCondition::insert($cond);
+        }
+    }
 
-        $order->is_shippable = $data['is_shippable'];
-        $order->is_subscription = $data['is_subscription'];
-        $order->requires_authorization = $data['requires_authorization'];
-        $order->subtotal = $data["subtotal"];
-        $order->tax = $data["tax"];
-        $order->shipping = $data["shipping"];
-        $order->discount = $data["discount"];
-        $order->total = $data["total"];
-        $order->save();
-        /* $className = "App\\Services\\" . $payment;
-          $gateway = new $className; //// <--- this thing will be autoloaded */
-        return $order;
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    public function prepareOrder(User $user, $platform, array $data) {
+        if (array_key_exists("order_id", $data)) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                $className = "App\\Services\\EditOrder" . ucfirst($platform);
+                $platFormService = new $className(); //// <--- this thing will be autoloaded
+                if($platFormService){
+                    $cart = $this->editCart->getCheckoutCart($user);
+                    return $platFormService->prepareOrder($user, $order, $platform, $data,$cart);
+                }
+                
+            }
+        }
     }
 
     public function processModel(array $data) {
@@ -121,25 +159,6 @@ class EditOrder {
      *
      * @return Response
      */
-    public function payOrder(User $user, array $data) {
-        $order = $this->getOrder($user);
-        Item::where('user_id', $user->id)
-                ->update(['order_id' => $order->id]);
-        $order->status = "holding";
-        if ($data['use_default']) {
-            
-        }
-
-
-        $order->save();
-        return array("status" => "error", "message" => "Empty Cart");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function setShippingAddress(User $user, $address) {
         $address = $address['address_id'];
         $theAddress = Address::find(intval($address));
@@ -153,7 +172,7 @@ class EditOrder {
                 $orderAddresses['type'] = "shipping";
                 $order->orderAddresses()->where('type', "shipping")->delete();
                 OrderAddress::insert($orderAddresses);
-                return array("status" => "success", "message" => "Address added to order", "order" =>$order);
+                return array("status" => "success", "message" => "Address added to order", "order" => $order);
             }
             return array("status" => "error", "message" => "Address does not belong to user");
         }
@@ -187,7 +206,7 @@ class EditOrder {
                 $this->setTaxesCondition($user, $data);
                 $order->orderAddresses()->where('type', "billing")->delete();
                 OrderAddress::insert($orderAddresses);
-                return array("status" => "success", "message" => "Billing Address added to order", "order" =>$order);
+                return array("status" => "success", "message" => "Billing Address added to order", "order" => $order);
             }
             return array("status" => "error", "message" => "Address does not belong to user");
         }
@@ -216,36 +235,10 @@ class EditOrder {
             $insertCondition = $theCondition->toArray();
             unset($insertCondition['id']);
             $insertCondition['order_id'] = $order->id;
-            $order->conditions()->where('type', "shipping")->delete();
-            Condition::insert($insertCondition);
+            $order->orderConditions()->where('type', "shipping")->delete();
+            OrderCondition::insert($insertCondition);
             Cart::session($user->id)->condition($condition);
-            return array("status" => "success", "message" => "Shipping condition set on the cart", "order" =>$order);
-        }
-        return array("status" => "error", "message" => "Address does not exist");
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    private function setHifeCondition(User $user, Order $order) {
-        Cart::session($user->id)->removeConditionsByType("misc");
-        $order->conditions()->wherePivot('type', "misc")->detach();
-        $theCondition = Condition::find(11);
-        if ($theCondition) {
-            $insertCondition = array(
-                'name' => $theCondition->name,
-                'type' => "misc",
-                'target' => $theCondition->target,
-                'value' => $theCondition->value,
-                'order' => $theCondition->order
-            );
-            $condition = new CartCondition($insertCondition);
-            $insertCondition['order_id'] = $order->id;
-            $insertCondition['condition_id'] = $theCondition->id;
-            Cart::session($user->id)->condition($condition);
-            DB::table('condition_order')->insert($insertCondition);
+            return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order);
         }
         return array("status" => "error", "message" => "Address does not exist");
     }
@@ -257,9 +250,8 @@ class EditOrder {
      */
     public function setTaxesCondition(User $user, array $data) {
         $order = $this->getOrder($user);
-        $this->setHifeCondition($user, $order);
         Cart::session($user->id)->removeConditionsByType("tax");
-        $order->conditions()->wherePivot('type', "tax")->detach();
+        $order->orderConditions()->where('type', "tax")->delete();
 
 
         if (array_key_exists("country_id", $data)) {
@@ -285,7 +277,7 @@ class EditOrder {
      * @return Response
      */
     public function loadOrderConditions(User $user, Order $order) {
-        $conditions = $order->conditions()->get();
+        $conditions = $order->orderConditions()->get();
         $applyConditions = array();
         foreach ($conditions as $condition) {
             $itemCondition = new CartCondition(array(
@@ -298,43 +290,10 @@ class EditOrder {
         }
     }
 
-    public function approveOrder(Order $order) {
-        $items = Cart::getContent();
-        $data = array();
-        $items = $order->items();
-        foreach ($items as $item) {
-            $data = json_decode($item->attributes);
-            if (array_key_exists("type", $data)) {
-                if ($data['type'] == "subscription") {
-                    $object = $data['object'];
-                    $id = $data['id'];
-                    $payer = $order->user_id;
-                    $interval = $data['interval'];
-                    $interval_type = $data['interval_type'];
-                    $date = date("Y-m-d");
-                    //increment 2 days
-                    $mod_date = strtotime($date . "+ " . $interval . " " . $interval_type);
-                    $newdate = date("Y-m-d", $mod_date);
-                    // add date to object
-                }
-            }
-            $attrs = json_decode($item->attributes, true);
-            if ($attrs) {
-                if (array_key_exists("model", $attrs)) {
-                    $class = "App\\Models\\" . $attrs["model"];
-                    $model = $class::where("id", $attrs['id']);
-                } else {
-                    
-                }
-            }
-            $order->status="approved";
-            $order->save();
-        }
-        return array("status" => "error", "message" => "Address does not exist");
-    }
-
-    public function denyOrder(Order $order) {
-        
+    public function approveOrder(Order $order, $platform) {
+        $className = "App\\Services\\EditOrder" . ucfirst($platform);
+        $platFormService = new $className; //// <--- this thing will be autoloaded
+        $platFormService->approveOrder($order, $platform);
     }
 
     public function submitOrder(Order $order) {
@@ -353,12 +312,12 @@ class EditOrder {
             // add single condition on a cart bases
             if ($theCondition->isReusable || (!$theCondition->isReusable && $theCondition->used < 1)) {
                 $order = $this->getOrder($user);
-                $theConditionApplied = $order->conditions()->wherePivot('condition_id', $theCondition->id)->first();
+                $theConditionApplied = $order->orderConditions()->where('condition_id', $theCondition->id)->first();
                 if ($theConditionApplied) {
                     //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
                 }
                 Cart::session($user->id)->removeConditionsByType("coupon");
-                $order->conditions()->wherePivot('type', "coupon")->detach();
+                $order->orderConditions()->where('type', "coupon")->delete();
                 $insertCondition = array(
                     'name' => $theCondition->name,
                     'type' => 'coupon',
@@ -372,7 +331,7 @@ class EditOrder {
                 $theCondition->save();
                 $insertCondition['order_id'] = $order->id;
                 $insertCondition['condition_id'] = $theCondition->id;
-                DB::table('condition_order')->insert($insertCondition);
+                OrderCondition::insert($insertCondition);
 
 
                 return array("status" => "success", "message" => "Cart condition set on the cart", "cart" => $this->editCart->getCheckoutCart($user));
@@ -399,10 +358,68 @@ class EditOrder {
             $condition = new CartCondition($insertCondition);
             $insertCondition['order_id'] = $order->id;
             $insertCondition['condition_id'] = $value->id;
-
+            OrderCondition::insert($insertCondition);
             Cart::session($user->id)->condition($condition);
+        }
+    }
 
-            DB::table('condition_order')->insert($insertCondition);
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    private function setOrderAttributes(User $user, $orderId, $attributes) {
+        $order = Order::find($orderId);
+        if ($order) {
+            if ($order->user_id == $user->id) {
+                $order->attributes = json_encode($attributes);
+                $order->save();
+            }
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    private function splitOrder(User $user, Order $order, $buyers, $platform) {
+        if ($order->user_id == $user->id) {
+            $totalBuyers = count($buyers) + 1;
+            $buyerSubtotal = $order->total / $totalBuyers;
+            $buyerTax = $order->tax / $totalBuyers;
+            $transactionCost = $buyerSubtotal * (0.0349) + 900;
+            $followers = array();
+            foreach ($buyers as $buyerItem) {
+                $buyer = User::find($buyerItem);
+                if ($buyer) {
+                    array_push($followers, $buyer);
+                    $payment = new Payment;
+                    $payment->user_id = $buyer->id;
+                    $payment->address_id = $order->address_id;
+                    $payment->order_id = $order->id;
+                    $payment->status = "pending";
+                    $payment->total = $buyerSubtotal + $transactionCost;
+                    $payment->tax = $buyerTax;
+                    $payment->save();
+                }
+            }
+            $payload = [
+                "order_id" => $order->id,
+                "first_name" => $user->firstName,
+                "last_name" => $user->lastName,
+            ];
+            $data = [
+                "trigger_id" => $user->id,
+                "message" => "",
+                "object" => self::OBJECT_ORDER,
+                "sign" => true,
+                "payload" => $payload,
+                "type" => self::ORDER_PAYMENT,
+                "user_status" => $user->getUserNotifStatus()
+            ];
+            $date = date("Y-m-d H:i:s");
+            return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, $platform);
         }
     }
 

@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use Validator;
-use App\Models\Country;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Order;
-use App\Models\Region;
+use App\Models\Address;
 use App\Models\City;
 use App\Models\Plan;
 use App\Jobs\ApproveOrder;
@@ -19,13 +19,13 @@ use App\Models\Transaction;
 
 class PayU {
 
-    private function populateOrderContent(Order $order) {
+    private function populatePaymentContent(Payment $payment) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
-        $reference = "besafe_test_rty_" . $order->id;
-        $paymentTotal = $order->total;
-        $order->referenceCode = $reference;
-        $order->save();
+        $reference = "besafe_test_payment_" . $payment->id . "_order_" . $payment->order_id;
+        $paymentTotal = $payment->total;
+        $payment->referenceCode = $reference;
+        $payment->save();
         $currency = "COP";
         $merchantId = env('PAYU_MERCHANT', "508029");
         $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($paymentTotal, 0, '.', '') . "~" . $currency;
@@ -42,7 +42,7 @@ class PayU {
     }
 
     private function populateBuyer(User $user, array $data) {
-        
+
         $buyerAddress = [
             "street1" => $data['buyer_address'],
             "street2" => "",
@@ -54,7 +54,7 @@ class PayU {
         ];
         $buyer = [
             "merchantBuyerId" => "1",
-            "fullName" => $user->firstName . " " .$user->lastName,
+            "fullName" => $user->firstName . " " . $user->lastName,
             "emailAddress" => $user->email,
             "contactPhone" => $user->cellphone,
             "dniNumber" => $user->docNum,
@@ -74,7 +74,7 @@ class PayU {
     }
 
     private function populatePayer(array $data) {
-        
+
         $payerAddress = [
             "street1" => $data['payer_address'],
             "street2" => "",
@@ -97,7 +97,7 @@ class PayU {
     }
 
     private function populatePayerSimple(array $data) {
-        
+
         $payer = [
             "merchantPayerId" => "1",
             "fullName" => $data['payer_name'],
@@ -130,8 +130,22 @@ class PayU {
         return $ShippingAddress;
     }
 
+    public function populateShippingFromAddress($addressId, array $data) {
+        $address = Address::find($addressId);
+        $region = Region::find($address->region_id);
+        $country = Country::find($address->country_id);
+        $city = City::find($address->city_id);
+        $data['shipping_address'] = $address->address;
+        $data['shipping_city'] = $city->name;
+        $data['shipping_state'] = $region->name;
+        $data['shipping_country'] = $country->code;
+        $data['shipping_postal'] = $address->postal;
+        $data['shipping_phone'] = $address->phone;
+        return $data;
+    }
+
     private function populateCC(array $data) {
-        
+
         $creditCard = [
             "number" => $data['cc_number'],
             "securityCode" => $data['cc_security_code'],
@@ -141,16 +155,16 @@ class PayU {
         return $creditCard;
     }
 
-    private function populateTotals(Order $order, $currency) {
+    private function populateTotals(Payment $payment, $currency) {
         $additionalValues = [
-            'value' => number_format($order->total, 2, '.', ''),
+            'value' => number_format($payment->total, 2, '.', ''),
             'currency' => $currency
         ];
         $additionalValuesTax = [
-            'value' => number_format($order->tax, 2, '.', ''),
+            'value' => number_format($payment->tax, 2, '.', ''),
             'currency' => $currency
         ];
-        $return = $order->total - $order->tax;
+        $return = $payment->total - $payment->tax;
         $additionalValuesReturnBase = [
             'value' => number_format($return, 2, '.', ''),
             'currency' => $currency
@@ -163,8 +177,8 @@ class PayU {
         return $additionalValuesCont;
     }
 
-    public function payCreditCard(User $user, array $data, Order $order) {
-        
+    public function payCreditCard(User $user, array $data, Payment $payment) {
+
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -185,8 +199,8 @@ class PayU {
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
         $merchant = $this->populateMerchant();
-        $orderCont = $this->populateOrderContent($order);
-        $additionalValuesCont = $this->populateTotals($order, "COP");
+        $orderCont = $this->populatePaymentContent($payment);
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
         $orderCont["shippingAddress"] = $ShippingAddress;
@@ -219,7 +233,7 @@ class PayU {
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
-    public function useSource(User $user, array $data, Order $order) {
+    public function useSource(User $user, array $data, Payment $payment) {
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -244,8 +258,8 @@ class PayU {
 
         $creditCardTokenId = $data['source'];
         $deviceSessionId = md5(session_id() . microtime());
-        $additionalValuesCont = $this->populateTotals($order, "COP");
-        $orderCont = $this->populateOrderContent($order);
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
+        $orderCont = $this->populatePaymentContent($payment);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
         $orderCont["shippingAddress"] = $ShippingAddress;
@@ -277,8 +291,8 @@ class PayU {
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
-    public function payDebitCard(User $user, array $data, Order $order) {
-        
+    public function payDebitCard(User $user, array $data, Payment $payment) {
+
         $validator = $this->validatorPayerSimple($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -291,8 +305,8 @@ class PayU {
         }
         $merchant = $this->populateMerchant();
         $deviceSessionId = md5(session_id() . microtime());
-        $additionalValuesCont = $this->populateTotals($order, "COP");
-        $orderCont = $this->populateOrderContent($order);
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
+        $orderCont = $this->populatePaymentContent($payment);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
 
@@ -329,16 +343,16 @@ class PayU {
         return $this->handleTransactionResponse($result, $user, $order);
     }
 
-    public function payCash(User $user, array $data, Order $order) {
+    public function payCash(User $user, array $data, Payment $payment) {
         $validator = $this->validatorCash($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        
-        $additionalValuesCont = $this->populateTotals($order, "COP");
+
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
         $merchant = $this->populateMerchant();
         $buyer = $this->populateBuyerSimple($user);
-        $orderCont = $this->populateOrderContent($order);
+        $orderCont = $this->populatePaymentContent($payment);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
         $date = date_create();
@@ -1023,14 +1037,13 @@ class PayU {
                 $transaction = Transaction::create($transactionResponse);
                 if ($transactionResponse['state'] == 'APPROVED') {
                     dispatch(new ApproveOrder($order));
-                } else if ($transactionResponse['state'] == 'PENDING' ) {
+                } else if ($transactionResponse['state'] == 'PENDING') {
                     dispatch(new PendingOrder($order));
                 } else {
                     dispatch(new DenyOrder($order));
-                    
                 }
-                return ["status" => "success", "transaction" => $transaction, "response" => $response,"message"=>$transactionResponse['responseCode']];
-            } 
+                return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
+            }
         }
         return $response;
     }
@@ -1045,7 +1058,7 @@ class PayU {
             'Content-Type: application/json; charset=utf-8',
             'Content-Length: ' . strlen($data_string),
             'Accept: application/json'
-            )
+                )
         );
         $response = curl_exec($curl);
         curl_close($curl);
@@ -1158,16 +1171,15 @@ class PayU {
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
-                
+
                 if ($transactionResponse['state'] == 'APPROVED') {
                     $transaction = Transaction::create($transactionResponse);
                     dispatch(new ApproveOrder($order));
-                } else if ($transactionResponse['state'] == 'PENDING' ) {
+                } else if ($transactionResponse['state'] == 'PENDING') {
                     dispatch(new PendingOrder($order));
                 } else {
                     $transaction = Transaction::create($transactionResponse);
                     dispatch(new DenyOrder($order));
-                    
                 }
                 //return ["status" => "success", "transaction" => $transaction, "response" => $response];
             }

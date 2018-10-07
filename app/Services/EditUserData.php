@@ -58,6 +58,19 @@ class EditUserData {
     }
 
     /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorCredits(array $data) {
+        return Validator::make($data, [
+                    'email' => 'required|max:255',
+                    'credits' => 'required|max:255'
+        ]);
+    }
+
+    /**
      * Create a new user instance after a valid registration.
      *
      * @param  array  $data
@@ -324,6 +337,32 @@ class EditUserData {
     public function getCodes(User $user) {
         $result = ["green" => $user->green, "red" => $user->red];
         return $result;
+    }
+
+    /**
+     * Update profile data.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function checkUserCredits(User $user, array $data) {
+        $validator = $this->validatorCredits($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $candidate = User::where("email", $data['email'])->get();
+        if (count($candidate)>0) {
+            $candidate = $candidate[0];
+            if ($candidate) {
+                $push = $candidate->push;
+                if ($push) {
+                    return ["result" => true, "user_id" => $candidate->id, "status" => "success", "credits" => $push->credits];
+                }
+                return ["result" => true, "user_id" => $candidate->id, "status" => "success", "credits" => 0];
+            }
+        }
+
+        return ["result" => false, "status" => "info"];
     }
 
     /**
@@ -644,13 +683,13 @@ class EditUserData {
                         ->first();
     }
 
-    public function getAddresses(User $user,$type = null) {
-        if($type){
-            $addresses = $user->addresses()->where("type",$type)->get();
+    public function getAddresses(User $user, $type = null) {
+        if ($type) {
+            $addresses = $user->addresses()->where("type", $type)->get();
         } else {
             $addresses = $user->addresses;
         }
-        
+
         foreach ($addresses as $address) {
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);

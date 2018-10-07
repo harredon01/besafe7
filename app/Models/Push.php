@@ -18,7 +18,7 @@ class Push extends Model
      *
      * @var array
      */
-    protected $fillable = ['id', 'user_id', 'platform', 'object_id'];
+    protected $fillable = ['id', 'user_id', 'platform', 'object_id','credits'];
     
     public function user() {
         return $this->belongsTo('App\Models\User');

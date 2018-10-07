@@ -27,8 +27,4 @@ class Condition extends Model {
         return $this->belongsTo('App\Models\ProductVariant');
     }
 
-    public function orders() {
-        return $this->belongsToMany('App\Models\Order','condition_order','condition_id','order_id');
-    }
-
 }

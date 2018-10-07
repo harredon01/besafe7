@@ -21,6 +21,7 @@ class CreateOrdersTable extends Migration {
                         $table->string('payment_status')->nullable();
                         $table->string('execution_status')->nullable();
                         $table->string('referenceCode');
+                        $table->text('attributes');
                         $table->string('comments')->nullable();
                         $table->double('subtotal', 15, 2);
                         $table->integer('object_id')->unsigned()->nullable();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditOrder;
+use App\Models\Order;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Services\CleanSearch;
 
@@ -60,9 +61,34 @@ class OrderApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function prepareOrder(Request $request) {
+    public function prepareOrder(Request $request, $platform) {
         $user = $request->user();
-        return response()->json($this->editOrder->prepareOrder($user));
+        return response()->json($this->editOrder->prepareOrder($user, $platform, $request->all()));
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function addDiscounts(Request $request, $platform, $order) {
+        $user = $request->user();
+        
+        $className = "App\\Services\\EditOrder" . ucfirst($platform);
+        $platFormService = new $className; //// <--- this thing will be autoloaded
+        if ($platFormService) {
+            $orderContainer = Order::find($order);
+            if ($orderContainer) {
+                if ($orderContainer->user_id == $user->id) {
+                    $this->editOrder->addItemsToOrder($user, $orderContainer);
+                    return response()->json($platFormService->addDiscounts($user, $orderContainer));
+                }
+                return response()->json(["status" => "error", "message"=>"Order is not users"]);
+            }
+            return response()->json(["status" => "error", "message"=>"Order not found"]);
+        }
+        return response()->json(["status" => "error", "message"=>"no service"]);
     }
 
     /**
@@ -99,9 +125,9 @@ class OrderApiController extends Controller {
             "proposed_time",
             "proposed_discount",
             "reason"]);
-        return response()->json($this->editOrder->sendProposal($user,$data));
+        return response()->json($this->editOrder->sendProposal($user, $data));
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -115,7 +141,7 @@ class OrderApiController extends Controller {
             "proposed_time",
             "proposed_discount",
             "reason"]);
-        return response()->json($this->editOrder->sendProposal($user,$data));
+        return response()->json($this->editOrder->sendProposal($user, $data));
     }
 
     /**
@@ -128,6 +154,7 @@ class OrderApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editOrder->setShippingAddress($user, $request->only("address_id")));
     }
+
     /**
      * Handle a login request to the application.
      *
@@ -136,9 +163,9 @@ class OrderApiController extends Controller {
      */
     public function setShippingCondition(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id") ));
+        return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id")));
     }
-     
+
     /**
      * Handle a login request to the application.
      *
@@ -147,8 +174,9 @@ class OrderApiController extends Controller {
      */
     public function setBillingAddress(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id") ));
-    } 
+        return response()->json($this->editOrder->setBillingAddress($user, $request->only("address_id")));
+    }
+
     /**
      * Handle a login request to the application.
      *
@@ -157,8 +185,9 @@ class OrderApiController extends Controller {
      */
     public function setCouponCondition(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setCouponCondition($user, $request->only("coupon") ));
-    } 
+        return response()->json($this->editOrder->setCouponCondition($user, $request->only("coupon")));
+    }
+
     /**
      * Handle a login request to the application.
      *
@@ -167,9 +196,9 @@ class OrderApiController extends Controller {
      */
     public function setTaxesCondition(Request $request) {
         $user = $request->user();
-        $data = $request->all("country_id","region_id");
-        return response()->json($this->editOrder->setTaxesCondition($user, $data ));
-    } 
+        $data = $request->all("country_id", "region_id");
+        return response()->json($this->editOrder->setTaxesCondition($user, $data));
+    }
 
     /**
      * Display a listing of the resource.
@@ -249,7 +278,7 @@ class OrderApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id,Request $request) {
+    public function destroy($id, Request $request) {
         $user = $request->user();
         return response()->json($this->editOrder->deleteOrder($user));
     }

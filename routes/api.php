@@ -57,11 +57,13 @@ Route::post('contacts/level', 'UserApiController@updateContactsLevel');
 Route::post('contacts/add/{code?}', 'UserApiController@addContact');
 Route::get('contacts/block/{code?}', 'UserApiController@blockContact');
 Route::get('contacts/code/{code?}', 'UserApiController@getContactByCode');
+Route::get('contacts/email/{email?}', 'UserApiController@getContactByEmail');
 Route::get('contacts/unblock/{code?}', 'UserApiController@unblockContact');
 Route::get('user/medical/{code?}', 'UserApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
+Route::post('user/credits', 'UserApiController@checkUserCredits');
 Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
@@ -147,6 +149,8 @@ Route::post('orders/tax', 'OrderApiController@setTaxesCondition');
 Route::post('orders/coupon', 'OrderApiController@setCouponCondition');
 Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
 Route::get('orders/confirm/{code?}', 'OrderApiController@confirmOrder');
+Route::post('orders/prepare/{platform?}', 'OrderApiController@prepareOrder');
+Route::post('orders/discounts/{platform?}/{order?}', 'OrderApiController@addDiscounts');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 
