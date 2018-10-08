@@ -15,8 +15,11 @@ use DB;
 class EditOrderFood {
 
     const OBJECT_ORDER = 'Order';
+    const CREDIT_PRICE = 10000;
+    const UNIT_LOYALTY_DISCOUNT = 11000;
     const OBJECT_ORDER_REQUEST = 'OrderRequest';
     const ORDER_PAYMENT = 'order_payment';
+    const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
     /**
@@ -24,16 +27,19 @@ class EditOrderFood {
      *
      * @return string
      */
-    protected function checkOrder(User $user, Order $order, array $data, $platform) {
+    protected function checkOrder(User $user, Order $order, array $data) {
         $items = $order->items();
-        $push = $user->push()->where("platform", $platform)->first();
+        $push = $user->push()->where("platform", self::PLATFORM_NAME)->first();
         $requiredCredits = 0;
         $requiredBuyers = 1;
+        $splitTotal = $order->total;
+        $totalDeposit = 0;
         foreach ($items as $value) {
             $attributes = json_decode($value->attributes, true);
             if (array_key_exists("requires_credit", $attributes)) {
                 if ($attributes['requires_credit']) {
                     $requiredCredits += $attributes['credits'];
+                    $totalDeposit += (self::CREDIT_PRICE * $attributes['credits']);
                 }
             }
             if (array_key_exists("multiple_buyers", $attributes)) {
@@ -44,6 +50,7 @@ class EditOrderFood {
             if (array_key_exists("is_credit", $attributes)) {
                 if ($attributes['is_credit']) {
                     $requiredCredits -= $value->quantity;
+                    $splitTotal -= ($value->price * $value->quantity);
                 }
             }
         }
@@ -52,7 +59,7 @@ class EditOrderFood {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
         if ($requiredCredits > 0) {
-            $creditHolders = Push::whereIn('user_id', $data['payers'])->where("credits", ">", 0)->where("platform", $platform)->count();
+            $creditHolders = Push::whereIn('user_id', $data['payers'])->where("credits", ">", 0)->where("platform", self::PLATFORM_NAME)->count();
             if ($push->credits > 0) {
                 $creditHolders++;
             }
@@ -60,12 +67,18 @@ class EditOrderFood {
                 return array("status" => "error", "message" => "Order does not have enough payers");
             }
         }
-        return array("status" => "success", "message" => "Order Passed validation", "order" => $order);
+        return array("status" => "success", 
+            "message" => "Order Passed validation", 
+            "order" => $order, 
+            "split" => $splitTotal, 
+            "deposit" => $totalDeposit,
+            "push" => $push
+                );
     }
 
     public function addDiscounts(User $user, Order $order) {
-        Cart::session($user->id)->removeConditionsByType("food");
-        $order->orderConditions()->where("type", "food")->delete();
+        Cart::session($user->id)->removeConditionsByType(self::PLATFORM_NAME);
+        $order->orderConditions()->where("type", self::PLATFORM_NAME)->delete();
         $items = $order->items;
         $conditions = [];
         foreach ($items as $value) {
@@ -82,14 +95,14 @@ class EditOrderFood {
                     }
                 }
                 if ($control == $control2) {
-                    $discount = (($control2 - 1) * $buyers * 11000);
+                    $discount = (($control2 - 1) * $buyers * self::UNIT_LOYALTY_DISCOUNT);
                 } else {
-                    $discount = ($control2 * $buyers * 11000);
+                    $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
                 }
                 $condition = new OrderCondition(array(
                     'name' => "Descuento por compromiso orden: " . $order->id,
                     'target' => "subtotal",
-                    'type' => "food",
+                    'type' => self::PLATFORM_NAME,
                     'value' => "-" . $discount,
                     'total' => $discount,
                 ));
@@ -97,7 +110,7 @@ class EditOrderFood {
                 $order->orderConditions()->save($condition);
                 $condition2 = new CartCondition(array(
                     'name' => $condition->name,
-                    'type' => $condition->target,
+                    'type' => $condition->type,
                     'target' => $condition->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
                     'value' => $condition->value,
                     'order' => 1
@@ -113,9 +126,9 @@ class EditOrderFood {
      *
      * @return string
      */
-    public function prepareOrder(User $user, Order $order, $platform, array $info, $cart) {
+    public function prepareOrder(User $user, Order $order, array $info, $cart) {
 
-        $checkResult = $this->checkOrder($user, $order, $info, $platform);
+        $checkResult = $this->checkOrder($user, $order, $info);
         $result = null;
         if ($checkResult['status'] == "success") {
             $order = $checkResult['order'];
@@ -130,20 +143,32 @@ class EditOrderFood {
             if (array_key_exists("split_order", $info)) {
                 if ($info['split_order']) {
                     if (array_key_exists("payers", $info)) {
-                        $this->splitOrder($user, $order, $info['payers'], $platform);
-                        $totalBuyers = count($info['payers'])+1;
+                        $this->splitOrder($user, $order, $info['payers'],$checkResult['deposit'],$checkResult['split']);
+                        $totalBuyers = count($info['payers']) + 1;
                     }
                 }
             }
-            $buyerSubtotal = $order->total / $totalBuyers;
+            $buyerSubtotal = $checkResult['split']/ $totalBuyers;
             $buyerTax = $order->tax / $totalBuyers;
             $transactionCost = 0;
+            if($checkResult['deposit']>0){
+                $push = $checkResult['push'];
+                if($push){
+                    if($push->credits == 0 ){
+                        $buyerSubtotal+= self::CREDIT_PRICE;
+                    }
+                } else {
+                    $buyerSubtotal+= self::CREDIT_PRICE;
+                }
+            }
             if ($totalBuyers > 1) {
-                $transactionCost = $buyerSubtotal * (0.0349) + 900;
+                $transactionCost = $this->getTransactionTotal($buyerSubtotal);
                 $order->total = $order->total + ($transactionCost * $totalBuyers);
                 $order->tax = $order->tax + (0);
                 //$order->status = "payment_created";
             }
+            
+            
             $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
             if ($payment) {
                 
@@ -162,6 +187,71 @@ class EditOrderFood {
             return $result;
         }
         return $checkResult;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    private function splitOrder(User $user, Order $order, $buyers, $depositTotal, $splitTotal) {
+        if ($order->user_id == $user->id) {
+            $totalBuyers = count($buyers) + 1;
+            $buyerSubtotal = $splitTotal / $totalBuyers;
+            $buyerTax = $order->tax / $totalBuyers;
+            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
+
+            $followers = array();
+            foreach ($buyers as $buyerItem) {
+                $buyer = User::find($buyerItem);
+                if ($buyer) {
+                    $buyerTotal = $buyerSubtotal;
+                    if ($depositTotal > 0) {
+                        $push = $buyer->push()->where("platform", self::PLATFORM_NAME)->first();
+                        if ($push) {
+                            if ($push->credits == 0) {
+                                $buyerTotal += self::CREDIT_PRICE;
+                            }
+                        } else {
+                            $buyerTotal += self::CREDIT_PRICE;
+                        }
+                    }
+                    array_push($followers, $buyer);
+                    $payment = Payment::where("order_id", $order->id)->where("user_id", $buyer->id)->where("status", "pending")->first();
+                    if ($payment) {
+                        
+                    } else {
+                        $payment = new Payment;
+                    }
+                    $payment->user_id = $buyer->id;
+                    $payment->address_id = $order->address_id;
+                    $payment->order_id = $order->id;
+                    $payment->status = "pending";
+                    $payment->total = $buyerTotal + $transactionCost;
+                    $payment->tax = $buyerTax;
+                    $payment->save();
+                }
+            }
+            $payload = [
+                "order_id" => $order->id,
+                "first_name" => $user->firstName,
+                "last_name" => $user->lastName,
+            ];
+            $data = [
+                "trigger_id" => $user->id,
+                "message" => "",
+                "subject" => "",
+                "object" => self::OBJECT_ORDER,
+                "sign" => true,
+                "payload" => $payload,
+                "type" => self::ORDER_PAYMENT,
+                "user_status" => $user->getUserNotifStatus()
+            ];
+            $date = date("Y-m-d H:i:s");
+            $className = "App\\Services\\EditAlerts";
+            $platFormService = new $className(); //// <--- this thing will be autoloaded
+            return $platFormService->sendMassMessage($data, $followers, $user, true, $date, self::PLATFORM_NAME);
+        }
     }
 
     /**
@@ -254,80 +344,8 @@ class EditOrderFood {
         
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    private function splitOrder(User $user, Order $order, $buyers, $platform) {
-        if ($order->user_id == $user->id) {
-            $items = $order->items;
-            $splitTotal = $order->total;
-            $depositTotal = 0;
-            foreach ($items as $value) {
-                $attributes = json_decode($value->attributes, true);
-                if (array_key_exists("is_credit", $attributes)) {
-                    if ($attributes['is_credit']) {
-                        $splitTotal -= 10000;
-                    }
-                }
-                if (array_key_exists("requires_credit", $attributes)) {
-                    if ($attributes['requires_credit']) {
-                        $depositTotal += $attributes['credits'] * 10000;
-                    }
-                }
-            }
-            $totalBuyers = count($buyers) + 1;
-            $buyerSubtotal = $splitTotal / $totalBuyers;
-            $buyerTax = $order->tax / $totalBuyers;
-            $transactionCost = $buyerSubtotal * (0.0349) + 900;
-            $followers = array();
-            foreach ($buyers as $buyerItem) {
-                $buyer = User::find($buyerItem);
-                if ($buyer) {
-                    $buyerTotal = $buyerSubtotal;
-                    if ($depositTotal > 0) {
-                        $push = $buyer->push()->where("platform", $platform)->first();
-                        if ($push->credits == 0) {
-                            $buyerTotal += 10000;
-                        }
-                    }
-                    array_push($followers, $buyer);
-                    $payment = Payment::where("order_id", $order->id)->where("user_id", $buyer->id)->where("status", "pending")->first();
-                    if ($payment) {
-                        
-                    } else {
-                        $payment = new Payment;
-                    }
-                    $payment->user_id = $buyer->id;
-                    $payment->address_id = $order->address_id;
-                    $payment->order_id = $order->id;
-                    $payment->status = "pending";
-                    $payment->total = $buyerTotal + $transactionCost;
-                    $payment->tax = $buyerTax;
-                    $payment->save();
-                }
-            }
-            $payload = [
-                "order_id" => $order->id,
-                "first_name" => $user->firstName,
-                "last_name" => $user->lastName,
-            ];
-            $data = [
-                "trigger_id" => $user->id,
-                "message" => "",
-                "subject" => "",
-                "object" => self::OBJECT_ORDER,
-                "sign" => true,
-                "payload" => $payload,
-                "type" => self::ORDER_PAYMENT,
-                "user_status" => $user->getUserNotifStatus()
-            ];
-            $date = date("Y-m-d H:i:s");
-            $className = "App\\Services\\EditAlerts";
-            $platFormService = new $className(); //// <--- this thing will be autoloaded
-            return $platFormService->sendMassMessage($data, $followers, $user, true, $date, $platform);
-        }
+    public function getTransactionTotal($total) {
+        return ($total * 0.0349 + 900);
     }
 
 }

@@ -129,7 +129,7 @@ class EditOrder {
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 if($platFormService){
                     $cart = $this->editCart->getCheckoutCart($user);
-                    return $platFormService->prepareOrder($user, $order, $platform, $data,$cart);
+                    return $platFormService->prepareOrder($user, $order, $data,$cart);
                 }
                 
             }

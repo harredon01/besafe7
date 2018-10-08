@@ -138,18 +138,21 @@ class EditCart {
      * @return Response
      */
     public function clearCart(User $user) {
-        
+
         Cart::session($user->id)->clear();
         $order = Order::where('status', 'pending')->where('user_id', $user->id)->first();
         if ($order) {
             $order->orderConditions()->delete();
+            $order->payments()->where("status", "pending")->delete();
             $order->items()->delete();
+            $order->subtotal = 0;
+            $order->tax = 0;
+            $order->total = 0;
+            $order->save();
         } else {
             Item::where('user_id', $user->id)->where('order_id', null)->delete();
         }
         Cart::clearCartConditions();
-        
-        
     }
 
     /**
@@ -328,7 +331,7 @@ class EditCart {
 
                 $item->quantity = $quantity;
                 $item->save();
-                return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user),"quantity"=>$quantity);
+                return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user), "quantity" => $quantity);
             } else {
                 return array("status" => "error", "message" => "No more stock of that product");
             }
@@ -499,7 +502,7 @@ class EditCart {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
-                    $item->quantity = (int) $data['quantity'] ;
+                    $item->quantity = (int) $data['quantity'];
                     $item->save();
                     $item->attributes = json_decode($item->attributes, true);
                     Cart::session($user->id)->update($item->id, array(
