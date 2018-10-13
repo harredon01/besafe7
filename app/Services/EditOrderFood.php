@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Condition;
+use App\Models\Delivery;
 use App\Models\OrderCondition;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -67,13 +68,13 @@ class EditOrderFood {
                 return array("status" => "error", "message" => "Order does not have enough payers");
             }
         }
-        return array("status" => "success", 
-            "message" => "Order Passed validation", 
-            "order" => $order, 
-            "split" => $splitTotal, 
+        return array("status" => "success",
+            "message" => "Order Passed validation",
+            "order" => $order,
+            "split" => $splitTotal,
             "deposit" => $totalDeposit,
             "push" => $push
-                );
+        );
     }
 
     public function addDiscounts(User $user, Order $order) {
@@ -127,7 +128,6 @@ class EditOrderFood {
      * @return string
      */
     public function prepareOrder(User $user, Order $order, array $info, $cart) {
-
         $checkResult = $this->checkOrder($user, $order, $info);
         $result = null;
         if ($checkResult['status'] == "success") {
@@ -138,29 +138,34 @@ class EditOrderFood {
             $order->shipping = 0;
             $order->discount = 0;
             $order->total = $data["total"];
-
             $totalBuyers = 1;
             if (array_key_exists("split_order", $info)) {
                 if ($info['split_order']) {
                     if (array_key_exists("payers", $info)) {
-                        $this->splitOrder($user, $order, $info['payers'],$checkResult['deposit'],$checkResult['split']);
+                        $this->splitOrder($user, $order, $info['payers'], $checkResult['deposit'], $checkResult['split']);
                         $totalBuyers = count($info['payers']) + 1;
                     }
                 }
             } else {
-                Payment::where("order_id", $order->id)->where("user_id","<>", $user->id)->where("status", "pending")->delete();
+                Payment::where("order_id", $order->id)->where("user_id", "<>", $user->id)->where("status", "pending")->delete();
             }
-            $buyerSubtotal = $checkResult['split']/ $totalBuyers;
+            if (array_key_exists("payers", $info)) {
+                $records = [
+                    "buyers" => $info['payers']
+                ];
+                $order->attributes = json_encode($records);
+            }
+            $buyerSubtotal = $checkResult['split'] / $totalBuyers;
             $buyerTax = $order->tax / $totalBuyers;
             $transactionCost = 0;
-            if($checkResult['deposit']>0){
+            if ($checkResult['deposit'] > 0) {
                 $push = $checkResult['push'];
-                if($push){
-                    if($push->credits == 0 ){
-                        $buyerSubtotal+= self::CREDIT_PRICE;
+                if ($push) {
+                    if ($push->credits == 0) {
+                        $buyerSubtotal += self::CREDIT_PRICE;
                     }
                 } else {
-                    $buyerSubtotal+= self::CREDIT_PRICE;
+                    $buyerSubtotal += self::CREDIT_PRICE;
                 }
             }
             if ($totalBuyers > 1) {
@@ -169,15 +174,13 @@ class EditOrderFood {
                 $order->tax = $order->tax + (0);
                 //$order->status = "payment_created";
             }
-            
-            
             $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
             if ($payment) {
                 
             } else {
                 $payment = new Payment;
             }
-            $address = $order->orderAddresses()->where("type","shipping")->first();
+            $address = $order->orderAddresses()->where("type", "shipping")->first();
             $payment->user_id = $user->id;
             $payment->address_id = $address->id;
             $payment->order_id = $order->id;
@@ -289,6 +292,7 @@ class EditOrderFood {
         $items = $order->items();
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
+            $item->attributes = $data;
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "subscription") {
                     $object = $data['object'];
@@ -303,7 +307,7 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
-                    $this->createMealPlan($order, $item, $data);
+                    $this->createMealPlan($order, $item);
                 }
             }
             $attrs = json_decode($item->attributes, true);
@@ -321,34 +325,118 @@ class EditOrderFood {
         return array("status" => "error", "message" => "Address does not exist");
     }
 
-    public function createMealPlan(Order $order, Item $item, $data) {
-        $usersSent = null;
-        $itemUsers = 0;
-        if (array_key_exists("item_users", $data)) {
-            $itemUsers = $data['item_users'];
-        }
-
-        if (array_key_exists("users", $data)) {
-            $users = $data['users'];
-            if ($users) {
-                foreach ($users as $value) {
-
-                    $itemUsers--;
-                }
-            }
-        }
-        $user = $order->user();
-        for ($x = 0; $x <= $itemUsers; $x++) {
-            $this->createDeliveries($user->id, $item, $data);
+    public function createMealPlan(Order $order, Item $item) {
+        $data = json_decode($order->attributes, true);
+        $buyers = $data['buyers'];
+        for ($x = 0; $x <= count($buyers); $x++) {
+            $this->createDeliveries($buyers[$x], $item);
         }
     }
 
-    public function submitOrder(Order $order) {
-        
+    public function createDeliveries($user_id, Item $item) {
+        $date = date_create();
+        for ($x = 0; $x <= $item->quantity; $x++) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+            $delivery = new Delivery();
+            $delivery->user_id = $user_id;
+            $delivery->delivery = $date;
+            $delivery->save();
+        }
     }
 
     public function getTransactionTotal($total) {
         return ($total * 0.0349 + 900);
+    }
+
+    public function prepareRouteModel() {
+        
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getNearbyMerchants(array $data) {
+        $radius = 1;
+        $R = 6371;
+        $lat = 4.720112;
+        $long = -74.064916;
+        $maxLat = $lat + rad2deg($radius / $R);
+        $minLat = $lat - rad2deg($radius / $R);
+        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        for ($x = 0; $x <= 8; $x++) {
+            $operativeRadius = 0;
+            if ($x < 4) {
+                $operativeRadius = $radius;
+            } else {
+                $operativeRadius = $radius * 2;
+            }
+            if ($x == 0 || $x == 4) {
+                $thedata = [
+                    'lat' => $lat,
+                    'lat2' => $lat,
+                    'long' => $long,
+                    'latinf' => $lat,
+                    'latsup' => $maxLat,
+                    'longinf' => $long,
+                    'longsup' => $maxLon,
+                    'radius' => $operativeRadius
+                ];
+            } else if ($x == 1 || $x == 5) {
+                $thedata = [
+                    'lat' => $lat,
+                    'lat2' => $lat,
+                    'long' => $long,
+                    'latinf' => $lat,
+                    'latsup' => $maxLat,
+                    'longinf' => $long,
+                    'longsup' => $maxLon,
+                    'radius' => $operativeRadius
+                ];
+            } else if ($x == 2 || $x == 6) {
+                $thedata = [
+                    'lat' => $lat,
+                    'lat2' => $lat,
+                    'long' => $long,
+                    'latinf' => $lat,
+                    'latsup' => $maxLat,
+                    'longinf' => $long,
+                    'longsup' => $maxLon,
+                    'radius' => $operativeRadius
+                ];
+            } else if ($x == 3 || $x == 7) {
+                $thedata = [
+                    'lat' => $lat,
+                    'lat2' => $lat,
+                    'long' => $long,
+                    'latinf' => $lat,
+                    'latsup' => $maxLat,
+                    'longinf' => $long,
+                    'longsup' => $maxLon,
+                    'radius' => $operativeRadius
+                ];
+            } 
+
+            $deliveries = DB::select(""
+                            . "SELECT d.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  d.lat  ) ) ) ) AS Distance 
+                   FROM deliveries d
+                    WHERE
+                        status = 'active'
+                            AND d.private = 0
+                            AND d.type <> ''
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
+                    HAVING distance < :radius order by distance asc limit 20 "
+                            . "", $thedata);
+        }
+
+
+        return array("deliveries" => $deliveries);
     }
 
 }

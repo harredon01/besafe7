@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::resource('addresses', 'AddressApiController');
+Route::resource('coverage', 'CoveragePolygonController');
 Route::post('subscriptions/{source?}', 'SubscriptionApiController@store');
 Route::get('subscriptions/{source?}', 'SubscriptionApiController@index');
 Route::post('subscriptions/{source?}/existing', 'SubscriptionApiController@storeExistingSource');
