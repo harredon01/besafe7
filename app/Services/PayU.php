@@ -9,6 +9,8 @@ use App\Models\Order;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Plan;
+use App\Models\Country;
+use App\Models\Region;
 use App\Jobs\ApproveOrder;
 use App\Jobs\DenyOrder;
 use App\Jobs\PendingOrder;
@@ -132,15 +134,17 @@ class PayU {
 
     public function populateShippingFromAddress($addressId, array $data) {
         $address = Address::find($addressId);
-        $region = Region::find($address->region_id);
-        $country = Country::find($address->country_id);
-        $city = City::find($address->city_id);
-        $data['shipping_address'] = $address->address;
-        $data['shipping_city'] = $city->name;
-        $data['shipping_state'] = $region->name;
-        $data['shipping_country'] = $country->code;
-        $data['shipping_postal'] = $address->postal;
-        $data['shipping_phone'] = $address->phone;
+        if ($address) {
+            $region = Region::find($address->region_id);
+            $country = Country::find($address->country_id);
+            $city = City::find($address->city_id);
+            $data['shipping_address'] = $address->address;
+            $data['shipping_city'] = $city->name;
+            $data['shipping_state'] = $region->name;
+            $data['shipping_country'] = $country->code;
+            $data['shipping_postal'] = $address->postal;
+            $data['shipping_phone'] = $address->phone;
+        }
         return $data;
     }
 
@@ -230,7 +234,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $order);
+        return $this->handleTransactionResponse($result, $user, $payment);
     }
 
     public function useSource(User $user, array $data, Payment $payment) {
@@ -288,7 +292,7 @@ class PayU {
         ];
 //        return $dataSent;
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $order);
+        return $this->handleTransactionResponse($result, $user, $payment);
     }
 
     public function payDebitCard(User $user, array $data, Payment $payment) {
@@ -340,7 +344,7 @@ class PayU {
         ];
 
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $order);
+        return $this->handleTransactionResponse($result, $user, $payment);
     }
 
     public function payCash(User $user, array $data, Payment $payment) {
@@ -934,6 +938,129 @@ class PayU {
         return null;
     }
 
+    public function createToken(User $user, array $data) {
+        $source = $user->sources()->where("gateway", "Payu")->first();
+        if($source){
+            if($source->source){
+                $this->deleteToken($user);
+            }
+        }
+        $merchant = $this->populateMerchant();
+        $creditCardToken = [
+            "payerId" => $user->id,
+            "name" => $data['payer_name'],
+            "identificationNumber" => $data['payer_id'],
+            "paymentMethod" => $data['cc_branch'],
+            "number" => $data['cc_number'],
+            "securityCode" => $data['cc_security_code'],
+            "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
+            "name" => $data['cc_name']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "CREATE_TOKEN",
+            "merchant" => $merchant,
+            "creditCardToken" => $creditCardToken,
+            "test" => false,
+        ];
+
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        if ($result['code'] == "SUCCESS") {
+            
+            if ($source) {
+                $source->source = $result['creditCardTokenId'];
+                $source->save();
+            } else {
+                $source = new Source([
+                    "gateway" => "PayU",
+                    "source" => $result['creditCardTokenId']
+                ]);
+                $user->sources()->save($source);
+            }
+        }
+        return null;
+    }
+
+    public function deleteToken(User $user) {
+        $source = $user->sources()->where("gateway", "PayU")->first();
+        if ($source) {
+            $merchant = $this->populateMerchant();
+            $creditCardToken = [
+                "payerId" => $user->id,
+                "creditCardTokenId" => $source->source,
+            ];
+            $dataSent = [
+                "language" => "es",
+                "command" => "REMOVE_TOKEN",
+                "merchant" => $merchant,
+                "removeCreditCardToken" => $creditCardToken,
+                "test" => false,
+            ];
+
+            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+            if ($result['code'] == "SUCCESS") {
+                $source->source = "";
+                $source->save();
+            }
+            return null;
+        }
+    }
+    
+    public function useToken(User $user, array $data, Payment $payment) {
+        $validator = $this->validatorBuyer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorPayer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorShipping($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorToken($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $buyer = $this->populateBuyer($user, $data);
+        $ShippingAddress = $this->populateShipping($data);
+        $payer = $this->populatePayer($data);
+        $merchant = $this->populateMerchant();
+        $orderCont = $this->populatePaymentContent($payment);
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+        $orderCont["shippingAddress"] = $ShippingAddress;
+        $extraParams = [
+            "INSTALLMENTS_NUMBER" => 1
+        ];
+        $deviceSessionId = md5(session_id() . microtime());
+        $cookie = md5($deviceSessionId);
+        $transaction = [
+            "order" => $orderCont,
+            "payer" => $payer,
+            "creditCardTokenId" => $data['token'],
+            "extraParameters" => $extraParams,
+            "type" => "AUTHORIZATION_AND_CAPTURE",
+            "paymentMethod" => $data['cc_branch'],
+            "paymentCountry" => $data['payer_country'],
+            "deviceSessionId" => $deviceSessionId,
+            "ipAddress" => $data['ip_address'],
+            "cookie" => $cookie,
+            "userAgent" => $data['user_agent']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "SUBMIT_TRANSACTION",
+            "merchant" => $merchant,
+            "transaction" => $transaction,
+            "test" => "true",
+        ];
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->handleTransactionResponse($result, $user, $payment);
+    }
+
     public function deleteSubscription(User $user, $subscription) {
         $url = env('PAYU_REST') . 'subscriptions/' . $subscription;
         $result = $this->sendDelete($url);
@@ -1473,6 +1600,18 @@ class PayU {
                     'cc_name' => 'required|max:255',
                     'cc_number' => 'required|max:255',
                     'cc_security_code' => 'required|max:255',
+                        ]
+        );
+    }
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorToken(array $data) {
+        return Validator::make($data, [
+                    'token' => 'required|max:255'
                         ]
         );
     }

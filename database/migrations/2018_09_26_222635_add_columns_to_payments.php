@@ -22,14 +22,13 @@ class AddColumnsToPayments extends Migration
                                 ->on('orders');
             $table->integer('address_id')->unsigned()->nullable();
             $table->foreign('address_id')->references('id')
-                                ->on('addresses');
+                                ->on('order_addresses');
             $table->string('status');
             $table->string('referenceCode');
             $table->string('transactionId');
             $table->string('responseCode');
             $table->double('total', 15, 2);
             $table->double('tax', 15, 2);
-            
         });
     }
 
@@ -41,10 +40,12 @@ class AddColumnsToPayments extends Migration
     public function down()
     {
         Schema::table('payments', function (Blueprint $table) {
+            $table->dropForeign('payments_user_id_foreign');
             $table->dropColumn('user_id');
+            $table->dropForeign('payments_order_id_foreign');
             $table->dropColumn('order_id');
-            $table->dropColumn('payer_id');
-            $table->dropColumn('buyer_id');
+            $table->dropForeign('payments_address_id_foreign');
+            $table->dropColumn('address_id');
             $table->dropColumn('status');
             $table->dropColumn('referenceCode');
             $table->dropColumn('responseCode');

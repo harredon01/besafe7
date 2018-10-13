@@ -147,6 +147,8 @@ class EditOrderFood {
                         $totalBuyers = count($info['payers']) + 1;
                     }
                 }
+            } else {
+                Payment::where("order_id", $order->id)->where("user_id","<>", $user->id)->where("status", "pending")->delete();
             }
             $buyerSubtotal = $checkResult['split']/ $totalBuyers;
             $buyerTax = $order->tax / $totalBuyers;
@@ -175,8 +177,9 @@ class EditOrderFood {
             } else {
                 $payment = new Payment;
             }
+            $address = $order->orderAddresses()->where("type","shipping")->first();
             $payment->user_id = $user->id;
-            $payment->address_id = $order->address_id;
+            $payment->address_id = $address->id;
             $payment->order_id = $order->id;
             $payment->status = "pending";
             $payment->total = $buyerSubtotal + $transactionCost;

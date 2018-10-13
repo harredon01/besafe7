@@ -5,10 +5,12 @@ namespace App\Services;
 use Validator;
 use App\Models\Order;
 use App\Models\Plan;
+use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
+use App\Services\EditCart;
 
 class EditBilling {
 
@@ -23,6 +25,12 @@ class EditBilling {
      *
      */
     protected $editOrder;
+    
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $editCart;
 
     /**
      * Create a new class instance.
@@ -30,9 +38,10 @@ class EditBilling {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditGroup $editGroup, EditOrder $editOrder) {
+    public function __construct(EditGroup $editGroup, EditOrder $editOrder, EditCart $editCart) {
         $this->editGroup = $editGroup;
         $this->editOrder = $editOrder;
+        $this->editCart = $editCart;
     }
 
     public function processModel(User $user, array $data) {
@@ -111,6 +120,15 @@ class EditBilling {
         if ($source) {
             $gateway = new $className; //// <--- this thing will be autoloaded
             return $gateway->getSources($source);
+        } else {
+            return array();
+        }
+    }
+
+    public function getRawSources(User $user, $gateway) {
+        $source = $user->sources()->where('gateway', $gateway)->first();
+        if ($source) {
+            return $source;
         } else {
             return array();
         }
@@ -330,7 +348,17 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
-                return $gateway->payCreditCard($user, $data, $payment);
+                if (array_key_exists("token", $data)) {
+                    return $gateway->useToken($user, $data, $payment);
+                } else {
+                    $paymentResult = $gateway->payCreditCard($user, $data, $payment);
+                    if (array_key_exists("save_card", $data)) {
+                        if ($data['save_card']) {
+                            $gateway->saveCard($user, $data);
+                        }
+                    }
+                    return $paymentResult;
+                }
             }
         }
         return array("status" => "error", "message" => "Invalid order");
@@ -342,6 +370,7 @@ class EditBilling {
             if ($order->status == "pending") {
                 $order->status = "payment_created";
                 $order->save();
+                $this->editCart->clearCartSession($order->user_id);
             }
         }
     }

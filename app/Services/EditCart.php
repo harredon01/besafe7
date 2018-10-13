@@ -179,8 +179,8 @@ class EditCart {
      *
      * @return Response
      */
-    public function clearCartSession(User $user) {
-        Cart::session($user->id)->clear();
+    public function clearCartSession($userId) {
+        Cart::session($userId)->clear();
     }
 
     /**

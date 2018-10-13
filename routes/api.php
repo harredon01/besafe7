@@ -44,6 +44,7 @@ Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::post('billing/pay_cc/{source?}', 'BillingApiController@postPayCreditCard');
+Route::get('billing/raw_sources/{source?}', 'BillingApiController@getRawSources');
 Route::post('billing/pay_debit/{source?}', 'BillingApiController@postPayDebitCard');
 Route::post('billing/pay_cash/{source?}', 'BillingApiController@postPayCash');
 Route::post('payu/all', 'PayuController@postcreateAll');

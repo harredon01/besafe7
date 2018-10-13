@@ -42,6 +42,16 @@ class BillingApiController extends Controller {
         $user = $this->auth->user();
         return view('billing.sources')->with('user', $user);
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getRawSources(Request $request,$source) {
+        $user = $request->user();
+        $status = $this->editBilling->getRawSources($user,$source );
+        return response()->json($status);
+    }
     
     /**
      * Show the application dashboard to the user.
