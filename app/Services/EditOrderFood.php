@@ -290,6 +290,7 @@ class EditOrderFood {
         $items = Cart::getContent();
         $data = array();
         $items = $order->items();
+        $address = $order->orderAddresses()->where("type", "shipping")->first();
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
@@ -307,7 +308,7 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
-                    $this->createMealPlan($order, $item);
+                    $this->createMealPlan($order, $item, $address->id);
                 }
             }
             $attrs = json_decode($item->attributes, true);
@@ -325,21 +326,22 @@ class EditOrderFood {
         return array("status" => "error", "message" => "Address does not exist");
     }
 
-    public function createMealPlan(Order $order, Item $item) {
+    public function createMealPlan(Order $order, Item $item, $address_id) {
         $data = json_decode($order->attributes, true);
         $buyers = $data['buyers'];
         for ($x = 0; $x <= count($buyers); $x++) {
-            $this->createDeliveries($buyers[$x], $item);
+            $this->createDeliveries($buyers[$x], $item, $address_id);
         }
     }
 
-    public function createDeliveries($user_id, Item $item) {
+    public function createDeliveries($user_id, Item $item, $address_id) {
         $date = date_create();
         for ($x = 0; $x <= $item->quantity; $x++) {
             date_add($date, date_interval_create_from_date_string("1 days"));
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
             $delivery->delivery = $date;
+            $delivery->address_id = $address_id;
             $delivery->save();
         }
     }
@@ -348,8 +350,48 @@ class EditOrderFood {
         return ($total * 0.0349 + 900);
     }
 
-    public function prepareRouteModel() {
-        
+    public function prepareRouteModel(array $thedata) {
+        $deliveries = DB::select(""
+                        . "SELECT d.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  d.lat  ) ) ) ) AS Distance 
+                   FROM deliveries d
+                    WHERE
+                        status = 'active'
+                            AND d.private = 0
+                            AND d.type <> ''
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
+                    HAVING distance < :radius order by distance asc limit 20 "
+                        . "", $thedata);
+        if (count($deliveries) > 0) {
+            $initialAddress = $deliveries[0]->address_id;
+            $deliveryCounter = 0;
+            $stops = array();
+            $totalCounter = 0;
+            foreach ($deliveries as $value) {
+                $totalCounter++;
+                if ($value->address_id == $initialAddress) {
+                    $deliveryCounter++;
+                } else {
+                    $stop = [
+                        "amount" => $deliveryCounter,
+                        "address_id" => $initialAddress
+                    ];
+                    array_push($stops, $stop);
+                    $deliveryCounter = 1;
+                    $initialAddress = $value->address_id;
+                }
+                if ($totalCounter == count($deliveries)) {
+                    $stop = [
+                        "amount" => $deliveryCounter,
+                        "address_id" => $initialAddress
+                    ];
+                    array_push($stops, $stop);
+                }
+            }
+        }
     }
 
     /**
@@ -357,9 +399,10 @@ class EditOrderFood {
      *
      * @return Response
      */
-    public function getNearbyMerchants(array $data) {
+    public function prepareRoutingSimulation() {
         $radius = 1;
         $R = 6371;
+        $remainders = array();
         $lat = 4.720112;
         $long = -74.064916;
         $maxLat = $lat + rad2deg($radius / $R);
@@ -389,8 +432,8 @@ class EditOrderFood {
                     'lat' => $lat,
                     'lat2' => $lat,
                     'long' => $long,
-                    'latinf' => $lat,
-                    'latsup' => $maxLat,
+                    'latinf' => $minLat,
+                    'latsup' => $lat,
                     'longinf' => $long,
                     'longsup' => $maxLon,
                     'radius' => $operativeRadius
@@ -400,10 +443,10 @@ class EditOrderFood {
                     'lat' => $lat,
                     'lat2' => $lat,
                     'long' => $long,
-                    'latinf' => $lat,
-                    'latsup' => $maxLat,
-                    'longinf' => $long,
-                    'longsup' => $maxLon,
+                    'latinf' => $minLat,
+                    'latsup' => $lat,
+                    'longinf' => $minLon,
+                    'longsup' => $long,
                     'radius' => $operativeRadius
                 ];
             } else if ($x == 3 || $x == 7) {
@@ -413,26 +456,12 @@ class EditOrderFood {
                     'long' => $long,
                     'latinf' => $lat,
                     'latsup' => $maxLat,
-                    'longinf' => $long,
-                    'longsup' => $maxLon,
+                    'longinf' => $minLon,
+                    'longsup' => $long,
                     'radius' => $operativeRadius
                 ];
-            } 
-
-            $deliveries = DB::select(""
-                            . "SELECT d.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
-			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  d.lat  ) ) ) ) AS Distance 
-                   FROM deliveries d
-                    WHERE
-                        status = 'active'
-                            AND d.private = 0
-                            AND d.type <> ''
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
-                    HAVING distance < :radius order by distance asc limit 20 "
-                            . "", $thedata);
+            }
+            $this->prepareRouteModel($thedata);
         }
 
 
