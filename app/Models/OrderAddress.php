@@ -18,7 +18,7 @@ class OrderAddress extends Model
      *
      * @var array
      */
-    protected $fillable = ['id','firstName', 'lastName', 'address', 'city_id', 'country_id', 'region_id','lat','long','type','order_id','address_id',
+    protected $fillable = ['id','firstName', 'lastName', 'address', 'city_id', 'country_id', 'region_id','lat','long','type','order_id',
         'postal','phone'];
 
     public function user() {
@@ -35,8 +35,5 @@ class OrderAddress extends Model
     }
     public function order() {
         return $this->belongsTo('App\Models\Order');
-    }
-    public function address() {
-        return $this->belongsTo('App\Models\Address');
     }
 }

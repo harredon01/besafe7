@@ -35,9 +35,6 @@ class CreateOrderAddressesTable extends Migration
             $table->integer('order_id')->unsigned()->nullable();
             $table->foreign('order_id')->references('id')
                     ->on('orders');
-            $table->integer('address_id')->unsigned()->nullable();
-            $table->foreign('address_id')->references('id')
-                    ->on('addresses');
             $table->timestamps();
         });
     }

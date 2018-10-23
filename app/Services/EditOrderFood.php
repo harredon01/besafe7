@@ -132,12 +132,6 @@ class EditOrderFood {
         $result = null;
         if ($checkResult['status'] == "success") {
             $order = $checkResult['order'];
-            $data = $cart;
-            $order->subtotal = $data["subtotal"];
-            $order->tax = 0;
-            $order->shipping = 0;
-            $order->discount = 0;
-            $order->total = $data["total"];
             $totalBuyers = 1;
             if (array_key_exists("split_order", $info)) {
                 if ($info['split_order']) {
@@ -150,6 +144,7 @@ class EditOrderFood {
                 Payment::where("order_id", $order->id)->where("user_id", "<>", $user->id)->where("status", "pending")->delete();
             }
             if (array_key_exists("payers", $info)) {
+                array_push($info['payers'], $user->id);
                 $records = [
                     "buyers" => $info['payers']
                 ];
@@ -286,15 +281,40 @@ class EditOrderFood {
         return array("status" => "error", "message" => "Address does not exist");
     }
 
-    public function approveOrder(Order $order) {
-        $items = Cart::getContent();
+    public function approvePayment(Payment $payment) {
+        $order = Order::find($payment->order_id);
+        if ($order) {
+            $payments = $order->payments()->where("status", "<>", "Paid")->count();
+            if ($payments>0) {
+                $order->status="Pending-".$payments;
+                $order->save();
+                return array("status" => "success", "message" => "Payment approved, still payments pending");
+            } else {
+                return $this->approveOrder($order);
+            }
+        }
+    }
+
+    public function createMealPlan(Order $order, Item $item, $address_id) {
+        $data = json_decode($order->attributes, true);
+        $buyers = $data['buyers'];
+        for ($x = 0; $x < count($buyers); $x++) {
+            $this->createDeliveries($buyers[$x], $item, $address_id);
+        }
+    }
+
+    protected function approveOrder(Order $order) {
         $data = array();
-        $items = $order->items();
+        $items = $order->items()->get();
         $address = $order->orderAddresses()->where("type", "shipping")->first();
+        $status = "approved: items: ". count($items)." | ". json_encode($items);
         foreach ($items as $item) {
+            $status = $status." :".$item->attributes;
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
+            
             if (array_key_exists("type", $data)) {
+                $status = $status." type";
                 if ($data['type'] == "subscription") {
                     $object = $data['object'];
                     $id = $data['id'];
@@ -308,35 +328,25 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
+                    $status = $status." meal-plan";
                     $this->createMealPlan($order, $item, $address->id);
                 }
             }
-            $attrs = json_decode($item->attributes, true);
-            if ($attrs) {
-                if (array_key_exists("model", $attrs)) {
-                    $class = "App\\Models\\" . $attrs["model"];
-                    $model = $class::where("id", $attrs['id']);
-                } else {
-                    
-                }
+            if (array_key_exists("model", $data)) {
+                $class = "App\\Models\\" . $data["model"];
+                $model = $class::find("id", $data['id']);
+            } else {
+                
             }
-            $order->status = "approved";
-            $order->save();
         }
-        return array("status" => "error", "message" => "Address does not exist");
-    }
-
-    public function createMealPlan(Order $order, Item $item, $address_id) {
-        $data = json_decode($order->attributes, true);
-        $buyers = $data['buyers'];
-        for ($x = 0; $x <= count($buyers); $x++) {
-            $this->createDeliveries($buyers[$x], $item, $address_id);
-        }
+        $order->status = $status;
+        $order->save();
+        return array("status" => "success", "message" => "Order approved, subtasks completed", "order" => $order);
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
         $date = date_create();
-        for ($x = 0; $x <= $item->quantity; $x++) {
+        for ($x = 0; $x < $item->quantity; $x++) {
             date_add($date, date_interval_create_from_date_string("1 days"));
             $delivery = new Delivery();
             $delivery->user_id = $user_id;

@@ -125,13 +125,22 @@ class EditOrder {
         if (array_key_exists("order_id", $data)) {
             $order = Order::find($data['order_id']);
             if ($order) {
+
                 $className = "App\\Services\\EditOrder" . ucfirst($platform);
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
-                if($platFormService){
+                if ($platFormService) {
                     $cart = $this->editCart->getCheckoutCart($user);
-                    return $platFormService->prepareOrder($user, $order, $data,$cart);
+                    if ($cart['total'] > 0) {
+                        $order->subtotal = $cart["subtotal"];
+                        $order->tax = 0;
+                        $order->shipping = 0;
+                        $order->discount = 0;
+                        $order->total = $cart["total"];
+                        return $platFormService->prepareOrder($user, $order, $data, $cart);
+                    } else {
+                        return array("status" => "error", "message" => "Empty cart");
+                    }
                 }
-                
             }
         }
     }
@@ -166,10 +175,10 @@ class EditOrder {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
                 $orderAddresses = $theAddress->toarray();
-                $orderAddresses['address_id'] = $theAddress->id;
                 unset($orderAddresses['id']);
                 $orderAddresses['order_id'] = $order->id;
                 $orderAddresses['type'] = "shipping";
+                Payment::where("order_id", $order->id)->update(['address_id' => null]);
                 $order->orderAddresses()->where('type', "shipping")->delete();
                 OrderAddress::insert($orderAddresses);
                 return array("status" => "success", "message" => "Address added to order", "order" => $order);
@@ -290,10 +299,10 @@ class EditOrder {
         }
     }
 
-    public function approveOrder(Order $order, $platform) {
+    public function approvePayment(Payment $payment, $platform) {
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
-        $platFormService->approveOrder($order, $platform);
+        return $platFormService->approvePayment($payment);
     }
 
     public function submitOrder(Order $order) {

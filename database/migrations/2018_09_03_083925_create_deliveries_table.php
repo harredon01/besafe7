@@ -27,9 +27,10 @@ class CreateDeliveriesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')
                     ->on('users');
-            $table->integer('route_id')->unsigned();
+            $table->integer('route_id')->unsigned()->nullable();
             $table->foreign('route_id')->references('id')
                     ->on('routes');
+            $table->integer('address_id')->unsigned();
 	    $table->dateTime('delivery');
 	    $table->text('details')->nullable();
             $table->timestamps();

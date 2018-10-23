@@ -601,6 +601,7 @@ class EditUserData {
             }
             if ($country) {
                 $address->countryName = $country->name;
+                $address->countryCode = $country->code;
             }
             if ($data['type'] == 'billing') {
                 $this->setAsBillingAddress($user, $address->id);
@@ -614,7 +615,7 @@ class EditUserData {
         if ($address) {
             if ($address->user_id == $user->id) {
                 $address->delete();
-                return array("status" => "ok", "message" => "address deleted");
+                return array("status" => "success", "message" => "address deleted");
             }
             return array("status" => "error", "message" => "address does not belong to user");
         }
@@ -625,10 +626,6 @@ class EditUserData {
         $address = Address::find($addressId);
         if ($address) {
             if ($address->user_id == $user->id) {
-                Address::where('user_id', $user->id)
-                        ->where('type', 'billing')
-                        ->where('id', '!=', $addressId)
-                        ->update(['type' => 'shipping']);
                 $address->type = 'billing';
                 $address->save();
                 return array("status" => "ok", "message" => "address set as billing address");

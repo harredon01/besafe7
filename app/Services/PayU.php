@@ -11,7 +11,7 @@ use App\Models\City;
 use App\Models\Plan;
 use App\Models\Country;
 use App\Models\Region;
-use App\Jobs\ApproveOrder;
+use App\Jobs\ApprovePayment;
 use App\Jobs\DenyOrder;
 use App\Jobs\PendingOrder;
 use App\Models\Source;
@@ -168,7 +168,11 @@ class PayU {
             'value' => number_format($payment->tax, 2, '.', ''),
             'currency' => $currency
         ];
-        $return = $payment->total - $payment->tax;
+        $return = 0;
+        if($payment->tax > 0 ){
+            $return = $payment->total - $payment->tax;
+        }
+        
         $additionalValuesReturnBase = [
             'value' => number_format($return, 2, '.', ''),
             'currency' => $currency
@@ -181,7 +185,7 @@ class PayU {
         return $additionalValuesCont;
     }
 
-    public function payCreditCard(User $user, array $data, Payment $payment) {
+    public function payCreditCard(User $user, array $data, Payment $payment,$platform) {
 
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
@@ -234,10 +238,10 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment);
+        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
     }
 
-    public function useSource(User $user, array $data, Payment $payment) {
+    public function useSource(User $user, array $data, Payment $payment,$platform) {
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -292,10 +296,10 @@ class PayU {
         ];
 //        return $dataSent;
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment);
+        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
     }
 
-    public function payDebitCard(User $user, array $data, Payment $payment) {
+    public function payDebitCard(User $user, array $data, Payment $payment,$platform) {
 
         $validator = $this->validatorPayerSimple($data);
         if ($validator->fails()) {
@@ -344,7 +348,7 @@ class PayU {
         ];
 
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment);
+        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
     }
 
     public function payCash(User $user, array $data, Payment $payment) {
@@ -940,8 +944,8 @@ class PayU {
 
     public function createToken(User $user, array $data) {
         $source = $user->sources()->where("gateway", "Payu")->first();
-        if($source){
-            if($source->source){
+        if ($source) {
+            if ($source->source) {
                 $this->deleteToken($user);
             }
         }
@@ -966,7 +970,7 @@ class PayU {
 
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
         if ($result['code'] == "SUCCESS") {
-            
+
             if ($source) {
                 $source->source = $result['creditCardTokenId'];
                 $source->save();
@@ -1005,8 +1009,8 @@ class PayU {
             return null;
         }
     }
-    
-    public function useToken(User $user, array $data, Payment $payment) {
+
+    public function useToken(User $user, array $data, Payment $payment,$platform) {
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -1058,7 +1062,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment);
+        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
     }
 
     public function deleteSubscription(User $user, $subscription) {
@@ -1148,13 +1152,13 @@ class PayU {
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
-    public function handleTransactionResponse($response, User $user, Order $order) {
+    public function handleTransactionResponse($response, User $user, Payment $payment,$dataSent,$platform) {
         if ($response['code'] == "SUCCESS") {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
-                $transactionResponse['order_id'] = $order->id;
-                $transactionResponse['referenceCode'] = $order->referenceCode;
-                $transactionResponse['user_id'] = $user->id;
+                $transactionResponse['order_id'] = $payment->order_id;
+                $transactionResponse['referenceCode'] = $payment->referenceCode;
+                $transactionResponse['user_id'] = $payment->id;
                 $transactionResponse['gateway'] = 'payu';
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
@@ -1162,8 +1166,11 @@ class PayU {
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
                 $transaction = Transaction::create($transactionResponse);
+
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApproveOrder($order));
+                    $payment->status = "Paid";
+                    $payment->save();
+                    dispatch(new ApprovePayment($payment, $platform));
                 } else if ($transactionResponse['state'] == 'PENDING') {
                     dispatch(new PendingOrder($order));
                 } else {
@@ -1172,7 +1179,7 @@ class PayU {
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
-        return $response;
+        return ["status" => "error",  "response" => $response, "message" => $dataSent]; 
     }
 
     public function sendRequest(array $data, $query) {
@@ -1603,6 +1610,7 @@ class PayU {
                         ]
         );
     }
+
     /**
      * Get a validator for an incoming registration request.
      *

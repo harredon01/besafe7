@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Jobs;
-use App\Models\Order;
+use App\Models\Payment;
 use App\Services\EditOrder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -9,20 +9,23 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ApproveOrder implements ShouldQueue
+class ApprovePayment implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $order;
+    protected $payment;
+    
+    protected $platform;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Order $order )
+    public function __construct(Payment $payment,$platform )
     {
-        $this->order = $order;
+        $this->payment = $payment;
+        $this->platform = $platform;
     }
 
     /**
@@ -32,6 +35,6 @@ class ApproveOrder implements ShouldQueue
      */
     public function handle(EditOrder $editOrder)
     {
-        $editOrder->approveOrder($this->order); 
+        $editOrder->approvePayment($this->payment,$this->platform); 
     }
 }

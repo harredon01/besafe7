@@ -351,10 +351,10 @@ class EditBilling {
                 if (array_key_exists("token", $data)) {
                     return $gateway->useToken($user, $data, $payment);
                 } else {
-                    $paymentResult = $gateway->payCreditCard($user, $data, $payment);
+                    $paymentResult = $gateway->payCreditCard($user, $data, $payment,$data['platform']);
                     if (array_key_exists("save_card", $data)) {
                         if ($data['save_card']) {
-                            $gateway->saveCard($user, $data);
+                            $gateway->createToken($user, $data);
                         }
                     }
                     return $paymentResult;
@@ -383,7 +383,7 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
-                return $gateway->payDebitCard($user, $data, $payment);
+                return $gateway->payDebitCard($user, $data, $payment,$data['platform']);
             }
         }
         return array("status" => "error", "message" => "Invalid order");
