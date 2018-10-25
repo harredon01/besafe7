@@ -304,6 +304,16 @@ class EditOrder {
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->approvePayment($payment);
     }
+    public function denyPayment(Payment $payment, $platform) {
+        $className = "App\\Services\\EditOrder" . ucfirst($platform);
+        $platFormService = new $className; //// <--- this thing will be autoloaded
+        return $platFormService->denyPayment($payment);
+    }
+    public function pendingPayment(Payment $payment, $platform) {
+        $className = "App\\Services\\EditOrder" . ucfirst($platform);
+        $platFormService = new $className; //// <--- this thing will be autoloaded
+        return $platFormService->pendingPayment($payment);
+    }
 
     public function submitOrder(Order $order) {
         

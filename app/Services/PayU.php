@@ -12,8 +12,8 @@ use App\Models\Plan;
 use App\Models\Country;
 use App\Models\Region;
 use App\Jobs\ApprovePayment;
-use App\Jobs\DenyOrder;
-use App\Jobs\PendingOrder;
+use App\Jobs\DenyPayment;
+use App\Jobs\PendingPayment;
 use App\Models\Source;
 use Carbon\Carbon;
 use App\Models\Subscription;
@@ -1172,9 +1172,9 @@ class PayU {
                     $payment->save();
                     dispatch(new ApprovePayment($payment, $platform));
                 } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new PendingOrder($order));
+                    dispatch(new PendingPayment($payment, $platform));
                 } else {
-                    dispatch(new DenyOrder($order));
+                    dispatch(new DenyPayment($payment, $platform));
                 }
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
@@ -1310,7 +1310,7 @@ class PayU {
                     $transaction = Transaction::create($transactionResponse);
                     dispatch(new ApproveOrder($order));
                 } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new PendingOrder($order));
+                    dispatch(new PendingPayment($order));
                 } else {
                     $transaction = Transaction::create($transactionResponse);
                     dispatch(new DenyOrder($order));
@@ -1355,13 +1355,13 @@ class PayU {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
             }
             $transaction = $this->saveTransaction($data);
-            $order = Order::where("referenceCode", $referenceCode)->first();
+            $payment = Payment::where("referenceCode", $referenceCode)->first();
             if ($order) {
                 if ($data['state_pol'] == 4) {
-                    dispatch(new ApproveOrder($order));
+                    dispatch(new ApprovePayment($payment));
                     $transaction->description = "Transacción aprobada";
                 } else {
-                    dispatch(new DenyOrder($order));
+                    dispatch(new DenyPayment($payment));
                     $transaction->description = "Transacción rechazada";
                 }
             } else {
@@ -1457,7 +1457,7 @@ class PayU {
                     dispatch(new DenyOrder($order));
                     $transaction->description = "Error";
                 } else if ($data['transactionState'] == 7) {
-                    dispatch(new PendingOrder($order));
+                    dispatch(new PendingPayment($order));
                 } else {
                     $transaction->description = $data['mensaje'];
                 }

@@ -12,7 +12,7 @@ class Payment extends Model
      *
      * @var array
      */
-    protected $fillable = ['status', 'attributes', 'tax', 'total', 'total', 'user_id', 'referenceCode','transactionId','responseCode', 'extras', 'order_id', 'address_id'];
+    protected $fillable = ['status', 'attributes', 'tax', 'total', 'user_id', 'referenceCode','transactionId','responseCode', 'extras', 'order_id', 'address_id'];
     
     public function order() {
         return $this->belongsTo('App\Models\Order');

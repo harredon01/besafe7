@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Unlu\Laravel\Api\QueryBuilder;
+use App\Models\Payment;
 use App\Services\EditBilling;
 
 class BillingApiController extends Controller {
@@ -124,6 +126,30 @@ class BillingApiController extends Controller {
         $data['cookie'] = $request->cookie('name');
         $status = $this->editBilling->payCash($user,$source, $data);
         return response()->json($status);
+    }
+    
+    /**
+     * Get Registered addresses.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getPayments(Request $request) {
+        $request2 = $this->cleanSearch->handle($request);
+        if ($request2) {
+            $queryBuilder = new QueryBuilder(new Payment, $request2);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "no user id parameter allowed"
+                        ], 401);
     }
 
 }

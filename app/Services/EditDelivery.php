@@ -77,12 +77,13 @@ class EditDelivery {
         $delivery = Delivery::find($data['delivery_id']);
         if ($delivery) {
             if ($delivery->user_id == $user->id) {
+                $delivery->delivery = "20".$data['year']."-".$data['month']."-".$data['day'];
                 $delivery->type_id = $data['type_id'];
                 $delivery->starter_id = $data['starter_id'];
                 $delivery->main_id = $data['main_id'];
                 $delivery->dessert_id = $data['dessert_id'];
-		$delivery->observation = $data['observation'];
-		$delivery->details = json_encode($data['details']);
+                $delivery->observation = $data['observation'];
+                $delivery->details = json_encode($data['details']);
                 $delivery->status = "transit";
                 $delivery->save();
                 return array("status" => "success", "message" => "Delivery scheduled for transit");
@@ -105,8 +106,11 @@ class EditDelivery {
                     'starter_id' => 'required|max:255',
                     'main_id' => 'required|max:255',
                     'dessert_id' => 'required|max:255',
-		    'observation' => 'required|max:255',
-		    'details' => 'required|max:255'
+                    'observation' => 'required|max:255',
+                    'details' => 'required|max:255',
+                    'day' => 'required|max:255',
+                    'month' => 'required|max:255',
+                    'year' => 'required|max:255'
         ]);
     }
 

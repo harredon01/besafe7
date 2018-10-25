@@ -294,6 +294,15 @@ class EditOrderFood {
             }
         }
     }
+    public function denyPayment(Payment $payment) {
+        $payment->status="denied";
+        $payment->save();
+    }
+    
+    public function pendingPayment(Payment $payment) {
+        $payment->status="Open";
+        $payment->save();
+    }
 
     public function createMealPlan(Order $order, Item $item, $address_id) {
         $data = json_decode($order->attributes, true);
