@@ -390,10 +390,10 @@ class EditOrderFood {
             $totalCost += self::ROUTE_HOURS_EST*self::ROUTE_HOUR_COST;
             $totalIncomeShipping += $value->unit_price;
             $totalLunches += $value->unit;
-            if($value->unit>7){
-                $totalCost2 += $value->availability*5400;
+            if($value->availability>7){
+                $totalCost2 += ($value->availability+1)*5400;
             } else {
-                $totalCost2 += $value->availability*6400;
+                $totalCost2 += ($value->availability+1)*6400;
             }  
         }
         $totalIncome = $totalLunches*self::LUNCH_PROFIT;
