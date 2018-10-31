@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Item;
 use App\Models\Condition;
 use App\Models\Delivery;
+use App\Models\OrderAddress;
+use App\Models\Route;
 use App\Models\OrderCondition;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -17,6 +19,10 @@ class EditOrderFood {
 
     const OBJECT_ORDER = 'Order';
     const CREDIT_PRICE = 10000;
+    const LUNCH_ROUTE = 15;
+    const LUNCH_PROFIT = 1100;
+    const ROUTE_HOUR_COST = 11000;
+    const ROUTE_HOURS_EST = 3;
     const UNIT_LOYALTY_DISCOUNT = 11000;
     const OBJECT_ORDER_REQUEST = 'OrderRequest';
     const ORDER_PAYMENT = 'order_payment';
@@ -285,8 +291,8 @@ class EditOrderFood {
         $order = Order::find($payment->order_id);
         if ($order) {
             $payments = $order->payments()->where("status", "<>", "Paid")->count();
-            if ($payments>0) {
-                $order->status="Pending-".$payments;
+            if ($payments > 0) {
+                $order->status = "Pending-" . $payments;
                 $order->save();
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
@@ -294,13 +300,14 @@ class EditOrderFood {
             }
         }
     }
+
     public function denyPayment(Payment $payment) {
-        $payment->status="denied";
+        $payment->status = "denied";
         $payment->save();
     }
-    
+
     public function pendingPayment(Payment $payment) {
-        $payment->status="Open";
+        $payment->status = "Open";
         $payment->save();
     }
 
@@ -316,14 +323,14 @@ class EditOrderFood {
         $data = array();
         $items = $order->items()->get();
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $status = "approved: items: ". count($items)." | ". json_encode($items);
+        $status = "approved: items: " . count($items) . " | " . json_encode($items);
         foreach ($items as $item) {
-            $status = $status." :".$item->attributes;
+            $status = $status . " :" . $item->attributes;
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
-            
+
             if (array_key_exists("type", $data)) {
-                $status = $status." type";
+                $status = $status . " type";
                 if ($data['type'] == "subscription") {
                     $object = $data['object'];
                     $id = $data['id'];
@@ -337,7 +344,7 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
-                    $status = $status." meal-plan";
+                    $status = $status . " meal-plan";
                     $this->createMealPlan($order, $item, $address->id);
                 }
             }
@@ -357,6 +364,12 @@ class EditOrderFood {
         $date = date_create();
         for ($x = 0; $x < $item->quantity; $x++) {
             date_add($date, date_interval_create_from_date_string("1 days"));
+            $dayofweek = date('w', strtotime($date));
+            if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("2 days"));
+            } else if ($dayofweek == 6) {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            }
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
             $delivery->delivery = $date;
@@ -368,26 +381,120 @@ class EditOrderFood {
     public function getTransactionTotal($total) {
         return ($total * 0.0349 + 900);
     }
+    public function getTotalEstimatedShipping($results) {
+        $totalCost = 0;
+        $totalIncomeShipping = 0;
+        $totalCost2 = 0;
+        $totalLunches = 0;
+        foreach ($results as $value) {
+            $totalCost += self::ROUTE_HOURS_EST*self::ROUTE_HOUR_COST;
+            $totalIncomeShipping += $value->unit_price;
+            $totalLunches += $value->unit;
+            if($value->unit>7){
+                $totalCost2 += $value->availability*5400;
+            } else {
+                $totalCost2 += $value->availability*6400;
+            }  
+        }
+        $totalIncome = $totalLunches*self::LUNCH_PROFIT;
+        echo 'Lunches: ' . $totalLunches . PHP_EOL;
+        echo 'Routes: ' . count($results) . PHP_EOL;
+        echo 'Lunches per route: ' . ($totalLunches/count($results)) . PHP_EOL;
+        echo 'Cost: ' . $totalCost . PHP_EOL;
+        echo 'Cost2: ' . $totalCost2 . PHP_EOL;
+        echo 'Income Shipping: ' . $totalIncomeShipping . PHP_EOL;
+        echo 'Total Income: ' . ($totalIncomeShipping+$totalIncome) . PHP_EOL;
+        echo 'Total Profit: ' . (($totalIncomeShipping+$totalIncome)- $totalCost). PHP_EOL;
+        echo 'Total Profit2: ' . (($totalIncomeShipping+$totalIncome)- $totalCost2). PHP_EOL;
+        if($totalCost<$totalIncome){
+            echo 'Scenario successful!!' . PHP_EOL;
+        } else {
+            echo 'Scenario FAILED!!' . PHP_EOL;
+        }
+    }
 
-    public function prepareRouteModel(array $thedata) {
+    public function prepareRouteModel(array $thedata, $results) {
+//        dd($thedata);
         $deliveries = DB::select(""
-                        . "SELECT d.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
+                        . "SELECT d.id, d.delivery,d.address_id,status, lat,`long`, 
 			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  d.lat  ) ) ) ) AS Distance 
-                   FROM deliveries d
+		         cos( radians( lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
+                   FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
-                        status = 'active'
-                            AND d.private = 0
-                            AND d.type <> ''
+                        status = 'enqueue'
+                            AND d.user_id = 1
+                            AND d.delivery >= :theDate
+                            AND d.delivery <= :theDate2
                             AND lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
-                    HAVING distance < :radius order by distance asc limit 20 "
+                    HAVING distance < :radius order by distance asc limit 100 "
                         . "", $thedata);
+
+        $stops = $this->turnDeliveriesIntoStops($deliveries);
+        $results = $this->createRoutes($stops, $results);
+        return $results;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function createRoutes($stops, $routes) {
+        foreach ($stops as $value) {
+            $found = false;
+            foreach ($routes as $item) {
+                $available = self::LUNCH_ROUTE - $item->unit;
+                if ($available > 0 && $available >= $value['amount']) {
+                    $item->unit += $value['amount'];
+                    $item->unit_price += $value['shipping'];
+                    $item->availability++;
+                    $found = true;
+                }
+            }
+            if ($found == false) {
+                $route = new Route();
+                $route->unit = $value['amount'];
+                $route->unit_price = $value['shipping'];
+                $route->availability++;
+                array_push($routes, $route );
+            }   
+        }
+        return $routes;
+    }
+
+    private static function cmp($a, $b) {
+        if ($a['amount'] == $b['amount']) {
+            return 0;
+        }
+        return ($a['amount'] < $b['amount']) ? -1 : 1;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function turnDeliveriesIntoStops($deliveries) {
+        $stops = array();
+        $shipping = [
+            "1" => 3050.00,
+            "2" => 5200.00,
+            "3" => 8100.00,
+            "4" => 11200.00,
+            "5" => 11500.00,
+            "6" => 14100.00,
+            "7" => 16450.00,
+            "8" => 19200.00,
+            "9" => 17550.00,
+            "10" => 19500.00,
+            "11" => 21750.00,
+        ];
         if (count($deliveries) > 0) {
             $initialAddress = $deliveries[0]->address_id;
             $deliveryCounter = 0;
-            $stops = array();
+
             $totalCounter = 0;
             foreach ($deliveries as $value) {
                 $totalCounter++;
@@ -396,7 +503,10 @@ class EditOrderFood {
                 } else {
                     $stop = [
                         "amount" => $deliveryCounter,
-                        "address_id" => $initialAddress
+                        "address_id" => $initialAddress,
+                        "latitude" => $value->lat,
+                        "longitude" => $value->long,
+                        "shipping" => $shipping[$deliveryCounter],
                     ];
                     array_push($stops, $stop);
                     $deliveryCounter = 1;
@@ -405,12 +515,59 @@ class EditOrderFood {
                 if ($totalCounter == count($deliveries)) {
                     $stop = [
                         "amount" => $deliveryCounter,
-                        "address_id" => $initialAddress
+                        "address_id" => $initialAddress,
+                        "latitude" => $value->lat,
+                        "longitude" => $value->long,
+                        "shipping" => $shipping[$deliveryCounter],
                     ];
                     array_push($stops, $stop);
                 }
             }
+
+
+
+            usort($stops, array($this, 'cmp'));
         }
+        return $stops;
+    }
+
+    public function generateRandomDeliveries($lat, $long) {
+        $radius = 5; // in miles
+        $R = 6371;
+        $lat_max = ($lat + rad2deg($radius / $R)) * 1000000000;
+        $lat_min = ($lat - rad2deg($radius / $R)) * 1000000000;
+        $lng_max = ($long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
+        $lng_min = ($long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
+
+        $date = date_create();
+        $total = rand(0,100);
+        for ($x = 0; $x <= $total; $x++) {
+            $latit = rand($lat_min, $lat_max) / 1000000000;
+            $longit = rand($lng_min, $lng_max) / 1000000000;
+            $address = OrderAddress::create([
+                        "user_id" => 1,
+                        "name" => "test",
+                        "city_id" => 524,
+                        "region_id" => 11,
+                        "country_id" => 1,
+                        "address" => "Calle test",
+                        "lat" => $latit,
+                        "long" => $longit,
+            ]);
+            $amountDeliveries = rand(1, 10);
+            for ($j = 0; $j <= $amountDeliveries; $j++) {
+                $delivery = Delivery::create([
+                            "user_id" => 1,
+                            "delivery" => $date,
+                            "type_id" => 1,
+                            "status" => "enqueue",
+                            "starter_id" => 1,
+                            "address_id" => $address->id
+                ]);
+            }
+        }
+        echo 'lng (min/max): ' . $lng_min . '/' . $lng_max . PHP_EOL;
+        echo 'lat (min/max): ' . $lat_min . '/' . $lat_max . PHP_EOL;
     }
 
     /**
@@ -418,23 +575,22 @@ class EditOrderFood {
      *
      * @return Response
      */
-    public function prepareRoutingSimulation() {
-        $radius = 1;
+    public function prepareRoutingSimulation($lat, $long) {
         $R = 6371;
-        $remainders = array();
-        $lat = 4.720112;
-        $long = -74.064916;
-        $maxLat = $lat + rad2deg($radius / $R);
-        $minLat = $lat - rad2deg($radius / $R);
-        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $date = date("Y-m-d");
+        $results = [];
+        //$results['unscheduled'] = [];
+        $date2 = date('Y-m-d', strtotime($date . ' + 1 days'));
         for ($x = 0; $x <= 8; $x++) {
-            $operativeRadius = 0;
             if ($x < 4) {
-                $operativeRadius = $radius;
+                $radius = 3;
             } else {
-                $operativeRadius = $radius * 2;
+                $radius = 6;
             }
+            $maxLat = $lat + rad2deg($radius / $R);
+            $minLat = $lat - rad2deg($radius / $R);
+            $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+            $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
             if ($x == 0 || $x == 4) {
                 $thedata = [
                     'lat' => $lat,
@@ -444,7 +600,9 @@ class EditOrderFood {
                     'latsup' => $maxLat,
                     'longinf' => $long,
                     'longsup' => $maxLon,
-                    'radius' => $operativeRadius
+                    'theDate' => $date,
+                    'theDate2' => $date2,
+                    'radius' => $radius
                 ];
             } else if ($x == 1 || $x == 5) {
                 $thedata = [
@@ -455,7 +613,9 @@ class EditOrderFood {
                     'latsup' => $lat,
                     'longinf' => $long,
                     'longsup' => $maxLon,
-                    'radius' => $operativeRadius
+                    'theDate' => $date,
+                    'theDate2' => $date2,
+                    'radius' => $radius
                 ];
             } else if ($x == 2 || $x == 6) {
                 $thedata = [
@@ -465,8 +625,10 @@ class EditOrderFood {
                     'latinf' => $minLat,
                     'latsup' => $lat,
                     'longinf' => $minLon,
+                    'theDate' => $date,
+                    'theDate2' => $date2,
                     'longsup' => $long,
-                    'radius' => $operativeRadius
+                    'radius' => $radius
                 ];
             } else if ($x == 3 || $x == 7) {
                 $thedata = [
@@ -474,17 +636,17 @@ class EditOrderFood {
                     'lat2' => $lat,
                     'long' => $long,
                     'latinf' => $lat,
+                    'theDate' => $date,
+                    'theDate2' => $date2,
                     'latsup' => $maxLat,
                     'longinf' => $minLon,
                     'longsup' => $long,
-                    'radius' => $operativeRadius
+                    'radius' => $radius
                 ];
             }
-            $this->prepareRouteModel($thedata);
+            $results = $this->prepareRouteModel($thedata, $results);
         }
-
-
-        return array("deliveries" => $deliveries);
+        $this->getTotalEstimatedShipping($results);
     }
 
 }

@@ -27,8 +27,8 @@ class CreateRoutesTable extends Migration {
                         $table->double('height');
                         $table->double('width');
                         $table->double('unit_price');                        
-                        $table->string('unit');
-                        $table->integer('status');
+                        $table->integer('unit');
+                        $table->string('status');
 			$table->text('coverage')->nullable();
 			$table->timestamps();
                         

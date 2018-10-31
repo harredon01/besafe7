@@ -32,4 +32,8 @@ class Route extends Model {
     {
         return $this->hasMany('App\Models\Stop');
     }
+    public function deliveries()
+    {
+        return $this->hasMany('App\Models\Delivery');
+    }
 }
