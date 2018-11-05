@@ -20,6 +20,7 @@ class CreateDeliveriesTable extends Migration
             $table->string('main_id')->nullable();
             $table->string('dessert_id')->nullable();
             $table->string('code')->nullable();
+            $table->double('shipping')->nullable();
             $table->string('observation')->nullable();
             $table->integer('group_id')->unsigned()->nullable();
             $table->foreign('group_id')->references('id')
@@ -27,12 +28,6 @@ class CreateDeliveriesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')
                     ->on('users');
-            $table->integer('route_id')->unsigned()->nullable();
-            $table->foreign('route_id')->references('id')
-                    ->on('routes');
-            $table->integer('stop_id')->unsigned()->nullable();
-            $table->foreign('stop_id')->references('id')
-                    ->on('stops');
             $table->integer('address_id')->unsigned();
 	    $table->dateTime('delivery');
 	    $table->text('details')->nullable();

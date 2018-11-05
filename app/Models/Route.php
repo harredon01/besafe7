@@ -34,6 +34,6 @@ class Route extends Model {
     }
     public function deliveries()
     {
-        return $this->hasMany('App\Models\Delivery');
+        return $this->belongsToMany('App\Models\Delivery');
     }
 }

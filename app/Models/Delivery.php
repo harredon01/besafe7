@@ -19,7 +19,7 @@ class Delivery extends Model{
      * @var array
      */
     protected $fillable = ['type_id','starter_id','main_id','dessert_id','code','observation','address_id',
-        'group_id','user_id','route_id','stop_id','delivery','details'];
+        'group_id','user_id','shipping','delivery','details'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
@@ -27,13 +27,13 @@ class Delivery extends Model{
     public function group() {
         return $this->belongsTo('App\Models\Group');
     }
-    public function route() {
-        return $this->belongsTo('App\Models\Route');
+    public function routes() {
+        return $this->belongsToMany('App\Models\Route');
     }
     public function address() {
         return $this->belongsTo('App\Models\Address');
     }
-    public function stop() {
-        return $this->belongsTo('App\Models\Stop');
+    public function stops() {
+        return $this->belongsToMany('App\Models\Stop');
     }
 }

@@ -24,7 +24,7 @@ class Stop extends Model {
     }
     public function deliveries()
     {
-        return $this->hasMany('App\Models\Delivery');
+        return $this->belongsToMany('App\Models\Delivery');
     }
     public function city() {
         return $this->belongsTo('App\Models\City');

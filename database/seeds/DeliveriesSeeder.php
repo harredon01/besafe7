@@ -30,7 +30,16 @@ class DeliveriesSeeder extends Seeder {
     }
     
     public function deleteOldData() {
-        Delivery::where("user_id",1)->delete();
+        $deliveries = Delivery::where("user_id",1)->get();
+        foreach ($deliveries as $item) {
+            DB::table('delivery_stop')
+                     ->where('delivery_id', $item->id)
+                     ->delete();
+            DB::table('delivery_route')
+                     ->where('delivery_id', $item->id)
+                     ->delete();
+            $item->delete();
+        }
         $routes = Route::where("status","pending")->get();
         foreach ($routes as $value) {
             $value->stops()->delete();
