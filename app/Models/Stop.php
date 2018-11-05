@@ -16,11 +16,15 @@ class Stop extends Model {
      *
      * @var array
      */
-    protected $fillable = ['stop_order','arrival','city_name','region_name','country_name'];
+    protected $fillable = ['stop_order','arrival','amount','region_name','country_name','route_id','address_id'];
 
     public function route()
     {
         return $this->hasMany('App\Models\Route');
+    }
+    public function deliveries()
+    {
+        return $this->hasMany('App\Models\Delivery');
     }
     public function city() {
         return $this->belongsTo('App\Models\City');
@@ -30,6 +34,9 @@ class Stop extends Model {
     }
     public function country() {
         return $this->belongsTo('App\Models\Country');
+    }
+    public function address() {
+        return $this->belongsTo('App\Models\OrderAddress');
     }
 
 }

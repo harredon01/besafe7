@@ -16,9 +16,9 @@ class CreateDeliveriesTable extends Migration
         Schema::create('deliveries', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('type_id')->unsigned()->nullable();
-            $table->integer('starter_id')->unsigned()->nullable();
-            $table->integer('main_id')->unsigned()->nullable();
-            $table->integer('dessert_id')->unsigned()->nullable();
+            $table->string('starter_id')->nullable();
+            $table->string('main_id')->nullable();
+            $table->string('dessert_id')->nullable();
             $table->string('code')->nullable();
             $table->string('observation')->nullable();
             $table->integer('group_id')->unsigned()->nullable();
@@ -30,6 +30,9 @@ class CreateDeliveriesTable extends Migration
             $table->integer('route_id')->unsigned()->nullable();
             $table->foreign('route_id')->references('id')
                     ->on('routes');
+            $table->integer('stop_id')->unsigned()->nullable();
+            $table->foreign('stop_id')->references('id')
+                    ->on('stops');
             $table->integer('address_id')->unsigned();
 	    $table->dateTime('delivery');
 	    $table->text('details')->nullable();

@@ -16,13 +16,16 @@ class CreateStopsTable extends Migration {
 		{
 			$table->increments('id');
                         $table->integer('stop_order');
-                        $table->string('city_name');
+                        $table->integer('amount')->unsigned()->nullable();
                         $table->integer('route_id')->unsigned()->nullable();
                         $table->foreign('route_id')->references('id')
                                 ->on('routes');
                         $table->integer('city_id')->unsigned()->nullable();
                         $table->foreign('city_id')->references('id')
                                 ->on('cities');
+                        $table->integer('address_id')->unsigned()->nullable();
+                        $table->foreign('address_id')->references('id')
+                                ->on('order_addresses');
                         $table->string('region_name');
                         $table->integer('region_id')->unsigned()->nullable();
                         $table->foreign('region_id')->references('id')

@@ -3,10 +3,9 @@
 use Illuminate\Database\Seeder;
 use App\Services\EditOrderFood;
 use App\Models\Delivery;
-use App\Models\Route;
 use App\Models\OrderAddress;
 
-class DeliveriesSeeder extends Seeder {
+class PurchaseOrderSeeder extends Seeder {
     /**
      * Run the database seeds.
      *
@@ -24,20 +23,14 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
-        $this->deleteOldData();
-        $this->generateRandomDeliveries();
-        $this->editOrderFood->prepareRoutingSimulation(4.670129, -74.051013);
+//        $this->deleteOldData();
+//        $this->generateRandomDeliveries();
+        $this->editOrderFood->getPurchaseOrder();
     }
     
     public function deleteOldData() {
-        Delivery::where("user_id",1)->delete();
-        $routes = Route::where("status","pending")->get();
-        foreach ($routes as $value) {
-            $value->stops()->delete();
-        }
-        $routes = Route::where("status","pending")->delete();
-        
         OrderAddress::where("name","test")->delete();
+        Delivery::where("user_id",1)->delete();
     }
 
     public function generateRandomDeliveries() {

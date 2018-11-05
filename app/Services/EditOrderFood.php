@@ -6,10 +6,12 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Item;
+use App\Models\Article;
 use App\Models\Condition;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
+use App\Models\Stop;
 use App\Models\OrderCondition;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -381,42 +383,141 @@ class EditOrderFood {
     public function getTransactionTotal($total) {
         return ($total * 0.0349 + 900);
     }
+
+    public function getPurchaseOrder() {
+        $date = date("Y-m-d");
+        $deliveries = Delivery::where('delivery', $date)->get();
+
+        //$articles = Article::where('start_date',$date)->get();
+        $articles = Article::where('start_date', "2018-09-01")->get();
+        $father = [];
+        $keywords = ['fruit', 'meat', 'soup', 'chicken'];
+        foreach ($articles as $article) {
+
+            $attributes = json_decode($article->attributes, true);
+            $entradas = [];
+            $entradasNombre = [];
+            foreach ($attributes['entradas'] as $value) {
+                $entradas[$value['codigo']] = 0;
+                $entradasNombre[$value['codigo']] = $value['valor'];
+            }
+            $main = [];
+            $mainNombre = [];
+            foreach ($attributes['plato'] as $item) {
+                $main[$item['codigo']] = 0;
+                $mainNombre[$item['codigo']] = $item['valor'];
+            }
+            foreach ($keywords as $keyword) {
+                $father['keywords'][$keyword] = 0;
+            }
+//            array_push($plate, [0 => $main]);
+//            array_push($plate, [0 => $entradas]);
+            $father[$article->id]['count'] = 0;
+            $father[$article->id]['starter'] = $entradas;
+            $father[$article->id]['main'] = $main;
+            $father[$article->id]['name'] = $article->name;
+            $father[$article->id]['starter_name'] = $entradasNombre;
+            $father[$article->id]['main_name'] = $mainNombre;
+        }
+        //dd($father);
+
+        foreach ($deliveries as $value) {
+            $father[$value->type_id]['count'] ++;
+            $father[$value->type_id]['starter'][$value->starter_id] ++;
+            $father[$value->type_id]['main'][$value->main_id] ++;
+
+            foreach ($keywords as $word) {
+                if (strpos($value->starter_id, $word) !== false) {
+                    $father["keywords"][$word] ++;
+                }
+                if (strpos($value->main_id, $word) !== false) {
+                    $father["keywords"][$word] ++;
+                }
+            }
+        }
+        //dd($father);
+        $counter = 1;
+        foreach ($articles as $art) {
+            $attributes = json_decode($art->attributes, true);
+            echo "Total " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . PHP_EOL;
+            foreach ($attributes['entradas'] as $art2) {
+                echo "Total " . $father[$art->id]['name'] . " entrada: " . $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']] . PHP_EOL;
+            }
+            foreach ($attributes['plato'] as $art3) {
+                echo "Total " . $father[$art->id]['name'] . " principal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']] . PHP_EOL;
+            }
+        }
+        foreach ($keywords as $keyword2) {
+            echo "Total " . $keyword2 . ": " . $father['keywords'][$keyword2] . PHP_EOL;
+        }
+    }
+
     public function getTotalEstimatedShipping($results) {
+//        dd($results);
         $totalCost = 0;
         $totalIncomeShipping = 0;
         $totalCost2 = 0;
         $totalLunches = 0;
         foreach ($results as $value) {
-            $totalCost += self::ROUTE_HOURS_EST*self::ROUTE_HOUR_COST;
+            if ($value->height > 4) {
+                $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+            } else {
+                $totalCost += self::ROUTE_HOUR_COST * 2;
+            }
             $totalIncomeShipping += $value->unit_price;
             $totalLunches += $value->unit;
-            if($value->availability>7){
-                $totalCost2 += ($value->availability+1)*5400;
+            if (($value->height + 1) > 7) {
+                $totalCost2 += ($value->height + 1) * 5400;
             } else {
-                $totalCost2 += ($value->availability+1)*6400;
-            }  
+                $totalCost2 += ($value->height + 1) * 6400;
+            }
         }
-        $totalIncome = $totalLunches*self::LUNCH_PROFIT;
-        echo 'Lunches: ' . $totalLunches . PHP_EOL;
-        echo 'Routes: ' . count($results) . PHP_EOL;
-        echo 'Lunches per route: ' . ($totalLunches/count($results)) . PHP_EOL;
-        echo 'Cost: ' . $totalCost . PHP_EOL;
-        echo 'Cost2: ' . $totalCost2 . PHP_EOL;
-        echo 'Income Shipping: ' . $totalIncomeShipping . PHP_EOL;
-        echo 'Total Income: ' . ($totalIncomeShipping+$totalIncome) . PHP_EOL;
-        echo 'Total Profit: ' . (($totalIncomeShipping+$totalIncome)- $totalCost). PHP_EOL;
-        echo 'Total Profit2: ' . (($totalIncomeShipping+$totalIncome)- $totalCost2). PHP_EOL;
-        if($totalCost<$totalIncome){
+        $totalRoutes = count($results);
+        $totalIncome = $totalLunches * self::LUNCH_PROFIT;
+        $totalProfit = $totalIncomeShipping + $totalIncome;
+        $totalGains = 0;
+        $bestCost = "";
+        if($totalCost > $totalCost2){
+            $bestCost = "stops";
+            $totalGains = $totalProfit - $totalCost2;
+        } else {
+            $bestCost = "hourly";
+            $totalGains = $totalProfit - $totalCost;
+        }
+        $result = [
+            "hourly_cost" => $totalCost,
+            "stops_cost" => $totalCost2,
+            "hoov_income" => $totalIncome,
+            "shipping_income" => $totalIncomeShipping,
+            "total_income"=>$totalProfit,
+            "routes" => $totalRoutes,
+            "lunches" => $totalLunches,
+            "lunch_route" => ($totalLunches / $totalRoutes) ,
+            "best_cost" => $bestCost,
+            "day_profit" => $totalGains,
+        ];
+        echo 'Lunches: ' . $result['lunches'] . PHP_EOL;
+        echo 'Routes: ' . $result['routes'] . PHP_EOL;
+        echo 'Lunches per route: ' . $result['lunch_route'] . PHP_EOL;
+        echo 'hourly_cost: ' . $result['hourly_cost'] . PHP_EOL;
+        echo 'stops_cost: ' . $result['stops_cost']  . PHP_EOL;
+        echo 'Income Shipping: ' . $result['shipping_income'] . PHP_EOL;
+        echo 'Total Income: ' . $result['total_income'] . PHP_EOL;
+        echo 'Best shipping: ' . $result['best_cost'] . PHP_EOL;
+        echo 'Total Profit: ' . $result['day_profit']. PHP_EOL;
+        if ($result['best_cost'] < $result['shipping_income']) {
             echo 'Scenario successful!!' . PHP_EOL;
         } else {
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
+        return $result;
+        //dd($results);
     }
 
-    public function prepareRouteModel(array $thedata, $results) {
+    public function prepareRouteModel(array $thedata, $results, $preOrganize, $x) {
 //        dd($thedata);
         $deliveries = DB::select(""
-                        . "SELECT d.id, d.delivery,d.address_id,status, lat,`long`, 
+                        . "SELECT DISTINCT(d.id), d.delivery,d.address_id,status, lat,`long`, 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
@@ -426,13 +527,25 @@ class EditOrderFood {
                             AND d.user_id = 1
                             AND d.delivery >= :theDate
                             AND d.delivery <= :theDate2
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
-                    HAVING distance < :radius order by distance asc limit 100 "
+                            AND lat >= :latinf AND lat < :latsup
+                            AND `long` >= :longinf AND `long` < :longsup
+                    HAVING Distance <= :radius AND Distance > :radiusInf order by Distance asc"
                         . "", $thedata);
+        //echo "Query params: ". json_encode($thedata). PHP_EOL;
+        echo "Query results: " . count($deliveries) . PHP_EOL;
+        $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
-        $stops = $this->turnDeliveriesIntoStops($deliveries);
-        $results = $this->createRoutes($stops, $results);
+        //dd($stops);
+        if ($preOrganize) {
+            $results = $this->createRoutes($stops, $results, $x, 'preorganize', true);
+        } else {
+            $results = $this->createRoutes($stops, $results, $x, 'simple', true);
+        }
+
+        if ($x == 1) {
+            //dd($results);
+        }
+        //dd($results);
         return $results;
     }
 
@@ -441,25 +554,97 @@ class EditOrderFood {
      *
      * @return Response
      */
-    public function createRoutes($stops, $routes) {
+    public function createRoutes($stops, $routes, $x, $scenario, $save) {
         foreach ($stops as $value) {
             $found = false;
             foreach ($routes as $item) {
                 $available = self::LUNCH_ROUTE - $item->unit;
                 if ($available > 0 && $available >= $value['amount']) {
+                    $found = true;
                     $item->unit += $value['amount'];
                     $item->unit_price += $value['shipping'];
-                    $item->availability++;
-                    $found = true;
+                    if ($save) {
+                        $itemSavedStop = $item->stops()->where("address_id", $value["address_id"])->first();
+                        if ($itemSavedStop) {
+                            $foundInRoutes = true;
+                            $itemSavedStop->amount += $value['amount'];
+                            foreach ($value["deliveries"] as $del) {
+                                $realDel = Delivery::find($del->id);
+                                $realDel->stop_id = $itemSavedStop->id;
+                                $realDel->save();
+                            }
+                            $itemSavedStop->save();
+                        } else {
+                            $stopContainer = Stop::create([
+                                        "address_id" => $value["address_id"],
+                                        "amount" => $value["amount"],
+                                        "route_id" => $item->id
+                            ]);
+                            foreach ($value["deliveries"] as $del) {
+                                $realDel = Delivery::find($del->id);
+                                $realDel->stop_id = $stopContainer->id;
+                                $realDel->save();
+                            }
+                            $item->height++;
+                            $item->save();
+                        }
+                    } else {
+                        $routeStops = $item->stops2;
+
+                        $foundInRoutes = false;
+                        foreach ($routeStops as $rts) {
+                            if ($rts['address_id'] == $value["address_id"]) {
+                                $foundInRoutes = true;
+                                $key = array_search($rts, $routeStops);
+                                $routeStops[$key]['amount'] += $value['amount'];
+                            }
+                        }
+                        if (!$foundInRoutes) {
+                            array_push($routeStops, $value);
+                            $item->height++;
+                        }
+
+
+                        $item->stops2 = $routeStops;
+                        $item->deliveries2 = array_merge($item->deliveries2, $value["deliveries"]);
+                    }
+
+
+
+                    break;
                 }
             }
             if ($found == false) {
+                if ($x == 1) {
+                    //dd($value["deliveries"]);
+                }
+
                 $route = new Route();
+
+                $routestops = [$value];
+                $route->status = 'pending';
+                $route->description = $scenario;
                 $route->unit = $value['amount'];
+                $route->height = 1;
                 $route->unit_price = $value['shipping'];
-                $route->availability++;
-                array_push($routes, $route );
-            }   
+                if ($save) {
+                    $route->save();
+                    $stopContainer = Stop::create([
+                                "address_id" => $value["address_id"],
+                                "amount" => $value["amount"],
+                                "route_id" => $route->id
+                    ]);
+                    foreach ($value["deliveries"] as $del) {
+                        $realDel = Delivery::find($del->id);
+                        $realDel->stop_id = $stopContainer->id;
+                        $realDel->save();
+                    }
+                } else {
+                    $route->stops2 = $routestops;
+                    $route->deliveries2 = $value["deliveries"];
+                }
+                array_push($routes, $route);
+            }
         }
         return $routes;
     }
@@ -476,7 +661,7 @@ class EditOrderFood {
      *
      * @return Response
      */
-    public function turnDeliveriesIntoStops($deliveries) {
+    public function turnDeliveriesIntoStops($deliveries, $preorganize) {
         $stops = array();
         $shipping = [
             "1" => 3050.00,
@@ -494,39 +679,56 @@ class EditOrderFood {
         if (count($deliveries) > 0) {
             $initialAddress = $deliveries[0]->address_id;
             $deliveryCounter = 0;
-
+            $packages = [];
             $totalCounter = 0;
             foreach ($deliveries as $value) {
-                $totalCounter++;
-                if ($value->address_id == $initialAddress) {
-                    $deliveryCounter++;
+                if ($preorganize) {
+                    $totalCounter++;
+                    if ($value->address_id == $initialAddress) {
+                        $deliveryCounter++;
+                        array_push($packages, $value);
+                    } else {
+                        $stop = [
+                            "amount" => $deliveryCounter,
+                            "address_id" => $initialAddress,
+                            "latitude" => $value->lat,
+                            "longitude" => $value->long,
+                            "shipping" => $shipping[$deliveryCounter],
+                            "deliveries" => $packages
+                        ];
+                        array_push($stops, $stop);
+                        $packages = [];
+                        array_push($packages, $value);
+                        $deliveryCounter = 1;
+                        $initialAddress = $value->address_id;
+                    }
+                    if ($totalCounter == count($deliveries)) {
+                        $stop = [
+                            "amount" => $deliveryCounter,
+                            "address_id" => $initialAddress,
+                            "latitude" => $value->lat,
+                            "longitude" => $value->long,
+                            "shipping" => $shipping[$deliveryCounter],
+                            "deliveries" => $packages
+                        ];
+                        array_push($stops, $stop);
+                    }
                 } else {
+                    $packages = [$value];
                     $stop = [
-                        "amount" => $deliveryCounter,
-                        "address_id" => $initialAddress,
+                        "amount" => 1,
+                        "address_id" => $value->address_id,
                         "latitude" => $value->lat,
                         "longitude" => $value->long,
-                        "shipping" => $shipping[$deliveryCounter],
-                    ];
-                    array_push($stops, $stop);
-                    $deliveryCounter = 1;
-                    $initialAddress = $value->address_id;
-                }
-                if ($totalCounter == count($deliveries)) {
-                    $stop = [
-                        "amount" => $deliveryCounter,
-                        "address_id" => $initialAddress,
-                        "latitude" => $value->lat,
-                        "longitude" => $value->long,
-                        "shipping" => $shipping[$deliveryCounter],
+                        "shipping" => 2300,
+                        "deliveries" => $packages
                     ];
                     array_push($stops, $stop);
                 }
             }
-
-
-
-            usort($stops, array($this, 'cmp'));
+            if ($preorganize) {
+                usort($stops, array($this, 'cmp'));
+            }
         }
         return $stops;
     }
@@ -538,9 +740,11 @@ class EditOrderFood {
         $lat_min = ($lat - rad2deg($radius / $R)) * 1000000000;
         $lng_max = ($long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
         $lng_min = ($long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
-
-        $date = date_create();
-        $total = rand(0,100);
+        $date = date("Y-m-d");
+        //$articles = Article::where('start_date',$date)->get();
+        $articles = Article::where('start_date', "2018-09-01")->get();
+        //$date = date_create();
+        $total = rand(0, 10);
         for ($x = 0; $x <= $total; $x++) {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;
@@ -556,12 +760,20 @@ class EditOrderFood {
             ]);
             $amountDeliveries = rand(1, 10);
             for ($j = 0; $j <= $amountDeliveries; $j++) {
+                $type_num = rand(0, 2);
+                $art = $articles[$type_num];
+                $attrs = json_decode($art->attributes, true);
+                $starter = rand(0, 1);
+                $starterPlate = $attrs['entradas'][$starter];
+                $main = rand(0, 2);
+                $mainPlate = $attrs['plato'][$main];
                 $delivery = Delivery::create([
                             "user_id" => 1,
                             "delivery" => $date,
-                            "type_id" => 1,
+                            "type_id" => $art->id,
                             "status" => "enqueue",
-                            "starter_id" => 1,
+                            "starter_id" => $starterPlate['codigo'],
+                            "main_id" => $mainPlate['codigo'],
                             "address_id" => $address->id
                 ]);
             }
@@ -577,15 +789,25 @@ class EditOrderFood {
      */
     public function prepareRoutingSimulation($lat, $long) {
         $R = 6371;
+        $radius = 6;
+        $maxLat = $lat + rad2deg($radius / $R);
+        $minLat = $lat - rad2deg($radius / $R);
+        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+
         $date = date("Y-m-d");
-        $results = [];
-        //$results['unscheduled'] = [];
         $date2 = date('Y-m-d', strtotime($date . ' + 1 days'));
-        for ($x = 0; $x <= 8; $x++) {
+        $results = [];
+        $results2 = [];
+        //$results['unscheduled'] = [];
+
+        for ($x = 0; $x < 4; $x++) {
             if ($x < 4) {
-                $radius = 3;
+                $radiusInf = 0;
+                $radius = 7;
             } else {
-                $radius = 6;
+                $radiusInf = 3;
+                $radius = 7;
             }
             $maxLat = $lat + rad2deg($radius / $R);
             $minLat = $lat - rad2deg($radius / $R);
@@ -602,6 +824,7 @@ class EditOrderFood {
                     'longsup' => $maxLon,
                     'theDate' => $date,
                     'theDate2' => $date2,
+                    'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
             } else if ($x == 1 || $x == 5) {
@@ -615,6 +838,7 @@ class EditOrderFood {
                     'longsup' => $maxLon,
                     'theDate' => $date,
                     'theDate2' => $date2,
+                    'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
             } else if ($x == 2 || $x == 6) {
@@ -628,6 +852,7 @@ class EditOrderFood {
                     'theDate' => $date,
                     'theDate2' => $date2,
                     'longsup' => $long,
+                    'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
             } else if ($x == 3 || $x == 7) {
@@ -641,12 +866,15 @@ class EditOrderFood {
                     'latsup' => $maxLat,
                     'longinf' => $minLon,
                     'longsup' => $long,
+                    'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
             }
-            $results = $this->prepareRouteModel($thedata, $results);
+            $results2 = $this->prepareRouteModel($thedata, $results2, false, $x);
+            $results = $this->prepareRouteModel($thedata, $results, true, $x);
         }
         $this->getTotalEstimatedShipping($results);
+        $this->getTotalEstimatedShipping($results2);
     }
 
 }
