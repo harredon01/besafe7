@@ -1,0 +1,90 @@
+<!--
+  Generated template for the DeliveryProgramPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>{{ 'DELIVERY_PROGRAM.TITLE' | translate }}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <ion-item >
+        <p>{{ 'DELIVERY_PROGRAM.DESCRIPTION' | translate }}</p>
+    </ion-item>
+    <form  (submit)="updateDelivery()" [formGroup]="deliveryForm" >
+        <ion-list>
+
+            <ion-item>
+                <ion-label>{{ 'DELIVERY_PROGRAM.LUNCH_TYPE' | translate }}</ion-label>
+                <ion-select [(ngModel)]="saveDelivery.type_id" (cancel)="selectFoodType()" (ionChange)="selectFoodType()" formControlName="lunch_type"
+                    cancelText="Cancelar" okText="Confirmar">
+                    <ion-option value="{{foodItem.id}}" *ngFor="let foodItem of listArticles">{{foodItem.name}}</ion-option>
+                </ion-select>
+            </ion-item>
+
+
+            <ion-item>
+                <ion-label>{{ 'DELIVERY_PROGRAM.STARTER' | translate }}</ion-label>
+                <ion-select [(ngModel)]="saveDelivery.starter_id" (cancel)="selectFoodType()" (ionChange)="selectInitFood()" formControlName="starter"
+                    cancelText="Cancelar" okText="Confirmar" disabled="{{attributes.length == 0}}">
+                    <ion-option value="{{initFoodItem.codigo}}" *ngFor="let initFoodItem of attributes.entradas">{{initFoodItem.valor}}</ion-option>
+                </ion-select>
+            </ion-item>
+            
+            
+
+            <ion-item>
+                <ion-label>{{ 'DELIVERY_PROGRAM.MAIN_DISH' | translate }}</ion-label>
+                <ion-select [(ngModel)]="saveDelivery.main_id" (cancel)="selectFoodType()" (ionChange)="selectStandarFood()" formControlName="main_dish"
+                    cancelText="Cancelar" okText="Confirmar" disabled="{{attributes.length == 0}}">
+                    <ion-option value="{{standarFoodItem.codigo}}" *ngFor="let standarFoodItem of attributes.plato">{{standarFoodItem.valor}}</ion-option>
+                </ion-select>
+            </ion-item>
+
+            <ion-item>
+                <input type="tel" style="width:50px" placeholder="DD" [(ngModel)]="saveDelivery.day" (keyup)="keytab($event,2)" formControlName="delivery_year"/>
+                <input type="tel" style="width:50px" placeholder="MM" [(ngModel)]="saveDelivery.month" (keyup)="keytab($event,2)" formControlName="delivery_month"/>
+                <input type="tel" style="width:50px" placeholder="YY" [(ngModel)]="saveDelivery.year" formControlName="delivery_day"/>
+
+
+            </ion-item>
+            
+            <ion-item *ngIf="!payerForm.controls.delivery_month.valid  && (payerForm.controls.delivery__month.dirty || submitAttempt)">
+                <p>{{ 'DELIVERY_PROGRAM.DELIVERY_MONTH_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.delivery_year.valid  && (payerForm.controls.delivery__year.dirty || submitAttempt)">
+                <p>{{ 'DELIVERY_PROGRAM.DELIVERY_YEAR_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item *ngIf="dateError && submitAttempt">
+                <p>{{ 'DELIVERY_PROGRAM.DELIVERY_DATE_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <p>{{type}}</p>
+            </ion-item>
+            <ion-item>
+                <p>{{starterDish}}</p>
+            </ion-item>
+            <ion-item>
+                <p>{{mainDish}}</p>
+            </ion-item>
+            <ion-item>
+                <p>{{deliveryParams.delivery | date }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-label floating>{{ 'DELIVERY_PROGRAM.OBSERVATIONS' | translate }}</ion-label>
+                <ion-textarea [(ngModel)]="saveDelivery.observation" name="description"></ion-textarea>
+            </ion-item>
+            <div padding>
+                <input type="submit" value="{{ 'INPUTS.CREATE_ORDER' | translate }}" />
+            </div>
+        </ion-list>
+    </form>
+
+
+</ion-content>

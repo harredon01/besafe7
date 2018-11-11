@@ -1,0 +1,43 @@
+page-products {
+    .product-header-information {
+        display: flex;
+
+        span {
+            flex: 1;
+        }
+
+        div {
+            display: flex;
+            flex: 1;
+            justify-content: flex-end;
+
+            button {
+                border: 1px solid #dadada;
+            }
+
+        }
+    }
+
+    .content-car {
+        display: flex;
+        justify-content: flex-end;
+
+        #counter-items {
+            border-radius: 5em;
+            background-color: #000000;
+            color: #ffffff;
+            height: 20px;
+            width: 20px;
+            text-align: center;
+            left: 4em;
+            top: 0em;
+            position: relative;
+        }
+    }
+
+    .content-increment-product{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}

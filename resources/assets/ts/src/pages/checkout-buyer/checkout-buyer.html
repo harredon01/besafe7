@@ -1,0 +1,38 @@
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>{{ 'CHECKOUT_BUYER.TITLE' | translate }}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+    <ion-item >
+        <p>{{ 'CHECKOUT_BUYER.DESCRIPTION' | translate }}</p>
+    </ion-item>
+    <ion-list *ngIf="!showAddressCard">
+        <ion-item-sliding *ngFor="let item of currentItems">
+            <button ion-item (click)="saveBilling(item)">
+                <h2>{{item.name}}</h2>
+                <p>{{item.address}}</p>
+            </button>
+        </ion-item-sliding>
+    </ion-list>
+    <button *ngIf="!showAddressCard" ion-button round (click)="createAddress()">{{ 'INPUTS.CREATE_ADDRESS' | translate }}</button>
+    <ion-card *ngIf="showAddressCard">
+        <ion-item>
+            <h2>{{selectedAddress.address}}</h2>
+            <p>{{selectedAddress.name}}</p>
+        </ion-item>
+
+        <ion-card-content>
+            <p>{{selectedAddress.phone}}</p>
+            <p>{{selectedAddress.cityName}}</p>
+            <p>{{selectedAddress.regionName}}</p>
+            <p>{{selectedAddress.countryName}}</p>
+        </ion-card-content>
+    </ion-card>
+    <button ion-button round (click)="continuePayer()" *ngIf="showAddressCard">{{ 'INPUTS.CONTINUE' | translate }}</button>
+    <button ion-button round (click)="changeAddress()" *ngIf="showAddressCard">{{ 'INPUTS.CHANGE_ADDRESS' | translate }}</button>
+</ion-content>

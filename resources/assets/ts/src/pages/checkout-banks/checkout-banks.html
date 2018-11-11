@@ -1,0 +1,87 @@
+<ion-header>
+
+    <ion-navbar>
+        <ion-title>{{ 'CHECKOUT_BANKS.TITLE' | translate }}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+    <ion-item >
+        <p>{{ 'CHECKOUT_BANKS.DESCRIPTION' | translate }}</p>
+    </ion-item>
+    
+    <ion-item >
+        <ion-label>{{ 'INPUTS.MY_DATA' | translate }}</ion-label>
+        <ion-checkbox [(ngModel)]="v" (click)="useUser()"></ion-checkbox>
+    </ion-item>
+    <form  (submit)="payBank()" [formGroup]="payerForm" >
+        <ion-list>
+            <ion-item>
+                <ion-select [(ngModel)]="payer.financial_institution_code" formControlName="financial_institution_code">
+                    <ion-option *ngFor="let item of currentItems" [value]='item.value'>{{item.name}}</ion-option>
+                </ion-select>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.financial_institution_code.valid  && (payerForm.controls.financial_institution_code.dirty || submitAttempt)">
+                <p>{{ 'CHECKOUT_BANKS.BANK_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-select [(ngModel)]="payer.user_type" formControlName="user_type">
+                    <ion-option value="N">Persona natural</ion-option>
+                    <ion-option value="J">Persona Jurídica</ion-option>
+                </ion-select>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.user_type.valid  && (payerForm.controls.user_type.dirty || submitAttempt)">
+                <p>{{ 'CHECKOUT_BANKS.USER_TYPE_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-select  [(ngModel)]="payer.doc_type" formControlName="doc_type">
+                    <ion-option value="CC">Cédula de ciudadanía</ion-option>
+                    <ion-option value="CE">Cédula de extranjería.</ion-option>
+                    <ion-option value="NIT">Número de Identificación Tributario</ion-option>
+                    <ion-option value="TI">Tarjeta de Identidad</ion-option>
+                    <ion-option value="PP">Pasaporte</ion-option>
+                    <ion-option value="IDC">Identificador único de cliente</ion-option>
+                    <ion-option value="CEL">línea del móvil</ion-option>
+                    <ion-option value="RC">Registro civil de nacimiento.</ion-option>
+                    <ion-option value="DE">Documento de identificación extranjero</ion-option>
+                </ion-select>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.doc_type.valid  && (payerForm.controls.doc_type.dirty || submitAttempt)">
+                <p>{{ 'USER.DOC_TYPE_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-label >{{ 'USER.ID' | translate }}</ion-label>
+                <ion-input type="text" [(ngModel)]="payer.payer_id" formControlName="payer_id"></ion-input>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.payer_id.valid  && (payerForm.controls.payer_id.dirty || submitAttempt)">
+                <p>{{ 'USER.ID_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-label >{{ 'ADDRESS_FIELDS.PHONE' | translate }}</ion-label>
+                <ion-input type="tel" [(ngModel)]="payer.payer_phone" formControlName="payer_phone"></ion-input>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.payer_phone.valid  && (payerForm.controls.payer_phone.dirty || submitAttempt)">
+                <p>{{ 'ADDRESS_FIELDS.PHONE_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-label >{{ 'ADDRESS_FIELDS.NAME' | translate }}</ion-label>
+                <ion-input type="text" [(ngModel)]="payer.payer_name" formControlName="payer_name"></ion-input>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.payer_name.valid  && (payerForm.controls.payer_name.dirty || submitAttempt)">
+                <p>{{ 'ADDRESS_FIELDS.NAME_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <ion-label >{{ 'USER.EMAIL' | translate }}</ion-label>
+                <ion-input type="text" [(ngModel)]="payer.payer_email" formControlName="payer_email"></ion-input>
+            </ion-item>
+            <ion-item *ngIf="!payerForm.controls.payer_email.valid  && (payerForm.controls.payer_email.dirty || submitAttempt)">
+                <p>{{ 'USER.EMAIL_ERROR' | translate }}</p>
+            </ion-item>
+            <ion-item>
+                <button ion-button full >{{ 'INPUTS.EMAIL' | translate }}</button>
+            </ion-item>
+
+        </ion-list>
+    </form>
+</ion-content>

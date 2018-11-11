@@ -1,0 +1,259 @@
+{
+    "NAME": "Nombre",
+    "PASSWORD": "Contraseña",
+    "EMAIL": "Email",
+    "LOGIN": "Iniciar sesión",
+    "SIGNUP": "Registrarse",
+
+    "TAB1_TITLE": "Items",
+    "TAB2_TITLE": "Buscar",
+    "TAB3_TITLE": "Ajustes",
+
+    "MAP_TITLE": "Mapa",
+
+    "TUTORIAL_SLIDE1_TITLE": "Bienvenido/a al Ionic Super Starter",
+    "TUTORIAL_SLIDE1_DESCRIPTION": "El <b>Ionic Super Starter</b> es un starter de Ionic completo con muchas páginas preconstruidas y mejores prácticas.",
+
+    "TUTORIAL_SLIDE2_TITLE": "Cómo usar el Super Starter",
+    "TUTORIAL_SLIDE2_DESCRIPTION": "Monta los varios tipos de página que quieras y quita los que no. Hemos incluido muchas estructuras de página comunes en apps móviles, como páginas de inicio de sesión y registro, pestañas, y esta página de tutorial.",
+
+    "TUTORIAL_SLIDE3_TITLE": "Empezando",
+    "TUTORIAL_SLIDE3_DESCRIPTION": "¿Necesitas ayuda? Échale un vistazo al README del Super Starter para ver el tutorial completo.",
+
+    "SETTINGS_TITLE": "Ajustes",
+    "SETTINGS_OPTION1": "Opción 1",
+    "SETTINGS_OPTION2": "Opción 2",
+    "SETTINGS_OPTION3": "Opción 3",
+    "SETTINGS_OPTION4": "Opción 4",
+
+    "SETTINGS_PAGE_PROFILE": "Editar Perfil",
+
+    "WELCOME_TITLE": "Bienvenido/a",
+
+    "LOGIN_TITLE": "Iniciar sesión",
+    "LOGIN_ERROR": "No se ha podido iniciar sesión. Por favor revisa la información de la cuenta e inténtalo de nuevo.",
+    "LOGIN_BUTTON": "Iniciar sesión",
+    "SIGNUP_TITLE": "Registro",
+    "SIGNUP_ERROR": "No se ha podido crear la cuenta. Por favor revisa la información de la cuenta e inténtalo de nuevo.",
+    "SIGNUP_BUTTON": "Registrarse",
+
+    "LIST_MASTER_TITLE": "Items",
+
+    "ITEM_CREATE_TITLE": "Nuevo Item",
+    "ITEM_CREATE_CHOOSE_IMAGE": "Añadir Imagen",
+
+    "CARDS_TITLE": "Social",
+
+    "SEARCH_TITLE": "Buscar",
+    "ADDRESS_CREATE": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "ADDRESS_SELECT": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "ADDRESSES": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "BUYER_SELECT": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "TOTAL_NECESSARY": "Debes seleccionar un minimo de: "
+    },
+    "CART": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ERROR_GET":"",
+        "ERROR_UPDATE":""
+    },
+    "CHECKOUT_BANKS": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "USER_TYPE_ERROR":"",
+        "BANK_ERROR":"",
+        "BANKS_GET_ERROR":"",
+        "DEBIT_PAY_ERROR":""
+    },
+    "CHECKOUT_BUYER": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "CHECKOUT_CARD": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "SAVE_CARD":"",
+        "PAYER_CC_ERROR":"",
+        "PAYER_EXPIRATION_MONTH_ERROR":"",
+        "PAYER_EXPIRATION_YEAR_ERROR":"",
+        "PAYER_DATE_ERROR":"",
+        "PAYER_CVV_LENGTH_ERROR":"",
+        "PAYER_CVV_ERROR":"",
+        "PAYER_CC_NAME_ERROR":"",
+        "PAY_CC_ERROR":"",
+        "PAY_CC_SUCCESS":"",
+        "PAY_CC_STARTING":""
+    },
+    "CHECKOUT_CASH": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "PAYER_BRANCH_ERROR":"",
+        "TYPE_ERROR":"",
+        "PAY_CASH_ERROR":"",
+        "PAY_CASH_SUCCESS":"",
+        "PAY_CASH_STARTING":""
+    },
+    "CHECKOUT_PAYER": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "CHECKOUT_PREPARE": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "CC":"Tarjeta de credito",
+        "DEBIT":"Debito bancario",
+        "CASH":"Opciones de efectivo",
+        "SPLIT":"Dividir la orden entre los compradores equitativamente",
+        "PREPARE_ORDER_ERROR":"",
+        "PREPARE_ORDER_STARTING":"",
+        "PREPARE_ORDER_SUCCESS":""
+    },
+    "CHECKOUT_SHIPPING": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "COMMENTS": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "SAVE_RATING_ERROR":""
+    },
+    "DELIVERIES": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ERROR_GET":"",
+        "STARTING_GET":""
+    },
+    "DELIVERY_DETAIL": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "DELIVERY_PROGRAM": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "HOME": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "DELIVERIES_GET" :"",
+        "DELIVERY_WAITING_TITLE" :"",
+        "DELIVERY_WAITING_DESC":""
+    },
+    "LOGIN": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "LOGIN_ERROR":"",
+        "LOGIN_START":""
+    },
+    "MAP": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "MY_ACCOUNT": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "UPDATE_ERROR":"",
+        "UPDATE_START":""
+    },
+    "PASSWORD_UPDATE": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ERROR_UPDATE":"",
+        "UPDATE_START":""
+    },
+    "PAYMENTS": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ERROR_GET":"",
+        "GET_START":""
+    },
+    "PRODUCTS": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "HOME": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "DELIVERIES_TITLE":"",
+        "DELIVERIES_STATUS":""
+    },
+    "LOGIN": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "SETTINGS": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ADDRESSES":"",
+        "DELIVERIES":"",
+        "MY_ACCOUNT":"",
+        "PASSWORD":""
+    },
+    "SIGNUP": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion",
+        "ERROR_SAVE":"",
+        "SAVE_START":""
+    },
+    "TUTORIAL": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "WELCOME": {
+        "TITLE": "Crear Direccion",
+        "DESCRIPTION": "Crea las direcciones que vas a usar en la aplicacion"
+    },
+    "ADDRESS_FIELDS": {
+        "ADDRESS": "Direccion",
+        "NAME": "Nombre",
+        "PHONE": "Tel",
+        "POSTAL": "Cod Postal",
+        "ADDRESS_ERROR": "Direccion",
+        "NAME_ERROR": "Nombre",
+        "PHONE_ERROR": "Tel",
+        "POSTAL_ERROR": "Cod Postal",
+        "ERROR_SAVE":"",
+        "ERROR_GET":"",
+        "STARTING_GET":"",
+        "STARTING_SAVE":""
+    },
+    "INPUTS": {
+        "SUBMIT":"",
+        "UPDATE":"",
+        "CART_OPEN":"",
+        "MY_DATA":"",
+        "CREATE_ADDRESS":"",
+        "CONTINUE":"",
+        "CHANGE_ADDRESS":""
+    },
+    "USER": {
+        "NAME":"",
+        "NAME_ERROR":"",
+        "FIRSTNAME":"Ingresa tu primer nombre",
+        "FIRSTNAME_ERROR":"tu primer nombre es obligatorio",
+        "LASTNAME":"Ingresa tu apellido",
+        "LASTNAME_ERROR":"Tu apellido es obligatorio",
+        "EMAIL":"Ingresa tu correo electronico",
+        "EMAIL_ERROR":"",
+        "MOBILE":"Ingresa tu celular",
+        "MOBILE_ERROR":"Tu celular es obligatorio",
+        "PASSWORD":"Ingresa tu celular",
+        "PASSWORD_ERROR":"Tu celular es obligatorio",
+        "REPEAT_PASSWORD":"Ingresa tu celular",
+        "REPEAT_PASSWORD_ERROR":"Tu celular es obligatorio",
+        "PASSWORD_MATCH_ERROR":"Tu celular es obligatorio",
+        "ID":"Ingresa tu documento de identificación",
+        "ID_ERROR":"Tu documento de identificacion es obligatorio",
+        "DOC_TYPE_ERROR":""
+    }
+}
