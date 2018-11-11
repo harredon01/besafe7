@@ -16,6 +16,7 @@ class CreateAddressTable extends Migration {
 
             $table->string('name');
             $table->string('address');
+            $table->string('city')->nullable();
             $table->string('type')->nullable();
             $table->string('postal')->nullable();
             $table->string('phone')->nullable();

@@ -351,7 +351,7 @@ class EditUserData {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $candidate = User::where("email", $data['email'])->get();
-        if (count($candidate)>0) {
+        if (count($candidate) > 0) {
             $candidate = $candidate[0];
             if ($candidate) {
                 $push = $candidate->push;
@@ -564,50 +564,49 @@ class EditUserData {
     }
 
     public function createOrUpdateAddress(User $user, array $data) {
-        if ($data["address_id"]) {
-            $addressid = $data['address_id'];
-            unset($data['address_id']);
-            $city = City::find($data['city_id']);
-            $data['city'] = $city->name;
-            Address::where('user_id', $user->id)
-                    ->where('id', $addressid)->update($data);
-            $address = Address::find($addressid);
-            if ($address) {
-                $region = Region::find($address->region_id);
-                $country = Country::find($address->country_id);
-                if ($city) {
-                    $address->cityName = $city->name;
+        if (array_key_exists("address_id", $data)) {
+            if ($data["address_id"]) {
+                $addressid = $data['address_id'];
+                unset($data['address_id']);
+                $city = City::find($data['city_id']);
+                $data['city'] = $city->name;
+                Address::where('user_id', $user->id)
+                        ->where('id', $addressid)->update($data);
+                $address = Address::find($addressid);
+                if ($address) {
+                    $region = Region::find($address->region_id);
+                    $country = Country::find($address->country_id);
+                    if ($city) {
+                        $address->cityName = $city->name;
+                    }
+                    if ($region) {
+                        $address->regionName = $region->name;
+                    }
+                    if ($country) {
+                        $address->countryName = $country->name;
+                    }
+                    return array("status" => "success", "message" => "address updated", "address" => $address);
                 }
-                if ($region) {
-                    $address->regionName = $region->name;
-                }
-                if ($country) {
-                    $address->countryName = $country->name;
-                }
-                return array("status" => "success", "message" => "address updated", "address" => $address);
+                return array("status" => "error", "message" => "address not found");
             }
-        } else {
-            $city = City::find($data['city_id']);
-            $data['city'] = $city->name;
-            $address = new Address($data);
-            $user->addresses()->save($address);
-            $region = Region::find($address->region_id);
-            $country = Country::find($address->country_id);
-            if ($city) {
-                $address->cityName = $city->name;
-            }
-            if ($region) {
-                $address->regionName = $region->name;
-            }
-            if ($country) {
-                $address->countryName = $country->name;
-                $address->countryCode = $country->code;
-            }
-            if ($data['type'] == 'billing') {
-                $this->setAsBillingAddress($user, $address->id);
-            }
-            return array("status" => "success", "message" => "address created", "address" => $address);
         }
+        $city = City::find($data['city_id']);
+        $data['city'] = $city->name;
+        $address = new Address($data);
+        $user->addresses()->save($address);
+        $region = Region::find($address->region_id);
+        $country = Country::find($address->country_id);
+        if ($city) {
+            $address->cityName = $city->name;
+        }
+        if ($region) {
+            $address->regionName = $region->name;
+        }
+        if ($country) {
+            $address->countryName = $country->name;
+            $address->countryCode = $country->code;
+        }
+        return array("status" => "success", "message" => "address created", "address" => $address);
     }
 
     public function deleteAddress(User $user, $addressId) {

@@ -28,6 +28,7 @@ use App\Services\EditUserData;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
 use App\Services\EditGroup;
+use App\Services\EditMessages;
 use App\Services\EditMapObject;
 use DB;
 
@@ -41,16 +42,18 @@ class MerchantImport {
     protected $editAlerts;
     protected $editMapObject;
     protected $editGroup;
+    protected $editMessages;
 
     const OBJECT_LOCATION = 'Location';
     const OBJECT_REPORT = 'Report';
 
-    public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMapObject $editMapObject, EditGroup $editGroup) {
+    public function __construct(EditUserData $editUserData, EditLocation $editLocation, EditAlerts $editAlerts, EditMapObject $editMapObject, EditGroup $editGroup, EditMessages $editMessages) {
         $this->editUserData = $editUserData;
         $this->editLocation = $editLocation;
         $this->editAlerts = $editAlerts;
         $this->editMapObject = $editMapObject;
         $this->editGroup = $editGroup;
+        $this->editMessages = $editMessages;
     }
 
     public function getFile() {
@@ -459,8 +462,11 @@ class MerchantImport {
             if (array_key_exists('user_id', $row)) {
                 $user = User::find($row['user_id']);
                 if ($user) {
-                    $coords = ["lat" => $row['lat'], "long" => $row['long']];
+                    $coords = ["lat" => $row['lat'], "long" => $row['long'],"name" => "test","telephone"=>"123123","address"=>"address"];
                     $results = $this->editMapObject->saveOrCreateObject($user, $coords, "Merchant");
+                    if(!is_array($results)){
+                        dd($results);
+                    }
                     $merchant = $results['object'];
                     $row['telephone'] = $row['phone_number'];
                     if (!$row['telephone']) {
@@ -744,10 +750,9 @@ class MerchantImport {
                 $product = Product::updateOrCreate(['id' => $sheet['id']], [
                             'id' => $sheet['id'],
                             'name' => $sheet['name'],
-                            'description' => $sheet['hash'],
-                            'merchant_id' => $code,
+                            'description' => $sheet['description'],
                             'isActive' => $sheet['isactive'],
-                            'hash' => $sheet['hash'],
+                            'hash' => $sheet['slug'],
                 ]);
             }
         }
@@ -972,10 +977,11 @@ class MerchantImport {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
         $reader = $excel->toArray();
+        $date = date("Y-m-d");
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $coords = ["lat" => $sheet['lat'], "long" => $sheet['long']];
+                $coords = ["lat" => $sheet['lat'], "long" => $sheet['long'],"name" => "test","type"=>"burglary","address"=>"address","report_time"=>$date];
                 $results = $this->editMapObject->saveOrCreateObject($user, $coords, self::OBJECT_REPORT);
                 $report = $results['object'];
                 $sheet['id'] = $report->id;

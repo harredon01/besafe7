@@ -319,6 +319,7 @@ class Group extends Model {
 
     public function countRecipientsMessage($user, $data) {
         $res = $this->checkMemberType($user);
+        $followers = 0;
         if ($res) {
             if ($res->level != self::CONTACT_BLOCKED) {
                 if ($this->isPublicActive()) {

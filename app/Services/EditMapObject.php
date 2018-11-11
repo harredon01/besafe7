@@ -503,38 +503,47 @@ class EditMapObject {
     public function saveOrCreateObject(User $user, array $data, $type) {
         $group = null;
         if ($type == self::OBJECT_REPORT) {
-            if ($data['anonymous']) {
-                if ($data['anonymous'] == true) {
-                    $data['email'] = "";
-                    $data['telephone'] = "";
+            if (array_key_exists('anonymous', $data)) {
+                if ($data['anonymous']) {
+                    if ($data['anonymous'] == true) {
+                        $data['email'] = "";
+                        $data['telephone'] = "";
+                    }
                 }
             }
         }
-        if ($data['id'] && $data['id'] > 0) {
-            foreach ($data as $key => $value) {
-                if (!$value) {
-                    unset($data[$key]);
+        if (array_key_exists('id', $data)) {
+            if ($data['id'] && $data['id'] > 0) {
+                foreach ($data as $key => $value) {
+                    if (!$value) {
+                        unset($data[$key]);
+                    }
                 }
+                $object = $this->updateObject($user, $data, $type);
+                return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
             }
-            $object = $this->updateObject($user, $data, $type);
-        } else {
+        }
+        if (array_key_exists('private', $data)) {
             if (!$data["private"]) {
                 $data["private"] = 0;
             }
-            $data['status'] = 'active';
-            if ($type == self::OBJECT_MERCHANT) {
-                $validator = $this->validatorMerchant($data);
-                if ($validator->fails()) {
-                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-                }
-            } else if ($type == self::OBJECT_REPORT) {
-                $validator = $this->validatorReport($data);
-                if ($validator->fails()) {
-                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-                }
-            }
-            $object = $this->createObject($user, $data, $type);
+        } else {
+            $data["private"] = 0;
         }
+
+        $data['status'] = 'active';
+        if ($type == self::OBJECT_MERCHANT) {
+            $validator = $this->validatorMerchant($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+        } else if ($type == self::OBJECT_REPORT) {
+            $validator = $this->validatorReport($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+        }
+        $object = $this->createObject($user, $data, $type);
         return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
     }
 

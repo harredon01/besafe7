@@ -245,7 +245,7 @@ class UserTableSeeder extends Seeder {
             'birth' => "1986-07-10",
             'weight' => "70kg",
             'blood_type' => "o",
-            'antigent' => "+",
+            'antigen' => "+",
             'surgical_history' => "surgical_history",
             'obstetric_history' => "obstetric_history",
             'medications' => "medications",

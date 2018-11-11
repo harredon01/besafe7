@@ -568,76 +568,78 @@ class EditGroup {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        if ($data["group_id"]) {
-            $groupid = $data['group_id'];
-            $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND level = "active" ', [$user->id, $groupid]);
-            if (sizeof($members) == 0) {
-                return null;
-            }
-            unset($data['group_id']);
-            foreach ($data as $key => $value) {
-                if (!$value) {
-                    unset($data[$key]);
+        if (array_key_exists("group_id", $data)) {
+            if ($data["group_id"]) {
+                $groupid = $data['group_id'];
+                $members = DB::select('select user_id as id from group_user where user_id  = ? and group_id = ? and is_admin = 1 AND level = "active" ', [$user->id, $groupid]);
+                if (sizeof($members) == 0) {
+                    return null;
                 }
-            }
-            Group::where('id', $groupid)->update($data);
-            $group = Group::find($groupid);
-            if ($group) {
-                return ['status' => 'success', "message" => 'Group updated', "code" => $group->code, "group" => $group];
-            }
-            return ['status' => 'error', "message" => 'Group not found'];
-        } else {
-            $invites = array();
-            $admin = array();
-            $data["status"] = "active";
-            $data["avatar"] = "default";
-            $data["max_users"] = 10;
-            $invites = $data['contacts'];
-            unset($data['contacts']);
-            unset($data[0]);
-            unset($data[""]);
-            if ($data['is_public']) {
-                $again = true;
-                $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
-                while ($again) {
-                    $string = str_random(20);
-                    $group = Group::where("code", $string)->first();
-                    if ($group) {
-                        
-                    } else {
-                        $again = false;
-                        $data['code'] = $string;
+                unset($data['group_id']);
+                foreach ($data as $key => $value) {
+                    if (!$value) {
+                        unset($data[$key]);
                     }
                 }
-            } else {
-                $data['is_public'] = 0;
+                Group::where('id', $groupid)->update($data);
+                $group = Group::find($groupid);
+                if ($group) {
+                    return ['status' => 'success', "message" => 'Group updated', "code" => $group->code, "group" => $group];
+                }
+                return ['status' => 'error', "message" => 'Group not found'];
             }
-
-
-
-            $group = Group::create($data);
-            $invite = array();
-            $invite['group_id'] = $group->id;
-            $invite['user_id'] = $user->id;
-            $invite['color'] = 1;
-            $invite['level'] = "active";
-            $invite['is_admin'] = true;
-            $invite['created_at'] = date("Y-m-d H:i:s");
-            $invite['last_significant'] = date("Y-m-d H:i:s");
-            array_push($admin, $invite);
-            DB::table('group_user')->insert(
-                    $admin
-            );
-            $i = 0;
-            $data['contacts'] = $invites;
-            $data["group_id"] = $group->id;
-
-            dispatch(new InviteUsers($user, $data, true, $group));
-
-            //$this->inviteUsers($user, $data, true);
-            $group->updated_at = strtotime($group->updated_at);
-            return ['status' => 'success', 'message' => 'Group saved', "group" => $group, "strtotime" => strtotime($group->updated_at)];
         }
+
+        $invites = array();
+        $admin = array();
+        $data["status"] = "active";
+        $data["avatar"] = "default";
+        $data["max_users"] = 10;
+        $invites = $data['contacts'];
+        unset($data['contacts']);
+        unset($data[0]);
+        unset($data[""]);
+        if ($data['is_public']) {
+            $again = true;
+            $data['ends_at'] = date('Y-m-d', strtotime("+1 days"));
+            while ($again) {
+                $string = str_random(20);
+                $group = Group::where("code", $string)->first();
+                if ($group) {
+                    
+                } else {
+                    $again = false;
+                    $data['code'] = $string;
+                }
+            }
+        } else {
+            $data['is_public'] = 0;
+        }
+
+
+
+        $group = Group::create($data);
+        $invite = array();
+        $invite['group_id'] = $group->id;
+        $invite['user_id'] = $user->id;
+        $invite['color'] = 1;
+        $invite['level'] = "active";
+        $invite['is_admin'] = true;
+        $invite['created_at'] = date("Y-m-d H:i:s");
+        $invite['last_significant'] = date("Y-m-d H:i:s");
+        array_push($admin, $invite);
+        DB::table('group_user')->insert(
+                $admin
+        );
+        $i = 0;
+        $data['contacts'] = $invites;
+        $data["group_id"] = $group->id;
+
+        dispatch(new InviteUsers($user, $data, true, $group));
+
+        //$this->inviteUsers($user, $data, true);
+        $group->updated_at = strtotime($group->updated_at);
+        return ['status' => 'success', 'message' => 'Group saved', "group" => $group, "strtotime" => strtotime($group->updated_at)];
     }
 
     /**
