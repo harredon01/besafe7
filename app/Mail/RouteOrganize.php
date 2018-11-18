@@ -12,13 +12,20 @@ class RouteOrganize extends Mailable
     use Queueable, SerializesModels;
 
     /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $data;
+
+    /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($theData)
     {
-        //
+        $this->data = $theData;
     }
 
     /**
@@ -28,6 +35,6 @@ class RouteOrganize extends Mailable
      */
     public function build()
     {
-        return $this->view('view.name');
+        return $this->view('emails.distribution-email');
     }
 }

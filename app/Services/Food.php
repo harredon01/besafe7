@@ -2,20 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Order;
-use App\Models\Payment;
 use App\Models\User;
-use App\Models\Item;
 use App\Models\Article;
-use App\Models\Condition;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
-use App\Models\OrderCondition;
 use App\Services\Rapigo;
-use Darryldecode\Cart\CartCondition;
-use Cart;
 use DB;
 
 class Food {
@@ -51,7 +44,6 @@ class Food {
         $this->rapigo = $rapigo;
     }
 
-
     public function suspendDelvery($user_id) {
         Delivery::where("user_id", $user_id)->where("status", "<>", "deposit")->update(['status' => 'suspended']);
         Delivery::where("user_id", $user_id)->where("status", "deposit")->delete();
@@ -63,7 +55,8 @@ class Food {
         //$articles = Article::where('start_date',$date)->get();
         $articles = Article::where('start_date', "2018-09-01")->get();
         $father = [];
-        $keywords = ['fruit', 'meat', 'soup', 'chicken'];
+        $keywords = ['fruit', 'soup', 'meat', 'chicken'];
+        $keywords = ['fruit', 'soup'];
         foreach ($articles as $article) {
 
             $attributes = json_decode($article->attributes, true);
@@ -117,19 +110,37 @@ class Food {
         $articles = $config['articles'];
         $father = $config['father'];
         $keywords = $config['keywords'];
+        $finalresult = [];
+        $finalresult['keywords'] = [];
+        $finalresult['totals'] = [];
+        $finalresult['dish'] = [];
+        foreach ($keywords as $keyword2) {
+            if ($father['keywords'][$keyword2] > 0) {
+                $keyPrint = "Total " . $keyword2 . ": " . $father['keywords'][$keyword2];
+                array_push($finalresult['keywords'], $keyPrint);
+            }
+        }
         foreach ($articles as $art) {
             $attributes = json_decode($art->attributes, true);
-            echo "Total " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . PHP_EOL;
-            foreach ($attributes['entradas'] as $art2) {
-                echo "Total " . $father[$art->id]['name'] . " entrada: " . $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']] . PHP_EOL;
+            if ($father[$art->id]['count'] > 0) {
+                $title = "Total " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'];
+                array_push($finalresult['totals'], $title);
             }
+//            foreach ($attributes['entradas'] as $art2) {
+//                if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
+//                    $entrada = "Total " . $father[$art->id]['name'] . " entrada: " . $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']];
+//                    array_push($finalresult['dish'], $entrada);
+//                }
+//            }
             foreach ($attributes['plato'] as $art3) {
-                echo "Total " . $father[$art->id]['name'] . " principal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']] . PHP_EOL;
+                if ($father[$art->id]['main'][$art3['codigo']] > 0) {
+                    $fuerte = "Total " . $father[$art->id]['name'] . " principal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']];
+                    array_push($finalresult['dish'], $fuerte);
+                }
             }
         }
-        foreach ($keywords as $keyword2) {
-            echo "Total " . $keyword2 . ": " . $father['keywords'][$keyword2] . PHP_EOL;
-        }
+
+        return $finalresult;
     }
 
     public function getPurchaseOrder($deliveries) {
@@ -140,7 +151,8 @@ class Food {
         //dd($father);
         $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
         //dd($father);
-        $this->printTotalsConfig($dayConfig);
+        $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
+        return $dayConfig;
     }
 
     public function getTotalEstimatedShipping($description, $user) {
@@ -207,7 +219,6 @@ class Food {
         } else {
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
-        echo json_encode($results) . PHP_EOL;
         return $result;
         //dd($results);
     }
@@ -215,9 +226,9 @@ class Food {
     public function buildScenario($description, $user) {
 //        dd($results);
         if ($user) {
-            $results = Route::where("description", "user")->where("user_id", $user)->with(['deliveries'])->get();
+            $results = Route::where("description", "user")->where("user_id", $user)->with(['deliveries.user'])->get();
         } else {
-            $results = Route::where("description", $description)->with(['deliveries'])->get();
+            $results = Route::where("description", $description)->with(['deliveries.user'])->get();
         }
 
         $totalCost = 0;
@@ -229,53 +240,68 @@ class Food {
             $routeConfig = $config;
             $deliveries = $value->deliveries;
             $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
-            $this->printTotalsConfig($routeConfig);
+            $routeTotals = $this->printTotalsConfig($routeConfig);
             $stops = $value->stops()->with(['address', 'deliveries.user'])->get();
             $queryStops = [];
             foreach ($stops as $stop) {
                 //$stopDeliveries = $stop->deliveries;
                 $deliveries = "";
+                $stopConfig = $config;
+                $stopConfig['father'] = $this->countConfigElements($stop->deliveries, $stopConfig);
+                $stopTotals = $this->printTotalsConfig($stopConfig);
+                $stop->totals = $stopTotals;
                 foreach ($stop->deliveries as $stopDel) {
                     $details = json_decode($stopDel->details, true);
+                    $delConfig = $config;
+                    $dels = [$stopDel];
+                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
+                    $delTotals = $this->printTotalsConfig($delConfig);
+                    $stopDel->totals = $delTotals;
                     $delUser = $stopDel->user;
-                    $descr = "Usuario: ". $delUser->firstName . " " . $delUser->lastName . " ";
+                    $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
                     if (array_key_exists("pickup", $details)) {
                         if ($details['pickup'] == "envase") {
                             $descr = $descr . "Recoger envase, ";
                         }
                     }
-                    $descr = $descr . "Entregar id: ". $stopDel->id. ".\n ";
-                    echo $descr;
+                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
                     $stopDel->region_name = $descr;
-                    $deliveries =$deliveries. $descr;
+                    $deliveries = $deliveries . $descr;
                 }
                 $address = $stop->address;
-                echo $address. ".\n ";
-                $stop->region_name = $deliveries;
+
+                if ($stop->stop_order == 2) {
+                    $stop->region_name = $deliveries;
+                }
+
                 $querystop = [
                     "address" => $address->address,
-                    "description" => $deliveries,
+                    "description" => $stop->region_name,
                     "type" => "point",
                     "phone" => $address->phone
                 ];
                 array_push($queryStops, $querystop);
             }
-
-            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
-            $totalCost2 += $rapigoResponse['price'];
-            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-                $totalCost += $rapigoResponse['price'];
-            } else {
-                $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-                $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+            foreach ($value->deliveries as $del) {
+                $delConfig = $config;
+                $dels = [$del];
+                $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
+                $delTotals = $this->printTotalsConfig($delConfig);
+                $del->totals = $delTotals;
             }
-            $value->coverage = json_encode($rapigoResponse);
-            $value->save();
+
+//            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
+//            $totalCost2 += $rapigoResponse['price'];
+//            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+//                $totalCost += $rapigoResponse['price'];
+//            } else {
+//                $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+//                $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+//            }
+//            $value->coverage = json_encode($rapigoResponse);
+//            $value->save();
+            $value->totals = $routeTotals;
             $value->stops = $stops;
-            echo "Route" . PHP_EOL;
-            echo json_encode($value) . PHP_EOL;
-            echo PHP_EOL;
-            echo PHP_EOL;
             $totalCost += self::ROUTE_HOUR_COST * 3;
             $totalIncomeShipping += $value->unit_price;
             $totalLunches += $value->unit;
@@ -308,8 +334,8 @@ class Food {
         } else {
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
-        echo json_encode($results) . PHP_EOL;
-        return $result;
+        //echo json_encode($results) . PHP_EOL;
+        return $results;
         //dd($results);
     }
 
@@ -331,7 +357,7 @@ class Food {
                     HAVING Distance <= :radius AND Distance > :radiusInf order by Distance asc"
                         . "", $thedata);
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
-        echo "Query results: " . count($deliveries) . PHP_EOL;
+        //echo "Query results: " . count($deliveries) . PHP_EOL;
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
         //dd($stops);
@@ -359,7 +385,7 @@ class Food {
                     $item->unit += $value['amount'];
                     $item->unit_price += $value['shipping'];
                     if ($save) {
-                        $itemSavedStop = $item->stops()->where("address_id", $value["address_id"])->where("route_id", $item->id)->first();
+                        $itemSavedStop = $item->stops()->where("address_id", $value["address_id"])->where("route_id", $item->id)->where("stop_order", 2)->first();
                         if ($itemSavedStop) {
                             $foundInRoutes = true;
                             $stopDetails = json_decode($itemSavedStop->details, true);
@@ -444,7 +470,8 @@ class Food {
                                 "amount" => 0,
                                 "route_id" => $route->id,
                                 "stop_order" => 1,
-                                "details" => json_encode($details)
+                                "details" => json_encode($details),
+                                "region_name" => "Recoger los almuerzos de la ruta " . $route->id,
                     ]);
 
                     $details['pickups'] = $value["pickups"];
@@ -509,6 +536,7 @@ class Food {
                             "address_id" => $address->id,
                             "amount" => 0,
                             "route_id" => $route->id,
+                            "region_name" => "Entregar los envases recogidos",
                             "stop_order" => 3,
                             "details" => json_encode($details)
                 ]);

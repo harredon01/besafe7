@@ -1,15 +1,15 @@
 <?php
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| This file is where you may define all of the routes that are handled
-| by your application. Just tell Laravel the URIs it should respond
-| to using a Closure or controller method. Build something great!
-|
-*/
+  |--------------------------------------------------------------------------
+  | Web Routes
+  |--------------------------------------------------------------------------
+  |
+  | This file is where you may define all of the routes that are handled
+  | by your application. Just tell Laravel the URIs it should respond
+  | to using a Closure or controller method. Build something great!
+  |
+ */
 
 Route::get('/', function () {
     return view('welcome');
@@ -64,3 +64,30 @@ Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
+
+Route::get('/purchase', function () {
+    $className = "App\\Services\\Food";
+    $rapigoClassName = "App\\Services\\Rapigo";
+    $rapigo = new $rapigoClassName;
+    $deliveries = App\Models\Delivery::where("status", "enqueue")->get();
+    $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
+    $data = $gateway->getPurchaseOrder($deliveries);
+    $data['level']="";
+    return new App\Mail\PurchaseOrder($data);
+});
+Route::get('/route_organize', function () {
+    $className = "App\\Services\\Food";
+    $rapigoClassName = "App\\Services\\Rapigo";
+    $rapigo = new $rapigoClassName;
+    $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
+    $data = $gateway->buildScenario("preorganize",null);
+    return new App\Mail\RouteOrganize($data);
+});
+Route::get('/route_deliver', function () {
+    $className = "App\\Services\\Food";
+    $rapigoClassName = "App\\Services\\Rapigo";
+    $rapigo = new $rapigoClassName;
+    $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
+    $data = $gateway->buildScenario("preorganize",null);
+    return new App\Mail\RouteDeliver($data);
+});
