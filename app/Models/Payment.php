@@ -20,4 +20,7 @@ class Payment extends Model
     public function address() {
         return $this->belongsTo('App\Models\Address');
     }
+    public function transactions() {
+        return $this->belongsToMany('App\Models\Transaction');
+    }
 }

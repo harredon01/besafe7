@@ -21,10 +21,10 @@ use App\Models\Transaction;
 
 class PayU {
 
-    private function populatePaymentContent(Payment $payment) {
+    private function populatePaymentContent(Payment $payment,$platform) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
-        $reference = "besafe_test_payment_" . $payment->id . "_order_" . $payment->order_id;
+        $reference = $platform."_payment_" . $payment->id . "_order_" . $payment->order_id;
         $paymentTotal = $payment->total;
         $payment->referenceCode = $reference;
         $payment->save();
@@ -169,10 +169,10 @@ class PayU {
             'currency' => $currency
         ];
         $return = 0;
-        if($payment->tax > 0 ){
+        if ($payment->tax > 0) {
             $return = $payment->total - $payment->tax;
         }
-        
+
         $additionalValuesReturnBase = [
             'value' => number_format($return, 2, '.', ''),
             'currency' => $currency
@@ -185,7 +185,7 @@ class PayU {
         return $additionalValuesCont;
     }
 
-    public function payCreditCard(User $user, array $data, Payment $payment,$platform) {
+    public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
 
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
@@ -207,7 +207,7 @@ class PayU {
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
         $merchant = $this->populateMerchant();
-        $orderCont = $this->populatePaymentContent($payment);
+        $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
@@ -238,10 +238,10 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform);
     }
 
-    public function useSource(User $user, array $data, Payment $payment,$platform) {
+    public function useSource(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -267,7 +267,7 @@ class PayU {
         $creditCardTokenId = $data['source'];
         $deviceSessionId = md5(session_id() . microtime());
         $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont = $this->populatePaymentContent($payment);
+        $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
         $orderCont["shippingAddress"] = $ShippingAddress;
@@ -292,14 +292,14 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => false,
+            "test" => "true",
         ];
 //        return $dataSent;
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform);
     }
 
-    public function payDebitCard(User $user, array $data, Payment $payment,$platform) {
+    public function payDebitCard(User $user, array $data, Payment $payment, $platform) {
 
         $validator = $this->validatorPayerSimple($data);
         if ($validator->fails()) {
@@ -314,7 +314,7 @@ class PayU {
         $merchant = $this->populateMerchant();
         $deviceSessionId = md5(session_id() . microtime());
         $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont = $this->populatePaymentContent($payment);
+        $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
 
@@ -344,14 +344,13 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => false,
+            "test" => "false",
         ];
 
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
+        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
-    public function payCash(User $user, array $data, Payment $payment) {
+    public function payCash(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorCash($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -360,7 +359,7 @@ class PayU {
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $merchant = $this->populateMerchant();
         $buyer = $this->populateBuyerSimple($user);
-        $orderCont = $this->populatePaymentContent($payment);
+        $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
         $date = date_create();
@@ -379,7 +378,7 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => false,
+            "test" => "false",
         ];
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
@@ -943,7 +942,7 @@ class PayU {
     }
 
     public function createToken(User $user, array $data) {
-        $source = $user->sources()->where("gateway", "Payu")->first();
+        $source = $user->sources()->where("gateway", "PayU")->first();
         if ($source) {
             if ($source->source) {
                 $this->deleteToken($user);
@@ -1010,7 +1009,7 @@ class PayU {
         }
     }
 
-    public function useToken(User $user, array $data, Payment $payment,$platform) {
+    public function useToken(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -1031,7 +1030,7 @@ class PayU {
         $ShippingAddress = $this->populateShipping($data);
         $payer = $this->populatePayer($data);
         $merchant = $this->populateMerchant();
-        $orderCont = $this->populatePaymentContent($payment);
+        $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
@@ -1062,7 +1061,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment,$dataSent,$platform);
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform);
     }
 
     public function deleteSubscription(User $user, $subscription) {
@@ -1101,7 +1100,7 @@ class PayU {
         ];
         $dataSent = [
             "language" => "es",
-            "command" => "ORDER_DETAIL",
+            "command" => "ORDER_DETAIL_BY_REFERENCE_CODE",
             "merchant" => $merchant,
             "details" => $details,
             "test" => false,
@@ -1152,24 +1151,27 @@ class PayU {
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
-    public function handleTransactionResponse($response, User $user, Payment $payment,$dataSent,$platform) {
+    public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform) {
         if ($response['code'] == "SUCCESS") {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionResponse['order_id'] = $payment->order_id;
                 $transactionResponse['referenceCode'] = $payment->referenceCode;
                 $transactionResponse['user_id'] = $payment->id;
-                $transactionResponse['gateway'] = 'payu';
+                $transactionResponse['gateway'] = 'PayU';
+                $transactionResponse['type'] = 'CreditCard';
+                $transactionResponse['transaction_id'] = $transactionResponse['transactionId'];
+                $transactionResponse['transaction_state'] = $transactionResponse['state'];
+                $transactionResponse['response_code'] = $transactionResponse['trazabilityCode'];
+                $transactionResponse['transaction_date'] = date("Y-m-d",$transactionResponse['operationDate']);
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
                 $transaction = Transaction::create($transactionResponse);
-
+                $payment->transactions()->save($transaction);
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    $payment->status = "Paid";
-                    $payment->save();
                     dispatch(new ApprovePayment($payment, $platform));
                 } else if ($transactionResponse['state'] == 'PENDING') {
                     dispatch(new PendingPayment($payment, $platform));
@@ -1179,7 +1181,7 @@ class PayU {
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
-        return ["status" => "error",  "response" => $response, "message" => $dataSent]; 
+        return ["status" => "error", "response" => $response, "message" => $dataSent];
     }
 
     public function sendRequest(array $data, $query) {
@@ -1290,31 +1292,31 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function checkOrders() {
-        $orders = Order::where("status", "in_gateway")->get();
-        foreach ($orders as $order) {
-            $response = $this->getStatusOrderId($order->id);
+        $payments = Payment::where("status", "in_gateway")->get();
+        foreach ($payments as $payment) {
+            $response = $this->getStatusOrderId($payment->referenceCode);
             if ($response['code'] == "SUCCESS") {
                 $result = $response['result'];
+                $order = $payment->order;
                 $payload = $result['payload'];
                 $transactionResponse = $payload['transactions'][0]['transactionResponse'];
                 $transactionResponse['order_id'] = $order->id;
-                $transactionResponse['referenceCode'] = $order->referenceCode;
-                $transactionResponse['gateway'] = 'payu';
+                $transactionResponse['referenceCode'] = $payment->referenceCode;
+                $transactionResponse['gateway'] = 'PayU';
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
-
+                $transaction = $this->saveTransaction($transactionResponse, $payment);
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    $transaction = Transaction::create($transactionResponse);
-                    dispatch(new ApproveOrder($order));
-                } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new PendingPayment($order));
+                    dispatch(new ApprovePayment($payment));
+                    $transaction->description = "Transacción aprobada";
                 } else {
-                    $transaction = Transaction::create($transactionResponse);
-                    dispatch(new DenyOrder($order));
+                    dispatch(new DenyPayment($payment));
+                    $transaction->description = "Transacción rechazada";
                 }
+                
                 //return ["status" => "success", "transaction" => $transaction, "response" => $response];
             }
         }
@@ -1340,6 +1342,7 @@ class PayU {
         $current .= PHP_EOL;
         file_put_contents($file, $current);
         $ApiKey = env('PAYU_KEY');
+        $transactionId = $data['transactionId'];
         $merchant_id = $data['merchant_id'];
         $referenceCode = $data['reference_sale'];
         $TX_VALUE = $data['value'];
@@ -1350,13 +1353,14 @@ class PayU {
         $firmacreada = md5($firma_cadena);
         $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
-            $transactionExists = Transaction::where("transaction_id", $data['transaction_id'])->first();
+            $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transactionExists) {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
             }
-            $transaction = $this->saveTransaction($data);
+
             $payment = Payment::where("referenceCode", $referenceCode)->first();
-            if ($order) {
+            if ($payment) {
+                $transaction = $this->saveTransaction($data, $payment);
                 if ($data['state_pol'] == 4) {
                     dispatch(new ApprovePayment($payment));
                     $transaction->description = "Transacción aprobada";
@@ -1386,9 +1390,9 @@ class PayU {
         }
     }
 
-    private function saveTransaction(array $data) {
+    private function saveTransaction(array $data, Payment $payment) {
         $transactionId = $data['transaction_id'];
-        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayY')->first();
+        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
             $transaction->currency = $data['currency'];
             $transaction->transaction_state = $data['state_pol'];
@@ -1434,39 +1438,52 @@ class PayU {
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
         $firmacreada = md5($firma_cadena);
         $firma = $data['signature'];
+        $estadoTx = "";
         $transactionId = $data['transactionId'];
+        //if (true) {
         if (strtoupper($firma) == strtoupper($firmacreada)) {
-            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'payu')->first();
+            if ($data['transactionState'] == 4) {
+                $estadoTx = "Transaction approved";
+            } else if ($data['transactionState'] == 6) {
+                $estadoTx = "Transaction rejected";
+            } else if ($data['transactionState'] == 104) {
+                $estadoTx = "Error";
+            } else if ($data['transactionState'] == 7) {
+                $estadoTx = "Pending payment";
+            } else {
+                $estadoTx = $data['mensaje'];
+            }
+
+            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'PayU')->first();
             if ($transaction) {
-                $transaction->currency = $data['currency'];
-                $transaction->state = $data['transactionState'];
-                $transaction->description = $data['description'];
-                $transaction->paymentNetworkResponseCode = $data['polResponseCode'];
-                $transaction->trazabilityCode = $data['cus'];
-                $transaction->transactionDate = $data['processingDate'];
-                $transaction->authorizationCode = $data['authorizationCode'];
-                $transaction->extras = json_encode($data);
-                $order = $transaction->order;
+                $data['transaction'] = $transaction;
+                return $data;
+            }
+            $payment = Payment::where("referenceCode", $referenceCode)->first();
+            if ($payment) {
+                $transaction = $this->saveTransaction($data, $payment);
+                $data['transaction'] = $transaction;
                 if ($data['transactionState'] == 4) {
-                    dispatch(new ApproveOrder($order));
-                    $transaction->description = "Transacción aprobada";
+                    $estadoTx = "Transaction approved";
+                    dispatch(new ApprovePayment($payment, "PayU"));
                 } else if ($data['transactionState'] == 6) {
-                    dispatch(new DenyOrder($order));
-                    $transaction->description = "Transacción rechazada";
+                    $estadoTx = "Transaction rejected";
+                    dispatch(new DenyPayment($payment, "PayU"));
                 } else if ($data['transactionState'] == 104) {
-                    dispatch(new DenyOrder($order));
-                    $transaction->description = "Error";
+                    $estadoTx = "Error";
+                    dispatch(new DenyPayment($payment, "PayU"));
                 } else if ($data['transactionState'] == 7) {
-                    dispatch(new PendingPayment($order));
+                    $estadoTx = "Pending payment";
+                    dispatch(new PendingPayment($payment, "PayU"));
                 } else {
-                    $transaction->description = $data['mensaje'];
+                    $estadoTx = $data['mensaje'];
                 }
-                $transaction->save();
-                return ["status" => "successed", "message" => "transaction Processed"];
             }
         } else {
-            
+            $estadoTx = "Transaction failed security check";
         }
+        $data['estadoTx'] = $estadoTx;
+        return $data;
     }
 
     /**

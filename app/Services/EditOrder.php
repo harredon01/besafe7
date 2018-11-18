@@ -300,6 +300,8 @@ class EditOrder {
     }
 
     public function approvePayment(Payment $payment, $platform) {
+        $payment->status = "approved";
+        $payment->save();
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->approvePayment($payment);

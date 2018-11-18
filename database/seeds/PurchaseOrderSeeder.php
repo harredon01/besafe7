@@ -25,7 +25,9 @@ class PurchaseOrderSeeder extends Seeder {
     public function run() {
 //        $this->deleteOldData();
 //        $this->generateRandomDeliveries();
-        $this->editOrderFood->getPurchaseOrder();
+        $deliveries = Delivery::where("status","enqueue")->get();
+        //$this->editOrderFood->getPurchaseOrder($deliveries);
+        $this->editOrderFood->buildScenario("preorganize",null);
     }
     
     public function deleteOldData() {

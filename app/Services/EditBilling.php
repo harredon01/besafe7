@@ -397,7 +397,7 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
-                return $gateway->payCash($user, $data, $payment);
+                return $gateway->payCash($user, $data, $payment,$data['platform']);
             }
         }
         return array("status" => "error", "message" => "Invalid order");

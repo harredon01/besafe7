@@ -27,4 +27,7 @@ class Transaction extends Model
     public function order() {
         return $this->belongsTo('App\Models\Order');
     }
+    public function payments() {
+        return $this->belongsToMany('App\Models\Payment');
+    }
 }
