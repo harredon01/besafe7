@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\EditOrderFood;
+use App\Services\Food;
 use App\Services\Rapigo;
 use App\Models\Delivery;
 use App\Models\Route;
@@ -19,40 +19,15 @@ class DeliveriesSeeder extends Seeder {
      *
      */
     protected $editOrderFood;
-    /**
-     * The edit profile implementation.
-     *
-     */
-    protected $rapigo;
 
-    public function __construct(EditOrderFood $editOrderFood, Rapigo $rapigo) {
-        $this->editOrderFood = $editOrderFood;
-        $this->rapigo = $rapigo;
+    public function __construct(Food $food) {
+        $this->food = $food;
     }
 
     public function run() {
-        /*$points = [];
-        $address = [
-            "address"=>"Calle 73 # 0 - 24",
-            "description" => "prueba 1",
-            "type" =>"point",
-            "phone" =>"11111111111"
-        ];
-        array_push($points, $address);
-        /*$address = [
-            "address"=>"Cra 7 # 64 - 44",
-            "description" => "prueba 2",
-            "type" =>"point",
-            "phone" =>"222222"
-        ];
-        array_push($points, $address);
-        $data['points'] = json_encode($points);
-        $query = "https://test.rapigo.co/api/bogota/estimate/";
-        $response = $this->rapigo->sendPost($data, $query);
-        dd($response);*/
         $this->deleteOldData();
-        $this->generateRandomDeliveries();
-        $this->editOrderFood->prepareRoutingSimulation(4.670129, -74.051013);
+        $this->food->generateRandomDeliveries(4.670129, -74.051013);
+        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
     }
     
     public function deleteOldData() {
@@ -74,9 +49,4 @@ class DeliveriesSeeder extends Seeder {
         
         OrderAddress::where("name","test")->delete();
     }
-
-    public function generateRandomDeliveries() {
-        $this->editOrderFood->generateRandomDeliveries(4.670129, -74.051013);
-    }
-
 }

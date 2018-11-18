@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\EditOrderFood;
+use App\Services\Food;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
 
@@ -16,27 +16,23 @@ class PurchaseOrderSeeder extends Seeder {
      * The edit profile implementation.
      *
      */
-    protected $editOrderFood;
+    protected $food;
 
-    public function __construct(EditOrderFood $editOrderFood) {
-        $this->editOrderFood = $editOrderFood;
+    public function __construct(Food $food) {
+        $this->food = $food;
     }
 
     public function run() {
 //        $this->deleteOldData();
-//        $this->generateRandomDeliveries();
+//        $this->food->generateRandomDeliveries(4.670129, -74.051013);;
         $deliveries = Delivery::where("status","enqueue")->get();
-        //$this->editOrderFood->getPurchaseOrder($deliveries);
-        $this->editOrderFood->buildScenario("preorganize",null);
+        $this->food->getPurchaseOrder($deliveries);
+        $this->food->buildScenario("preorganize",null);
     }
     
     public function deleteOldData() {
         OrderAddress::where("name","test")->delete();
         Delivery::where("user_id",1)->delete();
-    }
-
-    public function generateRandomDeliveries() {
-        $this->editOrderFood->generateRandomDeliveries(4.670129, -74.051013);
     }
 
 }
