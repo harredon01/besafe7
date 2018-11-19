@@ -79,15 +79,26 @@ Route::get('/route_organize', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
+    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->buildScenario("preorganize",null);
+    $data = $gateway->buildScenario($results);
     return new App\Mail\RouteOrganize($data);
 });
 Route::get('/route_deliver', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
+    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->buildScenario("preorganize",null);
+    $data = $gateway->buildScenario($results);
     return new App\Mail\RouteDeliver($data);
+});
+Route::get('/route_choose', function () {
+    $className = "App\\Services\\Food";
+    $rapigoClassName = "App\\Services\\Rapigo";
+    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
+    $rapigo = new $rapigoClassName;
+    $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
+    $data = $gateway->getTotalEstimatedShipping($results);
+    return new App\Mail\RouteChoose($data);
 });

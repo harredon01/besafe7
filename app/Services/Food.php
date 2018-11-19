@@ -155,21 +155,15 @@ class Food {
         return $dayConfig;
     }
 
-    public function getTotalEstimatedShipping($description, $user) {
+    public function getTotalEstimatedShipping($results) {
 //        dd($results);
-        if ($user) {
-            $results = Route::where("description", "user")->where("user_id", $user)->with(['stops.address'])->get();
-        } else {
-            $results = Route::where("description", $description)->with(['stops.address'])->get();
-        }
-
         $totalCost = 0;
         $totalIncomeShipping = 0;
-        $totalCost2 = 0;
         $totalLunches = 0;
         foreach ($results as $value) {
             $stops = $value->stops;
             $queryStops = [];
+            $routeCost = 0;
             foreach ($stops as $stop) {
                 $address = $stop->address;
                 $querystop = [
@@ -180,14 +174,20 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-//            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
-//            $totalCost2 += $rapigoResponse['price'];
-//            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-//                $totalCost += $rapigoResponse['price'];
-//            } else {
-//                $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-//            }
-            $totalCost += self::ROUTE_HOUR_COST * 3;
+            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
+            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+                $routeCost = $rapigoResponse['price'];
+            } else {
+                $routeCost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+            }
+            if($routeCost> $value->unit_price){
+                $value->availability = 0;
+            } else {
+                $value->availability = 1;
+            }
+            $value->width = $routeCost;
+            $value->save();
+            $totalCost += $routeCost;
             $totalIncomeShipping += $value->unit_price;
             $totalLunches += $value->unit;
         }
@@ -206,7 +206,6 @@ class Food {
             "lunch_route" => ($totalLunches / $totalRoutes),
             "day_profit" => $totalGains,
         ];
-        echo 'Scenario: ' . $description . PHP_EOL;
         echo 'Lunches: ' . $result['lunches'] . PHP_EOL;
         echo 'Routes: ' . $result['routes'] . PHP_EOL;
         echo 'Lunches per route: ' . $result['lunch_route'] . PHP_EOL;
@@ -219,17 +218,12 @@ class Food {
         } else {
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
-        return $result;
+        return $results;
         //dd($results);
     }
 
-    public function buildScenario($description, $user) {
+    public function buildScenario($results) {
 //        dd($results);
-        if ($user) {
-            $results = Route::where("description", "user")->where("user_id", $user)->with(['deliveries.user'])->get();
-        } else {
-            $results = Route::where("description", $description)->with(['deliveries.user'])->get();
-        }
 
         $totalCost = 0;
         $totalIncomeShipping = 0;
@@ -289,6 +283,7 @@ class Food {
                 $delTotals = $this->printTotalsConfig($delConfig);
                 $del->totals = $delTotals;
             }
+            $value->status = "transit";
 
 //            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
 //            $totalCost2 += $rapigoResponse['price'];
@@ -321,7 +316,6 @@ class Food {
             "lunch_route" => ($totalLunches / $totalRoutes),
             "day_profit" => $totalGains,
         ];
-        echo 'Scenario: ' . $description . PHP_EOL;
         echo 'Lunches: ' . $result['lunches'] . PHP_EOL;
         echo 'Routes: ' . $result['routes'] . PHP_EOL;
         echo 'Lunches per route: ' . $result['lunch_route'] . PHP_EOL;
@@ -416,8 +410,9 @@ class Food {
                                 $item->deliveries()->save($realDel);
                             }
                             $item->height++;
-                            $item->save();
+                            
                         }
+                        $item->save();
                     } else {
                         $routeStops = $item->stops2;
                         $foundInRoutes = false;
