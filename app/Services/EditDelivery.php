@@ -9,44 +9,6 @@ use App\Models\Delivery;
 
 class EditDelivery {
 
-    const GROUP_AVATAR = 'group_avatar';
-    const GROUP_LEAVE = 'group_leave';
-    const GROUP_REMOVED = 'group_removed';
-    const GROUP_ACTIVE = 'group_active';
-    const GROUP_PENDING = 'group_pending';
-    const GROUP_EXPELLED = 'group_expelled';
-    const USER_AVATAR = 'user_avatar';
-    const USER_MESSAGE_TYPE = 'user_message';
-    const GROUP_MESSAGE_TYPE = 'group_message';
-    const GROUP_PRIVATE_MESSAGE_TYPE = 'group_private_message';
-    const GROUP_ADMIN = 'group_admin';
-    const GROUP_ADMIN_NEW = 'group_admin_new';
-    const NEW_CONTACT = 'new_contact';
-    const NEW_GROUP = 'new_group';
-    const GROUP_TYPE = 'group';
-    const USER_TYPE = 'user';
-    const RED_MESSAGE_TYPE = 'emergency';
-    const RED_SECRET_TYPE = 'emergency_secret';
-    const OBJECT_USER = 'User';
-    const OBJECT_GROUP = 'Group';
-    const OBJECT_LOCATION = 'Location';
-    const OBJECT_REPORT = 'Report';
-    const OBJECT_MERCHANT = 'Merchant';
-    const RED_MESSAGE_END = 'emergency_end';
-    const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
-    const NOTIFICATION_LOCATION = 'notification_location';
-    const TRACKING_LIMIT_FOLLOWER = 'tracking_limit_follower';
-    const TRACKING_LIMIT_TRACKING = 'tracking_limit_tracking';
-    const NOTIFICATION_APP = 'notification_app';
-    const ACCESS_USER_OBJECT = 'userables';
-    const ACCESS_USER_OBJECT_HISTORIC = 'userables_historic';
-    const ACCESS_USER_OBJECT_ID = 'userable_id';
-    const ACCESS_USER_OBJECT_TYPE = 'userable_type';
-    const MESSAGE_AUTHOR_ID = 'user_id';
-    const MESSAGE_RECIPIENT_ID = 'messageable_id';
-    const MESSAGE_RECIPIENT_TYPE = 'messageable_type';
-    const REQUEST_PING = "request_ping";
-    const REPLY_PING = "reply_ping";
 
     /**
      * The EditAlert implementation.

@@ -22,6 +22,7 @@ class EditRating {
             if ($object) {
                 if (array_key_exists('pseudo', $data)) {
                     if ($data['pseudo']) {
+                        
                     } else {
                         $data['pseudonim'] = $user->name;
                     }
@@ -29,20 +30,20 @@ class EditRating {
                     $data['pseudonim'] = $user->name;
                 }
                 $isReport = false;
-                if(array_key_exists('is_report', $data)){
-                    if($data['is_report'] == true ){
+                if (array_key_exists('is_report', $data)) {
+                    if ($data['is_report'] == true) {
                         $isReport = true;
                     }
                 }
-
+                Rating::where('type', $type)->where('object_id', $data['object_id'])->where('user_id', $user->id)->delete();
                 $result = Rating::create([
-                    'user_id' => $user->id,
-                    'rating' => $data['rating'],
-                    'type' => $type,
-                    'object_id' => $object->id,
-                    'pseudonim' => $data['pseudonim'],
-                    'comment' => $data['comment'],
-                    'is_report' => $isReport,
+                            'user_id' => $user->id,
+                            'rating' => $data['rating'],
+                            'type' => $type,
+                            'object_id' => $object->id,
+                            'pseudonim' => $data['pseudonim'],
+                            'comment' => $data['comment'],
+                            'is_report' => $isReport,
                 ]);
 
                 $rating = Rating::where('type', $type)->where('object_id', $data['object_id'])->avg('rating');
@@ -55,18 +56,25 @@ class EditRating {
                         $object->status = "verifying";
                     }
                 }
-                $object->rating = $rating;
-                $object->save();
+                try {
+                    $object->rating = $rating;
+                    $object->save();
+                } catch (Exception $ex) {
+                    
+                } catch (\Illuminate\Database\QueryException $e){
+                    
+                }
+
                 return array(
-                    "object_id"=>$data['object_id'],
+                    "object_id" => $data['object_id'],
                     "type" => $type,
-                    "ratings"=>$rating,
+                    "ratings" => $rating,
                     "result" => $result
-                        );
+                );
             }
         }
     }
-    
+
     /**
      * Show the application registration form.
      *
@@ -86,16 +94,16 @@ class EditRating {
             }
         }
     }
-    
+
     /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
     public function deleteFavoriteObject(array $data, User $user) {
-        Favorite::where('user_id',$user->id)
-                ->where('favorite_type',$data['type'])
-                ->where('object_id',$data['object_id'])->delete();
+        Favorite::where('user_id', $user->id)
+                ->where('favorite_type', $data['type'])
+                ->where('object_id', $data['object_id'])->delete();
     }
 
     /**
@@ -106,23 +114,23 @@ class EditRating {
      */
     public function validatorRating() {
         return [
-                    'type' => 'required|max:255',
-                    'comment' => 'required',
-                    'object_id' => 'required|integer|min:1',
-                    'rating' => 'required|integer|min:0|max:5'
+            'type' => 'required|max:255',
+            'comment' => 'required',
+            'object_id' => 'required|integer|min:1',
+            'rating' => 'required|integer|min:0|max:5'
         ];
     }
-    
+
     /**
      * Get a validator for an incoming edit profile request.
      *
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorFavorite( ) {
-        return  [
-                    'type' => 'required|max:255',
-                    'object_id' => 'required|integer|min:1',
+    public function validatorFavorite() {
+        return [
+            'type' => 'required|max:255',
+            'object_id' => 'required|integer|min:1',
         ];
     }
 
