@@ -2,7 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\Food;
-use App\Services\Rapigo;
+use App\Services\EditOrderFood;
+use App\Models\Item;
 use App\Models\Delivery;
 use App\Models\Route;
 use App\Models\OrderAddress;
@@ -19,15 +20,25 @@ class DeliveriesSeeder extends Seeder {
      *
      */
     protected $editOrderFood;
+    
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $food;
 
-    public function __construct(Food $food) {
-        $this->food = $food;
+    public function __construct(Food $food,EditOrderFood $editOrderfood) {
+        $this->food = $editOrderfood;
+        $this->editOrderfood = $editOrderfood;
     }
 
     public function run() {
-        $this->deleteOldData();
-        $this->food->generateRandomDeliveries(4.670129, -74.051013);
-        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
+//        $this->deleteOldData(); 
+//        $this->food->reprogramDeliveries();
+        $item = Item::find(49);
+        $this->food->createDeliveries(1,$item,1741);
+//        $this->food->generateRandomDeliveries(4.670129, -74.051013);
+//        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
     }
     
     public function deleteOldData() {

@@ -433,8 +433,18 @@ class EditOrderFood {
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
-        $date = date_create();
-        $attributes = $item->attributes;
+        $delivery = Delivery::where('user_id', $user_id)->orderBy('delivery', 'desc')->first();
+        if ($delivery) {
+
+            if (time() < strtotime($delivery->delivery)) {
+                $date = date_create($delivery->delivery);
+            } else {
+                $date = date_create();
+            }
+        } else {
+            $date = date_create();
+        }
+        $attributes = json_decode($item->attributes, true);
         $shippingPaid = 0;
         if (array_key_exists("shipping", $attributes)) {
             if ($attributes["shipping"] > 0) {
@@ -451,9 +461,9 @@ class EditOrderFood {
             date_add($date, date_interval_create_from_date_string("1 days"));
 
             $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-            if ($dayofweek == 5) {
+            if ($dayofweek == 6) {
                 date_add($date, date_interval_create_from_date_string("2 days"));
-            } else if ($dayofweek == 6) {
+            } else if ($dayofweek == 0) {
                 date_add($date, date_interval_create_from_date_string("1 days"));
             }
             $delivery = new Delivery();
@@ -479,6 +489,51 @@ class EditOrderFood {
             $delivery->address_id = $address_id;
             $delivery->status = "deposit";
             $delivery->save();
+        }
+    }
+
+    public function reprogramDeliveries() {
+        $date = date_create();
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek < 5 && $dayofweek > 0) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else {
+            return null;
+        }
+        $la = date_format($date, "Y-m-d");
+//        $date = date_create($la . " 23:59:59");
+//        dd($date);
+        $deliveries = Delivery::where('status', 'pending')->where('delivery', '<', $la . " 23:59:59")->where('user_id', 1)->orderBy('delivery', 'desc')->get();
+        foreach ($deliveries as $item) {
+            $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
+            if ($delivery) {
+                $date = date_create($delivery->delivery);
+            } else {
+                $date = date_create($item->delivery);
+            }
+
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            if ($dayofweek < 5) {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            } else if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("3 days"));
+            } else {
+                return null;
+            }
+            if ($delivery) {
+                if ($delivery->status == "deposit") {
+                    $item->delivery = $delivery->delivery;
+                    $delivery->delivery = $date;
+                    $delivery->save();
+                } else {
+                    $item->delivery = $date;
+                }
+            } else {
+                $item->delivery = $date;
+            }
+            $item->save();
         }
     }
 
