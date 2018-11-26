@@ -9,5 +9,5 @@ class CoveragePolygon extends Model
     //
     protected $table = 'coverage_polygons';
     
-    protected $fillable = ['coverage','country_id','region_id','city_id'];
+    protected $fillable = ['coverage','country_id','region_id','city_id','merchant_id'];
 }

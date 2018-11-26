@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\CoveragePolygon;
+use App\Models\Address;
+
 class Geolocation {
 
-    var $pointOnVertex = true; // Check if the point sits exactly on one of the vertices?
+    var $pointOnVertex = true; // Check if the point sits exactly on one of the vertices
 
     public function pointLocation() {
         $pointLocation = new pointLocation();
@@ -16,15 +19,15 @@ class Geolocation {
         }
     }
 
-    public function pointInPolygon($point, $polygon, $pointOnVertex = true) {
+    public function pointInPolygon($point, $vertices, $pointOnVertex = true) {
         $this->pointOnVertex = $pointOnVertex;
 
         // Transform string coordinates into arrays with x and y values
-        $point = $this->pointStringToCoordinates($point);
-        $vertices = array();
-        foreach ($polygon as $vertex) {
-            $vertices[] = $this->pointStringToCoordinates($vertex);
-        }
+//        $point = $this->pointStringToCoordinates($point);
+//        $vertices = array();
+//        foreach ($polygon as $vertex) {
+//            $vertices[] = $this->pointStringToCoordinates($vertex);
+//        }
 
         // Check if the point sits exactly on a vertex
         if ($this->pointOnVertex == true and $this->pointOnVertex($point, $vertices) == true) {
@@ -70,6 +73,23 @@ class Geolocation {
     public function pointStringToCoordinates($pointString) {
         $coordinates = explode(" ", $pointString);
         return array("x" => $coordinates[0], "y" => $coordinates[1]);
+    }
+
+    public function checkMerchantPolygons(Address $address, $merchant_id) {
+        $polygons = CoveragePolygon::where('merchant_id', $merchant_id)->get();
+        $point = array("x" => $address->lat, "y" => $address->long);
+        foreach ($polygons as $item) {
+            $coveragePoints = json_decode($item->coverage, true);
+            $vertices = array();
+            foreach ($coveragePoints as $vertex) {
+                $vertices[] = array("x" => $vertex->lat, "y" => $vertex->long);
+            }
+            $result = $this->pointInPolygon($point, $vertices, true);
+            if($result != "outside"){
+                return array("status" => "success", "message" => "Address in coverage","polygon" => $item);
+            }
+        }
+        return array("status" => "error", "message" => "Address not in coverage" );
     }
 
 }

@@ -15,6 +15,7 @@ use App\Models\Address;
 use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\Stripe;
+use App\Services\Geolocation;
 use App\Services\EditAlerts;
 use Mail;
 use Darryldecode\Cart\CartCondition;
@@ -62,16 +63,24 @@ class EditOrder {
     protected $editAlerts;
 
     /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $geolocation;
+
+    /**
      * Create a new class instance.
      *
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, EditAlerts $editAlerts) {
+    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, EditAlerts $editAlerts, Geolocation $geolocation) {
         $this->payU = $payU;
         $this->editAlerts = $editAlerts;
         $this->stripe = $stripe;
         $this->editCart = $editCart;
+        $this->geolocation = $geolocation;
     }
 
     public function getOrder(User $user) {
@@ -194,14 +203,18 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $orderAddresses = $theAddress->toarray();
-                unset($orderAddresses['id']);
-                $orderAddresses['order_id'] = $order->id;
-                $orderAddresses['type'] = "shipping";
-                Payment::where("order_id", $order->id)->update(['address_id' => null]);
-                $order->orderAddresses()->where('type', "shipping")->delete();
-                OrderAddress::insert($orderAddresses);
-                return array("status" => "success", "message" => "Address added to order", "order" => $order);
+                $result = $this->geolocation->checkMerchantPolygons($theAddress, $order->merchant_id);
+                if ($result["status"] == "success") {
+                    $orderAddresses = $theAddress->toarray();
+                    unset($orderAddresses['id']);
+                    $orderAddresses['order_id'] = $order->id;
+                    $orderAddresses['type'] = "shipping";
+                    Payment::where("order_id", $order->id)->update(['address_id' => null]);
+                    $order->orderAddresses()->where('type', "shipping")->delete();
+                    OrderAddress::insert($orderAddresses);
+                    return array("status" => "success", "message" => "Address added to order", "order" => $order);
+                }
+                return $result;
             }
             return array("status" => "error", "message" => "Address does not belong to user");
         }
