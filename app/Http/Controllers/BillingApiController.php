@@ -93,6 +93,17 @@ class BillingApiController extends Controller {
         $status = $this->editBilling->payCreditCard($user,$source, $data);
         return response()->json($status);
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\ResponsepostPayCreditCard
+     */
+    public function retryPayment(Request $request,$payment) {
+        $user = $request->user();
+        $status = $this->editBilling->retryPayment($user,$payment);
+        return response()->json($status);
+    }
 
     /**
      * Handle a login request to the application.

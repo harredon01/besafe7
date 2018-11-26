@@ -58,7 +58,6 @@ class EditOrderFood {
      */
     protected function checkOrder(User $user, Order $order, array $data) {
         $items = $order->items();
-        $push = $user->push()->where("platform", self::PLATFORM_NAME)->first();
         $requiredCredits = 0;
         $requiredBuyers = 1;
         $splitTotal = $order->total;
@@ -88,10 +87,8 @@ class EditOrderFood {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
         if ($requiredCredits > 0) {
-            $creditHolders = Push::whereIn('user_id', $data['payers'])->where("credits", ">", 0)->where("platform", self::PLATFORM_NAME)->count();
-            if ($push->credits > 0) {
-                $creditHolders++;
-            }
+            array_push($data['payers'], $user->id);
+            $creditHolders = $this->checkUsersCredits($data['payers']);
             if ($creditHolders < $requiredCredits) {
                 return array("status" => "error", "message" => "Order does not have enough payers");
             }
@@ -100,8 +97,109 @@ class EditOrderFood {
             "message" => "Order Passed validation",
             "order" => $order,
             "split" => $splitTotal,
+            "creditHolders" => $order,
+            "requiredCredits" => $splitTotal,
+            "deposit" => $totalDeposit
+        );
+    }
+
+    public function checkUsersCredits($usersArray) {
+        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) {
+                        $query->where('platform', 'food');
+                    }, 'deliveries' => function ($query) {
+                        $query->where('status', 'pending');
+                    }])->get();
+        $openCredits = 0;
+        foreach ($users as $user) {
+            $credits = 0;
+            $usedCredits = 0;
+            $push = $user->push;
+            if (count($push) > 0) {
+                $credits = $push[0]->credits;
+            }
+            $deliveries = $push->deliveries;
+            foreach ($deliveries as $delivery) {
+                $attributes = json_decode($delivery->details, true);
+                if (array_key_exists("pickup", $attributes)) {
+                    if ($attributes["pickup"] == "envase") {
+                        $usedCredits = 1;
+                    }
+                }
+                if (array_key_exists("deliver", $attributes)) {
+                    if ($attributes["deliver"] == "deposit") {
+                        $credits = 1;
+                    }
+                }
+            }
+            $openCredits += ($credits - $usedCredits);
+        }
+        return $openCredits;
+    }
+
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    protected function checkOrderCredits(User $user, Order $order, array $data) {
+        $items = $order->items();
+        $requiredCredits = 0;
+        $requiredBuyers = 1;
+        $splitTotal = $order->total;
+        $totalDeposit = 0;
+        $creditItem = "";
+        $creditItemMerchant = "";
+        foreach ($items as $value) {
+            $attributes = json_decode($value->attributes, true);
+            if (array_key_exists("requires_credit", $attributes)) {
+                if ($attributes['requires_credit']) {
+                    $requiredCredits += $attributes['credits'];
+                    $totalDeposit += (self::CREDIT_PRICE * $attributes['credits']);
+                }
+            }
+            if (array_key_exists("multiple_buyers", $attributes)) {
+                if ($attributes['multiple_buyers']) {
+                    $requiredBuyers += $attributes['buyers'];
+                }
+            }
+            if (array_key_exists("is_credit", $attributes)) {
+                if ($attributes['is_credit']) {
+                    $requiredCredits -= $value->quantity;
+                    $splitTotal -= ($value->price * $value->quantity);
+                    $creditItem = $value->product_variant_id;
+                }
+            }
+            $creditItemMerchant = $value->merchant_id;
+        }
+        if (!$creditItem) {
+            $variant = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+            $creditItem = $variant->id;
+        }
+        if ($requiredCredits > 0) {
+            array_push($data['payers'], $user->id);
+            $creditHolders = $this->checkUsersCredits($data['payers']);
+            if ($creditHolders < $requiredCredits) {
+                return array("status" => "error",
+                    "message" => "Order does not have enough payers",
+                    "order" => $order,
+                    "split" => $splitTotal,
+                    "creditHolders" => $order,
+                    "creditItem" => $creditItem,
+                    "creditItemMerchant" => $creditItemMerchant,
+                    "requiredCredits" => $splitTotal,
+                    "deposit" => $totalDeposit,
+                );
+            }
+        }
+        return array("status" => "success",
+            "message" => "Order Passed validation",
+            "order" => $order,
+            "split" => $splitTotal,
+            "creditHolders" => $order,
+            "creditItem" => $creditItem,
+            "creditItemMerchant" => $creditItemMerchant,
+            "requiredCredits" => $splitTotal,
             "deposit" => $totalDeposit,
-            "push" => $push
         );
     }
 
@@ -469,19 +567,25 @@ class EditOrderFood {
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
             $delivery->delivery = $date;
+            $details["merchant_id"] = $item->merchant_id;
+            $products = ["product" => $item->product_variant_id, "quantity" => 1];
+            $details["products"] = $products;
             $delivery->shipping = $shippingPaid;
             $delivery->address_id = $address_id;
             $delivery->status = "pending";
             if ($x > 0 && $returnDelivery) {
-                $details = ["pickup" => "envase"];
-                $delivery->details = json_encode($details);
+                $details["pickup"] = "envase";
             }
+            $delivery->details = json_encode($details);
             $delivery->save();
         }
         if ($returnDelivery) {
             $delivery = new Delivery();
             date_add($date, date_interval_create_from_date_string("1 days"));
-            $details = ["deliver" => "deposit"];
+            $details["merchant_id"] = $item->merchant_id;
+            $products = ["product" => $item->product_variant_id, "quantity" => 1];
+            $details["products"] = $products;
+            $details["deliver"] = "deposit";
             $delivery->details = json_encode($details);
             $delivery->user_id = $user_id;
             $delivery->delivery = $date;

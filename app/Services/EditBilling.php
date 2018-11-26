@@ -25,7 +25,7 @@ class EditBilling {
      *
      */
     protected $editOrder;
-    
+
     /**
      * The EditAlert implementation.
      *
@@ -88,6 +88,19 @@ class EditBilling {
 //            $gateway = new $className;
 //            return $gateway->editSource($user,$source, $id, $data);
 //        }
+    }
+
+    public function retryPayment(User $user, $payment_id) {
+        $payment = Payment::find($payment_id);
+        if ($payment) {
+            if ($user->id == $payment->user_id) {
+                $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->save();
+                return ['status' => 'success', 'message' => "", "payment" => $payment];
+            }
+            return ['status' => 'error', 'message' => "Access denied"];
+        }
+        return ['status' => 'error', 'message' => "Payment not found"];
     }
 
     public function getSource(User $user, $source, $id, array $data) {
@@ -348,10 +361,12 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
+                $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->save();
                 if (array_key_exists("token", $data)) {
                     return $gateway->useToken($user, $data, $payment);
                 } else {
-                    $paymentResult = $gateway->payCreditCard($user, $data, $payment,$data['platform']);
+                    $paymentResult = $gateway->payCreditCard($user, $data, $payment, $data['platform']);
                     if (array_key_exists("save_card", $data)) {
                         if ($data['save_card']) {
                             $gateway->createToken($user, $data);
@@ -383,7 +398,9 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
-                return $gateway->payDebitCard($user, $data, $payment,$data['platform']);
+                $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->save();
+                return $gateway->payDebitCard($user, $data, $payment, $data['platform']);
             }
         }
         return array("status" => "error", "message" => "Invalid order");
@@ -397,7 +414,9 @@ class EditBilling {
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
-                return $gateway->payCash($user, $data, $payment,$data['platform']);
+                $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->save();
+                return $gateway->payCash($user, $data, $payment, $data['platform']);
             }
         }
         return array("status" => "error", "message" => "Invalid order");

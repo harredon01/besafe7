@@ -354,7 +354,7 @@ class EditUserData {
         if (count($candidate) > 0) {
             $candidate = $candidate[0];
             if ($candidate) {
-                $push = $candidate->push;
+                $push = $candidate->push()->where("platform",$data['platform'])->first();
                 if ($push) {
                     return ["result" => true, "user_id" => $candidate->id, "status" => "success", "credits" => $push->credits];
                 }

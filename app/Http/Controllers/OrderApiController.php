@@ -74,7 +74,7 @@ class OrderApiController extends Controller {
      */
     public function addDiscounts(Request $request, $platform, $order) {
         $user = $request->user();
-        
+
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         if ($platFormService) {
@@ -84,11 +84,11 @@ class OrderApiController extends Controller {
                     $this->editOrder->addItemsToOrder($user, $orderContainer);
                     return response()->json($platFormService->addDiscounts($user, $orderContainer));
                 }
-                return response()->json(["status" => "error", "message"=>"Order is not users"]);
+                return response()->json(["status" => "error", "message" => "Order is not users"]);
             }
-            return response()->json(["status" => "error", "message"=>"Order not found"]);
+            return response()->json(["status" => "error", "message" => "Order not found"]);
         }
-        return response()->json(["status" => "error", "message"=>"no service"]);
+        return response()->json(["status" => "error", "message" => "no service"]);
     }
 
     /**
@@ -100,6 +100,17 @@ class OrderApiController extends Controller {
     public function payOrder(Request $request) {
         $user = $request->user();
         return response()->json($this->editOrder->payOrder($user, $request->all()));
+    }
+
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkOrder(Request $request, $platform) {
+        $user = $request->user();
+        return response()->json($this->editOrder->checkOrder($user, $platform, $request->all()));
     }
 
     /**

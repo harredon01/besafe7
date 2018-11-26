@@ -24,10 +24,8 @@ class PayU {
     private function populatePaymentContent(Payment $payment,$platform) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
-        $reference = $platform."_payment_" . $payment->id . "_order_" . $payment->order_id;
+        $reference = $payment->referenceCode;
         $paymentTotal = $payment->total;
-        $payment->referenceCode = $reference;
-        $payment->save();
         $currency = "COP";
         $merchantId = env('PAYU_MERCHANT', "508029");
         $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($paymentTotal, 0, '.', '') . "~" . $currency;

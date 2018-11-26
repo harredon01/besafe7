@@ -33,10 +33,12 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
-//        $this->deleteOldData(); 
+        $this->deleteOldData(); 
 //        $this->food->reprogramDeliveries();
-        $item = Item::find(49);
-        $this->food->createDeliveries(1,$item,1741);
+//        $item = Item::find(49);
+//        $this->food->createDeliveries(1,$item,1741);
+        $users = [2];
+        $this->food->checkUsersCredits($users);
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);
 //        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
     }

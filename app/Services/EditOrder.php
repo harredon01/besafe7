@@ -145,6 +145,26 @@ class EditOrder {
         }
     }
 
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    public function checkOrderCredits(User $user, $platform, array $data) {
+        if (array_key_exists("order_id", $data)) {
+            $order = Order::find($data['order_id']);
+        } else {
+            $order = $this->getOrder($user);
+        }
+        if ($order) {
+            $className = "App\\Services\\EditOrder" . ucfirst($platform);
+            $platFormService = new $className(); //// <--- this thing will be autoloaded
+            if ($platFormService) {
+                return $platFormService->checkOrderCredits($user, $order, $data);
+            }
+        }
+    }
+
     public function processModel(array $data) {
         $class = "App\\Models\\" . $data["model"];
         $model = $class::find($data['id']);
@@ -306,11 +326,13 @@ class EditOrder {
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->approvePayment($payment);
     }
+
     public function denyPayment(Payment $payment, $platform) {
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->denyPayment($payment);
     }
+
     public function pendingPayment(Payment $payment, $platform) {
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded

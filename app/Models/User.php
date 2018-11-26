@@ -89,6 +89,9 @@ class User extends Authenticatable {
     public function vehicles() {
         return $this->hasMany('App\Models\Vehicle');
     }
+    public function deliveries() {
+        return $this->hasMany('App\Models\Delivery');
+    }
     public function products() {
         return $this->hasMany('App\Models\Product');
     }

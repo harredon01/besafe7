@@ -174,12 +174,13 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
-            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-                $routeCost = $rapigoResponse['price'];
-            } else {
-                $routeCost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-            }
+//            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
+//            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+//                $routeCost = $rapigoResponse['price'];
+//            } else {
+//                $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+//            }
+            $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             if($routeCost> $value->unit_price){
                 $value->availability = 0;
             } else {
@@ -745,7 +746,7 @@ class Food {
         //$articles = Article::where('start_date',$date)->get();
         $articles = Article::where('start_date', "2018-09-01")->get();
         //$date = date_create();
-        $total = rand(0, 4);
+        $total = rand(1, 8);
         for ($x = 0; $x <= $total; $x++) {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;
@@ -770,10 +771,13 @@ class Food {
                 $main = rand(0, 2);
                 $mainPlate = $attrs['plato'][$main];
                 $pickingUp = rand(0, 1);
+                $pickingUp = 0;
                 $details = [];
                 if ($pickingUp == 1) {
                     $details['pickup'] = "envase";
                 }
+                $details['starter_id'] = $starterPlate['codigo'];
+                $details['main_id'] = $mainPlate['codigo'];
                 $delivery = Delivery::create([
                             "user_id" => 1,
                             "delivery" => $date,
@@ -864,7 +868,7 @@ class Food {
                     'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
-            } else if ($x == 3 || $x == 7) {
+            } else if ($x == 3 || $x == 7) { 
                 $thedata = [
                     'lat' => $lat,
                     'lat2' => $lat,
@@ -884,8 +888,10 @@ class Food {
         }
         $this->completeRoutes($results);
         $this->completeRoutes($results2);
-        $this->getTotalEstimatedShipping("preorganize", null);
-        $this->getTotalEstimatedShipping("simple", null);
+        $routes =Route::where("description","preorganize")->get();
+        $routes2 =Route::where("description","simple")->get();
+        $this->getTotalEstimatedShipping($routes);
+        $this->getTotalEstimatedShipping($routes2);
     }
 
 }
