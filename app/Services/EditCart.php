@@ -99,6 +99,12 @@ class EditCart {
           foreach ($taxItems as $item) {
           $taxTotal += $item->getCalculatedValue($subTotal-$couponTotal-$saleTotal );
           } */
+        $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
+        $shippingTotal = 0;
+        foreach ($shippingItems as $item) {
+            $shippingTotal += $item->getCalculatedValue($subTotal);
+        }
+        $data['shipping'] = $shippingTotal;
         $data['subtotal'] = $subTotal;
         $cartConditions = Cart::session($user->id)->getConditions();
         $resultConditions = [];
