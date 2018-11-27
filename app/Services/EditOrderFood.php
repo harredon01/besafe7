@@ -57,50 +57,20 @@ class EditOrderFood {
      * @return string
      */
     protected function checkOrder(User $user, Order $order, array $data) {
-        $items = $order->items();
-        $requiredCredits = 0;
-        $requiredBuyers = 1;
-        $splitTotal = $order->total;
-        $totalDeposit = 0;
-        foreach ($items as $value) {
-            $attributes = json_decode($value->attributes, true);
-            if (array_key_exists("requires_credit", $attributes)) {
-                if ($attributes['requires_credit']) {
-                    $requiredCredits += $attributes['credits'];
-                    $totalDeposit += (self::CREDIT_PRICE * $attributes['credits']);
-                }
-            }
-            if (array_key_exists("multiple_buyers", $attributes)) {
-                if ($attributes['multiple_buyers']) {
-                    $requiredBuyers += $attributes['buyers'];
-                }
-            }
-            if (array_key_exists("is_credit", $attributes)) {
-                if ($attributes['is_credit']) {
-                    $requiredCredits -= $value->quantity;
-                    $splitTotal -= ($value->price * $value->quantity);
-                }
-            }
+        $results = $this->checkOrderCredits($user, $order, $data);
+        if ($results['requiredCredits'] > 0) {
+            return array("status" => "error", "message" => "Order does not have enough deposits");
+        }
+        if ($results['requiredBuyers'] > 0) {
+            return array("status" => "error", "message" => "Order does not have enough buyers");
         }
         $address = $order->orderAddresses()->where('type', "shipping")->get();
         if (!$address) {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
-        if ($requiredCredits > 0) {
-            array_push($data['payers'], $user->id);
-            $creditHolders = $this->checkUsersCredits($data['payers']);
-            if ($creditHolders < $requiredCredits) {
-                return array("status" => "error", "message" => "Order does not have enough payers");
-            }
-        }
-        return array("status" => "success",
-            "message" => "Order Passed validation",
-            "order" => $order,
-            "split" => $splitTotal,
-            "creditHolders" => $order,
-            "requiredCredits" => $splitTotal,
-            "deposit" => $totalDeposit
-        );
+        $results['status'] = "success";
+        $results['message'] = "Order passed validation";
+        return $results;
     }
 
     public function checkUsersCredits($usersArray) {
@@ -147,14 +117,19 @@ class EditOrderFood {
         $requiredBuyers = 1;
         $splitTotal = $order->total;
         $totalDeposit = 0;
-        $creditItem = "";
+        $totalCredit = 0;
+        $creditItem = null;
         $creditItemMerchant = "";
+
         foreach ($items as $value) {
             $attributes = json_decode($value->attributes, true);
             if (array_key_exists("requires_credit", $attributes)) {
                 if ($attributes['requires_credit']) {
+                    if (!$creditItem) {
+                        $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                    }
+                    $requiredDeposit += ($creditItem->price * $attributes['credits']);
                     $requiredCredits += $attributes['credits'];
-                    $totalDeposit += (self::CREDIT_PRICE * $attributes['credits']);
                 }
             }
             if (array_key_exists("multiple_buyers", $attributes)) {
@@ -166,40 +141,54 @@ class EditOrderFood {
                 if ($attributes['is_credit']) {
                     $requiredCredits -= $value->quantity;
                     $splitTotal -= ($value->price * $value->quantity);
-                    $creditItem = $value->product_variant_id;
+                    $requiredDeposit -= ($value->price * $value->quantity);
+                    $totalDeposit += ($value->price * $value->quantity);
+                    $totalCredit++;
                 }
             }
             $creditItemMerchant = $value->merchant_id;
         }
-        if (!$creditItem) {
-            $variant = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
-            $creditItem = $variant->id;
+        if (count($data['payers']) > 0) {
+            $totalNotBuyingDeposit = count($data['payers']) - $totalCredit;
+            $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
+            $payerSplitIncludingDeposit = 0;
+            $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
+            $payertransactionCostDeposit = 0;
+            if ($totalCredit > 0) {
+                if (!$creditItem) {
+                    $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                }
+                $payerSplitIncludingDeposit = $payerSplitNotIncludingDeposit + $creditItem->price;
+                $payertransactionCostDeposit = $this->getTransactionTotal($payerSplitIncludingDeposit);
+            }
+            $transactionCost = ($payertransactionCostDeposit * $totalCredit) + ($totalNotBuyingDeposit * $payertransactionCostNoDeposit);
+            $order->total = $order->total + $transactionCost;
+            $order->tax = $order->tax + (0);
+            //$order->status = "payment_created";
         }
         if ($requiredCredits > 0) {
-            array_push($data['payers'], $user->id);
-            $creditHolders = $this->checkUsersCredits($data['payers']);
-            if ($creditHolders < $requiredCredits) {
-                return array("status" => "error",
-                    "message" => "Order does not have enough payers",
-                    "order" => $order,
-                    "split" => $splitTotal,
-                    "creditHolders" => $order,
-                    "creditItem" => $creditItem,
-                    "creditItemMerchant" => $creditItemMerchant,
-                    "requiredCredits" => $splitTotal,
-                    "deposit" => $totalDeposit,
-                );
-            }
+            $checkCredits = $data['payers'];
+            array_push($checkCredits, $user->id);
+            $creditHolders = $this->checkUsersCredits($checkCredits);
+            $requiredCredits -= $creditHolders;
+            $requiredDeposit -= ($creditItem->price * $creditHolders);
         }
-        return array("status" => "success",
-            "message" => "Order Passed validation",
-            "order" => $order,
+
+        if ($requiredBuyers > 0) {
+            $checkBuyers = $data['payers'];
+            array_push($checkBuyers, $user->id);
+            $requiredBuyers -= count($data['payers']);
+        }
+
+        return array(
             "split" => $splitTotal,
-            "creditHolders" => $order,
+            "order" => $order,
+            "creditHolders" => $creditHolders,
             "creditItem" => $creditItem,
             "creditItemMerchant" => $creditItemMerchant,
-            "requiredCredits" => $splitTotal,
-            "deposit" => $totalDeposit,
+            "requiredCredits" => $requiredCredits,
+            "requiredBuyers" => $requiredBuyers,
+            "totalDeposit" => $totalDeposit,
         );
     }
 
@@ -262,38 +251,34 @@ class EditOrderFood {
             if (array_key_exists("split_order", $info)) {
                 if ($info['split_order']) {
                     if (array_key_exists("payers", $info)) {
-                        $this->splitOrder($user, $order, $info['payers'], $checkResult['deposit'], $checkResult['split']);
+                        $this->splitOrder($user, $order, $info['payers'], $checkResult['totalDeposit'], $checkResult['split']);
                         $totalBuyers = count($info['payers']) + 1;
                     }
                 }
             } else {
                 Payment::where("order_id", $order->id)->where("user_id", "<>", $user->id)->where("status", "pending")->delete();
             }
-            if (array_key_exists("payers", $info)) {
-                array_push($info['payers'], $user->id);
-                $records = [
-                    "buyers" => $info['payers']
-                ];
-                $order->attributes = json_encode($records);
-            }
+
             $buyerSubtotal = $checkResult['split'] / $totalBuyers;
             $buyerTax = $order->tax / $totalBuyers;
             $transactionCost = 0;
-            if ($checkResult['deposit'] > 0) {
-                $push = $checkResult['push'];
-                if ($push) {
-                    if ($push->credits == 0) {
-                        $buyerSubtotal += self::CREDIT_PRICE;
-                    }
-                } else {
-                    $buyerSubtotal += self::CREDIT_PRICE;
+            if ($checkResult['totalDeposit'] > 0) {
+                $usersArray = [$user->id];
+                $userCredits = $this->checkUsersCredits($usersArray);
+                if ($userCredits == 0) {
+                    $creditItem = $checkResult['creditItem'];
+                    $buyerSubtotal += $creditItem->price;
                 }
             }
-            if ($totalBuyers > 1) {
-                $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-                $order->total = $order->total + ($transactionCost * $totalBuyers);
-                $order->tax = $order->tax + (0);
-                //$order->status = "payment_created";
+            if (array_key_exists("payers", $info)) {
+                if (count($info['payers']) > 0) {
+                    $transactionCost = $this->getTransactionTotal($buyerSubtotal);
+                    array_push($info['payers'], $user->id);
+                    $records = [
+                        "buyers" => $info['payers']
+                    ];
+                    $order->attributes = json_encode($records);
+                }
             }
             $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
             if ($payment) {
@@ -321,28 +306,25 @@ class EditOrderFood {
      *
      * @return Response
      */
-    private function splitOrder(User $user, Order $order, $buyers, $depositTotal, $splitTotal) {
+    private function splitOrder(User $user, Order $order, $buyers, $depositTotal, $splitTotal, $item) {
         if ($order->user_id == $user->id) {
             $totalBuyers = count($buyers) + 1;
             $buyerSubtotal = $splitTotal / $totalBuyers;
             $buyerTax = $order->tax / $totalBuyers;
-            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-
             $followers = array();
             foreach ($buyers as $buyerItem) {
                 $buyer = User::find($buyerItem);
                 if ($buyer) {
                     $buyerTotal = $buyerSubtotal;
                     if ($depositTotal > 0) {
-                        $push = $buyer->push()->where("platform", self::PLATFORM_NAME)->first();
-                        if ($push) {
-                            if ($push->credits == 0) {
-                                $buyerTotal += self::CREDIT_PRICE;
-                            }
-                        } else {
-                            $buyerTotal += self::CREDIT_PRICE;
+                        $buyers = [$buyer->id];
+                        $result = $this->checkUsersCredits($buyers);
+                        if ($result > 0) {
+                            $buyerTotal += $item->price;
+                            $transactionCost = $this->getTransactionTotal($buyerTotal);
                         }
                     }
+                    $transactionCost = $this->getTransactionTotal($buyerTotal);
                     array_push($followers, $buyer);
                     $payment = Payment::where("order_id", $order->id)->where("user_id", $buyer->id)->where("status", "pending")->first();
                     if ($payment) {
