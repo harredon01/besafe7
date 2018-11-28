@@ -14,6 +14,9 @@ class Payment extends Model
      */
     protected $fillable = ['status', 'attributes', 'tax', 'total', 'user_id', 'referenceCode','transactionId','responseCode', 'extras', 'order_id', 'address_id'];
     
+    public function user() {
+        return $this->belongsTo('App\Models\User');
+    }
     public function order() {
         return $this->belongsTo('App\Models\Order');
     }

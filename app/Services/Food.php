@@ -27,23 +27,6 @@ class Food {
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $rapigo;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(Rapigo $rapigo) {
-        $this->rapigo = $rapigo;
-    }
-
     public function suspendDelvery($user_id) {
         Delivery::where("user_id", $user_id)->where("status", "<>", "deposit")->update(['status' => 'suspended']);
         Delivery::where("user_id", $user_id)->where("status", "deposit")->delete();
@@ -160,6 +143,8 @@ class Food {
         $totalCost = 0;
         $totalIncomeShipping = 0;
         $totalLunches = 0;
+        $className = "App\\Services\\Rapigo";
+        $platFormService = new $className();
         foreach ($results as $value) {
             $stops = $value->stops;
             $queryStops = [];
@@ -174,7 +159,7 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-//            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
+//            $rapigoResponse = $platFormService->getEstimate($queryStops);
 //            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
 //                $routeCost = $rapigoResponse['price'];
 //            } else {
@@ -228,7 +213,8 @@ class Food {
 
         $totalCost = 0;
         $totalIncomeShipping = 0;
-        $totalCost2 = 0;
+        $className = "App\\Services\\Rapigo";
+        $platFormService = new $className();
         $totalLunches = 0;
         $config = $this->loadDayConfig();
         foreach ($results as $value) {
@@ -286,7 +272,7 @@ class Food {
             }
             $value->status = "transit";
 
-//            $rapigoResponse = $this->rapigo->getEstimate($queryStops);
+//            $rapigoResponse = $platFormService->getEstimate($queryStops);
 //            $totalCost2 += $rapigoResponse['price'];
 //            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
 //                $totalCost += $rapigoResponse['price'];

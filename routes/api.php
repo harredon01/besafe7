@@ -155,6 +155,7 @@ Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
 Route::get('orders/confirm/{code?}', 'OrderApiController@confirmOrder');
 Route::post('orders/prepare/{platform?}', 'OrderApiController@prepareOrder');
 Route::post('orders/discounts/{platform?}/{order?}', 'OrderApiController@addDiscounts');
+Route::post('orders/check/{order?}', 'OrderApiController@checkOrder');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 

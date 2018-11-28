@@ -1167,16 +1167,16 @@ class PayU {
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
-                $transaction = Transaction::create($transactionResponse);
-                $payment->transactions()->save($transaction);
-                if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApprovePayment($payment, $platform));
-                } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new PendingPayment($payment, $platform));
-                } else {
-                    dispatch(new DenyPayment($payment, $platform));
-                }
-                return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
+//                $transaction = Transaction::create($transactionResponse);
+//                $payment->transactions()->save($transaction);
+//                if ($transactionResponse['state'] == 'APPROVED') {
+//                    dispatch(new ApprovePayment($payment, $platform));
+//                } else if ($transactionResponse['state'] == 'PENDING') {
+//                    dispatch(new PendingPayment($payment, $platform));
+//                } else {
+//                    dispatch(new DenyPayment($payment, $platform));
+//                }
+                return ["status" => "success", "transaction" => null, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
         return ["status" => "error", "response" => $response, "message" => $dataSent];
@@ -1327,20 +1327,20 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function webhook(array $data) {
-        $file = '/home/hoovert/access.log';
-        // Open the file to get existing content
-        $current = file_get_contents($file);
-        //$daarray = json_decode(json_encode($data));
-        // Append a new person to the file
-
-        $current .= json_encode($data);
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        $current .= PHP_EOL;
-        file_put_contents($file, $current);
+//        $file = '/home/hoovert/access.log';
+//        // Open the file to get existing content
+//        $current = file_get_contents($file);
+//        //$daarray = json_decode(json_encode($data));
+//        // Append a new person to the file
+//
+//        $current .= json_encode($data);
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;4Vj8eK4rloUd272L48hsrarnUA~508029~payment_42_order_43_1543377788~72000.0~COP~4
+//        $current .= PHP_EOL;
+//        $current .= PHP_EOL;
+//        file_put_contents($file, $current);
         $ApiKey = env('PAYU_KEY');
-        $transactionId = $data['transactionId'];
+        $transactionId = $data['transaction_id'];
         $merchant_id = $data['merchant_id'];
         $referenceCode = $data['reference_sale'];
         $TX_VALUE = $data['value'];
@@ -1348,9 +1348,12 @@ class PayU {
         $currency = $data['currency'];
         $transactionState = $data['state_pol'];
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
+        
         $firmacreada = md5($firma_cadena);
+        
         $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
+            
             $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transactionExists) {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
@@ -1360,10 +1363,10 @@ class PayU {
             if ($payment) {
                 $transaction = $this->saveTransaction($data, $payment);
                 if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment));
+                    dispatch(new ApprovePayment($payment,"Food"));
                     $transaction->description = "Transacción aprobada";
                 } else {
-                    dispatch(new DenyPayment($payment));
+                    dispatch(new DenyPayment($payment,"Food")); 
                     $transaction->description = "Transacción rechazada";
                 }
             } else {
@@ -1384,7 +1387,7 @@ class PayU {
 
             return ["status" => "success", "message" => "transaction processed", "data" => $data];
         } else {
-            
+            return ["status" => "error", "message" => "signature", "data" => $data];
         }
     }
 

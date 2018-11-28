@@ -104,7 +104,7 @@ class PayuController extends Controller {
     }
 
     public function webhookPayU(Request $request) {
-        $this->payU->webhook($request->all());
+        return response()->json($this->payU->webhook($request->all()));
         //dispatch(new PayUCron());
     }
     public function postcreateAll(Request $request) {

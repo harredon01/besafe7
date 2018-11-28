@@ -109,8 +109,9 @@ class OrderApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function checkOrder(Request $request, $platform) {
+        $order = Order::find($platform);
         $user = $request->user();
-        return response()->json($this->editOrder->checkOrder($user, $platform, $request->all()));
+        return response()->json($this->editOrder->checkOrder($user, $order, $request->all()));
     }
 
     /**
@@ -163,7 +164,7 @@ class OrderApiController extends Controller {
      */
     public function setShippingAddress(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->setShippingAddress($user, $request->only("address_id")));
+        return response()->json($this->editOrder->setShippingAddress($user, $request->all()));
     }
 
     /**

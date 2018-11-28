@@ -82,9 +82,10 @@ class Geolocation {
             $coveragePoints = json_decode($item->coverage, true);
             $vertices = array();
             foreach ($coveragePoints as $vertex) {
-                $vertices[] = array("x" => $vertex->lat, "y" => $vertex->long);
+                $vertices[] = array("x" => $vertex['lat'], "y" => $vertex['lng']);
             }
             $result = $this->pointInPolygon($point, $vertices, true);
+            
             if($result != "outside"){
                 return array("status" => "success", "message" => "Address in coverage","polygon" => $item);
             }

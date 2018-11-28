@@ -13,7 +13,6 @@ use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
 use App\Models\OrderCondition;
-use App\Services\Rapigo;
 use Darryldecode\Cart\CartCondition;
 use Cart;
 use DB;
@@ -33,23 +32,6 @@ class EditOrderFood {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
-
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $rapigo;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(Rapigo $rapigo) {
-        $this->rapigo = $rapigo;
-    }
 
     public function addDiscounts(User $user, Order $order) {
         Cart::session($user->id)->removeConditionsByType(self::PLATFORM_NAME);
@@ -196,7 +178,7 @@ class EditOrderFood {
         return ($total * 0.0349 + 900);
     }
 
-    protected function approveOrder(Order $order) {
+    public function approveOrder(Order $order) {
         $data = array();
         $items = $order->items()->get();
         $address = $order->orderAddresses()->where("type", "shipping")->first();
