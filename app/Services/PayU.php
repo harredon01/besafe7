@@ -21,7 +21,7 @@ use App\Models\Transaction;
 
 class PayU {
 
-    private function populatePaymentContent(Payment $payment,$platform) {
+    private function populatePaymentContent(Payment $payment, $platform) {
         $accountId = env('PAYU_ACCOUNT', "512321");
         $apiKey = env('PAYU_KEY');
         $reference = $payment->referenceCode;
@@ -1161,7 +1161,7 @@ class PayU {
                 $transactionResponse['transaction_id'] = $transactionResponse['transactionId'];
                 $transactionResponse['transaction_state'] = $transactionResponse['state'];
                 $transactionResponse['response_code'] = $transactionResponse['trazabilityCode'];
-                $transactionResponse['transaction_date'] = date("Y-m-d",$transactionResponse['operationDate']);
+                $transactionResponse['transaction_date'] = date("Y-m-d", $transactionResponse['operationDate']);
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
                   unset($transactionResponse['extras']);
@@ -1314,7 +1314,7 @@ class PayU {
                     dispatch(new DenyPayment($payment));
                     $transaction->description = "Transacción rechazada";
                 }
-                
+
                 //return ["status" => "success", "transaction" => $transaction, "response" => $response];
             }
         }
@@ -1348,12 +1348,12 @@ class PayU {
         $currency = $data['currency'];
         $transactionState = $data['state_pol'];
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        
+
         $firmacreada = md5($firma_cadena);
-        
+
         $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
-            
+
             $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transactionExists) {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
@@ -1363,10 +1363,10 @@ class PayU {
             if ($payment) {
                 $transaction = $this->saveTransaction($data, $payment);
                 if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment,"Food"));
+                    dispatch(new ApprovePayment($payment, "Food"));
                     $transaction->description = "Transacción aprobada";
                 } else {
-                    dispatch(new DenyPayment($payment,"Food")); 
+                    dispatch(new DenyPayment($payment, "Food"));
                     $transaction->description = "Transacción rechazada";
                 }
             } else {
@@ -1374,13 +1374,17 @@ class PayU {
                     if ($data['state_pol'] == 4) {
                         $results = explode("_", $data["reference_recurring_payment"]);
                         $subscriptionL = Subscription::where("source_id", $results[0])->first();
-                        $subscriptionL->ends_at = Date($data['date_next_payment']);
-                        $objectType = "App\\Models\\" . $subscriptionL->type;
-                        $object = new $objectType;
-                        $target = $object->find($subscriptionL->object_id);
-                        $target->ends_at = $subscriptionL->ends_at;
-                        $target->save();
-                        $subscriptionL->save();
+                        if ($subscriptionL) {
+                            $subscriptionL->ends_at = Date($data['date_next_payment']);
+                            $objectType = "App\\Models\\" . $subscriptionL->type;
+                            $object = new $objectType;
+                            $target = $object->find($subscriptionL->object_id);
+                            if ($target) {
+                                $target->ends_at = $subscriptionL->ends_at;
+                                $target->save();
+                            }
+                            $subscriptionL->save();
+                        }
                     }
                 }
             }
