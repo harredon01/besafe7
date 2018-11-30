@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditOrder;
 use App\Models\Order;
+use App\Models\User;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Services\CleanSearch;
 
@@ -112,6 +113,21 @@ class OrderApiController extends Controller {
         $order = Order::find($platform);
         $user = $request->user();
         return response()->json($this->editOrder->checkOrder($user, $order, $request->all()));
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkUserCredits(Request $request) {
+        $data = $request->all();
+        $user = User::where("email",$data['email'])->first();
+        if($user){
+            return response()->json(["status"=>"success","credits"=>$this->editOrder->checkUsersCredits([$user],$data['platform']),"user_id"=>$user->id]);
+        }
+        return response()->json(["status"=>"error"]);
     }
 
     /**

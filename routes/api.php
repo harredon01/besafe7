@@ -67,7 +67,7 @@ Route::get('user/medical/{code?}', 'UserApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'UserApiController@changePassword');
-Route::post('user/credits', 'UserApiController@checkUserCredits');
+Route::post('user/credits/{user?}', 'OrderApiController@checkUserCredits');
 Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');

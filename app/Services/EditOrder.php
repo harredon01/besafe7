@@ -133,7 +133,7 @@ class EditOrder {
      *
      * @return Response
      */
-    private function splitOrder(User $user, Order $order, $buyers, $depositTotal, $splitTotal, $item) {
+    private function splitOrder(User $user, Order $order, $address,  $buyers, $depositTotal, $splitTotal, $item, $platform) {
         if ($order->user_id == $user->id) {
             $totalBuyers = count($buyers) + 1;
             $buyerSubtotal = $splitTotal / $totalBuyers;
@@ -145,7 +145,7 @@ class EditOrder {
                     $buyerTotal = $buyerSubtotal;
                     if ($depositTotal > 0) {
                         $buyers = [$buyer->id];
-                        $result = $this->checkUsersCredits($buyers);
+                        $result = $this->checkUsersCredits($buyers, $platform);
                         if ($result > 0) {
                             $buyerTotal += $item->price;
                             $transactionCost = $this->getTransactionTotal($buyerTotal);
@@ -160,7 +160,7 @@ class EditOrder {
                         $payment = new Payment;
                     }
                     $payment->user_id = $buyer->id;
-                    $payment->address_id = $order->address_id;
+                    $payment->address_id = $address->id;
                     $payment->order_id = $order->id;
                     $payment->status = "pending";
                     $payment->total = $buyerTotal + $transactionCost;
@@ -205,6 +205,8 @@ class EditOrder {
                 if ($cart['total'] > 0) {
                     $order->subtotal = $cart["subtotal"];
                     $order->tax = 0;
+                    $transactionCost = 0;
+                    $splitOrder = false;
                     $order->shipping = $cart["shipping"];
                     $order->discount = 0;
                     $order->total = $cart["total"];
@@ -213,10 +215,12 @@ class EditOrder {
                     if ($checkResult['status'] == "success") {
                         $order = $checkResult['order'];
                         $totalBuyers = 1;
+                        $address = $order->orderAddresses()->where("type", "shipping")->first();
                         if (array_key_exists("split_order", $info)) {
                             if ($info['split_order']) {
                                 if (array_key_exists("payers", $info)) {
-                                    $this->splitOrder($user, $order, $info['payers'], $checkResult['totalDeposit'], $checkResult['split']);
+                                    $splitOrder = true;
+                                    $this->splitOrder($user, $order,$address, $info['payers'], $checkResult['totalDeposit'],$checkResult['split'], $checkResult['creditItem'], $platform);
                                     $totalBuyers = count($info['payers']) + 1;
                                 }
                             }
@@ -226,10 +230,9 @@ class EditOrder {
 
                         $buyerSubtotal = $checkResult['split'] / $totalBuyers;
                         $buyerTax = $order->tax / $totalBuyers;
-                        $transactionCost = 0;
                         if ($checkResult['totalDeposit'] > 0) {
                             $usersArray = [$user->id];
-                            $userCredits = $this->checkUsersCredits($usersArray);
+                            $userCredits = $this->checkUsersCredits($usersArray, $platform);
                             if ($userCredits == 0) {
                                 $creditItem = $checkResult['creditItem'];
                                 $buyerSubtotal += $creditItem->price;
@@ -237,21 +240,28 @@ class EditOrder {
                         }
                         if (array_key_exists("payers", $info)) {
                             if (count($info['payers']) > 0) {
-                                $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-                                array_push($info['payers'], $user->id);
-                                $records = [
-                                    "buyers" => $info['payers']
-                                ];
-                                $order->attributes = json_encode($records);
+                                
+                            } else {
+                                $info['payers'] = [];
                             }
+                        } else {
+                            $info['payers'] = [];
                         }
+                        if ($splitOrder) {
+                            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
+                        }
+                        array_push($info['payers'], $user->id);
+                        $records = [
+                            "buyers" => $info['payers']
+                        ];
+                        $order->attributes = json_encode($records);
                         $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
                         if ($payment) {
                             
                         } else {
                             $payment = new Payment;
                         }
-                        $address = $order->orderAddresses()->where("type", "shipping")->first();
+                        
                         $payment->user_id = $user->id;
                         $payment->address_id = $address->id;
                         $payment->order_id = $order->id;
@@ -276,13 +286,13 @@ class EditOrder {
      *
      * @return string
      */
-    public function checkOrder(User $user,Order $order, array $data) {
+    public function checkOrder(User $user, Order $order, array $data) {
         $results = $this->checkOrderCreditsInternal($user, $order, $data);
         if ($results['requiredCredits'] > 0) {
-            return array("status" => "error", "message" => "Order does not have enough deposits");
+            return array("status" => "error","type" => "credits", "message" => "Order does not have enough deposits", "required_credits" => $results['requiredCredits']);
         }
         if ($results['requiredBuyers'] > 0) {
-            return array("status" => "error", "message" => "Order does not have enough buyers");
+            return array("status" => "error","type" => "buyers",  "message" => "Order does not have enough buyers", "required_buyers" => $results['requiredBuyers']);
         }
         $address = $order->orderAddresses()->where('type', "shipping")->get();
         if (!$address) {
@@ -293,9 +303,9 @@ class EditOrder {
         return $results;
     }
 
-    protected function checkUsersCredits($usersArray) {
-        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) {
-                        $query->where('platform', 'food');
+    public function checkUsersCredits($usersArray, $platform) {
+        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
+                        $query->where('platform', $platform);
                     }, 'deliveries' => function ($query) {
                         $query->where('status', 'pending');
                     }])->get();
@@ -327,10 +337,10 @@ class EditOrder {
     }
 
     protected function checkOrderCreditsInternal(User $user, Order $order, array $data) {
-        $items = $order->items();
+        $items = $order->items;
         $requiredCredits = 0;
         $creditHolders = 0;
-        $requiredBuyers = 1;
+        $requiredBuyers = 0;
         $splitTotal = $order->total;
         $totalDeposit = 0;
         $totalCredit = 0;
@@ -365,7 +375,8 @@ class EditOrder {
         }
         if (array_key_exists("payers", $data)) {
             if (count($data['payers']) > 0) {
-                $totalNotBuyingDeposit = count($data['payers']) - $totalCredit;
+                $totalNotBuyingDeposit = count($data['payers'])+1 - $totalCredit;
+                
                 $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
                 $payerSplitIncludingDeposit = 0;
                 $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
@@ -390,7 +401,7 @@ class EditOrder {
                 $checkCredits = [];
             }
             array_push($checkCredits, $user->id);
-            $creditHolders = $this->checkUsersCredits($checkCredits);
+            $creditHolders = $this->checkUsersCredits($checkCredits, $data['platform']);
             $requiredCredits -= $creditHolders;
             $requiredDeposit -= ($creditItem->price * $creditHolders);
         }
@@ -403,16 +414,15 @@ class EditOrder {
             array_push($checkBuyers, $user->id);
             $requiredBuyers -= count($checkBuyers);
         }
-
         return array(
             "split" => $splitTotal,
-            "order" => $order,
             "creditHolders" => $creditHolders,
             "creditItem" => $creditItem,
             "creditItemMerchant" => $creditItemMerchant,
             "requiredCredits" => $requiredCredits,
             "requiredBuyers" => $requiredBuyers,
             "totalDeposit" => $totalDeposit,
+            "order" => $order,
         );
     }
 

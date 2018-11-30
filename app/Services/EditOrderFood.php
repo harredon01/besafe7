@@ -239,7 +239,7 @@ class EditOrderFood {
         } else {
             $date = date_create();
         }
-        $attributes = json_decode($item->attributes, true);
+        $attributes = $item->attributes;
         $shippingPaid = 0;
         if (array_key_exists("shipping", $attributes)) {
             if ($attributes["shipping"] > 0) {
