@@ -206,6 +206,9 @@ class EditOrderFood {
                     $status = $status . " meal-plan";
                     $this->createMealPlan($order, $item, $address->id);
                 }
+                if ($data['type'] == "credit") {
+                    $this->createDeposit($order );
+                }
             }
             if (array_key_exists("model", $data)) {
                 $class = "App\\Models\\" . $data["model"];
@@ -224,6 +227,19 @@ class EditOrderFood {
         $buyers = $data['buyers'];
         for ($x = 0; $x < count($buyers); $x++) {
             $this->createDeliveries($buyers[$x], $item, $address_id);
+        }
+    }
+    public function createDeposit(Order $order ) {
+        $payments = $order->payments()->with("user.push")->get();
+        foreach ($payments as $value) {
+            $user = $value->user;
+            $push = $user->push;
+            if($push){
+                if(!$push->credits ||$push->credits==0){
+                    $push->credits = 1;
+                    $push->save();
+                }
+            }
         }
     }
 
@@ -272,6 +288,9 @@ class EditOrderFood {
             $delivery->status = "pending";
             if ($x > 0 && $returnDelivery) {
                 $details["pickup"] = "envase";
+            }
+            if ($returnDelivery) {
+                $details["deliver"] = "envase";
             }
             $delivery->details = json_encode($details);
             $delivery->save();

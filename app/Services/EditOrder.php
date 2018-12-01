@@ -29,6 +29,8 @@ class EditOrder {
     const ORDER_PAYMENT = 'order_payment';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
     const PAYMENT_APPROVED = 'payment_approved';
+    const PAYMENT_STATUS = 'payment_status';
+    const ORDER_STATUS = 'order_status';
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'Food';
 
@@ -133,7 +135,7 @@ class EditOrder {
      *
      * @return Response
      */
-    private function splitOrder(User $user, Order $order, $address,  $buyers, $depositTotal, $splitTotal, $item, $platform) {
+    private function splitOrder(User $user, Order $order, $address, $buyers, $depositTotal, $splitTotal, $item, $platform) {
         if ($order->user_id == $user->id) {
             $totalBuyers = count($buyers) + 1;
             $buyerSubtotal = $splitTotal / $totalBuyers;
@@ -142,11 +144,12 @@ class EditOrder {
             foreach ($buyers as $buyerItem) {
                 $buyer = User::find($buyerItem);
                 if ($buyer) {
+                    //dd($buyer->toArray());
                     $buyerTotal = $buyerSubtotal;
                     if ($depositTotal > 0) {
-                        $buyers = [$buyer->id];
-                        $result = $this->checkUsersCredits($buyers, $platform);
-                        if ($result > 0) {
+                        $buyersCredts = [$buyer->id];
+                        $result = $this->checkUsersCredits($buyersCredts, $platform);
+                        if ($result < 1) {
                             $buyerTotal += $item->price;
                             $transactionCost = $this->getTransactionTotal($buyerTotal);
                         }
@@ -220,7 +223,7 @@ class EditOrder {
                             if ($info['split_order']) {
                                 if (array_key_exists("payers", $info)) {
                                     $splitOrder = true;
-                                    $this->splitOrder($user, $order,$address, $info['payers'], $checkResult['totalDeposit'],$checkResult['split'], $checkResult['creditItem'], $platform);
+                                    $this->splitOrder($user, $order, $address, $info['payers'], $checkResult['totalDeposit'], $checkResult['split'], $checkResult['creditItem'], $platform);
                                     $totalBuyers = count($info['payers']) + 1;
                                 }
                             }
@@ -250,9 +253,11 @@ class EditOrder {
                         if ($splitOrder) {
                             $transactionCost = $this->getTransactionTotal($buyerSubtotal);
                         }
+                        $thePayersArray = $info['payers'];
                         array_push($info['payers'], $user->id);
+                        
                         $records = [
-                            "buyers" => $info['payers']
+                            "buyers" => $thePayersArray
                         ];
                         $order->attributes = json_encode($records);
                         $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
@@ -261,7 +266,7 @@ class EditOrder {
                         } else {
                             $payment = new Payment;
                         }
-                        
+
                         $payment->user_id = $user->id;
                         $payment->address_id = $address->id;
                         $payment->order_id = $order->id;
@@ -288,49 +293,65 @@ class EditOrder {
      */
     public function checkOrder(User $user, Order $order, array $data) {
         $results = $this->checkOrderCreditsInternal($user, $order, $data);
+        $results['status'] = "success";
+        $results['message'] = "Order passed validation";
         if ($results['requiredCredits'] > 0) {
-            return array("status" => "error","type" => "credits", "message" => "Order does not have enough deposits", "required_credits" => $results['requiredCredits']);
+            $results['status'] = "error";
+            $results['message'] = "Order does not have enough deposits";
+            $results['required_credits'] = $results['requiredCredits'];
+            $results['type'] = "credits";
+            return $results;
         }
         if ($results['requiredBuyers'] > 0) {
-            return array("status" => "error","type" => "buyers",  "message" => "Order does not have enough buyers", "required_buyers" => $results['requiredBuyers']);
+            $results['status'] = "error";
+            $results['message'] = "Order does not have enough buyers";
+            $results['required_buyers'] = $results['requiredBuyers'];
+            $results['type'] = "buyers";
+            return $results;
         }
         $address = $order->orderAddresses()->where('type', "shipping")->get();
         if (!$address) {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
-        $results['status'] = "success";
-        $results['message'] = "Order passed validation";
+        
         return $results;
     }
 
     public function checkUsersCredits($usersArray, $platform) {
         $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
-                        $query->where('platform', $platform);
-                    }, 'deliveries' => function ($query) {
-                        $query->where('status', 'pending');
+                        $query->where('platform', strtolower($platform));
                     }])->get();
+//        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
+//                        $query->where('platform', strtolower($platform));
+//                    }, 'deliveries' => function ($query) {
+//                        $query->where('status', 'pending');
+//                    }])->get();
         $openCredits = 0;
         foreach ($users as $user) {
             $credits = 0;
             $usedCredits = 0;
-            $push = $user->push;
-            if (count($push) > 0) {
-                $credits = $push[0]->credits;
+            $push = $user->toArray();
+            if (count($push['push']) > 0) {
+                $credits = $push['push'][0]['credits'];
             }
-            $deliveries = $push->deliveries;
-            foreach ($deliveries as $delivery) {
-                $attributes = json_decode($delivery->details, true);
-                if (array_key_exists("pickup", $attributes)) {
-                    if ($attributes["pickup"] == "envase") {
-                        $usedCredits = 1;
-                    }
-                }
-                if (array_key_exists("deliver", $attributes)) {
-                    if ($attributes["deliver"] == "deposit") {
-                        $credits = 1;
-                    }
-                }
-            }
+//            $deliveries = $user->deliveries;
+//            foreach ($deliveries as $delivery) {
+//                $attributes = json_decode($delivery->details, true);
+//                if ($attributes) {
+//                    if (array_key_exists("pickup", $attributes)) {
+//                        if ($attributes["deliver"] == "envase") {
+//                            $usedCredits = 1;
+//                        }
+//                    }
+//                    if (array_key_exists("deliver", $attributes)) {
+//                        if ($attributes["deliver"] == "deposit") {
+//                            $credits = 1;
+//                        }
+//                    }
+//                }
+//            }
+
+
             $openCredits += ($credits - $usedCredits);
         }
         return $openCredits;
@@ -339,6 +360,7 @@ class EditOrder {
     protected function checkOrderCreditsInternal(User $user, Order $order, array $data) {
         $items = $order->items;
         $requiredCredits = 0;
+        $requiredDeposit = 0;
         $creditHolders = 0;
         $requiredBuyers = 0;
         $splitTotal = $order->total;
@@ -348,10 +370,10 @@ class EditOrder {
         $creditItemMerchant = "";
         foreach ($items as $value) {
             $attributes = json_decode($value->attributes, true);
-            if (array_key_exists("requires_credit", $attributes)) {
-                if ($attributes['requires_credit']) {
+            if (array_key_exists("requires_credits", $attributes)) {
+                if ($attributes['requires_credits']) {
                     if (!$creditItem) {
-                        $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                        $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $value->merchant_id)->first();
                     }
                     $requiredDeposit += ($creditItem->price * $attributes['credits']);
                     $requiredCredits += $attributes['credits'];
@@ -375,8 +397,8 @@ class EditOrder {
         }
         if (array_key_exists("payers", $data)) {
             if (count($data['payers']) > 0) {
-                $totalNotBuyingDeposit = count($data['payers'])+1 - $totalCredit;
-                
+                $totalNotBuyingDeposit = count($data['payers']) + 1 - $totalCredit;
+
                 $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
                 $payerSplitIncludingDeposit = 0;
                 $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
@@ -584,10 +606,12 @@ class EditOrder {
         }
     }
 
-    public function approvePayment(Payment $payment, $platform) {
-        $payment->status = "approved";
-        $order = $payment->order;
-        $payment->save();
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function paymentStatusUpdate(Payment $payment, $platform, Order $order) {
         $user = $payment->user;
         $followers = [];
         array_push($followers, $user);
@@ -595,7 +619,11 @@ class EditOrder {
             "order_id" => $order->id,
             "first_name" => $user->firstName,
             "last_name" => $user->lastName,
-            "payment" => $payment
+            "payment_id" => $payment->id,
+            "payment_total" => $payment->total,
+            "payment_status" => $payment->status,
+            "order_total" => $order->total,
+            "order_status" => $order->status
         ];
         $data = [
             "trigger_id" => $user->id,
@@ -604,18 +632,66 @@ class EditOrder {
             "object" => self::OBJECT_ORDER,
             "sign" => true,
             "payload" => $payload,
-            "type" => self::PAYMENT_APPROVED,
+            "type" => self::PAYMENT_STATUS,
             "user_status" => $user->getUserNotifStatus()
         ];
         $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, self::PLATFORM_NAME);
+        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, $platform);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function OrderStatusUpdate(Payment $payment, $platform, Order $order) {
+        $user = $payment->user;
+        $followers = [];
+        $payments = $order->payments()->with('user')->get();
+        foreach ($payments as $item) {
+            $user = $item->user->id;
+            array_push($followers, $user);
+        }
+
+
+        $payload = [
+            "order_id" => $order->id,
+            "first_name" => $user->firstName,
+            "last_name" => $user->lastName,
+            "payment_id" => $payment->id,
+            "payment_total" => $payment->total,
+            "payment_status" => $payment->status,
+            "order_total" => $order->total,
+            "order_status" => $order->status
+        ];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => self::OBJECT_ORDER,
+            "sign" => true,
+            "payload" => $payload,
+            "type" => self::ORDER_STATUS,
+            "user_status" => $user->getUserNotifStatus()
+        ];
+        $date = date("Y-m-d H:i:s");
+        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, $platform);
+    }
+
+    public function approvePayment(Payment $payment, $platform) {
+        $payment->status = "approved";
+        $order = $payment->order;
+        $payment->save();
+
         if ($order) {
             $payments = $order->payments()->where("status", "<>", "Paid")->where("id", "<>", $payment->id)->count();
             if ($payments > 0) {
                 $order->status = "Pending-" . $payments;
                 $order->save();
+                $this->paymentStatusUpdate($payment, $platform, $order);
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
+                $this->orderStatusUpdate($payment, $platform, $order);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
@@ -624,12 +700,18 @@ class EditOrder {
     }
 
     public function denyPayment(Payment $payment, $platform) {
+        $payment->status = "denied";
+        $order = $payment->order;
+        $payment->save();
+        $this->paymentStatusUpdate($payment, $platform, $order);
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->denyPayment($payment);
     }
 
     public function pendingPayment(Payment $payment, $platform) {
+        $payment->status = "pending";
+        $payment->save();
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->pendingPayment($payment);

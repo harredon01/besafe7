@@ -108,6 +108,36 @@ class EditAlerts {
             $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
             $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
         }
+        $pos = strpos($data['subject'], '{order}');
+        if ($pos) {
+            $data['subject'] = str_replace("{order}", $arrayPayload['order_id'], $data['subject']);
+            $data['subject_es'] = str_replace("{order}", $arrayPayload['order_id'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{orderTotal}');
+        if ($pos) {
+            $data['subject'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['subject']);
+            $data['subject_es'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{orderStatus}');
+        if ($pos) {
+            $data['subject'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject']);
+            $data['subject_es'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{payment}');
+        if ($pos) {
+            $data['subject'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['subject']);
+            $data['subject_es'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{paymentStatus}');
+        if ($pos) {
+            $data['subject'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject']);
+            $data['subject_es'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject_es']);
+        }
+        $pos = strpos($data['subject'], '{paymentTotal}');
+        if ($pos) {
+            $data['subject'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['subject']);
+            $data['subject_es'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['subject_es']);
+        }
         if ($data) {
             $data['notification_id'] = strtotime($date);
         } else {

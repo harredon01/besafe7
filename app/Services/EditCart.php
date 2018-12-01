@@ -237,6 +237,11 @@ class EditCart {
                         return $order->id;
                     }
                 }
+                if ($order->status=="pending") {
+                    if ($order->user_id == $user->id || $order->supplier_id == $user->id) {
+                        return $order->id;
+                    }
+                }
             }
         }
         return null;
@@ -524,7 +529,7 @@ class EditCart {
             } else if ((int) $data['quantity'] == 0) {
                 Cart::session($user->id)->remove($item->id);
                 $item->delete();
-                return array("status" => "success", "message" => "Item deleted from cart");
+                return array("status" => "success", "message" => "Item deleted from cart", "cart" => $this->getCart($user));
             } else if ((int) $data['quantity'] < 0) {
                 return array("status" => "error", "message" => "amount must be positive");
             }
