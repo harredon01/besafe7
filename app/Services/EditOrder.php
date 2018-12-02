@@ -254,7 +254,7 @@ class EditOrder {
                             $transactionCost = $this->getTransactionTotal($buyerSubtotal);
                         }
                         $thePayersArray = $info['payers'];
-                        array_push($info['payers'], $user->id);
+                        array_push($thePayersArray, $user->id);
                         
                         $records = [
                             "buyers" => $thePayersArray
@@ -645,19 +645,16 @@ class EditOrder {
      * @return Response
      */
     public function OrderStatusUpdate(Payment $payment, $platform, Order $order) {
-        $user = $payment->user;
         $followers = [];
         $payments = $order->payments()->with('user')->get();
         foreach ($payments as $item) {
-            $user = $item->user->id;
+            $user = $item->user;
             array_push($followers, $user);
         }
 
 
         $payload = [
             "order_id" => $order->id,
-            "first_name" => $user->firstName,
-            "last_name" => $user->lastName,
             "payment_id" => $payment->id,
             "payment_total" => $payment->total,
             "payment_status" => $payment->status,
@@ -665,17 +662,17 @@ class EditOrder {
             "order_status" => $order->status
         ];
         $data = [
-            "trigger_id" => $user->id,
+            "trigger_id" => $order->id,
             "message" => "",
             "subject" => "",
             "object" => self::OBJECT_ORDER,
             "sign" => true,
             "payload" => $payload,
             "type" => self::ORDER_STATUS,
-            "user_status" => $user->getUserNotifStatus()
+            "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, $platform);
+        $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $platform);
     }
 
     public function approvePayment(Payment $payment, $platform) {
@@ -684,7 +681,7 @@ class EditOrder {
         $payment->save();
 
         if ($order) {
-            $payments = $order->payments()->where("status", "<>", "Paid")->where("id", "<>", $payment->id)->count();
+            $payments = $order->payments()->where("status", "<>", "approved")->where("id", "<>", $payment->id)->count();
             if ($payments > 0) {
                 $order->status = "Pending-" . $payments;
                 $order->save();

@@ -6,7 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Item;
-use App\Models\Article;
+use App\Models\Push;
 use App\Models\Condition;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
@@ -180,9 +180,9 @@ class EditOrderFood {
 
     public function approveOrder(Order $order) {
         $data = array();
-        $items = $order->items()->get();
+        $items = $order->items;
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $status = "approved: items: " . count($items) . " | " . json_encode($items);
+        $status = "approved";
         foreach ($items as $item) {
             $status = $status . " :" . $item->attributes;
             $data = json_decode($item->attributes, true);
@@ -207,7 +207,7 @@ class EditOrderFood {
                     $this->createMealPlan($order, $item, $address->id);
                 }
                 if ($data['type'] == "credit") {
-                    $this->createDeposit($order );
+                    $this->createDeposit($order);
                 }
             }
             if (array_key_exists("model", $data)) {
@@ -229,28 +229,53 @@ class EditOrderFood {
             $this->createDeliveries($buyers[$x], $item, $address_id);
         }
     }
-    public function createDeposit(Order $order ) {
+
+    public function createDeposit(Order $order) {
         $payments = $order->payments()->with("user.push")->get();
         foreach ($payments as $value) {
-            $user = $value->user;
-            $push = $user->push;
-            if($push){
-                if(!$push->credits ||$push->credits==0){
-                    $push->credits = 1;
-                    $push->save();
+            $user = $value->user->toArray();
+            $push = null;
+            foreach ($user['push'] as $item) {
+                if ($item['platform'] == "food") {
+                    $push = $item;
                 }
+            }
+            if ($push) {
+                if (array_key_exists("credits", $push)) {
+                    if (!$push['credits'] || $push['credits'] == 0) {
+                        $push['credits'] = 1;
+                        Push::where("id", $push['id'])->update($push);
+                    }
+                } else {
+                    Push::create(["user_id" => $user['id'],
+                        "platform" => "food",
+                        'credits' => 1,
+                    ]);
+                }
+            } else {
+                Push::create(["user_id" => $user['id'],
+                    "platform" => "food",
+                    'credits' => 1,
+                ]);
             }
         }
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
-        $delivery = Delivery::where('user_id', $user_id)->orderBy('delivery', 'desc')->first();
-        if ($delivery) {
-
-            if (time() < strtotime($delivery->delivery)) {
-                $date = date_create($delivery->delivery);
+        $lastDelivery = Delivery::where('user_id', $user_id)->orderBy('delivery', 'desc')->first();
+        $returnDelivery = false;
+        $hasDeposit = false;
+        if ($lastDelivery) {
+            if ($lastDelivery->status == "deposit") {
+                $hasDeposit = true;
+                $date = date_create($lastDelivery->delivery);
+                date_sub($date, date_interval_create_from_date_string("1 days"));
             } else {
-                $date = date_create();
+                if (time() < strtotime($lastDelivery->delivery)) {
+                    $date = date_create($lastDelivery->delivery);
+                } else {
+                    $date = date_create();
+                }
             }
         } else {
             $date = date_create();
@@ -262,7 +287,7 @@ class EditOrderFood {
                 $shippingPaid = $attributes["shipping"];
             }
         }
-        $returnDelivery = false;
+
         if (array_key_exists("credits", $attributes)) {
             if ($attributes["credits"] > 0) {
                 $returnDelivery = true;
@@ -279,7 +304,7 @@ class EditOrderFood {
             }
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
-            $delivery->delivery = $date;
+
             $details["merchant_id"] = $item->merchant_id;
             $products = ["product" => $item->product_variant_id, "quantity" => 1];
             $details["products"] = $products;
@@ -292,23 +317,33 @@ class EditOrderFood {
             if ($returnDelivery) {
                 $details["deliver"] = "envase";
             }
+            if ($x == 0 && $hasDeposit) {
+                
+            }
+            $delivery->delivery = $date;
             $delivery->details = json_encode($details);
             $delivery->save();
         }
         if ($returnDelivery) {
-            $delivery = new Delivery();
             date_add($date, date_interval_create_from_date_string("1 days"));
-            $details["merchant_id"] = $item->merchant_id;
-            $products = ["product" => $item->product_variant_id, "quantity" => 1];
-            $details["products"] = $products;
-            $details["deliver"] = "deposit";
-            $delivery->details = json_encode($details);
-            $delivery->user_id = $user_id;
-            $delivery->delivery = $date;
-            $delivery->shipping = 2500;
-            $delivery->address_id = $address_id;
-            $delivery->status = "deposit";
-            $delivery->save();
+            if ($hasDeposit) {
+                $lastDelivery->delivery = $date;
+                $lastDelivery->save();
+            } else {
+                $delivery = new Delivery();
+                
+                $details["merchant_id"] = $item->merchant_id;
+                $products = ["product" => $item->product_variant_id, "quantity" => 1];
+                $details["products"] = $products;
+                $details["deliver"] = "deposit";
+                $delivery->details = json_encode($details);
+                $delivery->user_id = $user_id;
+                $delivery->delivery = $date;
+                $delivery->shipping = 2500;
+                $delivery->address_id = $address_id;
+                $delivery->status = "deposit";
+                $delivery->save();
+            }
         }
     }
 
@@ -325,7 +360,7 @@ class EditOrderFood {
         $la = date_format($date, "Y-m-d");
 //        $date = date_create($la . " 23:59:59");
 //        dd($date);
-        $deliveries = Delivery::where('status', 'pending')->where('delivery', '<', $la . " 23:59:59")->where('user_id', 1)->orderBy('delivery', 'desc')->get();
+        $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->where('user_id', 1)->orderBy('delivery', 'desc')->get();
         foreach ($deliveries as $item) {
             $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
             if ($delivery) {

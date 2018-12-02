@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Services\Food;
 use App\Services\EditOrderFood;
 use App\Models\Item;
+use App\Models\Order;
 use App\Models\Delivery;
 use App\Models\Route;
 use App\Models\OrderAddress;
@@ -33,12 +34,14 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
-        $this->deleteOldData(); 
+//        $this->deleteOldData(); 
 //        $this->food->reprogramDeliveries();
 //        $item = Item::find(49);
 //        $this->food->createDeliveries(1,$item,1741);
-        $users = [2];
-        $this->food->checkUsersCredits($users);
+        $order = Order::find(53);
+        $this->food->approveOrder($order);
+//        $users = [2];
+//        $this->food->checkUsersCredits($users);
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);
 //        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
     }
