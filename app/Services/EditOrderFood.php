@@ -182,14 +182,11 @@ class EditOrderFood {
         $data = array();
         $items = $order->items;
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $status = "approved";
         foreach ($items as $item) {
-            $status = $status . " :" . $item->attributes;
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
 
             if (array_key_exists("type", $data)) {
-                $status = $status . " type";
                 if ($data['type'] == "subscription") {
                     $object = $data['object'];
                     $id = $data['id'];
@@ -203,7 +200,6 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
-                    $status = $status . " meal-plan";
                     $this->createMealPlan($order, $item, $address->id);
                 }
                 if ($data['type'] == "credit") {
@@ -217,7 +213,7 @@ class EditOrderFood {
                 
             }
         }
-        $order->status = $status;
+        $order->status = "approved";
         $order->save();
         return array("status" => "success", "message" => "Order approved, subtasks completed", "order" => $order);
     }
