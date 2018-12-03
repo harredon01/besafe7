@@ -362,6 +362,7 @@ class EditBilling {
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->status = "payment_created";
                 $payment->save();
                 if (array_key_exists("token", $data)) {
                     return $gateway->useToken($user, $data, $payment);
@@ -399,6 +400,7 @@ class EditBilling {
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->status = "payment_created";
                 $payment->save();
                 return $gateway->payDebitCard($user, $data, $payment, $data['platform']);
             }
@@ -415,6 +417,7 @@ class EditBilling {
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->status = "payment_created";
                 $payment->save();
                 return $gateway->payCash($user, $data, $payment, $data['platform']);
             }

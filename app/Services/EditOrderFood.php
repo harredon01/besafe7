@@ -261,21 +261,7 @@ class EditOrderFood {
         $lastDelivery = Delivery::where('user_id', $user_id)->orderBy('delivery', 'desc')->first();
         $returnDelivery = false;
         $hasDeposit = false;
-        if ($lastDelivery) {
-            if ($lastDelivery->status == "deposit") {
-                $hasDeposit = true;
-                $date = date_create($lastDelivery->delivery);
-                date_sub($date, date_interval_create_from_date_string("1 days"));
-            } else {
-                if (time() < strtotime($lastDelivery->delivery)) {
-                    $date = date_create($lastDelivery->delivery);
-                } else {
-                    $date = date_create();
-                }
-            }
-        } else {
-            $date = date_create();
-        }
+
         $attributes = $item->attributes;
         $shippingPaid = 0;
         if (array_key_exists("shipping", $attributes)) {
@@ -288,6 +274,21 @@ class EditOrderFood {
             if ($attributes["credits"] > 0) {
                 $returnDelivery = true;
             }
+        }
+        if ($lastDelivery) {
+            if ($lastDelivery->status == "deposit" && $returnDelivery) {
+                $hasDeposit = true;
+                $date = date_create($lastDelivery->delivery);
+                date_sub($date, date_interval_create_from_date_string("1 days"));
+            } else {
+                if (time() < strtotime($lastDelivery->delivery)) {
+                    $date = date_create($lastDelivery->delivery);
+                } else {
+                    $date = date_create();
+                }
+            }
+        } else {
+            $date = date_create();
         }
         for ($x = 0; $x < $item->quantity; $x++) {
             date_add($date, date_interval_create_from_date_string("1 days"));
@@ -327,7 +328,7 @@ class EditOrderFood {
                 $lastDelivery->save();
             } else {
                 $delivery = new Delivery();
-                
+
                 $details["merchant_id"] = $item->merchant_id;
                 $products = ["product" => $item->product_variant_id, "quantity" => 1];
                 $details["products"] = $products;

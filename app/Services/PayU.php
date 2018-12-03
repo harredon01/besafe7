@@ -1154,29 +1154,30 @@ class PayU {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionResponse['order_id'] = $payment->order_id;
-                $transactionResponse['referenceCode'] = $payment->referenceCode;
-                $transactionResponse['user_id'] = $payment->id;
+                $transactionResponse['reference_sale'] = $payment->referenceCode;
+                $transactionResponse['user_id'] = $user->id;
                 $transactionResponse['gateway'] = 'PayU';
-                $transactionResponse['type'] = 'CreditCard';
+                $transactionResponse['payment_method'] = 'CreditCard';
+                $transactionResponse['description'] = $transactionResponse['responseMessage'];
                 $transactionResponse['transaction_id'] = $transactionResponse['transactionId'];
                 $transactionResponse['transaction_state'] = $transactionResponse['state'];
-                $transactionResponse['response_code'] = $transactionResponse['trazabilityCode'];
+                $transactionResponse['response_code'] = $transactionResponse['responseCode'];
                 $transactionResponse['transaction_date'] = date("Y-m-d", $transactionResponse['operationDate']);
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
-//                $transaction = Transaction::create($transactionResponse);
-//                $payment->transactions()->save($transaction);
-//                if ($transactionResponse['state'] == 'APPROVED') {
-//                    dispatch(new ApprovePayment($payment, $platform));
-//                } else if ($transactionResponse['state'] == 'PENDING') {
-//                    dispatch(new PendingPayment($payment, $platform));
-//                } else {
-//                    dispatch(new DenyPayment($payment, $platform));
-//                }
-                return ["status" => "success", "transaction" => null, "response" => $response, "message" => $transactionResponse['responseCode']];
+                $transaction = Transaction::create($transactionResponse);
+                $payment->transactions()->save($transaction);
+                if ($transactionResponse['state'] == 'APPROVED') {
+                    dispatch(new ApprovePayment($payment, $platform));
+                } else if ($transactionResponse['state'] == 'PENDING') {
+                    dispatch(new PendingPayment($payment, $platform));
+                } else {
+                    dispatch(new DenyPayment($payment, $platform));
+                }
+                return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
         return ["status" => "error", "response" => $response, "message" => $dataSent];
@@ -1290,32 +1291,62 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function checkOrders() {
-        $payments = Payment::where("status", "in_gateway")->get();
-        foreach ($payments as $payment) {
-            $response = $this->getStatusOrderId($payment->referenceCode);
-            if ($response['code'] == "SUCCESS") {
-                $result = $response['result'];
-                $order = $payment->order;
-                $payload = $result['payload'];
-                $transactionResponse = $payload['transactions'][0]['transactionResponse'];
-                $transactionResponse['order_id'] = $order->id;
-                $transactionResponse['referenceCode'] = $payment->referenceCode;
-                $transactionResponse['gateway'] = 'PayU';
-                /* if (array_key_exists("extras", $transactionResponse)) {
-                  $extras = $transactionResponse['extras'];
-                  unset($transactionResponse['extras']);
-                  $transactionResponse['extras'] = json_encode($extras);
-                  } */
-                $transaction = $this->saveTransaction($transactionResponse, $payment);
-                if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApprovePayment($payment));
-                    $transaction->description = "Transacción aprobada";
-                } else {
-                    dispatch(new DenyPayment($payment));
-                    $transaction->description = "Transacción rechazada";
-                }
+        $payments = Payment::where("status", "payment_created")->get();
 
-                //return ["status" => "success", "transaction" => $transaction, "response" => $response];
+        foreach ($payments as $payment) {
+            $currentTime = time();
+            //dd(date("Y-m-d h:m:s"));
+            $paymentTime = strtotime($payment->updated_at);
+            $timeDiff = ($currentTime - $paymentTime) / (60 * 60 * 24);
+            if ($timeDiff > 3) {
+                $payment->status = "expired";
+                $payment->save();
+            } else {
+                $response = $this->getStatusOrderRef($payment->referenceCode);
+                if ($response['code'] == "SUCCESS") {
+                    $result = $response['result'];
+                    $payload = $result['payload'];
+                    $transactions = [];
+                    foreach ($payload as $result) {
+                        if ($result['status'] == "CAPTURED") {
+                            $transactions = $result['transactions'];
+                            $payload = $result;
+                            break;
+                        }
+                    }
+                    $transactionResponse = null;
+                    if (count($transactions) > 0) {
+                        foreach ($transactions as $transaction) {
+                            if ($transaction['transactionResponse']['state'] == "APPROVED") {
+                                $transactionResponse = $transaction['transactionResponse'];
+                                $transactionResponse['id'] = $transaction['id'];
+                                $transactionResponse['payment_method'] = $transaction["paymentMethod"];
+                                $transactionResponse['reference_code'] = $payload["referenceCode"];
+                                break;
+                            }
+                        }
+                    }
+                    if ($transactionResponse) {
+                        $transactionResponse['order_id'] = $payment->order_id;
+                        $transactionResponse['user_id'] = $payment->user_id;
+                        $transactionResponse['referenceCode'] = $payment->referenceCode;
+                        $transactionResponse['gateway'] = 'PayU';
+                        $transaction = $this->saveTransactionQuery($transactionResponse );
+                        if ($transactionResponse['state'] == 'APPROVED') {
+                            dispatch(new ApprovePayment($payment,"Food"));
+                        }
+                    }
+
+
+                    /* if (array_key_exists("extras", $transactionResponse)) {
+                      $extras = $transactionResponse['extras'];
+                      unset($transactionResponse['extras']);
+                      $transactionResponse['extras'] = json_encode($extras);
+                      } */
+
+
+                    //return ["status" => "success", "transaction" => $transaction, "response" => $response];
+                }
             }
         }
     }
@@ -1352,21 +1383,19 @@ class PayU {
         $firmacreada = md5($firma_cadena);
         $firma = $data['sign'];
         if (true) {
-
             $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transactionExists) {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
             }
-
             $payment = Payment::where("referenceCode", $referenceCode)->first();
             if ($payment) {
-                $transaction = $this->saveTransaction($data, $payment);
+                $data['user_id']=$payment->user_id;
+                $data['order_id']=$payment->order_id;
+                $transaction = $this->saveTransactionConfirmacion($data);
                 if ($data['state_pol'] == 4) {
                     dispatch(new ApprovePayment($payment, "Food"));
-                    $transaction->description = "Transacción aprobada";
-                } else {
+                } else  {
                     dispatch(new DenyPayment($payment, "Food"));
-                    $transaction->description = "Transacción rechazada";
                 }
             } else {
                 if (array_key_exists("reference_recurring_payment", $data)) {
@@ -1394,15 +1423,15 @@ class PayU {
         }
     }
 
-    private function saveTransaction(array $data, Payment $payment) {
+    private function saveTransactionConfirmacion(array $data ) {
         $transactionId = $data['transaction_id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
             $transaction->currency = $data['currency'];
-            $transaction->transaction_state = $data['state_pol'];
+            $transaction->transaction_state = $data['response_message_pol'];
             $transaction->description = $data['response_message_pol'];
             $transaction->reference_sale = $data['reference_sale'];
-            $transaction->payment_method = $data['payment_method_id'];
+            $transaction->payment_method = $data['payment_method_name'];
             $transaction->transaction_id = $data['transaction_id'];
             $transaction->transaction_date = $data['transaction_date'];
             $transaction->response_code = $data['response_code_pol'];
@@ -1413,12 +1442,74 @@ class PayU {
             $insert["reference_sale"] = $data["reference_sale"];
             $insert["response_code"] = $data["response_code_pol"];
             $insert["currency"] = $data["currency"];
-            $insert["payment_method"] = $data["payment_method_id"];
+            $insert["payment_method"] = $data["payment_method_type"];
             $insert["transaction_id"] = $data["transaction_id"];
             $insert["gateway"] = "PayU";
             $insert["description"] = $data["response_message_pol"];
             $insert["transaction_date"] = $data["transaction_date"];
-            $insert["transaction_state"] = $data["state_pol"];
+            $insert["transaction_state"] = $data["response_message_pol"];
+            $insert["extras"] = json_encode($data);
+            $transaction = Transaction::create($insert);
+        }
+        return $transaction;
+    }
+    private function saveTransactionRespuesta(array $data ) {
+        $transactionId = $data['transaction_id'];
+        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
+        if ($transaction) {
+            $transaction->currency = $data['currency'];
+            $transaction->transaction_state = $data['transactionState'];
+            $transaction->description = $data['message'];
+            $transaction->reference_sale = $data['referenceCode'];
+            $transaction->payment_method = $data['polPaymentMethodType'];
+            $transaction->transaction_id = $data['transactionId'];
+            $transaction->transaction_date = $data['processingDate'];
+            $transaction->response_code = $data['lapResponseCode'];
+            $transaction->extras = json_encode($data);
+            $transaction->save();
+        } else {
+            $insert = [];
+            $insert["reference_sale"] = $data["referenceCode"];
+            $insert["response_code"] = $data["lapResponseCode"];
+            $insert["currency"] = $data["currency"];
+            $insert["payment_method"] = $data["polPaymentMethodType"];
+            $insert["transaction_id"] = $data["transactionId"];
+            $insert["gateway"] = "PayU";
+            $insert["description"] = $data["message"];
+            $insert["transaction_date"] = $data["processingDate"];
+            $insert["transaction_state"] = $data["transactionState"];
+            $insert["extras"] = json_encode($data);
+            $transaction = Transaction::create($insert);
+        }
+        return $transaction;
+    }
+    private function saveTransactionQuery(array $data ) {
+        $transactionId = $data['id'];
+        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
+        if ($transaction) {
+            $transaction->transaction_state = $data['state'];
+            $transaction->description = $data['responseMessage'];
+            $transaction->user_id = $data['user_id'];
+            $transaction->order_id = $data['order_id'];
+            $transaction->reference_sale = $data['reference_code'];
+            $transaction->payment_method = $data['payment_method'];
+            $transaction->transaction_id = $data['id'];
+            $transaction->transaction_date = $data['transactionDate'];
+            $transaction->response_code = $data['responseCode'];
+            $transaction->extras = json_encode($data);
+            $transaction->save();
+        } else {
+            $insert = [];
+            $insert["reference_sale"] = $data["reference_code"];
+            $insert["response_code"] = $data["responseCode"];
+            $insert["payment_method"] = $data["payment_method"];
+            $insert["transaction_id"] = $data["id"];
+            $insert["user_id"] = $data["user_id"];
+            $insert["order_id"] = $data["order_id"];
+            $insert["gateway"] = "PayU";
+            $insert["description"] = $data["responseMessage"];
+            $insert["transaction_date"] = $data["transactionDate"];
+            $insert["transaction_state"] = $data["state"];
             $insert["extras"] = json_encode($data);
             $transaction = Transaction::create($insert);
         }
@@ -1465,20 +1556,20 @@ class PayU {
             }
             $payment = Payment::where("referenceCode", $referenceCode)->first();
             if ($payment) {
-                $transaction = $this->saveTransaction($data, $payment);
+                $transaction = $this->saveTransactionRespuesta($data);
                 $data['transaction'] = $transaction;
                 if ($data['transactionState'] == 4) {
                     $estadoTx = "Transaction approved";
-                    dispatch(new ApprovePayment($payment, "PayU"));
+                    dispatch(new ApprovePayment($payment, "Food"));
                 } else if ($data['transactionState'] == 6) {
                     $estadoTx = "Transaction rejected";
-                    dispatch(new DenyPayment($payment, "PayU"));
+                    dispatch(new DenyPayment($payment, "Food"));
                 } else if ($data['transactionState'] == 104) {
                     $estadoTx = "Error";
-                    dispatch(new DenyPayment($payment, "PayU"));
+                    dispatch(new DenyPayment($payment, "Food"));
                 } else if ($data['transactionState'] == 7) {
                     $estadoTx = "Pending payment";
-                    dispatch(new PendingPayment($payment, "PayU"));
+                    dispatch(new PendingPayment($payment, "Food"));
                 } else {
                     $estadoTx = $data['mensaje'];
                 }
