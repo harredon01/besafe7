@@ -8,6 +8,7 @@ use App\Models\Plan;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Jobs\SaveCard;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
@@ -353,6 +354,17 @@ class EditBilling {
         return 'There was a problem editing your group';
     }
 
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    public function saveCard(User $user, array $data, $source) {
+        $className = "App\\Services\\" . $source;
+        $gateway = new $className; //// <--- this thing will be autoloaded
+        $gateway->createToken($user, $data);
+    }
+
     public function payCreditCard(User $user, $source, array $data) {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
@@ -365,12 +377,13 @@ class EditBilling {
                 $payment->status = "payment_created";
                 $payment->save();
                 if (array_key_exists("token", $data)) {
-                    return $gateway->useToken($user, $data, $payment);
+                    return $gateway->useToken($user, $data, $payment, $data['platform']);
                 } else {
                     $paymentResult = $gateway->payCreditCard($user, $data, $payment, $data['platform']);
                     if (array_key_exists("save_card", $data)) {
                         if ($data['save_card']) {
-                            $gateway->createToken($user, $data);
+                            dispatch(new SaveCard($user, $data,$source));
+                            //return $gateway->createToken($user, $data);
                         }
                     }
                     return $paymentResult;

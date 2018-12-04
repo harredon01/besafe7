@@ -953,7 +953,6 @@ class PayU {
             "identificationNumber" => $data['payer_id'],
             "paymentMethod" => $data['cc_branch'],
             "number" => $data['cc_number'],
-            "securityCode" => $data['cc_security_code'],
             "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
             "name" => $data['cc_name']
         ];
@@ -962,24 +961,28 @@ class PayU {
             "command" => "CREATE_TOKEN",
             "merchant" => $merchant,
             "creditCardToken" => $creditCardToken,
-            "test" => false,
         ];
+        $payer = $this->populatePayer( $data);
+        $payer['method']=$data['cc_branch'];
+        //dd($dataSent);
 
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
         if ($result['code'] == "SUCCESS") {
-
+            $token = $result['creditCardToken'];
             if ($source) {
-                $source->source = $result['creditCardTokenId'];
+                $source->source = $token['creditCardTokenId'];
+                $source->extra = json_encode($payer);
                 $source->save();
             } else {
                 $source = new Source([
                     "gateway" => "PayU",
-                    "source" => $result['creditCardTokenId']
+                    "source" => $token['creditCardTokenId'],
+                    "extra" => json_encode($payer)
                 ]);
                 $user->sources()->save($source);
             }
         }
-        return null;
+        return $result;
     }
 
     public function deleteToken(User $user) {
@@ -1454,7 +1457,7 @@ class PayU {
         return $transaction;
     }
     private function saveTransactionRespuesta(array $data ) {
-        $transactionId = $data['transaction_id'];
+        $transactionId = $data['transactionId'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
             $transaction->currency = $data['currency'];
@@ -1535,8 +1538,8 @@ class PayU {
         $firma = $data['signature'];
         $estadoTx = "";
         $transactionId = $data['transactionId'];
-        //if (true) {
-        if (strtoupper($firma) == strtoupper($firmacreada)) {
+        if (true) {
+        //if (strtoupper($firma) == strtoupper($firmacreada)) {
             if ($data['transactionState'] == 4) {
                 $estadoTx = "Transaction approved";
             } else if ($data['transactionState'] == 6) {
@@ -1549,7 +1552,7 @@ class PayU {
                 $estadoTx = $data['mensaje'];
             }
 
-            $transaction = Transaction::where("transactionId", $transactionId)->where('gateway', 'PayU')->first();
+            $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transaction) {
                 $data['transaction'] = $transaction;
                 return $data;
