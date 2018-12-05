@@ -63,11 +63,13 @@ class DeliveriesSeeder extends Seeder {
             "payer_phone" => "3211336",
             "payer_id" => "1020716536",
         ];
-        $result = $this->food->createToken($user,$data);
+        $result = $this->food->checkOrders();
         dd($result);
-        $source = $user->sources()->where('gateway', strtolower("PayU"))->first();
-        $result = $this->food->getSources($source);
-        dd($result);
+//        $result = $this->food->createToken($user,$data);
+//        dd($result);
+//        $source = $user->sources()->where('gateway', strtolower("PayU"))->first();
+//        $result = $this->food->getSources($source);
+//        dd($result);
 //        $users = [2];
 //        $this->food->checkUsersCredits($users);
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);

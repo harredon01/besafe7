@@ -364,6 +364,23 @@ class EditBilling {
         $gateway = new $className; //// <--- this thing will be autoloaded
         $gateway->createToken($user, $data);
     }
+    
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    public function extractBuyer(array $data) {
+        $buyerAddress = [
+            "buyer_address" => $data['buyer_address'],
+            "buyer_city" => $data['buyer_city'],
+            "buyer_state" => $data['buyer_state'],
+            "buyer_country" => $data['buyer_country'],
+            "buyer_postal" => $data['buyer_postal'],
+            "buyer_phone" => $data['buyer_phone']
+        ];
+        return $buyerAddress;
+    }
 
     public function payCreditCard(User $user, $source, array $data) {
         if (array_key_exists("payment_id", $data)) {
@@ -372,9 +389,9 @@ class EditBilling {
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
-                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
+                $payment->attributes = json_encode($this->extractBuyer($data));
                 $payment->save();
                 if (array_key_exists("token", $data)) {
                     return $gateway->useToken($user, $data, $payment, $data['platform']);
@@ -411,7 +428,6 @@ class EditBilling {
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
-                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
                 $payment->save();
@@ -428,7 +444,6 @@ class EditBilling {
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
-                $data = $gateway->populateShippingFromAddress($payment->address_id, $data);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
                 $payment->save();

@@ -6,7 +6,7 @@ use Validator;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Order;
-use App\Models\Address;
+use App\Models\OrderAddress;
 use App\Models\City;
 use App\Models\Plan;
 use App\Models\Country;
@@ -131,7 +131,7 @@ class PayU {
     }
 
     public function populateShippingFromAddress($addressId, array $data) {
-        $address = Address::find($addressId);
+        $address = OrderAddress::find($addressId);
         if ($address) {
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);
@@ -142,8 +142,15 @@ class PayU {
             $data['shipping_country'] = $country->code;
             $data['shipping_postal'] = $address->postal;
             $data['shipping_phone'] = $address->phone;
+        } else {
+            $data['shipping_address'] = $data['buyer_address'];
+            $data['shipping_city'] = $data['buyer_city'];
+            $data['shipping_state'] = $data['buyer_state'];
+            $data['shipping_country'] = $data['buyer_country'] ;
+            $data['shipping_postal'] =$data['buyer_postal'];
+            $data['shipping_phone'] = $data['buyer_phone'];
         }
-        return $data;
+        return $this->populateShipping($data);
     }
 
     private function populateCC(array $data) {
@@ -184,6 +191,10 @@ class PayU {
     }
 
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
+        $validator = $this->validatorPayment($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
 
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
@@ -193,15 +204,12 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $validator = $this->validatorShipping($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }$validator = $this->validatorCC($data);
+        $validator = $this->validatorCC($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShipping($data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
         $merchant = $this->populateMerchant();
@@ -248,12 +256,8 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $validator = $this->validatorShipping($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShipping($data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
         $payer = $this->populatePayer($data);
         $validator = $this->validatorUseSource($data);
 
@@ -962,8 +966,8 @@ class PayU {
             "merchant" => $merchant,
             "creditCardToken" => $creditCardToken,
         ];
-        $payer = $this->populatePayer( $data);
-        $payer['method']=$data['cc_branch'];
+        $payer = $this->populatePayer($data);
+        $payer['method'] = $data['cc_branch'];
         //dd($dataSent);
 
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
@@ -1019,16 +1023,12 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $validator = $this->validatorShipping($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
         $validator = $this->validatorToken($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShipping($data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
         $payer = $this->populatePayer($data);
         $merchant = $this->populateMerchant();
         $orderCont = $this->populatePaymentContent($payment, $platform);
@@ -1295,7 +1295,6 @@ class PayU {
      */
     public function checkOrders() {
         $payments = Payment::where("status", "payment_created")->get();
-
         foreach ($payments as $payment) {
             $currentTime = time();
             //dd(date("Y-m-d h:m:s"));
@@ -1305,50 +1304,57 @@ class PayU {
                 $payment->status = "expired";
                 $payment->save();
             } else {
+
                 $response = $this->getStatusOrderRef($payment->referenceCode);
                 if ($response['code'] == "SUCCESS") {
                     $result = $response['result'];
                     $payload = $result['payload'];
-                    $transactions = [];
-                    foreach ($payload as $result) {
-                        if ($result['status'] == "CAPTURED") {
-                            $transactions = $result['transactions'];
-                            $payload = $result;
-                            break;
-                        }
-                    }
-                    $transactionResponse = null;
-                    if (count($transactions) > 0) {
-                        foreach ($transactions as $transaction) {
-                            if ($transaction['transactionResponse']['state'] == "APPROVED") {
-                                $transactionResponse = $transaction['transactionResponse'];
-                                $transactionResponse['id'] = $transaction['id'];
-                                $transactionResponse['payment_method'] = $transaction["paymentMethod"];
-                                $transactionResponse['reference_code'] = $payload["referenceCode"];
+                    if ($payload) {
+                        $transactions = [];
+                        foreach ($payload as $result) {
+                            if ($result['status'] == "CAPTURED") {
+                                $transactions = $result['transactions'];
+                                $payload = $result;
                                 break;
                             }
                         }
-                    }
-                    if ($transactionResponse) {
-                        $transactionResponse['order_id'] = $payment->order_id;
-                        $transactionResponse['user_id'] = $payment->user_id;
-                        $transactionResponse['referenceCode'] = $payment->referenceCode;
-                        $transactionResponse['gateway'] = 'PayU';
-                        $transaction = $this->saveTransactionQuery($transactionResponse );
-                        if ($transactionResponse['state'] == 'APPROVED') {
-                            dispatch(new ApprovePayment($payment,"Food"));
+                        $transactionResponse = null;
+                        if (count($transactions) > 0) {
+                            foreach ($transactions as $transaction) {
+                                if ($transaction['transactionResponse']['state'] == "APPROVED") {
+                                    $transactionResponse = $transaction['transactionResponse'];
+                                    $transactionResponse['id'] = $transaction['id'];
+                                    $transactionResponse['payment_method'] = $transaction["paymentMethod"];
+                                    $transactionResponse['reference_code'] = $payload["referenceCode"];
+                                    break;
+                                }
+                            }
                         }
+                        if ($transactionResponse) {
+                            $transactionResponse['order_id'] = $payment->order_id;
+                            $transactionResponse['user_id'] = $payment->user_id;
+                            $transactionResponse['referenceCode'] = $payment->referenceCode;
+                            $transactionResponse['gateway'] = 'PayU';
+                            $transaction = $this->saveTransactionQuery($transactionResponse);
+                            if ($transactionResponse['state'] == 'APPROVED') {
+                                dispatch(new ApprovePayment($payment, "Food"));
+                            }
+                        }
+
+
+                        /* if (array_key_exists("extras", $transactionResponse)) {
+                          $extras = $transactionResponse['extras'];
+                          unset($transactionResponse['extras']);
+                          $transactionResponse['extras'] = json_encode($extras);
+                          } */
+
+
+                        //return ["status" => "success", "transaction" => $transaction, "response" => $response];
+                    } else {
+                        $payment->status="invisible";
+                        $payment->save();
                     }
-
-
-                    /* if (array_key_exists("extras", $transactionResponse)) {
-                      $extras = $transactionResponse['extras'];
-                      unset($transactionResponse['extras']);
-                      $transactionResponse['extras'] = json_encode($extras);
-                      } */
-
-
-                    //return ["status" => "success", "transaction" => $transaction, "response" => $response];
+                    
                 }
             }
         }
@@ -1392,12 +1398,12 @@ class PayU {
             }
             $payment = Payment::where("referenceCode", $referenceCode)->first();
             if ($payment) {
-                $data['user_id']=$payment->user_id;
-                $data['order_id']=$payment->order_id;
+                $data['user_id'] = $payment->user_id;
+                $data['order_id'] = $payment->order_id;
                 $transaction = $this->saveTransactionConfirmacion($data);
                 if ($data['state_pol'] == 4) {
                     dispatch(new ApprovePayment($payment, "Food"));
-                } else  {
+                } else {
                     dispatch(new DenyPayment($payment, "Food"));
                 }
             } else {
@@ -1426,7 +1432,7 @@ class PayU {
         }
     }
 
-    private function saveTransactionConfirmacion(array $data ) {
+    private function saveTransactionConfirmacion(array $data) {
         $transactionId = $data['transaction_id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1456,7 +1462,8 @@ class PayU {
         }
         return $transaction;
     }
-    private function saveTransactionRespuesta(array $data ) {
+
+    private function saveTransactionRespuesta(array $data) {
         $transactionId = $data['transactionId'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1486,7 +1493,8 @@ class PayU {
         }
         return $transaction;
     }
-    private function saveTransactionQuery(array $data ) {
+
+    private function saveTransactionQuery(array $data) {
         $transactionId = $data['id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1539,7 +1547,7 @@ class PayU {
         $estadoTx = "";
         $transactionId = $data['transactionId'];
         if (true) {
-        //if (strtoupper($firma) == strtoupper($firmacreada)) {
+            //if (strtoupper($firma) == strtoupper($firmacreada)) {
             if ($data['transactionState'] == 4) {
                 $estadoTx = "Transaction approved";
             } else if ($data['transactionState'] == 6) {
@@ -1707,6 +1715,23 @@ class PayU {
                         ]
         );
     }
+    
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorPayment(array $data) {
+        return Validator::make($data, [
+                    'buyer_address' => 'required|max:255',
+                    'buyer_city' => 'required|max:255',
+                    'buyer_state' => 'required|max:255',
+                    'buyer_country' => 'required|max:255',
+                    'buyer_postal' => 'required|max:255',
+                        ]
+        );
+    }
 
     /**
      * Get a validator for an incoming registration request.
@@ -1772,24 +1797,6 @@ class PayU {
                     'payer_name' => 'required|max:255',
                     'payer_email' => 'required|max:255',
                     'payer_id' => 'required|max:255',
-                        ]
-        );
-    }
-
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorShipping(array $data) {
-        return Validator::make($data, [
-                    'shipping_address' => 'required|max:255',
-                    'shipping_city' => 'required|max:255',
-                    'shipping_state' => 'required|max:255',
-                    'shipping_country' => 'required|max:255',
-                    'shipping_postal' => 'required|max:255',
-                    'shipping_phone' => 'required|max:255',
                         ]
         );
     }

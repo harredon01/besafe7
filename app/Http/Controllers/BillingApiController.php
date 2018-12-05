@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Payment;
 use App\Services\EditBilling;
+use App\Services\CleanSearch;
 
 class BillingApiController extends Controller {
 
@@ -23,14 +24,15 @@ class BillingApiController extends Controller {
      */
     private $editBilling;
     
-    private $payU;
+    private $cleanSearch;
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditBilling $editBilling) {
+    public function __construct(EditBilling $editBilling, CleanSearch $cleanSearch) {
         $this->editBilling = $editBilling;
+        $this->cleanSearch = $cleanSearch;
         $this->middleware('auth:api');
     }
     
@@ -145,7 +147,8 @@ class BillingApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function getPayments(Request $request) {
-        $request2 = $this->cleanSearch->handle($request);
+        $user = $request->user();
+        $request2 = $this->cleanSearch->handle($user,$request);
         if ($request2) {
             $queryBuilder = new QueryBuilder(new Payment, $request2);
             $result = $queryBuilder->build()->paginate();

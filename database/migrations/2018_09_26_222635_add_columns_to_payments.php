@@ -27,6 +27,7 @@ class AddColumnsToPayments extends Migration
             $table->string('referenceCode');
             $table->string('transactionId');
             $table->string('responseCode');
+            $table->text('attributes');
             $table->double('total', 15, 2);
             $table->double('tax', 15, 2);
         });
