@@ -14,6 +14,7 @@ use App\Models\Region;
 use App\Jobs\ApprovePayment;
 use App\Jobs\DenyPayment;
 use App\Jobs\PendingPayment;
+use App\Jobs\SaveCard;
 use App\Models\Source;
 use Carbon\Carbon;
 use App\Models\Subscription;
@@ -42,7 +43,6 @@ class PayU {
     }
 
     private function populateBuyer(User $user, array $data) {
-
         $buyerAddress = [
             "street1" => $data['buyer_address'],
             "street2" => "",
@@ -61,6 +61,34 @@ class PayU {
             "shippingAddress" => $buyerAddress
         ];
         return $buyer;
+    }
+
+    private function populateBuyerAddress(User $user ) {
+        $address = $user->addresses()->where("is_default", true)->first();
+        if ($address) {
+            $region = Region::find($address->region_id);
+            $country = Country::find($address->country_id);
+            $city = City::find($address->city_id);
+            $buyerAddress = [
+                "street1" => $address->address,
+                "street2" => "",
+                "city" =>  $city->name,
+                "state" => $region->name,
+                "country" => $country->code,
+                "postalCode" => $address->postal,
+                "phone" => $address->phone
+            ];
+            $buyer = [
+                "merchantBuyerId" => "1",
+                "fullName" => $user->firstName . " " . $user->lastName,
+                "emailAddress" => $user->email,
+                "contactPhone" => $user->cellphone,
+                "dniNumber" => $user->docNum,
+                "shippingAddress" => $buyerAddress
+            ];
+            return $buyer;
+        } 
+        return null;
     }
 
     private function populateMerchant() {
@@ -146,8 +174,8 @@ class PayU {
             $data['shipping_address'] = $data['buyer_address'];
             $data['shipping_city'] = $data['buyer_city'];
             $data['shipping_state'] = $data['buyer_state'];
-            $data['shipping_country'] = $data['buyer_country'] ;
-            $data['shipping_postal'] =$data['buyer_postal'];
+            $data['shipping_country'] = $data['buyer_country'];
+            $data['shipping_postal'] = $data['buyer_postal'];
             $data['shipping_phone'] = $data['buyer_phone'];
         }
         return $this->populateShipping($data);
@@ -190,6 +218,76 @@ class PayU {
         return $additionalValuesCont;
     }
 
+    public function useCreditCardOptions(User $user, array $data, Payment $payment, $platform) {
+        if (array_key_exists("quick", $data)) {
+            return $this->quickPayCreditCard($user, $data, $payment, $platform);
+        } 
+        if (array_key_exists("token", $data)) {
+            return $this->useToken($user, $data, $payment, $platform);
+        } else {
+            $paymentResult = $this->payCreditCard($user, $data, $payment, $platform);
+            if (array_key_exists("save_card", $data)) {
+                if ($data['save_card']) {
+                    dispatch(new SaveCard($user, $data, "PayU"));
+                    //return $gateway->createToken($user, $data);
+                }
+            }
+            return $paymentResult;
+        }
+    }
+
+    public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
+        $validator = $this->validatorPayment($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorPayer($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $validator = $this->validatorCC($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $buyer = $this->populateBuyerAddress($user );
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+        $payer = $this->populatePayer($data);
+        $creditCard = $this->populateCC($data);
+        $merchant = $this->populateMerchant();
+        $orderCont = $this->populatePaymentContent($payment, $platform);
+        $additionalValuesCont = $this->populateTotals($payment, "COP");
+        $orderCont["additionalValues"] = $additionalValuesCont;
+        $orderCont["buyer"] = $buyer;
+        $orderCont["shippingAddress"] = $ShippingAddress;
+        $extraParams = [
+            "INSTALLMENTS_NUMBER" => 1
+        ];
+        $deviceSessionId = md5(session_id() . microtime());
+        $cookie = md5($deviceSessionId);
+        $transaction = [
+            "order" => $orderCont,
+            "payer" => $payer,
+            "creditCard" => $creditCard,
+            "extraParameters" => $extraParams,
+            "type" => "AUTHORIZATION_AND_CAPTURE",
+            "paymentMethod" => $data['cc_branch'],
+            "paymentCountry" => $data['payer_country'],
+            "deviceSessionId" => $deviceSessionId,
+            "ipAddress" => $data['ip_address'],
+            "cookie" => $cookie,
+            "userAgent" => $data['user_agent']
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "SUBMIT_TRANSACTION",
+            "merchant" => $merchant,
+            "transaction" => $transaction,
+            "test" => "true",
+        ];
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform);
+    }
+
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorPayment($data);
         if ($validator->fails()) {
@@ -209,7 +307,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
         $merchant = $this->populateMerchant();
@@ -257,7 +355,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
         $payer = $this->populatePayer($data);
         $validator = $this->validatorUseSource($data);
 
@@ -1028,7 +1126,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id,$data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
         $payer = $this->populatePayer($data);
         $merchant = $this->populateMerchant();
         $orderCont = $this->populatePaymentContent($payment, $platform);
@@ -1351,10 +1449,9 @@ class PayU {
 
                         //return ["status" => "success", "transaction" => $transaction, "response" => $response];
                     } else {
-                        $payment->status="invisible";
+                        $payment->status = "invisible";
                         $payment->save();
                     }
-                    
                 }
             }
         }
@@ -1715,7 +1812,7 @@ class PayU {
                         ]
         );
     }
-    
+
     /**
      * Get a validator for an incoming registration request.
      *

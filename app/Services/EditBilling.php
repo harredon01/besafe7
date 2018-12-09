@@ -8,7 +8,7 @@ use App\Models\Plan;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
-use App\Jobs\SaveCard;
+
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
@@ -393,18 +393,7 @@ class EditBilling {
                 $payment->status = "payment_created";
                 $payment->attributes = json_encode($this->extractBuyer($data));
                 $payment->save();
-                if (array_key_exists("token", $data)) {
-                    return $gateway->useToken($user, $data, $payment, $data['platform']);
-                } else {
-                    $paymentResult = $gateway->payCreditCard($user, $data, $payment, $data['platform']);
-                    if (array_key_exists("save_card", $data)) {
-                        if ($data['save_card']) {
-                            dispatch(new SaveCard($user, $data,$source));
-                            //return $gateway->createToken($user, $data);
-                        }
-                    }
-                    return $paymentResult;
-                }
+                return $gateway->useCreditCardOptions($user, $data, $payment, $data['platform']);
             }
         }
         return array("status" => "error", "message" => "Invalid order");

@@ -9,6 +9,7 @@ use App\Services\EditUserData;
 use App\Services\CleanSearch;
 use App\Querybuilders\ContactQueryBuilder;
 use App\Models\User;
+use App\Models\Address;
 use App\Models\Medical;
 use App\Jobs\ImportContactsId;
 use App\Jobs\AddContact;
@@ -115,6 +116,22 @@ class UserApiController extends Controller {
     public function checkUserCredits(Request $request) {
         $user = $request->user();
         return response()->json($this->editUserData->checkUserCredits($user, $request->all()));
+    }
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setAsBillingAddress($address, Request $request) {
+        $user = $request->user();
+        $addresCont = Address::find($address);
+        if($addresCont->user_id == $user->id){
+            $address->is_default = true;
+            $address->save();
+            return response()->json(["status"=>"success","message"=>"address set as default"]);
+        }
+        return response()->json(["status"=>"error","message"=>"address does not belong to user"]);
     }
 
     /**

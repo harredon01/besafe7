@@ -19,7 +19,7 @@ class Address extends Model {
      * @var array
      */
     protected $fillable = ['id','name', 'city', 'address', 'city_id', 'country_id', 'region_id','lat','long','type',
-        'postal','phone'];
+        'postal','phone','is_default'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
