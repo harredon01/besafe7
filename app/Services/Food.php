@@ -8,8 +8,12 @@ use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
+use App\Models\Merchant;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\Rapigo;
 use DB;
+use Excel;
 
 class Food {
 
@@ -166,7 +170,7 @@ class Food {
 //                $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
 //            }
             $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
-            if($routeCost> $value->unit_price){
+            if ($routeCost > $value->unit_price) {
                 $value->availability = 0;
             } else {
                 $value->availability = 1;
@@ -397,7 +401,6 @@ class Food {
                                 $item->deliveries()->save($realDel);
                             }
                             $item->height++;
-                            
                         }
                         $item->save();
                     } else {
@@ -854,7 +857,7 @@ class Food {
                     'radiusInf' => $radiusInf,
                     'radius' => $radius
                 ];
-            } else if ($x == 3 || $x == 7) { 
+            } else if ($x == 3 || $x == 7) {
                 $thedata = [
                     'lat' => $lat,
                     'lat2' => $lat,
@@ -874,10 +877,59 @@ class Food {
         }
         $this->completeRoutes($results);
         $this->completeRoutes($results2);
-        $routes =Route::where("description","preorganize")->get();
-        $routes2 =Route::where("description","simple")->get();
+        $routes = Route::where("description", "preorganize")->get();
+        $routes2 = Route::where("description", "simple")->get();
         $this->getTotalEstimatedShipping($routes);
         $this->getTotalEstimatedShipping($routes2);
+    }
+
+    public function importMerchants() {
+
+        $excel = Excel::load(storage_path('imports') . '/merchantsfood.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+
+            if (array_key_exists("id", $row)) {
+                $merchant = Merchant::find(intval($row['id']));
+
+                if ($merchant) {
+                    $products = $merchant->products;
+                    $merchant->products()->detach();
+                    foreach ($products as $value) {
+                        $value->productVariants()->delete();
+                        $value->delete();
+                    }
+
+                    $merchant->delete();
+                }
+                unset($row[0]);
+                Merchant::create($row);
+            }
+        }
+        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            $merchants = explode(",", $row['merchant_id']);
+            unset($row['merchant_id']);
+            if ($row['id']) {
+                $product = Product::create($row);
+                foreach ($merchants as $merchantId) {
+                    $merchant = Merchant::find($merchantId);
+                    if ($merchant) {
+                        $merchant->products()->save($product);
+                    }
+                }
+            }
+        }
+
+        $excel = Excel::load(storage_path('imports') . '/productvariantsfood.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            if ($row['sku']) {
+                $row['ref2'] = $row['sku'];
+                $product = ProductVariant::create($row);
+            }
+        }
     }
 
 }
