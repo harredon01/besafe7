@@ -36,6 +36,9 @@ class Merchant extends Model {
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');
     }
+    public function polygons() {
+        return $this->hasMany('App\Models\CoveragePolygon');
+    }
     public function city() {
         return $this->hasOne('App\Models\City');
     }

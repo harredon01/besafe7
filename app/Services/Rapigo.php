@@ -21,10 +21,9 @@ use App\Models\Transaction;
 
 class Rapigo {
 
-
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
-        $fields_string="";
+        $fields_string = "";
         foreach ($data as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
         }
@@ -33,7 +32,7 @@ class Rapigo {
         //dd($data);
         $headers = array(
             'Accept: application/json',
-            'Authorization: Basic '.env('RAPIGO_KEY') 
+            'Authorization: Basic ' . env('RAPIGO_KEY')
         );
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $fields_string);
@@ -44,29 +43,57 @@ class Rapigo {
         $response = json_decode(str_replace("\\", "", $response), true);
         return $response;
     }
+
     public function getEstimate(array $points) {
         //dd($points);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_TEST') ."api/bogota/estimate/";
+        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
         return $response;
     }
+
+    public function getOrderShippingCost(Order $order, array $origin, array $destination) {
+        //dd($points);
+        $points = [];
+        $querystop = [
+            "address" => $origin['address'],
+            "description" => "Origen",
+            "type" => "point",
+            "phone" => $origin['phone']
+        ];
+        array_push($points, $querystop);
+        $querystop = [
+            "address" => $destination['address'],
+            "description" => "Destino",
+            "type" => "point",
+            "phone" => $destination['phone']
+        ];
+        array_push($points, $querystop);
+        $data['points'] = json_encode($points);
+        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+        //dd($query);
+        $response = $this->sendPost($data, $query);
+        return $response;
+    }
+
     public function createRoute(array $points) {
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_TEST') ."api/bogota/request_service/";
+        $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
         $response = $this->sendPost($data, $query);
         return $response;
     }
+
     public function checkAddress($address) {
         $data['address'] = $address;
-        $query = env('RAPIGO_TEST') ."api/bogota/validate_address/";
+        $query = env('RAPIGO_TEST') . "api/bogota/validate_address/";
         $response = $this->sendPost($data, $query);
         return $response;
     }
+
     public function checkStatus($key) {
         $data['key'] = $key;
-        $query = env('RAPIGO_TEST') ."api/bogota/get_service_status/";
+        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
         $response = $this->sendPost($data, $query);
         return $response;
     }
@@ -137,6 +164,5 @@ class Rapigo {
             
         }
     }
-
 
 }

@@ -10,6 +10,8 @@ use App\Models\Route;
 use App\Models\Stop;
 use App\Models\Merchant;
 use App\Models\Product;
+use App\Models\Address;
+use App\Models\CoveragePolygon;
 use App\Models\ProductVariant;
 use App\Services\Rapigo;
 use DB;
@@ -899,14 +901,19 @@ class Food {
                         $value->productVariants()->delete();
                         $value->delete();
                     }
-
+                    $polygons = $merchant->polygons;
+                    foreach ($polygons as $item) {
+                        $address = $item->address;
+                        $item->delete();
+                        $address->delete();
+                    }
                     $merchant->delete();
                 }
                 unset($row[0]);
                 Merchant::create($row);
             }
         }
-        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx');
+        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx'); 
         $reader = $excel->toArray();
         foreach ($reader as $row) {
             $merchants = explode(",", $row['merchant_id']);
@@ -928,6 +935,20 @@ class Food {
             if ($row['sku']) {
                 $row['ref2'] = $row['sku'];
                 $product = ProductVariant::create($row);
+            }
+        }
+        $excel = Excel::load(storage_path('imports') . '/merchantAddress.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            if ($row['id']) {
+                Address::create($row);
+            }
+        }
+        $excel = Excel::load(storage_path('imports') . '/merchantPolygons.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            if ($row['id']) {
+                CoveragePolygon::create($row);
             }
         }
     }

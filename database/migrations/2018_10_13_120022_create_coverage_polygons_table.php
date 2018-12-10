@@ -27,6 +27,9 @@ class CreateCoveragePolygonsTable extends Migration {
             $table->integer('merchant_id')->unsigned()->nullable();
             $table->foreign('merchant_id')->references('id')
                     ->on('merchants');
+            $table->integer('address_id')->unsigned()->nullable();
+            $table->foreign('address_id')->references('id')
+                    ->on('addresses');
             $table->timestamps();
         });
     }

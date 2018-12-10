@@ -255,7 +255,7 @@ class EditOrder {
                         }
                         $thePayersArray = $info['payers'];
                         array_push($thePayersArray, $user->id);
-                        
+
                         $records = [
                             "buyers" => $thePayersArray
                         ];
@@ -309,11 +309,18 @@ class EditOrder {
             $results['type'] = "buyers";
             return $results;
         }
+        if ($results['requiresShipping'] > 0) {
+            $results['status'] = "error";
+            $results['order'] = $order;
+            $results['message'] = "Order requires shipping condition";
+            $results['type'] = "shipping";
+            return $results;
+        }
         $address = $order->orderAddresses()->where('type', "shipping")->get();
         if (!$address) {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
-        
+
         return $results;
     }
 
@@ -363,6 +370,7 @@ class EditOrder {
         $requiredDeposit = 0;
         $creditHolders = 0;
         $requiredBuyers = 0;
+        $requiresShipping = 0;
         $splitTotal = $order->total;
         $totalDeposit = 0;
         $totalCredit = 0;
@@ -394,6 +402,13 @@ class EditOrder {
                 }
             }
             $creditItemMerchant = $value->merchant_id;
+            if (array_key_exists("is_digital", $attributes)) {
+                if ($attributes['is_digital'] == 0) {
+                    if ($value) {
+                        $requiresShipping++;
+                    }
+                }
+            }
         }
         if (array_key_exists("payers", $data)) {
             if (count($data['payers']) > 0) {
@@ -436,6 +451,10 @@ class EditOrder {
             array_push($checkBuyers, $user->id);
             $requiredBuyers -= count($checkBuyers);
         }
+        $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
+        if($shippingCondition){
+            $requiresShipping = 0;
+        }
         return array(
             "split" => $splitTotal,
             "creditHolders" => $creditHolders,
@@ -444,6 +463,7 @@ class EditOrder {
             "requiredCredits" => $requiredCredits,
             "requiredBuyers" => $requiredBuyers,
             "totalDeposit" => $totalDeposit,
+            "requiresShipping" => $requiresShipping,
             "order" => $order,
         );
     }
@@ -485,6 +505,12 @@ class EditOrder {
                     $orderAddresses['type'] = "shipping";
                     Payment::where("order_id", $order->id)->update(['address_id' => null]);
                     $order->orderAddresses()->where('type', "shipping")->delete();
+                    $attributes = json_decode($order->attributes);
+                    $polygon = $result['polygon'];
+                    $attributes['polygon'] = $polygon->id;
+                    $attributes['origin'] = $polygon->address_id;
+                    $order->attributes = json_encode($attributes);
+                    $order->save();
                     OrderAddress::insert($orderAddresses);
                     return array("status" => "success", "message" => "Address added to order", "order" => $order);
                 }
@@ -557,6 +583,49 @@ class EditOrder {
             return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order);
         }
         return array("status" => "error", "message" => "Address does not exist");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function setPlatformShippingCondition(User $user, $order_id, $platform) {
+
+        Cart::removeConditionsByType("shipping");
+        $order = Order::find($order_id);
+        if ($order) {
+            if ($order->user_id == $user->id) {
+                // add single condition on a cart bases
+                $destination = $order->orderAddresses()->where('type', "shipping")->first();
+                $attributes = json_decode($order->attributes, true);
+                if (array_key_exists("origin", $attributes)) {
+                    $origin = Address::find($attributes['origin']);
+                    if ($origin) {
+                        $className = "App\\Services\\" . $platform;
+                        $gateway = new $className;
+                        $result = $gateway->getOrderShippingPrice($order, $origin->toArray(), $destination->toArray());
+                        $condition = new CartCondition(array(
+                            'name' => $platform,
+                            'type' => "shipping",
+                            'target' => 'total',
+                            'value' => $result['price'],
+                            'order' => 0
+                        ));
+                        $insertCondition = $condition->toArray();
+                        unset($insertCondition['id']);
+                        $insertCondition['order_id'] = $order->id;
+                        $order->orderConditions()->where('type', "shipping")->delete();
+                        OrderCondition::insert($insertCondition);
+                        Cart::session($user->id)->condition($condition);
+                    }
+                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order);
+                }
+                return array("status" => "error", "message" => "Order does not have an origin address");
+            }
+            return array("status" => "error", "message" => "Order not users");
+        }
+        return array("status" => "error", "message" => "Order not found");
     }
 
     /**

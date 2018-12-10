@@ -193,6 +193,16 @@ class OrderApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editOrder->setShippingCondition($user, $request->only("condition_id")));
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setPlatformShippingCondition(Request $request,$order,$platform) {
+        $user = $request->user();
+        return response()->json($this->editOrder->setPlatformShippingCondition($user, $order,$platform));
+    }
 
     /**
      * Handle a login request to the application.
