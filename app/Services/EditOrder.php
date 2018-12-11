@@ -501,11 +501,12 @@ class EditOrder {
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
+                    unset($orderAddresses['is_default']);
                     $orderAddresses['order_id'] = $order->id;
                     $orderAddresses['type'] = "shipping";
                     Payment::where("order_id", $order->id)->update(['address_id' => null]);
                     $order->orderAddresses()->where('type', "shipping")->delete();
-                    $attributes = json_decode($order->attributes);
+                    $attributes = json_decode($order->attributes,true);
                     $polygon = $result['polygon'];
                     $attributes['polygon'] = $polygon->id;
                     $attributes['origin'] = $polygon->address_id;

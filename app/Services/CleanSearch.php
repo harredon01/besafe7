@@ -37,7 +37,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -70,7 +70,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -103,7 +103,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -159,7 +159,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -216,7 +216,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -255,7 +255,7 @@ class CleanSearch {
         $data = $request->all("includes");
         if ($data['includes']) {
             return null;
-        } 
+        }
         $data = $request->all("columns");
         if ($data['columns']) {
             return null;
@@ -314,7 +314,11 @@ class CleanSearch {
                         return null;
                     }
                     if (!$data['shared'] && !$data['favorite']) {
-                        $finalString = $mystring . "&user_id=" . $user->id;
+                        if ($data['private'] == '1') {
+                            $finalString = $mystring . "&user_id=" . $user->id;
+                        } else {
+                            $finalString = $mystring . "&private=0";
+                        }
                     } else {
                         if ($data['shared']) {
                             if ($data['shared'] == 'true') {

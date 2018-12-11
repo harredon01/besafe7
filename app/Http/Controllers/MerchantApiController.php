@@ -10,6 +10,7 @@ use App\Services\ShareObject;
 use App\Services\CleanSearch;
 use App\Querybuilders\MerchantQueryBuilder;
 use App\Models\Merchant;
+use DB;
 
 class MerchantApiController extends Controller {
 

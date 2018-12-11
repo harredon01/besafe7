@@ -53,7 +53,7 @@ class Rapigo {
         return $response;
     }
 
-    public function getOrderShippingCost(Order $order, array $origin, array $destination) {
+    public function getOrderShippingPrice(Order $order, array $origin, array $destination) {
         //dd($points);
         $points = [];
         $querystop = [

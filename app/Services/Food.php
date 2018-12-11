@@ -907,10 +907,12 @@ class Food {
                         $item->delete();
                         $address->delete();
                     }
-                    $merchant->delete();
+                    $merchant->items()->delete();
+//                    $merchant->orders()->delete();
+//                    $merchant->delete();
                 }
                 unset($row[0]);
-                Merchant::create($row);
+                //Merchant::create($row);
             }
         }
         $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx'); 
