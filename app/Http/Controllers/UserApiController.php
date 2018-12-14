@@ -123,13 +123,14 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function setAsBillingAddress($address, Request $request) {
+    public function setAddressType($address,$type, Request $request) {
         $user = $request->user();
         $addresCont = Address::find($address);
         if($addresCont->user_id == $user->id){
-            $address->is_default = true;
-            $address->save();
-            return response()->json(["status"=>"success","message"=>"address set as default"]);
+            $addresCont->type = $type;
+            $addresCont->save();
+            $user->addresses()->where("id","<>",$address)->where("type",$type)->update(["type"=>null]);
+            return response()->json(["status"=>"success","message"=>"address type changed"]);
         }
         return response()->json(["status"=>"error","message"=>"address does not belong to user"]);
     }
@@ -307,9 +308,14 @@ class UserApiController extends Controller {
         }
         //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
         $count = Medical::where('user_id', $user->id)->count();
+        $data['savedCard'] = false;
+        $source = $user->sources()->where("has_default",true)->first();
+        if($source){
+            $data['savedCard'] = true;
+        }
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
-        $data['push'] = $user->push;
+        $data['push'] = $user->push()->where("platform","Food")->first();
         $data['count'] = $count;
         $data['green'] = $green;
         //$data['followers'] = count($users2);

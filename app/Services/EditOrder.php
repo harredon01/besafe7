@@ -452,7 +452,7 @@ class EditOrder {
             $requiredBuyers -= count($checkBuyers);
         }
         $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
-        if($shippingCondition){
+        if ($shippingCondition) {
             $requiresShipping = 0;
         }
         return array(
@@ -506,7 +506,7 @@ class EditOrder {
                     $orderAddresses['type'] = "shipping";
                     Payment::where("order_id", $order->id)->update(['address_id' => null]);
                     $order->orderAddresses()->where('type', "shipping")->delete();
-                    $attributes = json_decode($order->attributes,true);
+                    $attributes = json_decode($order->attributes, true);
                     $polygon = $result['polygon'];
                     $attributes['polygon'] = $polygon->id;
                     $attributes['origin'] = $polygon->address_id;
@@ -606,19 +606,25 @@ class EditOrder {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
                         $result = $gateway->getOrderShippingPrice($order, $origin->toArray(), $destination->toArray());
-                        $condition = new CartCondition(array(
+                        $insertCondition = array(
                             'name' => $platform,
                             'type' => "shipping",
                             'target' => 'total',
                             'value' => $result['price'],
                             'order' => 0
-                        ));
-                        $insertCondition = $condition->toArray();
-                        unset($insertCondition['id']);
+                        );
+                        $condition = new CartCondition($insertCondition);
                         $insertCondition['order_id'] = $order->id;
                         $order->orderConditions()->where('type', "shipping")->delete();
                         OrderCondition::insert($insertCondition);
                         Cart::session($user->id)->condition($condition);
+                        $cart = $this->editCart->getCheckoutCart($user);
+                        $order->subtotal = $cart["subtotal"];
+                        $order->tax = $cart["tax"];
+                        $order->shipping = $cart["shipping"];
+                        $order->discount = $cart["discount"];
+                        $order->total = $cart["total"];
+                        $order->save();
                     }
                     return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order);
                 }

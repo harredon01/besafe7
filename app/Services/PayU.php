@@ -64,7 +64,7 @@ class PayU {
     }
 
     private function populateBuyerAddress(User $user ) {
-        $address = $user->addresses()->where("is_default", true)->first();
+        $address = $user->addresses()->where("type", "buyer")->first();
         if ($address) {
             $region = Region::find($address->region_id);
             $country = Country::find($address->country_id);
@@ -220,7 +220,7 @@ class PayU {
 
     public function useCreditCardOptions(User $user, array $data, Payment $payment, $platform) {
         if (array_key_exists("quick", $data)) {
-            return $this->quickPayCreditCard($user, $data, $payment, $platform);
+            return $this->quickPayCreditCard($user,$data, $payment, $platform);
         } 
         if (array_key_exists("token", $data)) {
             return $this->useToken($user, $data, $payment, $platform);
@@ -237,22 +237,33 @@ class PayU {
     }
 
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
-        $validator = $this->validatorPayment($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $validator = $this->validatorPayer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $validator = $this->validatorCC($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        $source = $user->sources()->where("has_default",true)->where("gateway","PayU")->first();
+        if($source){
+            
+        } else {
+            return response()->json(array("status" => "error", "message" => "No default card"), 400);
         }
         $buyer = $this->populateBuyerAddress($user );
         $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
-        $payer = $this->populatePayer($data);
-        $creditCard = $this->populateCC($data);
+        $extras = json_decode($source->extra,true);
+        $payerAddress = [
+            "street1" => $extras['billingAddress']['street1'],
+            "street2" => "",
+            "city" => $extras['billingAddress']['city'],
+            "state" => $extras['billingAddress']['state'],
+            "country" => $extras['billingAddress']['country'],
+            "postalCode" => $extras['billingAddress']['postalCode'],
+            "phone" => $extras['billingAddress']['phone']
+        ];
+        $payer = [
+            "merchantPayerId" => "1",
+            "fullName" => $extras['fullName'],
+            "emailAddress" => $extras['emailAddress'],
+            "contactPhone" => $extras['billingAddress']['phone'],
+            "dniNumber" => $extras['dniNumber'],
+            "dniType" => "CC",
+            "billingAddress" => $payerAddress
+        ];
         $merchant = $this->populateMerchant();
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
@@ -267,11 +278,11 @@ class PayU {
         $transaction = [
             "order" => $orderCont,
             "payer" => $payer,
-            "creditCard" => $creditCard,
+            "creditCardTokenId" => $source->source,
             "extraParameters" => $extraParams,
             "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => $data['cc_branch'],
-            "paymentCountry" => $data['payer_country'],
+            "paymentMethod" => $extras['method'],
+            "paymentCountry" => $extras['billingAddress']['country'],
             "deviceSessionId" => $deviceSessionId,
             "ipAddress" => $data['ip_address'],
             "cookie" => $cookie,
@@ -1074,6 +1085,7 @@ class PayU {
             if ($source) {
                 $source->source = $token['creditCardTokenId'];
                 $source->extra = json_encode($payer);
+                $source->has_default = true;
                 $source->save();
             } else {
                 $source = new Source([

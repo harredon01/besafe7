@@ -87,18 +87,13 @@ class EditCart {
           $couponTotal = 0;
           foreach ($couponItems as $item) {
           $couponTotal += $item->getCalculatedValue($subTotal);
-          }
-          $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
-          $shippingTotal = 0;
-          foreach ($shippingItems as $item) {
-          $shippingTotal += $item->getCalculatedValue($subTotal);
-          }
-          $taxItems = Cart::session($user->id)->getConditionsByType("tax");
-          $taxTotal = 0;
-
-          foreach ($taxItems as $item) {
-          $taxTotal += $item->getCalculatedValue($subTotal-$couponTotal-$saleTotal );
           } */
+        $taxItems = Cart::session($user->id)->getConditionsByType("tax");
+        $taxTotal = 0;
+
+        foreach ($taxItems as $item) {
+            $taxTotal += $item->getCalculatedValue($subTotal - $couponTotal - $saleTotal);
+        }
         $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
         $shippingTotal = 0;
         foreach ($shippingItems as $item) {
@@ -106,6 +101,8 @@ class EditCart {
         }
         $data['shipping'] = $shippingTotal;
         $data['subtotal'] = $subTotal;
+        $data['discount'] = 0;
+        $data['tax'] = $taxTotal;
         $cartConditions = Cart::session($user->id)->getConditions();
         $resultConditions = [];
         foreach ($cartConditions as $condition) {
@@ -237,7 +234,7 @@ class EditCart {
                         return $order->id;
                     }
                 }
-                if ($order->status=="pending") {
+                if ($order->status == "pending") {
                     if ($order->user_id == $user->id || $order->supplier_id == $user->id) {
                         return $order->id;
                     }

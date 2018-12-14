@@ -391,7 +391,10 @@ class EditBilling {
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
-                $payment->attributes = json_encode($this->extractBuyer($data));
+                if(array_key_exists('buyer_address', $data)){
+                    $payment->attributes = json_encode($this->extractBuyer($data));
+                }
+                
                 $payment->save();
                 return $gateway->useCreditCardOptions($user, $data, $payment, $data['platform']);
             }

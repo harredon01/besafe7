@@ -626,6 +626,7 @@ class EditUserData {
         if ($address) {
             if ($address->user_id == $user->id) {
                 $address->type = 'billing';
+                
                 $address->save();
                 return array("status" => "ok", "message" => "address set as billing address");
             }
@@ -681,7 +682,11 @@ class EditUserData {
 
     public function getAddresses(User $user, $type = null) {
         if ($type) {
-            $addresses = $user->addresses()->where("type", $type)->get();
+            if($type=="shipping"){
+                $addresses = $user->addresses()->where("lat",">", 0)->get();
+            } else {
+                $addresses = $user->addresses()->where("type","like","%". $type."%")->get();
+            }
         } else {
             $addresses = $user->addresses;
         }
