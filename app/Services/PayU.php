@@ -244,7 +244,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => "No default card"), 400);
         }
         $buyer = $this->populateBuyerAddress($user );
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, []);
         $extras = json_decode($source->extra,true);
         $payerAddress = [
             "street1" => $extras['billingAddress']['street1'],
@@ -286,7 +286,6 @@ class PayU {
             "deviceSessionId" => $deviceSessionId,
             "ipAddress" => $data['ip_address'],
             "cookie" => $cookie,
-            "userAgent" => $data['user_agent']
         ];
         $dataSent = [
             "language" => "es",
@@ -1266,22 +1265,23 @@ class PayU {
         if ($response['code'] == "SUCCESS") {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
-                $transactionResponse['order_id'] = $payment->order_id;
-                $transactionResponse['reference_sale'] = $payment->referenceCode;
-                $transactionResponse['user_id'] = $user->id;
-                $transactionResponse['gateway'] = 'PayU';
-                $transactionResponse['payment_method'] = 'CreditCard';
-                $transactionResponse['description'] = $transactionResponse['responseMessage'];
-                $transactionResponse['transaction_id'] = $transactionResponse['transactionId'];
-                $transactionResponse['transaction_state'] = $transactionResponse['state'];
-                $transactionResponse['response_code'] = $transactionResponse['responseCode'];
-                $transactionResponse['transaction_date'] = date("Y-m-d", $transactionResponse['operationDate']);
+                $transactionContainer = [];
+                $transactionContainer['order_id'] = $payment->order_id;
+                $transactionContainer['reference_sale'] = $payment->referenceCode;
+                $transactionContainer['user_id'] = $user->id;
+                $transactionContainer['gateway'] = 'PayU';
+                $transactionContainer['payment_method'] = 'CreditCard';
+                $transactionContainer['description'] = $transactionResponse['responseMessage'];
+                $transactionContainer['transaction_id'] = $transactionResponse['transactionId'];
+                $transactionContainer['transaction_state'] = $transactionResponse['state'];
+                $transactionContainer['response_code'] = $transactionResponse['responseCode'];
+                $transactionContainer['transaction_date'] = date("Y-m-d", $transactionResponse['operationDate']);
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
                   unset($transactionResponse['extras']);
                   $transactionResponse['extras'] = json_encode($extras);
                   } */
-                $transaction = Transaction::create($transactionResponse);
+                $transaction = Transaction::create($transactionContainer);
                 $payment->transactions()->save($transaction);
                 if ($transactionResponse['state'] == 'APPROVED') {
                     dispatch(new ApprovePayment($payment, $platform));

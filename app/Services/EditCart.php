@@ -333,10 +333,13 @@ class EditCart {
             $quantity = (int) $data['quantity'];
             $productVariant = $item->productVariant;
             if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
-                Cart::session($user->id)->update($item->id, array(
+                $cartSes = Cart::session($user->id)->update($item->id, array(
                     'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
                 ));
-
+                $cartItem = $cartSes->get($item->id);
+                $item->priceSum = $cartItem->getPriceSum();
+                $item->priceConditions = $cartItem->getPriceWithConditions();
+                $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
                 $item->quantity = $quantity;
                 $item->save();
                 return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user), "quantity" => $quantity);
@@ -409,11 +412,10 @@ class EditCart {
                                     'quantity' => (int) $data['quantity'],
                                     'merchant_id' => $data['merchant_id'],
                                     'attributes' => json_encode($losAttributes),
-                                    'status' => 'active',
                                     'order_id' => $order_id,
                         ]);
-                        $item->attributes = $losAttributes;
-                        Cart::session($user->id)->add(array(
+
+                        $cartSes = Cart::session($user->id)->add(array(
                             'id' => $item->id,
                             'name' => $product->name,
                             'price' => $productVariant->getActivePrice(),
@@ -421,6 +423,13 @@ class EditCart {
                             'attributes' => $losAttributes,
                             'conditions' => $applyConditions
                         ));
+                        $cartItem = $cartSes->get($item->id);
+                        $item->priceSum = $cartItem->getPriceSum();
+                        $item->priceConditions = $cartItem->getPriceWithConditions();
+                        $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                        $item->save();
+                        $item->attributes = $losAttributes;
+
                         return array("status" => "success", "message" => "item added to cart successfully", "cart" => $this->getCart($user), "item" => $item);
                     } else {
                         return array("status" => "error", "message" => "SOLD_OUT");
@@ -473,14 +482,19 @@ class EditCart {
                                 'status' => 'active',
                                 'order_id' => $order_id
                     ]);
-                    $item->attributes = $losAttributes;
-                    Cart::session($user->id)->add(array(
+                    $cartSes = Cart::session($user->id)->add(array(
                         'id' => $item->id,
                         'name' => $losAttributes['name'],
                         'price' => $losAttributes['price'],
                         'quantity' => (int) $data['quantity'],
                         'attributes' => $losAttributes
                     ));
+                    $cartItem = $cartSes->get($item->id);
+                    $item->priceSum = $cartItem->getPriceSum();
+                    $item->priceConditions = $cartItem->getPriceWithConditions();
+                    $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                    $item->save();
+                    $item->attributes = $losAttributes;
                     return array("status" => "success",
                         "message" => "item added to cart successfully",
                         "cart" => $this->getCart($user),
@@ -511,14 +525,18 @@ class EditCart {
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
                     $item->quantity = (int) $data['quantity'];
-                    $item->save();
-                    $item->attributes = json_decode($item->attributes, true);
-                    Cart::session($user->id)->update($item->id, array(
+                    $cartSes = Cart::session($user->id)->update($item->id, array(
                         'quantity' => array(
                             'relative' => false,
                             'value' => $item->quantity
                         ),
                     ));
+                    $cartItem = $cartSes->get($item->id);
+                    $item->priceSum = $cartItem->getPriceSum();
+                    $item->priceConditions = $cartItem->getPriceWithConditions();
+                    $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                    $item->save();
+                    $item->attributes = json_decode($item->attributes, true);
                     return array("status" => "success", "message" => "item updated successfully", "cart" => $this->getCart($user), "item" => $item);
                 } else {
                     return array("status" => "error", "message" => "No more stock of that product");

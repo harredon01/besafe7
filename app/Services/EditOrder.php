@@ -250,15 +250,16 @@ class EditOrder {
                         } else {
                             $info['payers'] = [];
                         }
-                        if ($splitOrder) {
-                            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-                        }
                         $thePayersArray = $info['payers'];
                         array_push($thePayersArray, $user->id);
 
                         $records = [
                             "buyers" => $thePayersArray
                         ];
+                        if ($splitOrder) {
+                            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
+                            $records["split_order"] = $splitOrder;
+                        }
                         $order->attributes = json_encode($records);
                         $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
                         if ($payment) {
