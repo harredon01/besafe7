@@ -129,7 +129,16 @@ class OrderJobs {
             }
 
             $orderAttributes = json_decode($order->attributes, true);
-            if (!array_key_exists('buyers', $orderAttributes)) {
+            if (array_key_exists('buyers', $orderAttributes)) {
+                $buyers = $orderAttributes['buyers'];
+                $finalBuyers = [];
+                foreach ($buyers as $value) {
+                    if($value != $user->id){
+                        array_push($finalBuyers, $value);
+                    }
+                }
+                $orderAttributes['buyers'] = $finalBuyers;
+            } else {
                 $orderAttributes['buyers'] = [];
             }
             if (!array_key_exists('split_order', $orderAttributes)) {
