@@ -73,7 +73,7 @@ class OrderJobs {
      * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $editOrder;
-    
+
     /**
      * The Guard implementation.
      *
@@ -87,15 +87,16 @@ class OrderJobs {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, EditCart $editCart, EditAlerts $editAlerts, Geolocation $geolocation, EditOrder $editOrder,EditBilling $editBilling) {
+    public function __construct(PayU $payU, EditCart $editCart, EditAlerts $editAlerts, Geolocation $geolocation, EditOrder $editOrder, EditBilling $editBilling) {
         $this->payU = $payU;
         $this->editAlerts = $editAlerts;
         $this->editCart = $editCart;
+        $this->geolocation = $geolocation;
         $this->editOrder = $editOrder;
         $this->editBilling = $editBilling;
     }
 
-    public function RecurringOrder(Order $order,$ip_address) {
+    public function RecurringOrder(Order $order, $ip_address) {
         $user = $order->user;
         $this->editCart->clearCartSession($order->user_id);
 
@@ -134,47 +135,104 @@ class OrderJobs {
             if (!array_key_exists('split_order', $orderAttributes)) {
                 $orderAttributes['split_order'] = false;
             }
-            
+
             $address = $order->orderAddresses()->where("type", "shipping")->first();
             if ($address) {
+                $resultG = $this->geolocation->checkMerchantPolygons($address->lat,$address->long, $data['merchant_id']);
+                if ($resultG["status"] == "success") {
+                    $polygon = $resultG['polygon'];
+                    $orderAttributes['polygon'] = $polygon->id;
+                    $orderAttributes['origin'] = $polygon->address_id;
+                }
                 $addressCont = $address->toArray();
                 unset($addressCont['id']);
                 $newAddress = new OrderAddress($addressCont);
                 $newOrder->orderAddresses()->save($newAddress);
-                $container = [
-                    "order_id" => $newOrder->id,
-                    "payers" => $orderAttributes['buyers'],
-                    "split_order" => $orderAttributes["split_order"],
-                    "platform" => "Food"
-                ];
-                $result = $this->editOrder->checkOrder($user, $newOrder, $container);
-                if ($result['status'] == "success") {
-                    $result2 = $this->editOrder->prepareOrder($user, $container['platform'], $container);
-                    if ($result2['status'] == "success") {
-                        $payment = $result2['payment'];
-                        $data = [
-                            "payment_id" =>$payment->id,
-                            "quick" => true,
-                            "platform" => "Food",
-                            "ip_address" =>$ip_address
-                        ];
-                        $result3 = $this->editBilling->payCreditCard($user,"PayU",$data);
-                        dd($result3);
-                    }
-                    dd($result2);
-                }
-                return $result;
+                $newOrder->attributes = $orderAttributes;
+                return $this->postPrepareOrder($user, $newOrder, $ip_address);
             } else {
                 $newOrder->items()->delete();
                 $newOrder->delete();
             }
-
-            
         }
     }
 
-    public function generateDigitalSignature() {
-        
+    public function handleOrderPrepareError(User $user, Order $order, $result, $ip_address) {
+        echo "Order missing: ".$result["type"].PHP_EOL;
+        if ($result["type"] == "shipping") {
+            echo "Setting shipping condition".PHP_EOL;
+            if (is_array($order->attributes)) {
+                $order->attributes = json_encode($order->attributes);
+            }
+
+            $order->save();
+            $shippingResult = $this->editOrder->setPlatformShippingCondition($user, $order->id, "Rapigo");
+            echo "Shipping condition result".PHP_EOL;
+            echo json_encode($shippingResult).PHP_EOL;
+            if($shippingResult["status"]=="success"){
+                echo "Shipping condition set".PHP_EOL;
+            } else {
+                echo "Shipiing condition not set. Terminating.".PHP_EOL;
+                return null;
+            }
+        } else if ($result["type"] == "credits") {
+            echo "Adding required credits to order: ".$result["required_credits"].PHP_EOL;
+            $requiredCredits = $result["required_credits"];
+            $creditItem = $result["creditItem"];
+            $data = [
+                "product_variant_id" => $creditItem->id,
+                "quantity" => $requiredCredits,
+                "order_id" => $order->id,
+                "item_id" => null,
+                "merchant_id" => $creditItem->merchant_id
+            ];
+            $this->editCart->addCartItem($user, $data);
+            echo "required credits set".PHP_EOL;
+        } else {
+            return null;
+        }
+        $this->postPrepareOrder($user, $order, $ip_address);
+    }
+
+    public function handleOrderPrepareSuccess(User $user, Payment $payment, $ip_address) {
+        $data = [
+            "payment_id" => $payment->id,
+            "quick" => true,
+            "platform" => "Food",
+            "ip_address" => $ip_address
+        ];
+        return $this->editBilling->payCreditCard($user, "PayU", $data);
+    }
+
+    public function postPrepareOrder(User $user, Order $order, $ip_address) {
+        echo "Preparing order for payment creation".PHP_EOL;
+        $orderAttributes = $order->attributes;
+        if (!is_array($orderAttributes)) {
+            $orderAttributes = json_decode($orderAttributes, true);
+        }
+        $container = [
+            "order_id" => $order->id,
+            "payers" => $orderAttributes['buyers'],
+            "split_order" => $orderAttributes["split_order"],
+            "platform" => "Food"
+        ];
+        $result = $this->editOrder->checkOrder($user, $order, $container);
+        if ($result['status'] == "success") {
+            $order->attributes = json_encode($order->attributes);
+            $order->save();
+            echo "Order passed verification".PHP_EOL;
+            $result2 = $this->editOrder->prepareOrder($user, $container['platform'], $container);
+            echo "Order preparation result".PHP_EOL;
+            echo json_encode($result2).PHP_EOL;
+            if ($result2['status'] == "success") {
+                $payment = $result2['payment'];
+                $result3 = $this->handleOrderPrepareSuccess($user, $payment, $ip_address);
+                dd($result3);
+            }
+            dd($result2);
+        } else {
+            $this->handleOrderPrepareError($user, $order, $result, $ip_address);
+        }
     }
 
 }

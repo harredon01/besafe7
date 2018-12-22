@@ -498,7 +498,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress, $data['merchant_id']);
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat,$theAddress->long, $data['merchant_id']);
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);

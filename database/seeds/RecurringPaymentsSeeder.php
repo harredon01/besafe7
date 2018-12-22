@@ -30,7 +30,7 @@ class RecurringPaymentsSeeder extends Seeder {
 
     public function run() {
 
-        $order = Order::find(73);
+        $order = Order::find(70);
         $ip = gethostbyname(env('APP_URL'));
         $result = $this->orderJobs->RecurringOrder($order,$ip);
         dd($result);
