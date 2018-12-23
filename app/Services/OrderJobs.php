@@ -164,6 +164,7 @@ class OrderJobs {
                 $newOrder->delete();
             }
         }
+        
     }
 
     public function handleOrderPrepareError(User $user, Order $order, $result, $ip_address) {
@@ -236,9 +237,7 @@ class OrderJobs {
             if ($result2['status'] == "success") {
                 $payment = $result2['payment'];
                 $result3 = $this->handleOrderPrepareSuccess($user, $payment, $ip_address);
-                dd($result3);
             }
-            dd($result2);
         } else {
             $this->handleOrderPrepareError($user, $order, $result, $ip_address);
         }
