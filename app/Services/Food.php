@@ -32,7 +32,7 @@ class Food {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
-
+    
     public function suspendDelvery($user_id) {
         Delivery::where("user_id", $user_id)->where("status", "<>", "deposit")->update(['status' => 'suspended']);
         Delivery::where("user_id", $user_id)->where("status", "deposit")->delete();
@@ -80,14 +80,16 @@ class Food {
         $father = $config['father'];
         $keywords = $config['keywords'];
         foreach ($deliveries as $value) {
-            $father[$value->type_id]['count'] ++;
-            $father[$value->type_id]['starter'][$value->starter_id] ++;
-            $father[$value->type_id]['main'][$value->main_id] ++;
+            $details = json_decode($value->details,true);
+            $dish = $details["dish"];
+            $father[$dish['type_id']]['count'] ++;
+            $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
+            $father[$dish['type_id']]['main'][$dish['main_id']] ++;
             foreach ($keywords as $word) {
-                if (strpos($value->starter_id, $word) !== false) {
+                if (strpos($dish['starter_id'], $word) !== false) {
                     $father["keywords"][$word] ++;
                 }
-                if (strpos($value->main_id, $word) !== false) {
+                if (strpos($dish['main_id'], $word) !== false) {
                     $father["keywords"][$word] ++;
                 }
             }
@@ -766,9 +768,14 @@ class Food {
                 $details = [];
                 if ($pickingUp == 1) {
                     $details['pickup'] = "envase";
-                }
-                $details['starter_id'] = $starterPlate['codigo'];
-                $details['main_id'] = $mainPlate['codigo'];
+                } 
+                $dish = [
+                    'type_id' => $art->id,
+                    'starter_id' => $starterPlate['codigo'],
+                    'main_id' => $mainPlate['codigo'],
+                    'dessert_id' => null
+                ];
+                $details['dish'] = $dish;
                 $delivery = Delivery::create([
                             "user_id" => 1,
                             "delivery" => $date,

@@ -9,7 +9,6 @@ use App\Models\Delivery;
 
 class EditDelivery {
 
-
     /**
      * The EditAlert implementation.
      *
@@ -39,13 +38,21 @@ class EditDelivery {
         $delivery = Delivery::find($data['delivery_id']);
         if ($delivery) {
             if ($delivery->user_id == $user->id) {
-                $delivery->delivery = "20".$data['year']."-".$data['month']."-".$data['day'];
+                $details = json_decode($delivery->details,true);
+                $dish = [
+                    'type_id' => $data['type_id'],
+                    'starter_id' => $data['starter_id'],
+                    'main_id' => $data['main_id'], 
+                    'dessert_id' => $data['dessert_id']
+                ];
+                $details["meal"] = $dish;
+                $delivery->delivery = "20" . $data['year'] . "-" . $data['month'] . "-" . $data['day'];
                 $delivery->type_id = $data['type_id'];
                 $delivery->starter_id = $data['starter_id'];
                 $delivery->main_id = $data['main_id'];
                 $delivery->dessert_id = $data['dessert_id'];
                 $delivery->observation = $data['observation'];
-                $delivery->details = json_encode($data['details']);
+                $delivery->details = json_encode($details);
                 $delivery->status = "transit";
                 $delivery->save();
                 return array("status" => "success", "message" => "Delivery scheduled for transit");
