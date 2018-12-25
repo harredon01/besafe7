@@ -961,5 +961,13 @@ class Food {
             }
         }
     }
+    
+    public function importDishes(){
+        $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzos.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            dd($row);
+        }
+    }
 
 }

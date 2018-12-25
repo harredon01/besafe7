@@ -36,9 +36,10 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
-        $this->deleteOldData();
-        $this->food->generateRandomDeliveries(4.670129, -74.051013);
-        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
+        $this->food->importDishes();
+//        $this->deleteOldData();
+//        $this->food->generateRandomDeliveries(4.670129, -74.051013);
+//        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
     }
 
     public function deleteOldData() {

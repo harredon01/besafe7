@@ -33,6 +33,7 @@ class CreateOrdersTable extends Migration {
                         $table->double('total', 15, 2);
                         $table->boolean('is_shippable');
                         $table->boolean('is_digital');
+                        $table->boolean('is_recurring')->nullable();
                         $table->boolean('is_editable')->nullable();
                         $table->boolean('requires_authorization');
                         $table->integer('payment_method_id')->unsigned()->nullable();
