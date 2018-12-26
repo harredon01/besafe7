@@ -107,6 +107,25 @@ class EditOrder {
         }
     }
 
+    public function setOrderRecurringType(User $user, $order_id, array $data) {
+        $validator = $this->validatorOrderRecurring($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $order = Order::find($order_id);
+        if ($order) {
+            if ($user->id == $order->user_id) {
+                $order->is_recurring = $data["recurring"];
+                $order->recurring_type = $data["recurring_type"];
+                $order->recurring_value = $data["recurring_value"];
+                $order->save();
+                return response()->json(array("status" => "success", "message" => "order updated", "order" => $order), 200);
+            }
+            return response()->json(array("status" => "error", "message" => "order does not belong to user"), 400);
+        }
+        return response()->json(array("status" => "error", "message" => "order not found"), 400);
+    }
+
     public function addItemsToOrder(User $user, Order $order) {
         Item::where('user_id', $user->id)
                 ->whereNull('order_id')
@@ -276,6 +295,11 @@ class EditOrder {
                         $payment->tax = $buyerTax;
                         $payment->save();
                         $result = array("status" => "success", "message" => "Order submitted, payment created", "payment" => $payment, "order" => $order);
+                        if ($info["recurring"] == true) {
+                            $order->is_recurring = true;
+                            $order->recurring_type = $info["recurring_type"];
+                            $order->recurring_value = $info["recurring_value"];
+                        }
                         $order->save();
                         return $result;
                     }
@@ -498,7 +522,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat,$theAddress->long, $data['merchant_id']);
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id']);
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
@@ -958,6 +982,20 @@ class EditOrder {
         return Validator::make($data, [
                     'item_id' => 'required|max:255',
                     'quantity' => 'required|max:255',
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorOrderRecurring(array $data) {
+        return Validator::make($data, [
+                    'recurring' => 'required|max:255',
+                    'recurring_type' => 'required|max:255',
+                    'recurring_value' => 'required|max:255',
         ]);
     }
 

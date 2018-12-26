@@ -158,6 +158,7 @@ Route::get('orders/confirm/{code?}', 'OrderApiController@confirmOrder');
 Route::post('orders/prepare/{platform?}', 'OrderApiController@prepareOrder');
 Route::post('orders/discounts/{platform?}/{order?}', 'OrderApiController@addDiscounts');
 Route::post('orders/check/{order?}', 'OrderApiController@checkOrder');
+Route::post('orders/recurring/{order?}', 'OrderApiController@setOrderRecurringType');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 

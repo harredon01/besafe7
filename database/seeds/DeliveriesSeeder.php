@@ -31,12 +31,13 @@ class DeliveriesSeeder extends Seeder {
     protected $food;
 
     public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu) {
-        $this->food = $food;
+        $this->food = $payu;
         $this->editOrderfood = $editOrderfood;
     }
 
     public function run() {
-        $this->food->importDishes();
+        $this->food->checkTokens();
+//        $this->food->importDishes();
 //        $this->deleteOldData();
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);
 //        $this->food->prepareRoutingSimulation(4.670129, -74.051013);

@@ -309,9 +309,10 @@ class UserApiController extends Controller {
         //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
         $count = Medical::where('user_id', $user->id)->count();
         $data['savedCard'] = false;
-        $source = $user->sources()->where("has_default",true)->first();
-        if($source){
-            $data['savedCard'] = true;
+        $sources = $user->sources()->where("has_default",true)->get();
+        $data['savedCards'] = [];
+        foreach ($sources as $value) {
+            array_push($data['savedCards'], $value->gateway);
         }
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;

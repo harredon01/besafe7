@@ -66,6 +66,17 @@ class OrderApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editOrder->prepareOrder($user, $platform, $request->all()));
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setOrderRecurringType(Request $request, $order) {
+        $user = $request->user();
+        return $this->editOrder->setOrderRecurringType($user, $order, $request->all());
+    }
 
     /**
      * Handle a login request to the application.

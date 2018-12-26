@@ -965,8 +965,13 @@ class Food {
     public function importDishes(){
         $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzos.xlsx');
         $reader = $excel->toArray();
+        $i = 0;
         foreach ($reader as $row) {
-            dd($row);
+            if($i>0){
+                dd($row);
+            }
+            
+            $i++;
         }
     }
 

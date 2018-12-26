@@ -63,7 +63,7 @@ class PayU {
         return $buyer;
     }
 
-    private function populateBuyerAddress(User $user ) {
+    private function populateBuyerAddress(User $user) {
         $address = $user->addresses()->where("type", "buyer")->first();
         if ($address) {
             $region = Region::find($address->region_id);
@@ -72,7 +72,7 @@ class PayU {
             $buyerAddress = [
                 "street1" => $address->address,
                 "street2" => "",
-                "city" =>  $city->name,
+                "city" => $city->name,
                 "state" => $region->name,
                 "country" => $country->code,
                 "postalCode" => $address->postal,
@@ -87,7 +87,7 @@ class PayU {
                 "shippingAddress" => $buyerAddress
             ];
             return $buyer;
-        } 
+        }
         return null;
     }
 
@@ -220,8 +220,8 @@ class PayU {
 
     public function useCreditCardOptions(User $user, array $data, Payment $payment, $platform) {
         if (array_key_exists("quick", $data)) {
-            return $this->quickPayCreditCard($user,$data, $payment, $platform);
-        } 
+            return $this->quickPayCreditCard($user, $data, $payment, $platform);
+        }
         if (array_key_exists("token", $data)) {
             return $this->useToken($user, $data, $payment, $platform);
         } else {
@@ -237,15 +237,15 @@ class PayU {
     }
 
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
-        $source = $user->sources()->where("has_default",true)->where("gateway","PayU")->first();
-        if($source){
+        $source = $user->sources()->where("has_default", true)->where("gateway", "PayU")->first();
+        if ($source) {
             
         } else {
             return response()->json(array("status" => "error", "message" => "No default card"), 400);
         }
-        $buyer = $this->populateBuyerAddress($user );
+        $buyer = $this->populateBuyerAddress($user);
         $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, []);
-        $extras = json_decode($source->extra,true);
+        $extras = json_decode($source->extra, true);
         $payerAddress = [
             "street1" => $extras['billingAddress']['street1'],
             "street2" => "",
@@ -295,7 +295,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform,"COP");
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
@@ -352,7 +352,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform,"COP");
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
     public function useSource(User $user, array $data, Payment $payment, $platform) {
@@ -406,7 +406,7 @@ class PayU {
         ];
 //        return $dataSent;
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform,"COP");
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
     public function payDebitCard(User $user, array $data, Payment $payment, $platform) {
@@ -1090,6 +1090,7 @@ class PayU {
                 $source = new Source([
                     "gateway" => "PayU",
                     "source" => $token['creditCardTokenId'],
+                    "has_default" => true,
                     "extra" => json_encode($payer)
                 ]);
                 $user->sources()->save($source);
@@ -1117,9 +1118,43 @@ class PayU {
             $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
             if ($result['code'] == "SUCCESS") {
                 $source->source = "";
+                $source->has_default = false;
                 $source->save();
             }
             return null;
+        }
+    }
+
+    private function checkToken(Source $source) {
+        $today = date_create();
+        $date = date_create();
+        date_add($date, date_interval_create_from_date_string("1 months"));
+        $merchant = $this->populateMerchant();
+        $creditCardToken = [
+            "payerId" => $source->user_id,
+            "creditCardTokenId" => $source->source,
+            "startDate" => date_format($today, "Y-m-d") . "T" . date_format($today, "H:m:s"),
+            "endDate" => date_format($date, "Y-m-d") . "T" . date_format($date, "H:m:s")
+        ];
+        $dataSent = [
+            "language" => "es",
+            "command" => "GET_TOKENS",
+            "merchant" => $merchant,
+            "creditCardTokenInformation" => $creditCardToken,
+        ];
+        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        if (!$result["creditCardTokenList"]) {
+            $source->has_default = false;
+            $source->source = "";
+            $source->save();
+        }
+        return null;
+    }
+    
+    public function checkTokens(){
+        $sources = Source::where("has_default",true)->where("gateway", "PayU")->get();
+        foreach ($sources as $value) {
+            $this->checkToken($value);
         }
     }
 
@@ -1171,7 +1206,7 @@ class PayU {
             "test" => "true",
         ];
         $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform,"COP");
+        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
     public function deleteSubscription(User $user, $subscription) {
@@ -1261,8 +1296,8 @@ class PayU {
         return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
     }
 
-    public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform,$currency) {
-        if ($response['code'] == "SUCCESS" ) {
+    public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform, $currency) {
+        if ($response['code'] == "SUCCESS") {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionContainer = [];
@@ -1276,7 +1311,7 @@ class PayU {
                 $transactionContainer['transaction_id'] = $transactionResponse['transactionId'];
                 $transactionContainer['transaction_state'] = $transactionResponse['state'];
                 $transactionContainer['response_code'] = $transactionResponse['responseCode'];
-                $transactionContainer['transaction_date'] = date("Y-m-d h:m:s", $transactionResponse['operationDate']/1000);
+                $transactionContainer['transaction_date'] = date("Y-m-d h:m:s", $transactionResponse['operationDate'] / 1000);
                 $transactionContainer["extras"] = json_encode($transactionResponse);
                 /* if (array_key_exists("extras", $transactionResponse)) {
                   $extras = $transactionResponse['extras'];
@@ -1447,7 +1482,7 @@ class PayU {
                             $transactionResponse['user_id'] = $payment->user_id;
                             $transactionResponse['referenceCode'] = $payment->referenceCode;
                             $transactionResponse['gateway'] = 'PayU';
-                            $transaction = $this->saveTransactionQuery($transactionResponse,$payment);
+                            $transaction = $this->saveTransactionQuery($transactionResponse, $payment);
                             if ($transactionResponse['state'] == 'APPROVED') {
                                 dispatch(new ApprovePayment($payment, "Food"));
                             }
@@ -1511,7 +1546,7 @@ class PayU {
             if ($payment) {
                 $data['user_id'] = $payment->user_id;
                 $data['order_id'] = $payment->order_id;
-                $transaction = $this->saveTransactionConfirmacion($data,$payment);
+                $transaction = $this->saveTransactionConfirmacion($data, $payment);
                 if ($data['state_pol'] == 4) {
                     dispatch(new ApprovePayment($payment, "Food"));
                 } else {
@@ -1543,7 +1578,7 @@ class PayU {
         }
     }
 
-    private function saveTransactionConfirmacion(array $data,Payment $payment) {
+    private function saveTransactionConfirmacion(array $data, Payment $payment) {
         $transactionId = $data['transaction_id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1577,7 +1612,7 @@ class PayU {
         return $transaction;
     }
 
-    private function saveTransactionRespuesta(array $data,Payment $payment) {
+    private function saveTransactionRespuesta(array $data, Payment $payment) {
         $transactionId = $data['transactionId'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1611,7 +1646,7 @@ class PayU {
         return $transaction;
     }
 
-    private function saveTransactionQuery(array $data,Payment $payment) {
+    private function saveTransactionQuery(array $data, Payment $payment) {
         $transactionId = $data['id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
         if ($transaction) {
@@ -1637,7 +1672,7 @@ class PayU {
             $insert["gateway"] = "PayU";
             $insert["currency"] = "COP";
             $insert["description"] = $data["responseMessage"];
-            $insert["transaction_date"] = date("Y-m-d h:m:s", $data['operationDate']/1000);
+            $insert["transaction_date"] = date("Y-m-d h:m:s", $data['operationDate'] / 1000);
             $insert["transaction_state"] = $data["state"];
             $insert["extras"] = json_encode($data);
             $transaction = Transaction::create($insert);
@@ -1688,7 +1723,7 @@ class PayU {
             if ($payment) {
                 $data['user_id'] = $payment->user_id;
                 $data['order_id'] = $payment->order_id;
-                $transaction = $this->saveTransactionRespuesta($data,$payment);
+                $transaction = $this->saveTransactionRespuesta($data, $payment);
                 $data['transaction'] = $transaction;
                 if ($data['transactionState'] == 4) {
                     $estadoTx = "Transaction approved";
