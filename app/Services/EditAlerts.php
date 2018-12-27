@@ -159,8 +159,11 @@ class EditAlerts {
                         }
                     }
                     $data['user_id'] = $user->id;
+                    $subjectEs = $data['subject_es'];
+                    unset($data['subject_es']);
                     $notification = new Notification($data);
                     $notification->save();
+                    $data['subject_es'] = $subjectEs;
                     $arrayContent[] = $data;
                     if ($user->emailNotifications) {
                         array_push($arrayEmail, array("name" => $user->name, "email" => $user->email));
@@ -174,11 +177,11 @@ class EditAlerts {
                         }
                         $result = $user->push()->where('platform', $platform)->first();
                         if ($result) {
-                            if($result->platform == "hife"){
+                            if ($result->platform == "hife") {
                                 array_push($arrayPushHife, $result->object_id);
-                            } else if($result->platform == "food"){
+                            } else if ($result->platform == "food") {
                                 array_push($arrayPushFood, $result->object_id);
-                            } 
+                            }
                         }
                     }
                 }

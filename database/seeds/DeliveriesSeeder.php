@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use App\Services\Food;
 use App\Services\PayU;
 use App\Services\EditOrderFood;
+use App\Services\EditAlerts;
 use App\Models\Item;
 use App\Models\Order;
 use App\Models\User;
@@ -17,7 +18,7 @@ class DeliveriesSeeder extends Seeder {
      *
      * @return void
      */
-
+const ORDER_PAYMENT = 'order_payment';
     /**
      * The edit profile implementation.
      *
@@ -30,13 +31,26 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $food;
 
-    public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu) {
-        $this->food = $payu;
+    public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
+        $this->food = $editAlerts;
         $this->editOrderfood = $editOrderfood;
     }
 
     public function run() {
-        $this->food->checkTokens();
+        $user = User::find(1);
+        $user2 = User::find(2);
+        $users = [$user2];
+        $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "test",
+                        "payload" => ['order_id'=>1,"order_total"=>12,"order_status"=>"test"],
+                        "object" => "test",
+                        "sign" => true,
+                        "type" => self::ORDER_PAYMENT,
+                        "user_status" => "test"
+                    ];
+        $this->food->sendMassMessage($data, $users, $user, true, null,"food");
+//        $this->food->checkTokens();
 //        $this->food->importDishes();
 //        $this->deleteOldData();
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);

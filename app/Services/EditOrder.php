@@ -427,6 +427,7 @@ class EditOrder {
                 }
             }
             $creditItemMerchant = $value->merchant_id;
+            $order->merchant_id = $creditItemMerchant;
             if (array_key_exists("is_digital", $attributes)) {
                 if ($attributes['is_digital'] == 0) {
                     if ($value) {
