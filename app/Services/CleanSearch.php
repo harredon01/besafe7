@@ -42,25 +42,25 @@ class CleanSearch {
             if (count($check) != 2) {
                 return null;
             }
+            $data = $request->all("user_id");
+            if ($data['user_id']) {
+                return null;
+            }
             $data = $request->all("merchant_id");
             if ($data['merchant_id']) {
                 $merchant = Merchant::find($data['merchant_id']);
                 if ($merchant) {
                     if ($merchant->user_id == $user->id) {
-                        $request2 = Request::create($mystring . "&merchant_id=" . $user->id, 'GET');
+                        $request2 = Request::create($mystring . "&merchant_id=" . $merchant->id, 'GET');
                     } else {
                         return null;
                     }
                 } else {
                     return null;
                 }
-            } 
-            $data = $request->all("user_id");
-            if ($data['user_id']) {
-                return null;
             } else {
-                
-            }
+                $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
+            } 
         }
 
         return $request2;
