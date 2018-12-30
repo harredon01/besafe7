@@ -152,9 +152,8 @@ class EditCart {
             $order->tax = 0;
             $order->total = 0;
             $order->save();
-        } else {
-            Item::where('user_id', $user->id)->where('order_id', null)->delete();
-        }
+        } 
+        Item::where('user_id', $user->id)->where('order_id', null)->delete();
         Cart::clearCartConditions();
     }
 
@@ -165,6 +164,7 @@ class EditCart {
      */
     public function checkCartAuth(User $user, $requires_authorization, $order_id, $merchant_id) {
         $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
+        //dd($item->toArray());
         if (!$item) {
             return true;
         } else {

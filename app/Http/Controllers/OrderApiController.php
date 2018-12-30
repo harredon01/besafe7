@@ -255,7 +255,8 @@ class OrderApiController extends Controller {
      * @return Response
      */
     public function index(Request $request) {
-        $request2 = $this->cleanSearch->handleOrder($request);
+        $user = $request->user();
+        $request2 = $this->cleanSearch->handleOrder($user,$request);
         if ($request2) {
             $queryBuilder = new QueryBuilder(new Order, $request2);
             $result = $queryBuilder->build()->paginate();

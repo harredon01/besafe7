@@ -77,12 +77,25 @@ class EditUserData {
      * @return User
      */
     public function create(array $data) {
+        $pass = $data['password'];
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['salt'] = str_random(40);
         $user = User::create($data);
-        $this->getUserCode($user);
-        return ['status' => 'success'];
+        $http = new \GuzzleHttp\Client;
+        $response = $http->post(env('APP_URL').'/oauth/token', [
+            'form_params' => [
+                'grant_type' => 'password',
+                'client_id' => '1',
+                'client_secret' => 'nuoLagU2jqmzWqN6zHMEo82vNhiFpbsBsqcs2DPt',
+                'username' => $data['email'],
+                'password' => $pass,
+                'scope' => '*',
+            ],
+        ]);
+        $json = json_decode((string) $response->getBody(), true);
+        //$this->getUserCode($user);
+        return ['status' => 'success', 'access_token' => $json['access_token']];
     }
 
     /**
@@ -354,7 +367,7 @@ class EditUserData {
         if (count($candidate) > 0) {
             $candidate = $candidate[0];
             if ($candidate) {
-                $push = $candidate->push()->where("platform",$data['platform'])->first();
+                $push = $candidate->push()->where("platform", $data['platform'])->first();
                 if ($push) {
                     return ["result" => true, "user_id" => $candidate->id, "status" => "success", "credits" => $push->credits];
                 }
@@ -626,7 +639,7 @@ class EditUserData {
         if ($address) {
             if ($address->user_id == $user->id) {
                 $address->type = 'billing';
-                
+
                 $address->save();
                 return array("status" => "ok", "message" => "address set as billing address");
             }
@@ -682,10 +695,10 @@ class EditUserData {
 
     public function getAddresses(User $user, $type = null) {
         if ($type) {
-            if($type=="shipping"){
-                $addresses = $user->addresses()->where("lat",">", 0)->get();
+            if ($type == "shipping") {
+                $addresses = $user->addresses()->where("lat", ">", 0)->get();
             } else {
-                $addresses = $user->addresses()->where("type","like","%". $type."%")->get();
+                $addresses = $user->addresses()->where("type", "like", "%" . $type . "%")->get();
             }
         } else {
             $addresses = $user->addresses;
