@@ -118,7 +118,10 @@ class EditOrder {
                 $order->is_recurring = $data["recurring"];
                 $order->recurring_type = $data["recurring_type"];
                 $order->recurring_value = $data["recurring_value"];
+                
                 $order->save();
+                $order->items;
+                $order->order_conditions = $order->orderConditions;
                 return response()->json(array("status" => "success", "message" => "order updated", "order" => $order), 200);
             }
             return response()->json(array("status" => "error", "message" => "order does not belong to user"), 400);
