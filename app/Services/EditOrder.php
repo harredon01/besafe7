@@ -295,11 +295,14 @@ class EditOrder {
                         $payment->tax = $buyerTax;
                         $payment->save();
                         $result = array("status" => "success", "message" => "Order submitted, payment created", "payment" => $payment, "order" => $order);
-                        if ($info["recurring"] == true) {
-                            $order->is_recurring = true;
-                            $order->recurring_type = $info["recurring_type"];
-                            $order->recurring_value = $info["recurring_value"];
+                        if (array_key_exists("recurring", $info)) {
+                            if ($info["recurring"] == true) {
+                                $order->is_recurring = true;
+                                $order->recurring_type = $info["recurring_type"];
+                                $order->recurring_value = $info["recurring_value"];
+                            }
                         }
+
                         $order->save();
                         return $result;
                     }

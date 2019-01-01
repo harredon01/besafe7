@@ -46,6 +46,7 @@ class EditOrderFood {
                 $control = $value->quantity / 10;
                 $control2 = floor($value->quantity / 10);
                 $discount = 0;
+                $buyers = 1;
                 if (array_key_exists("multiple_buyers", $attributes)) {
                     if ($attributes['multiple_buyers']) {
                         $buyers = $attributes['buyers'];
