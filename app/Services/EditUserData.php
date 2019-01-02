@@ -206,7 +206,7 @@ class EditUserData {
         }
         $user->name = $user->firstName . " " . $user->lastName;
         $user->save();
-        return array("status" => "success", "message" => "User Profile Updated");
+        return array("status" => "success", "message" => "User Profile Updated","user" => $user);
     }
 
     public function getContact($contactId) {
