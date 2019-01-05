@@ -8,7 +8,8 @@ use App\Models\Plan;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailPayment;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
@@ -364,7 +365,7 @@ class EditBilling {
         $gateway = new $className; //// <--- this thing will be autoloaded
         $gateway->createToken($user, $data);
     }
-    
+
     /**
      * Get the failed login message.
      *
@@ -391,10 +392,10 @@ class EditBilling {
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
-                if(array_key_exists('buyer_address', $data)){
+                if (array_key_exists('buyer_address', $data)) {
                     $payment->attributes = json_encode($this->extractBuyer($data));
                 }
-                
+
                 $payment->save();
                 return $gateway->useCreditCardOptions($user, $data, $payment, $data['platform']);
             }
@@ -423,7 +424,17 @@ class EditBilling {
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
                 $payment->save();
-                return $gateway->payDebitCard($user, $data, $payment, $data['platform']);
+                $results = $gateway->payDebitCard($user, $data, $payment, $data['platform']);
+                $url = "";
+                if (array_key_exists("email", $data)) {
+                    if ($results['code'] == "SUCCESS") {
+                        if ($results['transactionResponse']['state'] == "PENDING") {
+                            $url = $results['transactionResponse']['extraParameters']['BANK_URL'];
+                            Mail::to($user)->send(new EmailPayment($payment, $user, $url));
+                        }
+                    }
+                }
+                return $results;
             }
         }
         return array("status" => "error", "message" => "Invalid order");
@@ -439,7 +450,17 @@ class EditBilling {
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
                 $payment->save();
-                return $gateway->payCash($user, $data, $payment, $data['platform']);
+                $results = $gateway->payCash($user, $data, $payment, $data['platform']);
+                $url = "";
+                if (array_key_exists("email", $data)) {
+                    if ($results['code'] == "SUCCESS") {
+                        if ($results['transactionResponse']['state'] == "PENDING") {
+                            $url = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_HTML'];
+                            Mail::to($user)->send(new EmailPayment($payment, $user, $url));
+                        }
+                    }
+                }
+                return $results;
             }
         }
         return array("status" => "error", "message" => "Invalid order");

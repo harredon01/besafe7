@@ -17,7 +17,7 @@ class RouteDeliver extends Mailable
      * @var Order
      */
     public $data;
-
+    
     /**
      * Create a new message instance.
      *

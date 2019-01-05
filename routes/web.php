@@ -102,3 +102,10 @@ Route::get('/route_choose', function () {
     $data = $gateway->getTotalEstimatedShipping($results);
     return new App\Mail\RouteChoose($data);
 });
+
+Route::get('/email_payment', function () {
+    $user = App\Models\User::find(2);
+    $payment = App\Models\Payment::find(118);
+    $url = "http://www.google.com";
+    return new App\Mail\EmailPayment($payment,$user,$url);
+});
