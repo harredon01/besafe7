@@ -333,10 +333,10 @@ class EditCart {
             $quantity = (int) $data['quantity'];
             $productVariant = $item->productVariant;
             if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
-                $cartSes = Cart::session($user->id)->update($item->id, array(
+                Cart::session($user->id)->update($item->id, array(
                     'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
                 ));
-                $cartItem = $cartSes->get($item->id);
+                $cartItem = Cart::session($user->id)->get($item->id);
                 $item->priceSum = $cartItem->getPriceSum();
                 $item->priceConditions = $cartItem->getPriceWithConditions();
                 $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
@@ -415,7 +415,7 @@ class EditCart {
                                     'order_id' => $order_id,
                         ]);
 
-                        $cartSes = Cart::session($user->id)->add(array(
+                        Cart::session($user->id)->add(array(
                             'id' => $item->id,
                             'name' => $product->name,
                             'price' => $productVariant->getActivePrice(),
@@ -423,7 +423,7 @@ class EditCart {
                             'attributes' => $losAttributes,
                             'conditions' => $applyConditions
                         ));
-                        $cartItem = $cartSes->get($item->id);
+                        $cartItem = Cart::session($user->id)->get($item->id);
                         $item->priceSum = $cartItem->getPriceSum();
                         $item->priceConditions = $cartItem->getPriceWithConditions();
                         $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
@@ -482,14 +482,14 @@ class EditCart {
                                 'status' => 'active',
                                 'order_id' => $order_id
                     ]);
-                    $cartSes = Cart::session($user->id)->add(array(
+                    Cart::session($user->id)->add(array(
                         'id' => $item->id,
                         'name' => $losAttributes['name'],
                         'price' => $losAttributes['price'],
                         'quantity' => (int) $data['quantity'],
                         'attributes' => $losAttributes
                     ));
-                    $cartItem = $cartSes->get($item->id);
+                    $cartItem = Cart::session($user->id)->get($item->id);
                     $item->priceSum = $cartItem->getPriceSum();
                     $item->priceConditions = $cartItem->getPriceWithConditions();
                     $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
@@ -525,13 +525,13 @@ class EditCart {
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
                     $item->quantity = (int) $data['quantity'];
-                    $cartSes = Cart::session($user->id)->update($item->id, array(
+                    Cart::session($user->id)->update($item->id, array(
                         'quantity' => array(
                             'relative' => false,
                             'value' => $item->quantity
                         ),
                     ));
-                    $cartItem = $cartSes->get($item->id);
+                    $cartItem = Cart::session($user->id)->get($item->id);
                     $item->priceSum = $cartItem->getPriceSum();
                     $item->priceConditions = $cartItem->getPriceWithConditions();
                     $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
