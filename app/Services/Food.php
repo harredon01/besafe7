@@ -13,6 +13,8 @@ use App\Models\Product;
 use App\Models\Address;
 use App\Models\CoveragePolygon;
 use App\Models\ProductVariant;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RouteChoose;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -32,7 +34,7 @@ class Food {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
-    
+
     public function suspendDelvery($user_id) {
         Delivery::where("user_id", $user_id)->where("status", "<>", "deposit")->update(['status' => 'suspended']);
         Delivery::where("user_id", $user_id)->where("status", "deposit")->delete();
@@ -44,7 +46,7 @@ class Food {
         //$articles = Article::where('start_date',$date)->get();
         $articles = Article::where('start_date', "2018-09-01")->get();
         $father = [];
-        $keywords = ['fruit', 'soup', 'meat', 'chicken'];
+        //$keywords = ['fruit', 'soup', 'meat', 'chicken'];
         $keywords = ['fruit', 'soup'];
         foreach ($articles as $article) {
 
@@ -80,7 +82,7 @@ class Food {
         $father = $config['father'];
         $keywords = $config['keywords'];
         foreach ($deliveries as $value) {
-            $details = json_decode($value->details,true);
+            $details = json_decode($value->details, true);
             $dish = $details["dish"];
             $father[$dish['type_id']]['count'] ++;
             $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
@@ -134,7 +136,8 @@ class Food {
         return $finalresult;
     }
 
-    public function getPurchaseOrder($deliveries) {
+    public function getPurchaseOrder() {
+        $deliveries = Delivery::where("status", "transit")->get();
         $dayConfig = $this->loadDayConfig();
         $articles = $dayConfig['articles'];
         $father = $dayConfig['father'];
@@ -146,17 +149,17 @@ class Food {
         return $dayConfig;
     }
 
-    public function getTotalEstimatedShipping($results) {
-//        dd($results);
+    public function getTotalEstimatedShipping($scenario) {
+        $routes = Route::where("type", $scenario)->with(['stops.address'])->get();
         $totalCost = 0;
         $totalIncomeShipping = 0;
         $totalLunches = 0;
         $className = "App\\Services\\Rapigo";
         $platFormService = new $className();
-        foreach ($results as $value) {
-            $stops = $value->stops;
+        foreach ($routes as $route) {
+            $stops = $route->stops;
             $queryStops = [];
-            $routeCost = 0;
+            $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             foreach ($stops as $stop) {
                 $address = $stop->address;
                 $querystop = [
@@ -170,22 +173,14 @@ class Food {
 //            $rapigoResponse = $platFormService->getEstimate($queryStops);
 //            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
 //                $routeCost = $rapigoResponse['price'];
-//            } else {
-//                $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
 //            }
-            $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
-            if ($routeCost > $value->unit_price) {
-                $value->availability = 0;
-            } else {
-                $value->availability = 1;
-            }
-            $value->width = $routeCost;
-            $value->save();
+            $route->unit_cost = $routeCost;
+            $route->save();
             $totalCost += $routeCost;
-            $totalIncomeShipping += $value->unit_price;
-            $totalLunches += $value->unit;
+            $totalIncomeShipping += $route->unit_price;
+            $totalLunches += $route->unit;
         }
-        $totalRoutes = count($results);
+        $totalRoutes = count($routes);
         $totalIncome = $totalLunches * self::LUNCH_PROFIT;
         $totalProfit = $totalIncomeShipping + $totalIncome;
 
@@ -208,29 +203,31 @@ class Food {
         echo 'Total Income: ' . $result['total_income'] . PHP_EOL;
         echo 'Total Profit: ' . $result['day_profit'] . PHP_EOL;
         if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
+            $result['status'] = "success";
             echo 'Scenario successful!!' . PHP_EOL;
         } else {
+            $result['status'] = "failure";
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
-        return $results;
-        //dd($results);
+        $result["url"] = "";
+        return $result;
     }
 
-    public function buildScenario($results) {
+    public function buildScenario($scenario) {
 //        dd($results);
-
+        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->get();
         $totalCost = 0;
         $totalIncomeShipping = 0;
         $className = "App\\Services\\Rapigo";
         $platFormService = new $className();
         $totalLunches = 0;
         $config = $this->loadDayConfig();
-        foreach ($results as $value) {
+        foreach ($routes as $route) {
             $routeConfig = $config;
-            $deliveries = $value->deliveries;
+            $deliveries = $route->deliveries;
             $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
             $routeTotals = $this->printTotalsConfig($routeConfig);
-            $stops = $value->stops()->with(['address', 'deliveries.user'])->get();
+            $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
             $queryStops = [];
             foreach ($stops as $stop) {
                 //$stopDeliveries = $stop->deliveries;
@@ -271,30 +268,36 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-            foreach ($value->deliveries as $del) {
+            foreach ($route->deliveries as $del) {
                 $delConfig = $config;
                 $dels = [$del];
                 $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
                 $delTotals = $this->printTotalsConfig($delConfig);
                 $del->totals = $delTotals;
             }
-            $value->status = "transit";
+            $route->status = "transit";
 
-//            $rapigoResponse = $platFormService->getEstimate($queryStops);
-//            $totalCost2 += $rapigoResponse['price'];
-//            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-//                $totalCost += $rapigoResponse['price'];
-//            } else {
-//                $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-//                $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-//            }
-//            $value->coverage = json_encode($rapigoResponse);
-//            $value->save();
-            $value->totals = $routeTotals;
-            $value->stops = $stops;
-            $totalCost += self::ROUTE_HOUR_COST * 3;
-            $totalIncomeShipping += $value->unit_price;
-            $totalLunches += $value->unit;
+            $rapigoResponse = $platFormService->getEstimate($queryStops);
+            $type="stops";
+            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+                $totalCost += $rapigoResponse['price'];
+                $route->unit_cost = $rapigoResponse['price'];
+            } else {
+                $type = "hour";
+                $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+                $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+                $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+            }
+            $serviceBookResponse = $platFormService->createRoute($queryStops,$type);
+            $route->coverage = json_encode($serviceBookResponse);
+            // temp
+            $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+            $route->unit_cost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+            $route->save();
+            $route->totals = $routeTotals;
+            $route->stops = $stops;
+            $totalIncomeShipping += $route->unit_price;
+            $totalLunches += $route->unit;
         }
         $totalRoutes = count($results);
         $totalIncome = $totalLunches * self::LUNCH_PROFIT;
@@ -319,12 +322,14 @@ class Food {
         echo 'Total Income: ' . $result['total_income'] . PHP_EOL;
         echo 'Total Profit: ' . $result['day_profit'] . PHP_EOL;
         if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
+            $result['status'] = "success";
             echo 'Scenario successful!!' . PHP_EOL;
         } else {
+            $result['status'] = "failure";
             echo 'Scenario FAILED!!' . PHP_EOL;
         }
-        //echo json_encode($results) . PHP_EOL;
-        return $results;
+        $result["url"] = "";
+        return $routes;
         //dd($results);
     }
 
@@ -337,10 +342,8 @@ class Food {
 		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
-                        status = 'enqueue'
+                        status = 'transit'
                             AND d.user_id = 1
-                            AND d.delivery >= :theDate
-                            AND d.delivery <= :theDate2
                             AND lat >= :latinf AND lat < :latsup
                             AND `long` >= :longinf AND `long` < :longsup
                     HAVING Distance <= :radius AND Distance > :radiusInf order by Distance asc"
@@ -435,6 +438,7 @@ class Food {
                 $routestops = [$value];
                 $route->status = 'pending';
                 $route->description = $scenario;
+                $route->type = $scenario;
                 $route->unit = $value['amount'];
                 $route->height = 1;
                 $route->unit_price = $value['shipping'];
@@ -768,7 +772,7 @@ class Food {
                 $details = [];
                 if ($pickingUp == 1) {
                     $details['pickup'] = "envase";
-                } 
+                }
                 $dish = [
                     'type_id' => $art->id,
                     'starter_id' => $starterPlate['codigo'],
@@ -781,7 +785,7 @@ class Food {
                             "delivery" => $date,
                             "type_id" => $art->id,
                             "shipping" => $shipping[$amountDeliveries],
-                            "status" => "enqueue",
+                            "status" => "transit",
                             "starter_id" => $starterPlate['codigo'],
                             "main_id" => $mainPlate['codigo'],
                             "address_id" => $address->id,
@@ -799,97 +803,98 @@ class Food {
      * @return Response
      */
     public function prepareRoutingSimulation($lat, $long) {
-        $R = 6371;
-        $radius = 6;
-        $maxLat = $lat + rad2deg($radius / $R);
-        $minLat = $lat - rad2deg($radius / $R);
-        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-
-        $date = date("Y-m-d");
-        $date2 = date('Y-m-d', strtotime($date . ' + 1 days'));
         $results = [];
         $results2 = [];
-        //$results['unscheduled'] = [];
-
         for ($x = 0; $x < 4; $x++) {
-            if ($x < 4) {
-                $radiusInf = 0;
-                $radius = 7;
-            } else {
-                $radiusInf = 3;
-                $radius = 7;
-            }
-            $maxLat = $lat + rad2deg($radius / $R);
-            $minLat = $lat - rad2deg($radius / $R);
-            $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-            $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-            if ($x == 0 || $x == 4) {
-                $thedata = [
-                    'lat' => $lat,
-                    'lat2' => $lat,
-                    'long' => $long,
-                    'latinf' => $lat,
-                    'latsup' => $maxLat,
-                    'longinf' => $long,
-                    'longsup' => $maxLon,
-                    'theDate' => $date,
-                    'theDate2' => $date2,
-                    'radiusInf' => $radiusInf,
-                    'radius' => $radius
-                ];
-            } else if ($x == 1 || $x == 5) {
-                $thedata = [
-                    'lat' => $lat,
-                    'lat2' => $lat,
-                    'long' => $long,
-                    'latinf' => $minLat,
-                    'latsup' => $lat,
-                    'longinf' => $long,
-                    'longsup' => $maxLon,
-                    'theDate' => $date,
-                    'theDate2' => $date2,
-                    'radiusInf' => $radiusInf,
-                    'radius' => $radius
-                ];
-            } else if ($x == 2 || $x == 6) {
-                $thedata = [
-                    'lat' => $lat,
-                    'lat2' => $lat,
-                    'long' => $long,
-                    'latinf' => $minLat,
-                    'latsup' => $lat,
-                    'longinf' => $minLon,
-                    'theDate' => $date,
-                    'theDate2' => $date2,
-                    'longsup' => $long,
-                    'radiusInf' => $radiusInf,
-                    'radius' => $radius
-                ];
-            } else if ($x == 3 || $x == 7) {
-                $thedata = [
-                    'lat' => $lat,
-                    'lat2' => $lat,
-                    'long' => $long,
-                    'latinf' => $lat,
-                    'theDate' => $date,
-                    'theDate2' => $date2,
-                    'latsup' => $maxLat,
-                    'longinf' => $minLon,
-                    'longsup' => $long,
-                    'radiusInf' => $radiusInf,
-                    'radius' => $radius
-                ];
-            }
+            $thedata = $this->prepareQuadrantLimits($lat, $long, $x);
             $results2 = $this->prepareRouteModel($thedata, $results2, false, $x);
             $results = $this->prepareRouteModel($thedata, $results, true, $x);
         }
         $this->completeRoutes($results);
         $this->completeRoutes($results2);
-        $routes = Route::where("description", "preorganize")->get();
-        $routes2 = Route::where("description", "simple")->get();
-        $this->getTotalEstimatedShipping($routes);
-        $this->getTotalEstimatedShipping($routes2);
+        $this->getShippingCosts();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getShippingCosts() {
+        $resultsPre = $this->getTotalEstimatedShipping("preorganize");
+        $resultsSimple = $this->getTotalEstimatedShipping("simple");
+        $winningScenario = "";
+        if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
+            $winningScenario = "Preorganize";
+        } else {
+            $winningScenario = "Simple";
+        }
+        return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
+    }
+
+    public function prepareQuadrantLimits($lat, $long, $x) {
+        $R = 6371;
+        if ($x < 4) {
+            $radiusInf = 0;
+            $radius = 7;
+        } else {
+            $radiusInf = 3;
+            $radius = 7;
+        }
+        $maxLat = $lat + rad2deg($radius / $R);
+        $minLat = $lat - rad2deg($radius / $R);
+        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        if ($x == 0 || $x == 4) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $lat,
+                'latsup' => $maxLat,
+                'longinf' => $long,
+                'longsup' => $maxLon,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 1 || $x == 5) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $minLat,
+                'latsup' => $lat,
+                'longinf' => $long,
+                'longsup' => $maxLon,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 2 || $x == 6) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $minLat,
+                'latsup' => $lat,
+                'longinf' => $minLon,
+                'longsup' => $long,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 3 || $x == 7) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $lat,
+                'latsup' => $maxLat,
+                'longinf' => $minLon,
+                'longsup' => $long,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        }
+        return $thedata;
     }
 
     public function importMerchants() {
@@ -922,7 +927,7 @@ class Food {
                 //Merchant::create($row);
             }
         }
-        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx'); 
+        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx');
         $reader = $excel->toArray();
         foreach ($reader as $row) {
             $merchants = explode(",", $row['merchant_id']);
@@ -961,16 +966,16 @@ class Food {
             }
         }
     }
-    
-    public function importDishes(){
+
+    public function importDishes() {
         $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzos.xlsx');
         $reader = $excel->toArray();
         $i = 0;
         foreach ($reader as $row) {
-            if($i>0){
+            if ($i > 0) {
                 dd($row);
             }
-            
+
             $i++;
         }
     }

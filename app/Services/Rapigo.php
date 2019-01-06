@@ -53,7 +53,7 @@ class Rapigo {
         return $response;
     }
 
-    public function getOrderShippingPrice(Order $order, array $origin, array $destination) {
+    public function getOrderShippingPrice(array $origin, array $destination) {
         //dd($points);
         $points = [];
         $querystop = [
@@ -77,7 +77,10 @@ class Rapigo {
         return $response;
     }
 
-    public function createRoute(array $points) {
+    public function createRoute(array $points,$type) {
+        if($type == "hour"){
+            $data['type'] = 'hour';
+        }
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
         $response = $this->sendPost($data, $query);

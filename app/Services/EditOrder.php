@@ -173,7 +173,6 @@ class EditOrder {
                         $result = $this->checkUsersCredits($buyersCredts, $platform);
                         if ($result < 1) {
                             $buyerTotal += $item->price;
-                            $transactionCost = $this->getTransactionTotal($buyerTotal);
                         }
                     }
                     $transactionCost = $this->getTransactionTotal($buyerTotal);
@@ -216,6 +215,12 @@ class EditOrder {
     public function getTransactionTotal($total) {
         return ($total * 0.0349 + 900);
     }
+    
+    public function removeTransactionCost(Order $order) {
+        $order->orderConditions()->whereIn("name",["Costo fijo transaccion","Costo variable transaccion"])->delete();
+        Cart::session($order->user_id)::removeCartCondition("Costo fijo transaccion");
+        Cart::session($order->user_id)::removeCartCondition("Costo variable transaccion");
+    }
 
     /**
      * Get the failed login message.
@@ -226,9 +231,22 @@ class EditOrder {
         if (array_key_exists("order_id", $info)) {
             $order = Order::find($info['order_id']);
             if ($order) {
+                if (array_key_exists("split_order", $info)) {
+                    if ($info['split_order']) {
+                        $this->removeTransactionCost($order);
+                    }
+                } else {
+//                    $condition = $order->orderConditions()->where("name","Costo variable transaccion")->first();
+//                    $cartCond = Cart::session($order->user_id)::getCondition("Costo variable transaccion");
+                }
+                
+                
                 $cart = $this->editCart->getCheckoutCart($user);
                 if ($cart['total'] > 0) {
                     $order->subtotal = $cart["subtotal"];
+//                    if($condition){
+//                        
+//                    }
                     $order->tax = 0;
                     $transactionCost = 0;
                     $splitOrder = false;
@@ -637,7 +655,7 @@ class EditOrder {
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($order, $origin->toArray(), $destination->toArray());
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
                         $insertCondition = array(
                             'name' => $platform,
                             'type' => "shipping",

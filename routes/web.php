@@ -69,9 +69,8 @@ Route::get('/purchase', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
-    $deliveries = App\Models\Delivery::where("status", "enqueue")->get();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getPurchaseOrder($deliveries);
+    $data = $gateway->getPurchaseOrder();
     $data['level']="";
     return new App\Mail\PurchaseOrder($data);
 });
@@ -101,6 +100,15 @@ Route::get('/route_choose', function () {
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
     $data = $gateway->getTotalEstimatedShipping($results);
     return new App\Mail\RouteChoose($data);
+});
+Route::get('/scenario_select', function () {
+    $className = "App\\Services\\Food";
+    $rapigoClassName = "App\\Services\\Rapigo";
+    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
+    $rapigo = new $rapigoClassName;
+    $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
+    $data = $gateway->getShippingCosts();
+    return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']);
 });
 
 Route::get('/email_payment', function () {

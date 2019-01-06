@@ -40,25 +40,17 @@ class EditOrderFood {
         $conditions = [];
         foreach ($items as $value) {
             $attributes = json_decode($value->attributes, true);
-
             if ($value->quantity > 10) {
-
-                $control = $value->quantity / 10;
-                $control2 = floor($value->quantity / 10);
-                $discount = 0;
+                $control2 = floor($value->quantity / 11);
                 $buyers = 1;
                 if (array_key_exists("multiple_buyers", $attributes)) {
                     if ($attributes['multiple_buyers']) {
                         $buyers = $attributes['buyers'];
                     }
                 }
-                if ($control == $control2) {
-                    $discount = (($control2 - 1) * $buyers * self::UNIT_LOYALTY_DISCOUNT);
-                } else {
-                    $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
-                }
+                $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
                 $condition = new OrderCondition(array(
-                    'name' => "Descuento por compromiso orden: " . $order->id,
+                    'name' => "Por cada 11 dias recibe un descuento de 11 mil pesos",
                     'target' => "subtotal",
                     'type' => self::PLATFORM_NAME,
                     'value' => "-" . $discount,
@@ -75,6 +67,38 @@ class EditOrderFood {
                 ));
                 Cart::session($user->id)->condition($condition2);
             }
+            $conditionF = new OrderCondition(array(
+                'name' => "Costo fijo transaccion",
+                'target' => "total",
+                'type' => self::PLATFORM_NAME,
+                'value' => "+900",
+                'total' => 900,
+            ));
+            array_push($conditions, $conditionF);
+            $conditionV = new OrderCondition(array(
+                'name' => "Costo variable transaccion",
+                'target' => "total",
+                'type' => self::PLATFORM_NAME,
+                'value' => "3.49%",
+                'total' => 900,
+            ));
+            array_push($conditions, $conditionV);
+            $order->orderConditions()->saveMany([$conditionF,$conditionV]);
+            $condition2F = new CartCondition(array(
+                'name' => $conditionF->name,
+                'type' => $conditionF->type,
+                'target' => $conditionF->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
+                'value' => $conditionF->value,
+                'order' => 1
+            ));
+            $condition2V = new CartCondition(array(
+                'name' => $conditionV->name,
+                'type' => $conditionV->type,
+                'target' => $conditionV->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
+                'value' => $conditionV->value,
+                'order' => 1
+            ));
+            Cart::session($user->id)->condition([$condition2F,$condition2V]);
         }
         return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions);
     }
