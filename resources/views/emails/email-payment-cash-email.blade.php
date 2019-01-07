@@ -84,38 +84,18 @@ $style = [
                                     <td style="{{ $fontFamily }} {{ $style['email-body_cell'] }}">
                                         <!-- Greeting -->
                                         <h1 style="{{ $style['header-1'] }}">
-                                            Resumen de resultados sector alrededor del polygono {{$polygon_id}}
+                                            Hola {{$user->firstName}}!
                                         </h1>
 
                                         <p style="{{ $style['paragraph'] }}">
-                                                Resultado mas optimo: {{$winner}}
+                                                Gracias por comprar en lonchis. Para continuar con el proceso para tu pago {{$payment->id}} debes pagar el comprobante en el metodo que escogiste. 
+                                        </p>
+                                        <p style="{{ $style['paragraph'] }}">
+                                            <a href="{{$url}}">Version Web</a> 
                                         </p>
                                         
                                         <p style="{{ $style['paragraph'] }}">
-                                                Resumen Escenario Pre: <br>
-                                                Estado: {{$preData['status']}}<br>
-                                                Total Costo: ${{ number_format($preData['ShippingCostEstimate'], 2, ',', '.') }}<br>
-                                                Ingreso Comision: ${{ number_format($preData['hoov_income'], 2, ',', '.') }}<br>
-                                                Ingreso Envio: ${{ number_format($preData['shipping_income'], 2, ',', '.') }}<br>
-                                                Total Ingreso: ${{ number_format($preData['total_income'], 2, ',', '.') }}<br>
-                                                Total Profit: ${{ number_format($preData['day_profit'], 2, ',', '.') }}<br>
-                                                Numero de rutas: {{$preData['routes']}}<br>
-                                                Numero de numero de almuerzos: {{$preData['lunches']}}<br>
-                                                Promedio almuerzos por ruta: {{$preData['lunch_route']}}<br>
-                                                <a href="{{$preData['scenario_hash']}}">Seleccionar</a> 
-                                        </p>
-                                        <p style="{{ $style['paragraph'] }}">
-                                                Resumen Escenario Pre: <br>
-                                                Estado: {{$simpleData['status']}}<br>
-                                                Total Costo: ${{ number_format($simpleData['ShippingCostEstimate'], 2, ',', '.') }}<br>
-                                                Ingreso Comision: ${{ number_format($simpleData['hoov_income'], 2, ',', '.') }}<br>
-                                                Ingreso Envio: ${{ number_format($simpleData['shipping_income'], 2, ',', '.') }}<br>
-                                                Total Ingreso: ${{ number_format($simpleData['total_income'], 2, ',', '.') }}<br>
-                                                Total Profit: ${{ number_format($simpleData['day_profit'], 2, ',', '.') }}<br>
-                                                Numero de rutas: {{$simpleData['routes']}}<br>
-                                                Numero de numero de almuerzos: {{$simpleData['lunches']}}<br>
-                                                Promedio almuerzos por ruta: {{$simpleData['lunch_route']}}<br>
-                                                <a href="{{$simpleData['scenario_hash']}}">Seleccionar</a> 
+                                            <a href="{{$pdf}}">Recibo en pdf</a> 
                                         </p>
 
                                         <!-- Salutation -->

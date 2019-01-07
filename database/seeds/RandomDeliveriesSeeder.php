@@ -5,6 +5,7 @@ use App\Services\Food;
 use App\Models\Delivery;
 use App\Models\Route;
 use App\Models\OrderAddress;
+use App\Models\CoveragePolygon;
 
 class RandomDeliveriesSeeder extends Seeder {
     /**
@@ -19,7 +20,10 @@ class RandomDeliveriesSeeder extends Seeder {
 
     public function run() {
         $this->deleteOldData();
-        $this->food->generateRandomDeliveries(4.670129, -74.051013);
+        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
+        foreach ($polygons as $value) {
+            $this->food->generateRandomDeliveries($value);
+        }
     }
 
     public function deleteOldData() {

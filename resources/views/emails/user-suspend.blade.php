@@ -106,6 +106,23 @@
                                             {!!$stop->region_name!!}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td style="{{ $fontFamily }}">
+                                            @foreach ($stop->deliveries as $delivery)
+                                            <p>
+                                                Direccion: {{ $delivery->address->address }}<br>
+                                                Telefono: {{ $delivery->address->phone }}<br>
+                                                Usuario: {{ $delivery->user->name }}<br>
+                                                @if (array_key_exists('pickup',$delivery->details))
+                                                @if ($delivery->details['pickup']=='envase')
+                                                <a href="">Borrar Credito</a>
+                                                <a href="">Usar Almuerzo como credito</a>
+                                                @endif
+                                                @endif
+                                            </p>
+                                            @endforeach
+                                        </td>
+                                    </tr>
                                 </table>
                                 @endforeach
                                 @endforeach

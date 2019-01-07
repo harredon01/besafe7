@@ -4,10 +4,12 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use App\Models\Payment;
+use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ScenarioSelect extends Mailable
+class EmailPaymentPse extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -16,37 +18,32 @@ class ScenarioSelect extends Mailable
      *
      * @var Order
      */
-    public $preData;
+    public $payment;
+    
     /**
      * The order instance.
      *
      * @var Order
      */
-    public $simpleData;
+    public $user;
+    
     /**
      * The order instance.
      *
      * @var Order
      */
-    public $winner;
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
-    public $polygon_id;
+    public $url;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($preData,$simpleData,$winner,$polygon_id)
+    public function __construct(Payment $payment, User $user,$url)
     {
-        $this->preData = $preData;
-        $this->simpleData = $simpleData;
-        $this->winner = $winner;
-        $this->polygon_id = $polygon_id;
+        $this->payment = $payment;
+        $this->user = $user;
+        $this->url = $url;
     }
 
     /**
@@ -56,6 +53,6 @@ class ScenarioSelect extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.scenario-select-email');
+        return $this->view('emails.email-payment-pse-email');
     }
 }

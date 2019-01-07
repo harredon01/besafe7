@@ -64,6 +64,13 @@ Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
+Route::get('food/build_route_id/{id?}/{hash?}', 'FoodController@buildScenarioRouteId');
+Route::get('food/build_complete_scenario/{scenario?}/{hash?}', 'FoodController@buildCompleteScenario');
+Route::get('food/build_scenario_positive/{scenario?}/{hash?}', 'FoodController@buildScenarioPositive');
+Route::get('food/get_scenario_structure/{scenario?}', 'FoodController@getScenarioStructure');
+Route::get('food/regenerate_scenarios/{polygon?}/{hash?}', 'FoodController@regenerateScenarios');
+Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
+Route::get('food/polygons', 'FoodController@getPolygons');
 
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";
@@ -78,7 +85,7 @@ Route::get('/route_organize', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
-    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
+    $results = App\Models\Route::where("type", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
     $data = $gateway->buildScenario($results);
     return new App\Mail\RouteOrganize($data);
@@ -95,25 +102,32 @@ Route::get('/route_deliver', function () {
 Route::get('/route_choose', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
-    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getTotalEstimatedShipping($results);
-    return new App\Mail\RouteChoose($data);
+    $data = $gateway->getTotalEstimatedShipping("preorganize-1");
+    return new App\Mail\RouteChoose($data['routes']);
 });
 Route::get('/scenario_select', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
-    $results = App\Models\Route::where("description", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
     $rapigo = new $rapigoClassName;
+    $polygons = App\Models\CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->first();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getShippingCosts();
-    return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']);
+    $data = $gateway->getShippingCosts($polygons->id);
+    return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner'],$polygons->id);
 });
 
-Route::get('/email_payment', function () {
+Route::get('/email_payment_pse', function () {
     $user = App\Models\User::find(2);
     $payment = App\Models\Payment::find(118);
     $url = "http://www.google.com";
-    return new App\Mail\EmailPayment($payment,$user,$url);
+    return new App\Mail\EmailPaymentPse($payment,$user,$url);
+});
+
+Route::get('/email_payment_cash', function () {
+    $user = App\Models\User::find(2);
+    $payment = App\Models\Payment::find(118);
+    $url = "http://www.google.com";
+    $pdf = "http://www.google.com";
+    return new App\Mail\EmailPaymentCash($payment,$user,$url,$pdf);
 });

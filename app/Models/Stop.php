@@ -16,7 +16,7 @@ class Stop extends Model {
      *
      * @var array
      */
-    protected $fillable = ['stop_order','arrival','amount','region_name','country_name','route_id','address_id','details'];
+    protected $fillable = ['stop_order','arrival','amount','region_name','country_name','route_id','address_id','details','code','status'];
 
     public function route()
     {

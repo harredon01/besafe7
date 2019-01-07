@@ -9,7 +9,8 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\EmailPayment;
+use App\Mail\EmailPaymentCash;
+use App\Mail\EmailPaymentPse;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
@@ -430,7 +431,7 @@ class EditBilling {
                     if ($results['code'] == "SUCCESS") {
                         if ($results['transactionResponse']['state'] == "PENDING") {
                             $url = $results['transactionResponse']['extraParameters']['BANK_URL'];
-                            Mail::to($user)->send(new EmailPayment($payment, $user, $url));
+                            Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
                         }
                     }
                 }
@@ -456,7 +457,8 @@ class EditBilling {
                     if ($results['code'] == "SUCCESS") {
                         if ($results['transactionResponse']['state'] == "PENDING") {
                             $url = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_HTML'];
-                            Mail::to($user)->send(new EmailPayment($payment, $user, $url));
+                            $pdf = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_PDF'];
+                            Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url,$pdf));
                         }
                     }
                 }

@@ -15,6 +15,8 @@ class CreateCoveragePolygonsTable extends Migration {
         Schema::create('coverage_polygons', function (Blueprint $table) {
             $table->increments('id');
             $table->text('coverage')->nullable();
+            $table->double('lat', 12, 9);
+            $table->double('long', 12, 9);
             $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')
                     ->on('countries');

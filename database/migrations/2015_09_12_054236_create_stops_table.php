@@ -35,6 +35,8 @@ class CreateStopsTable extends Migration {
                         $table->foreign('country_id')->references('id')
                                 ->on('countries');
                         $table->dateTime('arrival');
+                        $table->string('code');
+                        $table->string('status');
                         $table->text('details');
 			$table->timestamps();
 		});
