@@ -130,73 +130,15 @@ class EditOrderFood {
     }
 
     public function approvePayment(Payment $payment) {
-        $user = $payment->user;
-        $followers = [];
-        array_push($followers, $user);
-        $payload = [
-            "order_id" => $order->id,
-            "first_name" => $user->firstName,
-            "last_name" => $user->lastName,
-            "payment" => $payment
-        ];
-        $data = [
-            "trigger_id" => $user->id,
-            "message" => "",
-            "subject" => "",
-            "object" => self::OBJECT_ORDER,
-            "sign" => true,
-            "payload" => $payload,
-            "type" => self::PAYMENT_DENIED,
-            "user_status" => $user->getUserNotifStatus()
-        ];
-        $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $platFormService = new $className(); //// <--- this thing will be autoloaded
-        $platFormService->sendMassMessage($data, $followers, $user, true, $date, self::PLATFORM_NAME);
-        $order = Order::find($payment->order_id);
-        if ($order) {
-            $payments = $order->payments()->where("status", "<>", "Paid")->where("id", "<>", $payment->id)->count();
-            if ($payments > 0) {
-                $order->status = "Pending-" . $payments;
-                $order->save();
-                return array("status" => "success", "message" => "Payment approved, still payments pending");
-            } else {
-                return $this->approveOrder($order);
-            }
-        }
+        
     }
 
     public function denyPayment(Payment $payment) {
-        $user = $payment->user;
-        $followers = [];
-        array_push($followers, $user);
-        $payment->status = "denied";
-        $payment->save();
-        $payload = [
-            "order_id" => $order->id,
-            "first_name" => $user->firstName,
-            "last_name" => $user->lastName,
-            "payment" => $payment
-        ];
-        $data = [
-            "trigger_id" => $user->id,
-            "message" => "",
-            "subject" => "",
-            "object" => self::OBJECT_ORDER,
-            "sign" => true,
-            "payload" => $payload,
-            "type" => self::PAYMENT_DENIED,
-            "user_status" => $user->getUserNotifStatus()
-        ];
-        $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $platFormService = new $className(); //// <--- this thing will be autoloaded
-        return $platFormService->sendMassMessage($data, $followers, $user, true, $date, self::PLATFORM_NAME);
+        
     }
 
     public function pendingPayment(Payment $payment) {
-        $payment->status = "Open";
-        $payment->save();
+ 
     }
 
     public function getTransactionTotal($total) {

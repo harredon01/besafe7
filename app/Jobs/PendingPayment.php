@@ -15,15 +15,18 @@ class PendingPayment implements ShouldQueue
 
 
     protected $payment;
+    
+    protected $platform;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Payment $payment )
+    public function __construct(Payment $payment,$platform )
     {
         $this->payment = $payment;
+        $this->platform = $platform;
     }
 
     /**
@@ -33,6 +36,6 @@ class PendingPayment implements ShouldQueue
      */
     public function handle(EditOrder $editOrder)
     {
-        $editOrder->pendingPayment($this->payment); 
+        $editOrder->pendingPayment($this->payment,$this->platform); 
     }
 }

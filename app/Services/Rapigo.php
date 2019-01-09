@@ -131,38 +131,7 @@ class Rapigo {
         $firmacreada = md5($firma_cadena);
         $firma = $data['sign'];
         if (strtoupper($firma) == strtoupper($firmacreada)) {
-            $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-            if ($transactionExists) {
-                return ["status" => "success", "message" => "transaction already processed", "data" => $data];
-            }
-
-            $payment = Payment::where("referenceCode", $referenceCode)->first();
-            if ($payment) {
-                $transaction = $this->saveTransaction($data, $payment);
-                if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment));
-                    $transaction->description = "Transacción aprobada";
-                } else {
-                    dispatch(new DenyPayment($payment));
-                    $transaction->description = "Transacción rechazada";
-                }
-            } else {
-                if (array_key_exists("reference_recurring_payment", $data)) {
-                    if ($data['state_pol'] == 4) {
-                        $results = explode("_", $data["reference_recurring_payment"]);
-                        $subscriptionL = Subscription::where("source_id", $results[0])->first();
-                        $subscriptionL->ends_at = Date($data['date_next_payment']);
-                        $objectType = "App\\Models\\" . $subscriptionL->type;
-                        $object = new $objectType;
-                        $target = $object->find($subscriptionL->object_id);
-                        $target->ends_at = $subscriptionL->ends_at;
-                        $target->save();
-                        $subscriptionL->save();
-                    }
-                }
-            }
-
-            return ["status" => "success", "message" => "transaction processed", "data" => $data];
+            
         } else {
             
         }

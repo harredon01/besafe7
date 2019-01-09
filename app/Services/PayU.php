@@ -1297,7 +1297,7 @@ class PayU {
     }
 
     public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform, $currency) {
-        if ($response['code'] == "SUCCESS" && false) {
+        if ($response['code'] == "SUCCESS") {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionContainer = [];

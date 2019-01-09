@@ -118,7 +118,7 @@ class EditOrder {
                 $order->is_recurring = $data["recurring"];
                 $order->recurring_type = $data["recurring_type"];
                 $order->recurring_value = $data["recurring_value"];
-                
+
                 $order->save();
                 $order->items;
                 $order->order_conditions = $order->orderConditions;
@@ -215,9 +215,9 @@ class EditOrder {
     public function getTransactionTotal($total) {
         return ($total * 0.0349 + 900);
     }
-    
+
     public function removeTransactionCost(Order $order) {
-        $order->orderConditions()->whereIn("name",["Costo fijo transaccion","Costo variable transaccion"])->delete();
+        $order->orderConditions()->whereIn("name", ["Costo fijo transaccion", "Costo variable transaccion"])->delete();
         Cart::session($order->user_id)::removeCartCondition("Costo fijo transaccion");
         Cart::session($order->user_id)::removeCartCondition("Costo variable transaccion");
     }
@@ -239,8 +239,8 @@ class EditOrder {
 //                    $condition = $order->orderConditions()->where("name","Costo variable transaccion")->first();
 //                    $cartCond = Cart::session($order->user_id)::getCondition("Costo variable transaccion");
                 }
-                
-                
+
+
                 $cart = $this->editCart->getCheckoutCart($user);
                 if ($cart['total'] > 0) {
                     $order->subtotal = $cart["subtotal"];
@@ -453,10 +453,8 @@ class EditOrder {
             $creditItemMerchant = $value->merchant_id;
             $order->merchant_id = $creditItemMerchant;
             if (array_key_exists("is_digital", $attributes)) {
-                if ($attributes['is_digital'] == 0) {
-                    if ($value) {
-                        $requiresShipping++;
-                    }
+                if (!$attributes['is_digital']) {
+                    $requiresShipping++;
                 }
             }
         }
@@ -814,6 +812,7 @@ class EditOrder {
                 $this->paymentStatusUpdate($payment, $platform, $order);
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
+                $order->status = "approved";
                 $this->orderStatusUpdate($payment, $platform, $order);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded

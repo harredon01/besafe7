@@ -14,15 +14,18 @@ class DenyPayment implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $payment;
+    
+    protected $platform;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Payment $payment )
+    public function __construct(Payment $payment ,$platform)
     {
         $this->payment = $payment;
+        $this->platform = $platform;
     }
 
     /**
@@ -32,6 +35,6 @@ class DenyPayment implements ShouldQueue
      */
     public function handle(EditOrder $editOrder)
     {
-        $editOrder->denyPayment($this->payment); 
+        $editOrder->denyPayment($this->payment,$this->platform); 
     }
 }
