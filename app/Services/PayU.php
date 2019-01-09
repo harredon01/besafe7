@@ -1297,7 +1297,7 @@ class PayU {
     }
 
     public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform, $currency) {
-        if ($response['code'] == "SUCCESS") {
+        if ($response['code'] == "SUCCESS" && false) {
             if ($user) {
                 $transactionResponse = $response['transactionResponse'];
                 $transactionContainer = [];
@@ -1535,9 +1535,9 @@ class PayU {
         $transactionState = $data['state_pol'];
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
         //dd($firma_cadena);
-        $firmacreada = md5($firma_cadena);
+        $firmacreada = sha1($firma_cadena);
         $firma = $data['sign'];
-        if (true) {
+        if ($firmacreada == $firma) {
             $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transactionExists) {
                 return ["status" => "success", "message" => "transaction already processed", "data" => $data];
@@ -1696,11 +1696,11 @@ class PayU {
         $currency = $data['currency'];
         $transactionState = $data['transactionState'];
         $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        $firmacreada = md5($firma_cadena);
+        $firmacreada = sha1($firma_cadena);
         $firma = $data['signature'];
         $estadoTx = "";
         $transactionId = $data['transactionId'];
-        if (true) {
+        if ($firma==$firmacreada) {
             //if (strtoupper($firma) == strtoupper($firmacreada)) {
             if ($data['transactionState'] == 4) {
                 $estadoTx = "Transaction approved";

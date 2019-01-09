@@ -187,7 +187,7 @@ class EditOrder {
                     $payment->address_id = $address->id;
                     $payment->order_id = $order->id;
                     $payment->status = "pending";
-                    $payment->total = $buyerTotal + $transactionCost;
+                    $payment->total = round($buyerTotal + $transactionCost);
                     $payment->tax = $buyerTax;
                     $payment->save();
                 }
@@ -312,7 +312,7 @@ class EditOrder {
                         $payment->address_id = $address->id;
                         $payment->order_id = $order->id;
                         $payment->status = "pending";
-                        $payment->total = $buyerSubtotal + $transactionCost;
+                        $payment->total = round($buyerSubtotal + $transactionCost);
                         $payment->tax = $buyerTax;
                         $payment->save();
                         $result = array("status" => "success", "message" => "Order submitted, payment created", "payment" => $payment, "order" => $order);
