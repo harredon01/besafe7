@@ -67,8 +67,9 @@ Route::get('safereportsext/{code?}', 'MapExternalController@report');
 Route::get('food/build_route_id/{id?}/{hash?}', 'FoodController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}/{hash?}', 'FoodController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}/{hash?}', 'FoodController@buildScenarioPositive');
-Route::get('food/get_scenario_structure/{scenario?}', 'FoodController@getScenarioStructure');
+Route::get('food/get_scenario_structure/{scenario?}/{polygon?}', 'FoodController@getScenarioStructure');
 Route::get('food/regenerate_scenarios/{polygon?}/{hash?}', 'FoodController@regenerateScenarios');
+Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
 Route::get('food/polygons', 'FoodController@getPolygons');
 

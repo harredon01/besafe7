@@ -1,6 +1,6 @@
 ﻿angular.module('besafe')
 
-        .controller('ProductsCtrl', function ($scope, Products, $rootScope) {
+        .controller('ProductsCtrl', function ($scope, Cart, $rootScope) {
             angular.element(document).ready(function () {
                 $scope.clean();
             });
@@ -17,7 +17,7 @@
                 });
             }
             $scope.addCartItem = function (product_variant_id, quantity) {
-                Products.addCartItem(product_variant_id, quantity).then(function (data) {
+                Cart.addCartItem(product_variant_id, quantity).then(function (data) {
                     if (data.status=="error") {
                         alert(data.message);
                     } else {
@@ -31,7 +31,7 @@
             }
 
         })
-        .controller('CartCtrl', function ($scope, Products, $rootScope) {
+        .controller('CartCtrl', function ($scope, Cart, $rootScope) {
             angular.element(document).ready(function () {
                 if(window.location.href=='http://hoovert.com/auth/login' || window.location.href=='http://www.hoovert.com/auth/login'){
                 } else {
@@ -54,7 +54,7 @@
                 $scope.getCart();
             });
             $scope.getCart = function () {
-                Products.getCart().then(function (data) {
+                Cart.getCart().then(function (data) {
                     if (data.status == 'error') {
                         alert(data.message);
                     } else {
@@ -69,7 +69,7 @@
             $scope.updateCartItem = function (product_variant_id) {
                 var quantity = angular.element(document.querySelector('input[name=quantity-' + product_variant_id + ']')).val();
                 console.log("da qty: "+quantity);
-                Products.updateCartItem(product_variant_id, quantity).then(function (data) {
+                Cart.updateCartItem(product_variant_id, quantity).then(function (data) {
                     if (data.status == 'error') {
                         alert(data.message);
                     } 
@@ -80,7 +80,7 @@
                         });
             }
             $scope.clearCart = function () {
-                Products.clearCart().then(function (data) {
+                Cart.clearCart().then(function (data) {
                     $scope.getCart();
                 },
                         function (data) {
@@ -88,7 +88,7 @@
                         });
             }
             $scope.deleteCartItem = function (product_variant_id) {
-                Products.updateCartItem(product_variant_id, 0).then(function (data) {
+                Cart.updateCartItem(product_variant_id, 0).then(function (data) {
                     if (data.status == 'error') {
                         alert(data.message);
                     } 

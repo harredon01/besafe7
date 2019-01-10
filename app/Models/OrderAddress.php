@@ -36,4 +36,7 @@ class OrderAddress extends Model
     public function order() {
         return $this->belongsTo('App\Models\Order');
     }
+    public function deliveries() {
+        return $this->hasMany('App\Models\Delivery');
+    }
 }

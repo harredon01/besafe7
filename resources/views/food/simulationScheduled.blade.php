@@ -22,6 +22,7 @@
   
                     <div >
                         <p>Rutas reprogramadas</p>
+                        <a href="/food/summary/{{ $polygon }}">Ver</a>
                     </div>
 
                 </div>

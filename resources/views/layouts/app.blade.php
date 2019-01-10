@@ -16,7 +16,7 @@
 
         <!-- Scripts -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-        <script src="/js/app.js"></script>
+        <!--script src="/js/app.js"></script-->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
@@ -43,7 +43,6 @@
         <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script src="{{ asset('/js/services/groups.js')}}"></script>
         <script src="{{ asset('/js/services/address.js')}}"></script>
-        <script src="https://js.stripe.com/v3/"></script>
 
         <script>
             window.Laravel = <?php
@@ -51,7 +50,6 @@ echo json_encode([
     'csrfToken' => csrf_token(),
 ]);
 ?>;
-    Stripe.setPublishableKey('pk_test_N5j29nGw3qH1kHNvtdwR6r1u');
         </script>
     </head>
     <body>

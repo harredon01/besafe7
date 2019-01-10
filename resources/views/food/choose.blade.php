@@ -24,6 +24,7 @@
                         <p>
                             <a href="/food/build_complete_scenario/preorganize-1/{{$result['scenario_hash']}}">Seleccionar</a>  <br>
                         <a href="/food/build_scenario_positive/preorganize-1/{{$result['scenario_hash']}}">Activar los positivios</a>  <br>
+                        <a href="/food/regenerate_scenarios/{{$polygon}}/{{$result['scenario_hash']}}">Volver a generar todo</a>  <br>
                         </p>
                         <ul>
                             @foreach ($data as $route)

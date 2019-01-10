@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\LocationController@moveOldLocations')->hourly();
         $schedule->call('App\Http\Controllers\GroupController@updateExpiredGroups')->daily();
         $schedule->call('App\Http\Controllers\PayuController@cronPayU')->hourly();
+        $schedule->call('App\Http\Controllers\FoodController@runRecurringTask')->hourly();
     }
 
     /**

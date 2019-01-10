@@ -74,9 +74,9 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure($scenario) {
+    public function getScenarioStructure($scenario,$polygon) {
         $results = $this->food->getTotalEstimatedShipping($scenario);
-        return view('food.choose')->with('data', $results['routes'])->with('result', $results['result']);
+        return view('food.choose')->with('data', $results['routes'])->with('result', $results['result'])->with('polygon', $polygon);
     }
     /**
      * Show the application dashboard to the user.
@@ -122,7 +122,34 @@ class FoodController extends Controller {
      */
     public function regenerateScenarios($polygon,$hash) {
         $this->food->regenerateScenarios($polygon,$hash);
-        return view('food.simulationScheduled');
+        return view('food.simulationScheduled')->with('polygon', $polygon);
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function regenerateDeliveries() {
+        $this->food->deleteRandomDeliveriesData();
+        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
+        foreach ($polygons as $value) {
+            $this->food->generateRandomDeliveries($value);
+        }
+        foreach ($polygons as $value) {
+            $this->food->prepareRoutingSimulation($value);
+        }
+        
+        return view('food.polygons')->with('polygons', $polygons);
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function runRecurringTask() {
+        $this->food->runRecurringTask();
     }
     
 

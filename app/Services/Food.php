@@ -241,10 +241,12 @@ class Food {
     }
     
     public function regenerateScenarios($polygon, $hash) {
-        $routes = CoveragePolygon::where("id", $polygon)->orderBy('id')->get();
-        //$checkResult = $this->checkScenario($routes, $hash);
+        $polygons = CoveragePolygon::where("id", $polygon)->orderBy('id')->get();
+        $checkResult = $this->checkScenario($polygons, $hash);
         if (true) {
-            $this->prepareRoutingSimulation($routes[0]);
+            foreach ($polygons as $item) {
+                $this->prepareRoutingSimulation($item);
+            }
         }
     }
 
@@ -362,7 +364,7 @@ class Food {
                             $descr = $descr . "Recoger envase, ";
                         }
                     }
-                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
+                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ". json_encode($delTotals);
                     $stopDel->region_name = $descr;
                     $deliveries = $deliveries . $descr;
                 }
@@ -478,7 +480,6 @@ class Food {
         //echo "Query results: " . count($deliveries) . PHP_EOL;
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
-        //dd($stops);
         if ($preOrganize) {
             $results = $this->createRoutes($stops, $results, $x, 'preorganize', true, $polygon);
         } else {
@@ -856,6 +857,26 @@ class Food {
         }
         return $stops;
     }
+    
+    public function deleteRandomDeliveriesData(){
+        $deliveries = Delivery::where("user_id", 1)->get();
+        foreach ($deliveries as $item) {
+            DB::table('delivery_stop')
+                    ->where('delivery_id', $item->id)
+                    ->delete();
+            DB::table('delivery_route')
+                    ->where('delivery_id', $item->id)
+                    ->delete();
+            $item->delete();
+        }
+        $routes = Route::where("status", "pending")->get();
+        foreach ($routes as $value) {
+            $value->stops()->delete();
+        }
+        Route::where("status", "pending")->delete();
+
+        OrderAddress::where("name", "test")->delete();
+    }
 
     public function generateRandomDeliveries(CoveragePolygon $polygon) {
         $lat = $polygon->lat;
@@ -948,7 +969,6 @@ class Food {
      * @return Response
      */
     public function prepareRoutingSimulation(CoveragePolygon $polygon) {
-        $this->deleteOldData();
         $results = [];
         $results2 = [];
         for ($x = 0; $x < 4; $x++) {
