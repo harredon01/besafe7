@@ -61,7 +61,7 @@ class MessagesApiController extends Controller {
         return response()->json([
                     'status' => "error",
                     'message' => "no user id parameter allowed"
-                        ], 401);
+                        ], 403);
     }
 
     /**

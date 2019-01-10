@@ -171,7 +171,7 @@ class LocationController extends Controller {
         return response()->json([
                     'status' => "error",
                     'message' => "no user id parameter allowed"
-                        ], 401);
+                        ], 403);
     }
     /**
      * Store a newly created resource in storage.
@@ -194,7 +194,7 @@ class LocationController extends Controller {
         return response()->json([
                     'status' => "error",
                     'message' => "Invalid Search"
-                        ], 401);
+                        ], 403);
     }
 
 }

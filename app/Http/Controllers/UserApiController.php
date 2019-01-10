@@ -69,7 +69,7 @@ class UserApiController extends Controller {
             }
             return response()->json($this->editUserData->updatePassword($user, $request->only("password")));
         }
-        return response()->json(['error' => 'invalid password'], 401);
+        return response()->json(['error' => 'invalid password'], 403);
     }
 
     /**
@@ -229,7 +229,7 @@ class UserApiController extends Controller {
         return response()->json([
                     'status' => "error",
                     'message' => "no user id parameter allowed"
-                        ], 401);
+                        ], 403);
     }
 
     /**
