@@ -73,7 +73,7 @@ class AuthApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request) {
-        $credentials = $request->all('area_code', 'cellphone', 'email');
+        $credentials = $request->all('area_code', 'cellphone', 'email','docNum','docType');
         $validator = $this->editUserData->validatorRegister($request->all());
 
         if ($validator->fails()) {
