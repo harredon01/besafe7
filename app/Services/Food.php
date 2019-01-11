@@ -224,7 +224,7 @@ class Food {
     }
 
     public function buildScenarioRouteId($id, $hash) {
-        $routes = App\Models\Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+        $routes = Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
             $this->buildScenarioTransit($routes);
@@ -232,10 +232,10 @@ class Food {
     }
 
     public function buildScenarioPositive($scenario, $hash) {
-        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->limit(1)->get();
+        $routes = Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->limit(1)->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
-            $routes = App\Models\Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
+            $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
             $this->buildScenarioTransit($routes);
         }
     }
@@ -251,7 +251,7 @@ class Food {
     }
 
     public function buildCompleteScenario($scenario, $hash) {
-        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+        $routes = Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
             $this->buildScenarioTransit($routes);
@@ -259,13 +259,12 @@ class Food {
     }
 
     public function generateHash($id, $created_at, $updated_at) {
-        return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
+        return base64_encode(Hash::make($id . $created_at .$updated_at. env('LONCHIS_KEY')));
     }
 
     public function checkHash($id, $created_at, $updated_at, $hash) {
         $keyDecoded = base64_decode($hash);
-        $generated = Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY'));
-        if (Hash::check($generated, $keyDecoded)) {
+        if (Hash::check($id . $created_at . $updated_at.env('LONCHIS_KEY'), $keyDecoded)) {
             return true;
         } else {
             return false;
@@ -339,7 +338,6 @@ class Food {
     }
 
     public function buildScenarioTransit($routes) {
-//        dd($results);
         $totalCost = 0;
         $config = $this->loadDayConfig();
         $totalIncomeShipping = 0;
@@ -358,13 +356,14 @@ class Food {
                     $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
                     $delTotals = $this->printTotalsConfig($delConfig);
                     $stopDel->totals = $delTotals;
+                    $delUser = $stopDel->user;
                     $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
                     if (array_key_exists("pickup", $details)) {
                         if ($details['pickup'] == "envase") {
                             $descr = $descr . "Recoger envase, ";
                         }
                     }
-                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ". json_encode($delTotals);
+                    $descr = $descr . "Entrada: " . $delTotals["keywords"][0]. " " . $delTotals["dish"][0]. " | ";
                     $stopDel->region_name = $descr;
                     $deliveries = $deliveries . $descr;
                 }
@@ -380,7 +379,7 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-            $route->status = "built";
+            $route->status = "created";
             $rapigoResponse = $platFormService->getEstimate($queryStops);
             $type = "stops";
             if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
@@ -393,18 +392,17 @@ class Food {
                 $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
             }
             $serviceBookResponse = $platFormService->createRoute($queryStops, $type);
-            $stopCodes = $serviceBookResponse['points'];
-            $route->code = $serviceBookResponse['key'];
+            $stopCodes = $serviceBookResponse['paradas_referencia'];
             $route->coverage = json_encode($serviceBookResponse);
             $i = 0;
             foreach ($stops as $stop) {
-                $stop->code = $stopCodes[$i];
+                $stop->code = $stopCodes[$i]["ref_parada"];
                 $stop->save();
                 $i++;
             }
             // temp
-            $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
-            $route->unit_cost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+//            $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+//            $route->unit_cost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             $route->save();
             $route->stops = $stops;
             $totalIncomeShipping += $route->unit_price;
@@ -869,11 +867,11 @@ class Food {
                     ->delete();
             $item->delete();
         }
-        $routes = Route::where("status", "pending")->get();
+        $routes = Route::whereIn("status", ["pending","created"])->get();
         foreach ($routes as $value) {
             $value->stops()->delete();
+            $value->delete();
         }
-        Route::where("status", "pending")->delete();
 
         OrderAddress::where("name", "test")->delete();
     }
@@ -892,7 +890,7 @@ class Food {
         //$articles = Article::where('start_date',$date)->get();
         $articles = Article::where('start_date', "2018-09-01")->get();
         //$date = date_create();
-        $total = rand(1, 8);
+        $total = rand(1, 2);
         for ($x = 0; $x <= $total; $x++) {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;

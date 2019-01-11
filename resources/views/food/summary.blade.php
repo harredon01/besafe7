@@ -27,10 +27,10 @@
                         Resultado mas optimo: {{$data['winner']}}
                     </p>
                     <p>
-                        <a href="/food/regenerate_scenarios/{{$polygon_id}}/qweqwe">Regenerar Simulacion</a>
+                        <a target="_blank" href="/food/regenerate_scenarios/{{$polygon_id}}/qweqwe">Regenerar Simulacion</a>
                     </p>
                     <p>
-                        <a href="/food/regenerate_deliveries">Regenerar Entregas de mentira</a>
+                        <a target="_blank" href="/food/regenerate_deliveries">Regenerar Entregas de mentira</a>
                     </p>
 
                     <p>
@@ -44,9 +44,9 @@
                         Numero de rutas: {{$data['resultsPre']['routes']}}<br>
                         Numero de numero de almuerzos: {{$data['resultsPre']['lunches']}}<br>
                         Promedio almuerzos por ruta: {{$data['resultsPre']['lunch_route']}}<br>
-                        <a href="/food/build_complete_scenario/simple-1/{{$data['resultsPre']['scenario_hash']}}">Seleccionar</a> <br>
-                        <a href="/food/build_scenario_positive/simple-1/{{$data['resultsSimple']['scenario_hash']}}">Activar los positivios</a>  <br>
-                        <a href="/food/get_scenario_structure/simple-1/{{$polygon_id}}">Ver</a>
+                        <a target="_blank" href="/food/build_complete_scenario/simple-1/{{$data['resultsPre']['scenario_hash']}}">Seleccionar</a> <br>
+                        <a target="_blank" href="/food/build_scenario_positive/simple-1/{{$data['resultsSimple']['scenario_hash']}}">Activar los positivios</a>  <br>
+                        <a target="_blank" href="/food/get_scenario_structure/simple-1/{{$polygon_id}}">Ver</a>
                     </p>
                     <p>
                         Resumen Escenario Pre: <br>
@@ -59,9 +59,9 @@
                         Numero de rutas: {{$data['resultsSimple']['routes']}}<br>
                         Numero de numero de almuerzos: {{$data['resultsSimple']['lunches']}}<br>
                         Promedio almuerzos por ruta: {{$data['resultsSimple']['lunch_route']}}<br>
-                        <a href="/food/build_complete_scenario/preorganize-1/{{$data['resultsSimple']['scenario_hash']}}">Seleccionar</a>  <br>
-                        <a href="/food/build_scenario_positive/preorganize-1/{{$data['resultsSimple']['scenario_hash']}}">Activar los positivios</a>  <br>
-                        <a href="/food/get_scenario_structure/preorganize-1/{{$polygon_id}}">Ver</a>
+                        <a target="_blank" href="/food/build_complete_scenario/preorganize-1/{{$data['resultsSimple']['scenario_hash']}}">Seleccionar</a>  <br>
+                        <a target="_blank" href="/food/build_scenario_positive/preorganize-1/{{$data['resultsSimple']['scenario_hash']}}">Activar los positivios</a>  <br>
+                        <a target="_blank" href="/food/get_scenario_structure/preorganize-1/{{$polygon_id}}">Ver</a>
                     </p>
 
                     <!-- Salutation -->

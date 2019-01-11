@@ -27,7 +27,7 @@
                                 <h2>
                                     {{ $polygon->id }}
                                 </h2>
-                                <a href="/food/summary/{{ $polygon->id }}">Ver</a>
+                                <a target="_blank" href="/food/summary/{{ $polygon->id }}">Ver</a>
                             </li>
                             @endforeach
                         </ul>
