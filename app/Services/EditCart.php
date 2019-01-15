@@ -92,7 +92,7 @@ class EditCart {
         $taxTotal = 0;
 
         foreach ($taxItems as $item) {
-            $taxTotal += $item->getCalculatedValue($subTotal - $couponTotal - $saleTotal);
+            $taxTotal += $item->getCalculatedValue($subTotal);
         }
         $shippingItems = Cart::session($user->id)->getConditionsByType("shipping");
         $shippingTotal = 0;
@@ -102,6 +102,7 @@ class EditCart {
         $data['shipping'] = $shippingTotal;
         $data['subtotal'] = $subTotal;
         $data['discount'] = 0;
+        $data['total'] = Cart::session($user->id)->getTotal();
         $data['tax'] = $taxTotal;
         $cartConditions = Cart::session($user->id)->getConditions();
         $resultConditions = [];
@@ -115,12 +116,13 @@ class EditCart {
             $cond['getEffect'] = substr($condition->getValue(), 0, 1); // the order of the condition
             $cond['getAttributes'] = $condition->getAttributes(); // the attributes of the condition, returns an empty [] if no attributes added
             $value = $condition->getCalculatedValue($subTotal);
+            
             $cond['total'] = $value;
-            if (substr($condition->getValue(), 0, 1) == "-") {
+            /*if (substr($condition->getValue(), 0, 1) == "-") {
                 $subTotal = $subTotal - $value;
             } else {
                 $subTotal = $subTotal + $value;
-            }
+            }*/
 
             array_push($resultConditions, $cond);
         }
@@ -130,7 +132,7 @@ class EditCart {
         $data['requires_authorization'] = $requires_authorization;
         $data['is_subscription'] = $is_subscription;
         $data['totalItems'] = $totalItems;
-        $data['total'] = Cart::session($user->id)->getTotal();
+        
 
         return $data;
     }

@@ -69,7 +69,7 @@ class EditOrderFood {
             }
             $conditionF = new OrderCondition(array(
                 'name' => "Costo fijo transaccion",
-                'target' => "total",
+                'target' => "subtotal",
                 'type' => self::PLATFORM_NAME,
                 'value' => "+900",
                 'total' => 900,
@@ -89,14 +89,14 @@ class EditOrderFood {
                 'type' => $conditionF->type,
                 'target' => $conditionF->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
                 'value' => $conditionF->value,
-                'order' => 1
+                'order' => 100
             ));
             $condition2V = new CartCondition(array(
                 'name' => $conditionV->name,
                 'type' => $conditionV->type,
                 'target' => $conditionV->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
                 'value' => $conditionV->value,
-                'order' => 1
+                'order' => 100
             ));
             Cart::session($user->id)->condition([$condition2F,$condition2V]);
         }
