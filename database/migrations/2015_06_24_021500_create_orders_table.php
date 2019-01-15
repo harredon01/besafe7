@@ -36,7 +36,6 @@ class CreateOrdersTable extends Migration {
                         $table->boolean('is_editable')->nullable();
                         $table->string('recurring_type')->nullable();
                         $table->string('recurring_value')->nullable();
-                        $table->string('execution_status')->nullable();
                         $table->boolean('requires_authorization');
                         $table->integer('payment_method_id')->unsigned()->nullable();
                         $table->foreign('payment_method_id')->references('id')
