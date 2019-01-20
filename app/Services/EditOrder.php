@@ -17,6 +17,7 @@ use App\Services\PayU;
 use App\Services\Stripe;
 use App\Services\Geolocation;
 use App\Services\EditAlerts;
+use App\Mail\OrderApproved;
 use Mail;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -208,7 +209,7 @@ class EditOrder {
                 "user_status" => $user->getUserNotifStatus()
             ];
             $date = date("Y-m-d H:i:s");
-            return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, self::PLATFORM_NAME);
+            return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
         }
     }
 
@@ -735,7 +736,7 @@ class EditOrder {
      *
      * @return Response
      */
-    public function paymentStatusUpdate(Payment $payment, $platform, Order $order) {
+    public function paymentStatusUpdate(Payment $payment, Order $order) {
         $user = $payment->user;
         $followers = [];
         array_push($followers, $user);
@@ -760,7 +761,7 @@ class EditOrder {
             "user_status" => $user->getUserNotifStatus()
         ];
         $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, $platform);
+        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
     }
 
     /**
@@ -771,8 +772,16 @@ class EditOrder {
     public function OrderStatusUpdate(Payment $payment, $platform, Order $order) {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
+        $sendEmail = true;
+        if($order->status == "approved"){
+            $shipping = $order->orderAddresses()->where("type", "shipping")->first();
+            $sendEmail = false;
+        }
         foreach ($payments as $item) {
             $user = $item->user;
+            if($order->status == "approved"){
+                Mail::to($user)->send(new OrderApproved($order, $user, $shipping));
+            }
             array_push($followers, $user);
         }
 
@@ -796,7 +805,7 @@ class EditOrder {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $platform);
+        $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
     }
 
     public function approvePayment(Payment $payment, $platform) {
@@ -809,11 +818,11 @@ class EditOrder {
             if ($payments > 0) {
                 $order->status = "Pending-" . $payments;
                 $order->save();
-                $this->paymentStatusUpdate($payment, $platform, $order);
+                $this->paymentStatusUpdate($payment, $order);
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
                 $order->status = "approved";
-                $this->orderStatusUpdate($payment, $platform, $order);
+                $this->orderStatusUpdate($payment, $order);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
@@ -825,7 +834,7 @@ class EditOrder {
         $payment->status = "denied";
         $order = $payment->order;
         $payment->save();
-        $this->paymentStatusUpdate($payment, $platform, $order);
+        $this->paymentStatusUpdate($payment, $order);
         $className = "App\\Services\\EditOrder" . ucfirst($platform);
         $platFormService = new $className; //// <--- this thing will be autoloaded
         return $platFormService->denyPayment($payment);

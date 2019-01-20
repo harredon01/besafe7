@@ -63,82 +63,106 @@ class EditAlerts {
         DB::update($sql, $numbers);
         return ['success' => 'notifications updated'];
     }
-
-    public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date, $platform = NULL) {
-        $arrayPushHife = array();
-        $arrayPushFood = array();
-        $arrayEmail = array();
-        $arrayContent = array();
-        $notification = null;
-        $sign = $data['sign'];
-        unset($data['sign']);
+    public function buildMessage($userSending,$data){
+        $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
+        $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
+        $arrayPayload = $data['payload'];
         if ($userSending) {
-            $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
-            $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
-            $arrayPayload = $data['payload'];
             if ($translationEsp) {
                 $data['subject_es'] = str_replace("{user}", $userSending->name, $translationEsp->value);
+                $data['body_es'] = str_replace("{user}", $userSending->name, $translationEsp->body);
             }
             if ($translation) {
                 $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
+                $data['body'] = str_replace("{user}", $userSending->name, $translation->body);
             }
         } else {
-            $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
-            $translationesp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
-            $arrayPayload = $data['payload'];
             if ($translation) {
                 $data['subject'] = $translation->value;
+                $data['body'] = $translation->body;
             }
             if ($translationesp) {
                 $data['subject_es'] = $translationesp->value;
+                $data['body_es'] = $translationesp->body;
             }
         }
         $pos = strpos("e" . $data['type'], 'Report');
         if ($pos) {
             $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
             $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
+            $data['body'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['body']);
+            $data['body_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['body_es']);
         }
         $pos = strpos("e" . $data['type'], 'Merchant');
         if ($pos) {
             $data['subject'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject']);
             $data['subject_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['subject_es']);
+            $data['body'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['body']);
+            $data['body_es'] = str_replace("{trigger}", $arrayPayload['object_type'] . " " . $arrayPayload['object_name'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{group}');
         if ($pos) {
             $data['subject'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject']);
             $data['subject_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['subject_es']);
+            $data['body'] = str_replace("{group}", $arrayPayload['group_name'], $data['body']);
+            $data['body_es'] = str_replace("{group}", $arrayPayload['group_name'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{order}');
         if ($pos) {
             $data['subject'] = str_replace("{order}", $arrayPayload['order_id'], $data['subject']);
             $data['subject_es'] = str_replace("{order}", $arrayPayload['order_id'], $data['subject_es']);
+            $data['body'] = str_replace("{order}", $arrayPayload['order_id'], $data['body']);
+            $data['body_es'] = str_replace("{order}", $arrayPayload['order_id'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{orderTotal}');
         if ($pos) {
             $data['subject'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['subject']);
             $data['subject_es'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['subject_es']);
+            $data['body'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['body']);
+            $data['body_es'] = str_replace("{orderTotal}", $arrayPayload['order_total'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{orderStatus}');
         if ($pos) {
             $data['subject'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject']);
             $data['subject_es'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject_es']);
+            $data['body'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['body']);
+            $data['body_es'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{payment}');
         if ($pos) {
             $data['subject'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['subject']);
             $data['subject_es'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['subject_es']);
+            $data['body'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['body']);
+            $data['body_es'] = str_replace("{payment}", $arrayPayload['payment_id'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{paymentStatus}');
         if ($pos) {
             $data['subject'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject']);
             $data['subject_es'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject_es']);
+            $data['body'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['body']);
+            $data['body_es'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{paymentTotal}');
         if ($pos) {
             $data['subject'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['subject']);
             $data['subject_es'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['subject_es']);
+            $data['body'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['body']);
+            $data['body_es'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['body_es']);
         }
-        if ($data) {
+        return $data;
+    }
+
+    public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date, $sendEmail = true) {
+        $arrayPushHife = array();
+        $arrayPushFood = array();
+        $arrayEmail = array();
+        $arrayContent = array();
+        $notification = null;
+        $arrayPayload = $data['payload'];
+        $sign = $data['sign'];
+        unset($data['sign']);
+        $data = $this->buildMessage($userSending, $data);
+        if ($date) {
             $data['notification_id'] = strtotime($date);
         } else {
             $data['notification_id'] = strtotime(date("Y-m-d H:i:s"));
@@ -160,21 +184,23 @@ class EditAlerts {
                     }
                     $data['user_id'] = $user->id;
                     $subjectEs = $data['subject_es'];
+                    $body = $data['body'];
+                    $bodyEs = $data['body_es'];
                     unset($data['subject_es']);
+                    unset($data['body']);
+                    unset($data['body_es']);
                     $notification = new Notification($data);
                     $notification->save();
                     $data['subject_es'] = $subjectEs;
+                    $data['body'] = $body;
+                    $data['body_es'] = $bodyEs;
                     $arrayContent[] = $data;
-                    if ($user->emailNotifications) {
+                    if ($user->emailNotifications && $sendEmail) {
                         array_push($arrayEmail, array("name" => $user->name, "email" => $user->email));
                     }
 
                     if ($user->pushNotifications && $push) {
-                        if ($platform) {
-                            
-                        } else {
-                            $platform = "hife";
-                        }
+                        $platform = "food";
                         $result = $user->push()->where('platform', $platform)->first();
                         if ($result) {
                             if ($result->platform == "hife") {

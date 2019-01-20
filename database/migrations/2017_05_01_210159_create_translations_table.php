@@ -18,6 +18,7 @@ class CreateTranslationsTable extends Migration
             $table->string('code');
             $table->string('language');
             $table->string('value');
+            $table->text('body');
             $table->timestamps();
         });
     }

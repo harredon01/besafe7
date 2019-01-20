@@ -1,0 +1,15 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "web",
+    "site": "https://www.lonchis.com.co"
+  }
+},{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.recurring.food",
+    "sha256_cert_fingerprints":
+    ["AA:4C:FC:02:1D:41:7A:67:B2:5F:EE:12:10:6D:1D:D5:88:B6:C7:15:08:64:58:5B:18:1A:A9:2E:DF:06:FA:E7"]
+  }
+}]

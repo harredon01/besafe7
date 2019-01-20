@@ -18,6 +18,6 @@ class Translation extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id','code','language','value'];
+    protected $fillable = ['id','code','language','value','body'];
 
 }
