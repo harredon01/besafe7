@@ -20,7 +20,9 @@ class CreatePushTable extends Migration
             $table->foreign('user_id')->references('id')
                                 ->on('users');
             $table->string('push');
+            $table->string('platform');
             $table->string('object_id');
+            $table->double('credits');
             $table->timestamps();
         });
     }
