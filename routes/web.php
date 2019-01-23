@@ -132,3 +132,9 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment,$user,$url,$pdf);
 });
+Route::get('/test_order', function () {
+    $order = App\Models\Order::find(9);
+    $user = App\Models\User::find(2);
+    $shipping = App\Models\OrderAddress::find(10);
+    return new App\Mail\OrderApproved($order, $user, $shipping);
+});

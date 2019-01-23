@@ -37,7 +37,7 @@ class PayU {
             "description" => "besafe payment test",
             "language" => "es",
             "signature" => $sig,
-            "notifyUrl" => "http://hoovert.com/api/payu/webhook",
+            "notifyUrl" => "https://lonchis.com.co/api/payu/webhook",
         ];
         return $orderCont;
     }
@@ -430,7 +430,7 @@ class PayU {
 
 
         $extraParams = [
-            "RESPONSE_URL" => "http://hoovert.com/payu/return",
+            "RESPONSE_URL" => "https://lonchis.com.co/payu/return",
             "PSE_REFERENCE1" => $data['ip_address'],
             "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
             "USER_TYPE" => $data['user_type'],
@@ -1001,7 +1001,7 @@ class PayU {
             "customer" => $customer,
             "plan" => $plan,
             "deliveryAddress" => $address,
-            "notifyUrl" => "http://hoovert.com/api/payu/webhook",
+            "notifyUrl" => "https://lonchis.com.co/api/payu/webhook",
         ];
         $response = $this->sendPost($dataSent, $url);
         if (array_key_exists("id", $response)) {

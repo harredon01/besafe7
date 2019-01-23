@@ -131,20 +131,20 @@ class EditOrder {
     }
 
     public function addItemsToOrder(User $user, Order $order) {
+        $cart = $this->editCart->getCart($user);
         Item::where('user_id', $user->id)
                 ->whereNull('order_id')
                 ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
         $cartConditions = Cart::session($user->id)->getConditions();
-        $resultConditions = [];
         $order->orderConditions()->delete();
-        $cart = $this->editCart->getCart($user);
+        
         foreach ($cartConditions as $condition) {
             $cond = array();
             $cond['target'] = $condition->getTarget(); // the target of which the condition was applied
             $cond['name'] = $condition->getName(); // the name of the condition
             $cond['type'] = $condition->getType(); // the type
             $cond['value'] = $condition->getValue(); // the value of the condition
-            $cond['order'] = $condition->getOrder(); // the order of the condition
+            $cond['order'] = $cart['subtotal']; // the order of the condition
             $cond['attributes'] = json_encode($condition->getAttributes()); // the attributes of the condition, returns an empty [] if no attributes added
             $value = $condition->getCalculatedValue($cart['subtotal']);
             $cond['order_id'] = $order->id; // the name of the condition

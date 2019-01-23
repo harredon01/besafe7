@@ -4,12 +4,10 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use App\Models\Order;
-use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class OrderApproved extends Mailable
+class GeneralNotification extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -18,32 +16,23 @@ class OrderApproved extends Mailable
      *
      * @var Order
      */
-    public $order;
-    
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
-    public $shipping;
-    
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
     public $user;
+    /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $data;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Order $order,User $user,$shipping)
+    public function __construct(User $user,$data )
     {
-        $this->order = $order;
         $this->user = $user;
-        $this->shipping = $shipping;
+        $this->data = $data;
     }
 
     /**
@@ -53,6 +42,6 @@ class OrderApproved extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.orders.approved');
+        return $this->view('emails.general-notification-email');
     }
 }
