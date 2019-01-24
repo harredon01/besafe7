@@ -164,7 +164,9 @@ class EditLocation {
     public function parseLocation($location, User $user) {
         $data = [];
         $data["lat"] = $location['coords']['latitude'];
-        $data['uuid'] = $location['uuid'];
+        if (array_key_exists('uuid', $location)) {
+            $data['uuid'] = $location['uuid'];
+        }
         $time = strtotime($location['timestamp']);
         $data["report_time"] = date("Y-m-d H:i:s", $time);
         $data["long"] = $location['coords']['longitude'];
@@ -223,75 +225,76 @@ class EditLocation {
             }
         }
         $data = $this->parseLocation($location, $user);
-        $results = Location::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
+        if (array_key_exists('uuid', $data)) {
+            $results = Location::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
 
-        if ($results) {
-            return ['error' => 'location exists'];
-        }
-        $results = HistoricLocation::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
-        if ($results) {
-            return ['error' => 'location exists'];
-        } else {
-            unset($data['location']);
-            if ($user->is_tracking != 1 || $user->trip == 0) {
-                if ($extras['trackingStatus'] == "finishing") {
-                    return ['error' => 'Trip ended'];
-                }
-                $user->makeTrip();
-                $saveuser = true;
+            if ($results) {
+                return ['error' => 'location exists'];
             }
-            $data["trip"] = $user->trip;
-            $dalocation = Location::create($data);
-            if ($extras) {
-                if ($extras['trackingStatus'] == "finishing") {
-                    if (array_key_exists("code", $extras)) {
-                        $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
-                        $code = $extras['code'];
+            $results = HistoricLocation::where('uuid', $data['uuid'])->where('user_id', $user->id)->first();
+            if ($results) {
+                return ['error' => 'location exists'];
+            }
+        }
+        unset($data['location']);
+        if ($user->is_tracking != 1 || $user->trip == 0) {
+            if ($extras['trackingStatus'] == "finishing") {
+                return ['error' => 'Trip ended'];
+            }
+            $user->makeTrip();
+            $saveuser = true;
+        }
+        $data["trip"] = $user->trip;
+        $dalocation = Location::create($data);
+        if ($extras) {
+            if ($extras['trackingStatus'] == "finishing") {
+                if (array_key_exists("code", $extras)) {
+                    $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName);
+                    $code = $extras['code'];
 
-                        if ($code) {
-                            $result = $this->editAlerts->checkUserCode($user, $code);
-                            if ($result['status'] == "success") {
-                                $followers = $user->getCurrentFollowers();
-                                $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName, "status" => "success");
-                                $message = [
-                                    "trigger_id" => $user->id,
-                                    "message" => "",
-                                    "payload" => $payload,
-                                    "type" => self::LOCATION_LAST,
-                                    "object" => self::OBJECT_USER,
-                                    "sign" => true,
-                                    "user_status" => "normal"
-                                ];
-                                $user->is_tracking = 0;
-                                $user->hash = "";
-                                $user->trip = 0;
-                                $saveuser = true;
-                                $date = $user->updateFollowersDate("normal");
-                                $this->editAlerts->sendMassMessage($message, $followers, $user, true,$date);
-                                $dalocation->status = "stopped";
-                                $dalocation->islast = true;
-                                $dalocation->save();
-                                $storeTripCall = true;
-                            }
+                    if ($code) {
+                        $result = $this->editAlerts->checkUserCode($user, $code);
+                        if ($result['status'] == "success") {
+                            $followers = $user->getCurrentFollowers();
+                            $payload = array("trip" => $user->trip, "first_name" => $user->firstName, "last_name" => $user->lastName, "status" => "success");
+                            $message = [
+                                "trigger_id" => $user->id,
+                                "message" => "",
+                                "payload" => $payload,
+                                "type" => self::LOCATION_LAST,
+                                "object" => self::OBJECT_USER,
+                                "sign" => true,
+                                "user_status" => "normal"
+                            ];
+                            $user->is_tracking = 0;
+                            $user->hash = "";
+                            $user->trip = 0;
+                            $saveuser = true;
+                            $date = $user->updateFollowersDate("normal");
+                            $this->editAlerts->sendMassMessage($message, $followers, $user, true, $date);
+                            $dalocation->status = "stopped";
+                            $dalocation->islast = true;
+                            $dalocation->save();
+                            $storeTripCall = true;
                         }
                     }
                 }
             }
-
-            if ($user->write_report) {
-                $saveuser = true;
-                $user->write_report = false;
-                $this->writeReport($user, $data);
-            }
-            if ($saveuser) {
-                $user->save();
-            }
-            if ($storeTripCall) {
-                $this->saveEndTrip($user);
-            }
-
-            return ['success' => 'location saved'];
         }
+
+        if ($user->write_report) {
+            $saveuser = true;
+            $user->write_report = false;
+            $this->writeReport($user, $data);
+        }
+        if ($saveuser) {
+            $user->save();
+        }
+        if ($storeTripCall) {
+            $this->saveEndTrip($user);
+        }
+
+        return ['success' => 'location saved'];
     }
 
     /**

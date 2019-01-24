@@ -137,7 +137,7 @@ class EditOrder {
                 ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
         $cartConditions = Cart::session($user->id)->getConditions();
         $order->orderConditions()->delete();
-        
+
         foreach ($cartConditions as $condition) {
             $cond = array();
             $cond['target'] = $condition->getTarget(); // the target of which the condition was applied
@@ -453,8 +453,8 @@ class EditOrder {
             }
             $creditItemMerchant = $value->merchant_id;
             $order->merchant_id = $creditItemMerchant;
-            if (array_key_exists("is_digital", $attributes)) {
-                if (!$attributes['is_digital']) {
+            if (array_key_exists("is_shippable", $attributes)) {
+                if ($attributes['is_shippable']) {
                     $requiresShipping++;
                 }
             }
@@ -769,17 +769,17 @@ class EditOrder {
      *
      * @return Response
      */
-    public function OrderStatusUpdate(Payment $payment, $platform, Order $order) {
+    public function OrderStatusUpdate(Payment $payment, Order $order) {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
         $sendEmail = true;
-        if($order->status == "approved"){
+        if ($order->status == "approved") {
             $shipping = $order->orderAddresses()->where("type", "shipping")->first();
             $sendEmail = false;
         }
         foreach ($payments as $item) {
             $user = $item->user;
-            if($order->status == "approved"){
+            if ($order->status == "approved") {
                 Mail::to($user)->send(new OrderApproved($order, $user, $shipping));
             }
             array_push($followers, $user);

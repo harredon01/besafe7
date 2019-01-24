@@ -76,9 +76,10 @@ Route::get('food/polygons', 'FoodController@getPolygons');
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
+    $deliveries = App\Models\Delivery::where("status","transit")->get();
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getPurchaseOrder();
+    $data = $gateway->getPurchaseOrder($deliveries);
     $data['level']="";
     return new App\Mail\PurchaseOrder($data);
 });
@@ -86,7 +87,7 @@ Route::get('/route_organize', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
-    $results = App\Models\Route::where("type", "preorganize")->where("status", "pending")->with(['deliveries.user'])->get();
+    $results = App\Models\Route::where("type", "preorganize-1")->where("status", "pending")->with(['deliveries.user'])->get();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
     $data = $gateway->buildScenario($results);
     return new App\Mail\RouteOrganize($data);

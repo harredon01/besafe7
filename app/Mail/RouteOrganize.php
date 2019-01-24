@@ -35,6 +35,6 @@ class RouteOrganize extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.distribution-email');
+        return $this->markdown('emails.food.distribution');
     }
 }

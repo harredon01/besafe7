@@ -239,6 +239,7 @@ class EditMessages {
                     unset($data['to_id']);
                     $dauser = $data['payload'];
                     $dauser['is_admin'] = $data['is_admin'];
+                    unset($data['is_admin']);
                     $data['payload'] = $dauser;
                     $this->editAlerts->sendMassMessage($data, $followers, $user, $notif,null);
                 }

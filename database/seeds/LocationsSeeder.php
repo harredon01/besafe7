@@ -35,6 +35,8 @@ class LocationsSeeder extends Seeder {
         DB::table('vehicles')->delete();
         DB::table('cargos')->delete();
         DB::table('translations')->delete();
+        DB::table('order_addresses')->delete();
+        DB::table('coverage_polygons')->delete();
 
         DB::table('categories')->delete();
         DB::table('notifications')->delete();
@@ -50,6 +52,7 @@ class LocationsSeeder extends Seeder {
         DB::table('contacts')->delete();
         DB::table('merchant_payment_methods')->delete();
         DB::table('merchant_user')->delete();
+        DB::table('merchant_product')->delete();
         DB::table('addresses')->delete();
         
         DB::table('category_product')->delete();

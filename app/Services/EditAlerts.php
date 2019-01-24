@@ -81,9 +81,9 @@ class EditAlerts {
                 $data['subject'] = $translation->value;
                 $data['body'] = $translation->body;
             }
-            if ($translationesp) {
-                $data['subject_es'] = $translationesp->value;
-                $data['body_es'] = $translationesp->body;
+            if ($translationEsp) {
+                $data['subject_es'] = $translationEsp->value;
+                $data['body_es'] = $translationEsp->body;
             }
         }
         $pos = strpos("e" . $data['type'], 'Report');

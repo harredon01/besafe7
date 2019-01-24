@@ -22,6 +22,7 @@ class CreateDeliveriesTable extends Migration
             $table->string('code')->nullable();
             $table->double('shipping')->nullable();
             $table->string('observation')->nullable();
+            $table->string('status')->nullable();
             $table->integer('group_id')->unsigned()->nullable();
             $table->foreign('group_id')->references('id')
                     ->on('groups');

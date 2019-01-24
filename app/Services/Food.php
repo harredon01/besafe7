@@ -212,7 +212,7 @@ class Food {
         } else {
             $result['status'] = "failure";
         }
-        return array("routes"=>$routes,"result"=>$result);
+        return array("routes" => $routes, "result" => $result);
     }
 
     public function checkScenario($results, $hash) {
@@ -239,7 +239,7 @@ class Food {
             $this->buildScenarioTransit($routes);
         }
     }
-    
+
     public function regenerateScenarios($polygon, $hash) {
         $polygons = CoveragePolygon::where("id", $polygon)->orderBy('id')->get();
         $checkResult = $this->checkScenario($polygons, $hash);
@@ -364,7 +364,7 @@ class Food {
                             $descr = $descr . "Recoger envase, ";
                         }
                     }
-                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ". json_encode($delTotals);
+                    $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> " . json_encode($delTotals);
                     $stopDel->region_name = $descr;
                     $deliveries = $deliveries . $descr;
                 }
@@ -857,8 +857,8 @@ class Food {
         }
         return $stops;
     }
-    
-    public function deleteRandomDeliveriesData(){
+
+    public function deleteRandomDeliveriesData() {
         $deliveries = Delivery::where("user_id", 1)->get();
         foreach ($deliveries as $item) {
             DB::table('delivery_stop')
@@ -899,7 +899,7 @@ class Food {
             $address = OrderAddress::create([
                         "user_id" => 1,
                         "name" => "test",
-                        "city_id" => 524, 
+                        "city_id" => 524,
                         "region_id" => 11,
                         "country_id" => 1,
                         "address" => "Carrera 7a # 64-44",
@@ -945,7 +945,7 @@ class Food {
         echo 'lng (min/max): ' . $lng_min . '/' . $lng_max . PHP_EOL;
         echo 'lat (min/max): ' . $lat_min . '/' . $lat_max . PHP_EOL;
     }
-    
+
     public function deleteOldData() {
         $routes = Route::where("status", "pending")->get();
         foreach ($routes as $value) {
@@ -955,8 +955,8 @@ class Food {
             $stops = $value->stops;
             foreach ($stops as $item) {
                 DB::table('delivery_stop')
-                    ->where('stop_id', $item->id)
-                    ->delete();
+                        ->where('stop_id', $item->id)
+                        ->delete();
                 $item->delete();
             }
         }
@@ -989,7 +989,7 @@ class Food {
 
     public function runCompleteSimulation() {
 
-        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
+        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
             $this->prepareRoutingSimulation($polygon);
@@ -998,26 +998,27 @@ class Food {
     }
 
     public function runRecurringTask() {
-        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
+        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         $user = User::find(2);
         foreach ($polygons as $polygon) {
             $this->prepareRoutingSimulation($polygon);
             $results = $this->getShippingCosts($polygon->id);
             Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $polygon->id));
         }
-        $deliveries = Delivery::where("status","transit")->get();
-        $this->getPurchaseOrder($deliveries); 
+        $deliveries = Delivery::where("status", "transit")->get();
+        $this->getPurchaseOrder($deliveries);
     }
+
     public function runInstructions() {
         $user = User::find(2);
-        $routes = Route::where("status","built")->with(['deliveries.user'])->get();
+        $routes = Route::where("status", "built")->with(['deliveries.user'])->get();
         $results = $this->buildScenario($routes);
         Mail::to($user)->send(new RouteOrganize($results));
         Mail::to($user)->send(new RouteDeliver($results));
     }
 
     public function testDataCompleteSimulation() {
-        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
+        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }
@@ -1040,7 +1041,7 @@ class Food {
         } else {
             $winningScenario = "Simple";
         }
-        
+
         return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
     }
 
@@ -1175,6 +1176,13 @@ class Food {
         foreach ($reader as $row) {
             if ($row['id']) {
                 CoveragePolygon::create($row);
+            }
+        }
+        $excel = Excel::load(storage_path('imports') . '/articles.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            if ($row['id']) {
+                Article::create($row);
             }
         }
     }

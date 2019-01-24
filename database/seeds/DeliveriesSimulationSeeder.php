@@ -24,7 +24,7 @@ class DeliveriesSimulationSeeder extends Seeder {
         foreach ($polygons as $value) {
             $this->food->prepareRoutingSimulation($value);
             $results = $this->food->getShippingCosts($value->id);
-            Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
+            //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
         }
     }
     

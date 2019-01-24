@@ -35,6 +35,6 @@ class PurchaseOrder extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.purchase-order-email');
+        return $this->markdown('emails.food.purchase-order');
     }
 }
