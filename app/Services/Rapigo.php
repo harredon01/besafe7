@@ -2,22 +2,6 @@
 
 namespace App\Services;
 
-use Validator;
-use App\Models\Payment;
-use App\Models\User;
-use App\Models\Order;
-use App\Models\Address;
-use App\Models\City;
-use App\Models\Plan;
-use App\Models\Country;
-use App\Models\Region;
-use App\Jobs\ApprovePayment;
-use App\Jobs\DenyPayment;
-use App\Jobs\PendingPayment;
-use App\Models\Source;
-use Carbon\Carbon;
-use App\Models\Subscription;
-use App\Models\Transaction;
 
 class Rapigo {
 

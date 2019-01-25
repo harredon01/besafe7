@@ -178,6 +178,7 @@ class CleanTrash {
     }
 
     public function moveOldUserFollowing() {
+        $date = date("Y-m-d");
         $following = DB::select("SELECT user_id as id,user_id,object_id,userable_id,created_at,updated_at from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' order by user_id");
         if (sizeof($following) > 0) {
             $tracking = DB::select("SELECT userable_id as id from " . self::ACCESS_USER_OBJECT . " WHERE DATEDIFF(CURDATE(),created_at) > 1 and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "'  group by " . self::ACCESS_USER_OBJECT_ID . " ");
