@@ -3,11 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Route;
+use App\Models\Stop;
+use App\Models\Delivery;
 use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
+use App\Services\Food;
 
 class RouteController extends Controller
 {
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $food;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(Food $food ) {
+        $this->food = $food;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -97,5 +114,32 @@ class RouteController extends Controller
     public function destroy(Route $route)
     {
         //
+    }
+    
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function buildRoute(Request $request,$route)
+    {
+        $user = $request->user();
+        $routes = Route::where("id",$route)->get();
+        $this->food->buildScenario($routes);
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function updateRouteStop(Request $request,$route,$stop)
+    {
+        $user = $request->user();
+        $stopContainer = Stop::find($stop);
+        $oldRoute = $stop->route;
+        $newRoute = Route::find($route);
+        $stop->route_id = $newRoute->id;
     }
 }

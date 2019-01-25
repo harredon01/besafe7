@@ -194,5 +194,9 @@ Route::post('messages/send', 'MessagesApiController@postMessage');
 Route::get('ratings', 'RatingController@getRatingsObject');
 Route::post('ratings', 'RatingController@postAddRatingObject');
 
+Route::get('routes', 'RouteController@index');
+Route::post('routes/{code?}/build', 'RouteController@buildRoute');
+Route::post('routes/{code?}/stop/{stop?}', 'RouteController@updateRouteStop');
+
 Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
