@@ -3,27 +3,10 @@
 namespace App\Services;
 
 use Validator;
-use App\Services\EditAlerts;
 use App\Models\User;
 use App\Models\Delivery;
 
 class EditDelivery {
-
-    /**
-     * The EditAlert implementation.
-     *
-     */
-    protected $editAlerts;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -82,28 +65,4 @@ class EditDelivery {
                     'year' => 'required|max:255'
         ]);
     }
-
-    /**
-     * Get a validator for an incoming edit profile request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorFollower(array $data) {
-        return Validator::make($data, [
-                    'type' => 'required|max:255',
-                    'object' => 'required|max:255',
-                    'follower' => 'required|max:255',
-        ]);
-    }
-
-    /**
-     * Get the failed login message.
-     *
-     * @return string
-     */
-    protected function getFailedEditGroupMessage() {
-        return 'There was a problem editing your group';
-    }
-
 }

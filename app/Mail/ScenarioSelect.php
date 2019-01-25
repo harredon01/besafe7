@@ -29,24 +29,18 @@ class ScenarioSelect extends Mailable
      * @var Order
      */
     public $winner;
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
-    public $polygon_id;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($preData,$simpleData,$winner,$polygon_id)
+    public function __construct($preData,$simpleData,$winner)
     {
         $this->preData = $preData;
         $this->simpleData = $simpleData;
         $this->winner = $winner;
-        $this->polygon_id = $polygon_id;
+
     }
 
     /**

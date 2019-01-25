@@ -35,6 +35,9 @@ class CreateOrderAddressesTable extends Migration
             $table->integer('order_id')->unsigned()->nullable();
             $table->foreign('order_id')->references('id')
                     ->on('orders');
+            $table->integer('polygon_id')->unsigned()->nullable();
+            $table->foreign('polygon_id')->references('id')
+                    ->on('coverage_polygons');
             $table->timestamps();
         });
     }

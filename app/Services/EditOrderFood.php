@@ -74,7 +74,7 @@ class EditOrderFood {
                 'value' => "+900",
                 'total' => 900,
             ));
-            
+
             $conditionV = new OrderCondition(array(
                 'name' => "Costo variable transaccion",
                 'target' => "total",
@@ -82,8 +82,8 @@ class EditOrderFood {
                 'value' => "3.49%",
                 'total' => 900,
             ));
-            
-            
+
+
             $condition2F = new CartCondition(array(
                 'name' => $conditionF->name,
                 'type' => $conditionF->type,
@@ -99,13 +99,13 @@ class EditOrderFood {
                 'value' => $conditionV->value,
                 'order' => 100
             ));
-            
+
             $conditionV->total = $condition2V->getCalculatedValue($order->subtotal);
             //dd( $conditionV->toArray());
-            $order->orderConditions()->saveMany([$conditionF,$conditionV]);
+            $order->orderConditions()->saveMany([$conditionF, $conditionV]);
             array_push($conditions, $conditionF);
             array_push($conditions, $conditionV);
-            Cart::session($user->id)->condition([$condition2F,$condition2V]);
+            Cart::session($user->id)->condition([$condition2F, $condition2V]);
         }
         return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions);
     }
@@ -145,7 +145,7 @@ class EditOrderFood {
     }
 
     public function pendingPayment(Payment $payment) {
- 
+        
     }
 
     public function getTransactionTotal($total) {
@@ -155,7 +155,13 @@ class EditOrderFood {
     public function approveOrder(Order $order) {
         $data = array();
         $items = $order->items;
+        $className = "App\\Services\\Geolocation";
+        $geo = new $className;
         $address = $order->orderAddresses()->where("type", "shipping")->first();
+        $result = $geo->checkMerchantPolygons($address->lat,$address->long, $order->merchant_id);
+        $polygon = $result['polygon'];
+        $address->polygon_id = $polygon->id;
+        $address->save();
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;

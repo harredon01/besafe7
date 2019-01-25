@@ -244,6 +244,12 @@ class EditOrder {
 
                 $cart = $this->editCart->getCheckoutCart($user);
                 if ($cart['total'] > 0) {
+                    if (array_key_exists("merchant_id", $info)) {
+                        $merchant = Merchant::find($info['merchant_id']);
+                        if($merchant){
+                            $order->merchant_id = $merchant->id;
+                        }
+                    }
                     $order->subtotal = $cart["subtotal"];
 //                    if($condition){
 //                        

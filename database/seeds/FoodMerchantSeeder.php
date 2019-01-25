@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\Food;
+use App\Services\FoodImport;
 
 class FoodMerchantSeeder extends Seeder {
 
@@ -9,10 +9,10 @@ class FoodMerchantSeeder extends Seeder {
      * The edit profile implementation.
      *
      */
-    protected $food;
+    protected $foodImport;
 
-    public function __construct(Food $food) {
-        $this->food = $food;
+    public function __construct(FoodImport $foodImport) {
+        $this->foodImport = $foodImport;
     }
     /**
      * Run the database seeds.
@@ -21,7 +21,7 @@ class FoodMerchantSeeder extends Seeder {
      */
     public function run() {
         // $this->call(UsersTableSeeder::class);
-        $this->food->importMerchants();
+        $this->foodImport->importMerchants();
         $this->command->info('Food merchants seeded!');
     }
 

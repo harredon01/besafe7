@@ -18,4 +18,7 @@ class CoveragePolygon extends Model
     public function address() {
         return $this->belongsTo('App\Models\Address');
     }
+    public function orderAddresses() {
+        return $this->hasMany('App\Models\OrderAddress', 'polygon_id');
+    }
 }

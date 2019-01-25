@@ -27,6 +27,9 @@ class OrderAddress extends Model
     public function region() {
         return $this->belongsTo('App\Models\Region');
     }
+    public function polygon() {
+        return $this->belongsTo('App\Models\CoveragePolygon', 'polygon_id');
+    }
     public function country() {
         return $this->belongsTo('App\Models\Country');
     }
