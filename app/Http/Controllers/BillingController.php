@@ -63,5 +63,26 @@ class BillingController extends Controller {
 	$plans = $this->editBilling->getPlans();
         return view('billing.plans')->with('user',$user )->with('plans',$plans );
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getOrders() {
+        $user = $this->auth->user();
+
+        return view('billing.orders.ordersDashboard')->with('user',$user );
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPayments() {
+        $user = $this->auth->user();
+
+        return view('billing.payments.paymentsDashboard')->with('user',$user );
+    }
 
 }

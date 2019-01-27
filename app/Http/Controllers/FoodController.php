@@ -152,5 +152,16 @@ class FoodController extends Controller {
         $this->food->runRecurringTask();
     }
     
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getRoutes() {
+        $user = $this->auth->user();
+
+        return view('food.routesDashboard')->with('user',$user );
+    }
+    
 
 }

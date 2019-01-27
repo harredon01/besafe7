@@ -56,7 +56,8 @@ Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::get('payu/return', 'PayuController@returnPayU');
 Route::get('payu/cron', 'PayuController@cronPayU');
-
+Route::get('billing/orders', 'BillingController@getOrders');
+Route::get('billing/payments', 'BillingController@getPayments');
 
 
 Route::get('merchant/{code?}', 'MerchantController@getMerchantOrders');
@@ -72,6 +73,7 @@ Route::get('food/regenerate_scenarios/{polygon?}/{hash?}', 'FoodController@regen
 Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
 Route::get('food/polygons', 'FoodController@getPolygons');
+Route::get('food/routes', 'FoodController@getRoutes');
 
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";

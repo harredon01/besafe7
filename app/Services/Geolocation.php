@@ -61,6 +61,100 @@ class Geolocation {
             return "outside";
         }
     }
+    
+    public function prepareQuadrantLimits($lat, $long, $x) {
+        $R = 6371;
+        if ($x < 4) {
+            $radiusInf = 0;
+            $radius = 7;
+        } else {
+            $radiusInf = 3;
+            $radius = 7;
+        }
+        $maxLat = $lat + rad2deg($radius / $R);
+        $minLat = $lat - rad2deg($radius / $R);
+        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
+        if ($x == 0 || $x == 4) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $lat,
+                'latsup' => $maxLat,
+                'longinf' => $long,
+                'longsup' => $maxLon,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 1 || $x == 5) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $minLat,
+                'latsup' => $lat,
+                'longinf' => $long,
+                'longsup' => $maxLon,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 2 || $x == 6) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $minLat,
+                'latsup' => $lat,
+                'longinf' => $minLon,
+                'longsup' => $long,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        } else if ($x == 3 || $x == 7) {
+            $thedata = [
+                'lat' => $lat,
+                'lat2' => $lat,
+                'long' => $long,
+                'latinf' => $lat,
+                'latsup' => $maxLat,
+                'longinf' => $minLon,
+                'longsup' => $long,
+                'radiusInf' => $radiusInf,
+                'radius' => $radius
+            ];
+        }
+        return $thedata;
+    }
+    
+    public function prepareRouteModel(array $thedata, $results, $preOrganize, $x, $polygon) {
+//        dd($thedata);
+        $thedata['polygon'] = $polygon;
+        $deliveries = DB::select(""
+                        . "SELECT DISTINCT(d.id), d.delivery,d.details,d.user_id,d.address_id,status,shipping, lat,`long`, 
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
+                   FROM deliveries d join order_addresses a on d.address_id = a.id
+                    WHERE
+                        status = 'transit'
+                            AND d.user_id = 1
+                            AND lat >= :latinf AND lat < :latsup
+                            AND `long` >= :longinf AND `long` < :longsup
+                            AND a.polygon_id = :polygon order by Distance asc"
+                        . "", $thedata);
+        //echo "Query params: ". json_encode($thedata). PHP_EOL;
+        //echo "Query results: " . count($deliveries) . PHP_EOL;
+        $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
+
+        if ($preOrganize) {
+            $results = $this->createRoutes($stops, $results, $x, 'preorganize', true);
+        } else {
+            $results = $this->createRoutes($stops, $results, $x, 'simple', true);
+        }
+        //dd($results);
+        return $results;
+    }
 
     public function pointOnVertex($point, $vertices) {
         foreach ($vertices as $vertex) {

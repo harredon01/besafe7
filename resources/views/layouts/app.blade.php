@@ -32,6 +32,8 @@
         <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/routesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
@@ -45,6 +47,8 @@
         <script src="{{ asset('/js/services/groups.js')}}"></script>
         <script src="{{ asset('/js/services/address.js')}}"></script>
         <script src="{{ asset('/js/services/routes.js')}}"></script>
+        <script src="{{ asset('/js/services/payments.js')}}"></script>
+        <script src="{{ asset('/js/services/orders.js')}}"></script>
 
         <script>
             window.Laravel = <?php
@@ -117,7 +121,16 @@ echo json_encode([
                                     <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
                                 </ul>
                             </li>
-
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    Lonchis <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{{ url('food/routes')}}">Rutas</a></li>
+                                    <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>
+                                    <li><a href="{{ url('billing/payments')}}">Pagos</a></li>
+                                </ul>
+                            </li>
                             @endif
                         </ul>
                     </div>

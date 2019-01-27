@@ -473,8 +473,6 @@ class Food {
                     WHERE
                         status = 'transit'
                             AND d.user_id = 1
-                            AND lat >= :latinf AND lat < :latsup
-                            AND `long` >= :longinf AND `long` < :longsup
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
@@ -1072,59 +1070,13 @@ class Food {
             $radiusInf = 3;
             $radius = 7;
         }
-        $maxLat = $lat + rad2deg($radius / $R);
-        $minLat = $lat - rad2deg($radius / $R);
-        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        if ($x == 0 || $x == 4) {
-            $thedata = [
-                'lat' => $lat,
-                'lat2' => $lat,
-                'long' => $long,
-                'latinf' => $lat,
-                'latsup' => $maxLat,
-                'longinf' => $long,
-                'longsup' => $maxLon,
-                'radiusInf' => $radiusInf,
-                'radius' => $radius
-            ];
-        } else if ($x == 1 || $x == 5) {
-            $thedata = [
-                'lat' => $lat,
-                'lat2' => $lat,
-                'long' => $long,
-                'latinf' => $minLat,
-                'latsup' => $lat,
-                'longinf' => $long,
-                'longsup' => $maxLon,
-                'radiusInf' => $radiusInf,
-                'radius' => $radius
-            ];
-        } else if ($x == 2 || $x == 6) {
-            $thedata = [
-                'lat' => $lat,
-                'lat2' => $lat,
-                'long' => $long,
-                'latinf' => $minLat,
-                'latsup' => $lat,
-                'longinf' => $minLon,
-                'longsup' => $long,
-                'radiusInf' => $radiusInf,
-                'radius' => $radius
-            ];
-        } else if ($x == 3 || $x == 7) {
-            $thedata = [
-                'lat' => $lat,
-                'lat2' => $lat,
-                'long' => $long,
-                'latinf' => $lat,
-                'latsup' => $maxLat,
-                'longinf' => $minLon,
-                'longsup' => $long,
-                'radiusInf' => $radiusInf,
-                'radius' => $radius
-            ];
-        }
+        $thedata = [
+            'lat' => $lat,
+            'lat2' => $lat,
+            'long' => $long,
+            'radiusInf' => $radiusInf,
+            'radius' => $radius
+        ];
         return $thedata;
     }
 
