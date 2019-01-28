@@ -162,8 +162,8 @@ Route::post('orders/check/{order?}', 'OrderApiController@checkOrder');
 Route::post('orders/recurring/{order?}', 'OrderApiController@setOrderRecurringType');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
-Route::get('payments', 'BillingApiController@getPaymentsAdmin');
-Route::get('food/articles', 'FoodController@getArticles');
+Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
+Route::get('food/articles', 'ArticleController@index');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

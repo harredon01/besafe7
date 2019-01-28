@@ -7,22 +7,27 @@
             Descripcion: <span class="type">@{{ article.description}}</span><br/>
             Entradas:<br/>
             <table>
-                <tr ng-repeat="(key, value) in item.attributes.entradas">
-                    <td> @{{key}} </td> <td> @{{ value}} </td>
+                <tr>
+                    <td>Valor</td>
+                    <td>Codigo</td>
+                    <td>Descripcion</td>
+                </tr>
+                <tr ng-repeat="item in article.attributes.entradas">
+                    <td> @{{item.valor}} </td> <td> @{{item.codigo}} </td><td> @{{item.descripcion}} </td>
                 </tr>
             </table>
             Fuertes:<br/>
             <table>
-                <tr ng-repeat="(key, value) in item.attributes.plato">
-                    <td> @{{key}} </td> <td> @{{ value}} </td>
+                <tr>
+                    <td>Valor</td>
+                    <td>Codigo</td>
+                    <td>Descripcion</td>
+                </tr>
+                <tr ng-repeat="item in article.attributes.plato">
+                    <td> @{{item.valor}} </td> <td> @{{item.codigo}} </td><td> @{{item.descripcion}} </td>
                 </tr>
             </table>
-            <select>
-                <option value="Programado">Programado</option>
-                <option value="Transit">En transito</option>
-                <option value="Delivered">Entregado</option>
-            </select>
-            <br/><a href="javascript:;" ng-click="editDish(article)" class="editar">Aprobar</a>
+            <br/><a href="javascript:;" ng-click="editDish(article)" class="editar">Editar</a>
         </li>
         <li ng-show="showMore">
             <button ng-click="getArticles()">Cargar mas</button>

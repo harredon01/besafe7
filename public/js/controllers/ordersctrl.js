@@ -20,7 +20,7 @@
 
             $scope.getOrders = function () {
                 $scope.page++;
-                let url = "includes=orderConditions,items,payment&order_by=id,desc&page=" + $scope.page;
+                let url = "includes=orderConditions,items,payments,user&order_by=id,desc&page=" + $scope.page;
                 Orders.getOrders(url).then(function (data) {
                     if (data.page == data.last_page) {
                         $scope.loadMore = false;
