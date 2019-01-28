@@ -75,15 +75,6 @@ class EditOrderFood {
                 'total' => 900,
             ));
 
-            $conditionV = new OrderCondition(array(
-                'name' => "Costo variable transaccion",
-                'target' => "total",
-                'type' => self::PLATFORM_NAME,
-                'value' => "3.49%",
-                'total' => 900,
-            ));
-
-
             $condition2F = new CartCondition(array(
                 'name' => $conditionF->name,
                 'type' => $conditionF->type,
@@ -91,16 +82,20 @@ class EditOrderFood {
                 'value' => $conditionF->value,
                 'order' => 100
             ));
-            $conditionF->total = $condition2F->getCalculatedValue($order->subtotal);
             $condition2V = new CartCondition(array(
-                'name' => $conditionV->name,
-                'type' => $conditionV->type,
-                'target' => $conditionV->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
-                'value' => $conditionV->value,
+                'name' => "Costo variable transaccion",
+                'type' => self::PLATFORM_NAME,
+                'target' => "total", // this condition will be applied to cart's subtotal when getSubTotal() is called.
+                'value' => "3.49%",
                 'order' => 100
             ));
-
-            $conditionV->total = $condition2V->getCalculatedValue($order->subtotal);
+            $conditionV = new OrderCondition(array(
+                'name' => "Costo variable transaccion",
+                'target' => "total",
+                'type' => self::PLATFORM_NAME,
+                'value' => "3.49%",
+                'total' => $condition2V->getCalculatedValue($order->subtotal),
+            ));
             //dd( $conditionV->toArray());
             $order->orderConditions()->saveMany([$conditionF, $conditionV]);
             array_push($conditions, $conditionF);

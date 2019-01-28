@@ -3,6 +3,8 @@
         .controller('RoutesCtrl', function ($scope, Routes) {
             $scope.data = {};
             $scope.routes;
+            $scope.page = 0;
+            $scope.scenario = 'simple';
             $scope.regionVisible = false;
             $scope.editAddress = false;
             angular.element(document).ready(function () {
@@ -31,10 +33,33 @@
                             });
                 }
             }
+            $scope.changeScenario = function () {
+                $scope.page = 0;
+                $scope.routes = [];
+                $scope.getRoutes();
+            }
+            $scope.buildRouteData = function (route) {
+                let stops = route.stops;
+                for(item in stops){
+                    stops[item].details = JSON.parse(stops[item].details);
+                    let deliveries = stops[item].deliveries;
+                    for(item2 in deliveries){
+                        deliveries[item2].details = JSON.parse(deliveries[item2].details);
+                    }
+                    stops[item].deliveries = deliveries;
+                }
+                route.stops = stops;
+                return route;
+            }
             $scope.getRoutes = function () {
-                Routes.getRoutes().then(function (data) {
-                    $scope.routes = data.addresses;
-
+                $scope.page++;
+                let url = "includes=stops.deliveries&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario;
+                Routes.getRoutes(url).then(function (data) {
+                    let routesCont = data.data;
+                    for(item in routesCont){
+                        routesCont[item] = $scope.buildRouteData(routesCont[item]);
+                    }
+                    $scope.routes = routesCont;
                 },
                         function (data) {
 
@@ -45,14 +70,14 @@
                 $scope.regionVisible = false;
                 $scope.cityVisible = false;
             }
-            $scope.updateRouteStop = function (stop,route_id) {
+            $scope.updateRouteStop = function (stop, route_id) {
                 for (item in $scope.routes) {
                     if ($scope.routes[item].id == stop.route_id) {
                         $scope.routes.splice(item, 1);
                         $scope.routes.push(address);
                     }
                 }
-                Routes.updateRouteStop(stop,route_id).then(function (data) {
+                Routes.updateRouteStop(stop, route_id).then(function (data) {
 
                 },
                         function (data) {

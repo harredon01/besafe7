@@ -93,7 +93,7 @@ class OrderApiController extends Controller {
             $orderContainer = Order::find($order);
             if ($orderContainer) {
                 if ($orderContainer->user_id == $user->id) {
-                    $this->editOrder->addItemsToOrder($user, $orderContainer);
+                    $orderContainer = $this->editOrder->addItemsToOrder($user, $orderContainer);
                     return response()->json($platFormService->addDiscounts($user, $orderContainer));
                 }
                 return response()->json(["status" => "error", "message" => "Order is not users"]);

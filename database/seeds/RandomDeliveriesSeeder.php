@@ -22,13 +22,13 @@ class RandomDeliveriesSeeder extends Seeder {
         $this->deleteOldData();
         $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
         foreach ($polygons as $value) {
-            $this->food->generateRandomDeliveries($value);
+            $this->food->generateRandomDeliveries($value);  
         }
-        foreach ($polygons as $value) {
-            $this->food->prepareRoutingSimulation($value);
-            //$results = $this->food->getShippingCosts($value->id);
-            //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
-        }
+//        foreach ($polygons as $value) {
+//            $this->food->prepareRoutingSimulation($value);
+//            //$results = $this->food->getShippingCosts($value->id);
+//            //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
+//        }
     }
 
     public function deleteOldData() {

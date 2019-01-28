@@ -37,6 +37,7 @@ class CreateStopsTable extends Migration {
                         $table->dateTime('arrival');
                         $table->string('code');
                         $table->string('status');
+                        $table->double('shipping', 15, 2);
                         $table->text('details');
 			$table->timestamps();
 		});

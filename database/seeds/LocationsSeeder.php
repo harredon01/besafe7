@@ -54,6 +54,7 @@ class LocationsSeeder extends Seeder {
         DB::table('merchant_user')->delete();
         DB::table('merchant_product')->delete();
         DB::table('addresses')->delete();
+        DB::table('articles')->delete();
         
         DB::table('category_product')->delete();
         DB::table('category_merchant')->delete();

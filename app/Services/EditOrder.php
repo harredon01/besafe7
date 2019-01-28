@@ -12,6 +12,7 @@ use App\Models\Item;
 use App\Models\Condition;
 use App\Models\ProductVariant;
 use App\Models\Address;
+use App\Models\Merchant;
 use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\Stripe;
@@ -131,26 +132,29 @@ class EditOrder {
     }
 
     public function addItemsToOrder(User $user, Order $order) {
-        $cart = $this->editCart->getCart($user);
+        $cart = $this->editCart->getCheckoutCart($user);
         Item::where('user_id', $user->id)
                 ->whereNull('order_id')
                 ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
         $cartConditions = Cart::session($user->id)->getConditions();
         $order->orderConditions()->delete();
-
-        foreach ($cartConditions as $condition) {
-            $cond = array();
-            $cond['target'] = $condition->getTarget(); // the target of which the condition was applied
-            $cond['name'] = $condition->getName(); // the name of the condition
-            $cond['type'] = $condition->getType(); // the type
-            $cond['value'] = $condition->getValue(); // the value of the condition
-            $cond['order'] = $cart['subtotal']; // the order of the condition
-            $cond['attributes'] = json_encode($condition->getAttributes()); // the attributes of the condition, returns an empty [] if no attributes added
-            $value = $condition->getCalculatedValue($cart['subtotal']);
-            $cond['order_id'] = $order->id; // the name of the condition
-            $cond['total'] = $value;
-            OrderCondition::insert($cond);
-        }
+        $order->total= $cart['total'];
+        $order->subtotal= $cart['subtotal'];
+        $order->shipping= $cart['shipping'];
+        return $order;
+//        foreach ($cartConditions as $condition) {
+//            $cond = array();
+//            $cond['target'] = $condition->getTarget(); // the target of which the condition was applied
+//            $cond['name'] = $condition->getName(); // the name of the condition
+//            $cond['type'] = $condition->getType(); // the type
+//            $cond['value'] = $condition->getValue(); // the value of the condition
+//            $cond['order'] = $cart['subtotal']; // the order of the condition
+//            $cond['attributes'] = json_encode($condition->getAttributes()); // the attributes of the condition, returns an empty [] if no attributes added
+//            $value = $condition->getCalculatedValue($cart['subtotal']);
+//            $cond['order_id'] = $order->id; // the name of the condition
+//            $cond['total'] = $value;
+//            OrderCondition::insert($cond);
+//        }
     }
 
     /**
@@ -670,6 +674,7 @@ class EditOrder {
                         );
                         $condition = new CartCondition($insertCondition);
                         $insertCondition['order_id'] = $order->id;
+                        $insertCondition['total'] = $result['price'];
                         $order->orderConditions()->where('type', "shipping")->delete();
                         OrderCondition::insert($insertCondition);
                         Cart::session($user->id)->condition($condition);

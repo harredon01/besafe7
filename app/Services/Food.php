@@ -488,6 +488,23 @@ class Food {
         return $results;
     }
 
+    public function prepareQuadrantLimits($lat, $long, $x) {
+        $R = 6371;
+        if ($x < 4) {
+            $radiusInf = 0;
+            $radius = 7;
+        } else {
+            $radiusInf = 3;
+            $radius = 7;
+        }
+        $thedata = [
+            'lat' => $lat,
+            'lat2' => $lat,
+            'long' => $long
+        ];
+        return $thedata;
+    }
+
     private function addToExistingStop(Stop $itemSavedStop, Route $route, $stopContainer) {
         $stopDetails = json_decode($itemSavedStop->details, true);
         if (array_key_exists("pickups", $stopDetails)) {
@@ -495,6 +512,7 @@ class Food {
             $itemSavedStop->details = json_encode($stopDetails);
         }
         $itemSavedStop->amount += $stopContainer['amount'];
+        $itemSavedStop->shipping += $stopContainer['shipping'];
         foreach ($stopContainer["deliveries"] as $del) {
             $realDel2 = Delivery::find($del->id);
             $itemSavedStop->deliveries()->save($realDel2);
@@ -509,6 +527,7 @@ class Food {
         $stop = Stop::create([
                     "address_id" => $stopContainer["address_id"],
                     "amount" => $stopContainer["amount"],
+                    "shipping" => $stopContainer["shipping"],
                     "route_id" => $route->id,
                     "stop_order" => 2,
                     "details" => json_encode($details)
@@ -548,6 +567,7 @@ class Food {
             $firstStop = Stop::create([
                         "address_id" => $address->id,
                         "amount" => 0,
+                        "shipping" => 0,
                         "route_id" => $route->id,
                         "stop_order" => 1,
                         "details" => json_encode($details),
@@ -555,16 +575,17 @@ class Food {
             ]);
 
             $details['pickups'] = $stopContainer["pickups"];
-            $stopContainer = Stop::create([
+            $stopCreated = Stop::create([
                         "address_id" => $stopContainer["address_id"],
                         "amount" => $stopContainer["amount"],
+                        "shipping" => $stopContainer['shipping'],
                         "route_id" => $route->id,
                         "stop_order" => 2,
                         "details" => json_encode($details)
             ]);
             foreach ($stopContainer["deliveries"] as $del) {
                 $realDel = Delivery::find($del->id);
-                $stopContainer->deliveries()->save($realDel);
+                $stopCreated->deliveries()->save($realDel);
                 $route->deliveries()->save($realDel);
             }
         } else {
@@ -615,7 +636,7 @@ class Food {
             $found = false;
             foreach ($routes as $route) {
                 $available = self::LUNCH_ROUTE - $route->unit;
-                if ($available > 0 && $available >= $stopContainer['amount']) {
+                if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
                     $found = true;
                     $this->addStopToRoute($route, $save, $stopContainer);
                     break;
@@ -793,18 +814,18 @@ class Food {
             $packages = [];
             $pickups = [];
             $totalCounter = 0;
-            foreach ($deliveries as $value) {
-                $attributes = json_decode($value->details, true);
+            foreach ($deliveries as $delivery) {
+                $attributes = json_decode($delivery->details, true);
 
                 if ($preorganize) {
                     $totalCounter++;
-                    if ($value->address_id == $initialAddress) {
+                    if ($delivery->address_id == $initialAddress) {
                         $deliveryCounter++;
-                        $deliveryShipping += $value->shipping;
-                        array_push($packages, $value);
+                        $deliveryShipping += $delivery->shipping;
+                        array_push($packages, $delivery);
                         if (array_key_exists("pickup", $attributes)) {
                             if ($attributes['pickup'] == 'envase') {
-                                $delUser = User::find($value->user_id);
+                                $delUser = User::find($delivery->user_id);
                                 $desc = "Envase de " . $delUser->firstName . " " . $delUser->lastName;
                                 array_push($pickups, $desc);
                             }
@@ -813,33 +834,33 @@ class Food {
                         $stop = [
                             "amount" => $deliveryCounter,
                             "address_id" => $initialAddress,
-                            "latitude" => $value->lat,
-                            "longitude" => $value->long,
+                            "latitude" => $delivery->lat,
+                            "longitude" => $delivery->long,
                             "shipping" => $deliveryShipping,
                             "deliveries" => $packages,
                             "pickups" => $pickups
                         ];
                         array_push($stops, $stop);
                         $packages = [];
-                        array_push($packages, $value);
+                        array_push($packages, $delivery);
                         $pickups = [];
                         if (array_key_exists("pickup", $attributes)) {
                             if ($attributes['pickup'] == 'envase') {
-                                $delUser = User::find($value->user_id);
+                                $delUser = User::find($delivery->user_id);
                                 $desc = "Envase de " . $delUser->firstName . " " . $delUser->lastName;
                                 array_push($pickups, $desc);
                             }
                         }
                         $deliveryCounter = 1;
-                        $deliveryShipping = $value->shipping;
-                        $initialAddress = $value->address_id;
+                        $deliveryShipping = $delivery->shipping;
+                        $initialAddress = $delivery->address_id;
                     }
                     if ($totalCounter == count($deliveries)) {
                         $stop = [
                             "amount" => $deliveryCounter,
                             "address_id" => $initialAddress,
-                            "latitude" => $value->lat,
-                            "longitude" => $value->long,
+                            "latitude" => $delivery->lat,
+                            "longitude" => $delivery->long,
                             "shipping" => $deliveryShipping,
                             "deliveries" => $packages,
                             "pickups" => $pickups
@@ -849,18 +870,18 @@ class Food {
                 } else {
                     if (array_key_exists("pickup", $attributes)) {
                         if ($attributes['pickup'] == 'envase') {
-                            $delUser = User::find($value->user_id);
+                            $delUser = User::find($delivery->user_id);
                             $desc = "Envase de " . $delUser->firstName . " " . $delUser->lastName;
                             array_push($pickups, $desc);
                         }
                     }
-                    $packages = [$value];
+                    $packages = [$delivery];
                     $stop = [
                         "amount" => 1,
-                        "address_id" => $value->address_id,
-                        "latitude" => $value->lat,
-                        "longitude" => $value->long,
-                        "shipping" => $value->shipping,
+                        "address_id" => $delivery->address_id,
+                        "latitude" => $delivery->lat,
+                        "longitude" => $delivery->long,
+                        "shipping" => $delivery->shipping,
                         "deliveries" => $packages,
                         "pickups" => $pickups
                     ];
@@ -1059,25 +1080,6 @@ class Food {
         }
 
         return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
-    }
-
-    public function prepareQuadrantLimits($lat, $long, $x) {
-        $R = 6371;
-        if ($x < 4) {
-            $radiusInf = 0;
-            $radius = 7;
-        } else {
-            $radiusInf = 3;
-            $radius = 7;
-        }
-        $thedata = [
-            'lat' => $lat,
-            'lat2' => $lat,
-            'long' => $long,
-            'radiusInf' => $radiusInf,
-            'radius' => $radius
-        ];
-        return $thedata;
     }
 
 }

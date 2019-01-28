@@ -35,6 +35,7 @@
         <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
@@ -49,6 +50,7 @@
         <script src="{{ asset('/js/services/routes.js')}}"></script>
         <script src="{{ asset('/js/services/payments.js')}}"></script>
         <script src="{{ asset('/js/services/orders.js')}}"></script>
+        <script src="{{ asset('/js/services/food.js')}}"></script>
 
         <script>
             window.Laravel = <?php

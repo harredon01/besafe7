@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-
 use App\Models\Article;
 use App\Models\Merchant;
 use App\Models\Product;
@@ -95,26 +94,59 @@ class FoodImport {
                 CoveragePolygon::create($row);
             }
         }
-        $excel = Excel::load(storage_path('imports') . '/articles.xlsx');
-        $reader = $excel->toArray();
-        foreach ($reader as $row) {
-            if ($row['id']) {
-                Article::create($row);
-            }
-        }
+        $this->importDishes();
+    }
+
+    private function importDish($entradas, $principales, $postres, $activeRow) {
+        $dishes = [
+            "entradas" => $entradas,
+            "plato" => $principales,
+            "postre" => $postres
+        ];
+
+        $article = Article::create([
+                    "name" => $activeRow['almuerzo'],
+                    "description" => "Almuerzo " . $activeRow['almuerzo'],
+                    "start_date" => $activeRow['fecha'],
+                    "attributes" => json_encode($dishes)
+        ]);
     }
 
     public function importDishes() {
-        $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzos.xlsx');
+        $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzo.xlsx');
         $reader = $excel->toArray();
         $i = 0;
+        $activeRow = $reader[0];
+        $activeLunch = $activeRow['almuerzo'];
+        $entradas = [];
+        $principales = [];
+        $postres = [];
         foreach ($reader as $row) {
-            if ($i > 0) {
-                dd($row);
+            if ($row['fecha']) {
+                if ($row['almuerzo'] != $activeLunch) {
+                    $activeLunch = $row['almuerzo'];
+                    $this->importDish($entradas, $principales, $postres, $activeRow);
+                    $entradas = [];
+                    $principales = [];
+                    $postres = [];
+                } else {
+                    $plato = [
+                        "valor" => $row['plato'],
+                        "codigo" => $row['codigo'],
+                        "descripcion" => $row['descripcion']
+                    ];
+                    if ($row['tipo'] == "Entrada") {
+                        array_push($entradas, $plato);
+                    } else if ($row['tipo'] == "Principal") {
+                        array_push($principales, $plato);
+                    } else if ($row['tipo'] == "Postre") {
+                        array_push($postres, $plato);
+                    }
+                }
+                $activeRow = $row;
             }
-
-            $i++;
         }
+        $this->importDish($entradas, $principales, $postres, $activeRow);
     }
 
 }
