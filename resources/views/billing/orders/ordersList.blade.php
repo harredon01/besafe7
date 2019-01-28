@@ -16,7 +16,7 @@
                     Atributos: <br/>
                     <table>
                         <tr ng-repeat="(key, value) in item.attributes">
-                            <td> {{key}} </td> <td> {{ value}} </td>
+                            <td> @{{key}} </td> <td> @{{ value}} </td>
                         </tr>
                     </table>
                 </li>
@@ -39,8 +39,8 @@
             </select>
             <br/><a href="javascript:;" ng-click="approveOrder(order.id)" class="editar">Aprobar</a>
         </li>
-        <li>
-            <button>Cargar mas</button>
+        <li ng-show="showMore">
+            <button ng-click="getOrders()">Cargar mas</button>
         </li>
     </ul>
 </div>

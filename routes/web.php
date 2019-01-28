@@ -74,6 +74,7 @@ Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
 Route::get('food/polygons', 'FoodController@getPolygons');
 Route::get('food/routes', 'FoodController@getRoutes');
+Route::get('food/menu', 'FoodController@getMenu');
 
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";

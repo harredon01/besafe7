@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\EditOrder;
-use App\Jobs\PayUCron;
+use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 
 class PaymentController extends Controller {
@@ -78,12 +78,12 @@ class PaymentController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\ResponsepostPayCreditCard
      */
-    public function deleteSource(Request $request, $source,$source_id) {
+    public function deleteSource(Request $request, $source, $source_id) {
         $user = $request->user();
         $status = $this->editOrder->deleteSource($user, $source_id, $source);
         return response()->json($status);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -99,7 +99,7 @@ class PaymentController extends Controller {
         $status = $this->editOrder->useSource($user, $data, $source);
         return response()->json($status);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -137,7 +137,7 @@ class PaymentController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\ResponsepostPayCreditCard
      */
-    public function deleteSubscription(Request $request, $source,$subscription) {
+    public function deleteSubscription(Request $request, $source, $subscription) {
         $user = $request->user();
         $data = $request->all();
         if ($source == "PayU") {
@@ -146,7 +146,7 @@ class PaymentController extends Controller {
         $status = $this->editOrder->deleteSubscription($user, $subscription, $source);
         return response()->json($status);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -163,7 +163,7 @@ class PaymentController extends Controller {
         return response()->json($status);
     }
 
-    private function cleanPayu(array $data,Request $request) {
+    private function cleanPayu(array $data, Request $request) {
         $data['ip_address'] = $request->ip();
         $data['user_agent'] = $request->header('User-Agent');
         $data['cookie'] = $request->cookie('name');
@@ -239,6 +239,31 @@ class PaymentController extends Controller {
     public function returnPayU(Request $request) {
         $this->payU->webhookPayU($request->all());
         //dispatch(new PayUCron());
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index(Request $request) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        if ($request) {
+            $queryBuilder = new QueryBuilder(new Payment, $request);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
     }
 
 }

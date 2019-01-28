@@ -45,8 +45,8 @@
             </ul>
             <br/><a href="javascript:;" ng-click="buildRoute(route.id)" class="editar">Construir</a>
         </li>
-        <li>
-            <button ng-click="loadMore()">Cargar mas</button>
+        <li ng-show="showMore">
+            <button ng-click="getRoutes()">Cargar mas</button>
         </li>
     </ul>
 </div>

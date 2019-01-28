@@ -8,13 +8,13 @@
             Entradas:<br/>
             <table>
                 <tr ng-repeat="(key, value) in item.attributes.entradas">
-                    <td> {{key}} </td> <td> {{ value}} </td>
+                    <td> @{{key}} </td> <td> @{{ value}} </td>
                 </tr>
             </table>
             Fuertes:<br/>
             <table>
                 <tr ng-repeat="(key, value) in item.attributes.plato">
-                    <td> {{key}} </td> <td> {{ value}} </td>
+                    <td> @{{key}} </td> <td> @{{ value}} </td>
                 </tr>
             </table>
             <select>
@@ -24,8 +24,8 @@
             </select>
             <br/><a href="javascript:;" ng-click="editDish(article)" class="editar">Aprobar</a>
         </li>
-        <li>
-            <button>Cargar mas</button>
+        <li ng-show="showMore">
+            <button ng-click="getArticles()">Cargar mas</button>
         </li>
     </ul>
 </div>

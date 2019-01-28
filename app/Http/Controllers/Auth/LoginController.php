@@ -40,7 +40,7 @@ use AuthenticatesUsers;
     }
 
     protected function authenticated(Request $request, $user) {
-        $this->editCart->loadActiveCart($user);
+        //$this->editCart->loadActiveCart($user);
     }
 
 }

@@ -7,7 +7,7 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="replace-address">
-                        @include('food.paymentsList')
+                        @include('billing.payments.paymentsList')
                     </div>
                 </div>
             </div>

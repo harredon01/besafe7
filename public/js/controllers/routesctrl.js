@@ -4,6 +4,7 @@
             $scope.data = {};
             $scope.routes;
             $scope.page = 0;
+            $scope.loadMore = true;
             $scope.scenario = 'simple';
             $scope.regionVisible = false;
             $scope.editAddress = false;
@@ -40,10 +41,10 @@
             }
             $scope.buildRouteData = function (route) {
                 let stops = route.stops;
-                for(item in stops){
+                for (item in stops) {
                     stops[item].details = JSON.parse(stops[item].details);
                     let deliveries = stops[item].deliveries;
-                    for(item2 in deliveries){
+                    for (item2 in deliveries) {
                         deliveries[item2].details = JSON.parse(deliveries[item2].details);
                     }
                     stops[item].deliveries = deliveries;
@@ -56,7 +57,10 @@
                 let url = "includes=stops.deliveries&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario;
                 Routes.getRoutes(url).then(function (data) {
                     let routesCont = data.data;
-                    for(item in routesCont){
+                    if (data.page == data.last_page) {
+                        $scope.loadMore = false;
+                    }
+                    for (item in routesCont) {
                         routesCont[item] = $scope.buildRouteData(routesCont[item]);
                     }
                     $scope.routes = routesCont;

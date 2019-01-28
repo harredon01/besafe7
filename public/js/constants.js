@@ -1,6 +1,6 @@
 angular.module( 'besafe.constants', [] )
 .constant('API', {
-	address: 'http://hoovert.com/api',
-        website: 'http://hoovert.com',
-        avatar:'http://hoovert.com/avatars/avatar.jpg'
+	address: 'http://lonchis.com.co/api',
+        website: 'http://lonchis.com.co',
+        avatar:'http://lonchis.com.co/avatars/avatar.jpg'
 })

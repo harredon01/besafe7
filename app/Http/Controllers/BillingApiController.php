@@ -165,5 +165,30 @@ class BillingApiController extends Controller {
                     'message' => "no user id parameter allowed"
                         ], 403);
     }
+    
+    /**
+     * Get Registered addresses.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getPaymentsAdmin(Request $request) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handle($user,$request);
+        if ($request) {
+            $queryBuilder = new QueryBuilder(new Payment, $request);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "no user id parameter allowed"
+                        ], 403);
+    }
 
 }

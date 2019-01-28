@@ -128,6 +128,7 @@ echo json_encode([
                                     Lonchis <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{{ url('food/menu')}}">Menu</a></li>
                                     <li><a href="{{ url('food/routes')}}">Rutas</a></li>
                                     <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>
                                     <li><a href="{{ url('billing/payments')}}">Pagos</a></li>

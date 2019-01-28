@@ -53,6 +53,7 @@ Route::post('billing/retry/{payment?}', 'BillingApiController@retryPayment');
 Route::post('payu/all', 'PayuController@postcreateAll');
 Route::post('payu/webhook', 'PayuController@webhookPayU');
 
+
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
 Route::get('contacts', 'UserApiController@getContacts');
 Route::post('contacts/check', 'UserApiController@checkContacts');
@@ -161,6 +162,8 @@ Route::post('orders/check/{order?}', 'OrderApiController@checkOrder');
 Route::post('orders/recurring/{order?}', 'OrderApiController@setOrderRecurringType');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
+Route::get('payments', 'BillingApiController@getPaymentsAdmin');
+Route::get('food/articles', 'FoodController@getArticles');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

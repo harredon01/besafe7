@@ -2,11 +2,15 @@ angular.module('besafe')
         
         .service('Orders', function ($q, $http) {
 
-            var getOrders = function () {
+            var getOrders = function (where) {
+                let url = '/api/orders' ;
+                if(where){
+                    url = url+'?'+where;
+                }
                 var def = $q.defer();
                 $http({
                     method: 'get',
-                    url: '/api/orders' 
+                    url: url
                 })
                         .success(function (data) {
                             // console.log(data);
