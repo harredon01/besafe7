@@ -57,7 +57,7 @@ class FoodController extends Controller {
      */
     public function getSummaryShipping($polygon) {
         $user = $this->auth->user();
-        $results = $this->food->getShippingCosts($polygon);
+        $results = $this->food->getShippingCosts();
         return view('food.summary')->with('data', $results)->with('polygon_id', $polygon);
     }
     /**
@@ -116,15 +116,6 @@ class FoodController extends Controller {
         return view('food.buildScheduled')->with('data', $results);
     }
     
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function regenerateScenarios($polygon,$hash) {
-        $this->food->regenerateScenarios($polygon,$hash);
-        return view('food.simulationScheduled')->with('polygon', $polygon);
-    }
     
     /**
      * Show the application dashboard to the user.
@@ -137,10 +128,7 @@ class FoodController extends Controller {
         foreach ($polygons as $value) {
             $this->food->generateRandomDeliveries($value);
         }
-        foreach ($polygons as $value) {
-            $this->food->prepareRoutingSimulation($value);
-        }
-        
+        $this->food->prepareRoutingSimulation($polygons);
         return view('food.polygons')->with('polygons', $polygons);
     }
     

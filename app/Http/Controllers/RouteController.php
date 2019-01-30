@@ -23,6 +23,7 @@ class RouteController extends Controller
      * @return void
      */
     public function __construct(Food $food ) {
+        $this->middleware('auth:api');
         $this->food = $food;
     }
     /**

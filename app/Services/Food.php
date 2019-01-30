@@ -223,14 +223,16 @@ class Food {
         return false;
     }
 
-    public function regenerateScenarios($polygon, $hash) {
-        $polygons = CoveragePolygon::where("id", $polygon)->orderBy('id')->get();
-        $checkResult = $this->checkScenario($polygons, $hash);
-        if (true) {
-            foreach ($polygons as $item) {
-                $this->prepareRoutingSimulation($item);
-            }
+    public function regenerateScenarios() {
+        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $this->prepareRoutingSimulation($polygons);
+    }
+    
+    public function checkUser(User $user) {
+        if($user->id == 1 ||$user->id == 2 ||$user->id == 3){
+            return true;
         }
+        return false;
     }
 
     public function buildScenarioRouteId($id, $hash) {
@@ -242,7 +244,7 @@ class Food {
     }
 
     public function buildScenarioPositive($scenario, $hash) {
-        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->limit(1)->get();
+        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
             $routes = App\Models\Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
@@ -472,7 +474,6 @@ class Food {
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
                         status = 'transit'
-                            AND d.user_id = 1
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
@@ -548,7 +549,6 @@ class Food {
         $route->unit = $stopContainer['amount'];
         $route->height = 1;
         $route->unit_price = $stopContainer['shipping'];
-
         if ($save) {
             $route->save();
             $address = OrderAddress::create([
@@ -934,7 +934,7 @@ class Food {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;
             $address = OrderAddress::create([
-                        "user_id" => 1,
+                        "user_id" => 5,
                         "name" => "test",
                         "city_id" => 524,
                         "region_id" => 11,
@@ -968,7 +968,7 @@ class Food {
                 ];
                 $details['dish'] = $dish;
                 $delivery = Delivery::create([
-                            "user_id" => 1,
+                            "user_id" => 5,
                             "delivery" => $date,
                             "type_id" => $art->id,
                             "shipping" => $shipping[$amountDeliveries],
