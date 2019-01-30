@@ -165,13 +165,13 @@ Route::resource('orders', 'OrderApiController');
 Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
 
 Route::get('food/articles', 'ArticleController@index');
-Route::get('food/build_route_id/{id?}', 'FoodController@buildScenarioRouteId');
+Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
 Route::get('food/get_scenario_structure/{scenario?}', 'FoodApiController@getScenarioStructure');
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
-Route::get('food/summary/{polygon?}', 'FoodApiController@getSummaryShipping');
+Route::get('food/summary', 'FoodApiController@getSummaryShipping');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');
