@@ -9,7 +9,8 @@ use App\Jobs\PostEmergencyEnd;
 use App\Jobs\PostEmergency;
 use App\Models\Translation;
 use App\Models\Notification;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\GeneralNotification;
 use DB;
 use PushNotification;
 
@@ -568,10 +569,7 @@ class EditAlerts {
             file_put_contents($file, $current);
         }
         if (count($userEmail) > 0) {
-            $mail = Mail::send('emails.order', ["message" => $msg], function($message) {
-                        $message->from('noreply@hoovert.com', 'Hoove');
-                        $message->to($userEmail)->subject($msg['subject']);
-                    });
+            $mail = Mail::to($userEmail)->send(new GeneralNotification($msg['subject_es'], $msg['body_es']));
             $result['mail'] = $mail;
         }
         return $result;
@@ -628,32 +626,32 @@ class EditAlerts {
 
     public function sendNotification(array $data, array $userPush, array $userEmail, $platform) {
 
-        if (count($userEmail) > 0) {
-            $mail = Mail::send('emails.order', ["message" => $data], function($message) {
-                        $message->from('noreply@hoovert.com', 'Hoove');
-                        $message->to($userEmail)->subject($data['subject']);
-                    });
-            $result['mail'] = $mail;
-        }
-        if (count($userPush) > 0) {
-            $deviceCollection = array();
-            foreach ($userPush as $value) {
-                $deviceCollection[] = PushNotification::Device($value);
-            }
-            $devices = PushNotification::DeviceCollection($deviceCollection);
-            $message = PushNotification::Message($data['subject'], array(
-                        'a' => $data
-            ));
-            if ($platform == "android") {
-                PushNotification::app('appNameAndroid')
-                        ->to($devices)
-                        ->send($message);
-            } elseif ($platform == "ios") {
-                PushNotification::app('appNameIOS')
-                        ->to($devices)
-                        ->send($message);
-            }
-        }
+//        if (count($userEmail) > 0) {
+//            $mail = Mail::send('emails.order', ["message" => $data], function($message) {
+//                        $message->from('noreply@hoovert.com', 'Hoove');
+//                        $message->to($userEmail)->subject($data['subject']);
+//                    });
+//            $result['mail'] = $mail;
+//        }
+//        if (count($userPush) > 0) {
+//            $deviceCollection = array();
+//            foreach ($userPush as $value) {
+//                $deviceCollection[] = PushNotification::Device($value);
+//            }
+//            $devices = PushNotification::DeviceCollection($deviceCollection);
+//            $message = PushNotification::Message($data['subject'], array(
+//                        'a' => $data
+//            ));
+//            if ($platform == "android") {
+//                PushNotification::app('appNameAndroid')
+//                        ->to($devices)
+//                        ->send($message);
+//            } elseif ($platform == "ios") {
+//                PushNotification::app('appNameIOS')
+//                        ->to($devices)
+//                        ->send($message);
+//            }
+//        }
     }
 
     /**

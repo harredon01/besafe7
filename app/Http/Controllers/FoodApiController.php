@@ -12,7 +12,7 @@ use App\Jobs\BuildScenarioRouteIdApi;
 use App\Models\Article;
 use App\Models\CoveragePolygon;
 
-class FoodController extends Controller {
+class FoodApiController extends Controller {
     /*
       |--------------------------------------------------------------------------
       | Home Controller
@@ -149,8 +149,8 @@ class FoodController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            //dispatch(new RegenerateScenarios());
-            $this->food->regenerateScenarios();
+            dispatch(new RegenerateScenarios());
+            //$this->food->regenerateScenarios();
             return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));

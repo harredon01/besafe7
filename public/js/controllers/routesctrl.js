@@ -1,6 +1,6 @@
 ﻿angular.module('besafe')
 
-        .controller('RoutesCtrl', function ($scope, Routes) {
+        .controller('RoutesCtrl', function ($scope, Routes, Food) {
             $scope.data = {};
             $scope.routes;
             $scope.page = 0;
@@ -91,6 +91,13 @@
             $scope.buildRoute = function (route) {
                 Routes.buildRoute(route.id).then(function (data) {
                     route.status = "scheduled";
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.regenerateScenarios = function () {
+                Food.regenerateScenarios().then(function (data) {
                 },
                         function (data) {
 

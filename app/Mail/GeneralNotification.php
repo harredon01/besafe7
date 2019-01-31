@@ -16,23 +16,23 @@ class GeneralNotification extends Mailable
      *
      * @var Order
      */
-    public $user;
+    public $subject;
     /**
      * The order instance.
      *
      * @var Order
      */
-    public $data;
+    public $bodyMail;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(User $user,$data )
+    public function __construct($subject,$bodyMail)
     {
-        $this->user = $user;
-        $this->data = $data;
+        $this->subject = $subject;
+        $this->bodyMail = $bodyMail;
     }
 
     /**
@@ -42,6 +42,6 @@ class GeneralNotification extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.general-notification-email');
+        return $this->markdown('emails.general-notification')->subject($this->subject);
     }
 }

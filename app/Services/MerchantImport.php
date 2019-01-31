@@ -462,9 +462,9 @@ class MerchantImport {
             if (array_key_exists('user_id', $row)) {
                 $user = User::find($row['user_id']);
                 if ($user) {
-                    $coords = ["lat" => $row['lat'], "long" => $row['long'],"name" => "test","telephone"=>"123123","address"=>"address"];
+                    $coords = ["lat" => $row['lat'], "long" => $row['long'], "name" => "test", "telephone" => "123123", "address" => "address"];
                     $results = $this->editMapObject->saveOrCreateObject($user, $coords, "Merchant");
-                    if(!is_array($results)){
+                    if (!is_array($results)) {
                         dd($results);
                     }
                     $merchant = $results['object'];
@@ -684,11 +684,19 @@ class MerchantImport {
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
             unset($sheet['']);
-            $translation = Translation::updateOrCreate([
-                        'code' => $sheet['code'],
-                        'language' => $sheet['language'],
-                        'value' => $sheet['value']
-            ]);
+            if ($sheet['code']) {
+                if(!$sheet['body']){
+                    $sheet['body']="";
+                }
+                $translation = Translation::updateOrCreate([
+                            'code' => $sheet['code'],
+                            'language' => $sheet['language'],
+                            'value' => $sheet['value'],
+                            'body' => $sheet['body']
+                ]);
+            } else {
+                break;
+            }
         }
     }
 
@@ -981,7 +989,7 @@ class MerchantImport {
         foreach ($reader as $sheet) {
             $user = User::find($sheet['user_id']);
             if ($user) {
-                $coords = ["lat" => $sheet['lat'], "long" => $sheet['long'],"name" => "test","type"=>"burglary","address"=>"address","report_time"=>$date];
+                $coords = ["lat" => $sheet['lat'], "long" => $sheet['long'], "name" => "test", "type" => "burglary", "address" => "address", "report_time" => $date];
                 $results = $this->editMapObject->saveOrCreateObject($user, $coords, self::OBJECT_REPORT);
                 $report = $results['object'];
                 $sheet['id'] = $report->id;
