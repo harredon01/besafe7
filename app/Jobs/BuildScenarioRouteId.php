@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 use App\Services\Food;
+use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -32,8 +33,48 @@ class BuildScenarioRouteId implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food)
+    public function handle(Food $food,EditAlerts $editAlerts)
     {
         $food->buildScenarioRouteId($this->id, $this->hash); 
+        $payload = ["route"=> $this->id ];
+        $user = User::find(2);
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_route_transit",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+    }
+    
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception, EditAlerts $editAlerts)
+    {
+        $payload = ["route"=> $this->id ];
+        $user = User::find(2);
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_route_transit_failed",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

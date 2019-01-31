@@ -50,5 +50,30 @@ class RegenerateScenarios implements ShouldQueue {
         $date = date("Y-m-d H:i:s");
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
+    
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception, EditAlerts $editAlerts)
+    {
+        $payload = [ ];
+        $user = User::find(2);
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_regeneration_failed",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+    }
 
 }

@@ -150,6 +150,20 @@ class EditAlerts {
             $data['body'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['body']);
             $data['body_es'] = str_replace("{paymentTotal}", $arrayPayload['payment_total'], $data['body_es']);
         }
+        $pos = strpos($data['subject'], '{scenario}');
+        if ($pos) {
+            $data['subject'] = str_replace("{scenario}", $arrayPayload['scenario'], $data['subject']);
+            $data['subject_es'] = str_replace("{scenario}", $arrayPayload['scenario'], $data['subject_es']);
+            $data['body'] = str_replace("{scenario}", $arrayPayload['scenario'], $data['body']);
+            $data['body_es'] = str_replace("{scenario}", $arrayPayload['scenario'], $data['body_es']);
+        }
+        $pos = strpos($data['subject'], '{route}');
+        if ($pos) {
+            $data['subject'] = str_replace("{route}", $arrayPayload['route'], $data['subject']);
+            $data['subject_es'] = str_replace("{route}", $arrayPayload['route'], $data['subject_es']);
+            $data['body'] = str_replace("{route}", $arrayPayload['route'], $data['body']);
+            $data['body_es'] = str_replace("{route}", $arrayPayload['route'], $data['body_es']);
+        }
         return $data;
     }
 

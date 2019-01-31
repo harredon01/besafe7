@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Services\Food;
+use App\Services\EditAlerts;
 use App\Models\CoveragePolygon;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -31,13 +33,53 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(Food $food) {
+    public function handle(Food $food, EditAlerts $editAlerts) {
         $food->deleteRandomDeliveriesData();
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         foreach ($polygons as $value) {
             $food->generateRandomDeliveries($value);
         }
         $food->prepareRoutingSimulation($polygons);
+        $payload = [ ];
+        $user = User::find(2);
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_regeneration_complete",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+    }
+    
+    /**
+     * The job failed to process.
+     *
+     * @param  Exception  $exception
+     * @return void
+     */
+    public function failed(Exception $exception, EditAlerts $editAlerts)
+    {
+        $payload = [ ];
+        $user = User::find(2);
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_regeneration_failed",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
 }
