@@ -116,10 +116,9 @@ Route::get('/scenario_select', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
-    $polygons = App\Models\CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->first();
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getShippingCosts($polygons->id);
-    return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner'],$polygons->id);
+    $data = $gateway->getShippingCosts();
+    return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']);
 });
 
 Route::get('/email_payment_pse', function () {

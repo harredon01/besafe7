@@ -32,7 +32,7 @@ class RandomDeliveriesSeeder extends Seeder {
     }
 
     public function deleteOldData() {
-        $deliveries = Delivery::where("user_id", 1)->get();
+        $deliveries = Delivery::where("user_id", 5)->get();
         foreach ($deliveries as $item) {
             DB::table('delivery_stop')
                     ->where('delivery_id', $item->id)

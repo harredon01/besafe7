@@ -146,6 +146,15 @@ class FoodController extends Controller {
      *
      * @return Response
      */
+    public function reprogramDeliveries() {
+        $this->food->reprogramDeliveries();
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
     public function getRoutes() {
         $user = $this->auth->user();
 

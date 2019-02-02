@@ -6,7 +6,8 @@
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate</a>
+                    <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
+                    <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a>
                     <div class="replace-address">
                         @include('food.routesList')
                     </div>

@@ -314,7 +314,7 @@ class Food {
                 $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
                 $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
             }
-            $serviceBookResponse = $platFormService->createRoute($queryStops, $type);
+            /*$serviceBookResponse = $platFormService->createRoute($queryStops, $type);
             $stopCodes = $serviceBookResponse['points'];
             $route->code = $serviceBookResponse['key'];
             $route->coverage = json_encode($serviceBookResponse);
@@ -323,7 +323,7 @@ class Food {
                 $stop->code = $stopCodes[$i];
                 $stop->save();
                 $i++;
-            }
+            }*/
             // temp
             $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             $route->unit_cost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
@@ -896,7 +896,7 @@ class Food {
     }
 
     public function deleteRandomDeliveriesData() {
-        $deliveries = Delivery::where("user_id", 1)->get();
+        $deliveries = Delivery::where("user_id", 5)->get();
         foreach ($deliveries as $item) {
             DB::table('delivery_stop')
                     ->where('delivery_id', $item->id)
@@ -927,7 +927,7 @@ class Food {
         $date = date("Y-m-d");
         $shipping = $this->getShippingCostArray();
         //$articles = Article::where('start_date',$date)->get();
-        $articles = Article::where('start_date', "2018-09-01")->get();
+        $articles = Article::where('start_date', "2019-10-02")->get();
         //$date = date_create();
         $total = rand(5, 8);
         for ($x = 0; $x <= $total; $x++) {
@@ -945,14 +945,14 @@ class Food {
                         "long" => $longit,
                         "phone" => "3105507245"
             ]);
-            $amountDeliveries = rand(1, 3);
+            $amountDeliveries = rand(1, 6);
             for ($j = 0; $j <= $amountDeliveries; $j++) {
-                $type_num = rand(0, 2);
-                $art = $articles[$type_num];
+                $type_num = rand(0, count($articles)-1);
+                $art = $articles[$type_num];             
                 $attrs = json_decode($art->attributes, true);
-                $starter = rand(0, 1);
+                $starter = rand(0, count($attrs['entradas'])-1);
                 $starterPlate = $attrs['entradas'][$starter];
-                $main = rand(0, 2);
+                $main = rand(0, count($attrs['plato'])-1);
                 $mainPlate = $attrs['plato'][$main];
                 $pickingUp = rand(0, 1);
                 $pickingUp = 0;
@@ -1028,18 +1028,20 @@ class Food {
     }
 
     public function runCompleteSimulation() {
-
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
-            $this->prepareRoutingSimulation($polygon);
         }
+        $this->prepareRoutingSimulation($polygons);
         $this->getShippingCosts();
     }
 
     public function runRecurringTask() {
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         $user = User::find(2);
+        foreach ($polygons as $polygon) {
+            $this->generateRandomDeliveries($polygon);
+        }
         $this->prepareRoutingSimulation($polygons);
         $results = $this->getShippingCosts();
         Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner']));
@@ -1080,6 +1082,51 @@ class Food {
         }
 
         return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
+    }
+    
+    public function reprogramDeliveries() {
+        $date = date_create();
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek < 5 && $dayofweek > 0) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else {
+            return null;
+        }
+        $la = date_format($date, "Y-m-d");
+//        $date = date_create($la . " 23:59:59");
+//        dd($date);
+        $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->where('user_id', 1)->orderBy('delivery', 'desc')->get();
+        foreach ($deliveries as $item) {
+            $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
+            if ($delivery) {
+                $date = date_create($delivery->delivery);
+            } else {
+                $date = date_create($item->delivery);
+            }
+
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            if ($dayofweek < 5) {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            } else if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("3 days"));
+            } else {
+                return null;
+            }
+            if ($delivery) {
+                if ($delivery->status == "deposit") {
+                    $item->delivery = $delivery->delivery;
+                    $delivery->delivery = $date;
+                    $delivery->save();
+                } else {
+                    $item->delivery = $date;
+                }
+            } else {
+                $item->delivery = $date;
+            }
+            $item->save();
+        }
     }
 
 }

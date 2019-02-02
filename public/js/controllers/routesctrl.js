@@ -103,5 +103,12 @@
 
                         });
             }
+            $scope.regenerateDeliveries = function () {
+                Food.regenerateDeliveries().then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
 
         })

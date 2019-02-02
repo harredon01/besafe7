@@ -3,7 +3,7 @@
     Escenario <br/>
     <select ng-model="scenario" ng-change="changeScenario()">
         <option value="simple">Simple</option>
-        <option value="preorganized">Preorganizado</option>
+        <option value="preorganize">Preorganizado</option>
     </select>
     <ul>
         <li id="route-@{{ route.id}}" ng-repeat="route in routes">

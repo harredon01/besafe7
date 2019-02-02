@@ -96,6 +96,20 @@ class EditUserData {
             ],
         ]);
         $json = json_decode((string) $response->getBody(), true);
+        $payload = [];
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "registration",
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $this->editAlerts->sendMassMessage($data, $followers, null, false, $date, true);
         //$this->getUserCode($user);
         return ['status' => 'success', 'access_token' => $json['access_token']];
     }

@@ -40,7 +40,6 @@ class ScenarioSelect extends Mailable
         $this->preData = $preData;
         $this->simpleData = $simpleData;
         $this->winner = $winner;
-
     }
 
     /**
@@ -50,6 +49,6 @@ class ScenarioSelect extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.scenario-select-email');
+        return $this->markdown('emails.scenario-select-email');
     }
 }
