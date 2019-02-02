@@ -16,16 +16,18 @@ class BuildScenarioRouteIdApi implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $id;
+    
+    protected $user;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($id  )
+    public function __construct(User $user,$id  )
     {
         $this->id = $id;
-
+        $this->user = $user;
     }
 
     /**
@@ -38,8 +40,10 @@ class BuildScenarioRouteIdApi implements ShouldQueue
         $routes = Route::where("id", $this->id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
         $food->buildScenarioTransit($routes);
         $payload = ["route"=> $this->id ];
-        $user = User::find(2);
-        $followers = [$user];
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        $followers = [$this->user];
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -60,13 +64,15 @@ class BuildScenarioRouteIdApi implements ShouldQueue
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception, EditAlerts $editAlerts)
+    public function failed(Exception $exception)
     {
         $payload = ["route"=> $this->id ];
-        $user = User::find(2);
-        $followers = [$user];
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        $followers = [$this->user];
         $data = [
-            "trigger_id" => $user->id,
+            "trigger_id" => $this->user->id,
             "message" => "",
             "subject" => "",
             "object" => "Lonchis",
@@ -76,6 +82,8 @@ class BuildScenarioRouteIdApi implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

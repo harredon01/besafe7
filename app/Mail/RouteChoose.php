@@ -35,6 +35,6 @@ class RouteChoose extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.routes-choose-email');
+        return $this->markdown('emails.food.route-choose');
     }
 }

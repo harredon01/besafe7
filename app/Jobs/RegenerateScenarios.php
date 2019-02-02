@@ -57,7 +57,7 @@ class RegenerateScenarios implements ShouldQueue {
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception, EditAlerts $editAlerts)
+    public function failed(Exception $exception)
     {
         $payload = [ ];
         $user = User::find(2);
@@ -73,6 +73,8 @@ class RegenerateScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 

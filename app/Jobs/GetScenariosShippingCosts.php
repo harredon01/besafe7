@@ -7,22 +7,25 @@ use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ScenarioSelect;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class BuildCompleteScenario implements ShouldQueue
+class GetScenariosShippingCosts implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
+    
+    protected $user;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(User $user)
     {
-
+        $this->user = $user;
     }
 
     /**
@@ -30,9 +33,10 @@ class BuildCompleteScenario implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food,EditAlerts $editAlerts)
+    public function handle(Food $food)
     {
-        $results = $food->getShippingCosts(); 
+        $data = $food->getShippingCosts(); 
+        Mail::to($this->user)->send(new ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']));
     }
     
     /**
@@ -41,7 +45,7 @@ class BuildCompleteScenario implements ShouldQueue
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception, EditAlerts $editAlerts)
+    public function failed(Exception $exception)
     {
         $payload = ["scenario"=> $this->scenario." completo"  ];
         $user = User::find(2);
@@ -57,6 +61,8 @@ class BuildCompleteScenario implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

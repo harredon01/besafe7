@@ -16,16 +16,18 @@ class BuildScenario implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $scenario;
+    
+    protected $user;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($scenario  )
+    public function __construct(User $user, $scenario  )
     {
         $this->scenario = $scenario;
-
+        $this->user = $user;
     }
 
     /**
@@ -38,8 +40,10 @@ class BuildScenario implements ShouldQueue
         $routes = Route::where("type", $this->scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
         $food->buildScenarioTransit($routes);
         $payload = ["scenario"=> $this->scenario ];
-        $user = User::find(2);
-        $followers = [$user];
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        $followers = [$this->user];
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -60,13 +64,15 @@ class BuildScenario implements ShouldQueue
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception, EditAlerts $editAlerts)
+    public function failed(Exception $exception)
     {
         $payload = ["scenario"=> $this->scenario ];
-        $user = User::find(2);
-        $followers = [$user];
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        $followers = [$this->user];
         $data = [
-            "trigger_id" => $user->id,
+            "trigger_id" => $this->user,
             "message" => "",
             "subject" => "",
             "object" => "Lonchis",
@@ -76,6 +82,8 @@ class BuildScenario implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

@@ -88,6 +88,22 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
+            var getSummaryShipping = function () {
+                let url = '/api/food/summary' ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to buildCompleteScenario");
+                        });
+                return def.promise;
+            }
             var regenerateScenarios = function () {
                 let url = '/api/food/regenerate_scenarios';
                 var def = $q.defer();
@@ -141,6 +157,7 @@ angular.module('besafe')
                 getArticles:getArticles,
                 regenerateDeliveries:regenerateDeliveries,
                 getScenarioStructure:getScenarioStructure,
+                getSummaryShipping:getSummaryShipping,
                 buildScenarioRouteId:buildScenarioRouteId,
                 buildCompleteScenario:buildCompleteScenario,
                 regenerateScenarios:regenerateScenarios,

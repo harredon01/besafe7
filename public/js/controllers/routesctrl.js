@@ -110,5 +110,19 @@
 
                         });
             }
+            $scope.getTotalShippingCosts = function () {
+                Food.getSummaryShipping().then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.getScenarioEmails = function () {
+                Food.getScenarioStructure($scope.scenario).then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
 
         })

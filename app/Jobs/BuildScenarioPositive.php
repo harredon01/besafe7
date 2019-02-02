@@ -60,7 +60,7 @@ class BuildScenarioPositive implements ShouldQueue
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception, EditAlerts $editAlerts)
+    public function failed(Exception $exception)
     {
         $payload = ["scenario"=> $this->scenario." positivos"  ];
         $user = User::find(2);
@@ -76,6 +76,8 @@ class BuildScenarioPositive implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

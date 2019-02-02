@@ -3,30 +3,30 @@
 namespace App\Jobs;
 use App\Models\User;
 use App\Services\Food;
-use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RouteChoose;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class BuildCompleteScenario implements ShouldQueue
+class GetScenarioStructure implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    
+    protected $user;
     protected $scenario;
-    protected $hash;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($scenario, $hash )
+    public function __construct(User $user,$scenario)
     {
+        $this->user = $user;
         $this->scenario = $scenario;
-        $this->hash = $hash;
-
     }
 
     /**
@@ -34,24 +34,13 @@ class BuildCompleteScenario implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food,EditAlerts $editAlerts)
+    public function handle(Food $food)
     {
-        $food->buildCompleteScenario($this->scenario, $this->hash); 
-        $payload = ["scenario"=> $this->scenario." completo" ];
-        $user = User::find(2);
-        $followers = [$user];
-        $data = [
-            "trigger_id" => $user->id,
-            "message" => "",
-            "subject" => "",
-            "object" => "Lonchis",
-            "sign" => true,
-            "payload" => $payload,
-            "type" => "food_scenario_transit",
-            "user_status" => "normal"
-        ];
-        $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $data = $food->getTotalEstimatedShipping($this->scenario); 
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        Mail::to($this->user)->send(new RouteChoose($data['routes']));
     }
     
     /**
@@ -63,16 +52,18 @@ class BuildCompleteScenario implements ShouldQueue
     public function failed(Exception $exception)
     {
         $payload = ["scenario"=> $this->scenario." completo"  ];
-        $user = User::find(2);
-        $followers = [$user];
+        if(!$this->user){
+            $this->user = User::find(2);
+        }
+        $followers = [$this->user];
         $data = [
-            "trigger_id" => $user->id,
+            "trigger_id" => $this->user->id,
             "message" => "",
             "subject" => "",
             "object" => "Lonchis",
             "sign" => true,
             "payload" => $payload,
-            "type" => "food_scenario_transit_failed",
+            "type" => "shipping_costs_failed",
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
