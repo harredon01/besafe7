@@ -19,10 +19,24 @@ angular.module('besafe')
                         .error(function () {
                             def.reject("Failed to get getArticles");
                         });
-
                 return def.promise;
                 /**/
-
+            }
+            var getLargestAddresses = function () {
+                let url = '/api/food/largest_addresses' ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get getLargestAddresses");
+                        });
+                return def.promise;
             }
             var buildScenarioRouteId = function (route_id) {
                 let url = '/api/food/build_route_id/'+route_id ;
@@ -162,6 +176,7 @@ angular.module('besafe')
                 buildCompleteScenario:buildCompleteScenario,
                 regenerateScenarios:regenerateScenarios,
                 buildScenarioPositive:buildScenarioPositive,
-                updateArticle:updateArticle
+                updateArticle:updateArticle,
+                getLargestAddresses:getLargestAddresses
             };
         })

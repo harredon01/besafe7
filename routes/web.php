@@ -74,6 +74,7 @@ Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
 Route::get('food/polygons', 'FoodController@getPolygons');
 Route::get('food/routes', 'FoodController@getRoutes');
+Route::get('food/largest_addresses', 'FoodController@getLargestAddresses');
 Route::get('food/menu', 'FoodController@getMenu');
 
 Route::get('/purchase', function () {

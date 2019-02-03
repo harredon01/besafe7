@@ -178,6 +178,21 @@ class FoodApiController extends Controller {
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getLargestAddresses(Request $request) {
+        $user = $request->user();
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            $results = $this->food->getLargestAddresses();
+            return response()->json(array("status" => "success", "message" => "Most common addresses","data" => $results));
+        }
+        return response()->json(array("status" => "error", "message" => "User not authorized"));
+    }
 
     /**
      * Display a listing of the resource.

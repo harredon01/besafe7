@@ -6,6 +6,7 @@
             $scope.page = 0;
             $scope.loadMore = true;
             $scope.scenario = 'simple';
+            $scope.status = 'pending';
             $scope.regionVisible = false;
             $scope.editAddress = false;
             $scope.mapActive = false;
@@ -96,7 +97,7 @@
             }
             $scope.getRoutes = function () {
                 $scope.page++;
-                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario;
+                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario+ "&status=" + $scope.status;
                 Routes.getRoutes(url).then(function (data) {
                     let routesCont = data.data;
                     if (data.page == data.last_page) {
@@ -171,7 +172,7 @@
                         });
             }
             $scope.buildRoute = function (route) {
-                Routes.buildRoute(route.id).then(function (data) {
+                Food.buildScenarioRouteId(route.id).then(function (data) {
                     route.status = "scheduled";
                 },
                         function (data) {

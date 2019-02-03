@@ -262,6 +262,15 @@ class Food {
 
     public function buildScenarioTransit($routes) {
 //        dd($results);
+        foreach ($routes as $route) {
+            $route->status = "built";
+            $route->save();
+        }
+        return true;
+    }
+    
+    public function buildScenarioLogistics() {
+        $routes = App\Models\Route::where("status", "built")->with(['deliveries.user'])->orderBy('id')->get();
         $totalCost = 0;
         $config = $this->loadDayConfig();
         $totalIncomeShipping = 0;
@@ -314,7 +323,7 @@ class Food {
                 $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
                 $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
             }
-            /*$serviceBookResponse = $platFormService->createRoute($queryStops, $type);
+            $serviceBookResponse = $platFormService->createRoute($queryStops, $type);
             $stopCodes = $serviceBookResponse['points'];
             $route->code = $serviceBookResponse['key'];
             $route->coverage = json_encode($serviceBookResponse);
@@ -323,10 +332,7 @@ class Food {
                 $stop->code = $stopCodes[$i];
                 $stop->save();
                 $i++;
-            }*/
-            // temp
-            $totalCost += self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
-            $route->unit_cost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+            }
             $route->save();
             $route->stops = $stops;
             $totalIncomeShipping += $route->unit_price;
@@ -487,6 +493,15 @@ class Food {
         }
         //dd($results);
         return $results;
+    }
+    
+    public function getLargestAddresses() {
+        $thedata = [];
+        $thedata = DB::select(""
+                        . "SELECT count(d.id) as total,oa.address FROM deliveries d "
+                . "join order_addresses oa on oa.id = d.address_id "
+                . "where d.status='transit' group by oa.address limit 30;");
+        return $thedata;
     }
 
     public function prepareQuadrantLimits($lat, $long, $x) {

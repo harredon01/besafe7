@@ -1,10 +1,5 @@
 <div style="height:400px; overflow:scroll">
     Rutas<br><br>
-    Escenario <br/>
-    <select ng-model="scenario" ng-change="changeScenario()">
-        <option value="simple">Simple</option>
-        <option value="preorganize">Preorganizado</option>
-    </select>
     <ul>
         <li id="route-@{{ route.id}}" ng-repeat="route in routes">
             <h3>Ruta Id: <span class="type">@{{ route.id}}</span></h3><br/>
@@ -89,7 +84,7 @@
                     <button ng-click="updateRouteStop()" ng-show="stop.amount>0">Actualizar</button>
                 </li>
             </ul-->
-            <br/><a href="javascript:;" ng-click="buildRoute(route.id)" class="editar">Construir</a>
+            <br/><a href="javascript:;" ng-click="buildRoute(route)" class="editar">Construir</a>
             <br/><br/><a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
         </li>
         <li ng-show="showMore">

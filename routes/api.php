@@ -172,6 +172,7 @@ Route::get('food/get_scenario_structure/{scenario?}', 'FoodApiController@getScen
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
 Route::get('food/summary', 'FoodApiController@getSummaryShipping');
+Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

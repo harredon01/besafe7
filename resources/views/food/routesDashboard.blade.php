@@ -6,6 +6,15 @@
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-body">
+                    Escenario <br/>
+                    <select ng-model="scenario" ng-change="changeScenario()">
+                        <option value="simple">Simple</option>
+                        <option value="preorganize">Preorganizado</option>
+                    </select><br/>
+                    <select ng-model="status" ng-change="changeScenario()">
+                        <option value="pending">Pending</option>
+                        <option value="built">Built</option>
+                    </select><br/>
                     <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>
