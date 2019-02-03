@@ -1,4 +1,4 @@
-<div>
+<div style="height:400px; overflow:scroll">
     Rutas<br><br>
     Escenario <br/>
     <select ng-model="scenario" ng-change="changeScenario()">
@@ -14,7 +14,53 @@
             Ingreso Envio: <span class="type">@{{ route.unit_price}}</span><br/>
             Almuerzos: <span class="type">@{{ route.unit}}</span><br/>
             Stops
-            <ul>
+            <table>
+                <tr>
+                    <td>
+                        Id
+                    </td>
+                    <td>
+                        Status
+                    </td>
+                    <td>
+                        Amount
+                    </td>
+                    <td>
+                        Envio
+                    </td>
+                    <td>
+                        Detalles
+                    </td>
+                    <td>
+                        Acciones
+                    </td>
+                </tr>
+                <tr ng-repeat="stop in route.stops">
+                    <td>
+                        @{{ stop.id}}
+                    </td>
+                    <td>
+                        @{{ stop.status}}
+                    </td>
+                    <td>
+                        @{{ stop.amount}}
+                    </td>
+                    <td>
+                        @{{ stop.shipping}}
+                    </td>
+                    <td>
+                        Detalles Parada: 
+                    <table>
+                        <tr ng-repeat="(key, value) in stop.details">
+                            <td> @{{key}} </td> <td> @{{ value}} </td>
+                        </tr>
+                    </table>
+                    </td>
+                    <td><input type="tel" name="Route" ng-model="stop.route_id" ng-show="stop.amount>0"/>
+                    <button ng-click="updateRouteStop()" ng-show="stop.amount>0">Actualizar</button></td>
+                </tr>
+            </table>
+            <!--ul>
                 <li id="route-@{{ route.id}}-stop-@{{ stop.id}}" ng-repeat="stop in route.stops">
                     Id: <span class="type">@{{ stop.id}}</span><br/>
                     Status: <span class="type">@{{ stop.status}}</span><br/>
@@ -42,8 +88,9 @@
                     <input type="tel" name="Route" ng-model="stop.route_id" ng-show="stop.amount>0"/>
                     <button ng-click="updateRouteStop()" ng-show="stop.amount>0">Actualizar</button>
                 </li>
-            </ul>
+            </ul-->
             <br/><a href="javascript:;" ng-click="buildRoute(route.id)" class="editar">Construir</a>
+            <br/><br/><a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
         </li>
         <li ng-show="showMore">
             <button ng-click="getRoutes()">Cargar mas</button>

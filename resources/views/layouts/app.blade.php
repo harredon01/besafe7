@@ -20,7 +20,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
         <script src="{{ asset('/js/app_1.js')}}"></script>
         <script src="{{ asset('/js/constants.js')}}"></script>
         <script src="{{ asset('/js/controllers/userctrl.js')}}"></script>

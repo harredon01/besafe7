@@ -13,7 +13,7 @@ angular.module('besafe')
                 var myLatlng = new google.maps.LatLng(latitude, longitude);
                 mapOptions = {
                     center: myLatlng,
-                    zoom: 8,
+                    zoom: 12,
                     mapTypeId: google.maps.MapTypeId.ROADMAP
                 };
                 if (document.getElementById("map")) {
@@ -92,6 +92,37 @@ angular.module('besafe')
                     infoWindow.open($rootScope.map, marker);
                 });
                 return marker;
+            }
+            var createStop = function (stop) {
+                damap = $rootScope.map;
+                console.log("creating stop",stop)
+                var marker = new google.maps.Marker({
+                    id: stop.id,
+                    position: new google.maps.LatLng(stop.lat, stop.long),
+                    map: damap,
+                    animation: google.maps.Animation.DROP,
+                    name: stop.name
+                });
+                marker.content = '<div class="infoWindowContent">' + stop.id + ' ' + stop.name + '</div>';
+                google.maps.event.addListener(marker, 'click', function () {
+                    infoWindow.setContent('<h2>' + marker.created_at + '</h2>' + marker.content);
+                    infoWindow.open($rootScope.map, marker);
+                });
+                return marker;
+            }
+            var createRoute = function (route,color) {
+                damap = $rootScope.map;
+                console.log("createRoute",route)
+                var flightPlanCoordinates = route.stopsLat;
+                var flightPath = new google.maps.Polyline({
+                    path: flightPlanCoordinates,
+                    geodesic: true,
+                    strokeColor: color,
+                    strokeOpacity: 1.0,
+                    strokeWeight: 2
+                });
+                flightPath.setMap(damap);
+                return flightPath;
             }
 
             var consoleLogMarkers = function (damarkers) {
@@ -243,6 +274,8 @@ angular.module('besafe')
             return {
                 updateLocations: updateLocations,
                 createMap: createMap,
+                createStop:createStop,
+                createRoute:createRoute,
                 createReport: createReport
             };
         })

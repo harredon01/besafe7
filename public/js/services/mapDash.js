@@ -11,7 +11,7 @@ angular.module('besafe')
 
             var createMap = function (element) {
                 var dalength = $rootScope.markers.length;
-                var zoom = 6;
+                var zoom = 12;
                 var myLatlng = new google.maps.LatLng(4.704296, -74.073775);
 
                 mapOptions = {
