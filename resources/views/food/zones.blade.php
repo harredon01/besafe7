@@ -1,20 +1,20 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container" ng-controller="MenuCtrl">
+<div class="container" ng-controller="ZonesCtrl">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="replace-address">
-                        @include('food.articlesList')
+                        @include('food.zonesList')
                     </div>
                 </div>
             </div>
             <div class="panel panel-default">
-                <div class="panel-heading">Cargar Menu</div>
+                <div class="panel-heading">Cargar Zonas</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/food/menu') }}">
+                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/food/zones') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">

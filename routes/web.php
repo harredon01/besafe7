@@ -72,10 +72,14 @@ Route::get('food/get_scenario_structure/{scenario?}/{hash?}', 'FoodController@ge
 Route::get('food/regenerate_scenarios/{polygon?}/{hash?}', 'FoodController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
-Route::get('food/polygons', 'FoodController@getPolygons');
 Route::get('food/routes', 'FoodController@getRoutes');
 Route::get('food/largest_addresses', 'FoodController@getLargestAddresses');
-Route::get('food/menu', 'FoodController@getMenu');
+Route::get('food/menu', 'FoodImportController@getMenu');
+Route::get('food/zones', 'FoodImportController@getZones');
+Route::get('food/messages', 'FoodImportController@getMessages');
+Route::post('food/menu', 'FoodImportController@postMenu');
+Route::post('food/zones', 'FoodImportController@postZones');
+Route::post('food/messages', 'FoodImportController@postMessages');
 
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";

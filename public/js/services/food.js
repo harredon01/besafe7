@@ -2,8 +2,48 @@ angular.module('besafe')
         
         .service('Food', function ($q, $http) {
 
-            var getArticles = function (where) {
-                let url = '/api/food/articles' ;
+            var getMenu = function (where) {
+                let url = '/api/food/menu' ;
+                if(where){
+                    url = url+'?'+where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get getArticles");
+                        });
+                return def.promise;
+                /**/
+            }
+            var getZones = function (where) {
+                let url = '/api/food/zones' ;
+                if(where){
+                    url = url+'?'+where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get getArticles");
+                        });
+                return def.promise;
+                /**/
+            }
+            var getMessages = function (where) {
+                let url = '/api/food/messages' ;
                 if(where){
                     url = url+'?'+where;
                 }
@@ -150,25 +190,104 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var updateArticle = function (article) {
+            var updateMenuItem = function (item) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/api/food/articles/'+article.id,
-                        data: article, // pass in data as strings
+                        url: '/api/food/menu/'+item.id,
+                        data: item, // pass in data as strings
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to updateArticle");
+                            def.reject("Failed to updateMenuItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var updateZoneItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/food/zone/'+item.id,
+                        data: item, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to updateZoneItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var updateMessageItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/food/messages/'+item.id,
+                        data: item, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to updateMessageItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var deleteMessageItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'DELETE',
+                        url: '/api/food/messages/'+item.id
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to deleteMessageItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var deleteZoneItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'DELETE',
+                        url: '/api/food/zone/'+item.id
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to deleteZoneItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var deleteMenuItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'DELETE',
+                        url: '/api/food/menu/'+item.id
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to deleteMenuItem");
                         });
                 return def.promise;
                 /**/
             }
 
             return {
-                getArticles:getArticles,
+                getMenu:getMenu,
+                getZones:getZones,
+                getMessages:getMessages,
                 regenerateDeliveries:regenerateDeliveries,
                 getScenarioStructure:getScenarioStructure,
                 getSummaryShipping:getSummaryShipping,
@@ -176,7 +295,12 @@ angular.module('besafe')
                 buildCompleteScenario:buildCompleteScenario,
                 regenerateScenarios:regenerateScenarios,
                 buildScenarioPositive:buildScenarioPositive,
-                updateArticle:updateArticle,
+                updateZoneItem:updateZoneItem,
+                updateMenuItem:updateMenuItem,
+                updateMessageItem:updateMessageItem,
+                deleteZoneItem:deleteZoneItem,
+                deleteMenuItem:deleteMenuItem,
+                deleteMessageItem:deleteMessageItem,
                 getLargestAddresses:getLargestAddresses
             };
         })

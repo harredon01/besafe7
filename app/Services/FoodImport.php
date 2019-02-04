@@ -87,14 +87,8 @@ class FoodImport {
                 Address::create($row);
             }
         }
-        $excel = Excel::load(storage_path('imports') . '/merchantPolygons.xlsx');
-        $reader = $excel->toArray();
-        foreach ($reader as $row) {
-            if ($row['id']) {
-                CoveragePolygon::create($row);
-            }
-        }
-        $this->importDishes();
+        $this->importPolygons(storage_path('imports') . '/merchantPolygons.xlsx');
+        $this->importDishes(storage_path('imports') . '/TemplateAlmuerzo.xlsx');
     }
 
     private function importDish($entradas, $principales, $postres, $activeRow) {
@@ -111,9 +105,19 @@ class FoodImport {
                     "attributes" => json_encode($dishes)
         ]);
     }
+    
+    private function importPolygons($path) {
+        $excel = Excel::load($path);
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            if ($row['id']) {
+                CoveragePolygon::create($row);
+            }
+        }
+    }
 
-    public function importDishes() {
-        $excel = Excel::load(storage_path('imports') . '/TemplateAlmuerzo.xlsx');
+    public function importDishes($path) {
+        $excel = Excel::load($path);
         $reader = $excel->toArray();
         $i = 0;
         $activeRow = $reader[0];
@@ -147,6 +151,28 @@ class FoodImport {
             }
         }
         $this->importDish($entradas, $principales, $postres, $activeRow);
+    }
+    
+    public function importTranslations($path) {
+
+        $excel = Excel::load($path);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            unset($sheet['']);
+            if ($sheet['code']) {
+                if(!$sheet['body']){
+                    $sheet['body']="";
+                }
+                $translation = Translation::updateOrCreate([
+                            'code' => $sheet['code'],
+                            'language' => $sheet['language'],
+                            'value' => $sheet['value'],
+                            'body' => $sheet['body']
+                ]);
+            } else {
+                break;
+            }
+        }
     }
 
 }

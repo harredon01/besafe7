@@ -9,7 +9,9 @@ use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
 use App\Jobs\RegenerateDeliveriesAndScenarios;
 use App\Jobs\BuildScenarioRouteIdApi;
+use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Article;
+use App\Models\Translation;
 use App\Models\CoveragePolygon;
 
 class FoodApiController extends Controller {
@@ -199,11 +201,61 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getArticles(Request $request) {
+    public function getMenu(Request $request) {
         $user = $request->user();
         //$request2 = $this->cleanSearch->handleOrder($user, $request);
         if ($request) {
             $queryBuilder = new QueryBuilder(new Article, $request);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
+    }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getMessages(Request $request) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        if ($request) {
+            $queryBuilder = new QueryBuilder(new Translation, $request);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
+    }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getZones(Request $request) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        if ($request) {
+            $queryBuilder = new QueryBuilder(new CoveragePolygon, $request);
             $result = $queryBuilder->build()->paginate();
             return response()->json([
                         'data' => $result->items(),

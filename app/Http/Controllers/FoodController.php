@@ -188,40 +188,4 @@ class FoodController extends Controller {
         return view('food.addressesDashboard')->with('user', $user);
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function getMenu() {
-        $user = $this->auth->user();
-
-        return view('food.menu')->with('user', $user);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function getArticles(Request $request) {
-        $user = $request->user();
-        //$request2 = $this->cleanSearch->handleOrder($user, $request);
-        if ($request) {
-            $queryBuilder = new QueryBuilder(new Article, $request);
-            $result = $queryBuilder->build()->paginate();
-            return response()->json([
-                        'data' => $result->items(),
-                        "total" => $result->total(),
-                        "per_page" => $result->perPage(),
-                        "page" => $result->currentPage(),
-                        "last_page" => $result->lastPage(),
-            ]);
-        }
-        return response()->json([
-                    'status' => "error",
-                    'message' => "illegal parameter"
-                        ], 403);
-    }
-
 }

@@ -37,6 +37,8 @@
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/foodaddressesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/foodmessagesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
@@ -130,6 +132,8 @@ echo json_encode([
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ url('food/menu')}}">Menu</a></li>
+                                    <li><a href="{{ url('food/zones')}}">Zonas</a></li>
+                                    <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
                                     <li><a href="{{ url('food/routes')}}">Rutas</a></li>
                                     <li><a href="{{ url('food/largest_addresses')}}">Direcciones Comunes</a></li>
                                     <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>

@@ -164,7 +164,9 @@ Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
 
-Route::get('food/articles', 'ArticleController@index');
+Route::get('food/menu', 'FoodApiController@getMenu');
+Route::get('food/zones', 'FoodApiController@getZones');
+Route::get('food/messages', 'FoodApiController@getMessages');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
