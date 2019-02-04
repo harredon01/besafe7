@@ -14,7 +14,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Cargar Zonas</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/food/zones') }}">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data" method="POST" action="{{ url('/food/zones') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">

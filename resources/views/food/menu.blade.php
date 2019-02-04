@@ -14,7 +14,7 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Cargar Menu</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/food/menu') }}">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data" method="POST" action="{{ url('/food/menu') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">

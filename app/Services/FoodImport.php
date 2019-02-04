@@ -6,6 +6,7 @@ use App\Models\Article;
 use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\Address;
+use App\Models\Translation;
 use App\Models\CoveragePolygon;
 use App\Models\ProductVariant;
 use Excel;
@@ -154,7 +155,7 @@ class FoodImport {
     }
     
     public function importTranslations($path) {
-
+        Translation::where("id",">",'0')->delete();
         $excel = Excel::load($path);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {

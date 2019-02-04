@@ -14,14 +14,14 @@
             <div class="panel panel-default">
                 <div class="panel-heading">Cargar Alertas</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/food/messages') }}">
+                    <form class="form-horizontal" enctype="multipart/form-data" role="form" method="POST" action="{{ url('/food/messages') }}">
                         {{ csrf_field() }}
 
-                        <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">
+                        <div class="form-group{{ $errors->has('uploadfile') ? ' has-error' : '' }}">
                             <label for="uploadfile" class="col-md-4 control-label">Subir excel</label>
 
                             <div class="col-md-6">
-                                <input id="firstName" type="file" class="form-control" name="uploadfile" >
+                                <input id="uploadfile" type="file" class="form-control" name="uploadfile" >
 
                                 @if ($errors->has('uploadfile'))
                                     <span class="help-block">

@@ -40,6 +40,7 @@ class FoodImportController extends Controller {
     public function getMessages() {
         return view('food.messages');
     }
+
     /**
      * Show the application dashboard to the user.
      *
@@ -47,8 +48,15 @@ class FoodImportController extends Controller {
      */
     public function postMessages(Request $request) {
         $user = $this->auth->user();
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
-        return view('food.polygons')->with('polygons', $polygons);
+        
+        if ($request->hasFile('uploadfile')) {
+            if ($request->file('uploadfile')->isValid()) {
+                $path = $request->uploadfile->path();
+                $this->food->importTranslations($path);
+            }
+        }
+
+        return view('food.messages')->with('user', $user);
     }
 
     /**
@@ -60,6 +68,7 @@ class FoodImportController extends Controller {
         $user = $this->auth->user();
         return view('food.menu')->with('user', $user);
     }
+
     /**
      * Show the application dashboard to the user.
      *
@@ -67,8 +76,11 @@ class FoodImportController extends Controller {
      */
     public function postMenu(Request $request) {
         $user = $this->auth->user();
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
-        return view('food.polygons')->with('polygons', $polygons);
+        if ($request->file('uploadfile')->isValid()) {
+            $path = $request->uploadfile->path();
+            $this->food->importDishes($path);
+        }
+        return view('food.menu')->with('user', $user);
     }
 
     /**
@@ -87,8 +99,11 @@ class FoodImportController extends Controller {
      */
     public function postZones(Request $request) {
         $user = $this->auth->user();
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
-        return view('food.polygons')->with('polygons', $polygons);
+        if ($request->file('uploadfile')->isValid()) {
+            $path = $request->uploadfile->path();
+            $this->food->importPolygons($path);
+        }
+        return view('food.zones')->with('user', $user);
     }
 
 }
