@@ -18,7 +18,7 @@ class CreateSourcesTable extends Migration
             $table->string('source');
             $table->string('gateway');
             $table->string('client_id');
-            $table->string('extra');
+            $table->text('extra');
             $table->string('type');
             $table->boolean('is_active');
             $table->boolean('has_default');

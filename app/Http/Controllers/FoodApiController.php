@@ -186,6 +186,19 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
+    public function getRouteInfo($delivery) {
+        $result = $this->food->getRouteInfo($delivery);
+        if ($result) {
+            return response()->json(array("status" => "success", "message" => "Route info", "route"=>$result));
+        }
+        return response()->json(array("status" => "error", "message" => "User not authorized"));
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
     public function getLargestAddresses(Request $request) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);

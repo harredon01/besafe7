@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailPaymentCash;
 use App\Mail\EmailPaymentPse;
+use App\Mail\EmailPaymentInBank;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
@@ -399,6 +400,24 @@ class EditBilling {
 
                 $payment->save();
                 return $gateway->useCreditCardOptions($user, $data, $payment, $data['platform']);
+            }
+        }
+        return array("status" => "error", "message" => "Invalid order");
+    }
+    public function payInBank(User $user, $source, array $data) {
+        if (array_key_exists("payment_id", $data)) {
+            $payment = Payment::find($data['payment_id']);
+            if ($payment) {
+                $this->changeOrderStatus($payment->order_id);
+                $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                $payment->status = "payment_created";
+                if (array_key_exists('buyer_address', $data)) {
+                    $payment->attributes = json_encode($this->extractBuyer($data));
+                }
+
+                $payment->save();
+                Mail::to($user)->send(new EmailPaymentInBank($payment, $user));
+                return array("status" => "success", "message" => "Payment Created","payment" => $payment);
             }
         }
         return array("status" => "error", "message" => "Invalid order");

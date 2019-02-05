@@ -45,6 +45,7 @@ Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::post('billing/pay_cc/{source?}', 'BillingApiController@postPayCreditCard');
+Route::post('billing/pay_in_bank/{source?}', 'BillingApiController@postPayInBank');
 Route::get('billing/raw_sources/{source?}', 'BillingApiController@getRawSources');
 Route::get('billing/payments', 'BillingApiController@getPayments');
 Route::post('billing/pay_debit/{source?}', 'BillingApiController@postPayDebitCard');
@@ -175,6 +176,7 @@ Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios')
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
 Route::get('food/summary', 'FoodApiController@getSummaryShipping');
 Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
+Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

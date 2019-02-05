@@ -53,6 +53,6 @@ class EmailPaymentPse extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.email-payment-pse-email');
+        return $this->markdown('emails.email-payment-pse-email');
     }
 }

@@ -227,9 +227,9 @@ class Food {
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         $this->prepareRoutingSimulation($polygons);
     }
-    
+
     public function checkUser(User $user) {
-        if($user->id == 1 ||$user->id == 2 ||$user->id == 3){
+        if ($user->id == 1 || $user->id == 2 || $user->id == 3) {
             return true;
         }
         return false;
@@ -268,7 +268,7 @@ class Food {
         }
         return true;
     }
-    
+
     public function buildScenarioLogistics() {
         $routes = App\Models\Route::where("status", "built")->with(['deliveries.user'])->orderBy('id')->get();
         $totalCost = 0;
@@ -326,6 +326,13 @@ class Food {
             $serviceBookResponse = $platFormService->createRoute($queryStops, $type);
             $stopCodes = $serviceBookResponse['points'];
             $route->code = $serviceBookResponse['key'];
+            $location = [
+                "runner" => "",
+                "runner_phone" => "",
+                "lat" => 0,
+                "long" => 0
+            ];
+            $serviceBookResponse["location"] = $location;
             $route->coverage = json_encode($serviceBookResponse);
             $i = 0;
             foreach ($stops as $stop) {
@@ -494,13 +501,13 @@ class Food {
         //dd($results);
         return $results;
     }
-    
+
     public function getLargestAddresses() {
         $thedata = [];
         $thedata = DB::select(""
                         . "SELECT count(d.id) as total,oa.address FROM deliveries d "
-                . "join order_addresses oa on oa.id = d.address_id "
-                . "where d.status='transit' group by oa.address limit 30;");
+                        . "join order_addresses oa on oa.id = d.address_id "
+                        . "where d.status='transit' group by oa.address limit 30;");
         return $thedata;
     }
 
@@ -561,6 +568,15 @@ class Food {
         $route->status = 'pending';
         $route->description = $scenario;
         $route->type = $scenario;
+        $serviceBookResponse=[];
+        $location = [
+            "runner" => "",
+            "runner_phone" => "",
+            "lat" => 0,
+            "long" => 0
+        ];
+        $serviceBookResponse["location"] = $location;
+        $route->coverage = json_encode($serviceBookResponse);
         $route->unit = $stopContainer['amount'];
         $route->height = 1;
         $route->unit_price = $stopContainer['shipping'];
@@ -962,12 +978,12 @@ class Food {
             ]);
             $amountDeliveries = rand(1, 6);
             for ($j = 0; $j <= $amountDeliveries; $j++) {
-                $type_num = rand(0, count($articles)-1);
-                $art = $articles[$type_num];             
+                $type_num = rand(0, count($articles) - 1);
+                $art = $articles[$type_num];
                 $attrs = json_decode($art->attributes, true);
-                $starter = rand(0, count($attrs['entradas'])-1);
+                $starter = rand(0, count($attrs['entradas']) - 1);
                 $starterPlate = $attrs['entradas'][$starter];
-                $main = rand(0, count($attrs['plato'])-1);
+                $main = rand(0, count($attrs['plato']) - 1);
                 $mainPlate = $attrs['plato'][$main];
                 $pickingUp = rand(0, 1);
                 $pickingUp = 0;
@@ -1079,6 +1095,36 @@ class Food {
         }
     }
 
+    public function getRouteInfo($delivery_id) {
+        $theData = ["delivery" => $delivery_id];
+        $routes = DB::select(" select route_id from delivery_route where delivery_id = :delivery", $theData);
+        if (count($routes) > 0) {
+            $route = Route::where("id", $routes[0]->route_id)->with(['stops.address'])->first();
+            return $route;
+        }
+        return null;
+    }
+
+    public function getActiveRoutesUpdate() {
+        $routes = Route::where("status", "transit")->get();
+        if (count($routes)) {
+            $className = "App\\Services\\Rapigo";
+            $platFormService = new $className();
+            foreach ($routes as $route) {
+                $route->coverage = json_parse($route->coverage, true);
+                $location = $route->coverage["location"];
+                $status = $platFormService->checkStatus($route->code);
+                $location["runner"] = $status["detalle"]["mensajero_asignado"];
+                $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
+                $location["lat"] = $status["detalle"]["latitud"];
+                $location["long"] = $status["detalle"]["longitud"];
+                $route->coverage["location"] = $location;
+                $route->coverage = json_encode($route->coverage);
+                $route->save();
+            }
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -1098,7 +1144,7 @@ class Food {
 
         return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
     }
-    
+
     public function reprogramDeliveries() {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));

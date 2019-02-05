@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class EmailPaymentCash extends Mailable
+class EmailPaymentInBank extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -27,31 +27,17 @@ class EmailPaymentCash extends Mailable
      */
     public $user;
     
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
-    public $url;
-    
-    /**
-     * The order instance.
-     *
-     * @var Order
-     */
-    public $pdf;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct(Payment $payment, User $user,$url,$pdf)
+    public function __construct(Payment $payment, User $user)
     {
         $this->payment = $payment;
         $this->user = $user;
-        $this->url = $url;
-        $this->pdf = $pdf;
+
     }
 
     /**
@@ -61,6 +47,6 @@ class EmailPaymentCash extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.email-payment-cash-email');
+        return $this->markdown('emails.email-payment-bank');
     }
 }

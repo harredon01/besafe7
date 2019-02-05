@@ -95,6 +95,22 @@ class BillingApiController extends Controller {
         $status = $this->editBilling->payCreditCard($user,$source, $data);
         return response()->json($status);
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\ResponsepostPayCreditCard
+     */
+    public function postPayInBank(Request $request,$source) {
+        $user = $request->user();
+        $data = $request->all();
+        $data['ip_address'] = $request->ip();
+        $data['user_agent'] = $request->header('User-Agent');
+        $data['cookie'] = $request->cookie('name');
+        $status = $this->editBilling->payInBank($user,$source, $data);
+        return response()->json($status);
+    }
     /**
      * Handle a login request to the application.
      *
