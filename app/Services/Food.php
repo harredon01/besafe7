@@ -39,9 +39,65 @@ class Food {
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
-    public function suspendDelvery($user_id) {
-        Delivery::where("user_id", $user_id)->where("status", "<>", "deposit")->update(['status' => 'suspended']);
-        Delivery::where("user_id", $user_id)->where("status", "deposit")->delete();
+    public function suspendDelvery(User $user, $option) {
+        $className = "App\\Services\\EditAlerts";
+        $platFormService = new $className();
+        $payload = [];
+        $date = date("Y-m-d H:i:s");
+        $followers = [$user];
+        if ($option == "cancel") {
+            Delivery::where("user_id", $user->id)->where("status", "pending")->update(['status' => 'suspended']);
+            Delivery::where("user_id", $user->id)->where("status", "deposit")->delete();
+            $push = $user->push()->where("platform", "food")->first();
+            $push->credits = 0;
+            $push->save();
+            $data = [
+                "trigger_id" => $user->id,
+                "message" => "",
+                "subject" => "",
+                "object" => "Lonchis",
+                "sign" => true,
+                "payload" => $payload,
+                "type" => "food_meal_suspended",
+                "user_status" => "normal"
+            ];
+            $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+        } else {
+            $delivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('id', 'desc')->first();
+            if ($delivery) {
+                $delivery->delete();
+                $data = [
+                    "trigger_id" => $user->id,
+                    "message" => "",
+                    "subject" => "",
+                    "object" => "Lonchis",
+                    "sign" => true,
+                    "payload" => $payload,
+                    "type" => "food_meal_traded",
+                    "user_status" => "normal"
+                ];
+                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+            } else {
+                $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->orderBy('id', 'desc')->first();
+                if ($deposit) {
+                    $deposit->delete();
+                }
+                $push = $user->push()->where("platform", "food")->first();
+                $push->credits = 0;
+                $push->save();
+                $data = [
+                    "trigger_id" => $user->id,
+                    "message" => "",
+                    "subject" => "",
+                    "object" => "Lonchis",
+                    "sign" => true,
+                    "payload" => $payload,
+                    "type" => "food_meal_suspended",
+                    "user_status" => "normal"
+                ];
+                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+            }
+        }
     }
 
     public function loadDayConfig() {
@@ -568,7 +624,7 @@ class Food {
         $route->status = 'pending';
         $route->description = $scenario;
         $route->type = $scenario;
-        $serviceBookResponse=[];
+        $serviceBookResponse = [];
         $location = [
             "runner" => "",
             "runner_phone" => "",

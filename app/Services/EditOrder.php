@@ -138,9 +138,9 @@ class EditOrder {
                 ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
         $cartConditions = Cart::session($user->id)->getConditions();
         $order->orderConditions()->delete();
-        $order->total= $cart['total'];
-        $order->subtotal= $cart['subtotal'];
-        $order->shipping= $cart['shipping'];
+        $order->total = $cart['total'];
+        $order->subtotal = $cart['subtotal'];
+        $order->shipping = $cart['shipping'];
         return $order;
 //        foreach ($cartConditions as $condition) {
 //            $cond = array();
@@ -222,9 +222,8 @@ class EditOrder {
     }
 
     public function removeTransactionCost(Order $order) {
-        $order->orderConditions()->whereIn("name", ["Costo fijo transaccion", "Costo variable transaccion"])->delete();
-        Cart::session($order->user_id)::removeCartCondition("Costo fijo transaccion");
-        Cart::session($order->user_id)::removeCartCondition("Costo variable transaccion");
+        Cart::session($order->user_id)->removeConditionsByType(self::TRANSACTION_CONDITION);
+        $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
     }
 
     /**
@@ -250,7 +249,7 @@ class EditOrder {
                 if ($cart['total'] > 0) {
                     if (array_key_exists("merchant_id", $info)) {
                         $merchant = Merchant::find($info['merchant_id']);
-                        if($merchant){
+                        if ($merchant) {
                             $order->merchant_id = $merchant->id;
                         }
                     }

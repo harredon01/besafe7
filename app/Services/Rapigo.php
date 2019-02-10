@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Stop;
+use App\Models\Route;
+use App\Models\Delivery;
 
 class Rapigo {
 
@@ -61,8 +64,8 @@ class Rapigo {
         return $response;
     }
 
-    public function createRoute(array $points,$type) {
-        if($type == "hour"){
+    public function createRoute(array $points, $type) {
+        if ($type == "hour") {
             $data['type'] = 'hour';
         }
         $data['points'] = json_encode($points);
@@ -79,6 +82,49 @@ class Rapigo {
     }
 
     public function checkStatus($key) {
+        $data['key'] = $key;
+        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
+        $response = $this->sendPost($data, $query);
+        return $response;
+    }
+
+    public function stopUpdate($data) {
+        if ($data["extra_data"]["state"] == "realizada") {
+            
+            $this->stopComplete($stop);
+        } else if ($data["extra_data"]["state"] == "no_realizada") {
+            $stop = Stop::where("code", $data["key"])->first();
+            $route = $stop->route;
+            $results = $this->checkStatus($route->code);
+            $runnerName = $results["detalle"]["mensajero_asignado"];
+        }
+    }
+
+    private function stopComplete($data) {
+        $stop = Stop::where("code", $data["key"])->first();
+        $stop->status = "completed";
+        $stop->save();
+    }
+    private function generateHash($id, $created_at, $updated_at) {
+        return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
+    }
+
+    private function stopFailed($data) {
+        $stop = Stop::where("code", $data["key"])->first();
+        $route = $stop->route;
+        $results = $this->checkStatus($route->code);
+        $runnerName = $results["detalle"]["mensajero_asignado"];
+        $runnerPhone = $results["detalle"]["mensajero_telefono"];
+    }
+
+    public function stopArrived($key) {
+        $data['key'] = $key;
+        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
+        $response = $this->sendPost($data, $query);
+        return $response;
+    }
+
+    public function routeComplete($key) {
         $data['key'] = $key;
         $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
         $response = $this->sendPost($data, $query);

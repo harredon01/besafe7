@@ -15,6 +15,7 @@ use App\Mail\EmailPaymentInBank;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
 use App\Services\EditCart;
+use Cart;
 
 class EditBilling {
 
@@ -408,9 +409,16 @@ class EditBilling {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
-                $this->changeOrderStatus($payment->order_id);
+                $order = $payment->order;
+                Cart::session($user->id)->removeConditionsByType(self::TRANSACTION_CONDITION);
+                $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
+                $results = $this->editOrder->prepareOrder($user, "Food", $data);
+                $order = $results["order"];
+                $payment = $results["payment"];
+                $this->changeOrderStatus($order->id);
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
-                $payment->status = "payment_created";
+                $payment->status = "payment_in_bank";
+                
                 if (array_key_exists('buyer_address', $data)) {
                     $payment->attributes = json_encode($this->extractBuyer($data));
                 }

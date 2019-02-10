@@ -89,6 +89,23 @@ class FoodController extends Controller {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
         }
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function cancelUserCredit($user,$option, $hash) {
+        $users = User::where('id',$user)->get()->limit(1);
+        $check = $this->food->checkScenario($users, $hash);
+        if ($check) {
+            $this->food->suspendDelivery($users[0],$option);
+            //$this->food->getTotalEstimatedShipping($scenario);
+            return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
+        } else {
+            return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
+        }
+    }
 
     /**
      * Show the application dashboard to the user.
