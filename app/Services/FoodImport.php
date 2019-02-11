@@ -107,13 +107,19 @@ class FoodImport {
         ]);
     }
     
-    private function importPolygons($path) {
+    public function importPolygons($path) {
         $excel = Excel::load($path);
         $reader = $excel->toArray();
         foreach ($reader as $row) {
-            if ($row['id']) {
-                CoveragePolygon::create($row);
-            }
+            $coverage = $row['coverage'];
+            $coverage = str_replace("new google.maps.LatLng(",'{"lat":',$coverage);
+            $coverage = str_replace("-74",'"lng":-74',$coverage);
+            $coverage = str_replace("),",'},',$coverage);
+            $coverage = str_replace(")",'}',$coverage);
+            $coverage = "[".$coverage."]";
+            $row['coverage'] = $coverage;
+            $find["id"] = $row["id"];
+            CoveragePolygon::updateOrCreate($find,$row);
         }
     }
 

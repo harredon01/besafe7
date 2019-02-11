@@ -35,7 +35,7 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
      */
     public function handle(Food $food, EditAlerts $editAlerts) {
         $food->deleteRandomDeliveriesData();
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         foreach ($polygons as $value) {
             $food->generateRandomDeliveries($value);
         }

@@ -742,7 +742,7 @@ class Food {
             }
             if ($found == false) {
                 $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer);
-                array_push($routes, $route);
+                array_unshift($routes, $route);
             }
         }
         return $routes;
@@ -1016,7 +1016,7 @@ class Food {
     public function generateRandomDeliveries(CoveragePolygon $polygon) {
         $lat = $polygon->lat;
         $long = $polygon->long;
-        $radius = 5; // in miles
+        $radius = 1; // in miles
         $R = 6371;
         $lat_max = ($lat + rad2deg($radius / $R)) * 1000000000;
         $lat_min = ($lat - rad2deg($radius / $R)) * 1000000000;
@@ -1027,7 +1027,7 @@ class Food {
         //$articles = Article::where('start_date',$date)->get();
         $articles = Article::where('start_date', "2019-10-02")->get();
         //$date = date_create();
-        $total = rand(5, 8);
+        $total = rand(0, 4);
         for ($x = 0; $x <= $total; $x++) {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;
@@ -1123,7 +1123,7 @@ class Food {
     }
 
     public function runCompleteSimulation() {
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }
@@ -1132,7 +1132,7 @@ class Food {
     }
 
     public function runRecurringTask() {
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         $user = User::find(2);
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
@@ -1153,7 +1153,7 @@ class Food {
     }
 
     public function testDataCompleteSimulation() {
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }

@@ -15,7 +15,7 @@ Ingreso Envio: ${{ number_format($preData['shipping_income'], 2, ',', '.') }}
 Total Ingreso: ${{ number_format($preData['total_income'], 2, ',', '.') }}  
 Total Profit: ${{ number_format($preData['day_profit'], 2, ',', '.') }}  
 Numero de rutas: {{$preData['routes']}}  
-Numero de numero de almuerzos: {{$preData['lunches']}}  
+Numero de almuerzos: {{$preData['lunches']}}  
 Promedio almuerzos por ruta: {{$preData['lunch_route']}}  
 @component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/preorganize/".$preData['scenario_hash']])
 Generar Correos
@@ -34,7 +34,7 @@ Ingreso Envio: ${{ number_format($simpleData['shipping_income'], 2, ',', '.') }}
 Total Ingreso: ${{ number_format($simpleData['total_income'], 2, ',', '.') }}  
 Total Profit: ${{ number_format($simpleData['day_profit'], 2, ',', '.') }}  
 Numero de rutas: {{$preData['routes']}}  
-Numero de numero de almuerzos: {{$simpleData['lunches']}}  
+Numero de almuerzos: {{$simpleData['lunches']}}  
 Promedio almuerzos por ruta: {{$simpleData['lunch_route']}}  
 @component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/simple/".$preData['scenario_hash']])
 Generar Correos
