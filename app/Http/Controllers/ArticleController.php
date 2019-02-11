@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Article;
 use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
-
+//use DB;
 class ArticleController extends Controller {
     
     /**
@@ -25,8 +25,10 @@ class ArticleController extends Controller {
     public function index(Request $request) {
         //$request2 = $this->cleanSearch->handleOrder($request);
         if (true) {
+            //DB::enableQueryLog();
             $queryBuilder = new QueryBuilder(new Article, $request);
             $result = $queryBuilder->build()->paginate();
+            //dd(DB::getQueryLog());
             return response()->json([
                         'data' => $result->items(),
                         "total" => $result->total(),
@@ -34,6 +36,7 @@ class ArticleController extends Controller {
                         "page" => $result->currentPage(),
                         "last_page" => $result->lastPage(),
             ]);
+            
         }
         return response()->json([
                     'status' => "error",

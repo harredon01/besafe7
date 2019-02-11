@@ -226,12 +226,17 @@ class PayU {
             return $this->useToken($user, $data, $payment, $platform);
         } else {
             $paymentResult = $this->payCreditCard($user, $data, $payment, $platform);
-            if (array_key_exists("save_card", $data)) {
-                if ($data['save_card']) {
-                    dispatch(new SaveCard($user, $data, "PayU"));
-                    //return $gateway->createToken($user, $data);
+            if ($paymentResult['response']['code'] == "SUCCESS") {
+                if ($paymentResult['response']['transactionResponse']['state'] == "APPROVED") {
+                    if (array_key_exists("save_card", $data)) {
+                        if ($data['save_card']) {
+                            dispatch(new SaveCard($user, $data, "PayU"));
+                            //return $gateway->createToken($user, $data);
+                        }
+                    }
                 }
             }
+
             return $paymentResult;
         }
     }
@@ -1150,9 +1155,9 @@ class PayU {
         }
         return null;
     }
-    
-    public function checkTokens(){
-        $sources = Source::where("has_default",true)->where("gateway", "PayU")->get();
+
+    public function checkTokens() {
+        $sources = Source::where("has_default", true)->where("gateway", "PayU")->get();
         foreach ($sources as $value) {
             $this->checkToken($value);
         }
@@ -1700,7 +1705,7 @@ class PayU {
         $firma = $data['signature'];
         $estadoTx = "";
         $transactionId = $data['transactionId'];
-        if ($firma==$firmacreada) {
+        if ($firma == $firmacreada) {
             //if (strtoupper($firma) == strtoupper($firmacreada)) {
             if ($data['transactionState'] == 4) {
                 $estadoTx = "Transaction approved";

@@ -26,8 +26,8 @@ Construir
 @endcomponent
 
 @component('mail::panel')
-Resumen Escenario Pre:  
-Estado: {{$preData['status']}}  
+Resumen Escenario Simple:  
+Estado: {{$simpleData['status']}}  
 Total Costo: ${{ number_format($simpleData['ShippingCostEstimate'], 2, ',', '.') }}  
 Ingreso Comision: ${{ number_format($simpleData['hoov_income'], 2, ',', '.') }}  
 Ingreso Envio: ${{ number_format($simpleData['shipping_income'], 2, ',', '.') }}  

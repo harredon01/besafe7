@@ -7,7 +7,7 @@ use App\Services\CleanSearch;
 use App\Services\EditDelivery;
 use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
-
+//use DB;
 class DeliveryController extends Controller
 {
     /**
@@ -42,8 +42,10 @@ class DeliveryController extends Controller
         $user = $request->user();
         $request2 = $this->cleanSearch->handle($user,$request);
         if ($request2) {
+            //DB::enableQueryLog();
             $queryBuilder = new QueryBuilder(new Delivery, $request2);
             $result = $queryBuilder->build()->paginate();
+            //dd(DB::getQueryLog());
             return response()->json([
                         'data' => $result->items(),
                         "total" => $result->total(),

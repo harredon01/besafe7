@@ -532,9 +532,19 @@ class Food {
         return [$route];
     }
 
-    public function prepareRouteModel(array $thedata, $results, $preOrganize, $x, $polygon) {
+    public function prepareRouteModel($results, $preOrganize,CoveragePolygon $polygon) {
 //        dd($thedata);
-        $thedata['polygon'] = $polygon;
+        $date = date_create();
+        $la = date_format($date, "Y-m-d");
+        $thedata = [
+            'lat' => $polygon->lat,
+            'lat2' => $polygon->lat,
+            'long' => $polygon->long,
+            'polygon' => $polygon->id,
+            'date1' => $la . " 00:00:00",
+            'date2' => $la . " 23:59:59",
+        ];
+        
         $deliveries = DB::select(""
                         . "SELECT DISTINCT(d.id), d.delivery,d.details,d.user_id,d.address_id,status,shipping, lat,`long`, 
 			( 6371 * acos( cos( radians( :lat ) ) *
@@ -543,6 +553,7 @@ class Food {
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
                         status = 'transit'
+                        AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
@@ -550,9 +561,9 @@ class Food {
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
         if ($preOrganize) {
-            $results = $this->createRoutes($stops, $results, $x, 'preorganize', true);
+            $results = $this->createRoutes($stops, $results, 'preorganize', true);
         } else {
-            $results = $this->createRoutes($stops, $results, $x, 'simple', true);
+            $results = $this->createRoutes($stops, $results, 'simple', true);
         }
         //dd($results);
         return $results;
@@ -567,15 +578,15 @@ class Food {
         return $thedata;
     }
 
-    public function prepareQuadrantLimits($lat, $long, $x) {
-        $R = 6371;
-        if ($x < 4) {
-            $radiusInf = 0;
-            $radius = 7;
-        } else {
-            $radiusInf = 3;
-            $radius = 7;
-        }
+    public function prepareQuadrantLimits($lat, $long) {
+//        $R = 6371;
+//        if ($x < 4) {
+//            $radiusInf = 0;
+//            $radius = 7;
+//        } else {
+//            $radiusInf = 3;
+//            $radius = 7;
+//        }
         $thedata = [
             'lat' => $lat,
             'lat2' => $lat,
@@ -718,7 +729,7 @@ class Food {
      *
      * @return Response
      */
-    public function createRoutes($stops, $routes, $x, $scenario, $save) {
+    public function createRoutes($stops, $routes, $scenario, $save) {
         foreach ($stops as $stopContainer) {
             $found = false;
             foreach ($routes as $route) {
@@ -1097,11 +1108,8 @@ class Food {
         $results = [];
         $results2 = [];
         foreach ($polygons as $polygon) {
-            for ($x = 0; $x < 4; $x++) {
-                $thedata = $this->prepareQuadrantLimits($polygon->lat, $polygon->long, $x);
-                $results2 = $this->prepareRouteModel($thedata, $results2, false, $x, $polygon->id);
-                $results = $this->prepareRouteModel($thedata, $results, true, $x, $polygon->id);
-            }
+            $results2 = $this->prepareRouteModel($results2, false, $polygon);
+            $results = $this->prepareRouteModel($results, true, $polygon);
         }
         $this->completeRoutes($results);
         $this->completeRoutes($results2);
@@ -1203,24 +1211,25 @@ class Food {
 
     public function reprogramDeliveries() {
         $date = date_create();
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek < 5 && $dayofweek > 0) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
-        } else if ($dayofweek == 5) {
-            date_add($date, date_interval_create_from_date_string("3 days"));
-        } else {
-            return null;
-        }
+//        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+//        dd($dayofweek);
+//        if ($dayofweek < 5 && $dayofweek > 0) {
+//            date_add($date, date_interval_create_from_date_string("1 days"));
+//        } else if ($dayofweek == 5) {
+//            date_add($date, date_interval_create_from_date_string("3 days"));
+//        } else {
+//            return null;
+//        }
         $la = date_format($date, "Y-m-d");
 //        $date = date_create($la . " 23:59:59");
 //        dd($date);
-        $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->where('user_id', 1)->orderBy('delivery', 'desc')->get();
+        $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->orderBy('delivery', 'desc')->get();
         foreach ($deliveries as $item) {
             $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
             if ($delivery) {
                 $date = date_create($delivery->delivery);
             } else {
-                $date = date_create($item->delivery);
+                $date = date_create();
             }
 
             $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));

@@ -13,12 +13,14 @@ use App\Models\Route;
 use App\Models\OrderAddress;
 
 class DeliveriesSeeder extends Seeder {
+
     /**
      * Run the database seeds.
      *
      * @return void
      */
-const ORDER_PAYMENT = 'order_payment';
+    const ORDER_PAYMENT = 'order_payment';
+
     /**
      * The edit profile implementation.
      *
@@ -32,25 +34,26 @@ const ORDER_PAYMENT = 'order_payment';
     protected $food;
 
     public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
-        $this->food = $editAlerts;
+        $this->food = $food;
         $this->editOrderfood = $editOrderfood;
     }
 
     public function run() {
-        $user = User::find(1);
-        $user2 = User::find(2);
-        $users = [$user2];
-        $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "test",
-                        "payload" => ['order_id'=>1,"order_total"=>12,"order_status"=>"test"],
-                        "object" => "test",
-                        "sign" => true,
-                        "type" => self::ORDER_PAYMENT,
-                        "user_status" => "test"
-                    ];
-        $this->food->sendMassMessage($data, $users, $user, true, null,"food");
-//        $this->food->checkTokens();
+        
+//        $user = User::find(1);
+//        $user2 = User::find(2);
+//        $users = [$user2];
+//        $data = [
+//                        "trigger_id" => $user->id,
+//                        "message" => "test",
+//                        "payload" => ['order_id'=>1,"order_total"=>12,"order_status"=>"test"],
+//                        "object" => "test",
+//                        "sign" => true,
+//                        "type" => self::ORDER_PAYMENT,
+//                        "user_status" => "test"
+//                    ];
+//        $this->food->sendMassMessage($data, $users, $user, true, null,"food");
+        $this->food->runCompleteSimulation();
 //        $this->food->importDishes();
 //        $this->deleteOldData();
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);
