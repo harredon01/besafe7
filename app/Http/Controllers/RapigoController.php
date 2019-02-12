@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\EditRating;
+use App\Services\Rapigo;
 use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
@@ -21,15 +21,15 @@ class RatingController extends Controller
      * The edit alerts implementation.
      *
      */
-    protected $editRating;
+    protected $rapigo;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Guard $auth, EditRating $editRating) {
-        $this->editRating = $editRating;
+    public function __construct(Guard $auth, Rapigo $rapigo) {
+        $this->rapigo = $rapigo;
         $this->auth = $auth;
         $this->middleware('auth:api');
     }
@@ -39,10 +39,8 @@ class RatingController extends Controller
      *
      * @return Response
      */
-    public function postAddRatingObject(Request $request) {
-        $request->validate($this->editRating->validatorRating());
-        $user = $request->user();
-        return $this->editRating->addRatingObject($request->all(), $user);
+    public function getActiveRoutesUpdate() {
+        return $this->rapigo->getActiveRoutesUpdate();
     }
     
     /**

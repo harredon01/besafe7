@@ -45,7 +45,7 @@ class BuildScenarioRouteIdApi implements ShouldQueue
         }
         $followers = [$this->user];
         $data = [
-            "trigger_id" => $user->id,
+            "trigger_id" => $this->user->id,
             "message" => "",
             "subject" => "",
             "object" => "Lonchis",

@@ -738,7 +738,7 @@ class Food {
                     $found = true;
                     $this->addStopToRoute($route, $save, $stopContainer);
                     break;
-                }
+                } 
             }
             if ($found == false) {
                 $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer);
@@ -1169,25 +1169,7 @@ class Food {
         return null;
     }
 
-    public function getActiveRoutesUpdate() {
-        $routes = Route::where("status", "transit")->get();
-        if (count($routes)) {
-            $className = "App\\Services\\Rapigo";
-            $platFormService = new $className();
-            foreach ($routes as $route) {
-                $route->coverage = json_parse($route->coverage, true);
-                $location = $route->coverage["location"];
-                $status = $platFormService->checkStatus($route->code);
-                $location["runner"] = $status["detalle"]["mensajero_asignado"];
-                $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
-                $location["lat"] = $status["detalle"]["latitud"];
-                $location["long"] = $status["detalle"]["longitud"];
-                $route->coverage["location"] = $location;
-                $route->coverage = json_encode($route->coverage);
-                $route->save();
-            }
-        }
-    }
+    
 
     /**
      * Store a newly created resource in storage.

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\Stop;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -16,16 +17,22 @@ class StopFailed extends Mailable
      *
      * @var Order
      */
-    public $data;
+    public $stop;
+    
+    public $runnerName;
+    
+    public $runnerPhone;
     
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($theData)
+    public function __construct(Stop $stop,$runnerName,$runnerPhone)
     {
-        $this->data = $theData;
+        $this->stop = $stop;
+        $this->runnerName = $runnerName;
+        $this->runnerPhone = $runnerPhone;
     }
 
     /**
@@ -35,6 +42,6 @@ class StopFailed extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.routes-email');
+        return $this->markdown('emails.food.stop-failed');
     }
 }

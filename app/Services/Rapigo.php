@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Stop;
 use App\Models\Route;
 use App\Models\Delivery;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StopFailed;
 
 class Rapigo {
 
@@ -88,47 +90,100 @@ class Rapigo {
         return $response;
     }
 
-    public function stopUpdate($data) {
-        if ($data["extra_data"]["state"] == "realizada") {
-            
-            $this->stopComplete($stop);
-        } else if ($data["extra_data"]["state"] == "no_realizada") {
-            $stop = Stop::where("code", $data["key"])->first();
-            $route = $stop->route;
-            $results = $this->checkStatus($route->code);
-            $runnerName = $results["detalle"]["mensajero_asignado"];
-        }
-    }
-
-    private function stopComplete($data) {
-        $stop = Stop::where("code", $data["key"])->first();
-        $stop->status = "completed";
-        $stop->save();
-    }
     private function generateHash($id, $created_at, $updated_at) {
         return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
     }
 
+    public function stopUpdate($data) {
+        if ($data["extra_data"]["state"] == "realizada") {
+            $this->stopComplete($data);
+        } else if ($data["extra_data"]["state"] == "no_realizada") {
+            $this->stopFailed($data);
+        }
+    }
+
+    private function stopComplete($data) {
+        $stop = Stop::where("code", $data["key"])->with("deliveries")->first();
+        foreach ($stop->deliveries as $delivery) {
+            $delivery->status = "completed";
+            $delivery->save();
+        }
+        $stop->status = "completed";
+        $stop->save();
+    }
+
     private function stopFailed($data) {
-        $stop = Stop::where("code", $data["key"])->first();
+        $stop = Stop::where("code", $data["key"])->with("deliveries.user")->first();
         $route = $stop->route;
         $results = $this->checkStatus($route->code);
         $runnerName = $results["detalle"]["mensajero_asignado"];
         $runnerPhone = $results["detalle"]["mensajero_telefono"];
+        $userAdmin = User::find(2);
+        foreach ($stop->deliveries as $delivery) {
+            $user = $delivery->user;
+            $user->activationHash = $this->generateHash($user->id, $user->created_at, $user->updated_at);
+            $delivery = Delivery::where("status", "pending")->where("user_id", $user->id)->orderBy('delivery', 'desc')->first();
+            if ($delivery) {
+                $user->lunchHash = $user->activationHash;
+            } else {
+                $user->lunchHash = null;
+            }
+        }
+        Mail::to($userAdmin)->send(new StopFailed($stop, $runnerName, $runnerPhone));
     }
 
-    public function stopArrived($key) {
-        $data['key'] = $key;
-        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
-        $response = $this->sendPost($data, $query);
-        return $response;
+    public function stopArrived($info) {
+        $stop = Stop::where("code", $info["key"])->with("deliveries.user")->first();
+        $followers = [];
+        foreach ($stop->deliveries as $delivery) {
+            array_push($followers, $delivery->user);
+        }
+        $payload = [];
+        $data = [
+            "trigger_id" => 1,
+            "message" => "",
+            "subject" => "",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "food_meal_arriving",
+            "user_status" => "normal"
+        ];
+        $className = "App\\Services\\EditAlerts";
+        $editAlerts = new $className;
+        $date = date("Y-m-d H:i:s");
+        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        return true;
     }
 
-    public function routeComplete($key) {
-        $data['key'] = $key;
-        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
-        $response = $this->sendPost($data, $query);
-        return $response;
+    public function routeCompleted($data) {
+        $route = Route::where("code", $data["key"])->first();
+        $route->status = "complete";
+        $route->save();
+    }
+
+    public function routeStarted($data) {
+        $route = Route::where("code", $data["key"])->first();
+        $route->status = "transit";
+        $route->save();
+    }
+    
+    public function getActiveRoutesUpdate() {
+        $routes = Route::where("status", "transit")->get();
+        if (count($routes)) {
+            foreach ($routes as $route) {
+                $route->coverage = json_parse($route->coverage, true);
+                $location = $route->coverage["location"];
+                $status = $this->checkStatus($route->code);
+                $location["runner"] = $status["detalle"]["mensajero_asignado"];
+                $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
+                $location["lat"] = $status["detalle"]["latitud"];
+                $location["long"] = $status["detalle"]["longitud"];
+                $route->coverage["location"] = $location;
+                $route->coverage = json_encode($route->coverage);
+                $route->save();
+            }
+        }
     }
 
     /**
@@ -150,20 +205,18 @@ class Rapigo {
         $current .= PHP_EOL;
         $current .= PHP_EOL;
         file_put_contents($file, $current);
-        $ApiKey = env('PAYU_KEY');
-        $merchant_id = $data['merchant_id'];
-        $referenceCode = $data['reference_sale'];
-        $TX_VALUE = $data['value'];
-        $New_value = number_format($TX_VALUE, 1, '.', '');
-        $currency = $data['currency'];
-        $transactionState = $data['state_pol'];
-        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        $firmacreada = md5($firma_cadena);
-        $firma = $data['sign'];
-        if (strtoupper($firma) == strtoupper($firmacreada)) {
-            
-        } else {
-            
+        if (true) {
+            if ($data['codigo'] == "parada_llegue") {
+                $this->stopArrived($data);
+            } else if ($data['codigo'] == "parada_finalizada") {
+                $this->stopUpdate($data);
+            } else if ($data['codigo'] == "parada_finalizada") {
+                $this->stopUpdate($data);
+            } else if ($data['codigo'] == "servicio_asignado") {
+                $this->routeStarted($data);
+            } else if ($data['codigo'] == "servicio_finalizado") {
+                $this->routeCompleted($data);
+            }
         }
     }
 
