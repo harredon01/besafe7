@@ -593,7 +593,7 @@ class Food {
         $thedata = DB::select(""
                         . "SELECT count(d.id) as total,oa.address FROM deliveries d "
                         . "join order_addresses oa on oa.id = d.address_id "
-                        . "where d.status='transit' group by oa.address limit 30;");
+                        . "where d.status='enqueue' group by oa.address limit 30;");
         return $thedata;
     }
 
