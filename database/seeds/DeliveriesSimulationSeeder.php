@@ -23,7 +23,7 @@ class DeliveriesSimulationSeeder extends Seeder {
         $user = User::find(2);
         $this->food->deleteOldData();
         $this->food->prepareRoutingSimulation($polygons);
-        $results = $this->food->getShippingCosts();
+        $results = $this->food->getShippingCosts("pending");
         //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
     }
     

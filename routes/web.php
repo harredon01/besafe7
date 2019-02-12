@@ -114,7 +114,7 @@ Route::get('/route_choose', function () {
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getTotalEstimatedShipping("preorganize-1");
+    $data = $gateway->getTotalEstimatedShipping("preorganize","pending");
     return new App\Mail\RouteChoose($data['routes']);
 });
 Route::get('/scenario_select', function () {
@@ -122,7 +122,7 @@ Route::get('/scenario_select', function () {
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getShippingCosts();
+    $data = $gateway->getShippingCosts("pending");
     return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']);
 });
 

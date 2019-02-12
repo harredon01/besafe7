@@ -171,10 +171,10 @@ Route::get('food/messages', 'FoodApiController@getMessages');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
-Route::get('food/get_scenario_structure/{scenario?}', 'FoodApiController@getScenarioStructure');
+Route::get('food/get_scenario_structure/{scenario?}/{type?}', 'FoodApiController@getScenarioStructure');
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
-Route::get('food/summary', 'FoodApiController@getSummaryShipping');
+Route::get('food/summary/{type?}', 'FoodApiController@getSummaryShipping');
 Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
 

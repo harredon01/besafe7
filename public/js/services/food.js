@@ -126,8 +126,8 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getScenarioStructure = function (scenario) {
-                let url = '/api/food/get_scenario_structure/'+scenario ;
+            var getScenarioStructure = function (scenario,type) {
+                let url = '/api/food/get_scenario_structure/'+scenario+"/"+type ;
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -142,8 +142,8 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getSummaryShipping = function () {
-                let url = '/api/food/summary' ;
+            var getSummaryShipping = function (type) {
+                let url = '/api/food/summary/'+type ;
                 var def = $q.defer();
                 $http({
                     method: 'get',

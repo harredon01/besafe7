@@ -51,16 +51,6 @@ class FoodController extends Controller {
         return view('user.editAccess')->with('user', $user);
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function getSummaryShipping($polygon) {
-        $user = $this->auth->user();
-        $results = $this->food->getShippingCosts();
-        return view('food.summary')->with('data', $results)->with('polygon_id', $polygon);
-    }
 
     /**
      * Show the application dashboard to the user.
@@ -83,7 +73,7 @@ class FoodController extends Controller {
         $check = $this->food->checkScenario($routes, $hash);
         if ($check) {
             dispatch(new \App\Jobs\GetScenarioStructure(null,$scenario));
-            //$this->food->getTotalEstimatedShipping($scenario);
+            //$this->food->getTotalEstimatedShipping($scenario,"pending");
             return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
@@ -100,7 +90,6 @@ class FoodController extends Controller {
         $check = $this->food->checkScenario($users, $hash);
         if ($check) {
             $this->food->suspendDelivery($users[0],$option);
-            //$this->food->getTotalEstimatedShipping($scenario);
             return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");

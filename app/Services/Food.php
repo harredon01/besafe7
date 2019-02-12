@@ -210,8 +210,13 @@ class Food {
         return $dayConfig;
     }
 
-    public function getTotalEstimatedShipping($scenario) {
-        $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->get();
+    public function getTotalEstimatedShipping($scenario, $type) {
+        if ($type == "pending") {
+            $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->get();
+        } else {
+            $routes = Route::where("status", $scenario)->with(['stops.address'])->get();
+        }
+
         $totalCost = 0;
         $totalIncomeShipping = 0;
         $totalLunches = 0;
@@ -280,7 +285,7 @@ class Food {
     }
 
     public function regenerateScenarios() {
-        $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         $this->prepareRoutingSimulation($polygons);
     }
 
@@ -319,14 +324,23 @@ class Food {
     public function buildScenarioTransit($routes) {
 //        dd($results);
         foreach ($routes as $route) {
-            $route->status = "built";
+            $route->status = "enqueue";
+            foreach ($route->deliveries as $delivery) {
+                $delivery->status = "scheduled";
+                $delivery->save();
+            }
+            $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
+            foreach ($stops as $stop) {
+                $stop->code = "stop-" . $stop->id;
+                $stop->save();
+            }
             $route->save();
         }
         return true;
     }
 
     public function buildScenarioLogistics() {
-        $routes = App\Models\Route::where("status", "built")->with(['deliveries.user'])->orderBy('id')->get();
+        $routes = App\Models\Route::where("status", "enqueue")->with(['deliveries.user'])->orderBy('id')->get();
         $totalCost = 0;
         $config = $this->loadDayConfig();
         $totalIncomeShipping = 0;
@@ -339,12 +353,8 @@ class Food {
             foreach ($stops as $stop) {
                 $deliveries = "";
                 foreach ($stop->deliveries as $stopDel) {
-                    $details = json_decode($stopDel->details, true);
-                    $delConfig = $config;
-                    $dels = [$stopDel];
-                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-                    $delTotals = $this->printTotalsConfig($delConfig);
-                    $stopDel->totals = $delTotals;
+                    $stopDel->status = "scheduled";
+                    $delUser = $stopDel->user;
                     $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
                     if (array_key_exists("pickup", $details)) {
                         if ($details['pickup'] == "envase") {
@@ -353,6 +363,15 @@ class Food {
                     }
                     $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> " . json_encode($delTotals);
                     $stopDel->region_name = $descr;
+                    $stopDel->save();
+
+                    $details = json_decode($stopDel->details, true);
+                    $delConfig = $config;
+                    $dels = [$stopDel];
+                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
+                    $delTotals = $this->printTotalsConfig($delConfig);
+                    $stopDel->totals = $delTotals;
+
                     $deliveries = $deliveries . $descr;
                 }
                 $address = $stop->address;
@@ -367,7 +386,7 @@ class Food {
                 ];
                 array_push($queryStops, $querystop);
             }
-            $route->status = "built";
+            $route->status = "enqueue";
             $rapigoResponse = $platFormService->getEstimate($queryStops);
             $type = "stops";
             if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
@@ -532,7 +551,7 @@ class Food {
         return [$route];
     }
 
-    public function prepareRouteModel($results, $preOrganize,CoveragePolygon $polygon) {
+    public function prepareRouteModel($results, $preOrganize, CoveragePolygon $polygon) {
 //        dd($thedata);
         $date = date_create();
         $la = date_format($date, "Y-m-d");
@@ -544,7 +563,7 @@ class Food {
             'date1' => $la . " 00:00:00",
             'date2' => $la . " 23:59:59",
         ];
-        
+
         $deliveries = DB::select(""
                         . "SELECT DISTINCT(d.id), d.delivery,d.details,d.user_id,d.address_id,status,shipping, lat,`long`, 
 			( 6371 * acos( cos( radians( :lat ) ) *
@@ -552,7 +571,7 @@ class Food {
 		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
-                        status = 'transit'
+                        status = 'enqueue'
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
@@ -738,7 +757,7 @@ class Food {
                     $found = true;
                     $this->addStopToRoute($route, $save, $stopContainer);
                     break;
-                } 
+                }
             }
             if ($found == false) {
                 $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer);
@@ -1004,11 +1023,11 @@ class Food {
                     ->delete();
             $item->delete();
         }
-        $routes = Route::where("status", "pending")->get();
+        $routes = Route::whereIn("status", ["pending","enqueue"])->get();
         foreach ($routes as $value) {
             $value->stops()->delete();
         }
-        Route::where("status", "pending")->delete();
+        Route::whereIn("status", ["pending","enqueue"])->delete();
 
         OrderAddress::where("name", "test")->delete();
     }
@@ -1070,7 +1089,7 @@ class Food {
                             "delivery" => $date,
                             "type_id" => $art->id,
                             "shipping" => $shipping[$amountDeliveries],
-                            "status" => "transit",
+                            "status" => "enqueue",
                             "starter_id" => $starterPlate['codigo'],
                             "main_id" => $mainPlate['codigo'],
                             "address_id" => $address->id,
@@ -1119,7 +1138,7 @@ class Food {
         $polygon = CoveragePolygon::find(1);
         $this->generateRandomDeliveries($polygon);
         $this->prepareRoutingSimulation($polygon);
-        $this->getShippingCosts();
+        $this->getShippingCosts("pending");
     }
 
     public function runCompleteSimulation() {
@@ -1128,7 +1147,7 @@ class Food {
             $this->generateRandomDeliveries($polygon);
         }
         $this->prepareRoutingSimulation($polygons);
-        $this->getShippingCosts();
+        $this->getShippingCosts("pending");
     }
 
     public function runRecurringTask() {
@@ -1138,7 +1157,7 @@ class Food {
             $this->generateRandomDeliveries($polygon);
         }
         $this->prepareRoutingSimulation($polygons);
-        $results = $this->getShippingCosts();
+        $results = $this->getShippingCosts("pending");
         Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner']));
         $deliveries = Delivery::where("status", "transit")->get();
         $this->getPurchaseOrder($deliveries);
@@ -1169,18 +1188,23 @@ class Food {
         return null;
     }
 
-    
-
     /**
      * Store a newly created resource in storage.
      *
      * @return Response
      */
-    public function getShippingCosts() {
-        $resultsPre = $this->getTotalEstimatedShipping("preorganize");
-        $resultsPre = $resultsPre['result'];
-        $resultsSimple = $this->getTotalEstimatedShipping("simple");
-        $resultsSimple = $resultsSimple['result'];
+    public function getShippingCosts($type) {
+        if ($type == "pending") {
+            $resultsPre = $this->getTotalEstimatedShipping("preorganize", $type);
+            $resultsPre = $resultsPre['result'];
+            $resultsSimple = $this->getTotalEstimatedShipping("simple", $type);
+            $resultsSimple = $resultsSimple['result'];
+        } else {
+            $resultsPre = $this->getTotalEstimatedShipping("enqueue", $type);
+            $resultsPre = $resultsPre['result'];
+            $resultsSimple = $resultsPre;
+        }
+
         $winningScenario = "";
         if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
             $winningScenario = "Preorganize";

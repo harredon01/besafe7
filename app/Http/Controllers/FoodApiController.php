@@ -52,12 +52,12 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getSummaryShipping(Request $request) {
+    public function getSummaryShipping(Request $request,$type) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenariosShippingCosts($user));
-            //$results = $this->food->getShippingCosts();
+            dispatch(new \App\Jobs\GetScenariosShippingCosts($user,$type));
+            //$results = $this->food->getShippingCosts($type);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
@@ -67,12 +67,12 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure(Request $request, $scenario) {
+    public function getScenarioStructure(Request $request, $scenario,$type) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenarioStructure($user,$scenario));
-            //$this->food->getTotalEstimatedShipping($scenario);
+            dispatch(new \App\Jobs\GetScenarioStructure($user,$scenario,$type));
+            //$this->food->getTotalEstimatedShipping($scenario,$type);
             return response()->json(array("status" => "success", "message" => "Scenario shipping calculated"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
@@ -87,7 +87,7 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\BuildScenarioRouteIdApi($id));
+            dispatch(new \App\Jobs\BuildScenarioRouteIdApi($user,$id));
 //            $routes = App\Models\Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
 //            $this->food->buildScenarioTransit($routes);
             return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
@@ -121,9 +121,9 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            //dispatch(new BuildScenario($scenario));
-            $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
-            $this->food->buildScenarioTransit($routes);
+            dispatch(new BuildScenario($user,$scenario));
+//            $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+//            $this->food->buildScenarioTransit($routes);
             return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));

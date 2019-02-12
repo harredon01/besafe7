@@ -13,7 +13,7 @@
                     </select><br/>
                     <select ng-model="status" ng-change="changeScenario()">
                         <option value="pending">Pending</option>
-                        <option value="built">Built</option>
+                        <option value="enqueue">Esperando</option>
                     </select><br/>
                     <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>

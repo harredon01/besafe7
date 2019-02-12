@@ -18,14 +18,17 @@ class GetScenariosShippingCosts implements ShouldQueue
 
     
     protected $user;
+    
+    protected $type;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user)
+    public function __construct(User $user,$type)
     {
         $this->user = $user;
+        $this->type = $type;
     }
 
     /**
@@ -35,7 +38,7 @@ class GetScenariosShippingCosts implements ShouldQueue
      */
     public function handle(Food $food)
     {
-        $data = $food->getShippingCosts(); 
+        $data = $food->getShippingCosts($this->type); 
         Mail::to($this->user)->send(new ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']));
     }
     
