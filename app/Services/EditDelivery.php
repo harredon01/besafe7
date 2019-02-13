@@ -45,6 +45,7 @@ class EditDelivery {
                     $delivery->starter_id = $data['starter_id'];
                     $delivery->main_id = $data['main_id'];
                     $delivery->dessert_id = $data['dessert_id'];
+                    $this->checkRecurringPosibility($user);
                 }
 
 
@@ -76,6 +77,13 @@ class EditDelivery {
                     }
                 }
             }
+        }
+    }
+    
+    private function checkRecurringPosibility(User $user) {
+        $deliveries = Delivery::where("user_id",$user->id)->where("status","pending")->get();
+        if(count($deliveries)<=3){
+            $orders = Order::where("user_id",$user->id)->where("is_recurring",true)->where("status","approved")->orderBy('id', 'desc')->first();
         }
     }
 
