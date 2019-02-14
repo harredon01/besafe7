@@ -27,9 +27,10 @@ use DB;
 class EditOrder {
 
     const OBJECT_ORDER = 'Order';
+    const TRANSACTION_CONDITION = 'transaction';
     const OBJECT_ORDER_REQUEST = 'OrderRequest';
     const ORDER_PAYMENT = 'order_payment';
-    const ORDER_PAYMENT_REQUEST = 'order_payment_request';
+    const ORDER_PAYMENT_REQUEST = 'split_order_payment';
     const PAYMENT_APPROVED = 'payment_approved';
     const PAYMENT_STATUS = 'payment_status';
     const ORDER_STATUS = 'order_status';
@@ -136,8 +137,6 @@ class EditOrder {
         Item::where('user_id', $user->id)
                 ->whereNull('order_id')
                 ->update(['order_id' => $order->id, 'updated_at' => date("Y-m-d H:i:s")]);
-        $cartConditions = Cart::session($user->id)->getConditions();
-        $order->orderConditions()->delete();
         $order->total = $cart['total'];
         $order->subtotal = $cart['subtotal'];
         $order->shipping = $cart['shipping'];
@@ -209,7 +208,7 @@ class EditOrder {
                 "object" => self::OBJECT_ORDER,
                 "sign" => true,
                 "payload" => $payload,
-                "type" => self::ORDER_PAYMENT,
+                "type" => self::ORDER_PAYMENT_REQUEST,
                 "user_status" => $user->getUserNotifStatus()
             ];
             $date = date("Y-m-d H:i:s");
