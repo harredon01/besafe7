@@ -117,7 +117,10 @@ class FoodImport {
             $coverage = str_replace("),",'},',$coverage);
             $coverage = str_replace(")",'}',$coverage);
             $coverage = "[".$coverage."]";
-            $row['coverage'] = $coverage;
+            $resultset = json_decode($coverage,true);
+            $firstItem = $resultset[0];
+            array_push($resultset,$firstItem);
+            $row['coverage'] = json_encode($resultset);
             $find["id"] = $row["id"];
             CoveragePolygon::updateOrCreate($find,$row);
         }
