@@ -90,6 +90,7 @@ class DeliveryController extends Controller
             'observation',
             'details'
         ]);
+        $data['ip_address'] = $request->ip();
         return response()->json($this->editDelivery->postDeliveryOptions($user, $data));
 
     }

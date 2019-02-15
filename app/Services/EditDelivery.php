@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Validator;
 use App\Models\User;
+use App\Jobs\RecurringOrder;
 use App\Models\Push;
 use App\Models\Delivery;
 
@@ -45,7 +46,7 @@ class EditDelivery {
                     $delivery->starter_id = $data['starter_id'];
                     $delivery->main_id = $data['main_id'];
                     $delivery->dessert_id = $data['dessert_id'];
-                    $this->checkRecurringPosibility($user);
+                    $this->checkRecurringPosibility($user,$data['ip_address']);
                 }
 
 
@@ -80,10 +81,11 @@ class EditDelivery {
         }
     }
     
-    private function checkRecurringPosibility(User $user) {
+    private function checkRecurringPosibility(User $user,$ip_address) {
         $deliveries = Delivery::where("user_id",$user->id)->where("status","pending")->get();
-        if(count($deliveries)<=3){
-            $orders = Order::where("user_id",$user->id)->where("is_recurring",true)->where("status","approved")->orderBy('id', 'desc')->first();
+        if(count($deliveries)==1){
+            $order = Order::where("user_id",$user->id)->where("is_recurring",true)->where("status","approved")->orderBy('id', 'desc')->first();
+            dispatch(new RecurringOrder($order, $ip_address));
         }
     }
 

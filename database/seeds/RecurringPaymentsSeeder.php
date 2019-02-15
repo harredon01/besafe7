@@ -2,14 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\OrderJobs;
-use App\Services\PayU;
-use App\Services\EditOrderFood;
-use App\Models\Payment;
 use App\Models\Order;
-use App\Models\User;
-use App\Models\Delivery;
-use App\Models\Route;
-use App\Models\OrderAddress;
 
 class RecurringPaymentsSeeder extends Seeder {
     /**

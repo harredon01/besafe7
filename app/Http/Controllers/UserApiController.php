@@ -312,6 +312,7 @@ class UserApiController extends Controller {
         $sources = $user->sources()->where("has_default",true)->get();
         $data['savedCards'] = [];
         foreach ($sources as $value) {
+            $data['savedCard'] = true;
             array_push($data['savedCards'], $value->gateway);
         }
         $data['current_time'] = date("Y-m-d H:i:s");

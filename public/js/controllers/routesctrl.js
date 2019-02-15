@@ -39,6 +39,9 @@
             $scope.changeScenario = function () {
                 $scope.page = 0;
                 $scope.routes = [];
+                if ($scope.mapActive) {
+                    $scope.hideAll();
+                }
                 $scope.getRoutes();
             }
             $scope.getRouteColor = function () {
@@ -99,11 +102,11 @@
                 $scope.page++;
                 let type = "pending";
                 let scenario = $scope.scenario;
-                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario+ "&status=" + $scope.status;
-                if($scope.status != "pending"){
-                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario+ "&status=" + $scope.status;
+                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status;
+                if ($scope.status != "pending") {
+                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status;
                 }
-                
+
                 Routes.getRoutes(url).then(function (data) {
                     let routesCont = data.data;
                     if (data.page == data.last_page) {
@@ -201,7 +204,7 @@
             }
             $scope.getTotalShippingCosts = function () {
                 let type = "pending";
-                if($scope.status != "pending"){
+                if ($scope.status != "pending") {
                     type = "built";
                 }
                 Food.getSummaryShipping(type).then(function (data) {
@@ -213,11 +216,11 @@
             $scope.getScenarioEmails = function () {
                 let type = "pending";
                 let scenario = $scope.scenario;
-                if($scope.status != "pending"){
+                if ($scope.status != "pending") {
                     type = "built";
                     scenario = "enqueue";
                 }
-                Food.getScenarioStructure(scenario,type).then(function (data) {
+                Food.getScenarioStructure(scenario, type).then(function (data) {
                 },
                         function (data) {
 
