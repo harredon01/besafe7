@@ -7,7 +7,7 @@ Estado: {{$order->status}}
 | Nombre         | Valor          | Cantidad          |Total                        |
 | :------------- |---------------:| -----------------:|----------------------------:|
 @foreach ($order->items as $item)
-| {{$item->name}}|{{$item->price}}|{{$item->quantity}}|{{$item->priceSumConditions}}|
+| {{$item->name}}|{{number_format($item->price, 2, ',', '.')}}|{{$item->quantity}}|{{number_format($item->priceSumConditions, 2, ',', '.')}}|
 @endforeach  
 @endcomponent
 
@@ -15,9 +15,9 @@ Estado: {{$order->status}}
 | Nombre         | Tipo          | Valor            |
 | :------------- |--------------:|-----------------:|
 @foreach ($order->orderConditions as $item)
-| {{$item->name}}|{{$item->value}}|{{$item->total}} |
+| {{$item->name}}|{{$item->value}}|{{number_format($item->total, 2, ',', '.')}} |
 @endforeach
-|                |     Total      |{{$order->total}}|     
+|                |     Total      |{{number_format($order->total, 2, ',', '.')}}|     
 @endcomponent
 
 @component('mail::button', ['url' => ''])
