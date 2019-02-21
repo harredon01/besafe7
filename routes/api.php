@@ -177,6 +177,7 @@ Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries
 Route::get('food/summary/{type?}', 'FoodApiController@getSummaryShipping');
 Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
+Route::get('food/route_organize/{type?}', 'FoodApiController@showOrganizeEmails');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');

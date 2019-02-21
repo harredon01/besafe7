@@ -19,6 +19,7 @@ use Cart;
 
 class EditBilling {
 
+    const TRANSACTION_CONDITION = 'transaction';
     /**
      * The EditAlert implementation.
      *

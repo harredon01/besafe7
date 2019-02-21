@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid" ng-controller="RoutesCtrl">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col-md-8 col-md-offset-2"> 
             <div class="panel panel-default">
                 <div class="panel-body">
                     Escenario <br/>
@@ -19,6 +19,7 @@
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>
                     <a href="javascript:;" ng-click="getScenarioEmails()">Get scenario emails</a><br/><br/>
+                    <a href="javascript:;" ng-click="getScenarioOrganization()">Get scenario Structure emails</a><br/><br/>
                     <a href="javascript:;" ng-click="activateMap()">Activate Map</a><br/><br/>
                     <div class="mapcont" ng-show="mapActive">
                         <div id="map"></div>

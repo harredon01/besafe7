@@ -144,13 +144,13 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function regenerateDeliveries() {
+    public function regenerateDeliveries($shipping = "Rapigo") {
         $this->food->deleteRandomDeliveriesData();
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
         foreach ($polygons as $value) {
             $this->food->generateRandomDeliveries($value);
         }
-        $this->food->prepareRoutingSimulation($polygons);
+        $this->food->prepareRoutingSimulation($polygons,$shipping);
         return view('food.polygons')->with('polygons', $polygons);
     }
 

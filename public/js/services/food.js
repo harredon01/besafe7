@@ -158,6 +158,22 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
+            var getScenarioOrganizationStructure = function (type) {
+                let url = '/api/food/route_organize/'+type ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getScenarioOrganizationStructure");
+                        });
+                return def.promise;
+            }
             var regenerateScenarios = function () {
                 let url = '/api/food/regenerate_scenarios';
                 var def = $q.defer();
@@ -297,6 +313,7 @@ angular.module('besafe')
                 buildScenarioPositive:buildScenarioPositive,
                 updateZoneItem:updateZoneItem,
                 updateMenuItem:updateMenuItem,
+                getScenarioOrganizationStructure:getScenarioOrganizationStructure, 
                 updateMessageItem:updateMessageItem,
                 deleteZoneItem:deleteZoneItem,
                 deleteMenuItem:deleteMenuItem,

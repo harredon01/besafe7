@@ -16,7 +16,7 @@ class Route extends Model {
      *
      * @var array
      */
-    protected $fillable = ['description','weight','length','height','width','unit_price','unit_cost','unit','status','vehicle_id','coverage','availability','type'];
+    protected $fillable = ['description','weight','length','height','width','unit_price','unit_cost','unit','status','vehicle_id','coverage','availability','type','provider'];
 
     public function vehicle() {
         return $this->belongsTo('App\Models\Vehicle');

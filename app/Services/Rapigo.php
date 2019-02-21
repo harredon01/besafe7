@@ -66,14 +66,33 @@ class Rapigo {
         return $response;
     }
 
-    public function createRoute(array $points, $type) {
+    public function createRoute(array $points, $type, $route,$stops) {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
-        $response = $this->sendPost($data, $query);
-        return $response;
+        $serviceBookResponse = $this->sendPost($data, $query);
+        $stopCodes = $serviceBookResponse['points'];
+        $route->code = $serviceBookResponse['key'];
+        $location = [
+            "runner" => "",
+            "runner_phone" => "",
+            "lat" => 0,
+            "long" => 0
+        ];
+        $serviceBookResponse["location"] = $location;
+        $route->coverage = json_encode($serviceBookResponse);
+        $i = 0;
+        foreach ($stops as $stop) {
+            $stop->code = $stopCodes[$i];
+            $stop->status = "pending";
+            $stop->save();
+            $i++;
+        }
+        $route->save();
+        $route->stops = $stops;
+        return $route;
     }
 
     public function checkAddress($address) {
@@ -167,7 +186,7 @@ class Rapigo {
         $route->status = "transit";
         $route->save();
     }
-    
+
     public function getActiveRoutesUpdate() {
         $routes = Route::where("status", "transit")->get();
         if (count($routes)) {

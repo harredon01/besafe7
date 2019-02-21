@@ -183,6 +183,9 @@ class EditOrderFood {
                 if ($data['type'] == "credit") {
                     $this->createDeposit($order);
                 }
+                if ($data['type'] == "delivery") {
+                    $this->createDelivery($order, $item, $address->id);
+                }
             }
             if (array_key_exists("model", $data)) {
                 $class = "App\\Models\\" . $data["model"];
@@ -202,6 +205,21 @@ class EditOrderFood {
         for ($x = 0; $x < count($buyers); $x++) {
             $this->createDeliveries($buyers[$x], $item, $address_id);
         }
+    }
+
+    public function createDelivery(Order $order, Item $item, $address_id) {
+        $delivery = new Delivery();
+        $delivery->user_id = $order->user_id;
+
+        $details["merchant_id"] = $item->merchant_id;
+        $products = ["product" => $item->product_variant_id, "quantity" => 1];
+        $details["products"] = $products;
+        $delivery->shipping = $order->shipping;
+        $delivery->merchant_id = $item->merchant_id;
+        $delivery->address_id = $address_id;
+        $delivery->status = "pending";
+        $delivery->details = json_encode($details);
+        $delivery->save();
     }
 
     public function createDeposit(Order $order) {
@@ -284,6 +302,7 @@ class EditOrderFood {
             $products = ["product" => $item->product_variant_id, "quantity" => 1];
             $details["products"] = $products;
             $delivery->shipping = $shippingPaid;
+            $delivery->merchant_id = $item->merchant_id;
             $delivery->address_id = $address_id;
             $delivery->status = "pending";
             if ($x > 0 && $returnDelivery) {
@@ -314,6 +333,7 @@ class EditOrderFood {
                 $delivery->details = json_encode($details);
                 $delivery->user_id = $user_id;
                 $delivery->delivery = $date;
+                $delivery->merchant_id = $item->merchant_id;
                 $delivery->shipping = 2500;
                 $delivery->address_id = $address_id;
                 $delivery->status = "deposit";

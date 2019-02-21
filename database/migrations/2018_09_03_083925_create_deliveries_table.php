@@ -30,6 +30,9 @@ class CreateDeliveriesTable extends Migration
             $table->foreign('user_id')->references('id')
                     ->on('users');
             $table->integer('address_id')->unsigned();
+            $table->integer('merchant_id')->unsigned();
+            $table->foreign('merchant_id')->references('id')
+                    ->on('merchants');
 	    $table->dateTime('delivery');
 	    $table->text('details')->nullable();
             $table->timestamps();

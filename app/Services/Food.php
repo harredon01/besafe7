@@ -104,7 +104,7 @@ class Food {
         //$date = date("Y-m-d");
 //        $deliveries = Delivery::where('delivery', $date)->get();
         //$articles = Article::where('start_date',$date)->get();
-        $articles = Article::where('start_date', "2018-09-01")->get();
+        $articles = Article::where('start_date', "2019-10-02")->get();
         $father = [];
         //$keywords = ['fruit', 'soup', 'meat', 'chicken'];
         $keywords = ['fruit', 'soup'];
@@ -285,6 +285,7 @@ class Food {
     }
 
     public function regenerateScenarios() {
+        $this->deleteOldData();
         $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
         $this->prepareRoutingSimulation($polygons);
     }
@@ -332,11 +333,33 @@ class Food {
             $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
             foreach ($stops as $stop) {
                 $stop->code = "stop-" . $stop->id;
+                $stop->status = "pending";
                 $stop->save();
             }
             $route->save();
         }
         return true;
+    }
+
+    public function createRoutesFromDeliveries($deliveriesArray, $shipping) {
+        $results = [];
+        $bindingsString = trim(str_repeat('?,', count($deliveriesArray)), ',');
+        $deliveries = DB::select(""
+                        . "SELECT DISTINCT(d.id), d.delivery,d.details,d.user_id,d.address_id,status,shipping, lat,`long`, 
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
+                   FROM deliveries d join order_addresses a on d.address_id = a.id
+                   WHERE  id IN ({$bindingsString})");
+        $stops = $this->turnDeliveriesIntoStops($deliveries, true);
+        $results = $this->createRoutes($stops, $results, 'preorganize', true, $shipping);
+        $this->completeRoutes($results);
+        $date = date_create();
+        $data = [
+            "status" => "scheduled",
+            "updated_at" => $date
+        ];
+        Delivery::whereIn("id", $deliveriesArray)->update($data);
     }
 
     public function buildScenarioLogistics() {
@@ -387,36 +410,18 @@ class Food {
                 array_push($queryStops, $querystop);
             }
             $route->status = "enqueue";
-            $rapigoResponse = $platFormService->getEstimate($queryStops);
+            $shippingResponse = $platFormService->getEstimate($queryStops);
             $type = "stops";
-            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-                $totalCost += $rapigoResponse['price'];
-                $route->unit_cost = $rapigoResponse['price'];
+            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $shippingResponse['price']) {
+                $totalCost += $shippingResponse['price'];
+                $route->unit_cost = $shippingResponse['price'];
             } else {
                 $type = "hour";
                 $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-                $rapigoResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+                $shippingResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
                 $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
             }
-            $serviceBookResponse = $platFormService->createRoute($queryStops, $type);
-            $stopCodes = $serviceBookResponse['points'];
-            $route->code = $serviceBookResponse['key'];
-            $location = [
-                "runner" => "",
-                "runner_phone" => "",
-                "lat" => 0,
-                "long" => 0
-            ];
-            $serviceBookResponse["location"] = $location;
-            $route->coverage = json_encode($serviceBookResponse);
-            $i = 0;
-            foreach ($stops as $stop) {
-                $stop->code = $stopCodes[$i];
-                $stop->save();
-                $i++;
-            }
-            $route->save();
-            $route->stops = $stops;
+            $route = $platFormService->createRoute($queryStops, $type, $route, $stops);
             $totalIncomeShipping += $route->unit_price;
             $totalLunches += $route->unit;
         }
@@ -580,9 +585,9 @@ class Food {
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
         if ($preOrganize) {
-            $results = $this->createRoutes($stops, $results, 'preorganize', true);
+            $results = $this->createRoutes($stops, $results, 'preorganize', true, "Rapigo");
         } else {
-            $results = $this->createRoutes($stops, $results, 'simple', true);
+            $results = $this->createRoutes($stops, $results, 'simple', true, "Rapigo");
         }
         //dd($results);
         return $results;
@@ -648,12 +653,13 @@ class Food {
         }
     }
 
-    private function addToNewRouteAndStop($save, $scenario, $stopContainer) {
+    private function addToNewRouteAndStop($save, $scenario, $stopContainer, $shipping) {
         $route = new Route();
         $routestops = [$stopContainer];
         $route->status = 'pending';
         $route->description = $scenario;
         $route->type = $scenario;
+        $route->provider = $shipping;
         $serviceBookResponse = [];
         $location = [
             "runner" => "",
@@ -703,6 +709,9 @@ class Food {
             foreach ($stopContainer["deliveries"] as $del) {
                 $realDel = Delivery::find($del->id);
                 $stopCreated->deliveries()->save($realDel);
+                if ($shipping == "Basilikum") {
+                    $realDel->status = 'scheduled';
+                }
                 $route->deliveries()->save($realDel);
             }
         } else {
@@ -748,11 +757,15 @@ class Food {
      *
      * @return Response
      */
-    public function createRoutes($stops, $routes, $scenario, $save) {
+    public function createRoutes($stops, $routes, $scenario, $save, $shipping) {
         foreach ($stops as $stopContainer) {
             $found = false;
             foreach ($routes as $route) {
                 $available = self::LUNCH_ROUTE - $route->unit;
+                if($shipping == "Basilikum"){
+                    $available = 30 - $route->unit;
+                }
+                
                 if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
                     $found = true;
                     $this->addStopToRoute($route, $save, $stopContainer);
@@ -760,7 +773,7 @@ class Food {
                 }
             }
             if ($found == false) {
-                $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer);
+                $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer, $shipping);
                 array_unshift($routes, $route);
             }
         }
@@ -1023,11 +1036,11 @@ class Food {
                     ->delete();
             $item->delete();
         }
-        $routes = Route::whereIn("status", ["pending","enqueue"])->get();
+        $routes = Route::whereIn("status", ["pending", "enqueue"])->get();
         foreach ($routes as $value) {
             $value->stops()->delete();
         }
-        Route::whereIn("status", ["pending","enqueue"])->delete();
+        Route::whereIn("status", ["pending", "enqueue"])->delete();
 
         OrderAddress::where("name", "test")->delete();
     }
@@ -1092,6 +1105,7 @@ class Food {
                             "status" => "enqueue",
                             "starter_id" => $starterPlate['codigo'],
                             "main_id" => $mainPlate['codigo'],
+                            "merchant_id"=>1299,
                             "address_id" => $address->id,
                             "details" => json_encode($details)
                 ]);
@@ -1123,22 +1137,15 @@ class Food {
      *
      * @return Response
      */
-    public function prepareRoutingSimulation($polygons) {
+    public function prepareRoutingSimulation($polygons, $shipping = "Rapigo") {
         $results = [];
         $results2 = [];
         foreach ($polygons as $polygon) {
-            $results2 = $this->prepareRouteModel($results2, false, $polygon);
-            $results = $this->prepareRouteModel($results, true, $polygon);
+            $results2 = $this->prepareRouteModel($results2, false, $polygon, $shipping);
+            $results = $this->prepareRouteModel($results, true, $polygon, $shipping);
         }
         $this->completeRoutes($results);
         $this->completeRoutes($results2);
-    }
-
-    public function completeTest() {
-        $polygon = CoveragePolygon::find(1);
-        $this->generateRandomDeliveries($polygon);
-        $this->prepareRoutingSimulation($polygon);
-        $this->getShippingCosts("pending");
     }
 
     public function runCompleteSimulation() {

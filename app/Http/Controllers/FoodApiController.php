@@ -7,10 +7,13 @@ use Illuminate\Http\Request;
 use App\Services\Food;
 use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
+use App\Mails\RouteOrganize;
 use App\Jobs\RegenerateDeliveriesAndScenarios;
 use App\Jobs\BuildScenarioRouteIdApi;
+use App\Jobs\GetScenarioOrganizationStructure;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Article;
+use App\Models\Route;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
 
@@ -52,11 +55,11 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getSummaryShipping(Request $request,$type) {
+    public function getSummaryShipping(Request $request, $type) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenariosShippingCosts($user,$type));
+            dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $type));
             //$results = $this->food->getShippingCosts($type);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
@@ -67,11 +70,29 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure(Request $request, $scenario,$type) {
+    public function showOrganizeEmails(Request $request, $type) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenarioStructure($user,$scenario,$type));
+//            $routes = Route::where("status", "pending")->with(['deliveries.user'])->get();
+//            $results = $this->food->buildScenario($routes);
+//            Mail::to($$user)->send(new RouteOrganize($results));
+            dispatch(new GetScenarioOrganizationStructure($user, $type));
+            //$results = $this->food->getShippingCosts($type);
+            return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
+        }
+    }
+
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getScenarioStructure(Request $request, $scenario, $type) {
+        $user = $request->user();
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            dispatch(new \App\Jobs\GetScenarioStructure($user, $scenario, $type));
             //$this->food->getTotalEstimatedShipping($scenario,$type);
             return response()->json(array("status" => "success", "message" => "Scenario shipping calculated"));
         }
@@ -87,7 +108,7 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\BuildScenarioRouteIdApi($user,$id));
+            dispatch(new \App\Jobs\BuildScenarioRouteIdApi($user, $id));
 //            $routes = App\Models\Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
 //            $this->food->buildScenarioTransit($routes);
             return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
@@ -104,14 +125,14 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new BuildScenario($user,$scenario));
+            dispatch(new BuildScenario($user, $scenario));
 //            $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
 //            $this->food->buildScenarioTransit($routes);
             return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -121,7 +142,7 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new BuildScenario($user,$scenario));
+            dispatch(new BuildScenario($user, $scenario));
 //            $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
 //            $this->food->buildScenarioTransit($routes);
             return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
@@ -170,17 +191,17 @@ class FoodApiController extends Controller {
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
             dispatch(new RegenerateDeliveriesAndScenarios());
-            /*$this->food->deleteRandomDeliveriesData();
-            $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
-            foreach ($polygons as $value) {
-                $this->food->generateRandomDeliveries($value);
-            }
-            $this->food->prepareRoutingSimulation($polygons);*/
+            /* $this->food->deleteRandomDeliveriesData();
+              $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+              foreach ($polygons as $value) {
+              $this->food->generateRandomDeliveries($value);
+              }
+              $this->food->prepareRoutingSimulation($polygons); */
             return response()->json(array("status" => "success", "message" => "Scenarios and Deliveries Scheduled for regeneration"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -189,11 +210,11 @@ class FoodApiController extends Controller {
     public function getRouteInfo($delivery) {
         $result = $this->food->getRouteInfo($delivery);
         if ($result) {
-            return response()->json(array("status" => "success", "message" => "Route info", "route"=>$result));
+            return response()->json(array("status" => "success", "message" => "Route info", "route" => $result));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -204,7 +225,7 @@ class FoodApiController extends Controller {
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
             $results = $this->food->getLargestAddresses();
-            return response()->json(array("status" => "success", "message" => "Most common addresses","data" => $results));
+            return response()->json(array("status" => "success", "message" => "Most common addresses", "data" => $results));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
@@ -233,7 +254,7 @@ class FoodApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 403);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -258,7 +279,7 @@ class FoodApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 403);
     }
-    
+
     /**
      * Display a listing of the resource.
      *
