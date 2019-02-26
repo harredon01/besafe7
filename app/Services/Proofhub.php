@@ -50,22 +50,43 @@ class Proofhub {
         $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/timesheets";
         //dd($query);
         $sheets = $this->sendGet($query);
+        $totalTimeEntries = [];
         foreach ($sheets as $sheet) {
-            $project = $this->getTimeSheetTime($project, $sheet['id']);
+            $results = $this->getTimeSheetTime($project, $sheet['id']);
+            $totalTimeEntries = array_merge($totalTimeEntries, $results);
         }
-        return $project;
+        return $totalTimeEntries;
     }
 
-    public function calculateTotalsProject($project) {
-        $people = $project["rows"];
+    public function getProjectTaskLists($project) {
+        $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/todolists";
+        //dd($query);
+        $lists = $this->sendGet($query);
+        $totalTasks = [];
+        foreach ($lists as $list) {
+            $results = $this->getTasksList($project, $list['id']);
+            $totalTasks = array_merge($totalTasks, $results);
+        }
+        return $totalTasks;
+    }
+
+    public function getTasksList($project, $list) {
+        $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/todolists/" . $list . "/tasks";
+        //dd($query);
+        $tasks = $this->sendGet($query);
+        return $tasks;
+    }
+
+    public function calculateTotalsProject($projectPeople) {
         $totalCost = 0;
         $totalHours = 0;
         $finalPeople = [];
-        foreach ($people as $person) {
-            if ($person["total_cost"] > 0 || $person["billable"] > 0 || $person["non_billable"] > 0) {
+        $project = [];
+        foreach ($projectPeople as $person) {
+            if ($person["total_cost"] > 0 || $person["hours"] > 0) {
                 array_push($finalPeople, $person);
                 $totalCost += $person["total_cost"];
-                $totalHours += ($person["billable"] + $person["non_billable"]);
+                $totalHours += $person["hours"];
             }
         }
         $project["rows"] = $finalPeople;
@@ -78,29 +99,22 @@ class Proofhub {
         $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/timesheets/" . $sheet . "/time";
         //dd($query);
         $timeEntries = $this->sendGet($query);
-        $results = [];
-        foreach ($project["rows"] as $person) {
-            foreach ($timeEntries as $timeEntry) {
-                if ($timeEntry["creator"]["id"] == $person["id"]) {
-                    if ($timeEntry["status"] == "non billable") {
-                        $person["non_billable"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                    } else {
-                        $person["billable"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                        $person["total_cost"] = $person["billable"] * $person["cost"];
-                    }
-                }
-            }
-            array_push($results, $person);
-        }
-        $project["rows"] = $results;
-        return $project;
+        return $timeEntries;
     }
 
     public function getLabels() {
         $query = "https://backbone.proofhub.com/api/v3/labels";
         //dd($query);
         $labels = $this->sendGet($query);
-        dd($labels);
+        return $labels;
+    }
+
+    public function getTimeEntryTask($timeEntry, $tasks) {
+        foreach ($tasks as $task) {
+            if ($task["id"] == $timeEntry["task"]["task_id"]) {
+                return $task;
+            }
+        }
     }
 
     public function writeFile($data) {
@@ -122,6 +136,11 @@ class Proofhub {
 
     public function getSummary() {
         $people = $this->getPeople();
+        $labels = $this->getLabels();
+        $date1 = "2019-01-01";
+        $date2 = "2019-02-28";
+        $dateTimestamp1 = strtotime($date1);
+        $dateTimestamp2 = strtotime($date2);
         $copy = $people;
         $projects = [
             [
@@ -143,16 +162,60 @@ class Proofhub {
         $totalHours = 0;
         $totalCost = 0;
         foreach ($projects as $project) {
-            $project = $this->getProjectTimeSheets($project, $people);
-            $project = $this->calculateTotalsProject($project);
+
+            $projectPeople = $people;
+            $tasks = $this->getProjectTaskLists($project);
+            $timeEntries = $this->getProjectTimeSheets($project);
+            $resultsPeople = [];
+            foreach ($projectPeople as $person) {
+                foreach ($timeEntries as $timeEntry) {
+                    $timeEntryTimestamp = strtotime($timeEntry["date"]);
+                    if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
+                        if ($timeEntry["creator"]["id"] == $person["id"]) {
+                            $person["hours"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                            $person["total_cost"] = $person["hours"] * $person["cost"];
+                        }
+                    }
+                }
+                if ($person["hours"] > 0) {
+                    array_push($resultsPeople, $person);
+                }
+            }
+            $project['people'] = $resultsPeople;
+            $projectLabels = $labels;
+            $resultsLabels = [];
+            foreach ($projectLabels as $label) {
+                $hours = 0;
+                foreach ($timeEntries as $timeEntry) {
+                    $timeEntryTimestamp = strtotime($timeEntry["date"]);
+                    if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
+                        $task = $this->getTimeEntryTask($timeEntry, $tasks);
+                        $taskLabels = $task["labels"];
+                        if ($taskLabels) {
+                            foreach ($taskLabels as $taskLabel) {
+                                if ($label["id"] == $taskLabel) {
+                                    $hours += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                }
+                            }
+                        }
+                    }
+                }
+                if ($hours > 0) {
+                    $label["Hours"] = $hours;
+                    array_push($resultsLabels, $label);
+                }
+            }
+            $project['labels'] = $resultsLabels;
+            $project["rows"] = array_merge($resultsPeople, $resultsLabels);
+            $projectResults = $this->calculateTotalsProject($resultsPeople);
             $projectData = [
                 "Name" => $project["name"],
                 "Budget" => $project["budget"],
-                "Hours" => $project["Hours"],
-                "Consumed" => $project["Consumed"],
+                "Hours" => $projectResults["Hours"],
+                "Consumed" => $projectResults["Consumed"],
             ];
-            $totalHours += $project["Hours"];
-            $totalCost += $project["Consumed"];
+            $totalHours += $projectResults["Hours"];
+            $totalCost += $projectResults["Consumed"];
             array_push($results, $project);
             array_push($summary["rows"], $projectData);
         }
@@ -161,7 +224,6 @@ class Proofhub {
         $summary["Consumed"] = $totalCost;
         array_unshift($results, $summary);
         $this->writeFile($results);
-        dd($results);
     }
 
     public function getPeople() {
@@ -178,8 +240,7 @@ class Proofhub {
                 "name" => $resultsPerson['first_name'] . " " . $resultsPerson['last_name'],
                 "email" => $resultsPerson['email'],
                 "id" => $resultsPerson['id'],
-                "billable" => 0,
-                "non_billable" => 0,
+                "hours" => 0,
                 "total_cost" => 0
             ];
             if ($resultsPerson['id'] == "1871117844") {
