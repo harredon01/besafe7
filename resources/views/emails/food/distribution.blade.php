@@ -26,6 +26,9 @@
 @foreach ($delivery->totals['dish'] as $line)
 {{ $line }}
 @endforeach 
+@foreach ($delivery->totals['starter'] as $line)
+{{ $line }}
+@endforeach 
 @endforeach 
 @endcomponent
 @endcomponent

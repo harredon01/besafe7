@@ -98,31 +98,31 @@ class FoodImport {
             "plato" => $principales,
             "postre" => $postres
         ];
-
+        $date = explode("/", $activeRow['fecha']);
         $article = Article::create([
                     "name" => $activeRow['almuerzo'],
                     "description" => "Almuerzo " . $activeRow['almuerzo'],
-                    "start_date" => $activeRow['fecha'],
+                    "start_date" => $date[2]."-".$date[1]."-".$date[0],
                     "attributes" => json_encode($dishes)
         ]);
     }
-    
+
     public function importPolygons($path) {
         $excel = Excel::load($path);
         $reader = $excel->toArray();
         foreach ($reader as $row) {
             $coverage = $row['coverage'];
-            $coverage = str_replace("new google.maps.LatLng(",'{"lat":',$coverage);
-            $coverage = str_replace("-74",'"lng":-74',$coverage);
-            $coverage = str_replace("),",'},',$coverage);
-            $coverage = str_replace(")",'}',$coverage);
-            $coverage = "[".$coverage."]";
-            $resultset = json_decode($coverage,true);
+            $coverage = str_replace("new google.maps.LatLng(", '{"lat":', $coverage);
+            $coverage = str_replace("-74", '"lng":-74', $coverage);
+            $coverage = str_replace("),", '},', $coverage);
+            $coverage = str_replace(")", '}', $coverage);
+            $coverage = "[" . $coverage . "]";
+            $resultset = json_decode($coverage, true);
             $firstItem = $resultset[0];
-            array_push($resultset,$firstItem);
+            array_push($resultset, $firstItem);
             $row['coverage'] = json_encode($resultset);
             $find["id"] = $row["id"];
-            CoveragePolygon::updateOrCreate($find,$row);
+            CoveragePolygon::updateOrCreate($find, $row);
         }
     }
 
@@ -143,35 +143,34 @@ class FoodImport {
                     $entradas = [];
                     $principales = [];
                     $postres = [];
-                } else {
-                    $plato = [
-                        "valor" => $row['plato'],
-                        "codigo" => $row['codigo'],
-                        "descripcion" => $row['descripcion']
-                    ];
-                    if ($row['tipo'] == "Entrada") {
-                        array_push($entradas, $plato);
-                    } else if ($row['tipo'] == "Principal") {
-                        array_push($principales, $plato);
-                    } else if ($row['tipo'] == "Postre") {
-                        array_push($postres, $plato);
-                    }
+                }
+                $plato = [
+                    "valor" => $row['plato'],
+                    "codigo" => $row['codigo'],
+                    "descripcion" => $row['descripcion']
+                ];
+                if ($row['tipo'] == "Entrada") {
+                    array_push($entradas, $plato);
+                } else if ($row['tipo'] == "Principal") {
+                    array_push($principales, $plato);
+                } else if ($row['tipo'] == "Postre") {
+                    array_push($postres, $plato);
                 }
                 $activeRow = $row;
             }
         }
         $this->importDish($entradas, $principales, $postres, $activeRow);
     }
-    
+
     public function importTranslations($path) {
-        Translation::where("id",">",'0')->delete();
+        Translation::where("id", ">", '0')->delete();
         $excel = Excel::load($path);
         $reader = $excel->toArray();
         foreach ($reader as $sheet) {
             unset($sheet['']);
             if ($sheet['code']) {
-                if(!$sheet['body']){
-                    $sheet['body']="";
+                if (!$sheet['body']) {
+                    $sheet['body'] = "";
                 }
                 $translation = Translation::updateOrCreate([
                             'code' => $sheet['code'],

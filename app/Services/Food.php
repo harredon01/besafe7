@@ -187,7 +187,7 @@ class Food {
 //            }
             foreach ($attributes['plato'] as $art3) {
                 if ($father[$art->id]['main'][$art3['codigo']] > 0) {
-                    $fuerte = "Total " . $father[$art->id]['name'] . " principal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']];
+                    $fuerte = $father[$art->id]['name'] . " \nprincipal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']];
                     array_push($finalresult['dish'], $fuerte);
                 }
             }
@@ -762,10 +762,10 @@ class Food {
             $found = false;
             foreach ($routes as $route) {
                 $available = self::LUNCH_ROUTE - $route->unit;
-                if($shipping == "Basilikum"){
+                if ($shipping == "Basilikum") {
                     $available = 30 - $route->unit;
                 }
-                
+
                 if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
                     $found = true;
                     $this->addStopToRoute($route, $save, $stopContainer);
@@ -1079,33 +1079,33 @@ class Food {
             for ($j = 0; $j <= $amountDeliveries; $j++) {
                 $type_num = rand(0, count($articles) - 1);
                 $art = $articles[$type_num];
+                $dish = [];
                 $attrs = json_decode($art->attributes, true);
-                $starter = rand(0, count($attrs['entradas']) - 1);
-                $starterPlate = $attrs['entradas'][$starter];
-                $main = rand(0, count($attrs['plato']) - 1);
-                $mainPlate = $attrs['plato'][$main];
+                if (count($attrs['entradas']) > 0) {
+                    $starter = rand(0, count($attrs['entradas']) - 1);
+                    $starterPlate = $attrs['entradas'][$starter];
+                    $dish['starter_id'] = $starterPlate['codigo'];
+                }
+                if (count($attrs['plato']) > 0) {
+                    $main = rand(0, count($attrs['plato']) - 1);
+                    $mainPlate = $attrs['plato'][$main];
+                    $dish['main_id'] = $mainPlate['codigo'];
+                }
                 $pickingUp = rand(0, 1);
                 $pickingUp = 0;
                 $details = [];
                 if ($pickingUp == 1) {
                     $details['pickup'] = "envase";
                 }
-                $dish = [
-                    'type_id' => $art->id,
-                    'starter_id' => $starterPlate['codigo'],
-                    'main_id' => $mainPlate['codigo'],
-                    'dessert_id' => null
-                ];
+                $dish['type_id'] = $art->id;
+                $dish['dessert_id'] = null;
                 $details['dish'] = $dish;
                 $delivery = Delivery::create([
                             "user_id" => 5,
                             "delivery" => $date,
-                            "type_id" => $art->id,
                             "shipping" => $shipping[$amountDeliveries],
                             "status" => "enqueue",
-                            "starter_id" => $starterPlate['codigo'],
-                            "main_id" => $mainPlate['codigo'],
-                            "merchant_id"=>1299,
+                            "merchant_id" => 1299,
                             "address_id" => $address->id,
                             "details" => json_encode($details)
                 ]);

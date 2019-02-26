@@ -42,10 +42,6 @@ class EditDelivery {
                         'dessert_id' => $data['dessert_id']
                     ];
                     $details["meal"] = $dish;
-                    $delivery->type_id = $data['type_id'];
-                    $delivery->starter_id = $data['starter_id'];
-                    $delivery->main_id = $data['main_id'];
-                    $delivery->dessert_id = $data['dessert_id'];
                     $this->checkRecurringPosibility($user,$data['ip_address']);
                 }
 
@@ -111,10 +107,7 @@ class EditDelivery {
         return Validator::make($data, [
                     'delivery_id' => 'required|max:255',
                     'type_id' => 'required|max:255',
-                    'starter_id' => 'required|max:255',
                     'main_id' => 'required|max:255',
-                    'dessert_id' => 'required|max:255',
-                    'observation' => 'required|max:255',
         ]);
     }
 
