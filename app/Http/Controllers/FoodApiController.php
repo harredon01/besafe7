@@ -10,6 +10,8 @@ use App\Jobs\RegenerateScenarios;
 use App\Mails\RouteOrganize;
 use App\Jobs\RegenerateDeliveriesAndScenarios;
 use App\Jobs\BuildScenarioRouteIdApi;
+use App\Jobs\BuildScenarioPositive;
+use App\Jobs\BuildCompleteScenario;
 use App\Jobs\GetScenarioOrganizationStructure;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Article;
@@ -174,8 +176,8 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new RegenerateScenarios());
-            //$this->food->regenerateScenarios();
+            //dispatch(new RegenerateScenarios());
+            $this->food->regenerateScenarios();
             return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
@@ -191,12 +193,12 @@ class FoodApiController extends Controller {
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
             dispatch(new RegenerateDeliveriesAndScenarios());
-            /* $this->food->deleteRandomDeliveriesData();
-              $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
+            /*$this->food->deleteRandomDeliveriesData();
+              $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
               foreach ($polygons as $value) {
               $this->food->generateRandomDeliveries($value);
-              }
-              $this->food->prepareRoutingSimulation($polygons); */
+              }*/
+              //$this->food->prepareRoutingSimulation($polygons); 
             return response()->json(array("status" => "success", "message" => "Scenarios and Deliveries Scheduled for regeneration"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));

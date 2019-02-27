@@ -3,6 +3,7 @@
     <ul>
         <li id="address-@{{ address.id}}" ng-repeat="address in addresses">
             Direccion: <span class="type">@{{ address.address}}</span><br/>
+            Proveedor transp: <span class="type">@{{ address.provider}}</span><br/>
             Total: <span class="type">@{{ address.total}}</span><br/>
 
             <br/><a href="javascript:;" ng-click="delegateAddress(address.id)" class="editar">Delegar</a>

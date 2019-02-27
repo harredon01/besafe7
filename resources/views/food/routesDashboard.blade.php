@@ -15,6 +15,10 @@
                         <option value="pending">Pending</option>
                         <option value="enqueue">Esperando</option>
                     </select><br/>
+                    <select ng-model="provider" ng-change="changeScenario()">
+                        <option value="Rapigo">Rapigo</option>
+                        <option value="Basilikum">Basilikum</option>
+                    </select><br/>
                     <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>

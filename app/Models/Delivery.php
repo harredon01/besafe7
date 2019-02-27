@@ -18,7 +18,7 @@ class Delivery extends Model{
      *
      * @var array
      */
-    protected $fillable = ['type_id','starter_id','main_id','dessert_id','code','observation','address_id','merchant_id',
+    protected $fillable = ['type_id','provider','provider_id','dessert_id','code','observation','address_id','merchant_id',
         'group_id','user_id','shipping','delivery','details','status'];
 
     public function user() {

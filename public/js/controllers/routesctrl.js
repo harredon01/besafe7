@@ -7,6 +7,7 @@
             $scope.loadMore = true;
             $scope.scenario = 'simple';
             $scope.status = 'pending';
+            $scope.provider = 'Rapigo';
             $scope.regionVisible = false;
             $scope.editAddress = false;
             $scope.mapActive = false;
@@ -38,6 +39,7 @@
             }
             $scope.changeScenario = function () {
                 $scope.page = 0;
+                $scope.hideAll();
                 $scope.routes = [];
                 $scope.getRoutes();
             }
@@ -99,11 +101,11 @@
                 $scope.page++;
                 let type = "pending";
                 let scenario = $scope.scenario;
-                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario+ "&status=" + $scope.status;
-                if($scope.status != "pending"){
-                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario+ "&status=" + $scope.status;
+                let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
+                if ($scope.status != "pending") {
+                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
                 }
-                
+
                 Routes.getRoutes(url).then(function (data) {
                     let routesCont = data.data;
                     if (data.page == data.last_page) {
@@ -141,10 +143,14 @@
                     let stops = $scope.routes[route].stops;
                     for (item in stops) {
                         console.log("Creating map data stop")
-                        stops[item].marker.setMap(null);
+                        if (stops[item].marker) {
+                            stops[item].marker.setMap(null);
+                        }
                     }
                     $scope.routes[route].stops = stops;
-                    $scope.routes[route].polyline.setMap(null);
+                    if ($scope.routes[route].polyline) {
+                        $scope.routes[route].polyline.setMap(null);
+                    }
                 }
             }
             $scope.showRoute = function (route) {
@@ -199,9 +205,9 @@
 
                         });
             }
-            $scope.getTotalShippingCosts = function () { 
+            $scope.getTotalShippingCosts = function () {
                 let type = "pending";
-                if($scope.status != "pending"){
+                if ($scope.status != "pending") {
                     type = "built";
                 }
                 Food.getSummaryShipping(type).then(function (data) {
@@ -212,7 +218,7 @@
             }
             $scope.getScenarioOrganization = function () {
                 let type = "pending";
-                if($scope.status != "pending"){
+                if ($scope.status != "pending") {
                     type = "built";
                 }
                 Food.getScenarioOrganizationStructure(type).then(function (data) {
@@ -224,11 +230,11 @@
             $scope.getScenarioEmails = function () {
                 let type = "pending";
                 let scenario = $scope.scenario;
-                if($scope.status != "pending"){
+                if ($scope.status != "pending") {
                     type = "built";
                     scenario = "enqueue";
                 }
-                Food.getScenarioStructure(scenario,type).then(function (data) {
+                Food.getScenarioStructure(scenario, type).then(function (data) {
                 },
                         function (data) {
 

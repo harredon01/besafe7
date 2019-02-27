@@ -16,8 +16,8 @@ class CreateDeliveriesTable extends Migration
         Schema::create('deliveries', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('type_id')->unsigned()->nullable();
-            $table->string('starter_id')->nullable();
-            $table->string('main_id')->nullable();
+            $table->string('provider')->nullable();
+            $table->string('provider_id')->nullable();
             $table->string('dessert_id')->nullable();
             $table->string('code')->nullable();
             $table->double('shipping')->nullable();

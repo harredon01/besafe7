@@ -4,6 +4,7 @@
         <li id="route-@{{ route.id}}" ng-repeat="route in routes">
             <h3>Ruta Id: <span class="type">@{{ route.id}}</span></h3><br/>
             Type: <span class="type">@{{ route.type}}</span><br/>
+            Proveedor transp: <span class="type">@{{ route.provider}}</span><br/>
             Status: <span class="type">@{{ route.status}}</span><br/>
             Costo Envio: <span class="type">@{{ route.unit_cost}}</span><br/>
             Ingreso Envio: <span class="type">@{{ route.unit_price}}</span><br/>

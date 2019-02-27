@@ -31,6 +31,7 @@ class CreateRoutesTable extends Migration {
                         $table->integer('unit');
                         $table->string('status');
                         $table->string('provider');
+                        $table->string('provider_id');
                         $table->string('type')->nullable();
 			$table->text('coverage')->nullable();
 			$table->timestamps();

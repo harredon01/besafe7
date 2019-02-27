@@ -286,7 +286,9 @@ class Food {
 
     public function regenerateScenarios() {
         $this->deleteOldData();
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
+        $this->prepareRoutingSimulation($polygons);
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Basilikum")->get();
         $this->prepareRoutingSimulation($polygons);
     }
 
@@ -326,8 +328,12 @@ class Food {
 //        dd($results);
         foreach ($routes as $route) {
             $route->status = "enqueue";
+            $route->provider = "Rapigo";
+            $route->provider_id = "Rap_" . $route->id;
             foreach ($route->deliveries as $delivery) {
                 $delivery->status = "scheduled";
+                $delivery->provider = "Rapigo";
+                $delivery->provider_id = "Rap_" . $delivery->id;
                 $delivery->save();
             }
             $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
@@ -559,12 +565,14 @@ class Food {
     public function prepareRouteModel($results, $preOrganize, CoveragePolygon $polygon) {
 //        dd($thedata);
         $date = date_create();
+        date_add($date, date_interval_create_from_date_string("1 days"));
         $la = date_format($date, "Y-m-d");
         $thedata = [
             'lat' => $polygon->lat,
             'lat2' => $polygon->lat,
             'long' => $polygon->long,
             'polygon' => $polygon->id,
+            'provider' => $polygon->provider,
             'date1' => $la . " 00:00:00",
             'date2' => $la . " 23:59:59",
         ];
@@ -576,7 +584,7 @@ class Food {
 		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
-                        status = 'enqueue'
+                        status = 'enqueue' AND provider = :date2
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
@@ -585,9 +593,9 @@ class Food {
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
 
         if ($preOrganize) {
-            $results = $this->createRoutes($stops, $results, 'preorganize', true, "Rapigo");
+            $results = $this->createRoutes($stops, $results, 'preorganize', true, $polygon->provider);
         } else {
-            $results = $this->createRoutes($stops, $results, 'simple', true, "Rapigo");
+            $results = $this->createRoutes($stops, $results, 'simple', true, $polygon->provider);
         }
         //dd($results);
         return $results;
@@ -596,9 +604,9 @@ class Food {
     public function getLargestAddresses() {
         $thedata = [];
         $thedata = DB::select(""
-                        . "SELECT count(d.id) as total,oa.address FROM deliveries d "
+                        . "SELECT count(d.id) as total,oa.address, d.provider FROM deliveries d "
                         . "join order_addresses oa on oa.id = d.address_id "
-                        . "where d.status='enqueue' group by oa.address limit 30;");
+                        . "where d.status='enqueue' group by oa.address,d.provider limit 50;");
         return $thedata;
     }
 
@@ -763,7 +771,7 @@ class Food {
             foreach ($routes as $route) {
                 $available = self::LUNCH_ROUTE - $route->unit;
                 if ($shipping == "Basilikum") {
-                    $available = 30 - $route->unit;
+                    $available = 100 - $route->unit;
                 }
 
                 if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
@@ -1049,20 +1057,25 @@ class Food {
         $lat = $polygon->lat;
         $long = $polygon->long;
         $radius = 1; // in miles
+        $addresses = ["Carrera 7a # 64-44", "Calle 73 # 0 - 24", "Calle 53 # 5 - 74", "Calle 23 # 7 - 74", "Cra 9 # 77-67", "Cra 9 # 71-32", "Cra 9 # 71-32"];
         $R = 6371;
         $lat_max = ($lat + rad2deg($radius / $R)) * 1000000000;
         $lat_min = ($lat - rad2deg($radius / $R)) * 1000000000;
         $lng_max = ($long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
         $lng_min = ($long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)))) * 1000000000;
-        $date = date("Y-m-d");
+        $date = date_create();
+        date_add($date, date_interval_create_from_date_string("1 days"));
         $shipping = $this->getShippingCostArray();
-        //$articles = Article::where('start_date',$date)->get();
-        $articles = Article::where('start_date', "2019-10-02")->get();
+
+        $articles = Article::where('start_date', date_format($date, "Y-m-d"))->get();
+        //$articles = Article::where('start_date', "2019-10-02")->get();
         //$date = date_create();
         $total = rand(0, 4);
         for ($x = 0; $x <= $total; $x++) {
             $latit = rand($lat_min, $lat_max) / 1000000000;
             $longit = rand($lng_min, $lng_max) / 1000000000;
+            $addressIndex = rand(0, 6);
+
             $address = OrderAddress::create([
                         "user_id" => 5,
                         "name" => "test",
@@ -1070,7 +1083,7 @@ class Food {
                         "region_id" => 11,
                         "country_id" => 1,
                         "polygon_id" => $polygon->id,
-                        "address" => "Carrera 7a # 64-44",
+                        "address" => $addresses[$addressIndex],
                         "lat" => $latit,
                         "long" => $longit,
                         "phone" => "3105507245"
@@ -1141,15 +1154,19 @@ class Food {
         $results = [];
         $results2 = [];
         foreach ($polygons as $polygon) {
-            $results2 = $this->prepareRouteModel($results2, false, $polygon, $shipping);
+            if ($shipping == "Rapigo") {
+                $results2 = $this->prepareRouteModel($results2, false, $polygon, $shipping);
+            }
             $results = $this->prepareRouteModel($results, true, $polygon, $shipping);
         }
         $this->completeRoutes($results);
-        $this->completeRoutes($results2);
+        if ($shipping == "Rapigo") {
+            $this->completeRoutes($results2);
+        }
     }
 
     public function runCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }
@@ -1158,7 +1175,7 @@ class Food {
     }
 
     public function runRecurringTask() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
         $user = User::find(2);
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
@@ -1179,7 +1196,7 @@ class Food {
     }
 
     public function testDataCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }

@@ -165,6 +165,19 @@ class Proofhub {
 
             $projectPeople = $people;
             $tasks = $this->getProjectTaskLists($project);
+            $totalPendingTasks = 0;
+            $totalMissingHours = 0;
+            foreach ($tasks as $task) {
+                if(!$task["completed"]){
+                    $totalPendingTasks++;
+                    $estimate = $task["estimated_hours"] + ($task["estimated_mins"] / 60);
+                    $logged = $task["logged_hours"] + ($task["logged_mins"] / 60);
+                    if($estimate>$logged){
+                        $totalMissingHours += $estimate-$logged;
+                    }
+                    
+                }
+            }
             $timeEntries = $this->getProjectTimeSheets($project);
             $resultsPeople = [];
             foreach ($projectPeople as $person) {
@@ -213,6 +226,8 @@ class Proofhub {
                 "Budget" => $project["budget"],
                 "Hours" => $projectResults["Hours"],
                 "Consumed" => $projectResults["Consumed"],
+                "Total Pending tasks" => $totalPendingTasks,
+                "Estimated remaining hours" => $totalMissingHours,
             ];
             $totalHours += $projectResults["Hours"];
             $totalCost += $projectResults["Consumed"];

@@ -216,6 +216,7 @@ class EditOrderFood {
         $details["products"] = $products;
         $delivery->shipping = $order->shipping;
         $delivery->merchant_id = $item->merchant_id;
+        $delivery->provider = "Rapigo";
         $delivery->address_id = $address_id;
         $delivery->status = "pending";
         $delivery->details = json_encode($details);
