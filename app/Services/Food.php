@@ -8,6 +8,7 @@ use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
+use App\Jobs\RegenerateScenarios;
 use App\Models\Merchant;
 use App\Models\Product;
 use App\Models\Address;
@@ -286,9 +287,9 @@ class Food {
 
     public function regenerateScenarios() {
         $this->deleteOldData();
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         $this->prepareRoutingSimulation($polygons);
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Basilikum")->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Basilikum")->get();
         $this->prepareRoutingSimulation($polygons);
     }
 
@@ -584,10 +585,13 @@ class Food {
 		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
                    FROM deliveries d join order_addresses a on d.address_id = a.id
                     WHERE
-                        status = 'enqueue' AND provider = :date2
+                        status = 'enqueue' AND provider = :provider
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
+        if($polygon->provider=="Basilikum"){
+            //dd($deliveries);
+        }
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
         //echo "Query results: " . count($deliveries) . PHP_EOL;
         $stops = $this->turnDeliveriesIntoStops($deliveries, $preOrganize);
@@ -602,12 +606,38 @@ class Food {
     }
 
     public function getLargestAddresses() {
-        $thedata = [];
-        $thedata = DB::select(""
-                        . "SELECT count(d.id) as total,oa.address, d.provider FROM deliveries d "
+        $results = DB::select(""
+                        . "SELECT count(d.id) as total,oa.address, d.provider,d.delivery,d.merchant_id FROM deliveries d "
                         . "join order_addresses oa on oa.id = d.address_id "
                         . "where d.status='enqueue' group by oa.address,d.provider limit 50;");
-        return $thedata;
+        return $results;
+    }
+
+    public function delegateDeliveries($data) {      
+        $className = "App\\Services\\Geolocation";
+        $address = OrderAddress::where("address",$data['address'])->first();
+        $geo = new $className();
+        $results = $geo->checkMerchantPolygons($address->lat,$address->long,$data['merchant_id'],$data['provider']);
+        $polygon = $results['polygon'];
+        if ($data['complete']) {
+            $thedata = ["address" =>$data['address'] , "provider" => $data['provider']];
+            $thedata2 = ["address" =>$data['address'] ];
+            $results = DB::statement(""
+                            . " UPDATE deliveries set provider=:provider,  where address_id in (Select id from order_addresses where address = :address );", $thedata);
+            $results = DB::statement(""
+                            . " UPDATE order_addresses set polygon_id=$polygon->id where address = :address ;", $thedata2);
+        } else {
+            
+            $thedata = ["address" =>$data['address'] , "provider" => $data['provider']];
+            $thedata2 = ["address" =>$data['address'] ];
+            $results = DB::statement(""
+                            . " UPDATE deliveries set provider=:provider where address_id in (Select id from order_addresses where address = :address ) and status = 'enqueue';", $thedata);
+            $results = DB::statement(""
+                            . " UPDATE order_addresses set polygon_id=$polygon->id where address = :address ;", $thedata2);
+        }
+
+        dispatch(new RegenerateScenarios());
+        return $results;
     }
 
     public function prepareQuadrantLimits($lat, $long) {
@@ -1116,6 +1146,7 @@ class Food {
                 $delivery = Delivery::create([
                             "user_id" => 5,
                             "delivery" => $date,
+                            "provider" => "Rapigo",
                             "shipping" => $shipping[$amountDeliveries],
                             "status" => "enqueue",
                             "merchant_id" => 1299,
@@ -1166,7 +1197,7 @@ class Food {
     }
 
     public function runCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }
@@ -1175,7 +1206,7 @@ class Food {
     }
 
     public function runRecurringTask() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         $user = User::find(2);
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
@@ -1196,7 +1227,7 @@ class Food {
     }
 
     public function testDataCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         foreach ($polygons as $polygon) {
             $this->generateRandomDeliveries($polygon);
         }

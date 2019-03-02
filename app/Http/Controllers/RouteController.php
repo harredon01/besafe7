@@ -142,5 +142,6 @@ class RouteController extends Controller
         $oldRoute = $stop->route;
         $newRoute = Route::find($route);
         $stop->route_id = $newRoute->id;
+        $stop->save();
     }
 }

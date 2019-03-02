@@ -9,8 +9,21 @@
             angular.element(document).ready(function () {
                 $scope.getAddresses();
             });
-            $scope.delegate = function (address) {
-                Food.delegateAddress(address).then(function (data) {
+            $scope.delegateAddress = function (address,complete ) {
+                let provider = "";
+                if(address.provider == "Rapigo"){
+                    provider = "Basilikum";
+                } else {
+                    provider = "Rapigo";
+                }
+                let theDate = new Date(address.delivery);
+                let container = {
+                    "address":address.address,
+                    "provider":provider,
+                    "complete":complete,
+                    "merchant_id":address.merchant_id
+                };
+                Food.delegateDeliveriesAddress(container).then(function (data) {
 
                     },
                             function (data) {

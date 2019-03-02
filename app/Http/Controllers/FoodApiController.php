@@ -182,6 +182,21 @@ class FoodApiController extends Controller {
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function delegateDeliveries(Request $request) {
+        $user = $request->user();
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            $this->food->delegateDeliveries($request->all());
+            return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
+        }
+        return response()->json(array("status" => "error", "message" => "User not authorized"));
+    }
 
     /**
      * Show the application dashboard to the user.

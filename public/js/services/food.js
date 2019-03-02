@@ -78,6 +78,23 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
+            var delegateDeliveriesAddress = function (data) {
+                let url = '/api/food/delegate_deliveries' ;
+                var def = $q.defer();
+                $http({
+                    method: 'post',
+                    url: url,
+                    data:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get getLargestAddresses");
+                        });
+                return def.promise;
+            }
             var buildScenarioRouteId = function (route_id) {
                 let url = '/api/food/build_route_id/'+route_id ;
                 var def = $q.defer();
@@ -303,6 +320,7 @@ angular.module('besafe')
             return {
                 getMenu:getMenu,
                 getZones:getZones,
+                delegateDeliveriesAddress:delegateDeliveriesAddress,
                 getMessages:getMessages,
                 regenerateDeliveries:regenerateDeliveries,
                 getScenarioStructure:getScenarioStructure,
