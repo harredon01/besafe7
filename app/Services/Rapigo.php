@@ -10,6 +10,9 @@ use App\Mail\StopFailed;
 
 class Rapigo {
 
+    const ROUTE_HOUR_COST = 11000;
+    const ROUTE_HOURS_EST = 3;
+
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
         $fields_string = "";
@@ -66,7 +69,16 @@ class Rapigo {
         return $response;
     }
 
-    public function createRoute(array $points, $type, $route,$stops) {
+    public function createRoute(array $points, $route, $stops) {
+        $shippingResponse = $this->getEstimate($points);
+        $type = "stops";
+        if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $shippingResponse['price']) {
+            $route->unit_cost = $shippingResponse['price'];
+        } else {
+            $type = "hour";
+            $shippingResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+            $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+        }
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
@@ -90,6 +102,7 @@ class Rapigo {
             $stop->save();
             $i++;
         }
+        $route->status = "built";
         $route->save();
         $route->stops = $stops;
         return $route;

@@ -143,12 +143,13 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getScenarioStructure = function (scenario,provider,status) {
-                let url = '/api/food/get_scenario_structure/'+scenario+"/"+provider+"/"+status ;
+            var getScenarioStructure = function (data) {
+                let url = '/api/food/get_scenario_structure';
                 var def = $q.defer();
                 $http({
                     method: 'get',
-                    url: url
+                    url: url,
+                    params:data
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -159,8 +160,8 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getSummaryShipping = function (provider,status) {
-                let url = '/api/food/summary/'+provider+"/"+status ;
+            var getSummaryShipping = function (status) {
+                let url = '/api/food/summary/'+status ;
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -175,8 +176,25 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getScenarioOrganizationStructure = function (provider) {
-                let url = '/api/food/route_organize/'+provider ;
+            var getScenarioOrganizationStructure = function (data) {
+                let url = '/api/food/route_organize' ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url,
+                    params:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getScenarioOrganizationStructure");
+                        });
+                return def.promise;
+            }
+            var getPurchaseOrder = function () {
+                let url = '/api/food/purchase_order' ;
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -187,7 +205,7 @@ angular.module('besafe')
                             def.resolve(data);
                         })
                         .error(function () {
-                            def.reject("Failed to getScenarioOrganizationStructure");
+                            def.reject("Failed to getPurchaseOrder");
                         });
                 return def.promise;
             }
@@ -320,6 +338,7 @@ angular.module('besafe')
             return {
                 getMenu:getMenu,
                 getZones:getZones,
+                getPurchaseOrder:getPurchaseOrder,
                 delegateDeliveriesAddress:delegateDeliveriesAddress,
                 getMessages:getMessages,
                 regenerateDeliveries:regenerateDeliveries,

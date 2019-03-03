@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\StopFailed;
 
 class Basilikum {
+    const ROUTE_HOUR_COST = 11000;
+    const ROUTE_HOURS_EST = 3;
 
     public function getEstimate(array $points) {
         //dd($points);
@@ -26,14 +28,28 @@ class Basilikum {
         return $response;
     }
 
-    public function createRoute(array $points, $type) {
-//        if ($type == "hour") {
-//            $data['type'] = 'hour';
-//        }
-//        $data['points'] = json_encode($points);
-//        $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
-//        $response = $this->sendPost($data, $query);
-        return true;
+    public function createRoute(array $points, $type, $route,$stops){
+        $route->unit_cost = self::ROUTE_HOUR_COST*self::ROUTE_HOURS_EST;
+        $route->code = "route_".$route->id;
+        $location = [
+            "runner" => "",
+            "runner_phone" => "",
+            "lat" => 0,
+            "long" => 0
+        ];
+        $serviceBookResponse["location"] = $location;
+        $route->coverage = json_encode($serviceBookResponse);
+        $i = 0;
+        foreach ($stops as $stop) {
+            $stop->code = "stop_".$stop->id;
+            $stop->status = "pending";
+            $stop->save();
+            $i++;
+        }
+        $route->status = "built";
+        $route->save();
+        $route->stops = $stops;
+        return $route;
     }
 
     public function checkAddress($address) {

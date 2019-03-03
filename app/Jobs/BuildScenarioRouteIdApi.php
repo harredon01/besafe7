@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+use Exception;
 use App\Services\Food;
 use App\Models\Route;
 use App\Services\EditAlerts;

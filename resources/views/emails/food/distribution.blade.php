@@ -19,7 +19,7 @@
 
 @component('mail::panel')
 @foreach ($route->deliveries as $delivery)
-#Entrega {{ $delivery->id }} usuario {{ $delivery->user->firstName }} {{ $delivery->user->lastName }}
+## {{ $delivery->id }} {{ $delivery->user->firstName }} {{ $delivery->user->lastName }}
 @foreach ($delivery->totals['keywords'] as $line)
 {{ $line }}
 @endforeach 

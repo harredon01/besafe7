@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Services\Food;
 use App\Models\Article;
+use App\Models\User;
 use App\Models\CoveragePolygon;
 
 class FoodController extends Controller {
@@ -72,8 +73,14 @@ class FoodController extends Controller {
         $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->get()->limit(1);
         $check = $this->food->checkScenario($routes, $hash);
         if ($check) {
-            dispatch(new \App\Jobs\GetScenarioStructure($scenario,$provider,$status));
-            //$this->food->getTotalEstimatedShipping($scenario,$provider,$status);
+            $data =[
+                "type"=>$scenario,
+                "status"=>$status,
+                "provider"=>$provider
+            ];
+            $user = User::find(2);
+            dispatch(new \App\Jobs\GetScenarioStructure($user,$data));
+            //$this->food->getTotalEstimatedShipping($data);
             return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");

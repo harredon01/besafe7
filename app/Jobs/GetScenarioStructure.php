@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 use App\Models\User;
+use Exception;
 use App\Services\Food;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -17,20 +18,16 @@ class GetScenarioStructure implements ShouldQueue
 
     
     protected $user;
-    protected $status;
-    protected $scenario;
-    protected $provider;
+    protected $data;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$scenario,$provider,$status)
+    public function __construct(User $user,$data)
     {
         $this->user = $user;
-        $this->scenario = $scenario;
-        $this->provider = $provider;
-        $this->status = $status;
+        $this->data = $data;
     }
 
     /**
@@ -40,7 +37,7 @@ class GetScenarioStructure implements ShouldQueue
      */
     public function handle(Food $food)
     {
-        $data = $food->getTotalEstimatedShipping($this->scenario,$this->provider,$this->status); 
+        $data = $food->getTotalEstimatedShipping($this->data); 
         if(!$this->user){
             $this->user = User::find(2);
         }

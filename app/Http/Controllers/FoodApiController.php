@@ -18,6 +18,7 @@ use App\Models\Article;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteChoose;
 use App\Models\Route;
+use App\Models\Delivery;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
 
@@ -59,12 +60,28 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getSummaryShipping(Request $request, $provider, $status) {
+    public function getSummaryShipping(Request $request, $status) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $provider, $status));
-            //$results = $this->food->getShippingCosts($provider,$status);
+            //dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $status));
+            $results = $this->food->getShippingCosts($user,$status);
+            return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
+        }
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPurchaseOrder(Request $request ) {
+        $user = $request->user();
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            //dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $status));
+            $deliveries = Delivery::whereIn("status", ["scheduled","enqueue"])->get();
+            $this->food->getPurchaseOrder($deliveries);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
@@ -74,12 +91,11 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function showOrganizeEmails(Request $request, $provider) {
+    public function showOrganizeEmails(Request $request) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            $routes = Route::where("status", "enqueue")->where("provider", $provider)->with(['deliveries.user'])->get();
-            $results = $this->food->buildScenario($routes);
+            $results = $this->food->getStructureEmails($request->all());
             Mail::to($user)->send(new RouteOrganize($results));
 //            dispatch(new GetScenarioOrganizationStructure($user, $provider));
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
@@ -91,13 +107,13 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure(Request $request, $scenario, $provider, $status) {
+    public function getScenarioStructure(Request $request) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenarioStructure($user, $scenario, $provider, $status));
+            dispatch(new \App\Jobs\GetScenarioStructure($user, $request->all()));
             return response()->json(array("status" => "success", "message" => "Scenario shipping calculated"));
-//            $data = $this->food->getTotalEstimatedShipping($scenario, $provider, $status); 
+//            $data = $this->food->getTotalEstimatedShipping( $request->all()); 
 //            $result = Mail::to($user)->send(new RouteChoose($data['routes']));
 //            return response()->json(array("status" => "success", "message" => "Scenario shipping calculated","result" => $result));
         }

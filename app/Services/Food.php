@@ -186,18 +186,21 @@ class Food {
         foreach ($articles as $art) {
             $attributes = json_decode($art->attributes, true);
             if ($father[$art->id]['count'] > 0) {
-                $title = "Total " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'];
+                $title = $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . " ";
                 array_push($finalresult['totals'], $title);
+                $titulo = "### ".$father[$art->id]['name'] . "  ";
+                array_push($finalresult['dish'], $titulo);
             }
-//            foreach ($attributes['entradas'] as $art2) {
-//                if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
-//                    $entrada = "Total " . $father[$art->id]['name'] . " entrada: " . $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']];
-//                    array_push($finalresult['dish'], $entrada);
-//                }
-//            }
+
+            foreach ($attributes['entradas'] as $art2) {
+                if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
+                    $entrada = $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']]."  ";
+                    array_push($finalresult['dish'], $entrada);
+                }
+            }
             foreach ($attributes['plato'] as $art3) {
                 if ($father[$art->id]['main'][$art3['codigo']] > 0) {
-                    $fuerte = $father[$art->id]['name'] . " \nprincipal: " . $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']];
+                    $fuerte = $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']]."  ";
                     array_push($finalresult['dish'], $fuerte);
                 }
             }
@@ -222,66 +225,96 @@ class Food {
         }
     }
 
-    public function getTotalEstimatedShipping($scenario, $provider, $status) {
-        $routes = Route::where("type", $scenario)->where("status", $status)->where("provider", $provider)->with(['stops.address'])->get();
-        if ($routes) {
-            $totalCost = 0;
-            $totalIncomeShipping = 0;
-            $totalLunches = 0;
-            $scenarioHash = "";
-            if (count($routes) > 0) {
-                $scenroute = $routes[0];
-                $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at, $scenroute->updated_at);
+    private function calculateRoutesShipping($routes) {
+        $totalCost = 0;
+        $totalIncomeShipping = 0;
+        $totalLunches = 0;
+        $scenarioHash = "";
+        if (count($routes) > 0) {
+            $scenroute = $routes[0];
+            $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at, $scenroute->updated_at);
+        }
+        $className = "App\\Services\\Rapigo";
+        $rapigo = new $className();
+        $className2 = "App\\Services\\Basilikum";
+        $basilikum = new $className2();
+        foreach ($routes as $route) {
+            $stops = $route->stops;
+            $queryStops = [];
+            $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+            foreach ($stops as $stop) {
+                $address = $stop->address;
+                $querystop = [
+                    "address" => $address->address,
+                    "description" => $address->name,
+                    "type" => "point",
+                    "phone" => $address->phone
+                ];
+                array_push($queryStops, $querystop);
             }
-            $className = "App\\Services\\" . $provider;
-            $platFormService = new $className();
-            foreach ($routes as $route) {
-                $stops = $route->stops;
-                $queryStops = [];
-                $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
-                foreach ($stops as $stop) {
-                    $address = $stop->address;
-                    $querystop = [
-                        "address" => $address->address,
-                        "description" => $address->name,
-                        "type" => "point",
-                        "phone" => $address->phone
-                    ];
-                    array_push($queryStops, $querystop);
-                }
-                $rapigoResponse = $platFormService->getEstimate($queryStops);
-                if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-                    $routeCost = $rapigoResponse['price'];
-                }
-                $route->unit_cost = $routeCost;
-                $route->save();
-                $route->hash = $this->generateHash($route->id, $route->created_at, $route->updated_at);
-                $totalCost += $routeCost;
-                $totalIncomeShipping += $route->unit_price;
-                $totalLunches += $route->unit;
+            if ($route->provider == "Rapigo") {
+                $rapigoResponse = $rapigo->getEstimate($queryStops);
+            } else if ($route->provider == "Basilikum") {
+                $rapigoResponse = $basilikum->getEstimate($queryStops);
             }
-            $totalRoutes = count($routes);
-            $totalIncome = $totalLunches * self::LUNCH_PROFIT;
-            $totalProfit = $totalIncomeShipping + $totalIncome;
+            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+                $routeCost = $rapigoResponse['price'];
+            }
+            $route->unit_cost = $routeCost;
+            $route->save();
+            $route->hash = $this->generateHash($route->id, $route->created_at, $route->updated_at);
+            $totalCost += $routeCost;
+            $totalIncomeShipping += $route->unit_price;
+            $totalLunches += $route->unit;
+        }
+        $totalRoutes = count($routes);
+        $totalIncome = $totalLunches * self::LUNCH_PROFIT;
+        $totalProfit = $totalIncomeShipping + $totalIncome;
 
-            $totalGains = $totalProfit - $totalCost;
-            $result = [
-                "ShippingCostEstimate" => $totalCost,
-                "hoov_income" => $totalIncome,
-                "shipping_income" => $totalIncomeShipping,
-                "total_income" => $totalProfit,
-                "routes" => $totalRoutes,
-                "lunches" => $totalLunches,
-                "lunch_route" => ($totalLunches / $totalRoutes),
-                "day_profit" => $totalGains,
-                "scenario_hash" => $scenarioHash
-            ];
-            if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
-                $result['status'] = "success";
-            } else {
-                $result['status'] = "failure";
+        $totalGains = $totalProfit - $totalCost;
+        $result = [
+            "ShippingCostEstimate" => $totalCost,
+            "hoov_income" => $totalIncome,
+            "shipping_income" => $totalIncomeShipping,
+            "total_income" => $totalProfit,
+            "routes" => $totalRoutes,
+            "lunches" => $totalLunches,
+            "lunch_route" => ($totalLunches / $totalRoutes),
+            "day_profit" => $totalGains,
+            "scenario_hash" => $scenarioHash
+        ];
+        if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
+            $result['status'] = "success";
+        } else {
+            $result['status'] = "failure";
+        }
+        return array("routes" => $routes, "result" => $result);
+    }
+
+    private function buildRouteQuery(array $input) {
+        $query = Route::query();
+        foreach ($input as $column => $values) {
+            $query->where($column, $values);
+        }
+        return $query;
+    }
+
+    public function getTotalEstimatedShipping(array $input) {
+        $query = $this->buildRouteQuery($input);
+        $routes = $query->with(['stops.address'])->get();
+        if ($routes) {
+            if (count($routes) > 0) {
+                return $this->calculateRoutesShipping($routes);
             }
-            return array("routes" => $routes, "result" => $result);
+        }
+        return array("routes" => [], "result" => []);
+    }
+
+    public function getStructureEmails(array $input) {
+        $query = $this->buildRouteQuery($input);
+        $routes = $query->with(['deliveries.user'])->get();
+        if ($routes) {
+            return $this->buildScenario($routes);
         }
         return array("routes" => [], "result" => []);
     }
@@ -296,10 +329,12 @@ class Food {
 
     public function regenerateScenarios() {
         $this->deleteOldData();
+        $user = User::find(2);
         $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         $this->prepareRoutingSimulation($polygons);
         $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Basilikum")->get();
         $this->prepareRoutingSimulation($polygons, "Basilikum");
+        $this->getShippingCosts($user, "pending");
     }
 
     public function checkUser(User $user) {
@@ -338,12 +373,8 @@ class Food {
 //        dd($results);
         foreach ($routes as $route) {
             $route->status = "enqueue";
-            $route->provider = "Rapigo";
-            $route->provider_id = "Rap_" . $route->id;
             foreach ($route->deliveries as $delivery) {
                 $delivery->status = "scheduled";
-                $delivery->provider = "Rapigo";
-                $delivery->provider_id = "Rap_" . $delivery->id;
                 $delivery->save();
             }
             $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
@@ -378,15 +409,18 @@ class Food {
         Delivery::whereIn("id", $deliveriesArray)->update($data);
     }
 
-    public function buildScenarioLogistics() {
-        $routes = App\Models\Route::where("status", "enqueue")->with(['deliveries.user'])->orderBy('id')->get();
+    public function buildScenarioLogistics(array $input) {
+        $query = $this->buildRouteQuery($input);
+        $routes = $query->with(['deliveries.user'])->orderBy('id')->get();
         if ($routes) {
             $totalCost = 0;
             $deliveries = $routes[0]->deliveries;
             $config = $this->loadDayConfig($deliveries[0]->delivery);
             $totalIncomeShipping = 0;
             $className = "App\\Services\\Rapigo";
-            $platFormService = new $className();
+            $rapigo = new $className();
+            $className2 = "App\\Services\\Basilikum";
+            $basilikum = new $className2();
             $totalLunches = 0;
             foreach ($routes as $route) {
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
@@ -394,7 +428,6 @@ class Food {
                 foreach ($stops as $stop) {
                     $deliveries = "";
                     foreach ($stop->deliveries as $stopDel) {
-                        $stopDel->status = "scheduled";
                         $delUser = $stopDel->user;
                         $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
                         if (array_key_exists("pickup", $details)) {
@@ -427,19 +460,12 @@ class Food {
                     ];
                     array_push($queryStops, $querystop);
                 }
-                $route->status = "enqueue";
-                $shippingResponse = $platFormService->getEstimate($queryStops);
-                $type = "stops";
-                if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $shippingResponse['price']) {
-                    $totalCost += $shippingResponse['price'];
-                    $route->unit_cost = $shippingResponse['price'];
-                } else {
-                    $type = "hour";
-                    $totalCost += self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-                    $shippingResponse['price2 '] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-                    $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
+                if ($route->provider == "Rapigo") {
+                    $route = $rapigo->createRoute($queryStops, $route, $stops);
+                } else if ($route->provider == "Basilikum") {
+                    $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
-                $route = $platFormService->createRoute($queryStops, $type, $route, $stops);
+                $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
             }
@@ -517,19 +543,10 @@ class Food {
                         $stopDel->region_name = $descr;
                         $deliveries = $deliveries . $descr;
                     }
-                    $address = $stop->address;
 
                     if ($stop->stop_order == 2) {
                         $stop->region_name = $deliveries;
                     }
-
-                    $querystop = [
-                        "address" => $address->address,
-                        "description" => $stop->region_name,
-                        "type" => "point",
-                        "phone" => $address->phone
-                    ];
-                    array_push($queryStops, $querystop);
                 }
                 $totalDeliveries = [];
                 foreach ($route->deliveries as $del) {
@@ -1093,7 +1110,8 @@ class Food {
         foreach ($routes as $value) {
             $value->stops()->delete();
         }
-        Route::whereIn("status", ["pending", "enqueue"])->delete();
+        Route::where("status", "pending")->delete();
+        Route::where("status", "enqueue")->delete();
 
         OrderAddress::where("name", "test")->delete();
     }
@@ -1211,24 +1229,13 @@ class Food {
         }
     }
 
-    public function runCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
-        foreach ($polygons as $polygon) {
-            $this->generateRandomDeliveries($polygon);
-        }
-        $this->prepareRoutingSimulation($polygons);
-        $this->getShippingCosts("Rapigo", "pending");
-    }
-
     public function runRecurringTask() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         $user = User::find(2);
-        foreach ($polygons as $polygon) {
-            $this->generateRandomDeliveries($polygon);
-        }
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
         $this->prepareRoutingSimulation($polygons);
-        $results = $this->getShippingCosts("Rapigo", "pending");
-        Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner']));
+        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Basilikum")->get();
+        $this->prepareRoutingSimulation($polygons, "Basilikum");
+        $results = $this->getShippingCosts($user, "pending");
         $deliveries = Delivery::where("status", "transit")->get();
         $this->getPurchaseOrder($deliveries);
     }
@@ -1239,13 +1246,6 @@ class Food {
         $results = $this->buildScenario($routes);
         Mail::to($user)->send(new RouteOrganize($results));
         Mail::to($user)->send(new RouteDeliver($results));
-    }
-
-    public function testDataCompleteSimulation() {
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
-        foreach ($polygons as $polygon) {
-            $this->generateRandomDeliveries($polygon);
-        }
     }
 
     public function getRouteInfo($delivery_id) {
@@ -1263,26 +1263,47 @@ class Food {
      *
      * @return Response
      */
-    public function getShippingCosts($provider, $status) {
-        if ($provider == "Rapigo") {
-            $resultsPre = $this->getTotalEstimatedShipping("preorganize", $provider, $status);
-            $resultsPre = $resultsPre['result'];
-            $resultsSimple = $this->getTotalEstimatedShipping("simple", $provider, $status);
-            $resultsSimple = $resultsSimple['result'];
-        } else {
-            $resultsPre = $this->getTotalEstimatedShipping("preorganize", $provider, $status);
-            $resultsPre = $resultsPre['result'];
-            $resultsSimple = $resultsPre;
-        }
+    public function getShippingCosts($user, $status) {
+        $providers = ["Rapigo", "Basilikum"];
+        foreach ($providers as $provider) {
+            if ($provider == "Rapigo") {
+                $data = [
+                    "type" => "preorganize",
+                    "status" => $status,
+                    "provider" => $provider
+                ];
 
-        $winningScenario = "";
-        if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
-            $winningScenario = "Preorganize";
-        } else {
-            $winningScenario = "Simple";
-        }
+                $resultsPre = $this->getTotalEstimatedShipping($data);
+                $resultsPre = $resultsPre['result'];
+                $data = [
+                    "type" => "simple",
+                    "status" => $status,
+                    "provider" => $provider
+                ];
+                $resultsSimple = $this->getTotalEstimatedShipping($data);
+                $resultsSimple = $resultsSimple['result'];
+            } else if ($provider == "Basilikum") {
+                $data = [
+                    "status" => $status,
+                    "provider" => $provider
+                ];
+                $resultsPre = $this->getTotalEstimatedShipping($data);
+                $resultsPre = $resultsPre['result'];
+                $resultsSimple = $resultsPre;
+            }
+            $winningScenario = "";
+            if (!array_key_exists("day_profit", $resultsPre)) {
+                continue;
+            }
+            if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
+                $winningScenario = "Preorganize";
+            } else {
+                $winningScenario = "Simple";
+            }
 
-        return array("winner" => $winningScenario, "resultsPre" => $resultsPre, "resultsSimple" => $resultsSimple);
+            Mail::to($user)->send(new ScenarioSelect($resultsPre, $resultsSimple, $winningScenario));
+        }
+        return array("status" => "success", "message" => "costs sent");
     }
 
     public function reprogramDeliveries() {

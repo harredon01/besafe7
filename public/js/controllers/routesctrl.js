@@ -38,6 +38,8 @@
                 }
             }
             $scope.changeScenario = function () {
+                //$scope.provider= "Basilikum";
+                console.log("provider",$scope.provider);
                 $scope.page = 0;
                 $scope.hideAll();
                 if($scope.provider == "Basilikum"){
@@ -101,9 +103,9 @@
                 return route;
             }
             $scope.getRoutes = function () {
+                console.log("Status",$scope.status);
+                console.log("provider",$scope.provider);
                 $scope.page++;
-                let type = "pending";
-                let scenario = $scope.scenario;
                 let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
                 if ($scope.status != "pending") {
                     url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&status=" + $scope.status;
@@ -194,6 +196,13 @@
 
                         });
             }
+            $scope.getPurchaseOrder = function () {
+                Food.getPurchaseOrder().then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
             $scope.regenerateScenarios = function () {
                 Food.regenerateScenarios().then(function (data) {
                 },
@@ -209,21 +218,38 @@
                         });
             }
             $scope.getTotalShippingCosts = function () {
-                Food.getSummaryShipping($scope.provider,$scope.status).then(function (data) {
+                Food.getSummaryShipping($scope.status).then(function (data) {
                 },
                         function (data) {
 
                         });
             }
             $scope.getScenarioOrganization = function () {
-                Food.getScenarioOrganizationStructure($scope.provider).then(function (data) {
+                let data = $scope.getInputs();
+                Food.getScenarioOrganizationStructure(data).then(function (data) {
                 },
                         function (data) {
 
                         });
             }
+            $scope.getInputs = function () {
+                let data;
+                if($scope.status=="enqueue"){
+                    data = {
+                        "status":"enqueue"
+                    };
+                }else {
+                    data = {
+                        "status":$scope.status,
+                        "provider":$scope.provider,
+                        "type":$scope.scenario
+                    };
+                }
+                return data;
+            }
             $scope.getScenarioEmails = function () {
-                Food.getScenarioStructure($scope.scenario,$scope.provider,$scope.status).then(function (data) {
+                let data = $scope.getInputs();
+                Food.getScenarioStructure(data).then(function (data) {
                 },
                         function (data) {
 

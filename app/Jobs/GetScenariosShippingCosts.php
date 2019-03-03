@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+use Exception;
 use App\Models\User;
 use App\Services\Food;
 use App\Services\EditAlerts;
@@ -26,10 +27,9 @@ class GetScenariosShippingCosts implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(User $user,$provider,$status)
+    public function __construct(User $user,$status)
     {
         $this->user = $user;
-        $this->provider = $provider;
         $this->status = $status;
     }
 
@@ -40,10 +40,8 @@ class GetScenariosShippingCosts implements ShouldQueue
      */
     public function handle(Food $food)
     {
-        $data = $food->getShippingCosts($this->provider,$this->status); 
-        if(array_key_exists('resultsPre', $data)){
-            Mail::to($this->user)->send(new ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']));
-        }
+        $data = $food->getShippingCosts($this->user,$this->status); 
+        
     }
     
     /**
@@ -54,7 +52,7 @@ class GetScenariosShippingCosts implements ShouldQueue
      */
     public function failed(Exception $exception)
     {
-        $payload = ["scenario"=> $this->scenario." completo"  ];
+        $payload = ["estado"=> $this->status." completo"  ];
         $user = User::find(2);
         $followers = [$user];
         $data = [

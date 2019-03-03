@@ -171,14 +171,15 @@ Route::get('food/messages', 'FoodApiController@getMessages');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
-Route::get('food/get_scenario_structure/{scenario?}/{provider?}/{status?}', 'FoodApiController@getScenarioStructure');
+Route::get('food/get_scenario_structure', 'FoodApiController@getScenarioStructure');
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
-Route::get('food/summary/{provider?}/{status?}', 'FoodApiController@getSummaryShipping');
+Route::get('food/summary/{status?}', 'FoodApiController@getSummaryShipping');
 Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 Route::post('food/delegate_deliveries', 'FoodApiController@delegateDeliveries');
 Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
-Route::get('food/route_organize/{provider?}', 'FoodApiController@showOrganizeEmails');
+Route::get('food/purchase_order', 'FoodApiController@getPurchaseOrder');
+Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');
