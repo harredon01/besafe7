@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\Food;
 use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
-use App\Mails\RouteOrganize;
+use App\Mail\RouteOrganize;
 use App\Jobs\RegenerateDeliveriesAndScenarios;
 use App\Jobs\BuildScenarioRouteIdApi;
 use App\Jobs\BuildScenarioPositive;
@@ -15,6 +15,8 @@ use App\Jobs\BuildCompleteScenario;
 use App\Jobs\GetScenarioOrganizationStructure;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Article;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\RouteChoose;
 use App\Models\Route;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
@@ -57,12 +59,12 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getSummaryShipping(Request $request, $type) {
+    public function getSummaryShipping(Request $request, $provider, $status) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $type));
-            //$results = $this->food->getShippingCosts($type);
+            dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $provider, $status));
+            //$results = $this->food->getShippingCosts($provider,$status);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
@@ -72,15 +74,14 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function showOrganizeEmails(Request $request, $type) {
+    public function showOrganizeEmails(Request $request, $provider) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-//            $routes = Route::where("status", "pending")->with(['deliveries.user'])->get();
-//            $results = $this->food->buildScenario($routes);
-//            Mail::to($$user)->send(new RouteOrganize($results));
-            dispatch(new GetScenarioOrganizationStructure($user, $type));
-            //$results = $this->food->getShippingCosts($type);
+            $routes = Route::where("status", "enqueue")->where("provider", $provider)->with(['deliveries.user'])->get();
+            $results = $this->food->buildScenario($routes);
+            Mail::to($user)->send(new RouteOrganize($results));
+//            dispatch(new GetScenarioOrganizationStructure($user, $provider));
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
@@ -90,13 +91,15 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure(Request $request, $scenario, $type) {
+    public function getScenarioStructure(Request $request, $scenario, $provider, $status) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            dispatch(new \App\Jobs\GetScenarioStructure($user, $scenario, $type));
-            //$this->food->getTotalEstimatedShipping($scenario,$type);
+            dispatch(new \App\Jobs\GetScenarioStructure($user, $scenario, $provider, $status));
             return response()->json(array("status" => "success", "message" => "Scenario shipping calculated"));
+//            $data = $this->food->getTotalEstimatedShipping($scenario, $provider, $status); 
+//            $result = Mail::to($user)->send(new RouteChoose($data['routes']));
+//            return response()->json(array("status" => "success", "message" => "Scenario shipping calculated","result" => $result));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
@@ -182,7 +185,7 @@ class FoodApiController extends Controller {
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -208,12 +211,12 @@ class FoodApiController extends Controller {
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
             dispatch(new RegenerateDeliveriesAndScenarios());
-            /*$this->food->deleteRandomDeliveriesData();
+            /* $this->food->deleteRandomDeliveriesData();
               $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
               foreach ($polygons as $value) {
               $this->food->generateRandomDeliveries($value);
-              }*/
-              //$this->food->prepareRoutingSimulation($polygons); 
+              } */
+            //$this->food->prepareRoutingSimulation($polygons); 
             return response()->json(array("status" => "success", "message" => "Scenarios and Deliveries Scheduled for regeneration"));
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));

@@ -39,6 +39,13 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
+        $data = [
+            "address" => "Calle 73 # 0 - 24",
+            "complete" => false, 
+            "merchant_id" => 1299,
+            "provider" => "Basilikum"
+        ];
+        $this->food->delegateDeliveries($data);
         
 //        $user = User::find(1);
 //        $user2 = User::find(2);
@@ -53,7 +60,7 @@ class DeliveriesSeeder extends Seeder {
 //                        "user_status" => "test"
 //                    ];
 //        $this->food->sendMassMessage($data, $users, $user, true, null,"food");
-        $this->food->runCompleteSimulation();
+//        $this->food->runCompleteSimulation();
 //        $this->food->importDishes();
 //        $this->deleteOldData();
 //        $this->food->generateRandomDeliveries(4.670129, -74.051013);

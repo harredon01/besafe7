@@ -18,17 +18,16 @@ class GetScenarioOrganizationStructure implements ShouldQueue
 
     
     protected $user;
-    protected $type;
-    protected $scenario;
+    protected $provider;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$scenario)
+    public function __construct(User $user,$provider)
     {
         $this->user = $user;
-        $this->scenario = $scenario;
+        $this->provider = $provider;
     }
 
     /**
@@ -41,7 +40,7 @@ class GetScenarioOrganizationStructure implements ShouldQueue
         if(!$this->user){
             $this->user = User::find(2);
         }
-        $routes = Route::where("status", "pending")->with(['deliveries.user'])->get();
+        $routes = Route::where("status", "enqueue")->where("provider", $this->provider)->with(['deliveries.user'])->get();
         $results = $food->buildScenario($routes);
         Mail::to($this->user)->send(new RouteOrganize($results));
     }

@@ -143,8 +143,8 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
-            var getScenarioStructure = function (scenario,type) {
-                let url = '/api/food/get_scenario_structure/'+scenario+"/"+type ;
+            var getScenarioStructure = function (scenario,provider,status) {
+                let url = '/api/food/get_scenario_structure/'+scenario+"/"+provider+"/"+status ;
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -155,12 +155,12 @@ angular.module('besafe')
                             def.resolve(data);
                         })
                         .error(function () {
-                            def.reject("Failed to buildCompleteScenario");
+                            def.reject("Failed to getScenarioStructure");
                         });
                 return def.promise;
             }
-            var getSummaryShipping = function (type) {
-                let url = '/api/food/summary/'+type ;
+            var getSummaryShipping = function (provider,status) {
+                let url = '/api/food/summary/'+provider+"/"+status ;
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -171,12 +171,12 @@ angular.module('besafe')
                             def.resolve(data);
                         })
                         .error(function () {
-                            def.reject("Failed to buildCompleteScenario");
+                            def.reject("Failed to getSummaryShipping");
                         });
                 return def.promise;
             }
-            var getScenarioOrganizationStructure = function (type) {
-                let url = '/api/food/route_organize/'+type ;
+            var getScenarioOrganizationStructure = function (provider) {
+                let url = '/api/food/route_organize/'+provider ;
                 var def = $q.defer();
                 $http({
                     method: 'get',

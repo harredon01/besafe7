@@ -17,18 +17,20 @@ class GetScenarioStructure implements ShouldQueue
 
     
     protected $user;
-    protected $type;
+    protected $status;
     protected $scenario;
+    protected $provider;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$scenario,$type)
+    public function __construct(User $user,$scenario,$provider,$status)
     {
         $this->user = $user;
         $this->scenario = $scenario;
-        $this->type = $type;
+        $this->provider = $provider;
+        $this->status = $status;
     }
 
     /**
@@ -38,7 +40,7 @@ class GetScenarioStructure implements ShouldQueue
      */
     public function handle(Food $food)
     {
-        $data = $food->getTotalEstimatedShipping($this->scenario,$this->type); 
+        $data = $food->getTotalEstimatedShipping($this->scenario,$this->provider,$this->status); 
         if(!$this->user){
             $this->user = User::find(2);
         }

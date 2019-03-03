@@ -19,16 +19,18 @@ class GetScenariosShippingCosts implements ShouldQueue
     
     protected $user;
     
-    protected $type;
+    protected $provider;
+    protected $status;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$type)
+    public function __construct(User $user,$provider,$status)
     {
         $this->user = $user;
-        $this->type = $type;
+        $this->provider = $provider;
+        $this->status = $status;
     }
 
     /**
@@ -38,8 +40,10 @@ class GetScenariosShippingCosts implements ShouldQueue
      */
     public function handle(Food $food)
     {
-        $data = $food->getShippingCosts($this->type); 
-        Mail::to($this->user)->send(new ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']));
+        $data = $food->getShippingCosts($this->provider,$this->status); 
+        if(array_key_exists('resultsPre', $data)){
+            Mail::to($this->user)->send(new ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']));
+        }
     }
     
     /**

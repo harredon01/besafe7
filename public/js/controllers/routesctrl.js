@@ -40,6 +40,9 @@
             $scope.changeScenario = function () {
                 $scope.page = 0;
                 $scope.hideAll();
+                if($scope.provider == "Basilikum"){
+                    $scope.scenario = "preorganize";
+                }
                 $scope.routes = [];
                 $scope.getRoutes();
             }
@@ -103,7 +106,7 @@
                 let scenario = $scope.scenario;
                 let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
                 if ($scope.status != "pending") {
-                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
+                    url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&status=" + $scope.status;
                 }
 
                 Routes.getRoutes(url).then(function (data) {
@@ -206,35 +209,21 @@
                         });
             }
             $scope.getTotalShippingCosts = function () {
-                let type = "pending";
-                if ($scope.status != "pending") {
-                    type = "built";
-                }
-                Food.getSummaryShipping(type).then(function (data) {
+                Food.getSummaryShipping($scope.provider,$scope.status).then(function (data) {
                 },
                         function (data) {
 
                         });
             }
             $scope.getScenarioOrganization = function () {
-                let type = "pending";
-                if ($scope.status != "pending") {
-                    type = "built";
-                }
-                Food.getScenarioOrganizationStructure(type).then(function (data) {
+                Food.getScenarioOrganizationStructure($scope.provider).then(function (data) {
                 },
                         function (data) {
 
                         });
             }
             $scope.getScenarioEmails = function () {
-                let type = "pending";
-                let scenario = $scope.scenario;
-                if ($scope.status != "pending") {
-                    type = "built";
-                    scenario = "enqueue";
-                }
-                Food.getScenarioStructure(scenario, type).then(function (data) {
+                Food.getScenarioStructure($scope.scenario,$scope.provider,$scope.status).then(function (data) {
                 },
                         function (data) {
 

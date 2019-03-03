@@ -26,9 +26,11 @@
 @foreach ($delivery->totals['dish'] as $line)
 {{ $line }}
 @endforeach 
+@if (array_key_exists('starter',$delivery->totals ))
 @foreach ($delivery->totals['starter'] as $line)
 {{ $line }}
 @endforeach 
+@endif
 @endforeach 
 @endcomponent
 @endcomponent

@@ -6,19 +6,24 @@
         <div class="col-md-8 col-md-offset-2"> 
             <div class="panel panel-default">
                 <div class="panel-body">
-                    Escenario <br/>
-                    <select ng-model="scenario" ng-change="changeScenario()">
-                        <option value="simple">Simple</option>
-                        <option value="preorganize">Preorganizado</option>
-                    </select><br/>
+                    <div ng-if="provider=='Rapigo' && status=='pending'" >
+                        Escenario <br/>
+                        <select ng-model="scenario" ng-change="changeScenario()">
+                            <option value="simple">Simple</option>
+                            <option value="preorganize">Preorganizado</option>
+                        </select><br/>
+                    </div>
                     <select ng-model="status" ng-change="changeScenario()">
                         <option value="pending">Pending</option>
                         <option value="enqueue">Esperando</option>
                     </select><br/>
-                    <select ng-model="provider" ng-change="changeScenario()">
-                        <option value="Rapigo">Rapigo</option>
-                        <option value="Basilikum">Basilikum</option>
-                    </select><br/>
+                    <div ng-if="status=='pending'" >
+                        <select ng-model="provider" ng-change="changeScenario()">
+                            <option value="Rapigo">Rapigo</option>
+                            <option value="Basilikum">Basilikum</option>
+                        </select><br/>
+                    </div>
+                    
                     <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>

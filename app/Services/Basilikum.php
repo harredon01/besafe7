@@ -15,14 +15,14 @@ class Basilikum {
 //        $data['points'] = json_encode($points);
 //        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
         //dd($query);
-        $response['price2'] = 24000;
-        $response['price'] = 24000;
+        $response['price2'] = 20000;
+        $response['price'] = 20000;
         return $response;
     }
 
     public function getOrderShippingPrice(array $origin, array $destination) {
-        $response['price'] = 24000;
-        $response['price2'] = 24000;
+        $response['price'] = 20000;
+        $response['price2'] = 20000;
         return $response;
     }
 

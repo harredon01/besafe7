@@ -68,12 +68,12 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function getScenarioStructure($scenario, $hash) {
+    public function getScenarioStructure($scenario,$provider,$status, $hash) {
         $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->get()->limit(1);
         $check = $this->food->checkScenario($routes, $hash);
         if ($check) {
-            dispatch(new \App\Jobs\GetScenarioStructure(null,$scenario));
-            //$this->food->getTotalEstimatedShipping($scenario,"pending");
+            dispatch(new \App\Jobs\GetScenarioStructure($scenario,$provider,$status));
+            //$this->food->getTotalEstimatedShipping($scenario,$provider,$status);
             return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
