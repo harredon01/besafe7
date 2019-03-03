@@ -17,11 +17,15 @@ Total Profit: ${{ number_format($preData['day_profit'], 2, ',', '.') }}
 Numero de rutas: {{$preData['routes']}}  
 Numero de almuerzos: {{$preData['lunches']}}  
 Promedio almuerzos por ruta: {{$preData['lunch_route']}}  
-@component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/preorganize/".$preData['scenario_hash']])
+Ruta hash: {{$preData['scenarioHashId']}} 
+@component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/preorganize/".$preData['route_provider']."/".$preData['route_status']."/".$preData['scenario_hash']])
 Generar Correos
 @endcomponent
-@component('mail::button', ['url' => config('app.url'). "/food/build_complete_scenario/preorganize/".$preData['scenario_hash']])
+@component('mail::button', ['url' => config('app.url'). "/food/build_complete_scenario/preorganize/".$preData['route_provider']."/".$preData['scenario_hash']])
 Construir
+@endcomponent
+@component('mail::button', ['url' => config('app.url'). "/food/build_scenario_positive/preorganize/".$preData['route_provider']."/".$preData['scenario_hash']])
+Construir los positivos
 @endcomponent
 @endcomponent
 
@@ -36,11 +40,15 @@ Total Profit: ${{ number_format($simpleData['day_profit'], 2, ',', '.') }}
 Numero de rutas: {{$preData['routes']}}  
 Numero de almuerzos: {{$simpleData['lunches']}}  
 Promedio almuerzos por ruta: {{$simpleData['lunch_route']}}  
-@component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/simple/".$preData['scenario_hash']])
+Ruta hash: {{$simpleData['scenarioHashId']}}  
+@component('mail::button', ['url' =>config('app.url'). "/food/get_scenario_structure/simple/".$preData['route_provider']."/".$preData['route_status']."/".$preData['scenario_hash']])
 Generar Correos
 @endcomponent
-@component('mail::button', ['url' => config('app.url'). "/food/build_complete_scenario/simple/".$preData['scenario_hash']])
+@component('mail::button', ['url' => config('app.url'). "/food/build_complete_scenario/simple/".$preData['route_provider']."/".$preData['scenario_hash']])
 Construir
+@endcomponent
+@component('mail::button', ['url' => config('app.url'). "/food/build_scenario_positive/simple/".$preData['route_provider']."/".$preData['scenario_hash']])
+Construir los positivos
 @endcomponent
 @endcomponent
 

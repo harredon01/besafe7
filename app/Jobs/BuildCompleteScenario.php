@@ -16,6 +16,7 @@ class BuildCompleteScenario implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $scenario;
+    protected $provider;
     protected $hash;
 
     /**
@@ -23,11 +24,11 @@ class BuildCompleteScenario implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($scenario, $hash )
+    public function __construct($scenario,$provider, $hash )
     {
         $this->scenario = $scenario;
+        $this->provider = $provider;
         $this->hash = $hash;
-
     }
 
     /**
@@ -37,7 +38,7 @@ class BuildCompleteScenario implements ShouldQueue
      */
     public function handle(Food $food,EditAlerts $editAlerts)
     {
-        $food->buildCompleteScenario($this->scenario, $this->hash); 
+        $food->buildCompleteScenario($this->scenario,$this->provider, $this->hash); 
         $payload = ["scenario"=> $this->scenario." completo" ];
         $user = User::find(2);
         $followers = [$user];

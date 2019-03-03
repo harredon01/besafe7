@@ -66,8 +66,8 @@ class Basilikum {
         return true;
     }
 
-    private function generateHash($id, $created_at, $updated_at) {
-        return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
+    private function generateHash($id, $created_at ) {
+        return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
 
 }

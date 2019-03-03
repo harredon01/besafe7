@@ -188,19 +188,19 @@ class Food {
             if ($father[$art->id]['count'] > 0) {
                 $title = $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . " ";
                 array_push($finalresult['totals'], $title);
-                $titulo = "### ".$father[$art->id]['name'] . "  ";
+                $titulo = "### " . $father[$art->id]['name'] . "  ";
                 array_push($finalresult['dish'], $titulo);
             }
 
             foreach ($attributes['entradas'] as $art2) {
                 if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
-                    $entrada = $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']]."  ";
+                    $entrada = $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']] . "  ";
                     array_push($finalresult['dish'], $entrada);
                 }
             }
             foreach ($attributes['plato'] as $art3) {
                 if ($father[$art->id]['main'][$art3['codigo']] > 0) {
-                    $fuerte = $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']]."  ";
+                    $fuerte = $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']] . "  ";
                     array_push($finalresult['dish'], $fuerte);
                 }
             }
@@ -230,9 +230,11 @@ class Food {
         $totalIncomeShipping = 0;
         $totalLunches = 0;
         $scenarioHash = "";
+        $scenarioHashId = "";
         if (count($routes) > 0) {
             $scenroute = $routes[0];
-            $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at, $scenroute->updated_at);
+            $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at );
+            $scenarioHashId = $scenroute->id;
         }
         $className = "App\\Services\\Rapigo";
         $rapigo = new $className();
@@ -262,7 +264,7 @@ class Food {
             }
             $route->unit_cost = $routeCost;
             $route->save();
-            $route->hash = $this->generateHash($route->id, $route->created_at, $route->updated_at);
+            $route->hash = $this->generateHash($route->id, $route->created_at );
             $totalCost += $routeCost;
             $totalIncomeShipping += $route->unit_price;
             $totalLunches += $route->unit;
@@ -281,7 +283,8 @@ class Food {
             "lunches" => $totalLunches,
             "lunch_route" => ($totalLunches / $totalRoutes),
             "day_profit" => $totalGains,
-            "scenario_hash" => $scenarioHash
+            "scenario_hash" => $scenarioHash,
+            "scenarioHashId"=>$scenarioHashId
         ];
         if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
             $result['status'] = "success";
@@ -301,7 +304,7 @@ class Food {
 
     public function getTotalEstimatedShipping(array $input) {
         $query = $this->buildRouteQuery($input);
-        $routes = $query->with(['stops.address'])->get();
+        $routes = $query->with(['stops.address'])->orderBy('id', 'asc')->get();
         if ($routes) {
             if (count($routes) > 0) {
                 return $this->calculateRoutesShipping($routes);
@@ -322,7 +325,7 @@ class Food {
     public function checkScenario($results, $hash) {
         if (count($results) > 0) {
             $scenroute = $results[0];
-            return $this->checkHash($scenroute->id, $scenroute->created_at, $scenroute->updated_at, $hash);
+            return $this->checkHash($scenroute->id, $scenroute->created_at, $hash);
         }
         return false;
     }
@@ -345,24 +348,25 @@ class Food {
     }
 
     public function buildScenarioRouteId($id, $hash) {
-        $routes = App\Models\Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+        $routes = Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
             $this->buildScenarioTransit($routes);
         }
     }
 
-    public function buildScenarioPositive($scenario, $hash) {
-        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+    public function buildScenarioPositive($scenario,$provider, $hash) {
+        $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
-            $routes = App\Models\Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
+            $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
             $this->buildScenarioTransit($routes);
         }
     }
 
-    public function buildCompleteScenario($scenario, $hash) {
-        $routes = App\Models\Route::where("type", $scenario)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+    public function buildCompleteScenario($scenario,$provider, $hash) {
+        $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
             $this->buildScenarioTransit($routes);
@@ -493,14 +497,13 @@ class Food {
         }
     }
 
-    public function generateHash($id, $created_at, $updated_at) {
-        return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
+    public function generateHash($id, $created_at ) {
+        return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
 
-    public function checkHash($id, $created_at, $updated_at, $hash) {
+    public function checkHash($id, $created_at, $hash) {
         $keyDecoded = base64_decode($hash);
-        $generated = Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY'));
-        if (Hash::check($generated, $keyDecoded)) {
+        if (Hash::check($id . $created_at . env('LONCHIS_KEY'), $keyDecoded)) {
             return true;
         } else {
             return false;
@@ -558,7 +561,7 @@ class Food {
                     $del->totals = $delTotals;
                 }
 
-                $route->hash = $this->generateHash($route->id, $route->created_at, $route->updated_at);
+                $route->hash = $this->generateHash($route->id, $route->created_at );
                 $route->totals = $routeTotals;
                 $route->stops = $stops;
             }
@@ -584,7 +587,7 @@ class Food {
                 }
                 $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
                 $stopDel->region_name = $descr;
-                $stopDel->hash = $this->generateHash($stopDel->id, $stopDel->created_at, $stopDel->updated_at);
+                $stopDel->hash = $this->generateHash($stopDel->id, $stopDel->created_at );
                 $stopDel->detauls = $details;
                 $deliveries = $deliveries . $descr;
             }
@@ -1272,9 +1275,11 @@ class Food {
                     "status" => $status,
                     "provider" => $provider
                 ];
-
+                
                 $resultsPre = $this->getTotalEstimatedShipping($data);
                 $resultsPre = $resultsPre['result'];
+                $resultsPre['route_provider'] = $provider;
+                $resultsPre['route_status'] = "pending";
                 $data = [
                     "type" => "simple",
                     "status" => $status,
@@ -1282,6 +1287,8 @@ class Food {
                 ];
                 $resultsSimple = $this->getTotalEstimatedShipping($data);
                 $resultsSimple = $resultsSimple['result'];
+                $resultsSimple['route_provider'] = $provider;
+                $resultsSimple['route_status'] = "pending";
             } else if ($provider == "Basilikum") {
                 $data = [
                     "status" => $status,
@@ -1289,6 +1296,8 @@ class Food {
                 ];
                 $resultsPre = $this->getTotalEstimatedShipping($data);
                 $resultsPre = $resultsPre['result'];
+                $resultsPre['route_provider'] = $provider;
+                $resultsPre['route_status'] = "pending";
                 $resultsSimple = $resultsPre;
             }
             $winningScenario = "";

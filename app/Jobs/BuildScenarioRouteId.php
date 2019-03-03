@@ -3,6 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Services\Food;
+use App\Models\User;
 use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;

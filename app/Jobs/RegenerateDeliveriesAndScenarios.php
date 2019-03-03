@@ -35,13 +35,15 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
      */
     public function handle(Food $food, EditAlerts $editAlerts) {
         $food->deleteRandomDeliveriesData();
+        $user = User::find(2);
         $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
         foreach ($polygons as $value) {
             $food->generateRandomDeliveries($value);
         }
         $food->prepareRoutingSimulation($polygons);
+        $food->getShippingCosts($user, "pending");
         $payload = [ ];
-        $user = User::find(2);
+        
         $followers = [$user];
         $data = [
             "trigger_id" => $user->id,
@@ -63,7 +65,7 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception)
+    /*public function failed(Exception $exception)
     {
         $payload = [ ];
         $user = User::find(2);
@@ -82,6 +84,6 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
         $className = "App\\Services\\EditAlerts";
         $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
-    }
+    }*/
 
 }

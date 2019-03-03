@@ -122,8 +122,8 @@ class Rapigo {
         return $response;
     }
 
-    private function generateHash($id, $created_at, $updated_at) {
-        return base64_encode(Hash::make($id . $created_at . $updated_at . env('LONCHIS_KEY')));
+    private function generateHash($id, $created_at ) {
+        return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
 
     public function stopUpdate($data) {
@@ -153,7 +153,7 @@ class Rapigo {
         $userAdmin = User::find(2);
         foreach ($stop->deliveries as $delivery) {
             $user = $delivery->user;
-            $user->activationHash = $this->generateHash($user->id, $user->created_at, $user->updated_at);
+            $user->activationHash = $this->generateHash($user->id, $user->created_at );
             $delivery = Delivery::where("status", "pending")->where("user_id", $user->id)->orderBy('delivery', 'desc')->first();
             if ($delivery) {
                 $user->lunchHash = $user->activationHash;

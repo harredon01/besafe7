@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Services\Food;
-use App\Models\Article;
+use App\Models\Route;
 use App\Models\User;
 use App\Models\CoveragePolygon;
 
@@ -70,7 +70,7 @@ class FoodController extends Controller {
      * @return Response
      */
     public function getScenarioStructure($scenario,$provider,$status, $hash) {
-        $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->get()->limit(1);
+        $routes = Route::where("type", $scenario)->where("status", "pending")->with(['stops.address'])->limit(1)->orderBy('id', 'asc')->get();
         $check = $this->food->checkScenario($routes, $hash);
         if ($check) {
             $data =[
@@ -78,6 +78,7 @@ class FoodController extends Controller {
                 "status"=>$status,
                 "provider"=>$provider
             ];
+            //dd($data);
             $user = User::find(2);
             dispatch(new \App\Jobs\GetScenarioStructure($user,$data));
             //$this->food->getTotalEstimatedShipping($data);
@@ -93,7 +94,7 @@ class FoodController extends Controller {
      * @return Response
      */
     public function cancelUserCredit($user,$option, $hash) {
-        $users = User::where('id',$user)->get()->limit(1);
+        $users = User::where('id',$user)->limit(1)->get();
         $check = $this->food->checkScenario($users, $hash);
         if ($check) {
             $this->food->suspendDelivery($users[0],$option);
@@ -119,9 +120,9 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function buildScenarioPositive($scenario, $hash) {
-        dispatch(new \App\Jobs\BuildScenarioPositive($scenario, $hash));
-        //$results = $this->food->buildScenarioPositive($scenario, $hash);
+    public function buildScenarioPositive($scenario,$provider, $hash) {
+        dispatch(new \App\Jobs\BuildScenarioPositive($scenario,$provider, $hash));
+        //$results = $this->food->buildScenarioPositive($scenario,$provider, $hash);
         return view('food.buildScheduled')->with('message', "Escenario enviado a rapigo. Si la autenticacion pasa sera construido");
     }
 
@@ -130,9 +131,9 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function buildCompleteScenario($scenario, $hash) {
-        dispatch(new \App\Jobs\BuildCompleteScenario($scenario, $hash));
-        //$results = $this->food->buildCompleteScenario($scenario, $hash);
+    public function buildCompleteScenario($scenario,$provider, $hash) {
+        dispatch(new \App\Jobs\BuildCompleteScenario($scenario,$provider, $hash));
+        //$results = $this->food->buildCompleteScenario($scenario,$provider, $hash);
         return view('food.buildScheduled')->with('message', "Escenario positivo enviado a rapigo. Si la autenticacion pasa sera construido");
     }
 

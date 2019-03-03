@@ -16,6 +16,7 @@ class BuildScenarioPositive implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $scenario;
+    protected $provider;
     protected $hash;
 
     /**
@@ -23,9 +24,10 @@ class BuildScenarioPositive implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($scenario, $hash )
+    public function __construct($scenario,$provider, $hash )
     {
         $this->scenario = $scenario;
+        $this->provider = $provider;
         $this->hash = $hash;
 
     }
@@ -37,7 +39,7 @@ class BuildScenarioPositive implements ShouldQueue
      */
     public function handle(Food $food, EditAlerts $editAlerts)
     {
-        $food->buildScenarioPositive($this->scenario, $this->hash); 
+        $food->buildScenarioPositive($this->scenario,$this->provider, $this->hash); 
         $payload = ["scenario"=> $this->scenario." positivos" ];
         $user = User::find(2);
         $followers = [$user];
