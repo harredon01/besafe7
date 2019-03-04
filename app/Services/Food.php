@@ -188,7 +188,7 @@ class Food {
             if ($father[$art->id]['count'] > 0) {
                 $title = $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . " ";
                 array_push($finalresult['totals'], $title);
-                $titulo = "### " . $father[$art->id]['name'] . "  ";
+                $titulo = "### " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . "  ";
                 array_push($finalresult['dish'], $titulo);
             }
 
@@ -233,7 +233,7 @@ class Food {
         $scenarioHashId = "";
         if (count($routes) > 0) {
             $scenroute = $routes[0];
-            $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at );
+            $scenarioHash = $this->generateHash($scenroute->id, $scenroute->created_at);
             $scenarioHashId = $scenroute->id;
         }
         $className = "App\\Services\\Rapigo";
@@ -264,7 +264,7 @@ class Food {
             }
             $route->unit_cost = $routeCost;
             $route->save();
-            $route->hash = $this->generateHash($route->id, $route->created_at );
+            $route->hash = $this->generateHash($route->id, $route->created_at);
             $totalCost += $routeCost;
             $totalIncomeShipping += $route->unit_price;
             $totalLunches += $route->unit;
@@ -284,7 +284,7 @@ class Food {
             "lunch_route" => ($totalLunches / $totalRoutes),
             "day_profit" => $totalGains,
             "scenario_hash" => $scenarioHash,
-            "scenarioHashId"=>$scenarioHashId
+            "scenarioHashId" => $scenarioHashId
         ];
         if ($result['ShippingCostEstimate'] < $result['shipping_income']) {
             $result['status'] = "success";
@@ -356,7 +356,7 @@ class Food {
         }
     }
 
-    public function buildScenarioPositive($scenario,$provider, $hash) {
+    public function buildScenarioPositive($scenario, $provider, $hash) {
         $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
@@ -365,7 +365,7 @@ class Food {
         }
     }
 
-    public function buildCompleteScenario($scenario,$provider, $hash) {
+    public function buildCompleteScenario($scenario, $provider, $hash) {
         $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
         $checkResult = $this->checkScenario($routes, $hash);
         if ($checkResult) {
@@ -392,28 +392,7 @@ class Food {
         return true;
     }
 
-    public function createRoutesFromDeliveries($deliveriesArray, $shipping) {
-        $results = [];
-        $bindingsString = trim(str_repeat('?,', count($deliveriesArray)), ',');
-        $deliveries = DB::select(""
-                        . "SELECT DISTINCT(d.id), d.delivery,d.details,d.user_id,d.address_id,status,shipping, lat,`long`, 
-			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  lat  ) ) ) ) AS Distance 
-                   FROM deliveries d join order_addresses a on d.address_id = a.id
-                   WHERE  id IN ({$bindingsString})");
-        $stops = $this->turnDeliveriesIntoStops($deliveries, true);
-        $results = $this->createRoutes($stops, $results, 'preorganize', true, $shipping);
-        $this->completeRoutes($results);
-        $date = date_create();
-        $data = [
-            "status" => "scheduled",
-            "updated_at" => $date
-        ];
-        Delivery::whereIn("id", $deliveriesArray)->update($data);
-    }
-
-    public function buildScenarioLogistics(array $input) {
+    public function buildScenarioLogistics(User $user,array $input) {
         $query = $this->buildRouteQuery($input);
         $routes = $query->with(['deliveries.user'])->orderBy('id')->get();
         if ($routes) {
@@ -427,34 +406,40 @@ class Food {
             $basilikum = new $className2();
             $totalLunches = 0;
             foreach ($routes as $route) {
+                $routeConfig = $config;
+                $deliveries = $route->deliveries;
+                $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
+                $routeTotals = $this->printTotalsConfig($routeConfig);
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
                 $queryStops = [];
                 foreach ($stops as $stop) {
-                    $deliveries = "";
+                    $stopConfig = $config;
+                    $stopDeliveries = $stop->deliveries;
+                    $stopConfig['father'] = $this->countConfigElements($stopDeliveries, $stopConfig);
+                    $stopTotals = $this->printTotalsConfig($stopConfig);
+                    $stop->totals = $stopTotals;
                     foreach ($stop->deliveries as $stopDel) {
                         $delUser = $stopDel->user;
                         $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
+                        $details = json_decode($stopDel->details, true);
                         if (array_key_exists("pickup", $details)) {
                             if ($details['pickup'] == "envase") {
                                 $descr = $descr . "Recoger envase, ";
                             }
                         }
-                        $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> " . json_encode($delTotals);
+                        $descr = $descr . "Entregar id: " . $stopDel->id . ".";
                         $stopDel->region_name = $descr;
-                        $stopDel->save();
-
-                        $details = json_decode($stopDel->details, true);
                         $delConfig = $config;
                         $dels = [$stopDel];
                         $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
                         $delTotals = $this->printTotalsConfig($delConfig);
                         $stopDel->totals = $delTotals;
 
-                        $deliveries = $deliveries . $descr;
+                        //$deliveries = $deliveries . $descr;
                     }
                     $address = $stop->address;
                     if ($stop->stop_order == 2) {
-                        $stop->region_name = $deliveries;
+                        //$stop->region_name = $deliveries;
                     }
                     $querystop = [
                         "address" => $address->address,
@@ -464,15 +449,27 @@ class Food {
                     ];
                     array_push($queryStops, $querystop);
                 }
-                if ($route->provider == "Rapigo") {
+                if (false) {
                     $route = $rapigo->createRoute($queryStops, $route, $stops);
-                } else if ($route->provider == "Basilikum") {
+                } else if (true) {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
+                $route->totals = $routeTotals;
                 $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
+                $totalDeliveries = [];
+                foreach ($route->deliveries as $del) {
+                    $delConfig = $config;
+                    $dels = [$del];
+                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
+                    $delTotals = $this->printTotalsConfig($delConfig);
+                    $del->totals = $delTotals;
+                }
             }
+            
+            Mail::to($user)->send(new RouteOrganize($routes));
+            Mail::to($user)->send(new RouteDeliver($routes));
             $totalRoutes = count($routes);
             $totalIncome = $totalLunches * self::LUNCH_PROFIT;
             $totalProfit = $totalIncomeShipping + $totalIncome;
@@ -497,7 +494,7 @@ class Food {
         }
     }
 
-    public function generateHash($id, $created_at ) {
+    public function generateHash($id, $created_at) {
         return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
 
@@ -553,7 +550,6 @@ class Food {
                 }
                 $totalDeliveries = [];
                 foreach ($route->deliveries as $del) {
-                    array_push($totalDeliveries, $stopDel);
                     $delConfig = $config;
                     $dels = [$del];
                     $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
@@ -561,7 +557,7 @@ class Food {
                     $del->totals = $delTotals;
                 }
 
-                $route->hash = $this->generateHash($route->id, $route->created_at );
+                $route->hash = $this->generateHash($route->id, $route->created_at);
                 $route->totals = $routeTotals;
                 $route->stops = $stops;
             }
@@ -587,7 +583,7 @@ class Food {
                 }
                 $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
                 $stopDel->region_name = $descr;
-                $stopDel->hash = $this->generateHash($stopDel->id, $stopDel->created_at );
+                $stopDel->hash = $this->generateHash($stopDel->id, $stopDel->created_at);
                 $stopDel->detauls = $details;
                 $deliveries = $deliveries . $descr;
             }
@@ -1275,7 +1271,7 @@ class Food {
                     "status" => $status,
                     "provider" => $provider
                 ];
-                
+
                 $resultsPre = $this->getTotalEstimatedShipping($data);
                 $resultsPre = $resultsPre['result'];
                 $resultsPre['route_provider'] = $provider;

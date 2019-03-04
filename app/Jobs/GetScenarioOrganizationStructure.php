@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Exception;
 use App\Models\User;
 use App\Models\Route;
@@ -13,22 +14,24 @@ use App\Mail\RouteOrganize;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class GetScenarioOrganizationStructure implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+class GetScenarioOrganizationStructure implements ShouldQueue {
 
-    
+    use Dispatchable,
+        InteractsWithQueue,
+        Queueable,
+        SerializesModels;
+
     protected $user;
-    protected $provider;
+    protected $data;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$provider)
-    {
+    public function __construct(User $user, $data) {
         $this->user = $user;
-        $this->provider = $provider;
+        $this->data = $data;
     }
 
     /**
@@ -36,26 +39,23 @@ class GetScenarioOrganizationStructure implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food)
-    {
-        if(!$this->user){
+    public function handle(Food $food) {
+        if (!$this->user) {
             $this->user = User::find(2);
         }
-        $routes = Route::where("status", "enqueue")->where("provider", $this->provider)->with(['deliveries.user'])->get();
-        $results = $food->buildScenario($routes);
+        $results = $food->getStructureEmails($this->data);
         Mail::to($this->user)->send(new RouteOrganize($results));
     }
-    
+
     /**
      * The job failed to process.
      *
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception)
-    {
-        $payload = ["scenario"=> $this->scenario." completo"  ];
-        if(!$this->user){
+    public function failed(Exception $exception) {
+        $payload = ["scenario" => $this->scenario . " completo"];
+        if (!$this->user) {
             $this->user = User::find(2);
         }
         $followers = [$this->user];
@@ -74,4 +74,5 @@ class GetScenarioOrganizationStructure implements ShouldQueue
         $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
+
 }

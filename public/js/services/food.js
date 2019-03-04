@@ -193,6 +193,23 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
+            var buildScenarioLogistics = function (data) {
+                let url = '/api/food/build_scenario_logistics' ;
+                var def = $q.defer();
+                $http({
+                    method: 'post',
+                    url: url,
+                    data:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to buildScenarioLogistics");
+                        });
+                return def.promise;
+            }
             var getPurchaseOrder = function () {
                 let url = '/api/food/purchase_order' ;
                 var def = $q.defer();
@@ -341,6 +358,7 @@ angular.module('besafe')
                 getPurchaseOrder:getPurchaseOrder,
                 delegateDeliveriesAddress:delegateDeliveriesAddress,
                 getMessages:getMessages,
+                buildScenarioLogistics:buildScenarioLogistics,
                 regenerateDeliveries:regenerateDeliveries,
                 getScenarioStructure:getScenarioStructure,
                 getSummaryShipping:getSummaryShipping,

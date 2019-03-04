@@ -28,9 +28,9 @@ class Basilikum {
         return $response;
     }
 
-    public function createRoute(array $points, $type, $route,$stops){
+    public function createRoute(array $points,$route,$stops){
         $route->unit_cost = self::ROUTE_HOUR_COST*self::ROUTE_HOURS_EST;
-        $route->code = "route_".$route->id;
+        $route->provider_id = "route_".$route->id;
         $location = [
             "runner" => "",
             "runner_phone" => "",
@@ -41,9 +41,15 @@ class Basilikum {
         $route->coverage = json_encode($serviceBookResponse);
         $i = 0;
         foreach ($stops as $stop) {
+            $totals = $stop->totals;
+            $deliveries = $stop->deliveries;
+            unset($stop->totals);
+            unset($stop->deliveries);
             $stop->code = "stop_".$stop->id;
             $stop->status = "pending";
             $stop->save();
+            $stop->totals = $totals;
+            $stop->deliveries = $deliveries;
             $i++;
         }
         $route->status = "built";

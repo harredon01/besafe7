@@ -97,7 +97,7 @@ class FoodApiController extends Controller {
         if ($checkResult) {
             $results = $this->food->getStructureEmails($request->all());
             Mail::to($user)->send(new RouteOrganize($results));
-//            dispatch(new GetScenarioOrganizationStructure($user, $provider));
+            dispatch(new GetScenarioOrganizationStructure($user, $request->all()));
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
@@ -113,6 +113,26 @@ class FoodApiController extends Controller {
         if ($checkResult) {
             dispatch(new \App\Jobs\GetScenarioStructure($user, $request->all()));
             return response()->json(array("status" => "success", "message" => "Scenario shipping calculated"));
+//            $data = $this->food->getTotalEstimatedShipping( $request->all()); 
+//            $result = Mail::to($user)->send(new RouteChoose($data['routes']));
+//            return response()->json(array("status" => "success", "message" => "Scenario shipping calculated","result" => $result));
+        }
+        return response()->json(array("status" => "error", "message" => "User not authorized"));
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function buildScenarioLogistics(Request $request) {
+        $user = $request->user();
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            $this->food->buildScenarioLogistics($user,$request->all());
+            
+            //dispatch(new \App\Jobs\BuildScenarioLogistics($user, $request->all()));
+            return response()->json(array("status" => "success", "message" => "Scenario sent to build"));
 //            $data = $this->food->getTotalEstimatedShipping( $request->all()); 
 //            $result = Mail::to($user)->send(new RouteChoose($data['routes']));
 //            return response()->json(array("status" => "success", "message" => "Scenario shipping calculated","result" => $result));

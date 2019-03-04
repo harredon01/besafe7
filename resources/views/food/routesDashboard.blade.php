@@ -28,6 +28,7 @@
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>
                     <a href="javascript:;" ng-click="getScenarioEmails()">Get scenario emails</a><br/><br/>
                     <a href="javascript:;" ng-click="getScenarioOrganization()">Get scenario Structure emails</a><br/><br/>
+                    <a href="javascript:;" ng-if="status=='enqueue'" ng-click="buildScenarioLogistics()">Build scenario logistics</a><br/><br/>
                     <a href="javascript:;" ng-click="getPurchaseOrder()">Get Purchase Order</a><br/><br/>
                     <a href="javascript:;" ng-click="activateMap()">Activate Map</a><br/><br/>
                     <div class="mapcont" ng-show="mapActive">

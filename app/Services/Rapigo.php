@@ -86,7 +86,7 @@ class Rapigo {
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
         $serviceBookResponse = $this->sendPost($data, $query);
         $stopCodes = $serviceBookResponse['points'];
-        $route->code = $serviceBookResponse['key'];
+        $route->provider_id = $serviceBookResponse['key'];
         $location = [
             "runner" => "",
             "runner_phone" => "",
@@ -97,9 +97,15 @@ class Rapigo {
         $route->coverage = json_encode($serviceBookResponse);
         $i = 0;
         foreach ($stops as $stop) {
+            $totals = $stop->totals;
+            $deliveries = $stop->deliveries;
+            unset($stop->totals);
+            unset($stop->deliveries);
             $stop->code = $stopCodes[$i];
             $stop->status = "pending";
             $stop->save();
+            $stop->totals = $totals;
+            $stop->deliveries = $deliveries;
             $i++;
         }
         $route->status = "built";
@@ -189,13 +195,13 @@ class Rapigo {
     }
 
     public function routeCompleted($data) {
-        $route = Route::where("code", $data["key"])->first();
+        $route = Route::where("provider_id", $data["key"])->where("provider", "Rapigo")->first();
         $route->status = "complete";
         $route->save();
     }
 
     public function routeStarted($data) {
-        $route = Route::where("code", $data["key"])->first();
+        $route = Route::where("provider_id", $data["key"])->where("provider", "Rapigo")->first();
         $route->status = "transit";
         $route->save();
     }

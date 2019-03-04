@@ -232,6 +232,14 @@
 
                         });
             }
+            $scope.buildScenarioLogistics = function () {
+                let data = $scope.getInputs();
+                Food.buildScenarioLogistics(data).then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
             $scope.getInputs = function () {
                 let data;
                 if($scope.status=="enqueue"){

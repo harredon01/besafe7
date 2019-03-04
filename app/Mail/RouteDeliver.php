@@ -35,6 +35,6 @@ class RouteDeliver extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.routes-email');
+        return $this->markdown('emails.food.transport-distribution');
     }
 }
