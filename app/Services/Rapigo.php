@@ -84,32 +84,36 @@ class Rapigo {
         }
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
+
         $serviceBookResponse = $this->sendPost($data, $query);
-        $stopCodes = $serviceBookResponse['points'];
-        $route->provider_id = $serviceBookResponse['key'];
-        $location = [
-            "runner" => "",
-            "runner_phone" => "",
-            "lat" => 0,
-            "long" => 0
-        ];
-        $serviceBookResponse["location"] = $location;
-        $route->coverage = json_encode($serviceBookResponse);
-        $i = 0;
-        foreach ($stops as $stop) {
-            $totals = $stop->totals;
-            $deliveries = $stop->deliveries;
-            unset($stop->totals);
-            unset($stop->deliveries);
-            $stop->code = $stopCodes[$i];
-            $stop->status = "pending";
-            $stop->save();
-            $stop->totals = $totals;
-            $stop->deliveries = $deliveries;
-            $i++;
+        if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
+            $stopCodes = $serviceBookResponse['paradas_referencia'];
+            $route->provider_id = $serviceBookResponse['key'];
+            $location = [
+                "runner" => "",
+                "runner_phone" => "",
+                "lat" => 0,
+                "long" => 0
+            ];
+            $serviceBookResponse["location"] = $location;
+            $route->coverage = json_encode($serviceBookResponse);
+            $i = 0;
+            foreach ($stops as $stop) {
+                $totals = $stop->totals;
+                $deliveries = $stop->deliveries;
+                unset($stop->totals);
+                unset($stop->deliveries);
+                $stop->code = $stopCodes[$i]['ref_parada'];
+                $stop->status = "pending";
+                $stop->save();
+                $stop->totals = $totals;
+                $stop->deliveries = $deliveries;
+                $i++;
+            }
+            $route->status = "built";
+            $route->save();
         }
-        $route->status = "built";
-        $route->save();
+
         $route->stops = $stops;
         return $route;
     }
@@ -128,7 +132,7 @@ class Rapigo {
         return $response;
     }
 
-    private function generateHash($id, $created_at ) {
+    private function generateHash($id, $created_at) {
         return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
 
@@ -159,7 +163,7 @@ class Rapigo {
         $userAdmin = User::find(2);
         foreach ($stop->deliveries as $delivery) {
             $user = $delivery->user;
-            $user->activationHash = $this->generateHash($user->id, $user->created_at );
+            $user->activationHash = $this->generateHash($user->id, $user->created_at);
             $delivery = Delivery::where("status", "pending")->where("user_id", $user->id)->orderBy('delivery', 'desc')->first();
             if ($delivery) {
                 $user->lunchHash = $user->activationHash;

@@ -414,20 +414,21 @@ class Food {
                 $queryStops = [];
                 foreach ($stops as $stop) {
                     $stopConfig = $config;
+                    $stopDescription = "";
                     $stopDeliveries = $stop->deliveries;
                     $stopConfig['father'] = $this->countConfigElements($stopDeliveries, $stopConfig);
                     $stopTotals = $this->printTotalsConfig($stopConfig);
                     $stop->totals = $stopTotals;
                     foreach ($stop->deliveries as $stopDel) {
                         $delUser = $stopDel->user;
-                        $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
+                        $descr = $delUser->firstName . " " . $delUser->lastName . " ";
                         $details = json_decode($stopDel->details, true);
                         if (array_key_exists("pickup", $details)) {
                             if ($details['pickup'] == "envase") {
                                 $descr = $descr . "Recoger envase, ";
                             }
                         }
-                        $descr = $descr . "Entregar id: " . $stopDel->id . ".";
+                        $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/>";
                         $stopDel->region_name = $descr;
                         $delConfig = $config;
                         $dels = [$stopDel];
@@ -435,23 +436,23 @@ class Food {
                         $delTotals = $this->printTotalsConfig($delConfig);
                         $stopDel->totals = $delTotals;
 
-                        //$deliveries = $deliveries . $descr;
+                        $stopDescription = $stopDescription . $descr;
                     }
                     $address = $stop->address;
-                    if ($stop->stop_order == 2) {
-                        //$stop->region_name = $deliveries;
+                    if ($stop->stop_order == 1) {
+                        $stopDescription = "Recoger los almuerzos de la ruta: ".$route->id;
                     }
                     $querystop = [
                         "address" => $address->address,
-                        "description" => $stop->region_name,
+                        "description" => $stopDescription,
                         "type" => "point",
                         "phone" => $address->phone
                     ];
                     array_push($queryStops, $querystop);
                 }
-                if (false) {
+                if ($route->provider=="Rapigo") {
                     $route = $rapigo->createRoute($queryStops, $route, $stops);
-                } else if (true) {
+                } else if ($route->provider=="Basilikum") {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
                 $route->totals = $routeTotals;
