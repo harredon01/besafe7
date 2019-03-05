@@ -462,6 +462,8 @@ class Food {
                 $totalDeliveries = [];
                 foreach ($route->deliveries as $del) {
                     $delConfig = $config;
+                    $del->status = "preparing";
+                    $del->save();
                     $dels = [$del];
                     $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
                     $delTotals = $this->printTotalsConfig($delConfig);
@@ -1334,14 +1336,15 @@ class Food {
             } else {
                 $date = date_create();
             }
-
             $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-            if ($dayofweek < 5) {
+            if ($dayofweek > 0&&$dayofweek < 5) {
                 date_add($date, date_interval_create_from_date_string("1 days"));
             } else if ($dayofweek == 5) {
                 date_add($date, date_interval_create_from_date_string("3 days"));
-            } else {
-                return null;
+            } else if ($dayofweek == 6) {
+                date_add($date, date_interval_create_from_date_string("2 days"));
+            } else if ($dayofweek == 7) {
+                date_add($date, date_interval_create_from_date_string("1 days"));
             }
             if ($delivery) {
                 if ($delivery->status == "deposit") {

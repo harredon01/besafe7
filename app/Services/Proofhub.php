@@ -156,22 +156,70 @@ class Proofhub {
     public function getSummary() {
         $people = $this->getPeople();
         $labels = $this->getLabels();
-        $date1 = "2019-01-31";
-        $date2 = "2019-02-21";
+        $date1 = "2017-02-01";
+        $date2 = "2019-02-29";
         $dateTimestamp1 = strtotime($date1);
         $dateTimestamp2 = strtotime($date2);
         $copy = $people;
         $projects = [
-            [
+            /*[
                 "name" => "TaxPayer Redesign and Dev",
                 "budget" => "50000",
                 "code" => "1420446568",
                 "rows" => $copy,
             ],
-            /*[
+            [
+                "name" => "Archies",
+                "budget" => "0",
+                "code" => "1714087114",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Primus",
+                "budget" => "0",
+                "code" => "2400881156",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Daportare",
+                "budget" => "0",
+                "code" => "2489878353",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Next Conn-Infrastructure",
+                "budget" => "0",
+                "code" => "2581819961",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Xtech",
+                "budget" => "0",
+                "code" => "2349279336",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Niños en movimiento",
+                "budget" => "1200000",
+                "code" => "2727778621",
+                "rows" => $copy,
+            ],*/
+            [
                 "name" => "NOVEDADES GUILLERS",
                 "budget" => "50000",
                 "code" => "1871891261",
+                "rows" => $copy,
+            ],
+            /*[
+                "name" => "Magic Flavors",
+                "budget" => "50000",
+                "code" => "2541330918",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "El techo",
+                "budget" => "50000",
+                "code" => "1889991926",
                 "rows" => $copy,
             ],
             [
@@ -188,7 +236,7 @@ class Proofhub {
             ],
             [
                 "name" => "Ezpot",
-                "budget" => "1000",
+                "budget" => "5000000",
                 "code" => "1498154595",
                 "rows" => $copy,
             ],

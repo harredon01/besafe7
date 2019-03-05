@@ -156,6 +156,8 @@ class Rapigo {
 
     private function stopFailed($data) {
         $stop = Stop::where("code", $data["key"])->with("deliveries.user")->first();
+        $stop->status = "completed";
+        $stop->save();
         $route = $stop->route;
         $results = $this->checkStatus($route->code);
         $runnerName = $results["detalle"]["mensajero_asignado"];

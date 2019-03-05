@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\FoodImport;
+use App\Services\Food;
 use App\Models\Article;
 
 class LunchesSeeder extends Seeder {
@@ -12,13 +12,12 @@ class LunchesSeeder extends Seeder {
      */
     protected $food;
 
-    public function __construct(FoodImport $food) {
+    public function __construct(Food $food) {
         $this->food = $food;
     }
 
     public function run() {
-        Article::where("id",">",0)->delete();
-        $this->food->importDishes();
+        $this->food->reprogramDeliveries();
         //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
     }
     
