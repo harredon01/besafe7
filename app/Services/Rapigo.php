@@ -145,7 +145,7 @@ class Rapigo {
     }
 
     private function stopComplete($data) {
-        $stop = Stop::where("code", $data["key"])->with("deliveries")->first();
+        $stop = Stop::where("code", $data["point"])->with("deliveries")->first();
         foreach ($stop->deliveries as $delivery) {
             $delivery->status = "completed";
             $delivery->save();
@@ -155,7 +155,7 @@ class Rapigo {
     }
 
     private function stopFailed($data) {
-        $stop = Stop::where("code", $data["key"])->with("deliveries.user")->first();
+        $stop = Stop::where("code", $data["point"])->with("deliveries.user")->first();
         $stop->status = "completed";
         $stop->save();
         $route = $stop->route;
@@ -177,7 +177,7 @@ class Rapigo {
     }
 
     public function stopArrived($info) {
-        $stop = Stop::where("code", $info["key"])->with("deliveries.user")->first();
+        $stop = Stop::where("code", $info["point"])->with("deliveries.user")->first();
         $followers = [];
         foreach ($stop->deliveries as $delivery) {
             array_push($followers, $delivery->user);
@@ -250,16 +250,19 @@ class Rapigo {
         $current .= PHP_EOL;
         file_put_contents($file, $current);
         if (true) {
-            if ($data['codigo'] == "parada_llegue") {
-                $this->stopArrived($data);
-            } else if ($data['codigo'] == "parada_finalizada") {
-                $this->stopUpdate($data);
-            } else if ($data['codigo'] == "parada_finalizada") {
-                $this->stopUpdate($data);
-            } else if ($data['codigo'] == "servicio_asignado") {
-                $this->routeStarted($data);
-            } else if ($data['codigo'] == "servicio_finalizado") {
-                $this->routeCompleted($data);
+            if(array_key_exists("type", $data)){
+                if($data['type']=="arrival"){
+                    $this->stopArrived($data);
+                } else if($data['type']=="exit"){
+                    $this->stopUpdate($data);
+                }
+            }
+            if(array_key_exists("message", $data)){
+                if($data['message']=="Mensajero Asignado"){
+                    $this->routeStarted($data);
+                } else if($data['message']=="Servicio Finalizado"){
+                    $this->routeCompleted($data);
+                }
             }
         }
     }

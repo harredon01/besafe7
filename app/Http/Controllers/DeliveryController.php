@@ -79,9 +79,9 @@ class DeliveryController extends Controller
     {
         $user = $request->user();
         $data = $request->all([
-            'day',
-            'month',
-            'year',
+            'type_name',
+            'starter_name',
+            'main_name',
             'type_id',
             'delivery_id',
             'starter_id',

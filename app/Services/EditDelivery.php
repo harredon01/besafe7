@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Jobs\RecurringOrder;
 use App\Models\Push;
 use App\Models\Delivery;
+use App\Mail\DeliveryScheduled;
+use Illuminate\Support\Facades\Mail;
 
 class EditDelivery {
 
@@ -26,6 +28,22 @@ class EditDelivery {
                 if ($delivery->status == "suspended") {
                     return array("status" => "error", "message" => "Delivery suspended");
                 }
+                $date = date_create();
+                $now = date_format($date, "Y-m-d H:i:s");
+                $today = date_format($date, "Y-m-d");
+                date_add($date, date_interval_create_from_date_string("1 days"));
+                $tomorrow = date_format($date, "Y-m-d");
+                $dateTomorrow = $tomorrow." 23:59:59";
+                $dateToday = $today." 21:00:00";
+                $dateTimestampTomorrow = strtotime($dateTomorrow);
+                $dateTimestampToday = strtotime($dateToday);
+                $dateTimestampNow = strtotime($now);
+                $datetimestampDelivery = strtotime($delivery->delivery);
+                if($datetimestampDelivery<$dateTimestampTomorrow){
+                    if($dateTimestampNow > $dateTimestampToday){
+                        return array("status" => "error", "message" => "Limit passed");
+                    }
+                }
                 $details = json_decode($delivery->details, true);
                 if ($delivery->status == "deposit") {
                     $this->suspendCreditDeposits($delivery);
@@ -42,7 +60,7 @@ class EditDelivery {
                         'dessert_id' => $data['dessert_id']
                     ];
                     $details["meal"] = $dish;
-                    $this->checkRecurringPosibility($user,$data['ip_address']);
+                    $this->checkRecurringPosibility($user, $data['ip_address']);
                 }
 
 
@@ -50,6 +68,7 @@ class EditDelivery {
                 $delivery->details = json_encode($details);
                 $delivery->status = "enqueue";
                 $delivery->save();
+                Mail::to($user)->send(new DeliveryScheduled($data));
                 return array("status" => "success", "message" => "Delivery scheduled for transit");
             }
             return array("status" => "error", "message" => "Delivery does not belong to user");
@@ -76,11 +95,11 @@ class EditDelivery {
             }
         }
     }
-    
-    private function checkRecurringPosibility(User $user,$ip_address) {
-        $deliveries = Delivery::where("user_id",$user->id)->where("status","pending")->get();
-        if(count($deliveries)==1){
-            $order = Order::where("user_id",$user->id)->where("is_recurring",true)->where("status","approved")->orderBy('id', 'desc')->first();
+
+    private function checkRecurringPosibility(User $user, $ip_address) {
+        $deliveries = Delivery::where("user_id", $user->id)->where("status", "pending")->get();
+        if (count($deliveries) == 1) {
+            $order = Order::where("user_id", $user->id)->where("is_recurring", true)->where("status", "approved")->orderBy('id', 'desc')->first();
             dispatch(new RecurringOrder($order, $ip_address));
         }
     }
