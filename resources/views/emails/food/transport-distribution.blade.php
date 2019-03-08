@@ -22,6 +22,9 @@ Proveedor: {{ $route->provider }}
 # Distribuido por parada
 @foreach ($route->stops as $stop)
 ## Parada {{ $stop->id }}
+Direccion: {{ $stop->address->address }}
+{{ $stop->address->notes }}  
+Telefono: {{ $stop->address->phone }}
 @foreach ($stop->totals['keywords'] as $line)
 {{ $line }}
 @endforeach 

@@ -65,22 +65,24 @@ class FoodApiController extends Controller {
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
             //dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $status));
-            $results = $this->food->getShippingCosts($user,$status);
+            $results = $this->food->getShippingCosts($user, $status);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
      * @return Response
      */
-    public function getPurchaseOrder(Request $request ) {
+    public function getPurchaseOrder(Request $request) {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            //dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $status));
-            $deliveries = Delivery::whereIn("status", ["scheduled","enqueue"])->get();
+            $date = date_create();
+            date_add($date, date_interval_create_from_date_string("1 days"));
+            $tomorrow = date_format($date, "Y-m-d");
+            $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery","<",$tomorrow." 23:59:59")->get();
             $this->food->getPurchaseOrder($deliveries);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
@@ -119,7 +121,7 @@ class FoodApiController extends Controller {
         }
         return response()->json(array("status" => "error", "message" => "User not authorized"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -129,8 +131,8 @@ class FoodApiController extends Controller {
         $user = $request->user();
         $checkResult = $this->food->checkUser($user);
         if ($checkResult) {
-            $this->food->buildScenarioLogistics($user,$request->all());
-            
+            $this->food->buildScenarioLogistics($user, $request->all());
+
             //dispatch(new \App\Jobs\BuildScenarioLogistics($user, $request->all()));
             return response()->json(array("status" => "success", "message" => "Scenario sent to build"));
 //            $data = $this->food->getTotalEstimatedShipping( $request->all()); 

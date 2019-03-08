@@ -58,6 +58,7 @@ class AddressApiController extends Controller {
             'name',
             'city',
             'address',
+            'notes',
             'type',
             'postal',
             'phone',

@@ -306,6 +306,7 @@ class EditOrderFood {
             $delivery->merchant_id = $item->merchant_id;
             $delivery->address_id = $address_id;
             $delivery->status = "pending";
+            $delivery->provider = "Rapigo";
             if ($x > 0 && $returnDelivery) {
                 $details["pickup"] = "envase";
             }
@@ -338,6 +339,7 @@ class EditOrderFood {
                 $delivery->shipping = 2500;
                 $delivery->address_id = $address_id;
                 $delivery->status = "deposit";
+                $delivery->provider = "Rapigo";
                 $delivery->save();
             }
         }

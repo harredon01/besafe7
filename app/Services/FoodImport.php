@@ -98,11 +98,18 @@ class FoodImport {
             "plato" => $principales,
             "postre" => $postres
         ];
-        $date = explode("/", $activeRow['fecha']);
+        $saveDate = "";
+        if(gettype($activeRow['fecha'])=="string"){
+            $date = explode("/", $activeRow['fecha']);
+            $saveDate = $date[2]."-".$date[1]."-".$date[0];
+        } else {
+            $saveDate = $activeRow['fecha'];
+        }
+        //dd($date);
         $article = Article::create([
                     "name" => $activeRow['almuerzo'],
                     "description" => "Almuerzo " . $activeRow['almuerzo'],
-                    "start_date" => $date[2]."-".$date[1]."-".$date[0],
+                    "start_date" => $saveDate,
                     "attributes" => json_encode($dishes)
         ]);
     }

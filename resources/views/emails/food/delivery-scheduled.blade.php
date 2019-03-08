@@ -1,7 +1,7 @@
 @component('mail::message')
 
 # Almuerzo programado
-Tu almuerzo quedo programado para entrega mañana con las siguientes opciones.
+Tu almuerzo quedo programado para entrega el {{ $data['date'] }}   con las siguientes opciones.
 
 Tipo de almuerzo: {{ $data['type_name'] }}  
 @if ($data['starter_name'])

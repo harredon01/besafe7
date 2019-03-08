@@ -143,14 +143,13 @@ class Food {
 
     public function countConfigElements($deliveries, $config) {
         $father = $config['father'];
-
         $keywords = $config['keywords'];
         foreach ($deliveries as $value) {
             $details = json_decode($value->details, true);
 
             $dish = $details["dish"];
             $father[$dish['type_id']]['count'] ++;
-            if (array_key_exists('starter_id', $dish)) {
+            if ($dish['starter_id']) {
                 $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
             }
 
@@ -392,7 +391,7 @@ class Food {
         return true;
     }
 
-    public function buildScenarioLogistics(User $user,array $input) {
+    public function buildScenarioLogistics(User $user, array $input) {
         $query = $this->buildRouteQuery($input);
         $routes = $query->with(['deliveries.user'])->orderBy('id')->get();
         if ($routes) {
@@ -440,7 +439,7 @@ class Food {
                     }
                     $address = $stop->address;
                     if ($stop->stop_order == 1) {
-                        $stopDescription = "Recoger los almuerzos de la ruta: ".$route->id;
+                        $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
                     }
                     $querystop = [
                         "address" => $address->address,
@@ -450,9 +449,9 @@ class Food {
                     ];
                     array_push($queryStops, $querystop);
                 }
-                if ($route->provider=="Rapigo") {
+                if ($route->provider == "Rapigo") {
                     $route = $rapigo->createRoute($queryStops, $route, $stops);
-                } else if ($route->provider=="Basilikum") {
+                } else if ($route->provider == "Basilikum") {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
                 $route->totals = $routeTotals;
@@ -470,7 +469,7 @@ class Food {
                     $del->totals = $delTotals;
                 }
             }
-            
+
             Mail::to($user)->send(new RouteOrganize($routes));
             Mail::to($user)->send(new RouteDeliver($routes));
             $totalRoutes = count($routes);
@@ -601,7 +600,13 @@ class Food {
     public function prepareRouteModel($results, $preOrganize, CoveragePolygon $polygon) {
 //        dd($thedata);
         $date = date_create();
-        date_add($date, date_interval_create_from_date_string("1 days"));
+        $datelimit = date_format($date, "Y-m-d");
+        $now = date_format($date, "Y-m-d H:i:s");
+        $dateTimestampLimit = strtotime($datelimit." 12:00:00");
+        $dateTimestampNow = strtotime($now);
+        if($dateTimestampNow>$dateTimestampLimit){
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        }
         $la = date_format($date, "Y-m-d");
         $thedata = [
             'lat' => $polygon->lat,
@@ -654,18 +659,21 @@ class Food {
         $className = "App\\Services\\Geolocation";
         $address = OrderAddress::where("address", $data['address'])->first();
         $geo = new $className();
-
+        
         $resultsGeo = $geo->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'], $data['provider']);
-        $polygon = $resultsGeo['polygon'];
-        $thedata = ["address" => $data['address'], "provider" => $data['provider']];
-        $thedata2 = ["address" => $data['address']];
-        $results = DB::statement(""
-                        . " UPDATE deliveries set provider=:provider where address_id in (Select id from order_addresses where address = :address );", $thedata);
-        DB::statement(""
-                . " UPDATE order_addresses set polygon_id=$polygon->id where address = :address ;", $thedata2);
+        if (array_key_exists('polygon', $resultsGeo)) {
+            $polygon = $resultsGeo['polygon'];
+            $thedata = ["address" => $data['address'], "provider" => $data['provider']];
+            $thedata2 = ["address" => $data['address']];
+            $results = DB::statement(""
+                            . " UPDATE deliveries set provider=:provider where address_id in (Select id from order_addresses where address = :address );", $thedata);
+            DB::statement(""
+                    . " UPDATE order_addresses set polygon_id=$polygon->id where address = :address ;", $thedata2);
 
-        dispatch(new RegenerateScenarios());
-        return $results;
+            dispatch(new RegenerateScenarios());
+            return $results;
+        }
+        return $resultsGeo;
     }
 
     public function prepareQuadrantLimits($lat, $long) {
@@ -1195,7 +1203,7 @@ class Food {
     }
 
     public function deleteOldData() {
-        $routes = Route::where("status", "pending")->get();
+        $routes = Route::whereIn("status", ["pending", "enqueue"])->get();
         foreach ($routes as $value) {
             DB::table('delivery_route')
                     ->where('route_id', $value->id)
@@ -1208,7 +1216,7 @@ class Food {
                 $item->delete();
             }
         }
-        $routes = Route::where("status", "pending")->delete();
+        $routes = Route::whereIn("status", ["pending", "enqueue"])->delete();
     }
 
     /**
@@ -1337,7 +1345,7 @@ class Food {
                 $date = date_create();
             }
             $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-            if ($dayofweek > 0&&$dayofweek < 5) {
+            if ($dayofweek > 0 && $dayofweek < 5) {
                 date_add($date, date_interval_create_from_date_string("1 days"));
             } else if ($dayofweek == 5) {
                 date_add($date, date_interval_create_from_date_string("3 days"));

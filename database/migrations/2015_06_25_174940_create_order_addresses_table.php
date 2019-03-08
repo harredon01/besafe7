@@ -13,6 +13,7 @@ class CreateOrderAddressesTable extends Migration
             $table->string('name');
             $table->string('city');
             $table->string('address');
+            $table->string('notes')->nullable();
             $table->string('type')->nullable();
             $table->string('postal')->nullable();
             $table->string('phone')->nullable();

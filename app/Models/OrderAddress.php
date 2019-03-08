@@ -19,7 +19,7 @@ class OrderAddress extends Model
      * @var array
      */
     protected $fillable = ['id','firstName', 'lastName', 'address', 'city_id', 'country_id', 'region_id','lat','long','type','order_id',
-        'postal','phone','polygon_id'];
+        'postal','phone','polygon_id','notes'];
 
     public function user() {
         return $this->belongsTo('App\Models\User');
