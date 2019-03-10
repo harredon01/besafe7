@@ -149,10 +149,11 @@ class Food {
 
             $dish = $details["dish"];
             $father[$dish['type_id']]['count'] ++;
-            if ($dish['starter_id']) {
-                $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
+            if (array_key_exists('starter_id', $dish)) {
+                if ($dish['starter_id']) {
+                    $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
+                }
             }
-
             $father[$dish['type_id']]['main'][$dish['main_id']] ++;
             foreach ($keywords as $word) {
                 if (array_key_exists('starter_id', $dish)) {
@@ -441,6 +442,9 @@ class Food {
                     if ($stop->stop_order == 1) {
                         $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
                     }
+                    if ($stop->stop_order == 3) {
+                        $stopDescription = "Entregar los envases de la ruta: " . $route->id;
+                    }
                     $querystop = [
                         "address" => $address->address,
                         "description" => $stopDescription,
@@ -602,9 +606,9 @@ class Food {
         $date = date_create();
         $datelimit = date_format($date, "Y-m-d");
         $now = date_format($date, "Y-m-d H:i:s");
-        $dateTimestampLimit = strtotime($datelimit." 12:00:00");
+        $dateTimestampLimit = strtotime($datelimit . " 12:00:00");
         $dateTimestampNow = strtotime($now);
-        if($dateTimestampNow>$dateTimestampLimit){
+        if ($dateTimestampNow > $dateTimestampLimit) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         }
         $la = date_format($date, "Y-m-d");
@@ -659,7 +663,7 @@ class Food {
         $className = "App\\Services\\Geolocation";
         $address = OrderAddress::where("address", $data['address'])->first();
         $geo = new $className();
-        
+
         $resultsGeo = $geo->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'], $data['provider']);
         if (array_key_exists('polygon', $resultsGeo)) {
             $polygon = $resultsGeo['polygon'];
@@ -987,16 +991,16 @@ class Food {
     public function getShippingCostArray() {
         return [
             "1" => 3050.00,
-            "2" => 2600.00,
-            "3" => 2700.00,
-            "4" => 2800.00,
-            "5" => 2300.00,
-            "6" => 2350.00,
-            "7" => 2350.00,
-            "8" => 2400.00,
-            "9" => 19500.00,
-            "10" => 1950.00,
-            "11" => 1450.00,
+            "2" => 2800.00,
+            "3" => 2800.00,
+            "4" => 2700.00,
+            "5" => 2700.00,
+            "6" => 2600.00,
+            "7" => 2500.00,
+            "8" => 2500.00,
+            "9" => 2400.00,
+            "10" => 2200.00,
+            "11" => 2000.00,
         ];
     }
 

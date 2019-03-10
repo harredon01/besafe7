@@ -82,11 +82,12 @@ class Rapigo {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
-//        $data['fecha_servicio']="2019-03-07";
-//        $data['hora_servicio']="10:30";
+        $data['fecha_servicio']="2019-03-07";
+        $data['hora_servicio']="10:30";
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
+        dd($data);
         $serviceBookResponse = $this->sendPost($data, $query);
         dd($serviceBookResponse);
         if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
