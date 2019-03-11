@@ -63,6 +63,15 @@ Route::get('billing/payments', 'BillingController@getPayments');
 Route::get('merchant/{code?}', 'MerchantController@getMerchantOrders');
 Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 
+Route::get('admin/store/products', 'ProductImportController@getProducts');
+Route::get('admin/store/variants', 'ProductImportController@getVariants');
+Route::get('admin/store/merchants', 'ProductImportController@getMerchants');
+Route::get('admin/store/categories', 'ProductImportController@getCategories');
+Route::post('admin/store/products', 'ProductImportController@postProducts');
+Route::post('admin/store/variants', 'ProductImportController@postVariants');
+Route::post('admin/store/merchants', 'ProductImportController@postMerchants');
+Route::post('admin/store/categories', 'ProductImportController@postCategories');
+
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
 Route::get('food/build_route_id/{id?}/{hash?}', 'FoodController@buildScenarioRouteId');

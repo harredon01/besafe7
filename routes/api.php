@@ -165,6 +165,11 @@ Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
 
+Route::get('admin/store/products', 'ProductImportApiController@getProducts'); 
+Route::get('admin/store/variants', 'ProductImportApiController@getVariants'); 
+Route::get('admin/store/merchants', 'ProductImportApiController@getMerchants'); 
+Route::get('admin/store/categories', 'ProductImportApiController@getCategories'); 
+
 Route::get('food/menu', 'FoodApiController@getMenu');
 Route::get('food/zones', 'FoodApiController@getZones');
 Route::get('food/messages', 'FoodApiController@getMessages');

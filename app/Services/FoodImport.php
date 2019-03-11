@@ -26,6 +26,32 @@ class FoodImport {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
+    
+    public function importProducts(){
+        $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx');
+        $reader = $excel->toArray();
+        foreach ($reader as $row) {
+            $merchants = explode(",", $row['merchant_id']);
+            $categories = explode(",", $row['categories']);
+            unset($row['merchant_id']);
+            unset($row['categories']);
+            if ($row['id']) {
+                $product = Product::create($row);
+                foreach ($merchants as $merchantId) {
+                    $merchant = Merchant::find($merchantId);
+                    if ($merchant) {
+                        $merchant->products()->save($product);
+                    }
+                }
+                foreach ($categories as $categoryId) {
+                    $category = Category::find($categoryId);
+                    if ($category) {
+                        $category->products()->save($product);
+                    }
+                }
+            }
+        }
+    }
 
     public function importMerchants() {
 

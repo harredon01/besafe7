@@ -36,6 +36,10 @@
         <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/admin/store/admin-store-merchantsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/admin/store/admin-store-categoriesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/foodaddressesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/foodmessagesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
@@ -53,6 +57,7 @@
         <script src="{{ asset('/js/services/routes.js')}}"></script>
         <script src="{{ asset('/js/services/payments.js')}}"></script>
         <script src="{{ asset('/js/services/orders.js')}}"></script>
+        <script src="{{ asset('/js/services/product-import.js')}}"></script>
         <script src="{{ asset('/js/services/food.js')}}"></script>
 
         <script>
@@ -138,6 +143,17 @@ echo json_encode([
                                     <li><a href="{{ url('food/largest_addresses')}}">Direcciones Comunes</a></li>
                                     <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>
                                     <li><a href="{{ url('billing/payments')}}">Pagos</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    Admin <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="{{ url('admin/store/products')}}">Productos</a></li>
+                                    <li><a href="{{ url('admin/store/variants')}}">Variants</a></li>
+                                    <li><a href="{{ url('admin/store/merchants')}}">Merchants</a></li>
+                                    <li><a href="{{ url('admin/store/categories')}}">Categories</a></li>
                                 </ul>
                             </li>
                             @endif

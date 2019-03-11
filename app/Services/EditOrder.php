@@ -197,12 +197,14 @@ class EditOrder {
                 }
             }
             $payload = [
+                "payment_id"=>$payment->id,
+                "payment_total"=>$payment->total,
                 "order_id" => $order->id,
                 "first_name" => $user->firstName,
                 "last_name" => $user->lastName,
             ];
             $data = [
-                "trigger_id" => $user->id,
+                "trigger_id" => $payment->id,
                 "message" => "",
                 "subject" => "",
                 "object" => self::OBJECT_ORDER,
