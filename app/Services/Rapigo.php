@@ -85,7 +85,7 @@ class Rapigo {
             $data['type'] = 'hour';
         }
         $data['fecha_servicio']="03/12/2019";
-        $data['hora_servicio']="10:30";
+        $data['hora_servicio']="11:00";
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
