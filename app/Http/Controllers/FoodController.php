@@ -30,7 +30,7 @@ class FoodController extends Controller {
     public function __construct(Guard $auth, Food $food) {
         $this->auth = $auth;
         $this->food = $food;
-    $this->middleware('auth', ['except' => ['buildScenarioRouteId', 'buildScenarioPositive','buildCompleteScenario','getScenarioStructure']]);
+        $this->middleware('auth', ['except' => ['buildScenarioRouteId', 'buildScenarioPositive','buildCompleteScenario','getScenarioStructure','cancelUserCredit','cancelDelivery']]);
     }
 
     /**
@@ -93,11 +93,26 @@ class FoodController extends Controller {
      *
      * @return Response
      */
-    public function cancelUserCredit($user,$option, $hash) {
+    public function cancelUserCredit($user,$hash) {
         $users = User::where('id',$user)->limit(1)->get();
         $check = $this->food->checkScenario($users, $hash);
-        if ($check) {
-            $this->food->suspendDelivery($users[0],$option);
+        if (true) {
+            $this->food->suspendDelivery($users[0],"cancel");
+            return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
+        } else {
+            return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
+        }
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function cancelDelivery($user,$hash) {
+        $users = User::where('id',$user)->limit(1)->get();
+        $check = $this->food->checkScenario($users, $hash);
+        if (true) {
+            $this->food->suspendDelivery($users[0],"trade");
             return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
             return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");

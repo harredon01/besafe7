@@ -82,7 +82,7 @@ class FoodApiController extends Controller {
             $date = date_create();
             date_add($date, date_interval_create_from_date_string("1 days"));
             $tomorrow = date_format($date, "Y-m-d");
-            $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery","<",$tomorrow." 23:59:59")->get();
+            $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery","<",$tomorrow." 23:59:59")->where("delivery",">",$tomorrow." 00:00:00")->get();
             $this->food->getPurchaseOrder($deliveries);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }

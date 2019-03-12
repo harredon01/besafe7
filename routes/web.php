@@ -78,6 +78,8 @@ Route::get('food/build_route_id/{id?}/{hash?}', 'FoodController@buildScenarioRou
 Route::get('food/build_complete_scenario/{scenario?}/{provider?}/{hash?}', 'FoodController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}/{provider?}/{hash?}', 'FoodController@buildScenarioPositive');
 Route::get('food/get_scenario_structure/{scenario?}/{provider?}/{status?}/{hash?}', 'FoodController@getScenarioStructure');
+Route::get('food/delete_deposit/{user?}/{hash?}', 'FoodController@cancelUserCredit');
+Route::get('food/delete_last_lunch/{user?}/{hash?}', 'FoodController@cancelDelivery');
 Route::get('food/regenerate_scenarios/{polygon?}/{hash?}', 'FoodController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodController@regenerateDeliveries');
 Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');

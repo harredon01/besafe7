@@ -203,7 +203,11 @@ class EditOrderFood {
         $data = json_decode($order->attributes, true);
         $buyers = $data['buyers'];
         for ($x = 0; $x < count($buyers); $x++) {
-            $this->createDeliveries($buyers[$x], $item, $address_id);
+            $user = User::find($buyers[$x]);
+            if($user){
+                $this->createDeliveries($user->id, $item, $address_id);
+            }
+            
         }
     }
 
@@ -251,11 +255,16 @@ class EditOrderFood {
                     'credits' => 1,
                 ]);
             }
+            Delivery::where("user_id",$user['id'])->where("status","suspended")->update(['status'=>'pending']);
         }
+        
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
-        $lastDelivery = Delivery::where('user_id', $user_id)->orderBy('delivery', 'desc')->first();
+        $lastDelivery = Delivery::where('user_id', $user_id)->whereIn('status', ["pending","deposit"])->where('provider', "Rapigo")->orderBy('delivery', 'desc')->first();
+//        if($user_id!=1){
+//            dd($lastDelivery);
+//        }
         $returnDelivery = false;
         $hasDeposit = false;
 

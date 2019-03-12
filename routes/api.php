@@ -53,6 +53,7 @@ Route::post('billing/pay_cash/{source?}', 'BillingApiController@postPayCash');
 Route::post('billing/retry/{payment?}', 'BillingApiController@retryPayment');
 Route::post('payu/all', 'PayuController@postcreateAll');
 Route::post('payu/webhook', 'PayuController@webhookPayU');
+Route::post('rapigo/webhook', 'RapigoController@webhook');
 
 
 Route::delete('contacts/{code?}', 'UserApiController@deleteContact');

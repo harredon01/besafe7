@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Unlu\Laravel\Api\QueryBuilder;
 
-class RatingController extends Controller
+class RapigoController extends Controller
 {
     /**
      * The Guard implementation.
@@ -31,7 +31,6 @@ class RatingController extends Controller
     public function __construct(Guard $auth, Rapigo $rapigo) {
         $this->rapigo = $rapigo;
         $this->auth = $auth;
-        $this->middleware('auth:api');
     }
 
     /**
@@ -48,16 +47,11 @@ class RatingController extends Controller
      *
      * @return Response
      */
-    public function getRatingsObject(Request $request) {
-        $queryBuilder = new QueryBuilder(new Rating, $request);
-        $result = $queryBuilder->build()->paginate();
+    public function webhook(Request $request) {
+        $this->rapigo->webhook($request->all());
         return response()->json([
-                    'data' => $result->items(),
-                    "total" => $result->total(),
-                    "per_page" => $result->perPage(),
-                    "page" => $result->currentPage(),
-                    "last_page" => $result->lastPage(),
-                    "last_page" => $result->lastPage(),
-        ]);
+                    'status' => "success",
+                    'message' => "webhook successful"
+                        ], 200);
     }
 }

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Stop;
 use App\Models\Route;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Delivery;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StopFailed;
@@ -82,14 +84,13 @@ class Rapigo {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
-        $data['fecha_servicio']="2019-03-07";
+        $data['fecha_servicio']="03/12/2019";
         $data['hora_servicio']="10:30";
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
-        dd($data);
+        //dd($data);
         $serviceBookResponse = $this->sendPost($data, $query);
-        dd($serviceBookResponse);
         if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
             $stopCodes = $serviceBookResponse['paradas_referencia'];
             $route->provider_id = $serviceBookResponse['key'];
@@ -141,6 +142,7 @@ class Rapigo {
     }
 
     public function stopUpdate($data) {
+        $data["extra_data"] = json_decode($data["extra_data"],true);
         if ($data["extra_data"]["state"] == "realizada") {
             $this->stopComplete($data);
         } else if ($data["extra_data"]["state"] == "no_realizada") {
@@ -182,6 +184,7 @@ class Rapigo {
 
     public function stopArrived($info) {
         $stop = Stop::where("code", $info["point"])->with("deliveries.user")->first();
+        
         $followers = [];
         foreach ($stop->deliveries as $delivery) {
             array_push($followers, $delivery->user);

@@ -8,6 +8,7 @@ use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
+use App\Models\Push;
 use App\Jobs\RegenerateScenarios;
 use App\Models\Merchant;
 use App\Models\Product;
@@ -40,7 +41,7 @@ class Food {
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
-    public function suspendDelvery(User $user, $option) {
+    public function suspendDelivery(User $user, $option) {
         $className = "App\\Services\\EditAlerts";
         $platFormService = new $className();
         $payload = [];
@@ -82,21 +83,23 @@ class Food {
                 $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->orderBy('id', 'desc')->first();
                 if ($deposit) {
                     $deposit->delete();
+                    $push = $user->push()->where("platform", "food")->first();
+                    $push->credits = 0;
+                    $push->save();
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "subject" => "",
+                        "object" => "Lonchis",
+                        "sign" => true,
+                        "payload" => $payload,
+                        "type" => "food_meal_suspended",
+                        "user_status" => "normal"
+                    ];
+                    $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+                } else {
+                    $this->suspendDelivery($user,"cancel");
                 }
-                $push = $user->push()->where("platform", "food")->first();
-                $push->credits = 0;
-                $push->save();
-                $data = [
-                    "trigger_id" => $user->id,
-                    "message" => "",
-                    "subject" => "",
-                    "object" => "Lonchis",
-                    "sign" => true,
-                    "payload" => $payload,
-                    "type" => "food_meal_suspended",
-                    "user_status" => "normal"
-                ];
-                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
             }
         }
     }

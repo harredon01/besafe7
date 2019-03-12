@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Jobs\RecurringOrder;
 use App\Models\Push;
 use App\Models\Delivery;
+use App\Models\Order;
 use App\Mail\DeliveryScheduled;
 use Illuminate\Support\Facades\Mail;
 
@@ -32,7 +33,7 @@ class EditDelivery {
                 $now = date_format($date, "Y-m-d H:i:s");
                 $dayofweek = date('w', strtotime($now));
                 $today = date_format($date, "Y-m-d");
-                $dateTimestampToday = strtotime($dateToday);
+                
                 $datetimestampDelivery = strtotime($delivery->delivery);
                 $dateTimestampNow = strtotime($now);
                 if ($dayofweek > 0 && $dayofweek < 5) {
@@ -40,6 +41,7 @@ class EditDelivery {
                     $tomorrow = date_format($date, "Y-m-d");
                     $dateTomorrow = $tomorrow . " 23:59:59";
                     $dateToday = $today . " 22:00:00";
+                    $dateTimestampToday = strtotime($dateToday);
                     $dateTimestampTomorrow = strtotime($dateTomorrow);
                     if ($datetimestampDelivery < $dateTimestampTomorrow) {
                         if ($dateTimestampNow > $dateTimestampToday) {
@@ -53,6 +55,7 @@ class EditDelivery {
                     $monday = date_format($date, "Y-m-d");
                     $dateMonday = $monday . " 23:59:59";
                     $dateToday = $today . " 22:00:00";
+                    $dateTimestampToday = strtotime($dateToday);
                     $dateTimestampMonday = strtotime($dateMonday);
                     if ($datetimestampDelivery < $dateTimestampMonday) {
                         $dateTimestampNow = strtotime($now);
@@ -129,8 +132,10 @@ class EditDelivery {
     private function checkRecurringPosibility(User $user, $ip_address) {
         $deliveries = Delivery::where("user_id", $user->id)->where("status", "pending")->get();
         if (count($deliveries) == 1) {
-            $order = Order::where("user_id", $user->id)->where("is_recurring", true)->where("status", "approved")->orderBy('id', 'desc')->first();
-            dispatch(new RecurringOrder($order, $ip_address));
+            $order = Order::where("user_id", $user->id)->where("recurring_type", "limit")->where("status", "approved")->orderBy('id', 'desc')->first();
+            if($order){
+                dispatch(new RecurringOrder($order, $ip_address));
+            }
         }
     }
 

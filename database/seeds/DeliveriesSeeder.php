@@ -5,7 +5,8 @@ use App\Services\Food;
 use App\Services\PayU;
 use App\Services\EditOrderFood;
 use App\Services\EditAlerts;
-use App\Models\Item;
+use App\Jobs\ApprovePayment;
+use App\Models\Payment;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\Delivery;
@@ -34,7 +35,7 @@ class DeliveriesSeeder extends Seeder {
     protected $food;
 
     public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
-        $this->food = $food;
+        $this->food = $editOrderfood;
         $this->editOrderfood = $editOrderfood;
     }
 
@@ -45,7 +46,9 @@ class DeliveriesSeeder extends Seeder {
             "merchant_id" => 1299,
             "provider" => "Basilikum"
         ];
-        $this->food->delegateDeliveries($data);
+        $payment = Payment::find(132);
+        dispatch(new ApprovePayment($payment, "Food"));
+        //$this->food->approveOrder($order);
         
 //        $user = User::find(1);
 //        $user2 = User::find(2);

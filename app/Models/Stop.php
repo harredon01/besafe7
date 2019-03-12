@@ -20,7 +20,7 @@ class Stop extends Model {
 
     public function route()
     {
-        return $this->hasMany('App\Models\Route');
+        return $this->belongsTo('App\Models\Route');
     }
     public function deliveries()
     {
