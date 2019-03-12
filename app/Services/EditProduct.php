@@ -142,7 +142,7 @@ class EditProduct {
                                         'merchants.telephone as merchant_telephone',
                                         'merchants.type as merchant_type')
                                 ->skip($skip)->take($take)->get();
-                $data['products_total'] = DB::table('products')->groupBy('products.id')
+                $data['products_total'] = DB::table('products')
                         ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                         ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
                         ->where('merchant_product.merchant_id', $merchant_id)
@@ -170,7 +170,8 @@ class EditProduct {
                                 'categories.id as category_id',
                                 'categories.name as category_name',
                                 'categories.description as category_description')
-                        ->orderBy('categories.id', 'asc')->get();
+                        ->orderBy('categories.id', 'asc')
+                        ->orderBy('products.id', 'asc')->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
                         ->whereIn('files.trigger_id', $products)
