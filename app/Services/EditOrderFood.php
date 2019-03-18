@@ -105,7 +105,7 @@ class EditOrderFood {
         array_push($conditions, $conditionF);
         array_push($conditions, $conditionV);
         Cart::session($user->id)->condition([$condition2F, $condition2V]);
-        return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions);
+        return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions,"order"=>$order);
     }
 
     /**

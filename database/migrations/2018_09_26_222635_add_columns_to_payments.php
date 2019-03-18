@@ -30,6 +30,7 @@ class AddColumnsToPayments extends Migration
             $table->text('attributes');
             $table->double('total', 15, 2);
             $table->double('tax', 15, 2);
+            $table->double('transaction_cost', 15, 2);
         });
     }
 

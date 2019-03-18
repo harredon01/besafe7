@@ -449,7 +449,7 @@ class Food {
                         $stopDescription = "Entregar los envases de la ruta: " . $route->id;
                     }
                     $querystop = [
-                        "address" => $address->address,
+                        "address" => $address->address." ".$address->notes,
                         "description" => $stopDescription,
                         "type" => "point",
                         "phone" => $address->phone

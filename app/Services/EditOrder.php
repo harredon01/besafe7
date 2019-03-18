@@ -307,23 +307,27 @@ class EditOrder {
                         $records = [
                             "buyers" => $thePayersArray
                         ];
-                        if ($splitOrder) {
-                            $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-                            $records["split_order"] = $splitOrder;
-                        }
-                        $order->attributes = json_encode($records);
+                        $transactionCost = $this->getTransactionTotal($buyerSubtotal);
+                        
                         $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
                         if ($payment) {
                             
                         } else {
                             $payment = new Payment;
                         }
-
+                        if ($splitOrder) {
+                            $payment->total = round($buyerSubtotal + $transactionCost);
+                            $records["split_order"] = $splitOrder;
+                        } else {
+                            $payment->total = round($buyerSubtotal + 0);
+                        }
+                        $order->attributes = json_encode($records);
+                        $payment->transaction_cost = $transactionCost;
                         $payment->user_id = $user->id;
                         $payment->address_id = $address->id;
                         $payment->order_id = $order->id;
                         $payment->status = "pending";
-                        $payment->total = round($buyerSubtotal + $transactionCost);
+                        
                         $payment->tax = $buyerTax;
                         $payment->save();
                         $result = array("status" => "success", "message" => "Order submitted, payment created", "payment" => $payment, "order" => $order);

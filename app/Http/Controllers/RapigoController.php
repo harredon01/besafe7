@@ -48,10 +48,11 @@ class RapigoController extends Controller
      * @return Response
      */
     public function webhook(Request $request) {
-        $this->rapigo->webhook($request->all());
+        ;
         return response()->json([
                     'status' => "success",
-                    'message' => "webhook successful"
+                    'message' => "webhook successful",
+                    "result" => $this->rapigo->webhook($request->all())
                         ], 200);
     }
 }

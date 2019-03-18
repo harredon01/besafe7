@@ -122,6 +122,17 @@ class BillingApiController extends Controller {
         $status = $this->editBilling->retryPayment($user,$payment);
         return response()->json($status);
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\ResponsepostPayCreditCard
+     */
+    public function postAddTransactionCosts(Request $request,$payment) {
+        $user = $request->user();
+        $status = $this->editBilling->addTransactionCosts($user,$payment);
+        return response()->json($status);
+    }
 
     /**
      * Handle a login request to the application.

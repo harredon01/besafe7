@@ -5,6 +5,7 @@ use App\Services\Food;
 use App\Services\PayU;
 use App\Services\EditOrderFood;
 use App\Services\EditAlerts;
+use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
 use App\Models\Order;
@@ -34,7 +35,7 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $food;
 
-    public function __construct(Food $food, EditOrderFood $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
+    public function __construct(Food $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
         $this->food = $editOrderfood;
         $this->editOrderfood = $editOrderfood;
     }
@@ -47,8 +48,8 @@ class DeliveriesSeeder extends Seeder {
             "provider" => "Basilikum"
         ];
         $payment = Payment::find(132);
-        dispatch(new ApprovePayment($payment, "Food"));
-        //$this->food->approveOrder($order);
+        //dispatch(new ApprovePayment($payment, "Food"));
+        $this->food->getActiveRoutesUpdate();
         
 //        $user = User::find(1);
 //        $user2 = User::find(2);

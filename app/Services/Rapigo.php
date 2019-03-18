@@ -84,8 +84,8 @@ class Rapigo {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
-        $data['fecha_servicio']="03/12/2019";
-        $data['hora_servicio']="11:00";
+        $data['fecha_servicio'] = "03/12/2019";
+        $data['hora_servicio'] = "10:30";
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
@@ -142,7 +142,7 @@ class Rapigo {
     }
 
     public function stopUpdate($data) {
-        $data["extra_data"] = json_decode($data["extra_data"],true);
+        $data["extra_data"] = json_decode($data["extra_data"], true);
         if ($data["extra_data"]["state"] == "realizada") {
             $this->stopComplete($data);
         } else if ($data["extra_data"]["state"] == "no_realizada") {
@@ -184,7 +184,7 @@ class Rapigo {
 
     public function stopArrived($info) {
         $stop = Stop::where("code", $info["point"])->with("deliveries.user")->first();
-        
+
         $followers = [];
         foreach ($stop->deliveries as $delivery) {
             array_push($followers, $delivery->user);
@@ -214,9 +214,14 @@ class Rapigo {
     }
 
     public function routeStarted($data) {
-        $route = Route::where("provider_id", $data["key"])->where("provider", "Rapigo")->first();
-        $route->status = "transit";
-        $route->save();
+        $route = Route::where("provider_id", $data["key"])->first();
+        if ($route) {
+            $route->status = "transit";
+            $route->save();
+            return $route;
+        } else {
+            return $data;
+        }
     }
 
     public function getActiveRoutesUpdate() {
@@ -257,21 +262,22 @@ class Rapigo {
         $current .= PHP_EOL;
         file_put_contents($file, $current);
         if (true) {
-            if(array_key_exists("type", $data)){
-                if($data['type']=="arrival"){
-                    $this->stopArrived($data);
-                } else if($data['type']=="exit"){
-                    $this->stopUpdate($data);
+            if (array_key_exists("type", $data)) {
+                if ($data['type'] == "arrival") {
+                    return $this->stopArrived($data);
+                } else if ($data['type'] == "exit") {
+                    return $this->stopUpdate($data);
                 }
             }
-            if(array_key_exists("message", $data)){
-                if($data['message']=="Mensajero Asignado"){
-                    $this->routeStarted($data);
-                } else if($data['message']=="Servicio Finalizado"){
-                    $this->routeCompleted($data);
+            if (array_key_exists("message", $data)) {
+                if ($data['message'] == "Mensajero Asignado") {
+                    return $this->routeStarted($data);
+                } else if ($data['message'] == "Servicio Finalizado") {
+                    return $this->routeCompleted($data);
                 }
             }
         }
+        return $data;
     }
 
 }

@@ -169,7 +169,7 @@ class Proofhub {
     public function getSummary() {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
-        $date1 = "2019-03-01";
+        $date1 = "2019-02-20";
         $date2 = "2019-04-01";
         $dateTimestamp1 = strtotime($date1);
         $dateTimestamp2 = strtotime($date2);
@@ -183,7 +183,7 @@ class Proofhub {
                 "code" => "1420446568",
                 "rows" => $copy,
             ],
-            [
+            /*[
                 "name" => "Archies",
                 "budget" => "0",
                 "country" => "COL",
@@ -326,7 +326,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1739080686",
                 "rows" => $copy,
-            ]
+            ]*/
         ];
         $results = [];
         $summary = [];

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Order;
+use App\Models\OrderCondition;
 use App\Models\Plan;
 use App\Models\Payment;
 use App\Models\Subscription;
@@ -20,6 +21,7 @@ use Cart;
 class EditBilling {
 
     const TRANSACTION_CONDITION = 'transaction';
+
     /**
      * The EditAlert implementation.
      *
@@ -390,7 +392,11 @@ class EditBilling {
     public function payCreditCard(User $user, $source, array $data) {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
+
             if ($payment) {
+                if ($payment->status == 'payment_in_bank') {
+                    return array("status" => "error", "message" => "Payment must be in bank");
+                }
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
@@ -406,30 +412,79 @@ class EditBilling {
         }
         return array("status" => "error", "message" => "Invalid order");
     }
+
     public function payInBank(User $user, $source, array $data) {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
-                $order = $payment->order;
-                Cart::session($user->id)->removeConditionsByType(self::TRANSACTION_CONDITION);
-                $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
-                $results = $this->editOrder->prepareOrder($user, "Food", $data);
-                $order = $results["order"];
-                $payment = $results["payment"];
-                $this->changeOrderStatus($order->id);
+                $order = $payment->order()->with("items","orderConditions")->first();
+                $payment->total = $payment->total - $payment->transaction_cost;
+                if (Payment::where("order_id",$payment->order_id)->count() == 1) {
+                    
+                    Cart::session($user->id)->removeConditionsByType(self::TRANSACTION_CONDITION);
+                    $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
+                    $results = $this->editOrder->prepareOrder($user, "Food", $data);
+                    $order = $results["order"];
+                    $order->total = $payment->total;
+                    $payment = $results["payment"];
+                    $this->changeOrderStatus($order->id);
+                    $order->orderConditions()->get();
+                }
+                $payment->transaction_cost = 0;
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_in_bank";
-                
+
                 if (array_key_exists('buyer_address', $data)) {
                     $payment->attributes = json_encode($this->extractBuyer($data));
                 }
 
                 $payment->save();
+                $payment->order = $order;
                 Mail::to($user)->send(new EmailPaymentInBank($payment, $user));
-                return array("status" => "success", "message" => "Payment Created","payment" => $payment);
+                return array("status" => "success", "message" => "Payment Created", "payment" => $payment);
             }
         }
         return array("status" => "error", "message" => "Invalid order");
+    }
+
+    public function addTransactionCosts(User $user, $payment_id) {
+        $payment = Payment::find($payment_id);
+        if ($payment) {
+            if ($payment->user_id == $user->id) {
+                if ($payment->status == "payment_in_bank") {
+                    $order = $payment->order()->with("items","orderConditions")->first();
+                    $payment->transaction_cost = $this->editOrder->getTransactionTotal($payment->total);
+                    $payment->total = $payment->total + $payment->transaction_cost;
+                    $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                    $payment->status = "pending";
+                    $payment->save();
+                    if (Payment::where("order_id",$payment->order_id)->count() == 1) {
+                        $conditionV = new OrderCondition(array(
+                            'name' => "Costo variable transaccion",
+                            'target' => "total",
+                            'type' => self::TRANSACTION_CONDITION,
+                            'value' => "3.49%",
+                            'total' => $payment->transaction_cost-900,
+                        ));
+                        $conditionF = new OrderCondition(array(
+                            'name' => "Costo fijo transaccion",
+                            'target' => "subtotal",
+                            'type' => self::TRANSACTION_CONDITION,
+                            'value' => "+900",
+                            'total' => 900,
+                        ));
+                        $order->orderConditions()->saveMany([$conditionF, $conditionV]);
+                        $order->total = $payment->total;
+                        $order->save();
+                        $order->orderConditions()->get();
+                    }
+                    $payment->order = $order;
+                    return array("status" => "success", "message" => "Payment Created", "payment" => $payment);
+                }
+                return array("status" => "error", "message" => "Transaction cost cant be added to payment");
+            }
+        }
+        return array("status" => "error", "message" => "Invalid payment");
     }
 
     private function changeOrderStatus($order_id) {
@@ -447,6 +502,9 @@ class EditBilling {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
+                if ($payment->status == 'payment_in_bank') {
+                    return array("status" => "error", "message" => "Payment must be in bank");
+                }
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
@@ -472,7 +530,11 @@ class EditBilling {
     public function payCash(User $user, $source, array $data) {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
+
             if ($payment) {
+                if ($payment->status == 'payment_in_bank') {
+                    return array("status" => "error", "message" => "Payment must be in bank");
+                }
                 $this->changeOrderStatus($payment->order_id);
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
@@ -486,7 +548,7 @@ class EditBilling {
                         if ($results['transactionResponse']['state'] == "PENDING") {
                             $url = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_HTML'];
                             $pdf = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_PDF'];
-                            Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url,$pdf));
+                            Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, $pdf));
                         }
                     }
                 }
