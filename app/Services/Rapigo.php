@@ -142,7 +142,6 @@ class Rapigo {
     }
 
     public function stopUpdate($data) {
-        $data["extra_data"] = json_decode($data["extra_data"], true);
         if ($data["extra_data"]["state"] == "realizada") {
             $this->stopComplete($data);
         } else if ($data["extra_data"]["state"] == "no_realizada") {
@@ -228,15 +227,15 @@ class Rapigo {
         $routes = Route::where("status", "transit")->get();
         if (count($routes)) {
             foreach ($routes as $route) {
-                $route->coverage = json_parse($route->coverage, true);
-                $location = $route->coverage["location"];
+                $coverage = json_decode($route->coverage, true);
+                $location = $coverage["location"];
                 $status = $this->checkStatus($route->code);
                 $location["runner"] = $status["detalle"]["mensajero_asignado"];
                 $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
                 $location["lat"] = $status["detalle"]["latitud"];
                 $location["long"] = $status["detalle"]["longitud"];
-                $route->coverage["location"] = $location;
-                $route->coverage = json_encode($route->coverage);
+                $coverage["location"] = $location;
+                $route->coverage = json_encode($coverage);
                 $route->save();
             }
         }

@@ -105,6 +105,7 @@ class ProductImport {
 ////                    $merchant->delete();
 //                }
                 unset($row[0]);
+                unset($row["address"]);
                 $find["id"] = $row["id"];
                 Merchant::updateOrCreate($find, $row);
             }

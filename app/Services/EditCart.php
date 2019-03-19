@@ -116,13 +116,13 @@ class EditCart {
             $cond['getEffect'] = substr($condition->getValue(), 0, 1); // the order of the condition
             $cond['getAttributes'] = $condition->getAttributes(); // the attributes of the condition, returns an empty [] if no attributes added
             $value = $condition->getCalculatedValue($subTotal);
-            
+
             $cond['total'] = $value;
-            /*if (substr($condition->getValue(), 0, 1) == "-") {
-                $subTotal = $subTotal - $value;
-            } else {
-                $subTotal = $subTotal + $value;
-            }*/
+            /* if (substr($condition->getValue(), 0, 1) == "-") {
+              $subTotal = $subTotal - $value;
+              } else {
+              $subTotal = $subTotal + $value;
+              } */
 
             array_push($resultConditions, $cond);
         }
@@ -132,7 +132,7 @@ class EditCart {
         $data['requires_authorization'] = $requires_authorization;
         $data['is_subscription'] = $is_subscription;
         $data['totalItems'] = $totalItems;
-        
+
 
         return $data;
     }
@@ -154,7 +154,7 @@ class EditCart {
             $order->tax = 0;
             $order->total = 0;
             $order->save();
-        } 
+        }
         Item::where('user_id', $user->id)->where('order_id', null)->delete();
         Cart::clearCartConditions();
     }
@@ -335,16 +335,20 @@ class EditCart {
             $quantity = (int) $data['quantity'];
             $productVariant = $item->productVariant;
             if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
-                Cart::session($user->id)->update($item->id, array(
-                    'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
-                ));
-                $cartItem = Cart::session($user->id)->get($item->id);
-                $item->priceSum = $cartItem->getPriceSum();
-                $item->priceConditions = $cartItem->getPriceWithConditions();
-                $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
-                $item->quantity = $quantity;
-                $item->save();
-                return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user), "quantity" => $quantity);
+                if ($productVariant->quantity <= $quantity) {
+                    Cart::session($user->id)->update($item->id, array(
+                        'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
+                    ));
+                    $cartItem = Cart::session($user->id)->get($item->id);
+                    $item->priceSum = $cartItem->getPriceSum();
+                    $item->priceConditions = $cartItem->getPriceWithConditions();
+                    $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                    $item->quantity = $quantity;
+                    $item->save();
+                    return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user), "quantity" => $quantity);
+                } else {
+                    return array("status" => "error", "message" => "MIN_QUANTITY","quantity"=>$productVariant->min_quantity);
+                }
             } else {
                 return array("status" => "error", "message" => "No more stock of that product");
             }
@@ -354,85 +358,88 @@ class EditCart {
                 $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
-
-                        $conditions = $productVariant->conditions()->where('status', 'active')->get();
-                        $applyConditions = array();
-                        foreach ($conditions as $condition) {
-                            $itemCondition = new CartCondition(array(
-                                'name' => $condition->name,
-                                'type' => $condition->type,
-                                'value' => $condition->value,
-                            ));
-                            array_push($applyConditions, $itemCondition);
-                        }
-                        $product = $productVariant->product;
-                        $itemName = $product->name . " " . $productVariant->description;
-                        $conditions = $product->conditions()->where('status', 'active')->get();
-                        foreach ($conditions as $condition) {
-                            $itemCondition = new CartCondition(array(
-                                'name' => $condition->name,
-                                'type' => $condition->type,
-                                'value' => $condition->value,
-                            ));
-                            array_push($applyConditions, $itemCondition);
-                        }
-
-                        $losAttributes = json_decode($productVariant->attributes, true);
-                        if (!$losAttributes) {
-                            $losAttributes = array();
-                        }
-                        $losAttributes['is_digital'] = $productVariant->is_digital;
-                        $losAttributes['conditions'] = $applyConditions;
-                        $losAttributes['image'] = $productVariant->getCartImg();
-                        $losAttributes['is_shippable'] = $productVariant->is_shippable;
-                        $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
-                        $losAttributes['merchant_id'] = $data['merchant_id'];
-                        $losAttributes['product_variant_id'] = $productVariant->id;
-                        $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
-                        if (array_key_exists("extras", $data)) {
-                            foreach ($data["extras"] as $x => $x_value) {
-                                $losAttributes[$x] = $x_value;
+                        if ($productVariant->quantity <= $quantity) {
+                            $conditions = $productVariant->conditions()->where('status', 'active')->get();
+                            $applyConditions = array();
+                            foreach ($conditions as $condition) {
+                                $itemCondition = new CartCondition(array(
+                                    'name' => $condition->name,
+                                    'type' => $condition->type,
+                                    'value' => $condition->value,
+                                ));
+                                array_push($applyConditions, $itemCondition);
                             }
-                        }
-                        if ($productVariant->attributes) {
-                            $productVariant->attributes = json_decode($productVariant->attributes, true);
-
-                            foreach ($productVariant->attributes as $x => $x_value) {
-                                $losAttributes[$x] = $x_value;
+                            $product = $productVariant->product;
+                            $itemName = $product->name . " " . $productVariant->description;
+                            $conditions = $product->conditions()->where('status', 'active')->get();
+                            foreach ($conditions as $condition) {
+                                $itemCondition = new CartCondition(array(
+                                    'name' => $condition->name,
+                                    'type' => $condition->type,
+                                    'value' => $condition->value,
+                                ));
+                                array_push($applyConditions, $itemCondition);
                             }
+
+                            $losAttributes = json_decode($productVariant->attributes, true);
+                            if (!$losAttributes) {
+                                $losAttributes = array();
+                            }
+                            $losAttributes['is_digital'] = $productVariant->is_digital;
+                            $losAttributes['conditions'] = $applyConditions;
+                            $losAttributes['image'] = $productVariant->getCartImg();
+                            $losAttributes['is_shippable'] = $productVariant->is_shippable;
+                            $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                            $losAttributes['merchant_id'] = $data['merchant_id'];
+                            $losAttributes['product_variant_id'] = $productVariant->id;
+                            $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
+                            if (array_key_exists("extras", $data)) {
+                                foreach ($data["extras"] as $x => $x_value) {
+                                    $losAttributes[$x] = $x_value;
+                                }
+                            }
+                            if ($productVariant->attributes) {
+                                $productVariant->attributes = json_decode($productVariant->attributes, true);
+
+                                foreach ($productVariant->attributes as $x => $x_value) {
+                                    $losAttributes[$x] = $x_value;
+                                }
+                            }
+
+
+                            $item = Item::create([
+                                        'product_variant_id' => $productVariant->id,
+                                        'name' => $product->name,
+                                        'user_id' => $user->id,
+                                        'price' => $productVariant->getActivePrice(),
+                                        'requires_authorization' => $productVariant->requires_authorization,
+                                        'paid_status' => "unpaid",
+                                        'fulfillment' => "unfulfilled",
+                                        'quantity' => (int) $data['quantity'],
+                                        'merchant_id' => $data['merchant_id'],
+                                        'attributes' => json_encode($losAttributes),
+                                        'order_id' => $order_id,
+                            ]);
+
+                            Cart::session($user->id)->add(array(
+                                'id' => $item->id,
+                                'name' => $product->name,
+                                'price' => $productVariant->getActivePrice(),
+                                'quantity' => (int) $data['quantity'],
+                                'attributes' => $losAttributes,
+                                'conditions' => $applyConditions
+                            ));
+                            $cartItem = Cart::session($user->id)->get($item->id);
+                            $item->priceSum = $cartItem->getPriceSum();
+                            $item->priceConditions = $cartItem->getPriceWithConditions();
+                            $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                            $item->save();
+                            $item->attributes = $losAttributes;
+
+                            return array("status" => "success", "message" => "item added to cart successfully", "cart" => $this->getCart($user), "item" => $item);
+                        } else {
+                            return array("status" => "error", "message" => "MIN_QUANTITY","quantity"=>$productVariant->min_quantity);
                         }
-
-
-                        $item = Item::create([
-                                    'product_variant_id' => $productVariant->id,
-                                    'name' => $product->name,
-                                    'user_id' => $user->id,
-                                    'price' => $productVariant->getActivePrice(),
-                                    'requires_authorization' => $productVariant->requires_authorization,
-                                    'paid_status' => "unpaid",
-                                    'fulfillment' => "unfulfilled",
-                                    'quantity' => (int) $data['quantity'],
-                                    'merchant_id' => $data['merchant_id'],
-                                    'attributes' => json_encode($losAttributes),
-                                    'order_id' => $order_id,
-                        ]);
-
-                        Cart::session($user->id)->add(array(
-                            'id' => $item->id,
-                            'name' => $product->name,
-                            'price' => $productVariant->getActivePrice(),
-                            'quantity' => (int) $data['quantity'],
-                            'attributes' => $losAttributes,
-                            'conditions' => $applyConditions
-                        ));
-                        $cartItem = Cart::session($user->id)->get($item->id);
-                        $item->priceSum = $cartItem->getPriceSum();
-                        $item->priceConditions = $cartItem->getPriceWithConditions();
-                        $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
-                        $item->save();
-                        $item->attributes = $losAttributes;
-
-                        return array("status" => "success", "message" => "item added to cart successfully", "cart" => $this->getCart($user), "item" => $item);
                     } else {
                         return array("status" => "error", "message" => "SOLD_OUT");
                     }
@@ -526,20 +533,26 @@ class EditCart {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
-                    $item->quantity = (int) $data['quantity'];
-                    Cart::session($user->id)->update($item->id, array(
-                        'quantity' => array(
-                            'relative' => false,
-                            'value' => $item->quantity
-                        ),
-                    ));
-                    $cartItem = Cart::session($user->id)->get($item->id);
-                    $item->priceSum = $cartItem->getPriceSum();
-                    $item->priceConditions = $cartItem->getPriceWithConditions();
-                    $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
-                    $item->save();
-                    $item->attributes = json_decode($item->attributes, true);
-                    return array("status" => "success", "message" => "item updated successfully", "cart" => $this->getCart($user), "item" => $item);
+                    if ($productVariant->min_quantity <= ((int) $data['quantity'] )) {
+                        $item->quantity = (int) $data['quantity'];
+                        Cart::session($user->id)->update($item->id, array(
+                            'quantity' => array(
+                                'relative' => false,
+                                'value' => $item->quantity
+                            ),
+                        ));
+                        $cartItem = Cart::session($user->id)->get($item->id);
+                        $item->priceSum = $cartItem->getPriceSum();
+                        $item->priceConditions = $cartItem->getPriceWithConditions();
+                        $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                        $item->save();
+                        $item->attributes = json_decode($item->attributes, true);
+                        return array("status" => "success", "message" => "item updated successfully", "cart" => $this->getCart($user), "item" => $item);
+                    } else {
+                        Cart::session($user->id)->remove($item->id);
+                        $item->delete();
+                        return array("status" => "success", "message" => "Item deleted from cart", "cart" => $this->getCart($user));
+                    }
                 } else {
                     return array("status" => "error", "message" => "No more stock of that product");
                 }

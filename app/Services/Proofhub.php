@@ -41,8 +41,15 @@ class Proofhub {
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
         );
         $response = curl_exec($curl);
+        $responseString = $response;
+//        $response = str_replace("&quot;", "'", $response);
+//        $response = str_replace("\\", "", $response);
+//        $response = str_replace('\"', "'", $response);
         curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
+        $response = json_decode($response, true);
+        if (!is_array($response)) {
+            dd($responseString);
+        }
         return $response;
     }
 
@@ -53,7 +60,9 @@ class Proofhub {
         $totalTimeEntries = [];
         foreach ($sheets as $sheet) {
             $results = $this->getTimeSheetTime($project, $sheet['id']);
-            $totalTimeEntries = array_merge($totalTimeEntries, $results);
+            if (is_array($results)) {
+                $totalTimeEntries = array_merge($totalTimeEntries, $results);
+            }
         }
         return $totalTimeEntries;
     }
@@ -76,6 +85,9 @@ class Proofhub {
         $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/todolists/" . $list . "/tasks";
         //dd($query);
         $tasks = $this->sendGet($query);
+        if (!is_array($tasks)) {
+            dd($query);
+        }
         return $tasks;
     }
 
@@ -114,8 +126,8 @@ class Proofhub {
 
         //dd($query);
         $timeEntries = $this->sendGet($query);
-        if ($sheet == "3998583695") {
-            //dd($timeEntries);
+        if (!is_array($timeEntries)) {
+            dd($query);
         }
         return $timeEntries;
     }
@@ -127,6 +139,7 @@ class Proofhub {
         $resultLabels = [];
         foreach ($labels as $label) {
             $label["invested_hours"] = 0;
+            $label["hours"] = 0;
             array_push($resultLabels, $label);
         }
         return $resultLabels;
@@ -169,7 +182,7 @@ class Proofhub {
     public function getSummary() {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
-        $date1 = "2019-02-20";
+        $date1 = "2019-03-01";
         $date2 = "2019-04-01";
         $dateTimestamp1 = strtotime($date1);
         $dateTimestamp2 = strtotime($date2);
@@ -183,7 +196,7 @@ class Proofhub {
                 "code" => "1420446568",
                 "rows" => $copy,
             ],
-            /*[
+            [
                 "name" => "Archies",
                 "budget" => "0",
                 "country" => "COL",
@@ -207,135 +220,136 @@ class Proofhub {
                 "code" => "2489878353",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Next Conn-Infrastructure",
-                "budget" => "0",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2581819961",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Xtech",
-                "budget" => "0",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2349279336",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Niños en movimiento",
-                "budget" => "1200000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2727778621",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "NOVEDADES GUILLERS",
-                "budget" => "50000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1871891261",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Magic Flavors",
-                "budget" => "30000000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2541330918",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "El techo",
-                "budget" => "50000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1889991926",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Cano",
-                "budget" => "5000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2234243776",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "CBC",
-                "budget" => "2400000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1714114251",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Ezpot",
-                "budget" => "5000000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1498154595",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Juan Valdez",
-                "budget" => "5500000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1753802741",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Celsia",
-                "budget" => "2500000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "2349062236",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Papa Johns",
-                "budget" => "2400000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1753924859",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Super de alimentos",
-                "budget" => "0",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1422726112",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Dilucca",
-                "budget" => "0",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1421925558",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "BYC en casa",
-                "budget" => "500000",
-                "country" => "COL",
-                "price" => "Retail",
-                "code" => "1739080686",
-                "rows" => $copy,
-            ]*/
+                /* [
+                  "name" => "Next Conn-Infrastructure",
+                  "budget" => "0",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2581819961",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Xtech",
+                  "budget" => "0",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2349279336",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Niños en movimiento",
+                  "budget" => "1200000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2727778621",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "NOVEDADES GUILLERS",
+                  "budget" => "50000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1871891261",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Magic Flavors",
+                  "budget" => "30000000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2541330918",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "El techo",
+                  "budget" => "50000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1889991926",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Cano",
+                  "budget" => "5000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2234243776",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "CBC",
+                  "budget" => "2400000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1714114251",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Ezpot",
+                  "budget" => "5000000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1498154595",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Juan Valdez",
+                  "budget" => "5500000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1753802741",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Celsia",
+                  "budget" => "2500000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "2349062236",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Papa Johns",
+                  "budget" => "2400000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1753924859",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Super de alimentos",
+                  "budget" => "0",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1422726112",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "Dilucca",
+                  "budget" => "0",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1421925558",
+                  "rows" => $copy,
+                  ],
+                  [
+                  "name" => "BYC en casa",
+                  "budget" => "500000",
+                  "country" => "COL",
+                  "price" => "Retail",
+                  "code" => "1739080686",
+                  "rows" => $copy,
+                  ] */
         ];
         $results = [];
         $summary = [];
         $summary["rows"] = [];
         $totalHours = 0;
         $totalCost = 0;
-                foreach ($projects as $project) {
-
+        foreach ($projects as $project) {
+            $timeEntries = $this->getProjectTimeSheets($project);
             $projectPeople = $people;
+            $projectLabels = $labels;
             $tasks = $this->getProjectTaskLists($project);
             $totalPendingTasks = 0;
             $totalMissingHours = 0;
@@ -349,21 +363,16 @@ class Proofhub {
                     }
                 }
             }
-            $timeEntries = $this->getProjectTimeSheets($project);
-            $resultsPeople = [];
-            foreach ($projectPeople as $person) {
-                if (array_key_exists("cost", $person)) {
-                    
-                } else {
-                    dd($person);
-                }
-                foreach ($timeEntries as $timeEntry) {
-                    $timeEntryTimestamp = strtotime($timeEntry["date"]);
-                    if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
+            foreach ($timeEntries as $timeEntry) {
+                $found = false;
+                $timeEntryTimestamp = strtotime($timeEntry["date"]);
+                if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
+                    $task = $this->getTimeEntryTask($timeEntry, $tasks);
+                    foreach ($projectPeople as &$person) {
                         if ($timeEntry["creator"]["id"] == $person["id"]) {
-                            $task = $this->getTimeEntryTask($timeEntry, $tasks);
                             $taskLabels = $task["labels"];
                             $isBillable = true;
+                            $found = true;
                             if ($taskLabels) {
                                 foreach ($taskLabels as $taskLabel) {
                                     if ($taskLabel == "2974484984") {
@@ -371,65 +380,38 @@ class Proofhub {
                                     }
                                 }
                             }
-                            if ($isBillable) {
-                                $person["billable"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                                if($project["country"]=="COL"){
-                                    if($project["price"]=="Wholesale"){
-                                        $person["billable_cost"] = $person["billable"] * $person["cost"];
-                                    } else {
-                                        $person["billable_cost"] = $person["billable"] * $person["retail"];
-                                    }
-                                } else {
-                                    if($project["price"]=="Wholesale"){
-                                        $person["billable_cost"] = $person["billable"] * $person["cost_us"];
-                                    } else {
-                                        $person["billable_cost"] = $person["billable"] * $person["retail_us"];
-                                    }
-                                }
-                                
-                            } else {
-                                $person["non_billable"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                                $person["non_billable_cost"] = $person["non_billable"] * $person["cost"];
-                            }
                             $person["hours"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
                             $person["total_cost"] = $person["hours"] * $person["cost"];
                         }
                     }
-                }
-                if ($person["hours"] > 0) {
-                    array_push($resultsPeople, $person);
-                }
-            }
-            $project['people'] = $resultsPeople;
-            $projectLabels = $labels;
-            $resultsLabels = [];
-            foreach ($projectLabels as $label) {
-                $hours = 0;
-                foreach ($timeEntries as $timeEntry) {
-                    $timeEntryTimestamp = strtotime($timeEntry["date"]);
-                    if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
-                        $task = $this->getTimeEntryTask($timeEntry, $tasks);
+                    foreach ($projectLabels as &$label) {
+                        $hours = 0;
                         $taskLabels = $task["labels"];
                         if ($taskLabels) {
                             foreach ($taskLabels as $taskLabel) {
                                 if ($label["id"] == $taskLabel) {
-                                    $hours += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                    $label["hours"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
                                 }
                             }
                         }
                     }
                 }
-                if ($hours > 0) {
-                    $insert = $label;
-                    unset($insert["id"]);
-                    unset($insert["color"]);
-                    $insert["Hours"] = $hours;
-                    array_push($resultsLabels, $insert);
+            }
+            foreach($projectPeople as $key => $person){
+                if($person["hours"]==0){
+                    unset($projectPeople[$key]);
                 }
             }
-            $project['labels'] = $resultsLabels;
-            $project["rows"] = array_merge($resultsPeople, $resultsLabels);
-            $projectResults = $this->calculateTotalsProject($resultsPeople);
+            foreach($projectLabels as $key => $label){
+                if($label["hours"]==0){
+                    unset($projectLabels[$key]);
+                }
+            }
+            $project['people'] = $projectPeople;
+            
+            $project['labels'] = $projectLabels;
+            $project["rows"] = array_merge($project['people'], $project['labels']);
+            $projectResults = $this->calculateTotalsProject($projectPeople);
             $projectData = [
                 "Name" => $project["name"],
                 "Budget" => $project["budget"],
@@ -454,8 +436,8 @@ class Proofhub {
         array_unshift($results, $summary);
         $this->writeFile($results);
     }
-    
-    private function calculateTotalsPeople($results,$people){
+
+    private function calculateTotalsPeople($results, $people) {
         foreach ($results as $project) {
             
         }
@@ -488,7 +470,6 @@ class Proofhub {
                 $saveperson['retail'] = 68181;
                 $saveperson['cost_us'] = 19.23;
                 $saveperson['retail_us'] = 22.73;
-                
             } else if ($resultsPerson['id'] == "4232277661") {
                 //Deyvid
                 $saveperson['cost'] = 26580;
