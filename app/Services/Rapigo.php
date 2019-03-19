@@ -84,8 +84,8 @@ class Rapigo {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
-        $data['fecha_servicio'] = "03/12/2019";
-        $data['hora_servicio'] = "10:30";
+        $data['fecha_servicio'] = "03/19/2019";
+        $data['hora_servicio'] = "11:30";
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
@@ -183,7 +183,8 @@ class Rapigo {
 
     public function stopArrived($info) {
         $stop = Stop::where("code", $info["point"])->with("deliveries.user")->first();
-
+        $stop->status = "arrived";
+        $stop->save();
         $followers = [];
         foreach ($stop->deliveries as $delivery) {
             array_push($followers, $delivery->user);
@@ -229,14 +230,16 @@ class Rapigo {
             foreach ($routes as $route) {
                 $coverage = json_decode($route->coverage, true);
                 $location = $coverage["location"];
-                $status = $this->checkStatus($route->code);
-                $location["runner"] = $status["detalle"]["mensajero_asignado"];
-                $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
-                $location["lat"] = $status["detalle"]["latitud"];
-                $location["long"] = $status["detalle"]["longitud"];
-                $coverage["location"] = $location;
-                $route->coverage = json_encode($coverage);
-                $route->save();
+                $status = $this->checkStatus($route->provider_id);
+                if (array_key_exists("detalle", $status) ) {
+                    $location["runner"] = $status["detalle"]["mensajero_asignado"];
+                    $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
+                    $location["lat"] = $status["detalle"]["latitud"];
+                    $location["long"] = $status["detalle"]["longitud"];
+                    $coverage["location"] = $location;
+                    $route->coverage = json_encode($coverage);
+                    $route->save();
+                }
             }
         }
     }
