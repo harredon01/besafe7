@@ -66,7 +66,7 @@ Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 Route::get('admin/store/products', 'ProductImportController@getProducts');
 Route::get('admin/store/variants', 'ProductImportController@getVariants');
 Route::get('admin/store/merchants', 'ProductImportController@getMerchants');
-Route::get('admin/store/categories', 'ProductImportController@getCategories');
+Route::get('admin/store/prod_categories', 'ProductImportController@getCategories');
 Route::post('admin/store/products', 'ProductImportController@postProducts');
 Route::post('admin/store/variants', 'ProductImportController@postVariants');
 Route::post('admin/store/merchants', 'ProductImportController@postMerchants');

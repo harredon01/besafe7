@@ -153,7 +153,7 @@ echo json_encode([
                                     <li><a href="{{ url('admin/store/products')}}">Productos</a></li>
                                     <li><a href="{{ url('admin/store/variants')}}">Variants</a></li>
                                     <li><a href="{{ url('admin/store/merchants')}}">Merchants</a></li>
-                                    <li><a href="{{ url('admin/store/categories')}}">Categories</a></li>
+                                    <li><a href="{{ url('admin/store/prod_categories')}}">Categories</a></li>
                                 </ul>
                             </li>
                             @endif

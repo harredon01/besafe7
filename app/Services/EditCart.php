@@ -335,7 +335,7 @@ class EditCart {
             $quantity = (int) $data['quantity'];
             $productVariant = $item->productVariant;
             if ($productVariant->quantity >= $quantity || $productVariant->is_digital) {
-                if ($productVariant->quantity <= $quantity) {
+                if ($productVariant->min_quantity <= $quantity) {
                     Cart::session($user->id)->update($item->id, array(
                         'quantity' => $quantity, // so if the current product has a quantity of 4, another 2 will be added so this will result to 6
                     ));
@@ -358,7 +358,7 @@ class EditCart {
                 $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
-                        if ($productVariant->quantity <= $quantity) {
+                        if ($productVariant->min_quantity <= (int) $data['quantity'] ) {
                             $conditions = $productVariant->conditions()->where('status', 'active')->get();
                             $applyConditions = array();
                             foreach ($conditions as $condition) {

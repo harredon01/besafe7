@@ -23,8 +23,8 @@ class Basilikum {
     }
 
     public function getOrderShippingPrice(array $origin, array $destination) {
-        $response['price'] = 20000;
-        $response['price2'] = 20000;
+        $response['price'] = 28000;
+        $response['price2'] = 28000;
         return $response;
     }
 

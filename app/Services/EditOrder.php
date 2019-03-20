@@ -197,8 +197,8 @@ class EditOrder {
                 }
             }
             $payload = [
-                "payment_id"=>$payment->id,
-                "payment_total"=>$payment->total,
+                "payment_id" => $payment->id,
+                "payment_total" => $payment->total,
                 "order_id" => $order->id,
                 "first_name" => $user->firstName,
                 "last_name" => $user->lastName,
@@ -308,7 +308,7 @@ class EditOrder {
                             "buyers" => $thePayersArray
                         ];
                         $transactionCost = $this->getTransactionTotal($buyerSubtotal);
-                        
+
                         $payment = Payment::where("order_id", $order->id)->where("user_id", $user->id)->where("status", "pending")->first();
                         if ($payment) {
                             
@@ -327,7 +327,7 @@ class EditOrder {
                         $payment->address_id = $address->id;
                         $payment->order_id = $order->id;
                         $payment->status = "pending";
-                        
+
                         $payment->tax = $buyerTax;
                         $payment->save();
                         $result = array("status" => "success", "message" => "Order submitted, payment created", "payment" => $payment, "order" => $order);
@@ -378,6 +378,13 @@ class EditOrder {
             $results['order'] = $order;
             $results['message'] = "Order requires shipping condition";
             $results['type'] = "shipping";
+            return $results;
+        }
+        if ($results['requiresDelivery'] > 0) {
+            $results['status'] = "error";
+            $results['order'] = $order;
+            $results['message'] = "Order requires delivery date";
+            $results['type'] = "delivery";
             return $results;
         }
         $address = $order->orderAddresses()->where('type', "shipping")->get();
@@ -435,6 +442,7 @@ class EditOrder {
         $creditHolders = 0;
         $requiredBuyers = 0;
         $requiresShipping = 0;
+        $requiresDelivery = 0;
         $splitTotal = $order->total;
         $totalDeposit = 0;
         $totalCredit = 0;
@@ -447,13 +455,21 @@ class EditOrder {
                     if (!$creditItem) {
                         $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $value->merchant_id)->first();
                     }
-                    $requiredDeposit += ($creditItem->price * $attributes['credits']);
+                    if ($attributes['type'] == "meal-plan") {
+                        $requiredDeposit += ($creditItem->price * $attributes['credits']);
+                    }
+
                     $requiredCredits += $attributes['credits'];
                 }
             }
             if (array_key_exists("multiple_buyers", $attributes)) {
                 if ($attributes['multiple_buyers']) {
                     $requiredBuyers += $attributes['buyers'];
+                }
+            }
+            if (array_key_exists("requires_delivery", $attributes)) {
+                if ($attributes['requires_delivery']) {
+                    $requiresDelivery = 1;
                 }
             }
             if (array_key_exists("is_credit", $attributes)) {
@@ -500,10 +516,19 @@ class EditOrder {
             } else {
                 $checkCredits = [];
             }
-            array_push($checkCredits, $user->id);
-            $creditHolders = $this->checkUsersCredits($checkCredits, $data['platform']);
-            $requiredCredits -= $creditHolders;
-            $requiredDeposit -= ($creditItem->price * $creditHolders);
+            if ($creditItemMerchant == 1299) {
+                array_push($checkCredits, $user->id);
+                $creditHolders = $this->checkUsersCredits($checkCredits, $data['platform']);
+                $requiredCredits -= $creditHolders;
+                $requiredDeposit -= ($creditItem->price * $creditHolders);
+            }
+        }
+        if ($requiresDelivery > 0) {
+            if (array_key_exists("delivery_date", $data)) {
+                if ($data['delivery_date']) {
+                    $requiresDelivery = 0;
+                }
+            }
         }
         if ($requiredBuyers > 0) {
             if (array_key_exists("payers", $data)) {
@@ -527,6 +552,7 @@ class EditOrder {
             "requiredBuyers" => $requiredBuyers,
             "totalDeposit" => $totalDeposit,
             "requiresShipping" => $requiresShipping,
+            "requiresDelivery" => $requiresDelivery,
             "order" => $order,
         );
     }
