@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration {
             $table->boolean('emailNotifications')->default(false);
             $table->boolean('pushNotifications')->default(false);
             $table->string('green')->nullable();
-            $table->string('red')->nullable();
+            $table->string('red')->nullable(); 
             $table->boolean('is_alerting')->default(false);
             $table->boolean('is_tracking')->default(false);
             $table->boolean('write_report')->default(false);
@@ -45,7 +45,7 @@ class CreateUsersTable extends Migration {
             $table->string('platform')->nullable();
             $table->string('name')->nullable();
             $table->string('docType')->nullable();
-            $table->string('docNum')->nullable()->unique();
+            $table->string('docNum')->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('username')->nullable();
             $table->string('password');

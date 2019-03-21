@@ -81,15 +81,15 @@ class AuthApiController extends Controller {
         }
         $verifyemail = DB::select('select * from users where email = ?', [$credentials['email']]);
         if ($verifyemail) {
-            return response()->json(['statuss' => 'error', 'message' => "Ese correo ya existe"], 200);
+            return response()->json(['status' => 'error', 'message' => "email_exists"], 400);
         }
         $verifycel = DB::select('select * from users where cellphone = ? and area_code = ? ', [$credentials['cellphone'], $credentials['area_code']]);
         if ($verifycel) {
-            return response()->json(['statuss' => 'error', 'message' => "Ese celular en ese pais ya existe"], 200);
+            return response()->json(['status' => 'error', 'message' => "cel_exists"], 400);
         }
         $verifyId = DB::select('select * from users where docNum = ? and docType = ? ', [$credentials['docNum'], $credentials['docType']]);
         if ($verifyId) {
-            return response()->json(['statuss' => 'error', 'message' => "Ese documento de identificacion ya existe"], 200);
+            return response()->json(['status' => 'error', 'message' => "id_exists"], 400);
         }
         $data = $request->all([
             'firstName',
