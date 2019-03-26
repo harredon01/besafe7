@@ -7,6 +7,9 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
+    const START_DATE = '2019-03-01';
+    const END_DATE = '2019-04-01';
+    const IS_ADMIN = false;
 
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
@@ -84,16 +87,12 @@ class Proofhub {
     }
 
     public function getProjectEvents($project) {
-        $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/events";
-        $lists = $this->sendGet($query);
-        $totalTasks = [];
-        foreach ($lists as $list) {
-            $results = $this->getTasksList($project, $list['id']);
-            if (is_array($results)) {
-                $totalTasks = array_merge($totalTasks, $results);
-            }
+        $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/events?view=milestones";
+        $events = $this->sendGet($query);
+        if (is_array($events)) {
+            return $events;
         }
-        return $totalTasks;
+        return [];
     }
 
     public function getTasksList($project, $list) {
@@ -122,7 +121,8 @@ class Proofhub {
                     if ($person["id"] == 4155953643) {
                         $person[self::TYPE_COST] = 30000;
                     } else {
-                        dd($person);
+                        $person[self::TYPE_COST] = 30000;
+                        //dd($person);
                     }
                 }
                 $totalCost += $person[self::TYPE_COST] * $person["hours"];
@@ -230,20 +230,20 @@ class Proofhub {
     public function getSummary() {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
-        $date1 = "2019-03-01";
-        $date2 = "2019-04-01";
+        $date1 = self::START_DATE;
+        $date2 = self::END_DATE;
         $dateTimestamp1 = strtotime($date1);
         $dateTimestamp2 = strtotime($date2);
         $copy = $people;
         $projects = [
             [
                 "name" => "TaxPayer Redesign and Dev",
-                "budget" => "50000",
+                "budget" => "0",
                 "country" => "COL",
                 "price" => "Retail",
                 "code" => "1420446568",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -259,7 +259,7 @@ class Proofhub {
                 "rows" => $copy,
             ], [
                 "name" => "igastoresbc",
-                "budget" => "50000",
+                "budget" => "0",
                 "country" => "COL",
                 "price" => "Retail",
                 "code" => "2555537362",
@@ -565,6 +565,62 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1409523753",
                 "rows" => $copy,
+            ],
+            [
+                "name" => "Sales Proposals",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "2727195166",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Vilaseca",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "1779963222",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dial",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "1637613840",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Agency",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "1694100398",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Support Daportare",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "2065259008",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Marketing Xpr",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "2646379904",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Balance ecuador",
+                "budget" => "0",
+                "country" => "COL",
+                "price" => "Retail",
+                "code" => "2547043347",
+                "rows" => $copy,
             ]
         ];
         $results = [];
@@ -590,6 +646,7 @@ class Proofhub {
                 }
             }
             $totalPendingMilestones = 0;
+            $projectMilestones = [];
             $totalCompletedMilestones = 0;
             $totalMissingBudget = 0;
             $events = $this->getProjectEvents($project);
@@ -598,8 +655,18 @@ class Proofhub {
                     if ($event["completed"]) {
                         $totalCompletedMilestones++;
                     } else {
+                        $projectMilestone = [
+                            "Title" => $event["title"],
+                            "Pago" => $event["description"],
+                            "Start" => $event["start"],
+                            "End" => $event["end"]
+                        ];
+                        array_push($projectMilestones, $projectMilestone);
                         $totalPendingMilestones++;
-                        $totalMissingBudget += $event["description"];
+                        if($event["description"]){
+                            $totalMissingBudget += intval($event["description"]);
+                        }
+                        
                     }
                 }
             }
@@ -621,7 +688,9 @@ class Proofhub {
                                         if ($personLabel["id"] == $taskLabel) {
                                             $foundPerson = true;
                                             $personLabel["hours"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                                            $personLabel["cost"] += $person[self::TYPE_COST] * ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                            if (self::IS_ADMIN) {
+                                                $personLabel["cost"] += $person[self::TYPE_COST] * ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                            }
                                         }
                                     }
                                     if (!$foundPerson) {
@@ -632,7 +701,10 @@ class Proofhub {
                                         $newPersonLabel["person_name"] = $person["name"];
                                         $newPersonLabel["person_id"] = $person["id"];
                                         $newPersonLabel["hours"] = ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
-                                        $newPersonLabel["cost"] = $person[self::TYPE_COST] * ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                        if (self::IS_ADMIN) {
+                                            $newPersonLabel["cost"] = $person[self::TYPE_COST] * ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
+                                        }
+
                                         array_push($person["labels"], $newPersonLabel);
                                     }
 
@@ -643,7 +715,9 @@ class Proofhub {
                             }
                             $person["hours"] += ($timeEntry["logged_hours"] + ($timeEntry["logged_mins"] / 60));
                             //dd($person);
-                            $person["total_cost"] = $person["hours"] * $person[self::TYPE_COST];
+                            if (self::IS_ADMIN) {
+                                $person["total_cost"] = $person["hours"] * $person[self::TYPE_COST];
+                            }
                         }
                     }
 
@@ -668,11 +742,18 @@ class Proofhub {
                 } else {
                     unset($projectPeople[$key]["cost_us"]);
                     unset($projectPeople[$key]["retail_us"]);
+                    if (!self::IS_ADMIN) {
+                        unset($projectPeople[$key]["cost"]);
+                        unset($projectPeople[$key]["retail"]);
+                    }
                     foreach ($person["labels"] as $item => $value) {
 
                         foreach ($projectLabels as &$projectLabel) {
                             if ($projectLabel["id"] == $value["id"]) {
-                                $projectLabel["cost"] += $value["cost"];
+                                if (self::IS_ADMIN) {
+                                    $projectLabel["cost"] += $value["cost"];
+                                }
+
                                 $projectLabel["hours"] += $value["hours"];
                             }
                         }
@@ -702,11 +783,17 @@ class Proofhub {
                     "person_name" => "Person",
                     "cost" => "Cost",
             ]);
+            $title3 = array([
+                    "name" => "Milestone",
+                    "hours" => "Pago",
+                    "person_name" => "Start",
+                    "cost" => "End",
+            ]);
 
             $project['personlabels'] = $projectPersonLabels;
             $project['labels'] = $projectLabels;
             if (count($projectPersonLabels) > 0) {
-                $project["rows"] = array_merge($project['people'], $title, $project['labels'], $title2, $projectPersonLabels);
+                $project["rows"] = array_merge($project['people'], $title, $project['labels'], $title2, $projectPersonLabels,$title3,$projectMilestones);
             } else {
                 $project["rows"] = $project['people'];
             }
@@ -766,7 +853,10 @@ class Proofhub {
                                     if ($personLabel["id"] == $personProjectLabel["id"]) {
                                         $pplfound = true;
                                         $personLabel["hours"] += $personProjectLabel["hours"];
-                                        $personLabel["cost"] += $personProjectLabel["cost"];
+                                        if (self::IS_ADMIN) {
+                                            $personLabel["cost"] += $personProjectLabel["cost"];
+                                        }
+                                        
                                     }
                                 }
                                 if (!$pplfound) {
@@ -787,6 +877,7 @@ class Proofhub {
         $totalResults = [];
         $title = array([
                 "name" => "label name",
+                "person_name" => "Person",
                 "hours" => "hours",
                 "cost" => "cost"
         ]);
@@ -803,13 +894,13 @@ class Proofhub {
                     unset($finalPerson['projects'][$key]["retail"]);
                     unset($finalPerson['projects'][$key]["total_cost"]);
                 }
+
                 foreach ($finalPerson['labels'] as $key => $value1) {
                     unset($finalPerson['labels'][$key]["id"]);
                     unset($finalPerson['labels'][$key]["person_id"]);
-                    unset($finalPerson['labels'][$key]["person_name"]);
                 }
                 $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
-                array_push($totalResults, $resultsPerson); 
+                array_push($totalResults, $resultsPerson);
             }
         }
         //dd($totalResults);
@@ -831,9 +922,11 @@ class Proofhub {
 
                             if ($label["id"] == $personProjectLabel["id"]) {
                                 $label["hours"] += $personProjectLabel["hours"];
-                                $label["cost"] += $personProjectLabel["cost"];
+                                if (self::IS_ADMIN) {
+                                    $label["cost"] += $personProjectLabel["cost"];
+                                    $projectLabel["cost"] += $personProjectLabel["cost"];
+                                }
                                 $projectLabel["hours"] += $personProjectLabel["hours"];
-                                $projectLabel["cost"] += $personProjectLabel["cost"];
                                 array_push($label["people"], $personProjectLabel);
                             }
                         }
@@ -857,18 +950,20 @@ class Proofhub {
                 $resume = [];
                 $resume["name"] = $finalLabel["name"];
                 $resume["hours"] = $finalLabel["hours"];
-                $resume["cost"] = $finalLabel["cost"];
+                if (self::IS_ADMIN) {
+                    $resume["cost"] = $finalLabel["cost"];
+                }
                 array_push($finalResults["rows"], $resume);
                 $resultsPerson = [];
                 $resultsPerson["name"] = $finalLabel["name"];
-                /*foreach ($finalLabel['projects'] as $key => $value1) {
-                      unset($finalLabel['projects'][$key]["cost"]);
-                      unset($finalLabel['projects'][$key]["retail"]);
-                      unset($finalLabel['projects'][$key]["total_cost"]); 
-                }*/
+                /* foreach ($finalLabel['projects'] as $key => $value1) {
+                  unset($finalLabel['projects'][$key]["cost"]);
+                  unset($finalLabel['projects'][$key]["retail"]);
+                  unset($finalLabel['projects'][$key]["total_cost"]);
+                  } */
                 foreach ($finalLabel['people'] as $key => $value1) {
                     unset($finalLabel['people'][$key]["id"]);
-                    unset($finalLabel['people'][$key]["person_name"]);
+                    unset($finalLabel['people'][$key]["person_id"]);
                 }
                 $resultsPerson["rows"] = array_merge($finalLabel['projects'], $title, $finalLabel['people']);
                 array_push($totalResults, $resultsPerson);

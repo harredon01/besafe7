@@ -474,11 +474,15 @@ class EditOrder {
             }
             if (array_key_exists("is_credit", $attributes)) {
                 if ($attributes['is_credit']) {
-                    $requiredCredits -= $value->quantity;
-                    $splitTotal -= ($value->price * $value->quantity);
-                    $requiredDeposit -= ($value->price * $value->quantity);
-                    $totalDeposit += ($value->price * $value->quantity);
-                    $totalCredit++;
+                    if ($creditItemMerchant == 1299) {
+                        $requiredCredits -= $value->quantity;
+                        $splitTotal -= ($value->price * $value->quantity);
+                        $requiredDeposit -= ($value->price * $value->quantity);
+                        $totalDeposit += ($value->price * $value->quantity);
+                        $totalCredit++;
+                    } else {
+                        $totalCredit++;
+                    }
                 }
             }
             $creditItemMerchant = $value->merchant_id;
@@ -491,20 +495,30 @@ class EditOrder {
         }
         if (array_key_exists("payers", $data)) {
             if (count($data['payers']) > 0) {
-                $totalNotBuyingDeposit = count($data['payers']) + 1 - $totalCredit;
+                if ($creditItemMerchant == 1299) {
+                    $totalBuyingDeposit = count($data['payers']) + 1 - $totalCredit;
+                } else {
+                    $totalBuyingDeposit = count($data['payers']) + 1;
+                }
+
 
                 $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
                 $payerSplitIncludingDeposit = 0;
                 $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
                 $payertransactionCostDeposit = 0;
-                if ($totalCredit > 0) {
-                    if (!$creditItem) {
-                        $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                if ($creditItemMerchant == 1299) {
+                    if ($totalCredit > 0) {
+                        if (!$creditItem) {
+                            $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                        }
+                        $payerSplitIncludingDeposit = $payerSplitNotIncludingDeposit + $creditItem->price;
+                        $payertransactionCostDeposit = $this->getTransactionTotal($payerSplitIncludingDeposit);
                     }
-                    $payerSplitIncludingDeposit = $payerSplitNotIncludingDeposit + $creditItem->price;
-                    $payertransactionCostDeposit = $this->getTransactionTotal($payerSplitIncludingDeposit);
+                    $transactionCost = ($payertransactionCostDeposit * $totalCredit) + ($totalBuyingDeposit * $payertransactionCostNoDeposit);
+                } else {
+                    $transactionCost = ($totalBuyingDeposit * $payertransactionCostNoDeposit);
                 }
-                $transactionCost = ($payertransactionCostDeposit * $totalCredit) + ($totalNotBuyingDeposit * $payertransactionCostNoDeposit);
+                
                 $order->total = $order->total + $transactionCost;
                 $order->tax = $order->tax + (0);
                 //$order->status = "payment_created";
@@ -521,6 +535,12 @@ class EditOrder {
                 $creditHolders = $this->checkUsersCredits($checkCredits, $data['platform']);
                 $requiredCredits -= $creditHolders;
                 $requiredDeposit -= ($creditItem->price * $creditHolders);
+            } else if ($creditItemMerchant == 1301) {
+                $requiredCredits = 1;
+                if ($totalCredit > 0) {
+                    $requiredCredits = 0;
+                }
+                $requiredDeposit = 0;
             }
         }
         if ($requiresDelivery > 0) {
