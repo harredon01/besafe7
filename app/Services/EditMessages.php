@@ -125,33 +125,31 @@ class EditMessages {
         }
         if ($data['type'] == self::USER_MESSAGE_TYPE) {
             $followers = $user->countRecipientsMessage($data['to_id']);
-            if ($followers > 0) {
-                $confirm = [
-                    "message" => $data['message'],
-                    self::MESSAGE_RECIPIENT_TYPE => self::USER_MESSAGE_TYPE,
-                    self::MESSAGE_AUTHOR_ID => $user->id,
-                    "status" => "unread",
-                    self::MESSAGE_RECIPIENT_ID => $data['to_id'],
-                ];
-                $message = Message::create($confirm);
-                $dauser = array();
-                $dauser['first_name'] = $user->firstName;
-                $dauser['last_name'] = $user->lastName;
-                $dauser['message_id'] = $message->id;
-                $data = [
-                    "to_id" => $data['to_id'],
-                    "trigger_id" => $user->id,
-                    "message" => $data['message'],
-                    "payload" => $dauser,
-                    "type" => self::USER_MESSAGE_TYPE,
-                    "object" => self::OBJECT_USER,
-                    "sign" => true,
-                    "user_status" => $user->getUserNotifStatus()
-                ];
-                //dispatch(new SendChat($data, $user, true));
-                $this->sendChat($data, $user, true);
-                return $message;
-            }
+            $confirm = [
+                "message" => $data['message'],
+                self::MESSAGE_RECIPIENT_TYPE => self::USER_MESSAGE_TYPE,
+                self::MESSAGE_AUTHOR_ID => $user->id,
+                "status" => "unread",
+                self::MESSAGE_RECIPIENT_ID => $data['to_id'],
+            ];
+            $message = Message::create($confirm);
+            $dauser = array();
+            $dauser['first_name'] = $user->firstName;
+            $dauser['last_name'] = $user->lastName;
+            $dauser['message_id'] = $message->id;
+            $data = [
+                "to_id" => $data['to_id'],
+                "trigger_id" => $user->id,
+                "message" => $data['message'],
+                "payload" => $dauser,
+                "type" => self::USER_MESSAGE_TYPE,
+                "object" => self::OBJECT_USER,
+                "sign" => true,
+                "user_status" => $user->getUserNotifStatus()
+            ];
+            //dispatch(new SendChat($data, $user, true));
+            $this->sendChat($data, $user, true);
+            return $message;
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
@@ -226,9 +224,14 @@ class EditMessages {
         if ($data['type'] == self::USER_MESSAGE_TYPE) {
             $followers = $user->getRecipientsMessage($data['to_id']);
             if (count($followers) > 0) {
-                unset($data['to_id']);
-                $this->editAlerts->sendMassMessage($data, $followers, $user, $notif,null);
+                
+            }else {
+                $followers = [];
+                $recipient = User::find($data['to_id']);
+                array_push($followers, $recipient);
             }
+            unset($data['to_id']);
+            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null);
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
@@ -241,11 +244,10 @@ class EditMessages {
                     $dauser['is_admin'] = $data['is_admin'];
                     unset($data['is_admin']);
                     $data['payload'] = $dauser;
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif,null);
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null);
                 }
             }
         }
-        
     }
 
     /**

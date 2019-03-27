@@ -418,26 +418,20 @@ class EditBilling {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
                 $order = $payment->order()->with("items","orderConditions")->first();
-                $payment->total = $payment->total - $payment->transaction_cost;
                 if (Payment::where("order_id",$payment->order_id)->count() == 1) {
-                    
-                    Cart::session($user->id)->removeConditionsByType(self::TRANSACTION_CONDITION);
                     $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
-                    $results = $this->editOrder->prepareOrder($user, "Food", $data);
-                    $order = $results["order"];
-                    $order->total = $payment->total;
-                    $payment = $results["payment"];
+                    $order->total = $payment->total - $payment->transaction_cost;
+                    $order->subtotal = $order->total - $order->shipping;
+                    $order->save();
                     $this->changeOrderStatus($order->id);
-                    $order->orderConditions()->get();
                 }
+                $payment->total = $payment->total - $payment->transaction_cost;
                 $payment->transaction_cost = 0;
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_in_bank";
-
                 if (array_key_exists('buyer_address', $data)) {
                     $payment->attributes = json_encode($this->extractBuyer($data));
                 }
-
                 $payment->save();
                 $payment->order = $order;
                 Mail::to($user)->send(new EmailPaymentInBank($payment, $user));
@@ -476,7 +470,6 @@ class EditBilling {
                         $order->orderConditions()->saveMany([$conditionF, $conditionV]);
                         $order->total = $payment->total;
                         $order->save();
-                        $order->orderConditions()->get();
                     }
                     $payment->order = $order;
                     return array("status" => "success", "message" => "Payment Created", "payment" => $payment);

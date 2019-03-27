@@ -41,36 +41,39 @@ class EditOrderFood {
         $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
         $items = $order->items;
         $conditions = [];
-        foreach ($items as $value) {
-            $attributes = json_decode($value->attributes, true);
-            if ($value->quantity > 10) {
-                $control2 = floor($value->quantity / 11);
-                $buyers = 1;
-                if (array_key_exists("multiple_buyers", $attributes)) {
-                    if ($attributes['multiple_buyers']) {
-                        $buyers = $attributes['buyers'];
+        if ($order->merchant_id == 1299) {
+            foreach ($items as $value) {
+                $attributes = json_decode($value->attributes, true);
+                if ($value->quantity > 10) {
+                    $control2 = floor($value->quantity / 11);
+                    $buyers = 1;
+                    if (array_key_exists("multiple_buyers", $attributes)) {
+                        if ($attributes['multiple_buyers']) {
+                            $buyers = $attributes['buyers'];
+                        }
                     }
+                    $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
+                    $condition = new OrderCondition(array(
+                        'name' => "Por cada 11 dias recibe un descuento de 11 mil pesos",
+                        'target' => "subtotal",
+                        'type' => self::PLATFORM_NAME,
+                        'value' => "-" . $discount,
+                        'total' => $discount,
+                    ));
+                    array_push($conditions, $condition);
+                    $order->orderConditions()->save($condition);
+                    $condition2 = new CartCondition(array(
+                        'name' => $condition->name,
+                        'type' => $condition->type,
+                        'target' => $condition->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
+                        'value' => $condition->value,
+                        'order' => 1
+                    ));
+                    Cart::session($user->id)->condition($condition2);
                 }
-                $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
-                $condition = new OrderCondition(array(
-                    'name' => "Por cada 11 dias recibe un descuento de 11 mil pesos",
-                    'target' => "subtotal",
-                    'type' => self::PLATFORM_NAME,
-                    'value' => "-" . $discount,
-                    'total' => $discount,
-                ));
-                array_push($conditions, $condition);
-                $order->orderConditions()->save($condition);
-                $condition2 = new CartCondition(array(
-                    'name' => $condition->name,
-                    'type' => $condition->type,
-                    'target' => $condition->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
-                    'value' => $condition->value,
-                    'order' => 1
-                ));
-                Cart::session($user->id)->condition($condition2);
             }
         }
+
         $conditionF = new OrderCondition(array(
             'name' => "Costo fijo transaccion",
             'target' => "subtotal",
@@ -105,7 +108,7 @@ class EditOrderFood {
         array_push($conditions, $conditionF);
         array_push($conditions, $conditionV);
         Cart::session($user->id)->condition([$condition2F, $condition2V]);
-        return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions,"order"=>$order);
+        return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions, "order" => $order);
     }
 
     /**
@@ -204,10 +207,9 @@ class EditOrderFood {
         $buyers = $data['buyers'];
         for ($x = 0; $x < count($buyers); $x++) {
             $user = User::find($buyers[$x]);
-            if($user){
+            if ($user) {
                 $this->createDeliveries($user->id, $item, $address_id);
             }
-            
         }
     }
 
@@ -255,13 +257,12 @@ class EditOrderFood {
                     'credits' => 1,
                 ]);
             }
-            Delivery::where("user_id",$user['id'])->where("status","suspended")->update(['status'=>'pending']);
+            Delivery::where("user_id", $user['id'])->where("status", "suspended")->update(['status' => 'pending']);
         }
-        
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
-        $lastDelivery = Delivery::where('user_id', $user_id)->whereIn('status', ["pending","deposit"])->where('provider', "Rapigo")->orderBy('delivery', 'desc')->first();
+        $lastDelivery = Delivery::where('user_id', $user_id)->whereIn('status', ["pending", "deposit"])->where('provider', "Rapigo")->orderBy('delivery', 'desc')->first();
 //        if($user_id!=1){
 //            dd($lastDelivery);
 //        }

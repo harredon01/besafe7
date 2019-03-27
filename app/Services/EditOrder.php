@@ -219,7 +219,7 @@ class EditOrder {
     }
 
     public function getTransactionTotal($total) {
-        return ($total * 0.0349 + 900);
+        return ((($total * 3.49)/100) + 900);
     }
 
     public function removeTransactionCost(Order $order) {
@@ -716,9 +716,9 @@ class EditOrder {
                         $gateway = new $className;
                         $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
                         $insertCondition = array(
-                            'name' => $platform,
+                            'name' => "Transporte ".$platform,
                             'type' => "shipping",
-                            'target' => 'total',
+                            'target' => 'subtotal',
                             'value' => $result['price'],
                             'order' => 0
                         );
@@ -736,7 +736,7 @@ class EditOrder {
                         $order->total = $cart["total"];
                         $order->save();
                     }
-                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order);
+                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order,"cart"=>$cart);
                 }
                 return array("status" => "error", "message" => "Order does not have an origin address");
             }
