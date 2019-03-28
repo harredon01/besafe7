@@ -82,6 +82,29 @@ class FoodImportController extends Controller {
         }
         return view('food.menu')->with('user', $user);
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getContent() {
+        $user = $this->auth->user();
+        return view('food.content')->with('user', $user);
+    }
+
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function postContent(Request $request) {
+        $user = $this->auth->user();
+        if ($request->file('uploadfile')->isValid()) {
+            $path = $request->uploadfile->path();
+            $this->food->importContent($path);
+        }
+        return view('food.content')->with('user', $user);
+    }
 
     /**
      * Show the application dashboard to the user.

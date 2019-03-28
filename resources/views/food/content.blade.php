@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container" ng-controller="MenuCtrl" ng-init='config={content:"lunch"}'>
+<div class="container" ng-controller="MenuCtrl" ng-init='config={content:"terms"}'>
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
@@ -12,9 +12,9 @@
                 </div>
             </div>
             <div class="panel panel-default">
-                <div class="panel-heading">Cargar Menu</div>
+                <div class="panel-heading">Cargar Contenido</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" enctype="multipart/form-data" method="POST" action="{{ url('/food/menu') }}">
+                    <form class="form-horizontal" role="form" enctype="multipart/form-data" method="POST" action="{{ url('/food/content') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">

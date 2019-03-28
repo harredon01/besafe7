@@ -137,6 +137,7 @@ echo json_encode([
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li><a href="{{ url('food/menu')}}">Menu</a></li>
+                                    <li><a href="{{ url('food/content')}}">Content</a></li>
                                     <li><a href="{{ url('food/zones')}}">Zonas</a></li>
                                     <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
                                     <li><a href="{{ url('food/routes')}}">Rutas</a></li>

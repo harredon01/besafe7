@@ -325,7 +325,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'DELETE',
-                        url: '/api/food/zone/'+item.id
+                        url: '/api/food/zones/'+item.id
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -340,7 +340,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'DELETE',
-                        url: '/api/food/menu/'+item.id
+                        url: '/api/food/content/'+item.id
                     })
                             .success(function (data) {
                                 def.resolve(data);

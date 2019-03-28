@@ -14,7 +14,12 @@
 Route::get('/', function () {
     return view('lonchis');
 });
-
+Route::get('/terms', function () {
+    return view('content.terms');
+});
+Route::get('/icons', function () {
+    return view('content.icons');
+});
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
@@ -88,7 +93,9 @@ Route::get('food/largest_addresses', 'FoodController@getLargestAddresses');
 Route::get('food/menu', 'FoodImportController@getMenu');
 Route::get('food/zones', 'FoodImportController@getZones');
 Route::get('food/messages', 'FoodImportController@getMessages');
+Route::get('food/content', 'FoodImportController@getContent');
 Route::post('food/menu', 'FoodImportController@postMenu');
+Route::post('food/content', 'FoodImportController@postContent');
 Route::post('food/zones', 'FoodImportController@postZones');
 Route::post('food/messages', 'FoodImportController@postMessages');
 

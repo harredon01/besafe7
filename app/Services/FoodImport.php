@@ -26,8 +26,8 @@ class FoodImport {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
-    
-    public function importProducts(){
+
+    public function importProducts() {
         $excel = Excel::load(storage_path('imports') . '/productsfood.xlsx');
         $reader = $excel->toArray();
         foreach ($reader as $row) {
@@ -125,14 +125,15 @@ class FoodImport {
             "postre" => $postres
         ];
         $saveDate = "";
-        if(gettype($activeRow['fecha'])=="string"){
+        if (gettype($activeRow['fecha']) == "string") {
             $date = explode("/", $activeRow['fecha']);
-            $saveDate = $date[2]."-".$date[1]."-".$date[0];
+            $saveDate = $date[2] . "-" . $date[1] . "-" . $date[0];
         } else {
             $saveDate = $activeRow['fecha'];
         }
         //dd($date);
         $article = Article::create([
+                    "type" => "lunch",
                     "name" => $activeRow['almuerzo'],
                     "description" => "Almuerzo " . $activeRow['almuerzo'],
                     "start_date" => $saveDate,
@@ -214,6 +215,20 @@ class FoodImport {
             } else {
                 break;
             }
+        }
+    }
+
+    public function importContent($path) {
+        $excel = Excel::load($path);
+        $reader = $excel->toArray();
+        foreach ($reader as $sheet) {
+            unset($sheet['']);
+            $article = Article::create([
+                        "type" => $sheet['type'],
+                        "name" => $sheet['name'],
+                        "description" => $sheet['description'],
+                        "body" => $sheet['body']
+            ]);
         }
     }
 

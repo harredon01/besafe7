@@ -82,7 +82,7 @@ class FoodApiController extends Controller {
             $date = date_create();
             date_add($date, date_interval_create_from_date_string("1 days"));
             $tomorrow = date_format($date, "Y-m-d");
-            $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery","<",$tomorrow." 23:59:59")->where("delivery",">",$tomorrow." 00:00:00")->get();
+            $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
             $this->food->getPurchaseOrder($deliveries);
             return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
         }
@@ -306,6 +306,63 @@ class FoodApiController extends Controller {
                         "page" => $result->currentPage(),
                         "last_page" => $result->lastPage(),
             ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
+    }
+
+    public function deleteContentItem(Request $request, $item) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            if ($request) {
+                Article::where("id", $item)->delete();
+                return response()->json([
+                            'status' => "success",
+                            "message" => "item deleted",
+                ]);
+            }
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
+    }
+    
+    public function deleteMessageItem(Request $request, $item) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            if ($request) {
+                Translation::where("id", $item)->delete();
+                return response()->json([
+                            'status' => "success",
+                            "message" => "item deleted",
+                ]);
+            }
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
+    }
+    
+    public function deleteZoneItem(Request $request, $item) {
+        $user = $request->user();
+        //$request2 = $this->cleanSearch->handleOrder($user, $request);
+        $checkResult = $this->food->checkUser($user);
+        if ($checkResult) {
+            if ($request) {
+                Translation::where("id", $item)->delete();
+                return response()->json([
+                            'status' => "success",
+                            "message" => "item deleted",
+                ]);
+            }
         }
         return response()->json([
                     'status' => "error",

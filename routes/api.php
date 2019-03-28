@@ -175,6 +175,9 @@ Route::get('admin/store/categories', 'ProductImportApiController@getCategories')
 Route::get('food/menu', 'FoodApiController@getMenu');
 Route::get('food/zones', 'FoodApiController@getZones');
 Route::get('food/messages', 'FoodApiController@getMessages');
+Route::delete('food/content/{item?}', 'FoodApiController@deleteContentItem');
+Route::delete('food/zones/{item?}', 'FoodApiController@deleteZoneItem');
+Route::delete('food/messages/{item?}', 'FoodApiController@deleteMessageItem');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
 Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
