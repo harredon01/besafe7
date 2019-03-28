@@ -620,6 +620,7 @@ class EditOrder {
                     $attributes['polygon'] = $polygon->id;
                     $attributes['origin'] = $polygon->address_id;
                     $order->attributes = json_encode($attributes);
+                    $order->merchant_id = $data['merchant_id'];
                     $order->save();
                     OrderAddress::insert($orderAddresses);
                     return array("status" => "success", "message" => "Address added to order", "order" => $order);

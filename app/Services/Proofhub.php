@@ -9,7 +9,14 @@ class Proofhub {
     const TYPE_COST = 'retail';
     const START_DATE = '2019-03-01';
     const END_DATE = '2019-04-01';
-    const IS_ADMIN = false;
+    const PRODUCCION = 'Produccion';
+    const CUENTAS = 'Cuentas';
+    const CANADA = 'Canada';
+    const INTERNO = 'Interno';
+    const IS_ADMIN = true;
+    const DIAS_HABILES = 19;
+    const MIN_HORAS_DIARIAS = 7;
+    const COSTO_HORA_PROMEDIO = 54887;
 
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
@@ -227,19 +234,13 @@ class Proofhub {
         })->store('xlsx');
     }
 
-    public function getSummary() {
-        $labels = $this->getLabels();
-        $people = $this->getPeople($labels);
-        $date1 = self::START_DATE;
-        $date2 = self::END_DATE;
-        $dateTimestamp1 = strtotime($date1);
-        $dateTimestamp2 = strtotime($date2);
-        $copy = $people;
+    public function getProjects($copy,$type) {
         $projects = [
             [
                 "name" => "TaxPayer Redesign and Dev",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1420446568",
                 "rows" => $copy,
@@ -247,13 +248,15 @@ class Proofhub {
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2727439403",
                 "rows" => $copy,
             ], [
-                "name" => "Klip",
+                "name" => "Klip(Accvent)",
                 "budget" => "15000000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2801511014",
                 "rows" => $copy,
@@ -261,6 +264,7 @@ class Proofhub {
                 "name" => "igastoresbc",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "2555537362",
                 "rows" => $copy,
@@ -268,6 +272,7 @@ class Proofhub {
                 "name" => "Cerromatoso",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2052138062",
                 "rows" => $copy,
@@ -275,6 +280,7 @@ class Proofhub {
                 "name" => "sheldon consulting",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1752852931",
                 "rows" => $copy,
@@ -282,6 +288,7 @@ class Proofhub {
                 "name" => "Afydi",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1767982047",
                 "rows" => $copy,
@@ -289,6 +296,7 @@ class Proofhub {
                 "name" => "Misi",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1793993272",
                 "rows" => $copy,
@@ -296,6 +304,7 @@ class Proofhub {
                 "name" => "Icapital",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1479511181",
                 "rows" => $copy,
@@ -303,6 +312,7 @@ class Proofhub {
                 "name" => "Teck",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1483921014",
                 "rows" => $copy,
@@ -310,6 +320,7 @@ class Proofhub {
                 "name" => "Prasino",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2382102056",
                 "rows" => $copy,
@@ -317,6 +328,7 @@ class Proofhub {
                 "name" => "Blulogistics",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2267161477",
                 "rows" => $copy,
@@ -324,6 +336,7 @@ class Proofhub {
                 "name" => "Volo",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1849937081",
                 "rows" => $copy,
@@ -331,6 +344,7 @@ class Proofhub {
                 "name" => "Universidad Rosario",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1846653453",
                 "rows" => $copy,
@@ -338,6 +352,7 @@ class Proofhub {
                 "name" => "Kava",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1833844586",
                 "rows" => $copy,
@@ -345,15 +360,17 @@ class Proofhub {
                 "name" => "Seguros Mundial",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
-                "code" => "1753816309",
+                "code" => "1768117734",
                 "rows" => $copy,
             ], [
                 "name" => "CVU",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
-                "code" => "1768117734",
+                "code" => "1753816309",
                 "rows" => $copy,
             ],
             [
@@ -361,12 +378,14 @@ class Proofhub {
                 "budget" => "0",
                 "country" => "COL",
                 "price" => "Retail",
+                "type" => self::PRODUCCION,
                 "code" => "2312725220",
                 "rows" => $copy,
             ], [
                 "name" => "BVC",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1891932252",
                 "rows" => $copy,
@@ -374,6 +393,7 @@ class Proofhub {
                 "name" => "Auvenir",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "2502782201",
                 "rows" => $copy,
@@ -381,6 +401,7 @@ class Proofhub {
                 "name" => "Archies",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1714087114",
                 "rows" => $copy,
@@ -389,6 +410,7 @@ class Proofhub {
                 "name" => "Primus",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2400881156",
                 "rows" => $copy,
@@ -397,6 +419,7 @@ class Proofhub {
                 "name" => "Daportare",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2489878353",
                 "rows" => $copy,
@@ -405,6 +428,7 @@ class Proofhub {
                 "name" => "Next Conn-Infrastructure",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2581819961",
                 "rows" => $copy,
@@ -413,6 +437,7 @@ class Proofhub {
                 "name" => "Xtech",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2349279336",
                 "rows" => $copy,
@@ -421,6 +446,7 @@ class Proofhub {
                 "name" => "NOVEDADES GUILLERS",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1871891261",
                 "rows" => $copy,
@@ -429,6 +455,7 @@ class Proofhub {
                 "name" => "Magic Flavors",
                 "budget" => "30000000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2541330918",
                 "rows" => $copy,
@@ -437,6 +464,7 @@ class Proofhub {
                 "name" => "Cano",
                 "budget" => "5000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2234243776",
                 "rows" => $copy,
@@ -445,6 +473,7 @@ class Proofhub {
                 "name" => "CBC",
                 "budget" => "2400000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1714114251",
                 "rows" => $copy,
@@ -453,6 +482,7 @@ class Proofhub {
                 "name" => "Ezpot",
                 "budget" => "5000000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1498154595",
                 "rows" => $copy,
@@ -461,14 +491,16 @@ class Proofhub {
                 "name" => "Juan Valdez",
                 "budget" => "5500000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1753802741",
                 "rows" => $copy,
             ],
             [
-                "name" => "Celsia",
+                "name" => "Support Celsia",
                 "budget" => "2500000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2349062236",
                 "rows" => $copy,
@@ -477,6 +509,7 @@ class Proofhub {
                 "name" => "Celsia epsa",
                 "budget" => "2500000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1934931508",
                 "rows" => $copy,
@@ -485,6 +518,7 @@ class Proofhub {
                 "name" => "Papa Johns",
                 "budget" => "2400000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1753924859",
                 "rows" => $copy,
@@ -493,6 +527,7 @@ class Proofhub {
                 "name" => "Super de alimentos",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1422726112",
                 "rows" => $copy,
@@ -501,6 +536,7 @@ class Proofhub {
                 "name" => "Dilucca",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1421925558",
                 "rows" => $copy,
@@ -509,6 +545,7 @@ class Proofhub {
                 "name" => "BYC en casa",
                 "budget" => "500000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1739080686",
                 "rows" => $copy,
@@ -517,6 +554,7 @@ class Proofhub {
                 "name" => "Fonnegra",
                 "budget" => "1200000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1767995616",
                 "rows" => $copy,
@@ -524,6 +562,7 @@ class Proofhub {
                 "name" => "Internal Management",
                 "budget" => "1200000",
                 "country" => "COL",
+                "type" => self::INTERNO,
                 "price" => "Retail",
                 "code" => "1753870584",
                 "rows" => $copy,
@@ -531,6 +570,7 @@ class Proofhub {
                 "name" => "Internal Management 2019",
                 "budget" => "1200000",
                 "country" => "COL",
+                "type" => self::INTERNO,
                 "price" => "Retail",
                 "code" => "2711279064",
                 "rows" => $copy,
@@ -538,6 +578,7 @@ class Proofhub {
                 "name" => "El techo",
                 "budget" => "50000",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1889991926",
                 "rows" => $copy,
@@ -546,6 +587,7 @@ class Proofhub {
                 "name" => "Niños en movimiento",
                 "budget" => "1200000",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2727778621",
                 "rows" => $copy,
@@ -554,6 +596,7 @@ class Proofhub {
                 "name" => "Chambar",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1481790725",
                 "rows" => $copy,
@@ -562,6 +605,7 @@ class Proofhub {
                 "name" => "DSRF",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1409523753",
                 "rows" => $copy,
@@ -570,6 +614,7 @@ class Proofhub {
                 "name" => "Sales Proposals",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::INTERNO,
                 "price" => "Retail",
                 "code" => "2727195166",
                 "rows" => $copy,
@@ -578,6 +623,7 @@ class Proofhub {
                 "name" => "Vilaseca",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1779963222",
                 "rows" => $copy,
@@ -586,6 +632,7 @@ class Proofhub {
                 "name" => "Dial",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1637613840",
                 "rows" => $copy,
@@ -594,6 +641,7 @@ class Proofhub {
                 "name" => "Agency",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::INTERNO,
                 "price" => "Retail",
                 "code" => "1694100398",
                 "rows" => $copy,
@@ -602,6 +650,7 @@ class Proofhub {
                 "name" => "Support Daportare",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2065259008",
                 "rows" => $copy,
@@ -610,6 +659,7 @@ class Proofhub {
                 "name" => "Marketing Xpr",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::INTERNO,
                 "price" => "Retail",
                 "code" => "2646379904",
                 "rows" => $copy,
@@ -618,11 +668,32 @@ class Proofhub {
                 "name" => "Balance ecuador",
                 "budget" => "0",
                 "country" => "COL",
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2547043347",
                 "rows" => $copy,
             ]
         ];
+        if($type){
+            $finalResult = [];
+            foreach ($projects as $item) {
+                if($item["type"]==$type){
+                    array_push($finalResult, $item);
+                }
+            }
+            return $finalResult;
+            
+        } else {
+            return $projects;
+        }
+        
+    }
+
+    public function getSummary($labels,$people,$projects,$full,$ignoreDate,$name) {
+        $date1 = self::START_DATE;
+        $date2 = self::END_DATE;
+        $dateTimestamp1 = strtotime($date1);
+        $dateTimestamp2 = strtotime($date2);
         $results = [];
         $summary = [];
         $summary["rows"] = [];
@@ -645,15 +716,20 @@ class Proofhub {
                     }
                 }
             }
+            $estimatedMissingBudget = $totalMissingHours*self::COSTO_HORA_PROMEDIO;
             $totalPendingMilestones = 0;
             $projectMilestones = [];
             $totalCompletedMilestones = 0;
             $totalMissingBudget = 0;
+            $totalPaidBudget = 0;
             $events = $this->getProjectEvents($project);
             foreach ($events as $event) {
                 if ($event["milestone"]) {
                     if ($event["completed"]) {
                         $totalCompletedMilestones++;
+                        if ($event["description"]) {
+                            $totalPaidBudget += intval($event["description"]);
+                        }
                     } else {
                         $projectMilestone = [
                             "Title" => $event["title"],
@@ -663,10 +739,9 @@ class Proofhub {
                         ];
                         array_push($projectMilestones, $projectMilestone);
                         $totalPendingMilestones++;
-                        if($event["description"]){
+                        if ($event["description"]) {
                             $totalMissingBudget += intval($event["description"]);
                         }
-                        
                     }
                 }
             }
@@ -674,7 +749,7 @@ class Proofhub {
             foreach ($timeEntries as $timeEntry) {
                 $foundCreator = false;
                 $timeEntryTimestamp = strtotime($timeEntry["date"]);
-                if ($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) {
+                if (($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2)||$ignoreDate) {
                     $task = $this->getTimeEntryTask($timeEntry, $tasks);
                     foreach ($projectPeople as &$person) {
                         if ($timeEntry["creator"]["id"] == $person["id"]) {
@@ -793,26 +868,29 @@ class Proofhub {
             $project['personlabels'] = $projectPersonLabels;
             $project['labels'] = $projectLabels;
             if (count($projectPersonLabels) > 0) {
-                $project["rows"] = array_merge($project['people'], $title, $project['labels'], $title2, $projectPersonLabels,$title3,$projectMilestones);
+                $project["rows"] = array_merge($project['people'], $title, $project['labels'], $title2, $projectPersonLabels, $title3, $projectMilestones);
             } else {
                 $project["rows"] = $project['people'];
             }
 
             $projectResults = $this->calculateTotalsProject($projectPeople);
             $projectData = [
-                "Name" => $project["name"],
-                "Budget" => $project["budget"],
-                "Hours" => $projectResults["Hours"],
-                "Consumed" => $projectResults["Consumed"],
+                "Nombre" => $project["name"],
+                "Presupuesto mensual" => $project["budget"],
+                "Horas" => $projectResults["Hours"],
+                "Presupuesto consumido" => $projectResults["Consumed"],
+                "Facturado" => "",
                 /* "billable" => $projectResults["billable"],
                   "billable_cost" => $projectResults["billable_cost"],
                   "non_billable_cost" => $projectResults["non_billable_cost"],
                   "non_billable" => $projectResults["non_billable"], */
-                "Total Pending tasks" => $totalPendingTasks,
-                "Estimated remaining hours" => $totalMissingHours,
-                "Total Pending Milestones" => $totalPendingMilestones,
-                "Estimated remaining budget" => $totalMissingBudget,
-                "Total Completed Milestones" => $totalCompletedMilestones,
+                "Tareas Abiertas" => $totalPendingTasks,
+                "Tiempo p terminacion" => $totalMissingHours,
+                "Presupuesto estimado faltante" => $estimatedMissingBudget,
+                "Milestones Abiertos" => $totalPendingMilestones,
+                "Presupuesto por recoger" => $totalMissingBudget,
+                "Milestones Cerrados" => $totalCompletedMilestones,
+                "Presupuesto Recogido" => $totalPaidBudget,
             ];
             $totalHours += $projectResults["Hours"];
             $totalCost += $projectResults["Consumed"];
@@ -826,13 +904,36 @@ class Proofhub {
         $summary["Consumed"] = $totalCost;
         //dd($results);
         $daProjects = $results;
-        $this->calculateTotalsPeople($daProjects, $people);
-        $this->calculateTotalsLabels($daProjects, $labels);
-        foreach ($results as $project) {
-            
+        if ($full) {
+            $this->calculateTotalsPeople($daProjects, $people);
+            $this->calculateTotalsLabels($daProjects, $labels);
         }
+
         array_unshift($results, $summary);
-        $this->writeFile($results, 'TotalHealthChecks_' . time());
+        $this->writeFile($results, $name);
+    }
+    
+    public function getReport() {
+        $labels = $this->getLabels();
+        $people = $this->getPeople($labels);
+        $copy = $people;
+        $projects = $this->getProjects($copy,null);
+        $full = true;
+        $name = 'Total_mes_' . time();
+        $ignoreDate = true;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
+        sleep(10);
+        $projects = $this->getProjects($copy,self::CUENTAS);
+        $full = false;
+        $name = 'Total_cuentas_mes_' . time();
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
+        sleep(10);
+        $projects = $this->getProjects($copy,self::PRODUCCION);
+        $full = false;
+        $name = 'Total_produccion_mes_' . time();
+        $ignoreDate = true;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
     }
 
     private function calculateTotalsPeople($results, $people) {
@@ -855,8 +956,8 @@ class Proofhub {
                                         $personLabel["hours"] += $personProjectLabel["hours"];
                                         if (self::IS_ADMIN) {
                                             $personLabel["cost"] += $personProjectLabel["cost"];
+                                            
                                         }
-                                        
                                     }
                                 }
                                 if (!$pplfound) {
@@ -886,13 +987,16 @@ class Proofhub {
                 $resume = [];
                 $resume["name"] = $finalPerson["name"];
                 $resume["hours"] = $finalPerson["hours"];
+                $resume["esperado"] = (self::DIAS_HABILES*self::MIN_HORAS_DIARIAS*$finalPerson["esperado"])/100;
                 array_push($finalResults["rows"], $resume);
                 $resultsPerson = [];
                 $resultsPerson["name"] = $finalPerson["name"];
                 foreach ($finalPerson['projects'] as $key => $value1) {
                     unset($finalPerson['projects'][$key]["cost"]);
                     unset($finalPerson['projects'][$key]["retail"]);
-                    unset($finalPerson['projects'][$key]["total_cost"]);
+                    if (!self::IS_ADMIN) {
+                        unset($finalPerson['projects'][$key]["total_cost"]);
+                    }
                 }
 
                 foreach ($finalPerson['labels'] as $key => $value1) {
@@ -988,6 +1092,8 @@ class Proofhub {
                 "name" => $resultsPerson['first_name'] . " " . $resultsPerson['last_name'],
                 "id" => $resultsPerson['id'],
                 "hours" => 0,
+                "esperado" => 90,
+                "faltan" => 0,
                 //"billable" => 0,
                 // "non_billable" => 0,
                 "total_cost" => 0,
@@ -999,133 +1105,138 @@ class Proofhub {
             if ($resultsPerson['id'] == "1871117844") {
                 //andres
                 $saveperson['cost'] = 57691;
-                $saveperson['retail'] = 68181;
+                $saveperson['retail'] = 71927;
                 $saveperson['cost_us'] = 19.23;
                 $saveperson['retail_us'] = 22.73;
             } else if ($resultsPerson['id'] == "4232277661") {
                 //Deyvid
                 $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 31413;
+                $saveperson['retail'] = 33139;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "3749231432") {
                 //Fabian Horta
                 $saveperson['cost'] = 49916;
-                $saveperson['retail'] = 58992;
+                $saveperson['retail'] = 62233;
                 $saveperson['cost_us'] = 16.64;
                 $saveperson['retail_us'] = 19.66;
             } else if ($resultsPerson['id'] == "1856477202") {
                 //Fabian Vargas
                 $saveperson['cost'] = 41412;
-                $saveperson['retail'] = 48942;
+                $saveperson['retail'] = 51631;
                 $saveperson['cost_us'] = 13.80;
                 $saveperson['retail_us'] = 16.31;
             } else if ($resultsPerson['id'] == "2133970978") {
                 //Gobert Perdomo
                 $saveperson['cost'] = 30887;
-                $saveperson['retail'] = 36502;
+                $saveperson['retail'] = 38508;
                 $saveperson['cost_us'] = 10.30;
                 $saveperson['retail_us'] = 12.17;
             } else if ($resultsPerson['id'] == "1923370963") {
                 //Juan Arredondo
                 $saveperson['cost'] = 29411;
-                $saveperson['retail'] = 34758;
+                $saveperson['retail'] = 36668;
                 $saveperson['cost_us'] = 9.8;
                 $saveperson['retail_us'] = 11.6;
             } else if ($resultsPerson['id'] == "2936451878") {
                 //Manuel Correa
                 $saveperson['cost'] = 41940;
-                $saveperson['retail'] = 49565;
+                $saveperson['retail'] = 52288;
                 $saveperson['cost_us'] = 13.98;
                 $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1923533788") {
                 //Victor Gil
                 $saveperson['cost'] = 30756;
-                $saveperson['retail'] = 36348;
+                $saveperson['retail'] = 38345;
                 $saveperson['cost_us'] = 10.25;
                 $saveperson['retail_us'] = 12.12;
             } else if ($resultsPerson['id'] == "1849041546") {
                 //Hoovert
                 $saveperson['cost'] = 111154;
-                $saveperson['retail'] = 131363;
+                $saveperson['retail'] = 138581;
+                $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 37.05;
                 $saveperson['retail_us'] = 43.79;
             } else if ($resultsPerson['id'] == "2316429479") {
                 //Julian
                 $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 314413;
+                $saveperson['retail'] = 33139;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "1856450064") {
                 //Jucaro
                 $saveperson['cost'] = 51451;
-                $saveperson['retail'] = 60806;
+                $saveperson['retail'] = 64147;
                 $saveperson['cost_us'] = 17.15;
                 $saveperson['retail_us'] = 20.27;
             } else if ($resultsPerson['id'] == "4173918621") {
                 //Sabine
                 $saveperson['cost'] = 36600;
-                $saveperson['retail'] = 43254;
+                $saveperson['retail'] = 45631;
                 $saveperson['cost_us'] = 12.20;
                 $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4472620297") {
                 //Neiderson
                 $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 31413;
+                $saveperson['retail'] = 33139;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "3464709062") {
                 //Karina Rodriguez
                 $saveperson['cost'] = 41940;
-                $saveperson['retail'] = 49565;
+                $saveperson['retail'] = 52288;
                 $saveperson['cost_us'] = 13.98;
                 $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1856110846") {
                 //David Mendez
                 $saveperson['cost'] = 81418;
-                $saveperson['retail'] = 96221;
+                $saveperson['retail'] = 101508;
+                $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 27.14;
                 $saveperson['retail_us'] = 32.07;
             } else if ($resultsPerson['id'] == "2304516147") {
                 //Alejandra Archila
                 $saveperson['cost'] = 30726;
-                $saveperson['retail'] = 36313;
+                $saveperson['retail'] = 38308;
                 $saveperson['cost_us'] = 10.24;
                 $saveperson['retail_us'] = 12.10;
             } else if ($resultsPerson['id'] == "3216537278") {
                 //Laura Aires
                 $saveperson['cost'] = 36600;
-                $saveperson['retail'] = 43254;
+                $saveperson['retail'] = 45631;
                 $saveperson['cost_us'] = 12.20;
                 $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4194692322") {
                 //Paula Lozano
                 $saveperson['cost'] = 43258;
-                $saveperson['retail'] = 51123;
+                $saveperson['retail'] = 53932;
                 $saveperson['cost_us'] = 14.42;
+                $saveperson['esperado'] = 50;
                 $saveperson['retail_us'] = 17.04;
             } else if ($resultsPerson['id'] == "4151530242") {
                 //Juliana Acosta
                 $saveperson['cost'] = 43258;
-                $saveperson['retail'] = 51123;
+                $saveperson['retail'] = 53932;
+                $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 14.42;
                 $saveperson['retail_us'] = 17.04;
             } else if ($resultsPerson['id'] == "2791958639") {
                 //Oscar Gil
                 $saveperson['cost'] = 52770;
-                $saveperson['retail'] = 62364;
+                $saveperson['retail'] = 65791;
+                $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 17.59;
                 $saveperson['retail_us'] = 20.79;
             } else if ($resultsPerson['id'] == "2213225838") {
                 //Edinson Loaisa
                 $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 39685;
+                $saveperson['retail'] = 41866;
                 $saveperson['cost_us'] = 11.19;
                 $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "4155953643") {
                 //Maria luisa
                 $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 39685;
+                $saveperson['retail'] = 41866;
                 $saveperson['cost_us'] = 11.19;
                 $saveperson['retail_us'] = 13.23;
             } else {

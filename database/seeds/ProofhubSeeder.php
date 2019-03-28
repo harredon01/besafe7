@@ -38,7 +38,7 @@ class ProofhubSeeder extends Seeder {
     }
 
     public function run() {
-        $this->proofhub->getSummary();
+        $this->proofhub->getReport();
     }
 
     public function deleteOldData() {
