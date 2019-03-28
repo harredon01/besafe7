@@ -83,6 +83,7 @@ class EditUserData {
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['salt'] = str_random(40);
+        $data['emailNotifications'] = 1;
         $user = User::create($data);
         $http = new \GuzzleHttp\Client;
         $response = $http->post(env('APP_URL').'/oauth/token', [
