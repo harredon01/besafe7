@@ -219,6 +219,8 @@ Route::post('cities/from', 'LocationController@getCitiesFrom');
 
 Route::get('messages/user/{code?}', 'MessagesApiController@getMessagesUser');
 Route::get('messages/group/{code?}', 'MessagesApiController@getMessagesGroup');
+Route::get('messages/chat', 'MessagesApiController@getChat');
+Route::get('messages/received', 'MessagesApiController@getReceivedChats');
 Route::post('messages/send', 'MessagesApiController@postMessage');
 
 Route::get('ratings', 'RatingController@getRatingsObject');

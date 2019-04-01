@@ -93,8 +93,12 @@ class Proofhub {
         return $totalTasks;
     }
 
-    public function getProjectEvents($project) {
-        $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/events?view=milestones";
+    public function getProjectEvents($project, $ignoreDate) {
+        if ($ignoreDate) {
+            $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/events?view=milestones";
+        } else {
+            $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/events?view=milestones&startDate=" . self::START_DATE . "&endDate=" . self::END_DATE;
+        }
         $events = $this->sendGet($query);
         if (is_array($events)) {
             return $events;
@@ -146,7 +150,7 @@ class Proofhub {
           $project["billable_cost"] = $billableCost;
           $project["non_billable"] = $nonbillable;
           $project["non_billable_cost"] = $totalCost; */
-        $project["Hours"] = $totalHours;
+        $project["Hours"] = number_format((float) $totalHours, 2, ',', '');
         return $project;
     }
 
@@ -212,8 +216,6 @@ class Proofhub {
             // Call them separately
             $excel->setDescription('This report is clasified');
             foreach ($data as $page) {
-                echo $title . PHP_EOL;
-                echo $page["name"] . PHP_EOL;
                 foreach ($page["rows"] as $key => $value) {
                     if ($page["rows"][$key]) {
                         if (array_key_exists("labels", $page["rows"][$key])) {
@@ -234,7 +236,7 @@ class Proofhub {
         })->store('xlsx');
     }
 
-    public function getProjects($copy,$type) {
+    public function getProjects($copy, $type) {
         $projects = [
             [
                 "name" => "TaxPayer Redesign and Dev",
@@ -674,27 +676,26 @@ class Proofhub {
                 "rows" => $copy,
             ]
         ];
-        if($type){
+        if ($type) {
             $finalResult = [];
             foreach ($projects as $item) {
-                if($item["type"]==$type){
+                if ($item["type"] == $type) {
                     array_push($finalResult, $item);
                 }
             }
             return $finalResult;
-            
         } else {
             return $projects;
         }
-        
     }
 
-    public function getSummary($labels,$people,$projects,$full,$ignoreDate,$name) {
+    public function getSummary($labels, $people, $projects, $full, $ignoreDate, $name) {
         $date1 = self::START_DATE;
         $date2 = self::END_DATE;
-        $dateTimestamp1 = strtotime($date1);
+        $dateTimestamp1 = strtotime($date1) - 1000;
         $dateTimestamp2 = strtotime($date2);
         $results = [];
+        $globalPendingMilestones = [];
         $summary = [];
         $summary["rows"] = [];
         $totalHours = 0;
@@ -716,13 +717,13 @@ class Proofhub {
                     }
                 }
             }
-            $estimatedMissingBudget = $totalMissingHours*self::COSTO_HORA_PROMEDIO;
+            $estimatedMissingBudget = $totalMissingHours * self::COSTO_HORA_PROMEDIO;
             $totalPendingMilestones = 0;
             $projectMilestones = [];
             $totalCompletedMilestones = 0;
             $totalMissingBudget = 0;
             $totalPaidBudget = 0;
-            $events = $this->getProjectEvents($project);
+            $events = $this->getProjectEvents($project, $ignoreDate);
             foreach ($events as $event) {
                 if ($event["milestone"]) {
                     if ($event["completed"]) {
@@ -738,6 +739,21 @@ class Proofhub {
                             "End" => $event["end"]
                         ];
                         array_push($projectMilestones, $projectMilestone);
+                        $projectMilestone2 = [
+                            "Nombre" => $project["name"],
+                            "Presupuesto mensual" => $event["title"],
+                            "Horas" => $event["description"],
+                            "Presupuesto consumido" => $event["start"],
+                            "Facturado" => $event["end"],
+                            "Tareas Abiertas" => "",
+                            "Tiempo p terminacion" => "",
+                            "Presupuesto estimado faltante" => "",
+                            "Milestones Abiertos" => "",
+                            "Presupuesto por recoger" => "",
+                            "Milestones Cerrados" => "",
+                            "Presupuesto Recogido" => "",
+                        ];
+                        array_push($globalPendingMilestones, $projectMilestone2);
                         $totalPendingMilestones++;
                         if ($event["description"]) {
                             $totalMissingBudget += intval($event["description"]);
@@ -749,7 +765,7 @@ class Proofhub {
             foreach ($timeEntries as $timeEntry) {
                 $foundCreator = false;
                 $timeEntryTimestamp = strtotime($timeEntry["date"]);
-                if (($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2)||$ignoreDate) {
+                if (($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) || $ignoreDate) {
                     $task = $this->getTimeEntryTask($timeEntry, $tasks);
                     foreach ($projectPeople as &$person) {
                         if ($timeEntry["creator"]["id"] == $person["id"]) {
@@ -834,6 +850,8 @@ class Proofhub {
                         }
                         unset($value["id"]);
                         unset($value["person_id"]);
+                        $value["hours"] = number_format((float) $value["hours"], 2, ',', '');
+                        $value["cost"] = number_format((float) $value["cost"], 2, ',', '');
                         array_push($projectPersonLabels, $value);
                     }
                 }
@@ -842,9 +860,14 @@ class Proofhub {
             foreach ($projectLabels as $key => $projectLabel) {
                 if ($projectLabel["hours"] == 0) {
                     unset($projectLabels[$key]);
+                } else {
+                    unset($projectLabels[$key]["color"]);
+                    unset($projectLabels[$key]["id"]);
+
+                    $projectLabels[$key]["hours"] = number_format((float) $projectLabels[$key]["hours"], 2, ',', '');
+                    $projectLabels[$key]["cost"] = number_format((float) $projectLabels[$key]["cost"], 2, ',', '');
+                    //dd($projectLabels[$key]);
                 }
-                unset($projectLabels[$key]["color"]);
-                unset($projectLabels[$key]["id"]);
             }
             $project['people'] = $projectPeople;
             $title = array([
@@ -854,8 +877,8 @@ class Proofhub {
             ]);
             $title2 = array([
                     "name" => "label name",
-                    "hours" => "hours",
-                    "person_name" => "Person",
+                    "hours" => "Person",
+                    "person_name" => "hours",
                     "cost" => "Cost",
             ]);
             $title3 = array([
@@ -867,13 +890,22 @@ class Proofhub {
 
             $project['personlabels'] = $projectPersonLabels;
             $project['labels'] = $projectLabels;
+            foreach ($projectPeople as $key => $projectPersonInt) {
+                unset($projectPeople[$key]["cost"]);
+                unset($projectPeople[$key]["retail"]);
+                unset($projectPeople[$key]["id"]);
+                unset($projectPeople[$key]["esperado"]);
+                unset($projectPeople[$key]["faltan"]);
+                $projectPeople[$key]["hours"] = number_format((float) $projectPeople[$key]["hours"], 2, ',', '');
+                $projectPeople[$key]["total_cost"] = number_format((float) $projectPeople[$key]["total_cost"], 2, ',', '');
+            }
             if (count($projectPersonLabels) > 0) {
-                $project["rows"] = array_merge($project['people'], $title, $project['labels'], $title2, $projectPersonLabels, $title3, $projectMilestones);
+                $project["rows"] = array_merge($projectPeople, $title, $project['labels'], $title2, $projectPersonLabels, $title3, $projectMilestones);
             } else {
-                $project["rows"] = $project['people'];
+                $project["rows"] = $projectPeople;
             }
 
-            $projectResults = $this->calculateTotalsProject($projectPeople);
+            $projectResults = $this->calculateTotalsProject($project['people']);
             $projectData = [
                 "Nombre" => $project["name"],
                 "Presupuesto mensual" => $project["budget"],
@@ -899,6 +931,24 @@ class Proofhub {
                 array_push($summary["rows"], $projectData);
             }
         }
+        if (count($globalPendingMilestones) > 0) {
+            $title = array([
+                    "Nombre" => "Project",
+                    "Presupuesto mensual" => "Milestone",
+                    "Horas" => "Pago",
+                    "Presupuesto consumido" => "Start",
+                    "Facturado" => "End",
+                    "Tareas Abiertas" => "",
+                    "Tiempo p terminacion" => "",
+                    "Presupuesto estimado faltante" => "",
+                    "Milestones Abiertos" => "",
+                    "Presupuesto por recoger" => "",
+                    "Milestones Cerrados" => "",
+                    "Presupuesto Recogido" => "",
+            ]);
+            $summary["rows"] = array_merge($summary["rows"], $title, $globalPendingMilestones);
+        }
+        //dd($summary["rows"]);
         $summary["Hours"] = $totalHours;
         $summary["name"] = "Summary";
         $summary["Consumed"] = $totalCost;
@@ -912,28 +962,33 @@ class Proofhub {
         array_unshift($results, $summary);
         $this->writeFile($results, $name);
     }
-    
+
     public function getReport() {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
         $copy = $people;
-        $projects = $this->getProjects($copy,null);
+        $projects = $this->getProjects($copy, null);
         $full = true;
         $name = 'Total_mes_' . time();
-        $ignoreDate = true;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
         sleep(10);
-        $projects = $this->getProjects($copy,self::CUENTAS);
+        $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
         sleep(10);
-        $projects = $this->getProjects($copy,self::PRODUCCION);
+        $projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
-        $name = 'Total_produccion_mes_' . time();
+        $name = 'Total_produccion_' . time();
         $ignoreDate = true;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate,$name);
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        $projects = $this->getProjects($copy, self::INTERNO);
+        $full = false;
+        $name = 'Total_internos_' . time();
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
     }
 
     private function calculateTotalsPeople($results, $people) {
@@ -956,7 +1011,6 @@ class Proofhub {
                                         $personLabel["hours"] += $personProjectLabel["hours"];
                                         if (self::IS_ADMIN) {
                                             $personLabel["cost"] += $personProjectLabel["cost"];
-                                            
                                         }
                                     }
                                 }
@@ -978,7 +1032,6 @@ class Proofhub {
         $totalResults = [];
         $title = array([
                 "name" => "label name",
-                "person_name" => "Person",
                 "hours" => "hours",
                 "cost" => "cost"
         ]);
@@ -986,14 +1039,18 @@ class Proofhub {
             if ($finalPerson["hours"] > 0) {
                 $resume = [];
                 $resume["name"] = $finalPerson["name"];
-                $resume["hours"] = $finalPerson["hours"];
-                $resume["esperado"] = (self::DIAS_HABILES*self::MIN_HORAS_DIARIAS*$finalPerson["esperado"])/100;
+                $resume["hours"] = number_format((float) $finalPerson["hours"], 2, ',', '');
+                $resume["esperado"] = (self::DIAS_HABILES * self::MIN_HORAS_DIARIAS * $finalPerson["esperado"]) / 100;
                 array_push($finalResults["rows"], $resume);
                 $resultsPerson = [];
                 $resultsPerson["name"] = $finalPerson["name"];
                 foreach ($finalPerson['projects'] as $key => $value1) {
                     unset($finalPerson['projects'][$key]["cost"]);
                     unset($finalPerson['projects'][$key]["retail"]);
+                    unset($finalPerson['projects'][$key]["esperado"]);
+                    unset($finalPerson['projects'][$key]["faltan"]);
+                    $finalPerson['projects'][$key]["total_cost"] = number_format((float) $finalPerson['projects'][$key]["total_cost"], 2, ',', '');
+                    $finalPerson['projects'][$key]["hours"] = number_format((float) $finalPerson['projects'][$key]["hours"], 2, ',', '');
                     if (!self::IS_ADMIN) {
                         unset($finalPerson['projects'][$key]["total_cost"]);
                     }
@@ -1002,6 +1059,9 @@ class Proofhub {
                 foreach ($finalPerson['labels'] as $key => $value1) {
                     unset($finalPerson['labels'][$key]["id"]);
                     unset($finalPerson['labels'][$key]["person_id"]);
+                    unset($finalPerson['labels'][$key]["person_name"]);
+                    $finalPerson['labels'][$key]["cost"] = number_format((float) $finalPerson['labels'][$key]["cost"], 2, ',', '');
+                    $finalPerson['labels'][$key]["hours"] = number_format((float) $finalPerson['labels'][$key]["hours"], 2, ',', '');
                 }
                 $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
                 array_push($totalResults, $resultsPerson);
@@ -1044,7 +1104,6 @@ class Proofhub {
         $finalResults["rows"] = [];
         $totalResults = [];
         $title = array([
-                "name" => "label name",
                 "person_name" => "Person",
                 "hours" => "hours",
                 "cost" => "Cost"
@@ -1053,9 +1112,9 @@ class Proofhub {
             if ($finalLabel["hours"] > 0) {
                 $resume = [];
                 $resume["name"] = $finalLabel["name"];
-                $resume["hours"] = $finalLabel["hours"];
+                $resume["hours"] = number_format((float) $finalLabel["hours"], 2, ',', '');
                 if (self::IS_ADMIN) {
-                    $resume["cost"] = $finalLabel["cost"];
+                    $resume["cost"] = number_format((float) $finalLabel["cost"], 2, ',', '');
                 }
                 array_push($finalResults["rows"], $resume);
                 $resultsPerson = [];
@@ -1068,6 +1127,13 @@ class Proofhub {
                 foreach ($finalLabel['people'] as $key => $value1) {
                     unset($finalLabel['people'][$key]["id"]);
                     unset($finalLabel['people'][$key]["person_id"]);
+                    unset($finalLabel['people'][$key]["name"]);
+                    $finalLabel['people'][$key]["cost"] = number_format((float) $finalLabel['people'][$key]["cost"], 2, ',', '');
+                    $finalLabel['people'][$key]["hours"] = number_format((float) $finalLabel['people'][$key]["hours"], 2, ',', '');
+                }
+                foreach ($finalLabel['projects'] as $key => $value2) {
+                    $finalLabel['projects'][$key]["cost"] = number_format((float) $finalLabel['projects'][$key]["cost"], 2, ',', '');
+                    $finalLabel['projects'][$key]["hours"] = number_format((float) $finalLabel['projects'][$key]["hours"], 2, ',', '');
                 }
                 $resultsPerson["rows"] = array_merge($finalLabel['projects'], $title, $finalLabel['people']);
                 array_push($totalResults, $resultsPerson);

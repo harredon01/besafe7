@@ -113,6 +113,21 @@ class EditMessages {
     }
 
     /**
+     * Gets the messages between two users.
+     *
+     * @return Response
+     */
+    public function getReceivedChats(User $user) {
+//        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,(select * from messages where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ' 
+//                . self::MESSAGE_RECIPIENT_ID . ' = ?) sorted_list  group by m.' . self::MESSAGE_AUTHOR_ID . ' order by m.id desc ', [ $user->id]);
+//        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,m.id,m.created_at,m.message from messages m join users u on m.' . self::MESSAGE_AUTHOR_ID . '=u.id where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ' 
+//                . self::MESSAGE_RECIPIENT_ID . ' = ? group by m.' . self::MESSAGE_AUTHOR_ID . ' order by m.id desc ', [ $user->id]);
+        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,m.id,m.created_at,m.message from messages m join users u on m.' . self::MESSAGE_AUTHOR_ID . '=u.id where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ' 
+                . self::MESSAGE_RECIPIENT_ID . ' = ? order by m.id desc ', [ $user->id]);
+        return $messages;
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @return Response
@@ -225,7 +240,7 @@ class EditMessages {
             $followers = $user->getRecipientsMessage($data['to_id']);
             if (count($followers) > 0) {
                 
-            }else {
+            } else {
                 $followers = [];
                 $recipient = User::find($data['to_id']);
                 array_push($followers, $recipient);
@@ -271,7 +286,6 @@ class EditMessages {
      */
     public function validatorGetMessage(array $data) {
         return Validator::make($data, [
-                    'recipient_id' => 'required|max:255',
                     'type' => 'required|max:255',
         ]);
     }

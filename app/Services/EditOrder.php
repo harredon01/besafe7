@@ -118,9 +118,14 @@ class EditOrder {
         $order = Order::find($order_id);
         if ($order) {
             if ($user->id == $order->user_id) {
-                $order->is_recurring = $data["recurring"];
-                $order->recurring_type = $data["recurring_type"];
-                $order->recurring_value = $data["recurring_value"];
+                if ($data["recurring"]) {
+                    $order->recurring_type = $data["recurring_type"];
+                    $order->recurring_value = $data["recurring_value"];
+                } else {
+                    $order->recurring_type = null;
+                    $order->recurring_value = null;
+                }
+
 
                 $order->save();
                 $order->items;
@@ -219,7 +224,7 @@ class EditOrder {
     }
 
     public function getTransactionTotal($total) {
-        return ((($total * 3.49)/100) + 900);
+        return ((($total * 3.49) / 100) + 900);
     }
 
     public function removeTransactionCost(Order $order) {
@@ -518,7 +523,7 @@ class EditOrder {
                 } else {
                     $transactionCost = ($totalBuyingDeposit * $payertransactionCostNoDeposit);
                 }
-                
+
                 $order->total = $order->total + $transactionCost;
                 $order->tax = $order->tax + (0);
                 //$order->status = "payment_created";
@@ -620,7 +625,6 @@ class EditOrder {
                     $attributes['polygon'] = $polygon->id;
                     $attributes['origin'] = $polygon->address_id;
                     $order->attributes = json_encode($attributes);
-                    $order->merchant_id = $data['merchant_id'];
                     $order->save();
                     OrderAddress::insert($orderAddresses);
                     return array("status" => "success", "message" => "Address added to order", "order" => $order);
@@ -717,7 +721,7 @@ class EditOrder {
                         $gateway = new $className;
                         $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
                         $insertCondition = array(
-                            'name' => "Transporte ".$platform,
+                            'name' => "Transporte " . $platform,
                             'type' => "shipping",
                             'target' => 'subtotal',
                             'value' => $result['price'],
@@ -737,7 +741,7 @@ class EditOrder {
                         $order->total = $cart["total"];
                         $order->save();
                     }
-                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order,"cart"=>$cart);
+                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order, "cart" => $cart);
                 }
                 return array("status" => "error", "message" => "Order does not have an origin address");
             }
@@ -831,7 +835,7 @@ class EditOrder {
      *
      * @return Response
      */
-    public function OrderStatusUpdate(Payment $payment, Order $order) {
+    public function OrderStatusUpdate(Order $order) {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
         $sendEmail = true;
@@ -840,34 +844,33 @@ class EditOrder {
             $sendEmail = false;
         }
         foreach ($payments as $item) {
+            $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
                 Mail::to($user)->send(new OrderApproved($order, $user, $shipping));
             }
             array_push($followers, $user);
+            $payload = [
+                "order_id" => $order->id,
+                "payment_id" => $item->id,
+                "payment_total" => $item->total,
+                "payment_status" => $item->status,
+                "order_total" => $order->total,
+                "order_status" => $order->status
+            ];
+            $data = [
+                "trigger_id" => $order->id,
+                "message" => "",
+                "subject" => "",
+                "object" => self::OBJECT_ORDER,
+                "sign" => true,
+                "payload" => $payload,
+                "type" => self::ORDER_STATUS,
+                "user_status" => "normal"
+            ];
+            $date = date("Y-m-d H:i:s");
+            $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
         }
-
-
-        $payload = [
-            "order_id" => $order->id,
-            "payment_id" => $payment->id,
-            "payment_total" => $payment->total,
-            "payment_status" => $payment->status,
-            "order_total" => $order->total,
-            "order_status" => $order->status
-        ];
-        $data = [
-            "trigger_id" => $order->id,
-            "message" => "",
-            "subject" => "",
-            "object" => self::OBJECT_ORDER,
-            "sign" => true,
-            "payload" => $payload,
-            "type" => self::ORDER_STATUS,
-            "user_status" => "normal"
-        ];
-        $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
     }
 
     public function approvePayment(Payment $payment, $platform) {
@@ -884,7 +887,7 @@ class EditOrder {
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
                 $order->status = "approved";
-                $this->orderStatusUpdate($payment, $order);
+                $this->orderStatusUpdate($order);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
