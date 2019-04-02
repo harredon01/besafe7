@@ -74,7 +74,7 @@ class EditOrderFood {
             }
         }
 
-        $conditionF = new OrderCondition(array(
+        /*$conditionF = new OrderCondition(array(
             'name' => "Costo fijo transaccion",
             'target' => "subtotal",
             'type' => self::TRANSACTION_CONDITION,
@@ -107,7 +107,7 @@ class EditOrderFood {
         $order->orderConditions()->saveMany([$conditionF, $conditionV]);
         array_push($conditions, $conditionF);
         array_push($conditions, $conditionV);
-        Cart::session($user->id)->condition([$condition2F, $condition2V]);
+        Cart::session($user->id)->condition([$condition2F, $condition2V]);*/
         return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions, "order" => $order);
     }
 

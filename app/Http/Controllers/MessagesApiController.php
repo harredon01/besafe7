@@ -108,6 +108,16 @@ class MessagesApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editMessages->getReceivedChats($user));
     }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getSupportAgent(Request $request,$type,$object) {
+        return response()->json($this->editMessages->getSupportAgent($type,$object));
+    }
 
     /**
      * Handle a registration request for the application.

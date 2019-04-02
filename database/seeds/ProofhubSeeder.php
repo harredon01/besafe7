@@ -38,9 +38,37 @@ class ProofhubSeeder extends Seeder {
     }
 
     public function run() {
+        /*$user = User::find(43);
+        $user->merchants()->delete();
+        $user->addresses()->delete();
+        $user->push()->delete();
+        $user->locations()->delete();
+        //$user->orders()->detach();
+        foreach ($user->orders as $item) {
+            $item->user_id = 3;
+            $item->save();
+        }
+        foreach ($user->payments as $item) {
+            $item->user_id = 3;
+            $item->save();
+        }
+        foreach ($user->deliveries as $item) {
+            $item->user_id = 3;
+            $item->save();
+        }
+        foreach ($user->deliveries as $item) {
+            $item->user_id = 3;
+            $item->save();
+        }
+        OrderAddress::where("user_id",$user->id)->update(["user_id"=>3]);
+        App\Models\Transaction::where("user_id",$user->id)->update(["user_id"=>3]);
+        $user->notifications()->delete();
+        $user->items()->delete();
+        $user->sources()->delete();
+        $user->messages()->delete();
+        $user->delete();*/
         $this->proofhub->getReport();
     }
-
     public function deleteOldData() {
         $deliveries = Delivery::where("user_id", 1)->get();
         foreach ($deliveries as $item) {

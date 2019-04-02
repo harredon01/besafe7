@@ -8,7 +8,7 @@ class Proofhub {
 
     const TYPE_COST = 'retail';
     const START_DATE = '2019-03-01';
-    const END_DATE = '2019-04-01';
+    const END_DATE = '2119-04-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
@@ -253,6 +253,14 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2727439403",
+                "rows" => $copy,
+            ], [
+                "name" => "La nuit",
+                "budget" => "15000000",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2836708259",
                 "rows" => $copy,
             ], [
                 "name" => "Klip(Accvent)",

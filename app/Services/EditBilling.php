@@ -418,13 +418,13 @@ class EditBilling {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
                 $order = $payment->order()->with("items","orderConditions")->first();
-                if (Payment::where("order_id",$payment->order_id)->count() == 1) {
+                /*if (Payment::where("order_id",$payment->order_id)->count() == 1) {
                     $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
                     $order->total = $payment->total - $payment->transaction_cost;
                     $order->subtotal = $order->total - $order->shipping;
                     $order->save();
                     $this->changeOrderStatus($order->id);
-                }
+                }*/
                 $payment->total = $payment->total - $payment->transaction_cost;
                 $payment->transaction_cost = 0;
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
@@ -452,6 +452,7 @@ class EditBilling {
                     $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                     $payment->status = "pending";
                     $payment->save();
+                    /*
                     if (Payment::where("order_id",$payment->order_id)->count() == 1) {
                         $conditionV = new OrderCondition(array(
                             'name' => "Costo variable transaccion",
@@ -471,6 +472,7 @@ class EditBilling {
                         $order->total = $payment->total;
                         $order->save();
                     }
+                     * */
                     $payment->order = $order;
                     return array("status" => "success", "message" => "Payment Created", "payment" => $payment);
                 }

@@ -264,6 +264,19 @@ class EditMessages {
             }
         }
     }
+    
+    public function getSupportAgent($type,$object){
+        if($type == "platform"){
+            if($object == "food"){
+                $user = User::find(2);
+                $friend = [
+                    "id" => $user->id,
+                    "name" => $user->firstName." ".$user->lastName                    
+                ];
+                return $friend;
+            }
+        }
+    }
 
     /**
      * Get a validator for an incoming edit profile request.

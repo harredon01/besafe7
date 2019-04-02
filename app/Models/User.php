@@ -66,6 +66,9 @@ class User extends Authenticatable {
     public function addresses() {
         return $this->hasMany('App\Models\Address');
     }
+    public function payments() {
+        return $this->hasMany('App\Models\Payment');
+    }
     public function push() {
         return $this->hasMany('App\Models\Push');
     }

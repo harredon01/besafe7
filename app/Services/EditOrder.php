@@ -196,6 +196,8 @@ class EditOrder {
                     $payment->address_id = $address->id;
                     $payment->order_id = $order->id;
                     $payment->status = "pending";
+                    $payment->subtotal = round($buyerTotal);
+                    $payment->transaction_cost = round($transactionCost);
                     $payment->total = round($buyerTotal + $transactionCost);
                     $payment->tax = $buyerTax;
                     $payment->save();
@@ -243,7 +245,7 @@ class EditOrder {
             if ($order) {
                 if (array_key_exists("split_order", $info)) {
                     if ($info['split_order']) {
-                        $this->removeTransactionCost($order);
+                        //$this->removeTransactionCost($order);
                     }
                 } else {
 //                    $condition = $order->orderConditions()->where("name","Costo variable transaccion")->first();
@@ -321,11 +323,10 @@ class EditOrder {
                             $payment = new Payment;
                         }
                         if ($splitOrder) {
-                            $payment->total = round($buyerSubtotal + $transactionCost);
                             $records["split_order"] = $splitOrder;
-                        } else {
-                            $payment->total = round($buyerSubtotal + 0);
-                        }
+                        } 
+                        $payment->subtotal = round($buyerSubtotal);
+                        $payment->total = round($buyerSubtotal + $transactionCost);
                         $order->attributes = json_encode($records);
                         $payment->transaction_cost = $transactionCost;
                         $payment->user_id = $user->id;
