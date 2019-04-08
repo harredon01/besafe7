@@ -38,7 +38,7 @@ class ProofhubSeeder extends Seeder {
     }
 
     public function run() {
-        /*$user = User::find(43);
+        $user = User::find(59);
         $user->merchants()->delete();
         $user->addresses()->delete();
         $user->push()->delete();
@@ -66,8 +66,8 @@ class ProofhubSeeder extends Seeder {
         $user->items()->delete();
         $user->sources()->delete();
         $user->messages()->delete();
-        $user->delete();*/
-        $this->proofhub->getReport();
+        $user->delete();
+        //$this->proofhub->getReport();
     }
     public function deleteOldData() {
         $deliveries = Delivery::where("user_id", 1)->get();

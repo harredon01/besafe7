@@ -7,13 +7,13 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-03-01';
+    const START_DATE = '2019-04-01';
     const END_DATE = '2119-04-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = true;
+    const IS_ADMIN = false;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -246,7 +246,16 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1420446568",
                 "rows" => $copy,
-            ], [
+            ],
+            [
+                "name" => "Hoov Eccom Time",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::INTERNO,
+                "price" => "Retail",
+                "code" => "2237106775",
+                "rows" => $copy,
+            ],[
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -261,6 +270,14 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2836708259",
+                "rows" => $copy,
+            ], [
+                "name" => "La nuit ongoing",
+                "budget" => "3000000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2925895418",
                 "rows" => $copy,
             ], [
                 "name" => "Klip(Accvent)",
@@ -859,7 +876,9 @@ class Proofhub {
                         unset($value["id"]);
                         unset($value["person_id"]);
                         $value["hours"] = number_format((float) $value["hours"], 2, ',', '');
-                        $value["cost"] = number_format((float) $value["cost"], 2, ',', '');
+                        if (self::IS_ADMIN) {
+                            $value["cost"] = number_format((float) $value["cost"], 2, ',', '');
+                        }
                         array_push($projectPersonLabels, $value);
                     }
                 }
@@ -980,7 +999,7 @@ class Proofhub {
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        sleep(10);
+        /*sleep(10);
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
@@ -996,7 +1015,7 @@ class Proofhub {
         $full = false;
         $name = 'Total_internos_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);*/
     }
 
     private function calculateTotalsPeople($results, $people) {
@@ -1068,7 +1087,10 @@ class Proofhub {
                     unset($finalPerson['labels'][$key]["id"]);
                     unset($finalPerson['labels'][$key]["person_id"]);
                     unset($finalPerson['labels'][$key]["person_name"]);
-                    $finalPerson['labels'][$key]["cost"] = number_format((float) $finalPerson['labels'][$key]["cost"], 2, ',', '');
+                    if (self::IS_ADMIN) {
+                        $finalPerson['labels'][$key]["cost"] = number_format((float) $finalPerson['labels'][$key]["cost"], 2, ',', '');
+                    }
+                    
                     $finalPerson['labels'][$key]["hours"] = number_format((float) $finalPerson['labels'][$key]["hours"], 2, ',', '');
                 }
                 $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
@@ -1136,11 +1158,16 @@ class Proofhub {
                     unset($finalLabel['people'][$key]["id"]);
                     unset($finalLabel['people'][$key]["person_id"]);
                     unset($finalLabel['people'][$key]["name"]);
-                    $finalLabel['people'][$key]["cost"] = number_format((float) $finalLabel['people'][$key]["cost"], 2, ',', '');
+                    if (self::IS_ADMIN) {
+                        $finalLabel['people'][$key]["cost"] = number_format((float) $finalLabel['people'][$key]["cost"], 2, ',', '');
+                    }
+                    
                     $finalLabel['people'][$key]["hours"] = number_format((float) $finalLabel['people'][$key]["hours"], 2, ',', '');
                 }
                 foreach ($finalLabel['projects'] as $key => $value2) {
-                    $finalLabel['projects'][$key]["cost"] = number_format((float) $finalLabel['projects'][$key]["cost"], 2, ',', '');
+                    if (self::IS_ADMIN) {
+                        $finalLabel['projects'][$key]["cost"] = number_format((float) $finalLabel['projects'][$key]["cost"], 2, ',', '');
+                    }
                     $finalLabel['projects'][$key]["hours"] = number_format((float) $finalLabel['projects'][$key]["hours"], 2, ',', '');
                 }
                 $resultsPerson["rows"] = array_merge($finalLabel['projects'], $title, $finalLabel['people']);

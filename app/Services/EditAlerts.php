@@ -125,9 +125,10 @@ class EditAlerts {
         $pos = strpos($data['subject'], '{orderStatus}');
         if ($pos) {
             $data['subject'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject']);
-            $data['subject_es'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject_es']);
             $data['body'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['body']);
-            $data['body_es'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['body_es']);
+            $orderStatus = $this->translateStatus($arrayPayload['order_status'],"a");
+            $data['subject_es'] = str_replace("{orderStatus}", $orderStatus, $data['subject_es']);
+            $data['body_es'] = str_replace("{orderStatus}", $orderStatus, $data['body_es']);
         }
         $pos = strpos($data['subject'], '{payment}');
         if ($pos) {
@@ -139,9 +140,10 @@ class EditAlerts {
         $pos = strpos($data['subject'], '{paymentStatus}');
         if ($pos) {
             $data['subject'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject']);
-            $data['subject_es'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject_es']);
             $data['body'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['body']);
-            $data['body_es'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['body_es']);
+            $paymentStatus = $this->translateStatus($arrayPayload['payment_status'],"o");
+            $data['subject_es'] = str_replace("{paymentStatus}", $paymentStatus, $data['subject_es']);
+            $data['body_es'] = str_replace("{paymentStatus}", $paymentStatus, $data['body_es']);
         }
         $pos = strpos($data['subject'], '{paymentTotal}');
         if ($pos) {
@@ -165,6 +167,22 @@ class EditAlerts {
             $data['body_es'] = str_replace("{route}", $arrayPayload['route'], $data['body_es']);
         }
         return $data;
+    }
+    
+    public function translateStatus($status,$male){
+        if($status == "approved"){
+            return "aprobad".$male;
+        }
+        if($status == "pending"){
+            return "esperando aprobacion";
+        }
+        if($status == "denied"){
+            return "rechazad".$male;
+        }
+        if($status == "payment_in_bank"){
+            return "pago por consignación";
+        }
+        return $status;
     }
 
     public function sendMassMessage(array $data, array $recipients, $userSending, $push, $date, $sendEmail = true) {
@@ -532,6 +550,9 @@ class EditAlerts {
         //$result['notification'] = $notification;
 
         if (count($userPush) > 0) {
+            if ($platform == "food") {
+                $msg['subject']=$msg['subject_es'];
+            }
             $content = array(
                 "en" => $msg['subject'],
                 "es" => $msg['subject_es']
@@ -569,18 +590,7 @@ class EditAlerts {
             $response = curl_exec($ch);
             curl_close($ch);
             $result['push'] = $response;
-            $file = '/home/hoovert/access.log';
-            // Open the file to get existing content
-            $current = file_get_contents($file);
-            //$daarray = json_decode(json_encode($data));
-            // Append a new person to the file
-
-            $current .= json_encode($result);
-            $current .= PHP_EOL;
-            $current .= PHP_EOL;
-            $current .= PHP_EOL;
-            $current .= PHP_EOL;
-            file_put_contents($file, $current);
+            
         }
         if (count($userEmail) > 0) {
             $mail = Mail::to($userEmail)->send(new GeneralNotification($msg['subject_es'], $msg['body_es']));

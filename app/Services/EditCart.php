@@ -526,9 +526,15 @@ class EditCart {
      */
     public function updateCartItem(User $user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        $item = Item::where('id', intval($data['item_id']))
+        if($order_id){
+            $item = Item::where('id', intval($data['item_id']))
                         ->where('user_id', $user->id)
                         ->where('order_id', $order_id)->first();
+        } else {
+            $item = Item::where('id', intval($data['item_id']))
+                        ->where('user_id', $user->id)->first();
+        }
+        
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {

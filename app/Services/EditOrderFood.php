@@ -54,7 +54,7 @@ class EditOrderFood {
                     }
                     $discount = ($control2 * $buyers * self::UNIT_LOYALTY_DISCOUNT);
                     $condition = new OrderCondition(array(
-                        'name' => "Por cada 11 dias recibe un descuento de 11 mil pesos",
+                        'name' => "Por cada 11 días recibe un descuento de 11 mil pesos",
                         'target' => "subtotal",
                         'type' => self::PLATFORM_NAME,
                         'value' => "-" . $discount,

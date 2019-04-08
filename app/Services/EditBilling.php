@@ -425,6 +425,7 @@ class EditBilling {
                     $order->save();
                     $this->changeOrderStatus($order->id);
                 }*/
+                $this->changeOrderStatus($payment->order_id);
                 $payment->total = $payment->total - $payment->transaction_cost;
                 $payment->transaction_cost = 0;
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();

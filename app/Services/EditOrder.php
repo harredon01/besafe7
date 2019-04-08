@@ -723,7 +723,7 @@ class EditOrder {
                         $gateway = new $className;
                         $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
                         $insertCondition = array(
-                            'name' => "Transporte " . $platform,
+                            'name' => "Servicio de transporte",
                             'type' => "shipping",
                             'target' => 'subtotal',
                             'value' => $result['price'],

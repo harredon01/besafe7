@@ -94,6 +94,17 @@ class DeliveryController extends Controller
         return response()->json($this->editDelivery->postDeliveryOptions($user, $data));
 
     }
+    
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function postCancelDeliverySelection(Request $request,$delivery)
+    {
+        $user = $request->user();
+        return response()->json($this->editDelivery->cancelDeliverySelection($user, $delivery));
+    }
 
     /**
      * Store a newly created resource in storage.
