@@ -187,7 +187,7 @@ class EditOrderFood {
                     $this->createDeposit($order);
                 }
                 if ($data['type'] == "delivery") {
-                    $this->createDelivery($order, $item, $address->id);
+                    //$this->createDelivery($order, $item, $address->id);
                 }
             }
             if (array_key_exists("model", $data)) {
@@ -326,7 +326,7 @@ class EditOrderFood {
             if ($x == 0 && $hasDeposit) {
                 
             }
-            $delivery->delivery = $date;
+            $delivery->delivery = date_format($date, "Y-m-d")." 12:00:00";
             $delivery->details = json_encode($details);
             $delivery->save();
         }

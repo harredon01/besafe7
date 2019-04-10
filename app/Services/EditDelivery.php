@@ -65,8 +65,10 @@ class EditDelivery {
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
-        if ($delivery->status == "suspended") {
-            return array("status" => "error", "message" => "Delivery suspended");
+        if ($delivery->status == "pending" || $delivery->status == "deposit") {
+            
+        } else {
+            return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
         $date = date_create();
         $now = date_format($date, "Y-m-d H:i:s");
