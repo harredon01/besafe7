@@ -933,6 +933,9 @@ class EditOrder {
                 $order = $this->getOrder($user);
                 $theConditionApplied = $order->orderConditions()->where('condition_id', $theCondition->id)->first();
                 if ($theConditionApplied) {
+                    $theCondition2 = Condition::where('id', $theConditionApplied->condition_id)->first();
+                    $theCondition2->used = $theCondition2->used+1;
+                    $theCondition2->save();
                     //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
                 }
                 Cart::session($user->id)->removeConditionsByType("coupon");
@@ -951,6 +954,7 @@ class EditOrder {
                 $insertCondition['order_id'] = $order->id;
                 $insertCondition['condition_id'] = $theCondition->id;
                 OrderCondition::insert($insertCondition);
+
 
 
                 return array("status" => "success", "message" => "Cart condition set on the cart", "cart" => $this->editCart->getCheckoutCart($user));

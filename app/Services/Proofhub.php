@@ -13,7 +13,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -238,15 +238,15 @@ class Proofhub {
 
     public function getProjects($copy, $type) {
         $projects = [
-            [
-                "name" => "TaxPayer Redesign and Dev",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "1420446568",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "TaxPayer Redesign and Dev",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "1420446568",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Hoov Eccom Time",
                 "budget" => "0",
@@ -999,10 +999,16 @@ class Proofhub {
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        /*sleep(10);
+        sleep(10);
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        sleep(10);
+        $projects = $this->getProjects($copy, self::CANADA);
+        $full = false;
+        $name = 'Total_canada_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
         sleep(10);
@@ -1015,7 +1021,7 @@ class Proofhub {
         $full = false;
         $name = 'Total_internos_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);*/
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
     }
 
     private function calculateTotalsPeople($results, $people) {

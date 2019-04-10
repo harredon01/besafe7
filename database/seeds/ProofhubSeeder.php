@@ -38,7 +38,7 @@ class ProofhubSeeder extends Seeder {
     }
 
     public function run() {
-        $user = User::find(59);
+        $user = User::find(56);
         $user->merchants()->delete();
         $user->addresses()->delete();
         $user->push()->delete();

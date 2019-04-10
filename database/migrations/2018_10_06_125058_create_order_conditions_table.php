@@ -20,6 +20,7 @@ class CreateOrderConditionsTable extends Migration {
             $table->string('value');
             $table->string('coupon')->nullable();
             $table->double('total');
+            $table->integer('condition_id')->unsigned()->nullable();
             $table->integer('order_id')->unsigned()->nullable();
             $table->foreign('order_id')->references('id')
                     ->on('orders');

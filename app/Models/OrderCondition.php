@@ -17,12 +17,9 @@ class OrderCondition extends Model
      *
      * @var array
      */
-    protected $fillable = ['name','status', 'type', 'target', 'value', 'attributes','coupon','order','order_id','isReusable','used','total'];
+    protected $fillable = ['name','status', 'type', 'target', 'value', 'attributes','coupon','order','order_id','condition_id','isReusable','used','total'];
 
     public function order() {
         return $this->belongsTo('App\Models\Order');
-    }
-    public function condition() {
-        return $this->belongsTo('App\Models\Condition');
     }
 }

@@ -216,15 +216,12 @@ class EditAlerts {
                         }
                     }
                     $data['user_id'] = $user->id;
-                    $subjectEs = $data['subject_es'];
                     $body = $data['body'];
                     $bodyEs = $data['body_es'];
-                    unset($data['subject_es']);
                     unset($data['body']);
                     unset($data['body_es']);
                     $notification = new Notification($data);
                     $notification->save();
-                    $data['subject_es'] = $subjectEs;
                     $data['body'] = $body;
                     $data['body_es'] = $bodyEs;
                     $arrayContent[] = $data;
