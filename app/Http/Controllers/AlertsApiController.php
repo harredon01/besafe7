@@ -90,6 +90,15 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editAlerts->countNotificationsUnread($user));
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function readAllNotifications(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editAlerts->readAllNotifications($user));
+    }
 
     public function getNotifications(Request $request) {
         $user = $request->user();

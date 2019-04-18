@@ -231,14 +231,16 @@ class Rapigo {
                 $coverage = json_decode($route->coverage, true);
                 $location = $coverage["location"];
                 $status = $this->checkStatus($route->provider_id);
-                if (array_key_exists("detalle", $status) ) {
-                    $location["runner"] = $status["detalle"]["mensajero_asignado"];
-                    $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
-                    $location["lat"] = $status["detalle"]["latitud"];
-                    $location["long"] = $status["detalle"]["longitud"];
-                    $coverage["location"] = $location;
-                    $route->coverage = json_encode($coverage);
-                    $route->save();
+                if ($status) {
+                    if (array_key_exists("detalle", $status)) {
+                        $location["runner"] = $status["detalle"]["mensajero_asignado"];
+                        $location["runner_phone"] = $status["detalle"]["mensajero_telefono"];
+                        $location["lat"] = $status["detalle"]["latitud"];
+                        $location["long"] = $status["detalle"]["longitud"];
+                        $coverage["location"] = $location;
+                        $route->coverage = json_encode($coverage);
+                        $route->save();
+                    }
                 }
             }
         }

@@ -96,6 +96,7 @@ Route::get('alerts', 'AlertsApiController@getNotifications');
 Route::delete('alerts/{code?}', 'AlertsApiController@deleteNotification');
 Route::get('alerts/count_unread', 'AlertsApiController@getCountNotificationsUnread');
 Route::post('alerts/read', 'AlertsApiController@openNotifications');
+Route::get('alerts/read_all', 'AlertsApiController@readAllNotifications');
 Route::post('alerts/setread', 'AlertsApiController@postMarkAsDownloaded');
 Route::get('alerts/request_ping/{code?}', 'AlertsApiController@getRequestPing');
 Route::post('alerts/reply_ping', 'AlertsApiController@postReplyPing');

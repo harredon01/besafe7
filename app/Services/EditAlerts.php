@@ -424,6 +424,20 @@ class EditAlerts {
         ];
         return $data;
     }
+    /**
+     * Gets the messages between two users.
+     *
+     * @return Response
+     */
+    public function readAllNotifications(User $user) {
+
+        $sql = "UPDATE notifications SET status='read' WHERE user_id = $user->id;";
+        $notifications = DB::statement($sql);
+        $data = [
+            "user" => $user
+        ];
+        return $data;
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -432,7 +446,7 @@ class EditAlerts {
      */
     public function countNotificationsUnread(User $user) {
         $count = Notification::where('user_id', $user->id)->where('status', "unread")->count();
-        return ['status' => 'success', "message" => "notification deleted", "total" => $count];
+        return ['status' => 'success', "message" => "notifications unread", "total" => $count];
     }
 
     public function postEmergency(User $user, array $data, $secret) {

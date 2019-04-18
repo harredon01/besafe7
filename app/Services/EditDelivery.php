@@ -65,7 +65,7 @@ class EditDelivery {
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
-        if ($delivery->status == "pending" || $delivery->status == "deposit") {
+        if ($delivery->status == "pending" || $delivery->status == "deposit" || $delivery->status == "enqueue") {
             
         } else {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
@@ -124,10 +124,21 @@ class EditDelivery {
                 $results = $this->checkDeliveryTime($delivery);
                 if ($results['status'] == 'success') {
                     $details = json_decode($delivery->details, true);
-                    unset($details['dish']);
+                    if(array_key_exists("deliver", $details)){
+                        if($details["deliver"]=="deposit"){
+                            $delivery->status = "deposit";
+                            $this->activateCreditDeposits($delivery);
+                        } else {
+                            $delivery->status = "pending";
+                            unset($details['dish']);
+                        }
+                    } else {
+                        $delivery->status = "pending";
+                        unset($details['dish']);
+                    }
                     $delivery->observation = "";
                     $delivery->details = json_encode($details);
-                    $delivery->status = "pending";
+                    
                     $delivery->save();
                     return array("status" => "success", "message" => "Delivery canceled");
                 } else {
@@ -145,12 +156,31 @@ class EditDelivery {
             $push->credits = $push->credits - 1;
             $push->save();
             if ($push->credits == 0) {
-                $deliveries = Delivery::where("user_id", $delivery->user_id)->where("status", "pending")->get();
+                $deliveries = Delivery::where("user_id", $deliveryDep->user_id)->where("status", "pending")->get();
                 foreach ($deliveries as $delivery) {
                     $details = json_decode($delivery->details, true);
                     if (array_key_exists("pickup", $details)) {
                         if ($details["pickup"] == "envase") {
                             $delivery->status = "suspended";
+                            $delivery->save();
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private function activateCreditDeposits(Delivery $deliveryDep) {
+        $push = Push::where("user_id", $deliveryDep->user_id)->where("platform", "food")->first();
+        if ($push) {
+            $push->credits = $push->credits + 1;
+            $push->save();
+            if ($push->credits > 0) {
+                $deliveries = Delivery::where("user_id", $deliveryDep->user_id)->where("status", "suspended")->get();
+                foreach ($deliveries as $delivery) {
+                    $details = json_decode($delivery->details, true);
+                    if (array_key_exists("pickup", $details)) {
+                        if ($details["pickup"] == "envase") {
+                            $delivery->status = "pending";
                             $delivery->save();
                         }
                     }

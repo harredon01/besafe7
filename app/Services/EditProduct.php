@@ -93,7 +93,7 @@ class EditProduct {
                                             ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
                                             ->where('merchant_product.merchant_id', $merchant_id)
                                             ->where('products.isActive', true)
-                                            ->select('products.*', 'merchants.name as merchant_name', 'merchants.description as merchant_description', 'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type')
+                                            ->select('products.*', 'merchants.name as merchant_name', 'merchants.description as merchant_description', 'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon')
                                             ->skip($skip)->take($take)->get();
                             $data['products_total'] = DB::table('products')
                                     ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
@@ -135,7 +135,7 @@ class EditProduct {
                                 ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
                                 ->where('merchant_product.merchant_id', $merchant_id)
                                 ->where('products.isActive', true)
-                                ->select('products.*', 'merchants.name as merchant_name', 'merchants.description as merchant_description', 'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type')
+                                ->select('products.*', 'merchants.name as merchant_name', 'merchants.description as merchant_description', 'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon')
                                 ->skip($skip)->take($take)->get();
                 $data['products_total'] = DB::table('products')
                         ->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
