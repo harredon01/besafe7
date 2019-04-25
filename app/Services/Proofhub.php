@@ -13,7 +13,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -255,7 +255,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2237106775",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -951,8 +951,14 @@ class Proofhub {
                 "Milestones Cerrados" => $totalCompletedMilestones,
                 "Presupuesto Recogido" => $totalPaidBudget,
             ];
-            $totalHours += $projectResults["Hours"];
-            $totalCost += $projectResults["Consumed"];
+            $projectResults["Hours"]=str_replace(",",".",$projectResults["Hours"]);
+            if (is_numeric($projectResults["Hours"])) {
+                $totalHours += $projectResults["Hours"];
+                $totalCost += $projectResults["Consumed"];
+            } else {
+                dd($projectResults);
+            }
+
             if (count($project["rows"]) > 0) {
                 array_push($results, $project);
                 array_push($summary["rows"], $projectData);
@@ -999,7 +1005,6 @@ class Proofhub {
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        return true;
         sleep(10);
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
@@ -1097,7 +1102,7 @@ class Proofhub {
                     if (self::IS_ADMIN) {
                         $finalPerson['labels'][$key]["cost"] = number_format((float) $finalPerson['labels'][$key]["cost"], 2, ',', '');
                     }
-                    
+
                     $finalPerson['labels'][$key]["hours"] = number_format((float) $finalPerson['labels'][$key]["hours"], 2, ',', '');
                 }
                 $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
@@ -1168,7 +1173,7 @@ class Proofhub {
                     if (self::IS_ADMIN) {
                         $finalLabel['people'][$key]["cost"] = number_format((float) $finalLabel['people'][$key]["cost"], 2, ',', '');
                     }
-                    
+
                     $finalLabel['people'][$key]["hours"] = number_format((float) $finalLabel['people'][$key]["hours"], 2, ',', '');
                 }
                 foreach ($finalLabel['projects'] as $key => $value2) {

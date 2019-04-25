@@ -2,7 +2,7 @@
 
 @section('content')
 <!-- slider area start -->
-<section id="home" class="slider-area image-background parallax" data-speed="3" data-bg-image="assets/img/bg/slider-bg.jpg">
+<section id="home" class="slider-area image-background parallax" data-speed="3" data-bg-image="assets/img/bg/opcion2home.jpg">
     <div class="container">
         <div class="col-md-6 col-sm-6 hidden-xs">
             <div class="row">
@@ -13,10 +13,9 @@
         </div>
         <div class="col-md-6 col-sm-6 col-xs-12">
             <div class="row">
-                <div class="slider-inner text-right">
-                    <h2>Who Else Wants To User</h2>
-                    <h5>And Use Our Zeed App !</h5>
-                    <a class="expand-video" href="https://www.youtube.com/watch?v=8qs2dZO6wcc"><i class="fa fa-play"></i>Watch the video</a>
+                <div class="slider-inner text-right"><br/>
+                    <h2>Fresco, delicioso, <br/>práctico y económico</h2>
+                    <a class="expand-video" style="display:none" href="https://www.youtube.com/watch?v=8qs2dZO6wcc"><i class="fa fa-play"></i>Watch the video</a>
                 </div>
             </div>
         </div>
@@ -29,23 +28,20 @@
         <div class="row">
             <div class="col-md-4 col-sm-4 col-xs-12">
                 <div class="service-single">
-                    <img src="assets/img/service/service-img1.png" alt="service image">
-                    <h2>Call service</h2>
-                    <p>Take The initative to call</p>
+                    <img src="assets/img/icon/plan-almuerzos.svg" alt="service image">
+                    <h2>Planes de almuerzos</h2>
                 </div>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-6">
                 <div class="service-single">
-                    <img src="assets/img/service/service-img2.png" alt="service image">
-                    <h2>Active warning</h2>
-                    <p>Timely detection of accidents</p>
+                    <img src="assets/img/icon/catering-eventos.svg" alt="service image">
+                    <h2>Catering para eventos</h2>
                 </div>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-6">
                 <div class="service-single">
-                    <img src="assets/img/service/service-img3.png" alt="service image">
-                    <h2>Care plan</h2>
-                    <p>The care content is pushed</p>
+                    <img src="assets/img/icon/listo.svg" alt="service image">
+                    <h2>Listos para servir</h2>
                 </div>
             </div>
         </div>
@@ -56,20 +52,30 @@
 <div class="about-area ptb--100">
     <div class="container">
         <div class="section-title">
-            <h2>About App</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit </p>
+            <h2>Nosotros</h2>
         </div>
         <div class="row d-flex flex-center">
             <div class="col-md-6 col-sm-6 hidden-xs">
                 <div class="about-left-img">
-                    <img src="assets/img/about/abt-left-img.png" alt="image">
+                    <img src="assets/img/about/nosotros.png" alt="image">
                 </div>
             </div>
 
             <div class="col-md-6 col-sm-6 col-xs-12 d-flex flex-center">
                 <div class="about-content">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed  eiuiosmod terttmpor incididunt ut labore et dolore magna aliqua. enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. doliuor in reprehenderit in voluptate velit esse  dolore eu fugiat nulla pariatur. cdatat non proident</p>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tuiempor incididunt ut labore et dolore magna aliqua. enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip</p>
+                    <p>Ofrecemos 3 servicios de alimentos y bebidas que se adaptan a tus necesidades y presupuesto.</p>
+                    <ol>
+                        <li>
+                            <p>Almuerzos a domicilios que entregamos en la puerta de tu casa  u oficina para que puedas comer sano, rico y variado mientras cuidas tu bolsillo</p><br/>
+                        </li>
+                        <li>
+                            <p>Desayunos, almuerzos, cenas, pasabocas  y refrigerios para eventos con servicio de meseros para calentar, servir y atender a tus invitados.</p><br/>
+                        </li>
+                        <li>
+                            <p>Platos recién preparados por el chef  que entregamos en la puerta de tu casa u oficina listos para servir.</p><br/>
+                        </li>
+                    </ol>                  
+                    
                 </div>
             </div>
         </div>
@@ -80,61 +86,46 @@
 <section class="feature-area bg-gray ptb--100" id="feature">
     <div class="container">
         <div class="section-title">
-            <h2>Features</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit</p>
+            <h2>Beneficios</h2>
         </div>
         <div class="row">
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="ft-content rtl">
                     <div class="ft-single">
-                        <img src="assets/img/icon/feature/1.png" alt="icon">
+                        <img src="assets/img/icon/features-ecofriendly.svg" alt="icon">
                         <div class="meta-content">
-                            <h2>Full Optional</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
+                            <h2>¡Eco- Friendly!</h2>
+                            <p>Usamos recipientes retornables o  de material reciclable que nos ayudan a cuidar nuestro planeta.</p>
                         </div>
                     </div>
                     <div class="ft-single">
-                        <img src="assets/img/icon/feature/2.png" alt="icon">
+                        <img src="assets/img/icon/feature-economic.svg" alt="icon">
                         <div class="meta-content">
-                            <h2>Unique Design</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
-                        </div>
-                    </div>
-                    <div class="ft-single">
-                        <img src="assets/img/icon/feature/3.png" alt="icon">
-                        <div class="meta-content">
-                            <h2>Voice Maker</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
+                            <h2>Mayor economía</h2>
+                            <p>Planes para todos los gustos y presupuestos que te ayudan a cuidar tu bolsillo, mientras disfrutas de una comida y un servicio de calidad.</p>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-4 hidden-sm col-xs-12">
                 <div class="ft-screen-img">
-                    <img src="assets/img/mobile/ft-screen-img.png" alt="image">
+                    <img src="assets/img/icon/feature/features.png" alt="image">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6 col-xs-12">
                 <div class="ft-content">
                     <div class="ft-single">
-                        <img src="assets/img/icon/feature/4.png" alt="icon">
+                        <img src="assets/img/icon/feature-facil.svg" alt="icon">
                         <div class="meta-content">
-                            <h2>Easy Settings</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
+                            <h2>Fácil y práctico</h2>
+                            <p>Con <i>Lonchis app</i> puedes solicitar cualquiera de los servicios en menos de 10 minutos, ¡y sin salir de casa!</p>
                         </div>
                     </div>
                     <div class="ft-single">
-                        <img src="assets/img/icon/feature/5.png" alt="icon">
+                        <img src="assets/img/icon/Feature-payment.svg" alt="icon">
                         <div class="meta-content">
-                            <h2>Flat Design</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
-                        </div>
-                    </div>
-                    <div class="ft-single">
-                        <img src="assets/img/icon/feature/6.png" alt="icon">
-                        <div class="meta-content">
-                            <h2>Easy Download</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, iumod tempor incididunt</p>
+                            <h2>Variedad y seguridad en métodos de pago</h2>
+                            <p>Contamos con 4 métodos seguros de pago para la facilidad y comodidad de todos.</p>
                         </div>
                     </div>
                 </div>
@@ -149,30 +140,30 @@
         <div class="row">
             <div class="col-md-3 col-sm-3 col-xs-12">
                 <div class="ach-single">
-                    <div class="icon"><i class="fa fa-users"></i></div>
-                    <p><span class="counter">10</span>k</p>
-                    <h5>Happy Clients</h5>
+                    <div class="icon"><i class="fa fa-coffee"></i></div>
+                    <p><span class="counter">8</span></p>
+                    <h5>Años de experiencia</h5>
                 </div>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12">
                 <div class="ach-single">
                     <div class="icon"><i class="fa fa-book"></i></div>
-                    <span class="counter">978</span>
-                    <h5>Projects complet</h5>
+                    <p>+<span class="counter">100</span></p>
+                    <h5>Opciones de menú</h5>
                 </div>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12">
                 <div class="ach-single">
-                    <div class="icon"><i class="fa fa-coffee"></i></div>
-                    <p><span class="counter">150</span>k</p>
-                    <h5>Cups of coffee</h5>
+                    <div class="icon"><i class="fa fa-users"></i></div>
+                    <p><span class="counter">18</span></p>
+                    <h5>Planes activos</h5>
                 </div>
             </div>
             <div class="col-md-3 col-sm-3 col-xs-12">
                 <div class="ach-single">
                     <div class="icon"><i class="fa fa-trophy"></i></div>
-                    <span class="counter">100</span>
-                    <h5>Winning awards</h5>
+                    <p>+<span class="counter">500</span></p>
+                    <h5>Eventos atendidos</h5>
                 </div>
             </div>
         </div>
@@ -189,32 +180,32 @@
         <img class="screen-img" src="assets/img/mobile/screen-slider.png" alt="mobile screen">
         <div class="screen-slider owl-carousel">
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen1.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis1.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen2.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis2.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen3.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis3.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen4.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis4.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen5.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis3.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen3.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis2.jpeg" alt="mobile screen">
             </div>
             <div class="single-screen">
-                <img src="assets/img/mobile/screen-slider/screen4.jpg" alt="mobile screen">
+                <img src="assets/img/mobile/screen-slider/lonchis1.jpeg" alt="mobile screen">
             </div>
         </div>
     </div>
 </section>
 <!-- screen slider area end -->
 <!-- testimonial carousel area start -->
-<div class="testimonial-area ptb--100">
+<div class="testimonial-area ptb--100" style="display: none">
     <div class="container">
         <div class="section-title">
             <h2>Client Says</h2>
@@ -278,7 +269,7 @@
 </div>
 <!-- testimonial carousel area end -->
 <!-- video area start -->
-<div class="video-area ptb--100">
+<div class="video-area ptb--100" style="display: none">
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-12">
@@ -294,59 +285,142 @@
 <section class="pricing-area ptb--100" id="pricing">
     <div class="container">
         <div class="section-title">
-            <h2>Pricing Plan</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit</p>
+            <h2>Planes Envase Retornable</h2>
+            <p>La personalización de los planes se puede hacer con la cantidad de personas y N° de almuerzos que desee, los datos anunciados a continuación son cantidades y valores intermedios de cada uno de los planes.</p>
         </div>
         <div class="row">
             <div class="col-md-4 col-sm-4 col-xs-12 col-6">
                 <div class="single-price">
                     <div class="prc-head">
-                        <span>Silver</span>
-                        <h5><small>$</small>50/m</h5>
+                        <span>Personal</span>
+                        <h5><small>$</small>14.200c/u</h5>
                     </div>
                     <ul>
-                        <li>10 User</li>
-                        <li>1 Year</li>
-                        <li>512 Mb Memory</li>
-                        <li>30GB SSD Disk</li>
-                        <li>1 TB Transfer</li>
-                        <li>6 Months Support</li>
+                        <li>1 Persona</li>
+                        <li>11 Almuerzos</li>
+                        <li>$156.200</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
-                    <a href="#">Order Now</a>
+                    <a style="display: none" href="#">Order Now</a>
                 </div>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-6">
                 <div class="single-price">
                     <div class="prc-head">
-                        <span>Silver</span>
-                        <h5><small>$</small>150/m</h5>
+                        <span>3 Amigos</span>
+                        <h5><small>$</small>12.100c/u</h5>
                     </div>
                     <ul>
-                        <li>10 User</li>
-                        <li>1 Year</li>
-                        <li>512 Mb Memory</li>
-                        <li>30GB SSD Disk</li>
-                        <li>1 TB Transfer</li>
-                        <li>6 Months Support</li>
+                        <li>3 Personas</li>
+                        <li>11 Almuerzos/p</li>
+                        <li>33 Almuerzos</li>
+                        <li>$399.300</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
-                    <a href="#">Order Now</a>
+                    <a style="display: none" href="#">Order Now</a>
                 </div>
             </div>
             <div class="col-md-4 col-sm-4 col-xs-12 col-6">
                 <div class="single-price">
                     <div class="prc-head">
-                        <span>Silver</span>
-                        <h5><small>$</small>250/m</h5>
+                        <span>10 Amigos</span>
+                        <h5><small>$</small>11.400c/u</h5>
                     </div>
                     <ul>
-                        <li>10 User</li>
-                        <li>1 Year</li>
-                        <li>512 Mb Memory</li>
-                        <li>30GB SSD Disk</li>
-                        <li>1 TB Transfer</li>
-                        <li>6 Months Support</li>
+                        <li>10 Personas</li>
+                        <li>11 Almuerzos/p</li>
+                        <li>110 Almuerzos</li>
+                        <li>$1.254.300</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
-                    <a href="#">Order Now</a>
+                    <a style="display: none" href="#">Order Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="section-title">
+            <h2>Planes Envase Desechable</h2>
+            <p>La personalización de los planes se puede hacer con la cantidad de personas y N° de almuerzos que desee, los datos anunciados a continuación son cantidades y valores intermedios de cada uno de los planes.</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-sm-4 col-xs-12 col-6">
+                <div class="single-price">
+                    <div class="prc-head">
+                        <span>Personal</span>
+                        <h5><small>$</small>15.100c/u</h5>
+                    </div>
+                    <ul>
+                        <li>1 Persona</li>
+                        <li>11 Almuerzos</li>
+                        <li>$166.100</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
+                    </ul>
+                    <a style="display: none" href="#">Order Now</a>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 col-6">
+                <div class="single-price">
+                    <div class="prc-head">
+                        <span>3 Amigos</span>
+                        <h5><small>$</small>13.000c/u</h5>
+                    </div>
+                    <ul>
+                        <li>3 Personas</li>
+                        <li>11 Almuerzos/p</li>
+                        <li>33 Almuerzos</li>
+                        <li>$427.900</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
+                    </ul>
+                    <a style="display: none" href="#">Order Now</a>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-12 col-6">
+                <div class="single-price">
+                    <div class="prc-head">
+                        <span>10 Amigos</span>
+                        <h5><small>$</small>12.250c/u</h5>
+                    </div>
+                    <ul>
+                        <li>10 Personas</li>
+                        <li>11 Almuerzos/p</li>
+                        <li>110 Almuerzos</li>
+                        <li>$1.254.300</li>
+                        <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
+                    </ul>
+                    <a style="display: none" href="#">Order Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="section-title">
+            <h2>Cenas y eventos</h2>
+            <p>Para el servicio de catering debes usar nuestro servicio de meseros.</p>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-4 col-xs-12 col-6">
+                <div class="single-price">
+                    <div class="prc-head">
+                        <h5>Alimentos</h5>
+                    </div>
+                    <ul>
+                        <li>Cenas y almuerzos desde $21.300/plato*</li>
+                        <li>Desayunos desde $17.800*</li>
+                        <li>Pasabocas desde $4.100*</li>
+                        <li>Refrigerios desde $6.650*</li>
+                        <li><b>*Aplican cantidades minimas</b></li>
+                    </ul>
+                    <a style="display: none" href="#">Order Now</a>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-4 col-xs-12 col-6">
+                <div class="single-price">
+                    <div class="prc-head">
+                        <h5>Servicios</h5>
+                    </div>
+                    <ul>
+                        <li>Mesero 1 a 5 horas: $96.000</li>
+                        <li>Menaje x persona: $ 4.000</li>
+                        <li>Transporte: $25.000</li>
+                    </ul>
+                    <a style="display: none" href="#">Order Now</a>
                 </div>
             </div>
         </div>
@@ -354,7 +428,7 @@
 </section>
 <!-- pricing area end -->
 <!-- team area start -->
-<section class="team-area bg-gray ptb--100" id="team">
+<section class="team-area bg-gray ptb--100" id="team" style="display: none">
     <div class="container">
         <div class="section-title">
             <h2>Our Amazing Team</h2>
@@ -433,19 +507,18 @@
 <section class="call-to-action ptb--100" id="download">
     <div class="container">
         <div class="section-title text-white">
-            <h2>Our Amazing Team</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit</p>
+            <h2>Descarga nuestra App</h2>
+            <p>Plataformas disponibles</p>
         </div>
         <div class="download-btns btn-area text-center">
-            <a href="#"><i class="fa fa-apple"></i>android story</a>
-            <a href="#"><i class="fa fa-windows"></i>Windows story</a>
-            <a href="#"><i class="fa fa-android"></i>android story</a>
+            <a href="#"><i class="fa fa-apple"></i>Apple store</a>
+            <a href="#"><i class="fa fa-android"></i>Google Play store</a>
         </div>
     </div>
 </section>
 <!-- call-action area end -->
 <!-- blog area start -->
-<section class="blog-post ptb--100" id="blog">
+<section class="blog-post ptb--100" id="blog" style="display: none">
     <div class="container">
         <div class="section-title">
             <h2>Latest News</h2>
@@ -499,7 +572,7 @@
 </section>
 <!-- blog area end -->
 <!-- client area start -->
-<div class="clinet-area bg-gray ptb--100">
+<div class="clinet-area bg-gray ptb--100" style="display:none">
     <div class="container">
         <div class="client-carousel owl-carousel">
             <img src="assets/img/client/client-img.png" alt="client image">
@@ -531,7 +604,7 @@
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <div class="contact_info">
-                    <div class="s-info">
+                    <div class="s-info" style="display: none">
                         <i class="fa fa-map-marker"></i>
                         <div class="meta-content">
                             <span>17 Bath Rd, Heathrow, Longford,Hounslow</span>
@@ -556,8 +629,8 @@
                         <ul>
                             <li><a href="#"><i class="fa fa-facebook"></i></a></li>
                             <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                            <li><a href="#"><i class="fa fa-behance"></i></a></li>
-                            <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+                            <li style="display: none"><a href="#"><i class="fa fa-behance"></i></a></li>
+                            <li style="display: none"><a href="#"><i class="fa fa-dribbble"></i></a></li>
                         </ul>
                     </div>
                 </div>

@@ -41,7 +41,7 @@
                         <div class="menu-area">
                             <div class="col-md-3 col-sm-12 col-xs-12">
                                 <div class="logo">
-                                    <a href="index.html"><img src="assets/img/icon/logo.png" alt="Zeedapp - App Landing Template"></a>
+                                    <a href="/"><img src="assets/img/icon/logo_2.png" alt="Zeedapp - App Landing Template"></a>
                                 </div>
                             </div>
                             <div class="col-md-9 hidden-xs hidden-sm">
@@ -52,9 +52,9 @@
                                             <li><a href="#feature">Features</a></li>
                                             <li><a href="#screenshot">Screenshot</a></li>
                                             <li><a href="#pricing">Pricing</a></li>
-                                            <li><a href="#team">Team</a></li>
+                                            <li style="display: none"><a href="#team">Team</a></li>
                                             <li><a href="#download">Download</a></li>
-                                            <li><a href="#blog">Blog</a></li>
+                                            <li style="display: none"><a href="#blog">Blog</a></li>
                                             <li><a href="#contact">Contact</a></li>
                                         </ul>
                                     </nav>
@@ -78,6 +78,9 @@
                 <div class="container">
                     <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                         Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+                    <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                         Acerca de nuestros <a href="/icons" target="_blank">íconos</a>
                         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
                 </div>
             </div>
