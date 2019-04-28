@@ -588,19 +588,14 @@
 <section class="contact-area ptb--100" id="contact">
     <div class="container">
         <div class="section-title">
-            <h2>Contact Us</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit</p>
+            <h2>Contáctanos</h2>
         </div>
         <div class="row">
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <div class="contact-form">
-                    <form action="#">
-                        <input type="text" name="name" placeholder="Enter Your Name">
-                        <input type="text" name="email" placeholder="Enter Your Email">
-                        <textarea name="msg" id="msg" placeholder="Your Message "></textarea>
-                        <input type="submit" value="Send" id="send">
-                    </form>
+                    <img src="assets/img/icon/logo-lonchis.png" alt="client image">
                 </div>
+                
             </div>
             <div class="col-md-6 col-sm-6 col-xs-12">
                 <div class="contact_info">
@@ -614,15 +609,14 @@
                     <div class="s-info">
                         <i class="fa fa-mobile"></i>
                         <div class="meta-content">
-                            <span>+0123 456 789 78</span>
-                            <span>+0123 456 789 78</span>
+                            <span>+57 310 341 8432</span>
+
                         </div>
                     </div>
                     <div class="s-info">
                         <i class="fa fa-paper-plane"></i>
                         <div class="meta-content">
-                            <span>Support@domain.com</span>
-                            <span>Example@Gmail.com</span>
+                            <span>servicioalcliente@lonchis.com.co</span>
                         </div>
                     </div>
                     <div class="c-social">

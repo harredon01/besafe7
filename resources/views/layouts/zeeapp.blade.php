@@ -49,13 +49,13 @@
                                     <nav class="nav-menu">
                                         <ul>
                                             <li class="active"><a href="#home">Home</a></li>
-                                            <li><a href="#feature">Features</a></li>
-                                            <li><a href="#screenshot">Screenshot</a></li>
-                                            <li><a href="#pricing">Pricing</a></li>
+                                            <li><a href="#feature">Beneficios</a></li>
+                                            <li><a href="#screenshot">Pantallazos</a></li>
+                                            <li><a href="#pricing">Precios</a></li>
                                             <li style="display: none"><a href="#team">Team</a></li>
-                                            <li><a href="#download">Download</a></li>
+                                            <li><a href="#download">Descárgalo</a></li>
                                             <li style="display: none"><a href="#blog">Blog</a></li>
-                                            <li><a href="#contact">Contact</a></li>
+                                            <li><a href="#contact">Contáctanos</a></li>
                                         </ul>
                                     </nav>
                                 </div>

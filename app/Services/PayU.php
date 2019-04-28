@@ -137,7 +137,7 @@ class PayU {
 
     private function populateBuyerSimple(User $user) {
         $buyer = [
-            "fullName" => $user->firstName + " " + $user->lastName,
+            "fullName" => $user->firstName . " " . $user->lastName,
             "emailAddress" => $user->email,
             "contactPhone" => $user->cellphone,
             "dniNumber" => $user->docNum,

@@ -1066,7 +1066,10 @@ END Blog Post
 END Contact Area
 ===========================*/
 .contact-area{}
-.contact-form{}
+.contact-form img{
+    width:162px;
+    float:right;
+}
 .contact-form form{}
 .contact-form input,
 .contact-form textarea{
