@@ -79,7 +79,7 @@ class EditProduct {
      *
      * @return Response
      */
-    public function getProductsMerchant(User $user, $merchant_id, $page) {
+    public function getProductsMerchant($user, $merchant_id, $page) {
         $data = [];
         $result = $this->checkAccessMerchant($user, $merchant_id);
         if ($result['access'] == true) {
@@ -332,7 +332,7 @@ class EditProduct {
      *
      * @return Response
      */
-    public function checkAccessMerchant(User $user, $merchant_id) {
+    public function checkAccessMerchant($user, $merchant_id) {
         $merchant = Merchant::find($merchant_id);
         $data = [];
         $access = false;

@@ -49,7 +49,7 @@ class MerchantApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('index');
     }
 
     /**

@@ -1195,7 +1195,7 @@ class Food {
                 $details['dish'] = $dish;
                 $delivery = Delivery::create([
                             "user_id" => 5,
-                            "delivery" => $date,
+                            "delivery" => date_format($date, "Y-m-d")." 12:00:00",
                             "provider" => "Rapigo",
                             "shipping" => $shipping[$amountDeliveries],
                             "status" => "enqueue",

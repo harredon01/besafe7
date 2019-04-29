@@ -34,7 +34,7 @@ class ProductApiController extends Controller {
     public function __construct(EditProduct $editProduct, ShareObject $shareObject) {
         $this->editProduct = $editProduct;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('getProductsMerchant');
     }
 
     /**
