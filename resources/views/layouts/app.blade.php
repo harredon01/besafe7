@@ -101,62 +101,86 @@ echo json_encode([
                             <li><a href="{{ url('/login') }}">Login</a></li>
                             <li><a href="{{ url('/register') }}">Register</a></li>
                             @else
-                            <li><a href="{{ url('products')}}">Products</a></li>
-                            <li><a href="{{ url('plans')}}">Plans</a></li>
-                            <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
-                                @include('products.cart')
-                            </li>
-                            <li><a href="{{ url('/checkout')}}">Checkout</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
+                                @if (Auth::user()->id == 2 || Auth::user()->id == 77 )
+                                <li><a href="{{ url('products')}}">Products</a></li>
+                                <li><a href="{{ url('plans')}}">Plans</a></li>
+                                <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
+                                    @include('products.cart')
+                                </li>
+                                <li><a href="{{ url('/checkout')}}">Checkout</a></li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        {{ Auth::user()->name }} <span class="caret"></span>
+                                    </a>
 
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ url('/logout')}}"
-                                           onclick="event.preventDefault();
-                                                   document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{{ url('/logout')}}"
+                                               onclick="event.preventDefault();
+                                                       document.getElementById('logout-form').submit();">
+                                                Logout
+                                            </a>
 
-                                        <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
-                                            {{ csrf_field()}}
-                                        </form>
-                                    </li>
-                                    <li><a href="{{ url('user/editProfile')}}">Edit Profile</a></li>
-                                    <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
-                                    <li><a href="{{ url('sources')}}">Edit Sources</a></li>
-                                    <li><a href="{{ url('subscriptions')}}">Edit Subscriptions</a></li>
-                                    <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    Lonchis <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="{{ url('food/menu')}}">Menu</a></li>
-                                    <li><a href="{{ url('food/content')}}">Content</a></li>
-                                    <li><a href="{{ url('food/zones')}}">Zonas</a></li>
-                                    <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
-                                    <li><a href="{{ url('food/routes')}}">Rutas</a></li>
-                                    <li><a href="{{ url('food/largest_addresses')}}">Direcciones Comunes</a></li>
-                                    <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>
-                                    <li><a href="{{ url('billing/payments')}}">Pagos</a></li>
-                                </ul>
-                            </li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    Admin <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" role="menu">
-                                    <li><a href="{{ url('admin/store/products')}}">Productos</a></li>
-                                    <li><a href="{{ url('admin/store/variants')}}">Variants</a></li>
-                                    <li><a href="{{ url('admin/store/merchants')}}">Merchants</a></li>
-                                    <li><a href="{{ url('admin/store/prod_categories')}}">Categories</a></li>
-                                </ul>
-                            </li>
+                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                {{ csrf_field()}}
+                                            </form>
+                                        </li>
+                                        <li><a href="{{ url('user/editProfile')}}">Edit Profile</a></li>
+                                        <li><a href="{{ url('user/editAddress')}}">Edit Addresses</a></li>
+                                        <li><a href="{{ url('sources')}}">Edit Sources</a></li>
+                                        <li><a href="{{ url('subscriptions')}}">Edit Subscriptions</a></li>
+                                        <li><a href="{{ url('user/editAccess')}}">Edit Access</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Lonchis <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="{{ url('food/menu')}}">Menu</a></li>
+                                        <li><a href="{{ url('food/content')}}">Content</a></li>
+                                        <li><a href="{{ url('food/zones')}}">Zonas</a></li>
+                                        <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
+                                        <li><a href="{{ url('food/routes')}}">Rutas</a></li>
+                                        <li><a href="{{ url('food/largest_addresses')}}">Direcciones Comunes</a></li>
+                                        
+                                    </ul>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Store <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="{{ url('admin/store/products')}}">Productos</a></li>
+                                        <li><a href="{{ url('admin/store/variants')}}">Variants</a></li>
+                                        <li><a href="{{ url('admin/store/merchants')}}">Merchants</a></li>
+                                        <li><a href="{{ url('admin/store/prod_categories')}}">Categories</a></li>
+                                        <li><a href="{{ url('billing/orders')}}">Ordenes</a></li>
+                                        <li><a href="{{ url('billing/payments')}}">Pagos</a></li>
+                                    </ul>
+                                </li>
+                                @else
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        {{ Auth::user()->name }} <span class="caret"></span>
+                                    </a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li>
+                                            <a href="{{ url('/logout')}}"
+                                               onclick="event.preventDefault();
+                                                       document.getElementById('logout-form').submit();">
+                                                Logout
+                                            </a>
+
+                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                {{ csrf_field()}}
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                                @endif
+                            
                             @endif
                         </ul>
                     </div>

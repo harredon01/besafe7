@@ -31,6 +31,7 @@ class FoodController extends Controller {
         $this->auth = $auth;
         $this->food = $food;
         $this->middleware('auth', ['except' => ['buildScenarioRouteId', 'buildScenarioPositive','buildCompleteScenario','getScenarioStructure','cancelUserCredit','cancelDelivery']]);
+        $this->middleware('admin', ['except' => ['buildScenarioRouteId', 'buildScenarioPositive','buildCompleteScenario','getScenarioStructure','cancelUserCredit','cancelDelivery']]);
     }
 
     /**

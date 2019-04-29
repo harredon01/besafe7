@@ -30,6 +30,7 @@ class FoodImportController extends Controller {
         $this->auth = $auth;
         $this->food = $food;
         $this->middleware('auth');
+        $this->middleware('admin');
     }
 
     /**

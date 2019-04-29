@@ -19,7 +19,7 @@
 
             $scope.getItems = function () {
                 $scope.page++;
-                let url = "type="+$scope.contentType+"&order_by=id,desc&page=" + $scope.page;
+                let url = "type=lunch&order_by=id,desc&page=" + $scope.page;
                 Food.getMenu(url).then(function (data) {
                     if (data.page == data.last_page) {
                         $scope.loadMore = false;

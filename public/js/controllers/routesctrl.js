@@ -48,12 +48,6 @@
                 $scope.routes = [];
                 $scope.getRoutes();
             }
-            $scope.getRouteColor = function () {
-
-                let routeColors = ["#FF0000", "#800000", "#FFFF00", "#808000", "#00FF00", "#008000", "#00FFFF", "#008080", "#0000FF", "#000080", "#FF00FF", "#800080"];
-                let random = Math.round(Math.random() * (routeColors.length - 1));
-                return routeColors[random];
-            }
             $scope.activateMap = function () {
                 $scope.mapActive = true;
                 console.log("Creating map data")
@@ -70,7 +64,7 @@
                     }
                     $scope.routes[route].stops = stops;
                     console.log("Creating map data route")
-                    let color = $scope.getRouteColor();
+                    let color = MapService.getColor();
                     $scope.routes[route].polyline = MapService.createRoute($scope.routes[route], color);
                 }
             }

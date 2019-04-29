@@ -275,10 +275,11 @@ angular.module('besafe')
                 /**/
             }
             var updateZoneItem = function (item) {
+                console.log("Updating zone item",item);
                 var def = $q.defer();
                 $http({
-                        method: 'POST',
-                        url: '/api/food/zone/'+item.id,
+                        method: 'PATCH',
+                        url: '/api/food/zones/'+item.id,
                         data: item, // pass in data as strings
                     })
                             .success(function (data) {
@@ -286,6 +287,22 @@ angular.module('besafe')
                             })
                         .error(function () {
                             def.reject("Failed to updateZoneItem");
+                        });
+                return def.promise;
+                /**/
+            }
+            var createZoneItem = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/food/zones',
+                        data: item, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to createZoneItem");
                         });
                 return def.promise;
                 /**/
@@ -367,6 +384,7 @@ angular.module('besafe')
                 regenerateScenarios:regenerateScenarios,
                 buildScenarioPositive:buildScenarioPositive,
                 updateZoneItem:updateZoneItem,
+                createZoneItem:createZoneItem,
                 updateMenuItem:updateMenuItem,
                 getScenarioOrganizationStructure:getScenarioOrganizationStructure, 
                 updateMessageItem:updateMessageItem,

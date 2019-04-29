@@ -95,7 +95,7 @@ angular.module('besafe')
             }
             var createStop = function (stop) {
                 damap = $rootScope.map;
-                console.log("creating stop",stop)
+                console.log("creating stop", stop)
                 var marker = new google.maps.Marker({
                     id: stop.id,
                     position: new google.maps.LatLng(stop.lat, stop.long),
@@ -110,9 +110,9 @@ angular.module('besafe')
                 });
                 return marker;
             }
-            var createRoute = function (route,color) {
+            var createRoute = function (route, color) {
                 damap = $rootScope.map;
-                console.log("createRoute",route)
+                console.log("createRoute", route)
                 var flightPlanCoordinates = route.stopsLat;
                 var flightPath = new google.maps.Polyline({
                     path: flightPlanCoordinates,
@@ -123,6 +123,47 @@ angular.module('besafe')
                 });
                 flightPath.setMap(damap);
                 return flightPath;
+            }
+            var getColor = function () {
+                let routeColors = ["#FF0000", "#800000", "#FFFF00", "#808000", "#00FF00", "#008000", "#00FFFF", "#008080", "#0000FF", "#000080", "#FF00FF", "#800080"];
+                let random = Math.round(Math.random() * (routeColors.length - 1));
+                return routeColors[random];
+            }
+            var createPolygon = function (zone, color) {
+                damap = $rootScope.map;
+                console.log("createRoute", zone)
+                var triangleCoords = JSON.parse(zone.coverage);
+
+                // Construct the polygon.
+                var bermudaTriangle = new google.maps.Polygon({
+                    id: zone.id,
+                    paths: triangleCoords,
+                    strokeColor: color,
+                    strokeOpacity: 0.8,
+                    editable: true,
+                    strokeWeight: 2,
+                    fillColor: '#FF0000',
+                    fillOpacity: 0.35,
+                    draggable: true,
+                    geodesic: true
+                });
+                bermudaTriangle.setMap(damap);
+                bermudaTriangle.getPaths().forEach(function (path, index) {
+                    google.maps.event.addListener(path, 'insert_at', function () {
+                        console.log('insert_at', zone.id);
+                    });
+                    google.maps.event.addListener(path, 'remove_at', function () {
+                        console.log('insert_at', zone.id);
+                    });
+                    google.maps.event.addListener(path, 'set_at', function () {
+                        console.log('insert_at', zone.id);
+                    });
+                });
+
+                google.maps.event.addListener(bermudaTriangle, 'dragend', function () {
+                    console.log('set_at.', bermudaTriangle.id);
+                });
+                return bermudaTriangle;
             }
 
             var consoleLogMarkers = function (damarkers) {
@@ -274,8 +315,10 @@ angular.module('besafe')
             return {
                 updateLocations: updateLocations,
                 createMap: createMap,
-                createStop:createStop,
-                createRoute:createRoute,
+                createStop: createStop,
+                createRoute: createRoute,
+                getColor: getColor,
+                createPolygon: createPolygon,
                 createReport: createReport
             };
         })

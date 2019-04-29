@@ -20,10 +20,6 @@ Estado: {{$order->status}}
 |                |     Total      |{{number_format($order->total, 2, ',', '.')}}|     
 @endcomponent
 
-@component('mail::button', ['url' => ''])
-Button Text
-@endcomponent
-
 Gracias,<br>
 {{ config('app.name') }}
 @endcomponent

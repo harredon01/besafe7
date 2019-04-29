@@ -12,7 +12,7 @@
         </tr>
         <tr ng-repeat="token in tokens">
             <td><span class="name">@{{ token.client_id }}</span></td>
-            <td><span class="name">@{{ token.client_name }}</span></td>
+            <td><span class="name">Lonchis App</span></td>
             <td><span class="name">@{{ token.name }}</span></td>
             <td><span class="created_at">@{{ token.created_at }}</span></td>
             <td><span class="updated_at">@{{ token.updated_at }}</span></td>

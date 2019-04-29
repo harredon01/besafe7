@@ -179,6 +179,8 @@ Route::get('food/zones', 'FoodApiController@getZones');
 Route::get('food/messages', 'FoodApiController@getMessages');
 Route::delete('food/content/{item?}', 'FoodApiController@deleteContentItem');
 Route::delete('food/zones/{item?}', 'FoodApiController@deleteZoneItem');
+Route::patch('food/zones/{item?}', 'FoodApiController@updateZoneItem');
+Route::post('food/zones', 'FoodApiController@createZoneItem');
 Route::delete('food/messages/{item?}', 'FoodApiController@deleteMessageItem');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
 Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
