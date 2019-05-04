@@ -13,7 +13,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -238,16 +238,32 @@ class Proofhub {
 
     public function getProjects($copy, $type) {
         $projects = [
-//            [
-//                "name" => "TaxPayer Redesign and Dev",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1420446568",
-//                "rows" => $copy,
-//            ],
             [
+                "name" => "TaxPayer Redesign and Dev",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "1420446568",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Hoov Eccom Time",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::INTERNO,
+                "price" => "Retail",
+                "code" => "2237106775",
+                "rows" => $copy,
+            ],[
+                "name" => "Template Latam",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::INTERNO,
+                "price" => "Retail",
+                "code" => "1524491469",
+                "rows" => $copy,
+            ],[
                 "name" => "Hoov Eccom Time",
                 "budget" => "0",
                 "country" => "COL",
@@ -328,6 +344,14 @@ class Proofhub {
                 "code" => "1793993272",
                 "rows" => $copy,
             ], [
+                "name" => "CUCU",
+                "budget" => "50000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1466430941",
+                "rows" => $copy,
+            ], [
                 "name" => "Icapital",
                 "budget" => "0",
                 "country" => "COL",
@@ -344,6 +368,30 @@ class Proofhub {
                 "code" => "1483921014",
                 "rows" => $copy,
             ], [
+                "name" => "Origin and Cause",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CANADA,
+                "price" => "Retail",
+                "code" => "1634588017",
+                "rows" => $copy,
+            ],[
+                "name" => "DK Furniture",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CANADA,
+                "price" => "Retail",
+                "code" => "1964728404",
+                "rows" => $copy,
+            ],[
+                "name" => "Eighth Avenue",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CANADA,
+                "price" => "Retail",
+                "code" => "1969531729",
+                "rows" => $copy,
+            ],[
                 "name" => "Prasino",
                 "budget" => "0",
                 "country" => "COL",
@@ -398,6 +446,23 @@ class Proofhub {
                 "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "1753816309",
+                "rows" => $copy,
+            ],[
+                "name" => "Bodytech Peru",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1753979134",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Ongoing Development",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::INTERNO,
+                "price" => "Retail",
+                "code" => "1479076983",
                 "rows" => $copy,
             ],
             [
@@ -698,6 +763,15 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2547043347",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "CONSTRUCTORA BOLIVAR",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2940400374",
                 "rows" => $copy,
             ]
         ];
@@ -1005,7 +1079,6 @@ class Proofhub {
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        return true;
         sleep(10);
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;

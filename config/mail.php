@@ -49,8 +49,8 @@ return [
       |
      */
     'from' => [
-        'address' => 'hello@example.com',
-        'name' => 'Example',
+        'address' => 'noresponder@lonchis.com.co',
+        'name' => 'Lonchis App',
     ],
     /*
       |--------------------------------------------------------------------------

@@ -23,18 +23,25 @@ use App\Models\Transaction;
 class PayU {
 
     private function populatePaymentContent(Payment $payment, $platform) {
-        $accountId = env('PAYU_ACCOUNT', "512321");
-        $apiKey = env('PAYU_KEY');
+        if ($payment->user_id == 2 || $payment->user_id == 77) {
+            $accountId = env('PAYU_TEST_ACCOUNT', "512321");
+            $apiKey = env('PAYU_TEST_KEY');
+            $merchantId = env('PAYU_TEST_MERCHANT', "508029");
+        } else {
+            $accountId = env('PAYU_ACCOUNT');
+            $apiKey = env('PAYU_KEY');
+            $merchantId = env('PAYU_MERCHANT');
+        }
+
         $reference = $payment->referenceCode;
         $paymentTotal = $payment->total;
         $currency = "COP";
-        $merchantId = env('PAYU_MERCHANT', "508029");
         $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($paymentTotal, 0, '.', '') . "~" . $currency;
         $sig = sha1($str);
         $orderCont = [
             "accountId" => $accountId,
             "referenceCode" => $reference,
-            "description" => "besafe payment test",
+            "description" => "Pago Lonchis app # " . $payment->id,
             "language" => "es",
             "signature" => $sig,
             "notifyUrl" => "https://lonchis.com.co/api/payu/webhook",
@@ -91,9 +98,16 @@ class PayU {
         return null;
     }
 
-    private function populateMerchant() {
+    private function populateMerchant($user) {
         $apiLogin = env('PAYU_LOGIN');
         $apiKey = env('PAYU_KEY');
+        if ($user) {
+            if ($user->id == 2 || $user->id == 77) {
+                $apiLogin = env('PAYU_TEST_LOGIN');
+                $apiKey = env('PAYU_TEST_KEY');
+            }
+        }
+
         $merchant = [
             'apiLogin' => $apiLogin,
             'apiKey' => $apiKey
@@ -241,6 +255,23 @@ class PayU {
         }
     }
 
+    private function getTestVar(User $user) {
+        if ($user->id == 2 || $user->id == 77) {
+            return "true";
+        } else {
+            return false;
+        }
+    }
+
+    private function getTestUrl($user) {
+        if ($user) {
+            if ($user->id == 2 || $user->id == 77) {
+                return "https://sandbox.api.payulatam.com";
+            }
+        }
+        return "https://api.payulatam.com";
+    }
+
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
         $source = $user->sources()->where("has_default", true)->where("gateway", "PayU")->first();
         if ($source) {
@@ -269,7 +300,7 @@ class PayU {
             "dniType" => "CC",
             "billingAddress" => $payerAddress
         ];
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
@@ -297,9 +328,9 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => "true",
+            "test" => $this->getTestVar($user),
         ];
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
@@ -325,7 +356,7 @@ class PayU {
         $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
@@ -354,9 +385,9 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => "true",
+            "test" => $this->getTestVar($user),
         ];
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
@@ -377,7 +408,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
 
         $creditCardTokenId = $data['source'];
         $deviceSessionId = md5(session_id() . microtime());
@@ -407,10 +438,10 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => "true",
+            "test" => $this->getTestVar($user),
         ];
 //        return $dataSent;
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
@@ -426,7 +457,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $deviceSessionId = md5(session_id() . microtime());
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont = $this->populatePaymentContent($payment, $platform);
@@ -462,7 +493,7 @@ class PayU {
             "test" => "false",
         ];
 
-        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
     }
 
     public function payCash(User $user, array $data, Payment $payment, $platform) {
@@ -472,7 +503,7 @@ class PayU {
         }
 
         $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $buyer = $this->populateBuyerSimple($user);
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
@@ -495,7 +526,7 @@ class PayU {
             "transaction" => $transaction,
             "test" => "false",
         ];
-        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
     }
 
     public function makeCharge(User $user, Order $order, array $payload) {
@@ -509,8 +540,8 @@ class PayU {
         }
     }
 
-    public function getBanks() {
-        $merchant = $this->populateMerchant();
+    public function getBanks(User $user) {
+        $merchant = $this->populateMerchant($user);
 
         $bankListInformation = [
             "paymentMethod" => "PSE",
@@ -523,7 +554,7 @@ class PayU {
             "bankListInformation" => $bankListInformation,
             "test" => false,
         ];
-        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
     }
 
     public function createSource(Source $source, array $data) {
@@ -550,7 +581,7 @@ class PayU {
             "type" => $data['branch'],
             "address" => $address
         ];
-        $response = $this->sendPost($datasent, env('PAYU_REST') . 'customers/' . $source->client_id . '/creditCards');
+        $response = $this->sendPost($datasent, $this->getTestUrl($source->user) . env('PAYU_REST') . 'customers/' . $source->client_id . '/creditCards');
         if (array_key_exists("token", $response)) {
             if (array_key_exists("default", $response)) {
                 if ($data['default'] == true) {
@@ -595,7 +626,7 @@ class PayU {
     }
 
     public function deleteSource(Source $source, $token) {
-        $url = env('PAYU_REST') . 'customers/' . $source->client_id . '/creditCards/' . $token;
+        $url = $this->getTestUrl($source->user) . env('PAYU_REST') . 'customers/' . $source->client_id . '/creditCards/' . $token;
         $result = $this->sendDelete($url);
         $result['status'] = "success";
         return $result;
@@ -644,7 +675,7 @@ class PayU {
             "fullName" => $user->name,
             "email" => $user->email,
         ];
-        $response = $this->sendPost($dataSent, env('PAYU_REST') . 'customers/');
+        $response = $this->sendPost($dataSent, $this->getTestUrl($user) . env('PAYU_REST') . 'customers/');
         if (array_key_exists("id", $response)) {
             $source = new Source([
                 "gateway" => "PayU",
@@ -657,7 +688,7 @@ class PayU {
     }
 
     public function getClient(Source $source) {
-        $url = env('PAYU_REST') . 'customers/' . $source->client_id;
+        $url = $this->getTestUrl($source->user) . env('PAYU_REST') . 'customers/' . $source->client_id;
         return $this->sendGet($url);
     }
 
@@ -665,7 +696,7 @@ class PayU {
         $sources = $user->sources()->where('gateway', "PayU")
                         ->where('client_id', $client)->get();
         if ($sources) {
-            $url = env('PAYU_REST') . 'customers/' . $client;
+            $url = $this->getTestUrl($user) . env('PAYU_REST') . 'customers/' . $client;
             $this->sendDelete($url);
             return $user->sources()->where('gateway', "PayU")->where('client_id', $client)->delete();
         }
@@ -690,7 +721,7 @@ class PayU {
             } else {
                 $days = 0;
             }
-            $url = env('PAYU_REST') . 'subscriptions/';
+            $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
             $plan = [
                 "planCode" => $planL->plan_id
             ];
@@ -715,7 +746,7 @@ class PayU {
 
             $response = $this->sendPost($dataSent, $url);
             if (array_key_exists("id", $response)) {
-                $url = env('PAYU_REST') . 'subscriptions/' . $subscription->source_id;
+                $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/' . $subscription->source_id;
                 $this->sendDelete($url);
                 $subscription->gateway = "PayU";
                 $subscription->status = "active";
@@ -741,7 +772,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $url = env('PAYU_REST') . 'subscriptions/';
+        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
         $plan = [
             "planCode" => $planL->plan_id
         ];
@@ -789,7 +820,7 @@ class PayU {
     }
 
     public function createPlan(Plan $planL) {
-        $url = env('PAYU_REST') . 'plans/';
+        $url = $this->getTestUrl(null) . env('PAYU_REST') . 'plans/';
         $additionalValues = [
             "name" => "PLAN_VALUE",
             "value" => "20000",
@@ -815,7 +846,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $url = env('PAYU_REST') . 'subscriptions/';
+        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
         $plan = [
             "planCode" => $planL->plan_id
         ];
@@ -866,7 +897,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $url = env('PAYU_REST') . 'subscriptions/';
+        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
         $plan = [
             "planCode" => $planL->plan_id
         ];
@@ -949,7 +980,7 @@ class PayU {
     public function createAll(User $user, array $data) {
         $planL = Plan::where("plan_id", $data['plan_id'])->first();
         $source = $user->sources()->where("gateway", "PayU")->first();
-        $url = env('PAYU_REST') . 'subscriptions/';
+        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
         $additionalValues = [
             "name" => "PLAN_VALUE",
             "value" => "20000",
@@ -1063,7 +1094,7 @@ class PayU {
                 $this->deleteToken($user);
             }
         }
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $creditCardToken = [
             "payerId" => $user->id,
             "name" => $data['payer_name'],
@@ -1083,7 +1114,7 @@ class PayU {
         $payer['method'] = $data['cc_branch'];
         //dd($dataSent);
 
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         if ($result['code'] == "SUCCESS") {
             $token = $result['creditCardToken'];
             if ($source) {
@@ -1107,7 +1138,7 @@ class PayU {
     public function deleteToken(User $user) {
         $source = $user->sources()->where("gateway", "PayU")->first();
         if ($source) {
-            $merchant = $this->populateMerchant();
+            $merchant = $this->populateMerchant($user);
             $creditCardToken = [
                 "payerId" => $user->id,
                 "creditCardTokenId" => $source->source,
@@ -1120,7 +1151,7 @@ class PayU {
                 "test" => false,
             ];
 
-            $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+            $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
             if ($result['code'] == "SUCCESS") {
                 $source->source = "";
                 $source->has_default = false;
@@ -1134,7 +1165,7 @@ class PayU {
         $today = date_create();
         $date = date_create();
         date_add($date, date_interval_create_from_date_string("1 months"));
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($source->user);
         $creditCardToken = [
             "payerId" => $source->user_id,
             "creditCardTokenId" => $source->source,
@@ -1147,7 +1178,7 @@ class PayU {
             "merchant" => $merchant,
             "creditCardTokenInformation" => $creditCardToken,
         ];
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($source->user) . env('PAYU_PAYMENTS'));
         if (!$result["creditCardTokenList"]) {
             $source->has_default = false;
             $source->source = "";
@@ -1179,7 +1210,7 @@ class PayU {
         $buyer = $this->populateBuyer($user, $data);
         $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
         $payer = $this->populatePayer($data);
-        $merchant = $this->populateMerchant();
+        $merchant = $this->populateMerchant($user);
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
@@ -1208,14 +1239,14 @@ class PayU {
             "command" => "SUBMIT_TRANSACTION",
             "merchant" => $merchant,
             "transaction" => $transaction,
-            "test" => "true",
+            "test" => $this->getTestVar($user),
         ];
-        $result = $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }
 
     public function deleteSubscription(User $user, $subscription) {
-        $url = env('PAYU_REST') . 'subscriptions/' . $subscription;
+        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/' . $subscription;
         $result = $this->sendDelete($url);
         $user->subscriptions()->where('gateway', "PayU")->where('source_id', $subscription)->delete();
         return $result;
@@ -1235,7 +1266,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_PAYMENTS'));
     }
 
     public function getStatusOrderId($order_id) {
@@ -1256,7 +1287,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, env('PAYU_REPORTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_REPORTS'));
     }
 
     public function getStatusOrderRef($order_ref) {
@@ -1277,7 +1308,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, env('PAYU_REPORTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_REPORTS'));
     }
 
     public function getStatusTransaction($transaction_id) {
@@ -1298,7 +1329,7 @@ class PayU {
             "test" => false,
         ];
 
-        return $this->sendRequest($dataSent, env('PAYU_PAYMENTS'));
+        return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_PAYMENTS'));
     }
 
     public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform, $currency) {
@@ -1332,9 +1363,30 @@ class PayU {
                 } else {
                     dispatch(new DenyPayment($payment, $platform));
                 }
+                $transaction->ur = $this->getTestUrl($user) ;
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
+        $transactionContainer = [];
+        $transactionContainer['order_id'] = $payment->order_id;
+        $transactionContainer['orderId'] = $payment->order_id;
+        $transactionContainer['reference_sale'] = $payment->referenceCode;
+        $transactionContainer['user_id'] = $user->id;
+        $transactionContainer['gateway'] = 'PayU';
+        $transactionContainer['currency'] = $currency;
+        $transactionContainer["url"] = $this->getTestUrl($user) ;
+        $transactionContainer['payment_method'] = 'CreditCard';
+        $transactionContainer['description'] = "error";
+        $transactionContainer['transaction_id'] = "-1";
+        $transactionContainer['transaction_state'] = "ERROR";
+        $transactionContainer['response_code'] = "ERROR";
+        $transactionContainer['responseMessage'] = "ERROR";
+        $transactionContainer['transactionId'] = "-1";
+        $transactionContainer['state'] = "ERROR";
+        $transactionContainer['responseCode'] = "ERROR";
+        $transactionContainer['transaction_date'] = date("Y-m-d h:m:s");
+        $transactionContainer['operationDate'] = date("Y-m-d h:m:s");
+        $response['transactionResponse'] = $transactionContainer;
         return ["status" => "error", "response" => $response, "message" => $dataSent];
     }
 

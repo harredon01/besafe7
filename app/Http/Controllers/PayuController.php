@@ -82,8 +82,9 @@ class PayuController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getBanks() {
-        $status = $this->payU->getBanks();
+    public function getBanks(Request $request) {
+        $user = $request->user();
+        $status = $this->payU->getBanks($user);
         return response()->json($status);
     }
 

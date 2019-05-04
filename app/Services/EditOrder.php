@@ -324,7 +324,7 @@ class EditOrder {
                         }
                         if ($splitOrder) {
                             $records["split_order"] = $splitOrder;
-                        } 
+                        }
                         $payment->subtotal = round($buyerSubtotal);
                         $payment->total = round($buyerSubtotal + $transactionCost);
                         $order->attributes = json_encode($records);
@@ -565,10 +565,16 @@ class EditOrder {
             array_push($checkBuyers, $user->id);
             $requiredBuyers -= count($checkBuyers);
         }
-        $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
-        if ($shippingCondition) {
-            $requiresShipping = 0;
+        if ($requiresShipping == 0) {
+            $order->orderConditions()->where('type', "shipping")->delete();
+            Cart::removeConditionsByType("shipping");
+        } else {
+            $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
+            if ($shippingCondition) {
+                $requiresShipping = 0;
+            }
         }
+
         return array(
             "split" => $splitTotal,
             "creditHolders" => $creditHolders,
@@ -709,7 +715,7 @@ class EditOrder {
      */
     public function setPlatformShippingCondition(User $user, $order_id, $platform) {
 
-        Cart::removeConditionsByType("shipping");
+
         $order = Order::find($order_id);
         if ($order) {
             if ($order->user_id == $user->id) {
@@ -733,6 +739,7 @@ class EditOrder {
                         $insertCondition['order_id'] = $order->id;
                         $insertCondition['total'] = $result['price'];
                         $order->orderConditions()->where('type', "shipping")->delete();
+                        Cart::removeConditionsByType("shipping");
                         OrderCondition::insert($insertCondition);
                         Cart::session($user->id)->condition($condition);
                         $cart = $this->editCart->getCheckoutCart($user);
@@ -934,7 +941,7 @@ class EditOrder {
                 $theConditionApplied = $order->orderConditions()->where('condition_id', $theCondition->id)->first();
                 if ($theConditionApplied) {
                     $theCondition2 = Condition::where('id', $theConditionApplied->condition_id)->first();
-                    $theCondition2->used = $theCondition2->used+1;
+                    $theCondition2->used = $theCondition2->used + 1;
                     $theCondition2->save();
                     //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
                 }
