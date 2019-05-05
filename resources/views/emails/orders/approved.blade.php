@@ -1,13 +1,11 @@
 @component('mail::message')
-# Introduction
+# Orden #{{$order->id}} Aprobada 
 
-Orden #{{$order->id}}
-Estado: {{$order->status}}
 @component('mail::table')
 | Nombre         | Valor          | Cantidad          |Total                        |
 | :------------- |---------------:| -----------------:|----------------------------:|
 @foreach ($order->items as $item)
-| {{$item->name}}|{{number_format($item->price, 2, ',', '.')}}|{{$item->quantity}}|{{number_format($item->priceSumConditions, 2, ',', '.')}}|
+| {{$item->name}}|${{number_format($item->price, 2, ',', '.')}}|{{$item->quantity}}|${{number_format($item->priceSumConditions, 2, ',', '.')}}|
 @endforeach  
 @endcomponent
 
@@ -15,9 +13,34 @@ Estado: {{$order->status}}
 | Nombre         | Tipo          | Valor            |
 | :------------- |--------------:|-----------------:|
 @foreach ($order->orderConditions as $item)
-| {{$item->name}}|{{$item->value}}|{{number_format($item->total, 2, ',', '.')}} |
+| {{$item->name}}|{{$item->value}}|${{number_format($item->total, 2, ',', '.')}} |
 @endforeach
-|                |     Total      |{{number_format($order->total, 2, ',', '.')}}|     
+|                |     Total      |${{number_format($order->total, 2, ',', '.')}}|     
+@endcomponent
+
+@component('mail::table')
+| La Orden           | Valor            |
+|:-----------------|-----------------:|
+|Productos         |${{number_format($order->totalCost, 2, ',', '.')}}|
+|ImpoConsumo       |${{number_format($order->totalTax, 2, ',', '.')}}|
+|Logistica total |${{number_format($order->totalPlatform, 2, ',', '.')}}|
+|Total             |${{number_format($order->total, 2, ',', '.')}}|
+@endcomponent
+
+@component('mail::table')
+| Tu Pago #{{$order->payment->id}}         | Valor            |
+|:-----------------|-----------------:|
+|Subtotal          |${{number_format($order->payment->subtotal, 2, ',', '.')}}|
+|Transaccion       |${{number_format($order->payment->transaction_cost, 2, ',', '.')}}|
+|Total             |${{number_format($order->payment->total, 2, ',', '.')}}|
+@endcomponent
+
+@component('mail::table')
+| Tus datos        | Valor            |
+|:-----------------|-----------------:|
+|Nombre:        |{{$user->firstName}} {{$user->lastName}}|
+|Dirección:       |{{$shipping->address}}|
+|Tel:       |{{$shipping->phone}}|
 @endcomponent
 
 Gracias,<br>

@@ -98,10 +98,37 @@ class Food {
                     ];
                     $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
                 } else {
-                    $this->suspendDelivery($user,"cancel");
+                    $this->suspendDelivery($user, "cancel");
                 }
             }
         }
+    }
+
+    public function inviteUser(User $user) {
+        $className = "App\\Services\\EditAlerts";
+        $platFormService = new $className();
+        $deliveryObj = Delivery::find(8850);
+        $delivery = [
+            "delivery" => $deliveryObj
+        ];
+        $payload = [
+            "page" => "DeliveryProgramPage",
+            "page_payload" => $delivery
+        ];
+        $followers = [$user];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "prueba mensaje programacion",
+            "subject" => "prueba mensaje programacion",
+            "object" => "Lonchis",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => "program_reminder",
+            "user_status" => "normal"
+        ];
+        $date = date_create($deliveryObj->delivery);
+        $date = date_format($date, "Y-m-d");
+        $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
     public function loadDayConfig($deliveryDate) {
@@ -449,7 +476,7 @@ class Food {
                         $stopDescription = "Entregar los envases de la ruta: " . $route->id;
                     }
                     $querystop = [
-                        "address" => $address->address." ".$address->notes,
+                        "address" => $address->address . " " . $address->notes,
                         "description" => $stopDescription,
                         "type" => "point",
                         "phone" => $address->phone
@@ -1195,7 +1222,7 @@ class Food {
                 $details['dish'] = $dish;
                 $delivery = Delivery::create([
                             "user_id" => 5,
-                            "delivery" => date_format($date, "Y-m-d")." 12:00:00",
+                            "delivery" => date_format($date, "Y-m-d") . " 12:00:00",
                             "provider" => "Rapigo",
                             "shipping" => $shipping[$amountDeliveries],
                             "status" => "enqueue",

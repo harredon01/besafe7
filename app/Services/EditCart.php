@@ -412,6 +412,8 @@ class EditCart {
                                         'name' => $product->name,
                                         'user_id' => $user->id,
                                         'price' => $productVariant->getActivePrice(),
+                                        'cost' => $productVariant->cost,
+                                        'tax' => $productVariant->tax,
                                         'requires_authorization' => $productVariant->requires_authorization,
                                         'paid_status' => "unpaid",
                                         'fulfillment' => "unfulfilled",
@@ -472,6 +474,12 @@ class EditCart {
                     $losAttributes = array();
                     $losAttributes['is_digital'] = 1;
                     $losAttributes['is_shippable'] = 0;
+                    if (!array_key_exists("cost", $data)) {
+                        $losAttributes['cost'] = 0;
+                    }
+                    if (!array_key_exists("tax", $data)) {
+                        $losAttributes['tax'] = 0;
+                    }
                     $losAttributes['requires_authorization'] = 1;
                     $losAttributes['merchant_id'] = $data['merchant_id'];
                     if (array_key_exists("extras", $data)) {
@@ -483,6 +491,8 @@ class EditCart {
                                 'name' => $losAttributes['name'],
                                 'user_id' => $user->id,
                                 'price' => $losAttributes['price'],
+                                'cost' => $losAttributes['cost'],
+                                'tax' => $losAttributes['tax'],
                                 'paid_status' => "unpaid",
                                 'fulfillment' => "unfulfilled",
                                 'quantity' => (int) $data['quantity'],

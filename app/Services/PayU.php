@@ -1363,7 +1363,7 @@ class PayU {
                 } else {
                     dispatch(new DenyPayment($payment, $platform));
                 }
-                $transaction->ur = $this->getTestUrl($user) ;
+                $transaction->ur = $this->getTestUrl($user);
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }
@@ -1374,7 +1374,7 @@ class PayU {
         $transactionContainer['user_id'] = $user->id;
         $transactionContainer['gateway'] = 'PayU';
         $transactionContainer['currency'] = $currency;
-        $transactionContainer["url"] = $this->getTestUrl($user) ;
+        $transactionContainer["url"] = $this->getTestUrl($user);
         $transactionContainer['payment_method'] = 'CreditCard';
         $transactionContainer['description'] = "error";
         $transactionContainer['transaction_id'] = "-1";
@@ -1498,13 +1498,13 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function checkOrders() {
-        $payments = Payment::where("status", "payment_created")->get();
+        $payments = Payment::whereIn("status", ["payment_created", "pending"])->get();
         foreach ($payments as $payment) {
             $currentTime = time();
             //dd(date("Y-m-d h:m:s"));
             $paymentTime = strtotime($payment->updated_at);
             $timeDiff = ($currentTime - $paymentTime) / (60 * 60 * 24);
-            if ($timeDiff > 3) {
+            if ($timeDiff > 10) {
                 $payment->status = "expired";
                 $payment->save();
             } else {
@@ -1516,7 +1516,9 @@ class PayU {
                     if ($payload) {
                         $transactions = [];
                         foreach ($payload as $result) {
-                            if ($result['status'] == "CAPTURED") {
+                            if ($result['status'] == "IN_PROGRESS") {
+                                break;
+                            } else {
                                 $transactions = $result['transactions'];
                                 $payload = $result;
                                 break;
@@ -1525,13 +1527,11 @@ class PayU {
                         $transactionResponse = null;
                         if (count($transactions) > 0) {
                             foreach ($transactions as $transaction) {
-                                if ($transaction['transactionResponse']['state'] == "APPROVED") {
-                                    $transactionResponse = $transaction['transactionResponse'];
-                                    $transactionResponse['id'] = $transaction['id'];
-                                    $transactionResponse['payment_method'] = $transaction["paymentMethod"];
-                                    $transactionResponse['reference_code'] = $payload["referenceCode"];
-                                    break;
-                                }
+                                $transactionResponse = $transaction['transactionResponse'];
+                                $transactionResponse['id'] = $transaction['id'];
+                                $transactionResponse['payment_method'] = $transaction["paymentMethod"];
+                                $transactionResponse['reference_code'] = $payload["referenceCode"];
+                                break;
                             }
                         }
                         if ($transactionResponse) {
@@ -1542,6 +1542,9 @@ class PayU {
                             $transaction = $this->saveTransactionQuery($transactionResponse, $payment);
                             if ($transactionResponse['state'] == 'APPROVED') {
                                 dispatch(new ApprovePayment($payment, "Food"));
+                            }
+                            if ($transactionResponse['state'] == 'DECLINED' || $transactionResponse['state'] == 'ERROR' || $transactionResponse['state'] == 'EXPIRED') {
+                                dispatch(new DenyPayment($payment, "Food"));
                             }
                         }
 

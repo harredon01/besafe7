@@ -16,7 +16,7 @@ class Item extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','sku','ref2','price','priceSum','priceConditions','priceSumConditions','paid_status','fulfillment',
+    protected $fillable = ['name','sku','ref2','price','priceSum','priceConditions','priceSumConditions','tax','cost','paid_status','fulfillment',
         'is_subscription','quantity','user_id','product_variant_id','order_id','requires_authorization','merchant_id','attributes'];
 
 

@@ -16,7 +16,7 @@ class EditProduct {
 
     const OBJECT_MERCHANT = 'Merchant';
     const OBJECT_PRODUCT = 'Product';
-    const OBJECT_PAGESIZE = 30;
+    const OBJECT_PAGESIZE = 50;
 
     /**
      * The Guard implementation.

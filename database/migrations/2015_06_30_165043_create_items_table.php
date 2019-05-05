@@ -22,6 +22,8 @@ class CreateItemsTable extends Migration {
                         $table->double('priceSum', 15, 2);
                         $table->double('priceConditions', 15, 2);
                         $table->double('priceSumConditions', 15, 2);
+                        $table->double('tax', 15, 2);
+                        $table->double('cost', 15, 2);
                         $table->boolean('is_subscription');
                         $table->string('paid_status');
                         $table->string('fulfillment');

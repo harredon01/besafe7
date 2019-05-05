@@ -19,6 +19,7 @@ use App\Services\Stripe;
 use App\Services\Geolocation;
 use App\Services\EditAlerts;
 use App\Mail\OrderApproved;
+use App\Mail\OrderApprovedInvoice;
 use Mail;
 use Darryldecode\Cart\CartCondition;
 use Cart;
@@ -857,6 +858,7 @@ class EditOrder {
             $user = $item->user;
             if ($order->status == "approved") {
                 Mail::to($user)->send(new OrderApproved($order, $user, $shipping));
+                unset($order->payment);
             }
             array_push($followers, $user);
             $payload = [
