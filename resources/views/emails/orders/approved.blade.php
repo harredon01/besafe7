@@ -24,6 +24,7 @@
 |Productos         |${{number_format($order->totalCost, 2, ',', '.')}}|
 |ImpoConsumo       |${{number_format($order->totalTax, 2, ',', '.')}}|
 |Logistica total |${{number_format($order->totalPlatform, 2, ',', '.')}}|
+|Descuentos |${{number_format($order->totalDiscount, 2, ',', '.')}}|
 |Total             |${{number_format($order->total, 2, ',', '.')}}|
 @endcomponent
 

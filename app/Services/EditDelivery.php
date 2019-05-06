@@ -85,7 +85,7 @@ class EditDelivery {
                 date_add($date, date_interval_create_from_date_string("1 days"));
                 $tomorrow = date_format($date, "Y-m-d");
                 $dateTomorrow = $tomorrow . " 23:59:59";
-                $dateToday = $today . " 22:00:00";
+                $dateToday = $today . " 18:00:00";
                 $dateTimestampToday = strtotime($dateToday);
                 $dateTimestampTomorrow = strtotime($dateTomorrow);
                 if ($datetimestampDelivery < $dateTimestampTomorrow) {

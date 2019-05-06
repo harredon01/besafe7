@@ -246,7 +246,7 @@ class EditMessages {
                 array_push($followers, $recipient);
             }
             unset($data['to_id']);
-            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null);
+            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null,false);
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
@@ -268,7 +268,7 @@ class EditMessages {
     public function getSupportAgent($type,$object){
         if($type == "platform"){
             if($object == "food"){
-                $user = User::find(2);
+                $user = User::find(77);
                 $friend = [
                     "id" => $user->id,
                     "name" => $user->firstName." ".$user->lastName                    

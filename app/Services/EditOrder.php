@@ -848,6 +848,8 @@ class EditOrder {
     public function OrderStatusUpdate(Order $order) {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
+        $adminUser = User::find(2);
+        $adminUser2 = User::find(77);
         $sendEmail = true;
         if ($order->status == "approved") {
             $shipping = $order->orderAddresses()->where("type", "shipping")->first();
@@ -857,8 +859,13 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
-                Mail::to($user)->send(new OrderApproved($order, $user, $shipping));
+                Mail::to($user)->cc($adminUser2)->bcc($adminUser)->send(new OrderApproved($order, $user, $shipping));
                 unset($order->payment);
+                unset($order->totalTax);
+                unset($order->totalCost);
+                unset($order->totalDiscount);
+                unset($order->totalPlatform);
+                
             }
             array_push($followers, $user);
             $payload = [
@@ -947,15 +954,54 @@ class EditOrder {
                     $theCondition2->save();
                     //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
                 }
-                Cart::session($user->id)->removeConditionsByType("coupon");
-                $order->orderConditions()->where('type', "coupon")->delete();
-                $insertCondition = array(
-                    'name' => $theCondition->name,
-                    'type' => 'coupon',
-                    'target' => $theCondition->target,
-                    'value' => $theCondition->value,
-                    'order' => $theCondition->order,
-                );
+
+                if ($theCondition->target == "quantity") {
+                    $item = $order->items()->whereIn("product_variant_id", [201, 202, 203, 204, 205, 206, 207, 208, 209, 210])->first();
+                    if (!$item) {
+                        return array("status" => "error", "message" => "Coupon quantity");
+                    }
+                    if ($item->quantity < 11) {
+                        return array("status" => "error", "message" => "Coupon quantity");
+                    }
+                    Cart::session($user->id)->removeConditionsByType("coupon");
+                    $order->orderConditions()->where('type', "coupon")->delete();
+                    $attributes = json_decode($item->attributes, true);
+                    $insertCondition = array(
+                        'name' => $theCondition->name,
+                        'type' => 'coupon',
+                        'target' => 'subtotal',
+                        'value' => "" . ((int) $theCondition->value * (int) $attributes["credits"]),
+                        'order' => $theCondition->order,
+                    );
+                } else if ($theCondition->target == "quantity2") {
+                    $item = $order->items()->whereIn("product_variant_id", [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220])->first();
+                    if (!$item) {
+                        return array("status" => "error", "message" => "Coupon quantity");
+                    }
+                    if ($item->quantity < 5) {
+                        return array("status" => "error", "message" => "Coupon quantity");
+                    }
+                    Cart::session($user->id)->removeConditionsByType("coupon");
+                    $order->orderConditions()->where('type', "coupon")->delete();
+                    $attributes = json_decode($item->attributes, true);
+                    $insertCondition = array(
+                        'name' => $theCondition->name,
+                        'type' => 'coupon',
+                        'target' => 'subtotal',
+                        'value' => $theCondition->value,
+                        'order' => $theCondition->order,
+                    );
+                } else {
+                    Cart::session($user->id)->removeConditionsByType("coupon");
+                    $order->orderConditions()->where('type', "coupon")->delete();
+                    $insertCondition = array(
+                        'name' => $theCondition->name,
+                        'type' => 'coupon',
+                        'target' => $theCondition->target,
+                        'value' => $theCondition->value,
+                        'order' => $theCondition->order,
+                    );
+                }
                 $condition = new CartCondition($insertCondition);
                 Cart::session($user->id)->condition($condition);
                 $theCondition->used = $theCondition->used + 1;

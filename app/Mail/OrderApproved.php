@@ -44,16 +44,21 @@ class OrderApproved extends Mailable
         $totalCost = 0 ;
         $totalTax = 0 ;
         $totalPlatform = 0 ;
+        $totalDiscount = 0 ;
         $payment = $order->payments()->where("user_id",$user->id)->first();
         foreach($order->items as $item){
             $totalCost += ($item->quantity*$item->cost) ;
             $totalTax += ($item->quantity*$item->tax) ;
             $totalPlatform += ($item->quantity*($item->price-($item->cost+$item->tax))) ;
         }
+        foreach ($order->orderConditions as $item){
+            
+        }
         $order->payment = $payment;
         $order->totalTax = $totalTax;
         $order->totalCost = $totalCost;
         $order->totalPlatform = $totalPlatform;
+        $order->totalDiscount = $totalDiscount;
         $this->order = $order;
         $this->user = $user;
         $this->shipping = $shipping;

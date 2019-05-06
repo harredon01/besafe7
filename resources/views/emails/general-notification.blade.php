@@ -1,5 +1,7 @@
 @component('mail::message')
 
+{{$subject}} 
+
 {{$bodyMail}} 
 
 Gracias,<br>
