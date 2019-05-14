@@ -732,7 +732,7 @@ class EditOrder {
                         $insertCondition = array(
                             'name' => "Servicio de transporte",
                             'type' => "shipping",
-                            'target' => 'subtotal',
+                            'target' => 'total',
                             'value' => $result['price'],
                             'order' => 0
                         );
@@ -859,13 +859,12 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
-                Mail::to($user)->cc($adminUser2)->bcc($adminUser)->send(new OrderApproved($order, $user, $shipping));
+                Mail::to($user)->bcc($adminUser)->send(new OrderApproved($order, $user, $shipping,"no"));
+                Mail::to($adminUser2)->cc($adminUser)->send(new OrderApproved($order, $user, $shipping,"yes"));
                 unset($order->payment);
-                unset($order->totalTax);
                 unset($order->totalCost);
-                unset($order->totalDiscount);
                 unset($order->totalPlatform);
-                
+                unset($order->totalDeposit);
             }
             array_push($followers, $user);
             $payload = [
@@ -947,48 +946,30 @@ class EditOrder {
             // add single condition on a cart bases
             if ($theCondition->isReusable || (!$theCondition->isReusable && $theCondition->used < 1)) {
                 $order = $this->getOrder($user);
+                
                 $theConditionApplied = $order->orderConditions()->where('condition_id', $theCondition->id)->first();
                 if ($theConditionApplied) {
                     $theCondition2 = Condition::where('id', $theConditionApplied->condition_id)->first();
                     $theCondition2->used = $theCondition2->used + 1;
                     $theCondition2->save();
-                    //return array("status" => "info", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
+                    //return array("status" => "error", "message" => "Cart condition already exists in order", "cart" => $this->editCart->getCart($user));
                 }
-
-                if ($theCondition->target == "quantity") {
-                    $item = $order->items()->whereIn("product_variant_id", [201, 202, 203, 204, 205, 206, 207, 208, 209, 210])->first();
-                    if (!$item) {
-                        return array("status" => "error", "message" => "Coupon quantity");
-                    }
-                    if ($item->quantity < 11) {
-                        return array("status" => "error", "message" => "Coupon quantity");
-                    }
-                    Cart::session($user->id)->removeConditionsByType("coupon");
-                    $order->orderConditions()->where('type', "coupon")->delete();
-                    $attributes = json_decode($item->attributes, true);
-                    $insertCondition = array(
-                        'name' => $theCondition->name,
-                        'type' => 'coupon',
-                        'target' => 'subtotal',
-                        'value' => "" . ((int) $theCondition->value * (int) $attributes["credits"]),
-                        'order' => $theCondition->order,
-                    );
-                } else if ($theCondition->target == "quantity2") {
-                    $item = $order->items()->whereIn("product_variant_id", [201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220])->first();
-                    if (!$item) {
-                        return array("status" => "error", "message" => "Coupon quantity");
-                    }
-                    if ($item->quantity < 5) {
-                        return array("status" => "error", "message" => "Coupon quantity");
+                $attributes = json_decode($theCondition->attributes, true);
+                if ($theCondition->target == "product_variant_id" || $theCondition->target == "product_id") {
+                    $result = $this->checkCoupon($order, $attributes, $theCondition);
+                    if($result['status']=="error"){
+                        return $result;
+                    } else {
+                        $value = $result['value'];
                     }
                     Cart::session($user->id)->removeConditionsByType("coupon");
                     $order->orderConditions()->where('type', "coupon")->delete();
-                    $attributes = json_decode($item->attributes, true);
                     $insertCondition = array(
+                        'condition_id' =>$theCondition->id,
                         'name' => $theCondition->name,
                         'type' => 'coupon',
-                        'target' => 'subtotal',
-                        'value' => $theCondition->value,
+                        'target' => 'total',
+                        'value' => $value,
                         'order' => $theCondition->order,
                     );
                 } else {
@@ -996,6 +977,7 @@ class EditOrder {
                     $order->orderConditions()->where('type', "coupon")->delete();
                     $insertCondition = array(
                         'name' => $theCondition->name,
+                        'condition_id' =>$theCondition->id,
                         'type' => 'coupon',
                         'target' => $theCondition->target,
                         'value' => $theCondition->value,
@@ -1008,14 +990,37 @@ class EditOrder {
                 $theCondition->save();
                 $insertCondition['order_id'] = $order->id;
                 $insertCondition['condition_id'] = $theCondition->id;
+                $insertCondition['total'] = $condition->getCalculatedValue(Cart::session($user->id)->getSubTotal());
                 OrderCondition::insert($insertCondition);
-
-
-
                 return array("status" => "success", "message" => "Cart condition set on the cart", "cart" => $this->editCart->getCheckoutCart($user));
             }
         }
         return array("status" => "error", "message" => "Coupon does not exist");
+    }
+
+    private function checkCoupon($order,$attributes,$theCondition) {
+        if($theCondition->target == "product_variant_id"){
+            $item = $order->items()->whereIn("product_variant_id", $attributes["targets"])->first();
+        } else {
+            $item = $order->items()->whereIn("product_id", $attributes["targets"])->first();
+        }
+        
+        if (!$item) {
+            return array("status" => "error", "message" => "Product missing");
+        }
+        if (array_key_exists("minquantity", $attributes)) {
+            if ($item->quantity < $attributes["minquantity"]) {
+                return array("status" => "error", "message" => "Coupon quantity");
+            }
+        }
+        $value = $theCondition->value;
+        if (array_key_exists("per_person", $attributes)) {
+            if ($attributes["per_person"] > 0) {
+                $attributes2 = json_decode($item->attributes, true);
+                $value = "" . ((int) $theCondition->value * (int) $attributes2["credits"]);
+            }
+        }
+        return array("status" => "success", "value" => $value);
     }
 
     /**

@@ -45,8 +45,15 @@ class Simi {
             ["name" => "Archies", "id" => "89564891"],
             ["name" => "Ezpot", "id" => "155384411"],
             ["name" => "Vilaseca", "id" => "180729051"],
-            ["name" => "BycEncasa", "id" => "135494543"],
+        //    ["name" => "Bodega y cocina", "id" => "149085830"],
             ["name" => "Daportare", "id" => "114361275"],
+            ["name" => "Cano Col", "id" => "186528565"],
+            ["name" => "Cano Int", "id" => "192819811"],
+        //    ["name" => "Brasa Roja", "id" => "114368786"],
+        //    ["name" => "Calimio", "id" => "131329703"],
+        //    ["name" => "Calivea", "id" => "131319203"],
+        //    ["name" => "Dilucca", "id" => "99509236"],
+            ["name" => "Celsia", "id" => "180921091"],
         ];
         foreach ($metrics as $value) {
             $this->runProject($analytics, $value);

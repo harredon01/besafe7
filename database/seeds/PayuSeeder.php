@@ -10,7 +10,8 @@ use App\Models\Order;
 use App\Models\User;
 use App\Models\Delivery;
 use App\Models\Route;
-use App\Models\OrderAddress;
+use App\Jobs\ApprovePayment;
+use App\Models\Payment;
 
 class PayuSeeder extends Seeder {
 
@@ -38,7 +39,9 @@ class PayuSeeder extends Seeder {
     }
 
     public function run() {
-        $this->proofhub->sendGet("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=AIzaSyDMggl2vpY-NVNQNNqj8yAFUcbgSYI9wss&input=Carrera 7&inputtype=textquery&language=es&fields=formatted_address,geometry,icon,id,name&locationbias=circle:53000@4.694278,-74.067352");
+        $payment = Payment::find(446);
+        dispatch(new ApprovePayment($payment, "Food"));
+        //$this->proofhub->sendGet("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=AIzaSyDMggl2vpY-NVNQNNqj8yAFUcbgSYI9wss&input=Carrera 7&inputtype=textquery&language=es&fields=formatted_address,geometry,icon,id,name&locationbias=circle:53000@4.694278,-74.067352");
     }
 
 }

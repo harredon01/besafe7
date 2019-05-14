@@ -72,43 +72,9 @@ class EditOrderFood {
                     ));
                     Cart::session($user->id)->condition($condition2);
                 }
-                    }
-                }
+            }
+        }
 
-        /* $conditionF = new OrderCondition(array(
-          'name' => "Costo fijo transaccion",
-          'target' => "subtotal",
-          'type' => self::TRANSACTION_CONDITION,
-          'value' => "+900",
-          'total' => 900,
-          ));
-
-          $condition2F = new CartCondition(array(
-          'name' => $conditionF->name,
-          'type' => $conditionF->type,
-          'target' => $conditionF->target, // this condition will be applied to cart's subtotal when getSubTotal() is called.
-          'value' => $conditionF->value,
-          'order' => 100
-          ));
-          $condition2V = new CartCondition(array(
-          'name' => "Costo variable transaccion",
-          'type' => self::TRANSACTION_CONDITION,
-          'target' => "total", // this condition will be applied to cart's subtotal when getSubTotal() is called.
-          'value' => "3.49%",
-          'order' => 100
-          ));
-          $conditionV = new OrderCondition(array(
-          'name' => "Costo variable transaccion",
-          'target' => "total",
-          'type' => self::TRANSACTION_CONDITION,
-          'value' => "3.49%",
-          'total' => $condition2V->getCalculatedValue($order->subtotal),
-          ));
-          //dd( $conditionV->toArray());
-          $order->orderConditions()->saveMany([$conditionF, $conditionV]);
-          array_push($conditions, $conditionF);
-          array_push($conditions, $conditionV);
-          Cart::session($user->id)->condition([$condition2F, $condition2V]); */
         return array("status" => "success", "message" => "Conditions added", "conditions" => $conditions, "order" => $order);
     }
 

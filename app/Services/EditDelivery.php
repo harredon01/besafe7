@@ -40,6 +40,7 @@ class EditDelivery {
                         $dish = [
                             'type_id' => $data['type_id'],
                             'starter_id' => $data['starter_id'],
+                            'drink_id' => $data['drink_id'],
                             'main_id' => $data['main_id'],
                             'dessert_id' => $data['dessert_id']
                         ];
@@ -65,6 +66,7 @@ class EditDelivery {
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
+        //return array("status" => "success", "message" => "Delivery in limit");
         if ($delivery->status == "pending" || $delivery->status == "deposit" || $delivery->status == "enqueue") {
             
         } else {
@@ -77,15 +79,15 @@ class EditDelivery {
 
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
-        $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60 / 24;
-        if ($diff < 1) {
+        $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60 ;
+        if ($diff < 13) {
             return array("status" => "error", "message" => "Limit passed");
-        } else if ($diff > 1 && $diff < 2) {
+        } else if ($diff > 18 && $diff < 42) {
             if ($dayofweek > 0 && $dayofweek < 6) {
                 date_add($date, date_interval_create_from_date_string("1 days"));
                 $tomorrow = date_format($date, "Y-m-d");
                 $dateTomorrow = $tomorrow . " 23:59:59";
-                $dateToday = $today . " 18:00:00";
+                $dateToday = $today . " 22:00:00";
                 $dateTimestampToday = strtotime($dateToday);
                 $dateTimestampTomorrow = strtotime($dateTomorrow);
                 if ($datetimestampDelivery < $dateTimestampTomorrow) {
@@ -96,7 +98,7 @@ class EditDelivery {
             } else {
                 return array("status" => "error", "message" => "Limit passed");
             }
-        } else if ($diff > 2 && $diff < 3) {
+        } else if ($diff > 42 && $diff < 66) {
             if ($dayofweek == 6) {
                 date_add($date, date_interval_create_from_date_string("2 days"));
                 $monday = date_format($date, "Y-m-d");

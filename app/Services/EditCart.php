@@ -82,12 +82,12 @@ class EditCart {
           $saleTotal = 0;
           foreach ($saleItems as $item) {
           $saleTotal += $item->getCalculatedValue($subTotal);
-          }
-          $couponItems = Cart::session($user->id)->getConditionsByType("coupon");
-          $couponTotal = 0;
-          foreach ($couponItems as $item) {
-          $couponTotal += $item->getCalculatedValue($subTotal);
-          } */
+          } 
+        $couponItems = Cart::session($user->id)->getConditionsByType("coupon");
+        $couponTotal = 0;
+        foreach ($couponItems as $item) {
+            $couponTotal += $item->getCalculatedValue($subTotal);
+        }*/
         $taxItems = Cart::session($user->id)->getConditionsByType("tax");
         $taxTotal = 0;
 
@@ -347,7 +347,7 @@ class EditCart {
                     $item->save();
                     return array("status" => "success", "message" => "item added to cart successfully", "item" => $item, "cart" => $this->getCart($user), "quantity" => $quantity);
                 } else {
-                    return array("status" => "error", "message" => "MIN_QUANTITY","quantity"=>$productVariant->min_quantity);
+                    return array("status" => "error", "message" => "MIN_QUANTITY", "quantity" => $productVariant->min_quantity);
                 }
             } else {
                 return array("status" => "error", "message" => "No more stock of that product");
@@ -358,7 +358,7 @@ class EditCart {
                 $resultCheck = $this->checkCartAuth($user, $productVariant->requires_authorization, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
                     if ((int) $productVariant->quantity >= (int) $data['quantity'] || $productVariant->is_digital) {
-                        if ($productVariant->min_quantity <= (int) $data['quantity'] ) {
+                        if ($productVariant->min_quantity <= (int) $data['quantity']) {
                             $conditions = $productVariant->conditions()->where('status', 'active')->get();
                             $applyConditions = array();
                             foreach ($conditions as $condition) {
@@ -440,7 +440,7 @@ class EditCart {
 
                             return array("status" => "success", "message" => "item added to cart successfully", "cart" => $this->getCart($user), "item" => $item);
                         } else {
-                            return array("status" => "error", "message" => "MIN_QUANTITY","quantity"=>$productVariant->min_quantity);
+                            return array("status" => "error", "message" => "MIN_QUANTITY", "quantity" => $productVariant->min_quantity);
                         }
                     } else {
                         return array("status" => "error", "message" => "SOLD_OUT");
@@ -536,15 +536,15 @@ class EditCart {
      */
     public function updateCartItem(User $user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        if($order_id){
+        if ($order_id) {
             $item = Item::where('id', intval($data['item_id']))
-                        ->where('user_id', $user->id)
-                        ->where('order_id', $order_id)->first();
+                            ->where('user_id', $user->id)
+                            ->where('order_id', $order_id)->first();
         } else {
             $item = Item::where('id', intval($data['item_id']))
-                        ->where('user_id', $user->id)->first();
+                            ->where('user_id', $user->id)->first();
         }
-        
+
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {

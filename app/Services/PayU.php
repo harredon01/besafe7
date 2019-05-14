@@ -1748,7 +1748,9 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnPayu(array $data) {
+        
         $ApiKey = env('PAYU_KEY');
+        
         $merchant_id = $data['merchantId'];
         $referenceCode = $data['referenceCode'];
         $TX_VALUE = $data['TX_VALUE'];
@@ -1776,6 +1778,7 @@ class PayU {
 
             $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
             if ($transaction) {
+                $data['estadoTx'] = $transaction->transaction_state;
                 $data['transaction'] = $transaction;
                 return $data;
             }

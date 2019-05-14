@@ -17,17 +17,17 @@
 @endforeach
 |                |     Total      |${{number_format($order->total, 2, ',', '.')}}|     
 @endcomponent
-
+@if ($invoice == 'yes')
 @component('mail::table')
 | La Orden           | Valor            |
 |:-----------------|-----------------:|
 |Productos         |${{number_format($order->totalCost, 2, ',', '.')}}|
-|ImpoConsumo       |${{number_format($order->totalTax, 2, ',', '.')}}|
+|ImpoConsumo       |${{number_format($order->tax, 2, ',', '.')}}|
+|Depositos, menaje y meseros |${{number_format($order->totalDeposit, 2, ',', '.')}}|
 |Logistica total |${{number_format($order->totalPlatform, 2, ',', '.')}}|
-|Descuentos |${{number_format($order->totalDiscount, 2, ',', '.')}}|
 |Total             |${{number_format($order->total, 2, ',', '.')}}|
 @endcomponent
-
+@endif
 @component('mail::table')
 | Tu Pago #{{$order->payment->id}}         | Valor            |
 |:-----------------|-----------------:|

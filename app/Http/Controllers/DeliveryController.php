@@ -87,6 +87,7 @@ class DeliveryController extends Controller
             'starter_id',
             'main_id',
             'dessert_id',
+            'drink_id',
             'observation',
             'details'
         ]);
