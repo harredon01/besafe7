@@ -20,7 +20,7 @@ class Proofhub {
 
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
-        $fields_string = "";
+        $fields_string = ""; 
         foreach ($data as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
         }
@@ -59,10 +59,13 @@ class Proofhub {
 //        $response = str_replace('\"', "'", $response);
         curl_close($curl);
         $response = json_decode($response, true);
-        if (!is_array($response)) {
-            dd($response);
+        if(array_key_exists('status', $response)){
+            sleep(11);
+            return $this->sendGet($query);
+        }else {
+            return $response;
         }
-        return $response;
+        
     }
 
     public function getProjectTimeSheets($project) {
@@ -219,7 +222,6 @@ class Proofhub {
     }
 
     public function writeFile($data, $title) {
-        dd($data);
         Excel::create($title, function($excel) use($data, $title) {
 
             $excel->setTitle($title);
@@ -826,7 +828,7 @@ class Proofhub {
                         dd("826");
                     }
                 } else {
-                    dd("829");
+                    dd($tasks);
                 }
             }
             $estimatedMissingBudget = $totalMissingHours * self::COSTO_HORA_PROMEDIO;
@@ -875,16 +877,16 @@ class Proofhub {
                         if ($event["description"]) {
                             $totalMissingBudget += intval($event["description"]);
                         }
-                        foreach ($event["assigned"] as $assinee) {
-                            $person = $this->getPerson($assinee, $people);
-                            if ($person) {
-                                if (is_array($person["milestones"])) {
-                                    array_push($person["milestones"], $projectMilestone);
-                                } else {
-                                    dd("884");
-                                }
-                            }
-                        }
+//                        foreach ($event["assigned"] as $assinee) {
+//                            $person = $this->getPerson($assinee, $people);
+//                            if ($person) {
+//                                if (is_array($person["milestones"])) {
+//                                    array_push($person["milestones"], $projectMilestone);
+//                                } else {
+//                                    dd("884");
+//                                }
+//                            }
+//                        }
                     }
                 }
             }
@@ -1107,24 +1109,18 @@ class Proofhub {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
         $copy = $people;
-        $projects = $this->getProjects($copy, null);
-        $full = true;
-        $name = 'Total_mes_' . time();
-        $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        sleep(10);
+        
+        
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        sleep(10);
         $projects = $this->getProjects($copy, self::CANADA);
         $full = false;
         $name = 'Total_canada_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        sleep(10);
         $projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
         $name = 'Total_produccion_' . time();
@@ -1133,6 +1129,11 @@ class Proofhub {
         $projects = $this->getProjects($copy, self::INTERNO);
         $full = false;
         $name = 'Total_internos_' . time();
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        $projects = $this->getProjects($copy, null);
+        $full = true;
+        $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
     }
@@ -1218,7 +1219,7 @@ class Proofhub {
                         "cost" => "Start",
                         "person_name" => "End",
                 ]);
-                if(count($finalPerson['milestones'])>0){
+                if(false){//if(count($finalPerson['milestones'])>0){
                     $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels'], $title2, $finalPerson['milestones']);
                 } else {
                     $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
@@ -1338,7 +1339,7 @@ class Proofhub {
                 // "non_billable_cost" => 0,
                 "labels" => [],
                 "projects" => [],
-                "milestones" => [],
+             //   "milestones" => [],
             ];
             if ($resultsPerson['id'] == "1871117844") {
                 //andres

@@ -30,6 +30,9 @@ class Kernel extends ConsoleKernel
         $schedule->call('App\Http\Controllers\RapigoController@getActiveRoutesUpdate')->everyFiveMinutes();;
         //$schedule->call('App\Http\Controllers\FoodController@runRecurringTask')->hourly();
         $schedule->call('App\Http\Controllers\FoodController@reprogramDeliveries')->hourly();
+        $schedule->command('db:backup')->dailyAt('18:00')->after(function ()use ($schedule) {
+             $schedule->call('App\Http\Controllers\FoodApiController@regenerateScenarios');
+         });
     }
 
     /**
