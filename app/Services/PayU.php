@@ -1682,7 +1682,7 @@ class PayU {
             $transaction->reference_sale = $data['referenceCode'];
             $transaction->payment_method = $data['polPaymentMethodType'];
             $transaction->transaction_id = $data['transactionId'];
-            $transaction->transaction_date = $data['processingDate'];
+            //$transaction->transaction_date = $data['processingDate'];
             $transaction->response_code = $data['lapResponseCode'];
             $transaction->extras = json_encode($data);
             $transaction->save();
@@ -1697,7 +1697,7 @@ class PayU {
             $insert["transaction_id"] = $data["transactionId"];
             $insert["gateway"] = "PayU";
             $insert["description"] = $data["message"];
-            $insert["transaction_date"] = $data["processingDate"];
+            //$insert["transaction_date"] = $data["processingDate"];
             $insert["transaction_state"] = $data["transactionState"];
             $insert["extras"] = json_encode($data);
             $transaction = Transaction::create($insert);

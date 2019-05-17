@@ -23,7 +23,8 @@
                         <option value="Basilikum">Basilikum</option>
                     </select><br/>
 
-                    <a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/>
+                    <a href="javascript:;" ng-click="sendReminder()">Enviar Recordatorio</a><br/><br/>
+                    <!--a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/-->
                     <a href="javascript:;" ng-click="regenerateScenarios()">Regenerate Scenarios</a><br/><br/>
                     <a href="javascript:;" ng-click="getTotalShippingCosts()">Get total shipping costs</a><br/><br/>
                     <a href="javascript:;" ng-click="getScenarioEmails()">Get scenario emails</a><br/><br/>

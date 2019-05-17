@@ -37,7 +37,7 @@ Telefono: {{ $stop->address->phone }}
 @endforeach 
 @endif
 @foreach ($stop->deliveries as $delivery)
-### {{ $delivery->id }} {{ $delivery->user->firstName }} {{ $delivery->user->lastName }}
+{{ $delivery->id }} {{ $delivery->user->firstName }} {{ $delivery->user->lastName }}
 @foreach ($delivery->totals['keywords'] as $line)
 {{ $line }}
 @endforeach 

@@ -227,7 +227,7 @@ class EditOrder {
     }
 
     public function getTransactionTotal($total) {
-        return ((($total * 3.49) / 100) + 900);
+        return ((($total * 6.5) / 100) + 900);
     }
 
     public function removeTransactionCost(Order $order) {

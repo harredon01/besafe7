@@ -12,6 +12,7 @@ use App\Jobs\RegenerateDeliveriesAndScenarios;
 use App\Jobs\BuildScenarioRouteIdApi;
 use App\Jobs\BuildScenarioPositive;
 use App\Jobs\BuildCompleteScenario;
+use App\Jobs\ApprovePayment;
 use App\Jobs\GetScenarioOrganizationStructure;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\Article;
@@ -82,6 +83,16 @@ class FoodApiController extends Controller {
         $this->food->getPurchaseOrder($deliveries);
         return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function sendReminder() {
+        $this->food->sendReminder();
+        return response()->json(array("status" => "success", "message" => "Reminder Sent"));
+    }
 
     /**
      * Show the application dashboard to the user.
@@ -137,6 +148,17 @@ class FoodApiController extends Controller {
 //            $routes = App\Models\Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
 //            $this->food->buildScenarioTransit($routes);
         return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function approvePayment( $id) {
+        $payment = \App\Models\Payment::find($id);
+        dispatch(new \App\Jobs\ApprovePayment($payment,  "Food"));
+        return response()->json(array("status" => "success", "message" => "Payment scheduled"));
     }
 
     /**

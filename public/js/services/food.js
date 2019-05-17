@@ -323,6 +323,22 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var sendReminder = function () {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/food/reminder',
+                        data: {}, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to sendReminder");
+                        });
+                return def.promise;
+                /**/
+            }
             var deleteMessageItem = function (item) {
                 var def = $q.defer();
                 $http({
@@ -380,6 +396,7 @@ angular.module('besafe')
                 getScenarioStructure:getScenarioStructure,
                 getSummaryShipping:getSummaryShipping,
                 buildScenarioRouteId:buildScenarioRouteId,
+                sendReminder:sendReminder,
                 buildCompleteScenario:buildCompleteScenario,
                 regenerateScenarios:regenerateScenarios,
                 buildScenarioPositive:buildScenarioPositive,

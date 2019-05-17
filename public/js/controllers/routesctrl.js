@@ -124,6 +124,13 @@
                 $scope.regionVisible = false;
                 $scope.cityVisible = false;
             }
+            $scope.sendReminder = function () {
+                Food.sendReminder().then(function (data) {
+                },
+                        function (data) {
+
+                        });
+            }
             $scope.showAll = function () {
                 console.log("Creating map data")
                 for (route in $scope.routes) {

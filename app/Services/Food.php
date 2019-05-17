@@ -250,8 +250,45 @@ class Food {
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
             $user = User::find(2);
-            Mail::to($user)->send(new PurchaseOrder($dayConfig));
+            $user2 = User::find(77);
+            Mail::to($user)->cc($user2)->send(new PurchaseOrder($dayConfig));
             return $dayConfig;
+        }
+    }
+
+    public function sendReminder() {
+        $date = date_create();
+        date_add($date, date_interval_create_from_date_string("1 days"));
+        $tomorrow = date_format($date, "Y-m-d");
+        $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
+        if (count($deliveries) > 0) {
+            $followers = [];
+            $className = "App\\Services\\EditAlerts";
+            $platFormService = new $className();
+            foreach ($deliveries as $deliveryObj) {
+
+                $delivery = [
+                    "delivery" => $deliveryObj
+                ];
+                $payload = [
+                    "page" => "DeliveryProgramPage",
+                    "page_payload" => $delivery
+                ];
+                $followers = [$deliveryObj->user];
+                $data = [
+                    "trigger_id" => -1,
+                    "message" => "",
+                    "subject" => "Ya escogiste tu almuerzo de mañana?",
+                    "object" => "Lonchis",
+                    "sign" => true,
+                    "payload" => $payload,
+                    "type" => "program_reminder",
+                    "user_status" => "normal"
+                ];
+                $date = date_create($deliveryObj->delivery);
+                $date = date_format($date, "Y-m-d");
+                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+            }
         }
     }
 
@@ -1132,8 +1169,9 @@ class Food {
                     array_push($stops, $stop);
                 }
             }
+            //dd($stops);
             if ($preorganize) {
-                usort($stops, array($this, 'cmp'));
+                //usort($stops, array($this, 'cmp'));
             }
         }
         return $stops;

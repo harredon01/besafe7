@@ -8,10 +8,10 @@
             Creado: <span class="type">@{{ payment.created_at}}</span><br/>
             Referencia: <span class="type">@{{ payment.referenceCode}}</span><br/>
             Total: <span class="type">@{{ payment.total}}</span><br/>
-
-            <br/><a href="javascript:;" ng-click="approvePayment(payment.id)" class="editar">Aprobar Pago</a>
+            
+            <a ng-hide="payment.status=='approved'" href="javascript:;" ng-click="approvePayment(payment)" class="editar">Aprobar Pago</a><br/><br/>
         </li>
-        <li ng-show="showMore">
+        <li ng-show="loadMore">
             <button ng-click="getPayments()">Cargar mas</button>
         </li>
     </ul>

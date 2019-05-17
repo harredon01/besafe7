@@ -168,6 +168,7 @@ Route::post('orders/recurring/{order?}', 'OrderApiController@setOrderRecurringTy
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
 Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
+Route::post('payments/{payment?}/approve', 'FoodApiController@approvePayment'); 
 
 Route::get('admin/store/products', 'ProductImportApiController@getProducts'); 
 Route::get('admin/store/variants', 'ProductImportApiController@getVariants'); 
@@ -192,6 +193,7 @@ Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries
 Route::get('food/summary/{status?}', 'FoodApiController@getSummaryShipping');
 Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 Route::post('food/delegate_deliveries', 'FoodApiController@delegateDeliveries');
+Route::post('food/reminder', 'FoodApiController@sendReminder');
 Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
 Route::get('food/purchase_order', 'FoodApiController@getPurchaseOrder');
 Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');

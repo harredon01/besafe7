@@ -7,7 +7,7 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-04-01';
+    const START_DATE = '2019-05-01';
     const END_DATE = '2119-04-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
@@ -60,7 +60,7 @@ class Proofhub {
         curl_close($curl);
         $response = json_decode($response, true);
         if (!is_array($response)) {
-            dd($responseString);
+            dd($response);
         }
         return $response;
     }
@@ -85,6 +85,11 @@ class Proofhub {
         $lists = $this->sendGet($query);
         $totalTasks = [];
         foreach ($lists as $list) {
+            if (array_key_exists('id', $list)) {
+                
+            } else {
+                dd("91");
+            }
             $results = $this->getTasksList($project, $list['id']);
             if (is_array($results)) {
                 $totalTasks = array_merge($totalTasks, $results);
@@ -205,8 +210,16 @@ class Proofhub {
         }
     }
 
-    public function writeFile($data, $title) {
+    private function getPerson($person_id, &$people) {
+        foreach ($people as &$person) {
+            if ($person["id"] == $person_id) {
+                return $person;
+            }
+        }
+    }
 
+    public function writeFile($data, $title) {
+        dd($data);
         Excel::create($title, function($excel) use($data, $title) {
 
             $excel->setTitle($title);
@@ -242,20 +255,12 @@ class Proofhub {
                 "name" => "TaxPayer Redesign and Dev",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "1420446568",
                 "rows" => $copy,
             ],
             [
-                "name" => "Hoov Eccom Time",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::INTERNO,
-                "price" => "Retail",
-                "code" => "2237106775",
-                "rows" => $copy,
-            ],[
                 "name" => "Template Latam",
                 "budget" => "0",
                 "country" => "COL",
@@ -263,7 +268,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1524491469",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Hoov Eccom Time",
                 "budget" => "0",
                 "country" => "COL",
@@ -375,7 +380,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1634588017",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "DK Furniture",
                 "budget" => "0",
                 "country" => "COL",
@@ -383,7 +388,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1964728404",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Eighth Avenue",
                 "budget" => "0",
                 "country" => "COL",
@@ -391,7 +396,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1969531729",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Prasino",
                 "budget" => "0",
                 "country" => "COL",
@@ -447,7 +452,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1753816309",
                 "rows" => $copy,
-            ],[
+            ], [
                 "name" => "Bodytech Peru",
                 "budget" => "0",
                 "country" => "COL",
@@ -807,13 +812,21 @@ class Proofhub {
             $totalPendingTasks = 0;
             $totalMissingHours = 0;
             foreach ($tasks as $task) {
-                if (!$task["completed"]) {
-                    $totalPendingTasks++;
-                    $estimate = $task["estimated_hours"] + ($task["estimated_mins"] / 60);
-                    $logged = $task["logged_hours"] + ($task["logged_mins"] / 60);
-                    if ($estimate > $logged) {
-                        $totalMissingHours += $estimate - $logged;
+                if (is_array($task)) {
+                    if (array_key_exists("completed", $task)) {
+                        if (!$task["completed"]) {
+                            $totalPendingTasks++;
+                            $estimate = $task["estimated_hours"] + ($task["estimated_mins"] / 60);
+                            $logged = $task["logged_hours"] + ($task["logged_mins"] / 60);
+                            if ($estimate > $logged) {
+                                $totalMissingHours += $estimate - $logged;
+                            }
+                        }
+                    } else {
+                        dd("826");
                     }
+                } else {
+                    dd("829");
                 }
             }
             $estimatedMissingBudget = $totalMissingHours * self::COSTO_HORA_PROMEDIO;
@@ -824,6 +837,11 @@ class Proofhub {
             $totalPaidBudget = 0;
             $events = $this->getProjectEvents($project, $ignoreDate);
             foreach ($events as $event) {
+                if (array_key_exists("milestone", $event)) {
+                    
+                } else {
+                    dd("842");
+                }
                 if ($event["milestone"]) {
                     if ($event["completed"]) {
                         $totalCompletedMilestones++;
@@ -857,13 +875,28 @@ class Proofhub {
                         if ($event["description"]) {
                             $totalMissingBudget += intval($event["description"]);
                         }
+                        foreach ($event["assigned"] as $assinee) {
+                            $person = $this->getPerson($assinee, $people);
+                            if ($person) {
+                                if (is_array($person["milestones"])) {
+                                    array_push($person["milestones"], $projectMilestone);
+                                } else {
+                                    dd("884");
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             foreach ($timeEntries as $timeEntry) {
                 $foundCreator = false;
-                $timeEntryTimestamp = strtotime($timeEntry["date"]);
+                if (array_key_exists("date", $timeEntry)) {
+                    $timeEntryTimestamp = strtotime($timeEntry["date"]);
+                } else {
+                    dd("897");
+                }
+
                 if (($timeEntryTimestamp > $dateTimestamp1 && $timeEntryTimestamp < $dateTimestamp2) || $ignoreDate) {
                     $task = $this->getTimeEntryTask($timeEntry, $tasks);
                     foreach ($projectPeople as &$person) {
@@ -1025,7 +1058,7 @@ class Proofhub {
                 "Milestones Cerrados" => $totalCompletedMilestones,
                 "Presupuesto Recogido" => $totalPaidBudget,
             ];
-            $projectResults["Hours"]=str_replace(",",".",$projectResults["Hours"]);
+            $projectResults["Hours"] = str_replace(",", ".", $projectResults["Hours"]);
             if (is_numeric($projectResults["Hours"])) {
                 $totalHours += $projectResults["Hours"];
                 $totalCost += $projectResults["Consumed"];
@@ -1179,7 +1212,18 @@ class Proofhub {
 
                     $finalPerson['labels'][$key]["hours"] = number_format((float) $finalPerson['labels'][$key]["hours"], 2, ',', '');
                 }
-                $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
+                $title2 = array([
+                        "name" => "Title",
+                        "hours" => "Pago",
+                        "cost" => "Start",
+                        "person_name" => "End",
+                ]);
+                if(count($finalPerson['milestones'])>0){
+                    $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels'], $title2, $finalPerson['milestones']);
+                } else {
+                    $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
+                }
+                
                 array_push($totalResults, $resultsPerson);
             }
         }
@@ -1275,6 +1319,12 @@ class Proofhub {
             $query = "https://backbone.proofhub.com/api/v3/people/" . $person;
             //dd($query);
             $resultsPerson = $this->sendGet($query);
+            if (array_key_exists("first_name", $resultsPerson)) {
+                $resultsPerson['first_name'] . " " . $resultsPerson['last_name'];
+            } else {
+                dd("1320");
+            }
+
             $saveperson = [
                 "name" => $resultsPerson['first_name'] . " " . $resultsPerson['last_name'],
                 "id" => $resultsPerson['id'],
@@ -1288,6 +1338,7 @@ class Proofhub {
                 // "non_billable_cost" => 0,
                 "labels" => [],
                 "projects" => [],
+                "milestones" => [],
             ];
             if ($resultsPerson['id'] == "1871117844") {
                 //andres

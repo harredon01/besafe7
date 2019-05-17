@@ -41,7 +41,7 @@ class Rapigo {
     public function getEstimate(array $points) {
         //dd($points);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
         return $response;
@@ -65,7 +65,7 @@ class Rapigo {
         ];
         array_push($points, $querystop);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
         return $response;
@@ -84,11 +84,11 @@ class Rapigo {
         if ($type == "hour") {
             $data['type'] = 'hour';
         }
-        $data['fecha_servicio'] = "03/19/2019";
+        $data['fecha_servicio'] = "05/17/2019";
         $data['hora_servicio'] = "11:30";
 
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
+        $query = env('RAPIGO_PROD') . "api/bogota/request_service/";
         //dd($data);
         $serviceBookResponse = $this->sendPost($data, $query);
         if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
@@ -125,14 +125,14 @@ class Rapigo {
 
     public function checkAddress($address) {
         $data['address'] = $address;
-        $query = env('RAPIGO_TEST') . "api/bogota/validate_address/";
+        $query = env('RAPIGO_PROD') . "api/bogota/validate_address/";
         $response = $this->sendPost($data, $query);
         return $response;
     }
 
     public function checkStatus($key) {
         $data['key'] = $key;
-        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
+        $query = env('RAPIGO_PROD') . "api/bogota/get_service_status/";
         $response = $this->sendPost($data, $query);
         return $response;
     }

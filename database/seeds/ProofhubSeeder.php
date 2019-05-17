@@ -68,7 +68,7 @@ class ProofhubSeeder extends Seeder {
         $user->messages()->delete();
         $user->delete();
         return true;*/
-        $this->proofhub->getReport();
+        $this->proofhub->getReport(); 
     }
     public function deleteOldData() {
         $deliveries = Delivery::where("user_id", 1)->get();
