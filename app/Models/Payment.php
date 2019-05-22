@@ -26,4 +26,7 @@ class Payment extends Model
     public function transactions() {
         return $this->belongsToMany('App\Models\Transaction');
     }
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }

@@ -26,5 +26,8 @@ class Condition extends Model {
     public function productVariant() {
         return $this->belongsTo('App\Models\ProductVariant');
     }
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 
 }

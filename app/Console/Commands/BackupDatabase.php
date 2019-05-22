@@ -25,10 +25,13 @@ class BackupDatabase extends Command {
     }
 
     public function handle() {
+        $this->info('Running backup.');
         try {
             $this->process->mustRun();
+            $this->info('Backup ran.');
             // executes after the command finishes
             if ($this->process->isSuccessful()) {
+                $this->info('Backup successful.');
                 $contents =  new File(storage_path('app/backups/' . $this->backupName));
                 $path = Storage::putFileAs('backups',$contents,$this->backupName, 'private');
                 //Storage::delete('backups/' . $this->backupName);

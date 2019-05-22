@@ -36,6 +36,7 @@
         <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/deliveriesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-merchantsctrl.js')}}"></script>
@@ -141,6 +142,7 @@ echo json_encode([
                                         <li><a href="{{ url('food/zones')}}">Zonas</a></li>
                                         <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
                                         <li><a href="{{ url('food/routes')}}">Rutas</a></li>
+                                        <li><a href="{{ url('food/deliveries')}}">Entregas</a></li>
                                         <li><a href="{{ url('food/largest_addresses')}}">Direcciones Comunes</a></li>
                                         
                                     </ul>

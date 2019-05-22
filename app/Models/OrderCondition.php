@@ -22,4 +22,8 @@ class OrderCondition extends Model
     public function order() {
         return $this->belongsTo('App\Models\Order');
     }
+    
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }

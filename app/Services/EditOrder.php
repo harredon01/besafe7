@@ -255,7 +255,7 @@ class EditOrder {
 
 
                 $cart = $this->editCart->getCheckoutCart($user);
-                if ($cart['total'] > 0) {
+                if (count($cart['items']) > 0) {
                     if (array_key_exists("merchant_id", $info)) {
                         $merchant = Merchant::find($info['merchant_id']);
                         if ($merchant) {
@@ -507,8 +507,6 @@ class EditOrder {
                 } else {
                     $totalBuyingDeposit = count($data['payers']) + 1;
                 }
-
-
                 $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
                 $payerSplitIncludingDeposit = 0;
                 $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
@@ -519,16 +517,8 @@ class EditOrder {
                             $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
                         }
                         $payerSplitIncludingDeposit = $payerSplitNotIncludingDeposit + $creditItem->price;
-                        $payertransactionCostDeposit = $this->getTransactionTotal($payerSplitIncludingDeposit);
                     }
-                    $transactionCost = ($payertransactionCostDeposit * $totalCredit) + ($totalBuyingDeposit * $payertransactionCostNoDeposit);
-                } else {
-                    $transactionCost = ($totalBuyingDeposit * $payertransactionCostNoDeposit);
                 }
-
-                $order->total = $order->total + $transactionCost;
-                $order->tax = $order->tax + (0);
-                //$order->status = "payment_created";
             }
         }
         if ($requiredCredits > 0) {
@@ -575,7 +565,6 @@ class EditOrder {
                 $requiresShipping = 0;
             }
         }
-
         return array(
             "split" => $splitTotal,
             "creditHolders" => $creditHolders,

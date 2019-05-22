@@ -131,6 +131,14 @@ class Food {
         $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
+    public function updateUserDeliveriesAddress($user_id, $address_id) {
+        $address = OrderAddress::find($address_id);
+        if ($address) {
+            $deliveries = Delivery::where('user_id', $user_id)->update(['address_id' => $address_id]);
+            return $deliveries;
+        }
+    }
+
     public function loadDayConfig($deliveryDate) {
         //$date = date("Y-m-d",$deliveryDate);
         $date = date_create($deliveryDate);
@@ -258,7 +266,14 @@ class Food {
 
     public function sendReminder() {
         $date = date_create();
-        date_add($date, date_interval_create_from_date_string("1 days"));
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek < 5 && $dayofweek > 0) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else {
+            return null;
+        }
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         if (count($deliveries) > 0) {
@@ -1411,8 +1426,13 @@ class Food {
         $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->orderBy('delivery', 'desc')->get();
         foreach ($deliveries as $item) {
             $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
+            $delivery2 = null;
             if ($delivery) {
                 $date = date_create($delivery->delivery);
+                $delivery2 = Delivery::where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'asc')->first();
+                if ($delivery->id == $delivery2->id) {
+                    $delivery2 = null;
+                }
             } else {
                 $date = date_create();
             }
@@ -1431,6 +1451,12 @@ class Food {
                     $item->delivery = $delivery->delivery;
                     $delivery->delivery = $date;
                     $delivery->save();
+                    if ($delivery2) {
+                        $tempAttrs = $delivery2->details;
+                        $delivery2->details = $item->details;
+                        $delivery2->save();
+                        $item->details = $tempAttrs;
+                    }
                 } else {
                     $item->delivery = $date;
                 }

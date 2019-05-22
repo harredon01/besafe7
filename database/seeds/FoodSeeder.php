@@ -21,8 +21,8 @@ class FoodSeeder extends Seeder {
      */
     public function run() {
         // $this->call(UsersTableSeeder::class);
-        $user = User::find(2);
-        $this->food->inviteUser($user);
+
+        $this->food->sendReminder();
         $this->command->info('Food merchants seeded!');
     }
 

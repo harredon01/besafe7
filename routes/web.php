@@ -91,6 +91,7 @@ Route::get('food/summary/{polygon?}', 'FoodController@getSummaryShipping');
 Route::get('food/routes', 'FoodController@getRoutes');
 Route::get('food/largest_addresses', 'FoodController@getLargestAddresses');
 Route::get('food/menu', 'FoodImportController@getMenu');
+Route::get('food/deliveries', 'FoodImportController@getDeliveries');
 Route::get('food/zones', 'FoodImportController@getZones');
 Route::get('food/messages', 'FoodImportController@getMessages');
 Route::get('food/content', 'FoodImportController@getContent');

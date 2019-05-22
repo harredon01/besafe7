@@ -32,4 +32,7 @@ class Item extends Model {
     public function merchant() {
         return $this->belongsTo('App\Models\Merchant');
     }
+    public function getTableColumns() {
+        return $this->getConnection()->getSchemaBuilder()->getColumnListing($this->getTable());
+    }
 }

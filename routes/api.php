@@ -195,6 +195,8 @@ Route::get('food/largest_addresses', 'FoodApiController@getLargestAddresses');
 Route::post('food/delegate_deliveries', 'FoodApiController@delegateDeliveries');
 Route::post('food/reminder', 'FoodApiController@sendReminder');
 Route::get('food/route_detail/{delivery?}', 'FoodApiController@getRouteInfo');
+Route::post('food/user/{user?}/address/{address?}', 'FoodApiController@updateUserDeliveriesAddress');
+Route::get('food/deliveries', 'FoodApiController@getDeliveries');
 Route::get('food/purchase_order', 'FoodApiController@getPurchaseOrder');
 Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');
 

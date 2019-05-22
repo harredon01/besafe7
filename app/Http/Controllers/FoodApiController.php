@@ -22,6 +22,7 @@ use App\Models\Route;
 use App\Models\Delivery;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
+use Artisan;
 
 class FoodApiController extends Controller {
     /*
@@ -74,8 +75,7 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function getPurchaseOrder(Request $request) {
-        $user = $request->user();
+    public function getPurchaseOrder() {
         $date = date_create();
         date_add($date, date_interval_create_from_date_string("1 days"));
         $tomorrow = date_format($date, "Y-m-d");
@@ -83,7 +83,7 @@ class FoodApiController extends Controller {
         $this->food->getPurchaseOrder($deliveries);
         return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -92,6 +92,10 @@ class FoodApiController extends Controller {
     public function sendReminder() {
         $this->food->sendReminder();
         return response()->json(array("status" => "success", "message" => "Reminder Sent"));
+    }
+    
+    public function backups(){
+        Artisan::call('db:backup');
     }
 
     /**
@@ -142,6 +146,16 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
+    public function updateUserDeliveriesAddress($user,$address) {
+        $this->food->updateUserDeliveriesAddress($user,$address);
+        return response()->json(array("status" => "success", "message" => $this->food->updateUserDeliveriesAddress($user,$address)));
+    }
+
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
     public function buildScenarioRouteId(Request $request, $id) {
         $user = $request->user();
         dispatch(new \App\Jobs\BuildScenarioRouteIdApi($user, $id));
@@ -149,15 +163,15 @@ class FoodApiController extends Controller {
 //            $this->food->buildScenarioTransit($routes);
         return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
      * @return Response
      */
-    public function approvePayment( $id) {
+    public function approvePayment($id) {
         $payment = \App\Models\Payment::find($id);
-        dispatch(new \App\Jobs\ApprovePayment($payment,  "Food"));
+        dispatch(new \App\Jobs\ApprovePayment($payment, "Food"));
         return response()->json(array("status" => "success", "message" => "Payment scheduled"));
     }
 
@@ -298,7 +312,7 @@ class FoodApiController extends Controller {
                     "message" => "item deleted",
         ]);
     }
-    
+
     public function createZoneItem(Request $request) {
         $data = $request->all();
         $item = CoveragePolygon::create($data);
@@ -308,7 +322,7 @@ class FoodApiController extends Controller {
                     "item" => $item
         ]);
     }
-    
+
     public function updateZoneItem(Request $request, $item) {
         $data = $request->all();
         CoveragePolygon::where("id", $item)->update($data);
@@ -325,6 +339,22 @@ class FoodApiController extends Controller {
      */
     public function getMessages(Request $request) {
         $queryBuilder = new QueryBuilder(new Translation, $request);
+        $result = $queryBuilder->build()->paginate();
+        return response()->json([
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+        ]);
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getDeliveries(Request $request) {
+        $queryBuilder = new QueryBuilder(new Delivery, $request);
         $result = $queryBuilder->build()->paginate();
         return response()->json([
                     'data' => $result->items(),

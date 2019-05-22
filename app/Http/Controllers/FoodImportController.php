@@ -41,6 +41,14 @@ class FoodImportController extends Controller {
     public function getMessages() {
         return view('food.messages');
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getDeliveries() {
+        return view('food.deliveriesDashboard');
+    }
 
     /**
      * Show the application dashboard to the user.

@@ -2,6 +2,26 @@ angular.module('besafe')
         
         .service('Food', function ($q, $http) {
 
+            var getDeliveries = function (where) {
+                let url = '/api/food/deliveries' ;
+                if(where){
+                    url = url+'?'+where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get getDeliveries");
+                        });
+                return def.promise;
+                /**/
+            }
             var getMenu = function (where) {
                 let url = '/api/food/menu' ;
                 if(where){
@@ -92,6 +112,24 @@ angular.module('besafe')
                         })
                         .error(function () {
                             def.reject("Failed to get getLargestAddresses");
+                        });
+                return def.promise;
+            }
+            
+            var updateDeliveryAddress = function (user,address) {
+                let url = '/api/food/user/'+user+"/address/"+address ;
+                var def = $q.defer();
+                $http({
+                    method: 'post',
+                    url: url,
+                    data:{}
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to updateDeliveryAddress");
                         });
                 return def.promise;
             }
@@ -384,6 +422,21 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var getArticlesByDate = function (item) {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/api/articles?start_date='+item
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to getArticlesByDate");
+                        });
+                return def.promise;
+                /**/
+            }
 
             return {
                 getMenu:getMenu,
@@ -391,11 +444,14 @@ angular.module('besafe')
                 getPurchaseOrder:getPurchaseOrder,
                 delegateDeliveriesAddress:delegateDeliveriesAddress,
                 getMessages:getMessages,
+                getArticlesByDate:getArticlesByDate,
+                updateDeliveryAddress:updateDeliveryAddress,
                 buildScenarioLogistics:buildScenarioLogistics,
                 regenerateDeliveries:regenerateDeliveries,
                 getScenarioStructure:getScenarioStructure,
                 getSummaryShipping:getSummaryShipping,
                 buildScenarioRouteId:buildScenarioRouteId,
+                getDeliveries:getDeliveries,
                 sendReminder:sendReminder,
                 buildCompleteScenario:buildCompleteScenario,
                 regenerateScenarios:regenerateScenarios,

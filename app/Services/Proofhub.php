@@ -81,6 +81,14 @@ class Proofhub {
         }
         return $totalTimeEntries;
     }
+    private static function cmp($a, $b) {
+        $dateTimestamp1 = strtotime($a['End']);
+        $dateTimestamp2 = strtotime($b['End']);
+        if ($dateTimestamp1 == $dateTimestamp2) {
+            return 0;
+        }
+        return ($dateTimestamp1 < $dateTimestamp2) ? -1 : 1;
+    }
 
     public function getProjectTaskLists($project) {
         $query = "https://backbone.proofhub.com/api/v3/projects/" . $project['code'] . "/todolists";
@@ -402,7 +410,7 @@ class Proofhub {
                 "name" => "Prasino",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CANADA,
                 "price" => "Retail",
                 "code" => "2382102056",
                 "rows" => $copy,
@@ -477,7 +485,7 @@ class Proofhub {
                 "budget" => "0",
                 "country" => "COL",
                 "price" => "Retail",
-                "type" => self::PRODUCCION,
+                "type" => self::CANADA,
                 "code" => "2312725220",
                 "rows" => $copy,
             ], [
@@ -509,7 +517,7 @@ class Proofhub {
                 "name" => "Primus",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2400881156",
                 "rows" => $copy,
@@ -518,7 +526,7 @@ class Proofhub {
                 "name" => "Daportare",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2489878353",
                 "rows" => $copy,
@@ -536,7 +544,7 @@ class Proofhub {
                 "name" => "Xtech",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2349279336",
                 "rows" => $copy,
@@ -767,7 +775,7 @@ class Proofhub {
                 "name" => "Balance ecuador",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::PRODUCCION,
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2547043347",
                 "rows" => $copy,
@@ -779,6 +787,24 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2940400374",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Casa chiqui",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3063142963",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Rivercol",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2944945893",
                 "rows" => $copy,
             ]
         ];
@@ -863,7 +889,7 @@ class Proofhub {
                             "Presupuesto mensual" => $event["title"],
                             "Horas" => $event["description"],
                             "Presupuesto consumido" => $event["start"],
-                            "Facturado" => $event["end"],
+                            "End" => $event["end"],
                             "Tareas Abiertas" => "",
                             "Tiempo p terminacion" => "",
                             "Presupuesto estimado faltante" => "",
@@ -890,6 +916,8 @@ class Proofhub {
                     }
                 }
             }
+            usort($globalPendingMilestones, array($this, 'cmp'));
+            usort($projectMilestones, array($this, 'cmp'));
 
             foreach ($timeEntries as $timeEntry) {
                 $foundCreator = false;
@@ -1109,7 +1137,18 @@ class Proofhub {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
         $copy = $people;
-        
+        $projects = $this->getProjects($copy, null);
+        $full = true;
+        $name = 'Total_mes_' . time();
+        $ignoreDate = false;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        return true;
+        $projects = $this->getProjects($copy, self::PRODUCCION);
+        $full = false;
+        $name = 'Total_produccion_' . time();
+        $ignoreDate = true;
+        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        return true;
         
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
@@ -1131,11 +1170,7 @@ class Proofhub {
         $name = 'Total_internos_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        $projects = $this->getProjects($copy, null);
-        $full = true;
-        $name = 'Total_mes_' . time();
-        $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        
     }
 
     private function calculateTotalsPeople($results, $people) {
@@ -1339,7 +1374,7 @@ class Proofhub {
                 // "non_billable_cost" => 0,
                 "labels" => [],
                 "projects" => [],
-             //   "milestones" => [],
+              //  "milestones" => [],
             ];
             if ($resultsPerson['id'] == "1871117844") {
                 //andres

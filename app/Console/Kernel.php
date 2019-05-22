@@ -27,12 +27,15 @@ class Kernel extends ConsoleKernel
         /*$schedule->call('App\Http\Controllers\LocationController@moveOldLocations')->hourly();
         $schedule->call('App\Http\Controllers\GroupController@updateExpiredGroups')->daily();*/
         $schedule->call('App\Http\Controllers\PayuController@cronPayU')->hourly();
+        
+        
         $schedule->call('App\Http\Controllers\RapigoController@getActiveRoutesUpdate')->everyFiveMinutes();;
-        //$schedule->call('App\Http\Controllers\FoodController@runRecurringTask')->hourly();
+        
         $schedule->call('App\Http\Controllers\FoodController@reprogramDeliveries')->hourly();
-        $schedule->command('db:backup')->dailyAt('18:00')->after(function ()use ($schedule) {
-             $schedule->call('App\Http\Controllers\FoodApiController@regenerateScenarios');
-         });
+        $schedule->call('App\Http\Controllers\FoodApiController@sendReminder')->dailyAt('15:30');
+        $schedule->call('App\Http\Controllers\FoodApiController@getPurchaseOrder')->dailyAt('18:15');
+        $schedule->call('App\Http\Controllers\FoodApiController@regenerateScenarios')->dailyAt('18:15');
+        $schedule->call('App\Http\Controllers\FoodApiController@backups')->dailyAt('18:15');
     }
 
     /**
