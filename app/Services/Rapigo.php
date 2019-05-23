@@ -151,66 +151,77 @@ class Rapigo {
 
     private function stopComplete($data) {
         $stop = Stop::where("code", $data["point"])->with("deliveries")->first();
-        foreach ($stop->deliveries as $delivery) {
-            $delivery->status = "completed";
-            $delivery->save();
+        if ($stop) {
+            foreach ($stop->deliveries as $delivery) {
+                $delivery->status = "completed";
+                $delivery->save();
+            }
+            $stop->status = "completed";
+            $stop->save();
         }
-        $stop->status = "completed";
-        $stop->save();
     }
 
     private function stopFailed($data) {
         $stop = Stop::where("code", $data["point"])->with("deliveries.user")->first();
-        $stop->status = "completed";
-        $stop->save();
-        $route = $stop->route;
-        $results = $this->checkStatus($route->code);
-        $runnerName = $results["detalle"]["mensajero_asignado"];
-        $runnerPhone = $results["detalle"]["mensajero_telefono"];
-        $userAdmin = User::find(2);
-        foreach ($stop->deliveries as $delivery) {
-            $user = $delivery->user;
-            $user->activationHash = $this->generateHash($user->id, $user->created_at);
-            $delivery = Delivery::where("status", "pending")->where("user_id", $user->id)->orderBy('delivery', 'desc')->first();
-            if ($delivery) {
-                $user->lunchHash = $user->activationHash;
-            } else {
-                $user->lunchHash = null;
+        if ($stop) {
+            $stop->status = "completed";
+            $stop->save();
+            $route = $stop->route;
+            $results = $this->checkStatus($route->code);
+            $runnerName = $results["detalle"]["mensajero_asignado"];
+            $runnerPhone = $results["detalle"]["mensajero_telefono"];
+            $userAdmin = User::find(2);
+            foreach ($stop->deliveries as $delivery) {
+                $user = $delivery->user;
+                $user->activationHash = $this->generateHash($user->id, $user->created_at);
+                $delivery = Delivery::where("status", "pending")->where("user_id", $user->id)->orderBy('delivery', 'desc')->first();
+                if ($delivery) {
+                    $user->lunchHash = $user->activationHash;
+                } else {
+                    $user->lunchHash = null;
+                }
             }
+            Mail::to($userAdmin)->send(new StopFailed($stop, $runnerName, $runnerPhone));
         }
-        Mail::to($userAdmin)->send(new StopFailed($stop, $runnerName, $runnerPhone));
     }
 
     public function stopArrived($info) {
         $stop = Stop::where("code", $info["point"])->with("deliveries.user")->first();
-        $stop->status = "arrived";
-        $stop->save();
-        $followers = [];
-        foreach ($stop->deliveries as $delivery) {
-            array_push($followers, $delivery->user);
+        if ($stop) {
+            $stop->status = "arrived";
+            $stop->save();
+            $followers = [];
+            foreach ($stop->deliveries as $delivery) {
+                array_push($followers, $delivery->user);
+            }
+            $payload = [];
+            $data = [
+                "trigger_id" => 1,
+                "message" => "",
+                "subject" => "",
+                "object" => "Lonchis",
+                "sign" => true,
+                "payload" => $payload,
+                "type" => "food_meal_arriving",
+                "user_status" => "normal"
+            ];
+            $className = "App\\Services\\EditAlerts";
+            $editAlerts = new $className;
+            $date = date("Y-m-d H:i:s");
+            $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
         }
-        $payload = [];
-        $data = [
-            "trigger_id" => 1,
-            "message" => "",
-            "subject" => "",
-            "object" => "Lonchis",
-            "sign" => true,
-            "payload" => $payload,
-            "type" => "food_meal_arriving",
-            "user_status" => "normal"
-        ];
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+
         return true;
     }
 
     public function routeCompleted($data) {
         $route = Route::where("provider_id", $data["key"])->where("provider", "Rapigo")->first();
-        $route->status = "complete";
-        $route->save();
+        if ($route) {
+            $route->status = "complete";
+            $route->save();
+        }else {
+            return $data;
+        }
     }
 
     public function routeStarted($data) {

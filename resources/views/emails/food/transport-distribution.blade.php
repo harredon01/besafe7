@@ -49,6 +49,7 @@ Telefono: {{ $stop->address->phone }}
 {{ $line }}
 @endforeach 
 @endif
+{{$delivery->region_name}}
 @endforeach 
 @endforeach 
 @endcomponent

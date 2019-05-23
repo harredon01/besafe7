@@ -507,10 +507,18 @@ class Food {
                         $details = json_decode($stopDel->details, true);
                         if (array_key_exists("pickup", $details)) {
                             if ($details['pickup'] == "envase") {
-                                $descr = $descr . "Recoger envase, ";
+                                $descr = $descr . "Recoger envase,  ";
                             }
                         }
-                        $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/>";
+                        if (array_key_exists("deliver", $details)) {
+                            if ($details['deliver'] == "envase") {
+                                $descr = $descr . "Envase Retornable,  ";
+                            }
+                        }
+                        if (array_key_exists("factura", $details)) {
+                            $descr = $descr . "Enviar factura,  ";
+                        }
+                        $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
                         $stopDel->region_name = $descr;
                         $delConfig = $config;
                         $dels = [$stopDel];
@@ -1451,14 +1459,14 @@ class Food {
                     $item->delivery = $delivery->delivery;
                     $delivery->delivery = $date;
                     $delivery->save();
-                    if ($delivery2) {
-                        $tempAttrs = $delivery2->details;
-                        $delivery2->details = $item->details;
-                        $delivery2->save();
-                        $item->details = $tempAttrs;
-                    }
                 } else {
                     $item->delivery = $date;
+                }
+                if ($delivery2) {
+                    $tempAttrs = $delivery2->details;
+                    $delivery2->details = $item->details;
+                    $delivery2->save();
+                    $item->details = $tempAttrs;
                 }
             } else {
                 $item->delivery = $date;

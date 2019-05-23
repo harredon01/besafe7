@@ -12,9 +12,20 @@
             $scope.editAddress = false;
             $scope.mapActive = false;
             angular.element(document).ready(function () {
-                $scope.getArticles(new Date());
-                setTimeout(function(){ $scope.getDeliveries(); }, 500);
                 
+                let date = new Date();
+                let day = date.getDay();
+                if (day < 5) {
+                    date.setDate(date.getDate() + 1);
+                } else if (day == 5) {
+                    date.setDate(date.getDate() + 3);
+                } else if (day == 6) {
+                    date.setDate(date.getDate() + 2);
+                }
+                $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
+                $scope.getArticles(new Date());
+                
+
             });
             $scope.activateMap = function () {
                 $scope.mapActive = true;
@@ -28,7 +39,7 @@
             $scope.createMapData = function () {
                 console.log("Creating map data")
                 for (item in $scope.deliveries) {
-                    $scope.deliveries[item].marker = $scope.buildDeliveryData($scope.deliveries[item]);
+                    $scope.deliveries[item].marker = MapService.createStop($scope.deliveries[item]);
                 }
             }
             $scope.buildDeliveryData = function (delivery) {
@@ -45,7 +56,7 @@
             $scope.getDeliveries = function () {
                 console.log("Status", $scope.status);
                 $scope.page++;
-                let url = "includes=user,address&order_by=id,asc&page=" + $scope.page + "&status=" + $scope.status+"&delivery<"+$scope.activeDate+" 23:59:59";
+                let url = "includes=user,address&order_by=id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
                 Food.getDeliveries(url).then(function (data) {
                     let deliveriesCont = data.data;
                     if (data.page == data.last_page) {
@@ -55,7 +66,7 @@
                         deliveriesCont[item] = $scope.buildDeliveryData(deliveriesCont[item]);
                     }
                     $scope.deliveries = deliveriesCont;
-                    console.log("Deliveries",$scope.deliveries);
+                    console.log("Deliveries", $scope.deliveries);
                     $scope.replaceFood();
                 },
                         function (data) {
@@ -95,9 +106,9 @@
                 $scope.regionVisible = false;
                 $scope.cityVisible = false;
             }
-            $scope.updateDeliveryAddress = function (user,address) {
+            $scope.updateDeliveryAddress = function (user, address) {
 
-                Food.updateDeliveryAddress(user,address).then(function (data) {
+                Food.updateDeliveryAddress(user, address).then(function (data) {
                     window.location.reload();
                 },
                         function (data) {
@@ -112,50 +123,46 @@
                         });
             }
             $scope.getArticle = function (id) {
-                console.log("getArticle",id);
+                console.log("getArticle", id);
                 for (let item in $scope.listArticles) {
                     if ($scope.listArticles[item].id == id) {
-                        console.log("getArticleres",$scope.listArticles[item]);
+                        console.log("getArticleres", $scope.listArticles[item]);
                         return $scope.listArticles[item];
                     }
                 }
             }
             $scope.replaceFood = function () {
-                console.log("articles",$scope.listArticles);
+                console.log("articles", $scope.listArticles);
                 for (let item in $scope.deliveries) {
+                    console.log("delivery",$scope.deliveries[item].id);
                     let attributes = $scope.deliveries[item].details;
                     let article = $scope.getArticle(attributes.dish.type_id);
-                    
+
                     attributes.tipoAlmuerzo = article.name;
-                    for (item in article.attributes.entradas) {
-                        if (article.attributes.entradas[item].codigo == attributes.dish.starter_id) {
-                            attributes.entrada = article.attributes.entradas[item].valor;
+                    for (item2 in article.attributes.entradas) {
+                        if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
+                            attributes.entrada = article.attributes.entradas[item2].valor;
                         }
                     }
-                    for (item in article.attributes.plato) {
-                        if (article.attributes.plato[item].codigo == attributes.dish.main_id) {
-                            attributes.plato = article.attributes.plato[item].valor;
+                    for (item3 in article.attributes.plato) {
+                        if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
+                            attributes.plato = article.attributes.plato[item3].valor;
                         }
                     }
                     delete attributes.dish;
+                    delete attributes.products;
+                    delete attributes.merchant_id;
                     $scope.deliveries[item].details = attributes;
+                    console.log("deliveryDone",$scope.deliveries[item].id);
                 }
             }
             $scope.getArticles = function (date) {
-                let day = date.getDay();
-                if (day < 5) {
-                    date.setDate(date.getDate() + 1);
-                } else if (day == 5) {
-                    date.setDate(date.getDate() + 3);
-                } else if (day == 6) {
-                    date.setDate(date.getDate() + 2);
-                }
-                $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
                 Food.getArticlesByDate($scope.activeDate).then(function (data) {
                     $scope.listArticles = data.data;
                     for (let item in $scope.listArticles) {
                         $scope.listArticles[item].attributes = JSON.parse($scope.listArticles[item].attributes);
                     }
+                    $scope.getDeliveries();
                 },
                         function (data) {
 

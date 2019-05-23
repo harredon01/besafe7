@@ -290,8 +290,8 @@ class EditOrderFood {
             if ($returnDelivery) {
                 $details["deliver"] = "envase";
             }
-            if ($x == 0 && $hasDeposit) {
-                
+            if ($x == 0 ) {
+                $details["factura"] = "true";
             }
             $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
             $delivery->details = json_encode($details);
