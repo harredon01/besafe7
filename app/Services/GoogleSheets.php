@@ -73,20 +73,26 @@ class GoogleSheets {
         $client = $this->getClient();
         $service = new \Google_Service_Sheets($client);
         $valueInputOption = "USER_ENTERED";
+        
         $spreadsheet = new \Google_Service_Sheets_Spreadsheet([
             'properties' => [
                 'title' => "Testsdfsd"
             ]
         ]);
+        
+        $spreadsheet = $service->spreadsheets->create($spreadsheet, [
+            'fields' => 'spreadsheetId'
+        ]);
+                $body2 = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(array(
+            'requests' => array('addSheet' => array('properties' => array('title' => "Hoovert")))));
+        $result = $service->spreadsheets->batchUpdate($spreadsheet->spreadsheetId, $body2);
+        return true;
         $values = [
           ["esto ", "Es", "una prueba"
           ],
           ["esto2 ", "Es2", "una prueba2"
           ]
           ];
-        $spreadsheet = $service->spreadsheets->create($spreadsheet, [
-            'fields' => 'spreadsheetId4'
-        ]);
         /*$spreadsheetId = $spreadsheet->spreadsheetId;
         $body = new \Google_Service_Sheets_ValueRange([
             'values' => $values

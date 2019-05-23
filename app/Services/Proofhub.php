@@ -13,7 +13,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = true;
+    const IS_ADMIN = false;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -1142,7 +1142,6 @@ class Proofhub {
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        return true;
         $projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
         $name = 'Total_produccion_' . time();
