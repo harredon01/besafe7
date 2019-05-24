@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use App\Services\GoogleSheets;
 use Excel;
 
 class Proofhub {
@@ -17,6 +17,21 @@ class Proofhub {
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
+    /**
+     * The EditAlert implementation.
+     *
+     */
+    protected $googleSheets;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(GoogleSheets $googleSheets) {
+        $this->googleSheets = $googleSheets;
+    }
 
     public function sendPost(array $data, $query) {
         //url-ify the data for the POST
@@ -230,6 +245,8 @@ class Proofhub {
     }
 
     public function writeFile($data, $title) {
+        $this->googleSheets->createSpreadsheet($title, $data);
+        /*
         Excel::create($title, function($excel) use($data, $title) {
 
             $excel->setTitle($title);
@@ -256,12 +273,12 @@ class Proofhub {
                     $sheet->fromArray($page["rows"], null, 'A1', true);
                 });
             }
-        })->store('xlsx');
+        })->store('xlsx');*/
     }
 
     public function getProjects($copy, $type) {
         $projects = [
-            [
+            /*[
                 "name" => "TaxPayer Redesign and Dev",
                 "budget" => "0",
                 "country" => "COL",
@@ -286,7 +303,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2237106775",
                 "rows" => $copy,
-            ], [
+            ],*/ [
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -294,7 +311,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2727439403",
                 "rows" => $copy,
-            ], [
+            ],[
                 "name" => "La nuit",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -302,7 +319,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2836708259",
                 "rows" => $copy,
-            ], [
+            ],/* [
                 "name" => "La nuit ongoing",
                 "budget" => "3000000",
                 "country" => "COL",
@@ -531,15 +548,15 @@ class Proofhub {
                 "code" => "2489878353",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Next Conn-Infrastructure",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "2581819961",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Next Conn-Infrastructure",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "2581819961",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Xtech",
                 "budget" => "0",
@@ -780,7 +797,7 @@ class Proofhub {
                 "code" => "2547043347",
                 "rows" => $copy,
             ],
-            [
+            */[
                 "name" => "CONSTRUCTORA BOLIVAR",
                 "budget" => "0",
                 "country" => "COL",

@@ -70,64 +70,47 @@ class GoogleSheets {
     }
 
     public function createSpreadsheet($title, $data) {
+        //dd("Sid".time());
         $client = $this->getClient();
+        //$title = $title . time();
         $service = new \Google_Service_Sheets($client);
         $valueInputOption = "USER_ENTERED";
-        
         $spreadsheet = new \Google_Service_Sheets_Spreadsheet([
             'properties' => [
-                'title' => "Testsdfsd"
+                'title' => $title
             ]
         ]);
-        
         $spreadsheet = $service->spreadsheets->create($spreadsheet, [
             'fields' => 'spreadsheetId'
         ]);
-                $body2 = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(array(
-            'requests' => array('addSheet' => array('properties' => array('title' => "Hoovert")))));
-        $result = $service->spreadsheets->batchUpdate($spreadsheet->spreadsheetId, $body2);
+        foreach ($data as $value) {
+            $body2 = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(array(
+                'requests' => array('addSheet' => array('properties' => array('title' => $value['name'])))));
+            $service->spreadsheets->batchUpdate($spreadsheet->spreadsheetId, $body2);
+            $values = $this->reorganizeArray($value["rows"]);
+            $body = new \Google_Service_Sheets_ValueRange([
+                'values' => $values
+            ]);
+            $params = [
+                'valueInputOption' => $valueInputOption
+            ];
+            $range = $value['name'] . "!A1";
+            $service->spreadsheets_values->update($spreadsheet->spreadsheetId, $range, $body, $params);
+        }
         return true;
-        $values = [
-          ["esto ", "Es", "una prueba"
-          ],
-          ["esto2 ", "Es2", "una prueba2"
-          ]
-          ];
-        /*$spreadsheetId = $spreadsheet->spreadsheetId;
-        $body = new \Google_Service_Sheets_ValueRange([
-            'values' => $values
-        ]);
-        $params = [
-            'valueInputOption' => $valueInputOption
-        ];
-        $range = "A1";
-        $result = $service->spreadsheets_values->update($spreadsheetId, $range, $body, $params);
-//        $body2 = new \Google_Service_Sheets_BatchUpdateSpreadsheetRequest(array(
-//                'requests' => array('addSheet' => array('properties' => array('title' => "Hoovert")))));
-//            $result = $service->spreadsheets->batchUpdate($spreadsheetId, $body2);
+    }
 
-
-        /* foreach ($data as $page) {
-
-
-          $values = [
-          ["esto ", "Es", "una prueba"
-          ],
-          ["esto2 ", "Es2", "una prueba2"
-          ]
-          ];
-          $body2 = new Google_Service_Sheets_BatchUpdateSpreadsheetRequest(array(
-          'requests' => array('addSheet' => array('properties' => array('title' => $page['name'])))));
-          $result = $service->spreadsheets->batchUpdate($spreadsheetId, $body2);
-          $body = new \Google_Service_Sheets_ValueRange([
-          'values' => $values
-          ]);
-          $range = $page['name']."!A1";
-          $params = [
-          'valueInputOption' => $valueInputOption
-          ];
-          $result = $service->spreadsheets_values->update($spreadsheetId, $range, $body, $params);
-          } */
+    public function reorganizeArray($data) {
+        $resultPage = [];
+        foreach ($data as $row) {
+            $resultRow = [];
+            foreach ($row as $key => $value) {
+                array_push($resultRow, $value);
+            }
+            array_push($resultPage, $resultRow);
+        }
+        dd($resultPage);
+        return $resultPage;
     }
 
     public function writeFile($data, $title) {

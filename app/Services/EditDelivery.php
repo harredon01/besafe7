@@ -27,7 +27,7 @@ class EditDelivery {
         if ($delivery) {
             if ($delivery->user_id == $user->id) {
                 $results = $this->checkDeliveryTime($delivery);
-                if ($results['status'] == 'success') {
+                if (true) {
                     $details = json_decode($delivery->details, true);
                     if ($delivery->status == "deposit") {
                         $this->suspendCreditDeposits($delivery);
