@@ -327,6 +327,142 @@ class EditProduct {
         return $data;
     }
 
+    public function buildVariant($container) {
+        $variant = [
+            "id" => $container->id,
+            "description" => $container->description,
+            "price" => $container->price,
+            "min_quantity" => $container->min_quantity,
+        ];
+        if ($container->attributes) {
+            $variant["attributes"] = json_decode($container->attributes,true);
+            if (array_key_exists("buyers", $variant["attributes"])) {
+                $variant["unitPrice"] = $variant["price"] / $variant["attributes"]["buyers"];
+            } else {
+                $variant["unitPrice"] = $variant["price"];
+            }
+        } else {
+            $variant["attributes"] = "";
+        }
+        return $variant;
+    }
+
+    private function buildProduct($container, $merchant, $merchant_id) {
+        $product = [
+            "id" => $container->product_id,
+            "name" => $container->prod_name,
+            "description" => $container->prod_desc,
+            "description_more" => false,
+            "more" => false,
+            "type" => $container->type,
+            "merchant_description_more" => false,
+            "inCart" => false,
+            "item_id" => null,
+            "imgs" => []
+        ];
+        if ($merchant) {
+            $product['merchant_name'] = $merchant->merchant_name;
+            $product['merchant_description'] = $merchant->merchant_description;
+            $product['src'] = $merchant->merchant_icon;
+            $product['merchant_type'] = $merchant->merchant_type;
+        }
+        if ($merchant_id == 1299) {
+            $product['amount'] = 11;
+        } else {
+            $product['amount'] = $container->min_quantity;
+        }
+        return $product;
+    }
+
+    public function buildProducts(array $items, $merchant_id) {
+        $results = [];
+        if (array_key_exists('products_variants', $items)) {
+            if (count($items['products_variants']) > 0) {
+                $resultsVariant = [];
+                $resultsCategory = [];
+                $activeProduct = $this->buildProduct($items['products_variants'][0], $items['merchant_products'][0], $merchant_id);
+                if (array_key_exists('category_id', $items['products_variants'][0])) {
+                    $cat = $items['products_variants'][0];
+                    $activeCategory = [
+                        "name" => $cat->category_name,
+                        "id" => $cat->category_id,
+                        "description" => $cat->category_description,
+                        "products" => [],
+                        "more" => false,
+                    ];
+                } else {
+                    $activeCategory = [
+                        "name" => null,
+                        "id" => null,
+                        "description" => null,
+                        "products" => [],
+                        "more" => false,
+                    ];
+                }
+
+                for ($i = 0; $i < count($items['products_variants']); $i++) {
+                    if ($items['products_variants'][$i]->product_id != $activeProduct['id']) {
+                        $activeProduct['variants'] = $resultsVariant;
+                        if ($activeCategory['id']) {
+                            if ($items['products_variants'][$i - 1]->category_id == $activeCategory['id']) {
+                                array_push($activeCategory['products'], $activeProduct);
+                            } else {
+                                array_push($resultsCategory, $activeCategory);
+                                $activeCategory = [
+                                    "name" => $items['products_variants'][$i - 1]->category_name,
+                                    "id" => $items['products_variants'][$i - 1]->category_id,
+                                    "description" => $items['products_variants'][$i - 1]->category_description,
+                                    "products" => [],
+                                    "more" => false,
+                                ];
+                                array_push($activeCategory['products'], $activeProduct);
+                            }
+                        }
+                        array_push($results, $activeProduct);
+                        $activeProduct = $this->buildProduct($items['products_variants'][$i], $items['merchant_products'][0], $merchant_id);
+                        $resultsVariant = [];
+                    }
+                    $variant = $this->buildVariant($items['products_variants'][$i]);
+                    array_push($resultsVariant, $variant);
+                    if (($i + 1) >= count($items['products_variants'])) { 
+                        $activeProduct['variants'] = $resultsVariant;
+                        if ($activeCategory['id']) {
+                            if ($items['products_variants'][$i]->category_id == $activeCategory['id']) {
+                                array_push($activeCategory['products'], $activeProduct);
+                                array_push($resultsCategory, $activeCategory);
+                            } else {
+                                array_push($resultsCategory, $activeCategory);
+                                $activeCategory = [
+                                    "name" => $items['products_variants'][$i]->category_name,
+                                    "id" => $items['products_variants'][$i]->category_id,
+                                    "description" => $items['products_variants'][$i]->category_description,
+                                    "products" => [],
+                                    "more" => false,
+                                ];
+                                array_push($activeCategory['products'], $activeProduct);
+                                array_push($resultsCategory, $activeCategory);
+                            }
+                        }
+                        array_push($results, $activeProduct);
+                    }
+                }
+                for ($j = 0; $j < count($items['products_files']); $j++) {
+                    for ($i = 0; $i < count($results); $i++) {
+                        if ($items['products_files'][$j]->trigger_id == $results[$i]['id']) {
+                            $imgInfo = [
+                                "file" => $items['products_files'][$j]->file
+                            ];
+                            array_push($results[$i]['imgs'], $imgInfo);
+                            break;
+                        }
+                    }
+                }
+                return $resultsCategory;
+            }
+            return null;
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *

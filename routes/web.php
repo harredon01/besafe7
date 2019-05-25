@@ -34,6 +34,7 @@ Route::post('user/editAddress', 'UserController@postEditAddress');
 
 Route::get('products', 'ProductController@getproducts');
 Route::get('products/{code?}', 'ProductController@getproduct');
+Route::get('products/{merchant?}/{page?}', 'ProductController@getproductsMerchant');
 
 Route::get('plans', 'BillingController@getPlans');
 Route::get('sources', 'BillingController@getSources');

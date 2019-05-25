@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\ProductVariant;
+use App\Services\EditProduct;
+use App\Models\Merchant;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductController extends Controller {
@@ -13,10 +14,10 @@ class ProductController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editOrder;
+    protected $editProduct;
 
-    public function __construct( ) {
-        
+    public function __construct(EditProduct $editProduct ) {
+        $this->editProduct = $editProduct;
     }
 
     /**
@@ -38,6 +39,13 @@ class ProductController extends Controller {
     public function getProducts() {
         $products = Product::with('productVariants')->paginate(8);
         return view('products.products', ['products' => $products]);
+    }
+    public function getProductsMerchant($slug,$page) {
+        $merchant = Merchant::where("url",$slug)->first();
+        $products =$this->editProduct->getProductsMerchant(null, $merchant->id, $page);
+        $productsCategory = $this->editProduct->buildProducts($products, $merchant->id);
+        dd($productsCategory);
+        return view('products.products', ['products' => $productsCategory]);
     }
 
 }

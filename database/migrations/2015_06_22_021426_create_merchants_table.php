@@ -21,6 +21,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('email')->nullable();
             $table->string('telephone')->nullable();
             $table->string('hash')->nullable();
+            $table->string('url')->nullable();
             $table->string('address');
             $table->text('description')->nullable();
             $table->string('icon')->nullable();

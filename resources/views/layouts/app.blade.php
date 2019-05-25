@@ -103,8 +103,9 @@ echo json_encode([
                             <li><a href="{{ url('/register') }}">Register</a></li>
                             @else
                                 @if (Auth::user()->id == 2 || Auth::user()->id == 77 )
-                                <li><a href="{{ url('products')}}">Products</a></li>
-                                <li><a href="{{ url('plans')}}">Plans</a></li>
+                                <li><a href="{{ url('products/planes/1')}}">Planes</a></li>
+                                <li><a href="{{ url('products/para-servir/1')}}">Para Servir</a></li>
+                                <li><a href="{{ url('products/catering/1')}}">Catering</a></li>
                                 <li class="dropdown replace-header-cart" ng-controller="CartCtrl">
                                     @include('products.cart')
                                 </li>
