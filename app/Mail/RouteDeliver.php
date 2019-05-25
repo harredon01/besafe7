@@ -19,13 +19,21 @@ class RouteDeliver extends Mailable
     public $data;
     
     /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $attachment;
+    
+    /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($theData)
+    public function __construct($theData,$attachment)
     {
         $this->data = $theData;
+        $this->attachment = $attachment;
     }
 
     /**
@@ -35,6 +43,6 @@ class RouteDeliver extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.transport-distribution');
+        return $this->markdown('emails.food.transport-distribution')->attachFromStorageDisk('local', $this->attachment);
     }
 }

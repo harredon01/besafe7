@@ -215,6 +215,7 @@ class Food {
         $finalresult['keywords'] = [];
         $finalresult['totals'] = [];
         $finalresult['dish'] = [];
+        $finalresult['excel'] = [];
         foreach ($keywords as $keyword2) {
             if ($father['keywords'][$keyword2] > 0) {
                 $keyPrint = "Total " . $keyword2 . ": " . $father['keywords'][$keyword2];
@@ -227,6 +228,9 @@ class Food {
                 $title = $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . " ";
                 array_push($finalresult['totals'], $title);
                 $titulo = "### " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . "  ";
+                $elTipo = ["Tipo", $father[$art->id]['name'], $father[$art->id]['count']
+                ];
+                array_push($finalresult['excel'], $father[$art->id]['name']);
                 array_push($finalresult['dish'], $titulo);
             }
 
@@ -234,12 +238,16 @@ class Food {
                 if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
                     $entrada = $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']] . "  ";
                     array_push($finalresult['dish'], $entrada);
+                    $elTipo = ["Entrada", $father[$art->id]['starter_name'][$art2['codigo']], $father[$art->id]['starter'][$art2['codigo']]];
+                    array_push($finalresult['excel'], $father[$art->id]['starter_name'][$art2['codigo']]);
                 }
             }
             foreach ($attributes['plato'] as $art3) {
                 if ($father[$art->id]['main'][$art3['codigo']] > 0) {
                     $fuerte = $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']] . "  ";
                     array_push($finalresult['dish'], $fuerte);
+                    $elTipo = ["Plato", $father[$art->id]['main_name'][$art3['codigo']], $father[$art->id]['main'][$art3['codigo']]];
+                    array_push($finalresult['excel'], $father[$art->id]['main_name'][$art3['codigo']]);
                 }
             }
         }
@@ -257,9 +265,8 @@ class Food {
             $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
-            $user = User::find(2);
-            $user2 = User::find(77);
-            Mail::to($user)->cc($user2)->send(new PurchaseOrder($dayConfig));
+            $users = User::whereIn('id',[2,77])->get();
+            Mail::to($users)->send(new PurchaseOrder($dayConfig));
             return $dayConfig;
         }
     }
@@ -474,7 +481,7 @@ class Food {
         return true;
     }
 
-    public function buildScenarioLogistics(User $user, array $input) {
+    public function buildScenarioLogistics(array $input) {
         $query = $this->buildRouteQuery($input);
         $routes = $query->with(['deliveries.user'])->orderBy('id')->get();
         if ($routes) {
@@ -487,36 +494,61 @@ class Food {
             $className2 = "App\\Services\\Basilikum";
             $basilikum = new $className2();
             $totalLunches = 0;
+            $results = [];
             foreach ($routes as $route) {
                 $routeConfig = $config;
+                $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
+                array_push($results, $arrayRouteTitle);
+                $arrayRoute = [$route->id, $route->provider, $route->unit_cost, $route->unit_price];
+                array_push($results, $arrayRoute);
+                $arrayDelTitle = ["Parada", "Direccion", "Entrega", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato"];
+                array_push($results, $arrayDelTitle);
                 $deliveries = $route->deliveries;
                 $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
                 $routeTotals = $this->printTotalsConfig($routeConfig);
+                //$results = array_merge($results,$routeTotals['excel']);
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
                 $queryStops = [];
                 foreach ($stops as $stop) {
                     $stopConfig = $config;
+                    $arrayStop = ["Parada", $stop->id, $stop->address->phone, $stop->address->address];
+
                     $stopDescription = "";
                     $stopDeliveries = $stop->deliveries;
                     $stopConfig['father'] = $this->countConfigElements($stopDeliveries, $stopConfig);
                     $stopTotals = $this->printTotalsConfig($stopConfig);
+                    //$results = array_merge($results, $stopTotals['excel']);
                     $stop->totals = $stopTotals;
+                    $address = $stop->address;
+
                     foreach ($stop->deliveries as $stopDel) {
                         $delUser = $stopDel->user;
+
+                        $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
                         $descr = $delUser->firstName . " " . $delUser->lastName . " ";
                         $details = json_decode($stopDel->details, true);
-                        if (array_key_exists("pickup", $details)) {
-                            if ($details['pickup'] == "envase") {
-                                $descr = $descr . "Recoger envase,  ";
-                            }
-                        }
                         if (array_key_exists("deliver", $details)) {
                             if ($details['deliver'] == "envase") {
                                 $descr = $descr . "Envase Retornable,  ";
+                                array_push($arrayDel, "Retornable");
                             }
+                        } else {
+                            array_push($arrayDel, "Desechable");
                         }
+                        if (array_key_exists("pickup", $details)) {
+                            if ($details['pickup'] == "envase") {
+                                $descr = $descr . "Recoger envase,  ";
+                                array_push($arrayDel, "SI");
+                            }
+                        } else {
+                            array_push($arrayDel, "NO");
+                        }
+
                         if (array_key_exists("factura", $details)) {
                             $descr = $descr . "Enviar factura,  ";
+                            array_push($arrayDel, "SI");
+                        } else {
+                            array_push($arrayDel, "NO");
                         }
                         $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
                         $stopDel->region_name = $descr;
@@ -524,17 +556,23 @@ class Food {
                         $dels = [$stopDel];
                         $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
                         $delTotals = $this->printTotalsConfig($delConfig);
+
+                        $arrayDel = array_merge($arrayDel, $delTotals['excel']);
+                        array_push($results, $arrayDel);
                         $stopDel->totals = $delTotals;
 
                         $stopDescription = $stopDescription . $descr;
                     }
-                    $address = $stop->address;
+
                     if ($stop->stop_order == 1) {
                         $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
+                        //array_push($arrayStop, $stopDescription);
                     }
                     if ($stop->stop_order == 3) {
                         $stopDescription = "Entregar los envases de la ruta: " . $route->id;
+                        //array_push($arrayStop, $stopDescription);
                     }
+                    //array_push($results, $arrayStop);
                     $querystop = [
                         "address" => $address->address . " " . $address->notes,
                         "description" => $stopDescription,
@@ -544,15 +582,14 @@ class Food {
                     array_push($queryStops, $querystop);
                 }
                 if ($route->provider == "Rapigo") {
-                    $route = $rapigo->createRoute($queryStops, $route, $stops);
-                } else if ($route->provider == "Basilikum") {
-                    $route = $basilikum->createRoute($queryStops, $route, $stops);
+                  $route = $rapigo->createRoute($queryStops, $route, $stops);
+                  } else if ($route->provider == "Basilikum") {
+                  $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
                 $route->totals = $routeTotals;
                 $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
-                $totalDeliveries = [];
                 foreach ($route->deliveries as $del) {
                     $delConfig = $config;
                     $del->status = "preparing";
@@ -563,9 +600,14 @@ class Food {
                     $del->totals = $delTotals;
                 }
             }
-
-            Mail::to($user)->send(new RouteOrganize($routes));
-            Mail::to($user)->send(new RouteDeliver($routes));
+            $page = [
+                "name" => "Rutas",
+                "rows" => $results
+            ];
+            $file = $this->writeFile([$page], "Rutas" . time());
+            $path = 'exports/'.$file->filename.".".$file->ext;
+            $users = User::whereIn('id',[2,77])->get();
+            Mail::to($users)->send(new RouteDeliver($routes,$path));
             $totalRoutes = count($routes);
             $totalIncome = $totalLunches * self::LUNCH_PROFIT;
             $totalProfit = $totalIncomeShipping + $totalIncome;
@@ -588,6 +630,36 @@ class Food {
             }
             return $result;
         }
+    }
+
+    public function writeFile($data, $title) {
+        return Excel::create($title, function($excel) use($data, $title) {
+
+            $excel->setTitle($title);
+            // Chain the setters
+            $excel->setCreator('Hoovert Arredondo')
+                    ->setCompany('Lonchis');
+            // Call them separately
+            $excel->setDescription('This report is clasified');
+            foreach ($data as $page) {
+//                foreach ($page["rows"] as $key => $value) {
+//                    if ($page["rows"][$key]) {
+//                        if (array_key_exists("labels", $page["rows"][$key])) {
+//                            unset($page["rows"][$key]["labels"]);
+//                        }
+//                        if (array_key_exists("projects", $page["rows"][$key])) {
+//                            unset($page["rows"][$key]["projects"]);
+//                        }
+//                        if (array_key_exists("people", $page["rows"][$key])) {
+//                            unset($page["rows"][$key]["people"]);
+//                        }
+//                    }
+//                }
+                $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
+                    $sheet->fromArray($page["rows"], null, 'A1', true);
+                });
+            }
+        })->store('xlsx',storage_path('app/exports'));
     }
 
     public function generateHash($id, $created_at) {
@@ -1457,10 +1529,10 @@ class Food {
             if ($delivery) {
                 if ($delivery->status == "deposit") {
                     $item->delivery = $delivery->delivery;
-                    $delivery->delivery = $date;
+                    $delivery->delivery = date_format($date, "Y-m-d"). " 12:00:00";
                     $delivery->save();
                 } else {
-                    $item->delivery = $date;
+                    $item->delivery = date_format($date, "Y-m-d"). " 12:00:00";
                 }
                 if ($delivery2) {
                     $tempAttrs = $delivery2->details;
@@ -1469,7 +1541,7 @@ class Food {
                     $item->details = $tempAttrs;
                 }
             } else {
-                $item->delivery = $date;
+                $item->delivery = date_format($date, "Y-m-d"). " 12:00:00";
             }
             $item->save();
         }

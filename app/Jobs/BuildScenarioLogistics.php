@@ -17,16 +17,14 @@ class BuildScenarioLogistics implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     
-    protected $user;
     protected $data;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(User $user,$data)
+    public function __construct($data)
     {
-        $this->user = $user;
         $this->data = $data;
     }
 
@@ -40,7 +38,7 @@ class BuildScenarioLogistics implements ShouldQueue
         if(!$this->user){
             $this->user = User::find(2);
         }
-        $food->buildScenarioLogistics($this->user,$this->data); 
+        $food->buildScenarioLogistics($this->data); 
     }
     
     /**

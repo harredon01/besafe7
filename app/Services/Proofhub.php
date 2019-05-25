@@ -245,8 +245,6 @@ class Proofhub {
     }
 
     public function writeFile($data, $title) {
-        $this->googleSheets->createSpreadsheet($title, $data);
-        /*
         Excel::create($title, function($excel) use($data, $title) {
 
             $excel->setTitle($title);
@@ -273,7 +271,7 @@ class Proofhub {
                     $sheet->fromArray($page["rows"], null, 'A1', true);
                 });
             }
-        })->store('xlsx');*/
+        })->store('xlsx');
     }
 
     public function getProjects($copy, $type) {

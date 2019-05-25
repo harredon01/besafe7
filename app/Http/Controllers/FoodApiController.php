@@ -131,10 +131,9 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function buildScenarioLogistics(Request $request) {
-        $user = $request->user();
-        $this->food->buildScenarioLogistics($user, $request->all());
+        $this->food->buildScenarioLogistics( $request->all());
 
-        //dispatch(new \App\Jobs\BuildScenarioLogistics($user, $request->all()));
+        //dispatch(new \App\Jobs\BuildScenarioLogistics($request->all()));
         return response()->json(array("status" => "success", "message" => "Scenario sent to build"));
 //            $data = $this->food->getTotalEstimatedShipping( $request->all()); 
 //            $result = Mail::to($user)->send(new RouteChoose($data['routes']));
