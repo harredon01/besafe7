@@ -67,6 +67,9 @@ class EditAlerts {
     public function buildMessage($userSending,$data){
         $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
         $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
+        if($data['type']=="program_reminder2"){
+            $data['type']="program_reminder";
+        }
         $arrayPayload = $data['payload'];
         if ($userSending) {
             if ($translationEsp) {

@@ -21,6 +21,7 @@ use App\Mail\RouteDeliver;
 use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
 use App\Mail\ScenarioSelect;
+use App\Mail\Newsletter;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -265,7 +266,7 @@ class Food {
             $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
-            $users = User::whereIn('id',[2,77])->get();
+            $users = User::whereIn('id', [2, 77])->get();
             Mail::to($users)->send(new PurchaseOrder($dayConfig));
             return $dayConfig;
         }
@@ -273,11 +274,16 @@ class Food {
 
     public function sendReminder() {
         $date = date_create();
+        $type = "program_reminder";
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         if ($dayofweek < 5 && $dayofweek > 0) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         } else if ($dayofweek == 5) {
+            $type = "program_reminder2";
             date_add($date, date_interval_create_from_date_string("3 days"));
+        } else if ($dayofweek == 6) {
+            $type = "program_reminder2";
+            date_add($date, date_interval_create_from_date_string("2 days"));
         } else {
             return null;
         }
@@ -304,12 +310,45 @@ class Food {
                     "object" => "Lonchis",
                     "sign" => true,
                     "payload" => $payload,
-                    "type" => "program_reminder",
+                    "type" => $type,
                     "user_status" => "normal"
                 ];
                 $date = date_create($deliveryObj->delivery);
                 $date = date_format($date, "Y-m-d");
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+            }
+        }
+    }
+
+    public function sendNewsletter() {
+        $date = date_create();
+        $type = "program_reminder";
+        $tomorrow = date_format($date, "Y-m-d");
+        
+        $followers = DB::select("select id,email from users where id IN (2,77) ");
+        if (count($followers) > 0) {
+            $payload = [
+                
+            ];
+
+            $data = [
+                "trigger_id" => -1,
+                "message" => "",
+                "subject" => "Visita tu correo para enterarte de nuestros menus y promociones de esta semana",
+                "object" => "Lonchis",
+                "sign" => true,
+                "payload" => $payload,
+                "type" => 'newsletter_food',
+                "user_status" => "normal"
+            ];
+            $date = date_create();
+            $date = date_format($date, "Y-m-d");
+            
+            $className = "App\\Services\\EditAlerts";
+            $platFormService = new $className();
+            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            foreach ($followers as $user) {
+                Mail::to($user->email)->send(new Newsletter());
             }
         }
     }
@@ -582,9 +621,9 @@ class Food {
                     array_push($queryStops, $querystop);
                 }
                 if ($route->provider == "Rapigo") {
-                  $route = $rapigo->createRoute($queryStops, $route, $stops);
-                  } else if ($route->provider == "Basilikum") {
-                  $route = $basilikum->createRoute($queryStops, $route, $stops);
+                    $route = $rapigo->createRoute($queryStops, $route, $stops);
+                } else if ($route->provider == "Basilikum") {
+                    $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
                 $route->totals = $routeTotals;
                 $totalCost += $route->unit_cost;
@@ -605,9 +644,9 @@ class Food {
                 "rows" => $results
             ];
             $file = $this->writeFile([$page], "Rutas" . time());
-            $path = 'exports/'.$file->filename.".".$file->ext;
-            $users = User::whereIn('id',[2,77])->get();
-            Mail::to($users)->send(new RouteDeliver($routes,$path));
+            $path = 'exports/' . $file->filename . "." . $file->ext;
+            $users = User::whereIn('id', [2, 77])->get();
+            Mail::to($users)->send(new RouteDeliver($routes, $path));
             $totalRoutes = count($routes);
             $totalIncome = $totalLunches * self::LUNCH_PROFIT;
             $totalProfit = $totalIncomeShipping + $totalIncome;
@@ -635,13 +674,13 @@ class Food {
     public function writeFile($data, $title) {
         return Excel::create($title, function($excel) use($data, $title) {
 
-            $excel->setTitle($title);
-            // Chain the setters
-            $excel->setCreator('Hoovert Arredondo')
-                    ->setCompany('Lonchis');
-            // Call them separately
-            $excel->setDescription('This report is clasified');
-            foreach ($data as $page) {
+                    $excel->setTitle($title);
+                    // Chain the setters
+                    $excel->setCreator('Hoovert Arredondo')
+                            ->setCompany('Lonchis');
+                    // Call them separately
+                    $excel->setDescription('This report is clasified');
+                    foreach ($data as $page) {
 //                foreach ($page["rows"] as $key => $value) {
 //                    if ($page["rows"][$key]) {
 //                        if (array_key_exists("labels", $page["rows"][$key])) {
@@ -655,11 +694,11 @@ class Food {
 //                        }
 //                    }
 //                }
-                $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-                    $sheet->fromArray($page["rows"], null, 'A1', true);
-                });
-            }
-        })->store('xlsx',storage_path('app/exports'));
+                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
+                            $sheet->fromArray($page["rows"], null, 'A1', true);
+                        });
+                    }
+                })->store('xlsx', storage_path('app/exports'));
     }
 
     public function generateHash($id, $created_at) {
@@ -1529,10 +1568,10 @@ class Food {
             if ($delivery) {
                 if ($delivery->status == "deposit") {
                     $item->delivery = $delivery->delivery;
-                    $delivery->delivery = date_format($date, "Y-m-d"). " 12:00:00";
+                    $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                     $delivery->save();
                 } else {
-                    $item->delivery = date_format($date, "Y-m-d"). " 12:00:00";
+                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                 }
                 if ($delivery2) {
                     $tempAttrs = $delivery2->details;
@@ -1541,7 +1580,7 @@ class Food {
                     $item->details = $tempAttrs;
                 }
             } else {
-                $item->delivery = date_format($date, "Y-m-d"). " 12:00:00";
+                $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
             }
             $item->save();
         }

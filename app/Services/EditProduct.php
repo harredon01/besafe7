@@ -335,7 +335,7 @@ class EditProduct {
             "min_quantity" => $container->min_quantity,
         ];
         if ($container->attributes) {
-            $variant["attributes"] = json_decode($container->attributes,true);
+            $variant["attributes"] = json_decode($container->attributes, true);
             if (array_key_exists("buyers", $variant["attributes"])) {
                 $variant["unitPrice"] = $variant["price"] / $variant["attributes"]["buyers"];
             } else {
@@ -424,7 +424,7 @@ class EditProduct {
                     }
                     $variant = $this->buildVariant($items['products_variants'][$i]);
                     array_push($resultsVariant, $variant);
-                    if (($i + 1) >= count($items['products_variants'])) { 
+                    if (($i + 1) >= count($items['products_variants'])) {
                         $activeProduct['variants'] = $resultsVariant;
                         if ($activeCategory['id']) {
                             if ($items['products_variants'][$i]->category_id == $activeCategory['id']) {
@@ -447,13 +447,17 @@ class EditProduct {
                     }
                 }
                 for ($j = 0; $j < count($items['products_files']); $j++) {
-                    for ($i = 0; $i < count($results); $i++) {
-                        if ($items['products_files'][$j]->trigger_id == $results[$i]['id']) {
-                            $imgInfo = [
-                                "file" => $items['products_files'][$j]->file
-                            ];
-                            array_push($results[$i]['imgs'], $imgInfo);
-                            break;
+                    for ($k = 0; $k < count($resultsCategory); $k++) {
+                        $prods = $resultsCategory[$k]['products'];
+                        for ($i = 0; $i < count($resultsCategory[$k]['products']); $i++) {
+                            if ($items['products_files'][$j]->trigger_id == $resultsCategory[$k]['products'][$i]['id']) {
+                                $imgInfo = [
+                                    "file" => $items['products_files'][$j]->file
+                                ];
+                                
+                                array_push($resultsCategory[$k]['products'][$i]['imgs'], $imgInfo);
+                                break;
+                            }
                         }
                     }
                 }

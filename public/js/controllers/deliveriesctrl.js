@@ -85,6 +85,9 @@
 
                         });
             }
+            $scope.sendNewsletter = function () {
+                Food.sendNewsletter();
+            }
             $scope.showAll = function () {
                 console.log("Creating map data")
                 for (item in $scope.deliveries) {

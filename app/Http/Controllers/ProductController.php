@@ -44,8 +44,7 @@ class ProductController extends Controller {
         $merchant = Merchant::where("url",$slug)->first();
         $products =$this->editProduct->getProductsMerchant(null, $merchant->id, $page);
         $productsCategory = $this->editProduct->buildProducts($products, $merchant->id);
-        dd($productsCategory);
-        return view('products.products', ['products' => $productsCategory]);
+        return view('products.productsMerchant', ['categories' => $productsCategory,"merchant"=>$merchant->id]);
     }
 
 }

@@ -16,8 +16,9 @@
                     a.css("display", "block");
                 });
             }
-            $scope.addCartItem = function (product_variant_id, quantity) {
-                Cart.addCartItem(product_variant_id, quantity).then(function (data) {
+            $scope.addCartItem = function (product_variant_id,merchant_id, quantity) {
+
+                Cart.addCartItem(product_variant_id,merchant_id, quantity).then(function (data) {
                     if (data.status=="error") {
                         alert(data.message);
                     } else {
@@ -33,7 +34,7 @@
         })
         .controller('CartCtrl', function ($scope, Cart, $rootScope) {
             angular.element(document).ready(function () {
-                if(window.location.href=='http://hoovert.com/auth/login' || window.location.href=='http://www.hoovert.com/auth/login'){
+                if(window.location.href=='https://lonchis.com.co/auth/login' || window.location.href=='http://www.lonchis.com.co/auth/login'){
                 } else {
                     $scope.getCart();
                 }

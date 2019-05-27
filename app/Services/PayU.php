@@ -387,6 +387,7 @@ class PayU {
             "transaction" => $transaction,
             "test" => $this->getTestVar($user),
         ];
+        //dd($dataSent);
         $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
         return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
     }

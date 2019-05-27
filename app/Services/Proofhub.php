@@ -2,6 +2,9 @@
 
 namespace App\Services;
 use App\Services\GoogleSheets;
+use App\Mail\ProofhubResults;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 use Excel;
 
 class Proofhub {
@@ -13,7 +16,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -245,7 +248,7 @@ class Proofhub {
     }
 
     public function writeFile($data, $title) {
-        Excel::create($title, function($excel) use($data, $title) {
+        $file =Excel::create($title, function($excel) use($data, $title) {
 
             $excel->setTitle($title);
             // Chain the setters
@@ -271,7 +274,10 @@ class Proofhub {
                     $sheet->fromArray($page["rows"], null, 'A1', true);
                 });
             }
-        })->store('xlsx');
+        })->store('xlsx',storage_path('app/exports'));
+            $path = 'exports/'.$file->filename.".".$file->ext;
+            $users = User::whereIn('id',[2])->get();
+            Mail::to($users)->send(new ProofhubResults($path));
     }
 
     public function getProjects($copy, $type) {
@@ -1162,13 +1168,13 @@ class Proofhub {
         $name = 'Total_produccion_' . time();
         $ignoreDate = true;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        return true;
         
         $projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
         $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        return true;
         $projects = $this->getProjects($copy, self::CANADA);
         $full = false;
         $name = 'Total_canada_mes_' . time();

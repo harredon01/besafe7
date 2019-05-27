@@ -37,7 +37,9 @@
 
             gtag('config', 'UA-139655421-1');
         </script>
-
+<!-- Start of  Zendesk Widget script -->
+<script id="ze-snippet" src="https://static.zdassets.com/ekr/snippet.js?key=685e3ab5-386c-47db-9190-bc6e4e7793c4"> </script>
+<!-- End of  Zendesk Widget script -->
     </head>
     <body>
         <!-- preloader area start -->

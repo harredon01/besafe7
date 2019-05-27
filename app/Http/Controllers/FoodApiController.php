@@ -77,7 +77,16 @@ class FoodApiController extends Controller {
      */
     public function getPurchaseOrder() {
         $date = date_create();
-        date_add($date, date_interval_create_from_date_string("1 days"));
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek < 5 && $dayofweek > 0) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else if ($dayofweek == 6) {
+            date_add($date, date_interval_create_from_date_string("2 days"));
+        } else {
+            return null;
+        }
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         $this->food->getPurchaseOrder($deliveries);
@@ -96,6 +105,11 @@ class FoodApiController extends Controller {
     
     public function backups(){
         Artisan::call('db:backup');
+    }
+    
+    public function sendNewsletter(){
+        $this->food->sendNewsletter();
+        //dispatch(new \App\Jobs\SendNewsletter());
     }
 
     /**

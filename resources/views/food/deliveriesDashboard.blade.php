@@ -16,6 +16,7 @@
                     </select><br/>
 
                     <a href="javascript:;" ng-click="sendReminder()">Enviar Recordatorio</a><br/><br/>
+                    <a href="javascript:;" ng-click="sendNewsletter()">Enviar Newsletter</a><br/><br/>
                     <!--a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/-->
                     <a href="javascript:;" ng-click="getPurchaseOrder()">Get Purchase Order</a><br/><br/>
                     <a href="javascript:;" ng-click="activateMap()">Activate Map</a><br/><br/>

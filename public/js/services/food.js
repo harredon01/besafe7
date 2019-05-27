@@ -2,6 +2,23 @@ angular.module('besafe')
         
         .service('Food', function ($q, $http) {
 
+            var sendNewsletter = function () {
+                let url = '/api/food/newsletter' ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to sendNewsletter");
+                        });
+                return def.promise;
+                /**/
+            }
             var getDeliveries = function (where) {
                 let url = '/api/food/deliveries' ;
                 if(where){
@@ -461,6 +478,7 @@ angular.module('besafe')
                 updateMenuItem:updateMenuItem,
                 getScenarioOrganizationStructure:getScenarioOrganizationStructure, 
                 updateMessageItem:updateMessageItem,
+                sendNewsletter:sendNewsletter,
                 deleteZoneItem:deleteZoneItem,
                 deleteMenuItem:deleteMenuItem,
                 deleteMessageItem:deleteMessageItem,
