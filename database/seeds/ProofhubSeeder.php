@@ -72,7 +72,8 @@ class ProofhubSeeder extends Seeder {
         }
 
         return true;*/
-        dispatch(new ProofhubJob()); 
+        $this->proofhub->getReport();
+        //dispatch(new ProofhubJob()); 
     }
 
     public function deleteOldData() {

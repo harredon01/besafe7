@@ -275,9 +275,9 @@ class Proofhub {
                 });
             }
         })->store('xlsx',storage_path('app/exports'));
-            $path = 'exports/'.$file->filename.".".$file->ext;
-            $users = User::whereIn('id',[2])->get();
-            Mail::to($users)->send(new ProofhubResults($path));
+//            $path = 'exports/'.$file->filename.".".$file->ext;
+//            $users = User::whereIn('id',[2])->get();
+//            Mail::to($users)->send(new ProofhubResults($path));
     }
 
     public function getProjects($copy, $type) {

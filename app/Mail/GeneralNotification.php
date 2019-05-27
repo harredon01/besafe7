@@ -42,6 +42,6 @@ class GeneralNotification extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.general-notification')->subject($this->subject);
+        return $this->markdown('emails.general-notification2')->subject($this->subject);
     }
 }
