@@ -52,9 +52,9 @@ class StoreExport {
     const PAYMENTS_AMOUNT = 'Cantidad Pagos';
     const ORDERS_AMOUNT = 'Cantidad Ordenes';
 
-    public function exportEverything() {
-        $startDate = "2019-05-05";
-        $endDate = "2021-05-19";
+    public function exportEverything($startDate,$endDate) {
+//        $startDate = "2019-05-05";
+//        $endDate = "2021-05-19";
         $shipping = 0;
         $tax = 0;
         $discount = 0;

@@ -210,7 +210,7 @@ Route::post('auth/validate_codes', 'AuthApiController@validateCodes');
 Route::post('auth/update_codes', 'AuthApiController@updateCodes');
 Route::post('auth/clean', 'AuthApiController@cleanServer');
 Route::post('auth/register', 'AuthApiController@create');
-Route::get('store/reports', 'StoreExportApiController@getStoreExport');
+Route::post('store/reports', 'StoreExportApiController@getStoreExport');
 
 Route::post('locations/user', 'LocationController@postLocation');
 Route::post('locations/follower', 'ShareApiController@postAddFollower');

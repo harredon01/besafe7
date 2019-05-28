@@ -4,7 +4,8 @@ namespace App\Services;
 use App\Services\GoogleSheets;
 use App\Mail\StoreReports;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
+use App\Jobs\ProofhubTotalsJob;
+use App\Jobs\ProofhubSummaryJob;
 use Excel;
 
 class Proofhub {
@@ -276,8 +277,7 @@ class Proofhub {
             }
         })->store('xlsx',storage_path('app/exports'));
             $path = 'exports/' . $file->filename . "." . $file->ext;
-            $users = User::whereIn('id', [2])->get();
-            Mail::to($users)->send(new StoreReports($path));
+            Mail::to("hoovert@backbone.digital")->send(new StoreReports($path));
 
     }
 
@@ -843,9 +843,11 @@ class Proofhub {
         }
     }
 
-    public function getSummary($labels, $people, $projects, $full, $ignoreDate, $name) {
+    public function getSummary($labels, $people, $type, $full, $ignoreDate, $name) {
         $date1 = self::START_DATE;
         $date2 = self::END_DATE;
+        $copy = $people;
+        $projects = $this->getProjects($copy, $type);
         $dateTimestamp1 = strtotime($date1) - 1000;
         $dateTimestamp2 = strtotime($date2);
         $results = [];
@@ -1148,7 +1150,9 @@ class Proofhub {
         $daProjects = $results;
         if ($full) {
             $this->calculateTotalsPeople($daProjects, $people);
-            $this->calculateTotalsLabels($daProjects, $labels);
+            //$this->calculateTotalsLabels($daProjects, $labels);
+//            dispatch(new ProofhubTotalsJob($daProjects, $people,"people")); 
+//            dispatch(new ProofhubTotalsJob($daProjects, $labels,"labels")); 
         }
 
         array_unshift($results, $summary);
@@ -1159,42 +1163,39 @@ class Proofhub {
         $labels = $this->getLabels();
         $people = $this->getPeople($labels);
         $copy = $people;
-        $projects = $this->getProjects($copy, null);
+        //$projects = $this->getProjects($copy, null);
         $full = true;
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        $projects = $this->getProjects($copy, self::PRODUCCION);
+        //$this->getSummary($labels, $people, null, $full, $ignoreDate, $name);
+        dispatch(new ProofhubSummaryJob($labels, $people, null, $full, $ignoreDate, $name)); 
+        //$projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
         $name = 'Total_produccion_' . time();
         $ignoreDate = true;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        
-        $projects = $this->getProjects($copy, self::CUENTAS);
+        //$this->getSummary($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name);
+        dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name)); 
+        //$projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
+        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name)); 
         return true;
         $projects = $this->getProjects($copy, self::CANADA);
         $full = false;
         $name = 'Total_canada_mes_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
-        $projects = $this->getProjects($copy, self::PRODUCCION);
-        $full = false;
-        $name = 'Total_produccion_' . time();
-        $ignoreDate = true;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        $this->getSummary($labels, $people, self::CANADA, $full, $ignoreDate, $name);
         $projects = $this->getProjects($copy, self::INTERNO);
         $full = false;
         $name = 'Total_internos_' . time();
         $ignoreDate = false;
-        $this->getSummary($labels, $people, $projects, $full, $ignoreDate, $name);
+        $this->getSummary($labels, $people, self::INTERNO, $full, $ignoreDate, $name);
         
     }
 
-    private function calculateTotalsPeople($results, $people) {
+    public function calculateTotalsPeople($results, $people) {
         foreach ($results as $project) {
             if (count($project["rows"]) > 0) {
                 $projectPeople = $project['people'];
@@ -1289,7 +1290,7 @@ class Proofhub {
         $this->writeFile($totalResults, 'People_' . time());
     }
 
-    private function calculateTotalsLabels($results, $labels) {
+    public function calculateTotalsLabels($results, $labels) {
         foreach ($labels as &$label) {
             foreach ($results as $project) {
                 $projectLabel = [];

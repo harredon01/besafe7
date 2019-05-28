@@ -316,7 +316,7 @@ class EditOrderFood {
                 $delivery->shipping = 2500;
                 $delivery->address_id = $address_id;
                 $delivery->status = "deposit";
-                $delivery->provider = "Rapigo";
+                $delivery->provider = "Basilikum";
                 $delivery->save();
             }
         }

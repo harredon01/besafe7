@@ -24,12 +24,14 @@ angular.module('besafe')
                 /**/
 
             }
-            var getStoreExport = function () {
+            var getStoreExport = function (from,to) {
                 let url = '/api/store/reports' ;
                 var def = $q.defer();
+                console.log("getStoreExport",from,to);
                 $http({
-                    method: 'get',
-                    url: url
+                    method: 'POST',
+                    url: url,
+                    data:{from:from,to:to}
                 })
                         .success(function (data) {
                             // console.log(data);

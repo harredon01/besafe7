@@ -12,7 +12,7 @@
             $scope.editAddress = false;
             $scope.mapActive = false;
             angular.element(document).ready(function () {
-                
+
                 let date = new Date();
                 let day = date.getDay();
                 if (day < 5) {
@@ -24,7 +24,7 @@
                 }
                 $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
                 $scope.getArticles(new Date());
-                
+
 
             });
             $scope.activateMap = function () {
@@ -56,7 +56,7 @@
             $scope.getDeliveries = function () {
                 console.log("Status", $scope.status);
                 $scope.page++;
-                let url = "includes=user,address&order_by=id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
+                let url = "includes=user,address&order_by=address_id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
                 Food.getDeliveries(url).then(function (data) {
                     let deliveriesCont = data.data;
                     if (data.page == data.last_page) {
@@ -137,26 +137,27 @@
             $scope.replaceFood = function () {
                 console.log("articles", $scope.listArticles);
                 for (let item in $scope.deliveries) {
-                    console.log("delivery",$scope.deliveries[item].id);
+                    console.log("delivery", $scope.deliveries[item].id);
                     let attributes = $scope.deliveries[item].details;
-                    let article = $scope.getArticle(attributes.dish.type_id);
-
-                    attributes.tipoAlmuerzo = article.name;
-                    for (item2 in article.attributes.entradas) {
-                        if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
-                            attributes.entrada = article.attributes.entradas[item2].valor;
+                    if (attributes.dish) {
+                        let article = $scope.getArticle(attributes.dish.type_id);
+                        attributes.tipoAlmuerzo = article.name;
+                        for (item2 in article.attributes.entradas) {
+                            if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
+                                attributes.entrada = article.attributes.entradas[item2].valor;
+                            }
                         }
-                    }
-                    for (item3 in article.attributes.plato) {
-                        if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
-                            attributes.plato = article.attributes.plato[item3].valor;
+                        for (item3 in article.attributes.plato) {
+                            if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
+                                attributes.plato = article.attributes.plato[item3].valor;
+                            }
                         }
+                        delete attributes.dish;
+                        delete attributes.products;
+                        delete attributes.merchant_id;
+                        $scope.deliveries[item].details = attributes;
+                        console.log("deliveryDone", $scope.deliveries[item].id);
                     }
-                    delete attributes.dish;
-                    delete attributes.products;
-                    delete attributes.merchant_id;
-                    $scope.deliveries[item].details = attributes;
-                    console.log("deliveryDone",$scope.deliveries[item].id);
                 }
             }
             $scope.getArticles = function (date) {

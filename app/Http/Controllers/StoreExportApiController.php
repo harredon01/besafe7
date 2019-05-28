@@ -47,7 +47,8 @@ class StoreExportApiController extends Controller {
      * @return Response
      */
     public function getStoreExport(Request $request) {
-        $this->store->exportEverything();
+        $data = $request->all();
+        $this->store->exportEverything($data['from'],$data['to']);
         return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
     }
 

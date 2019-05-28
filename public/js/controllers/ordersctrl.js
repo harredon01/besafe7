@@ -3,12 +3,50 @@
         .controller('OrdersCtrl', function ($scope, Orders) {
             $scope.data = {};
             $scope.orders;
+            $scope.from;
+            $scope.to;
             $scope.loadMore = true,
-            $scope.page = 0;
+                    $scope.page = 0;
             angular.element(document).ready(function () {
+                $scope.buildDatePicker();
                 $scope.getOrders();
             });
-            
+
+            $scope.buildDatePicker = function () {
+                var dateFormat = "yy-mm-dd",
+                        from = $("#from")
+                        .datepicker({
+                            defaultDate: "-1m",
+                            changeMonth: true,
+                            numberOfMonths: 2,
+                            dateFormat: dateFormat
+                        })
+                        .on("change", function () {
+                            to.datepicker("option", "minDate", $scope.getDate(this));
+                            $scope.from = $scope.getDate(this);
+                        }),
+                        to = $("#to").datepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    numberOfMonths: 2,
+                    dateFormat: dateFormat
+                })
+                        .on("change", function () {
+                            from.datepicker("option", "maxDate", $scope.getDate(this));
+                            $scope.to = $scope.getDate(this);
+                        });
+            }
+            $scope.getDate = function (element) {
+                var date;
+                try {
+                    date = $.datepicker.parseDate("yy-mm-dd", element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
+
             $scope.buildOrderData = function (order) {
                 let items = order.items;
                 for (item in items) {
@@ -36,9 +74,9 @@
 
                         });
             }
-            $scope.updateOrderStatus = function (status,order_id) {
+            $scope.updateOrderStatus = function (status, order_id) {
 
-                Orders.updateOrderStatus(status,order_id).then(function (data) {
+                Orders.updateOrderStatus(status, order_id).then(function (data) {
 
                 },
                         function (data) {
@@ -46,8 +84,8 @@
                         });
             }
             $scope.getStoreExport = function () {
-
-                Orders.getStoreExport().then(function (data) {
+                console.log("Date", $scope.from, $scope.to);
+                Orders.getStoreExport($scope.from, $scope.to).then(function (data) {
 
                 },
                         function (data) {

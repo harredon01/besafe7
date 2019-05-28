@@ -6,6 +6,7 @@
             Status: <span class="type">@{{ payment.status}}</span><br/>
             Ultima actualizacion: <span class="type">@{{ payment.updated_at}}</span><br/>
             Creado: <span class="type">@{{ payment.created_at}}</span><br/>
+            Usuario: <span class="type">@{{ payment.user.firstName}} @{{ payment.user.lastName}}</span><br/>
             Referencia: <span class="type">@{{ payment.referenceCode}}</span><br/>
             Total: <span class="type">@{{ payment.total}}</span><br/>
             
