@@ -24,6 +24,25 @@ angular.module('besafe')
                 /**/
 
             }
+            var getStoreExport = function () {
+                let url = '/api/store/reports' ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getStoreExport");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
             var approveOrder = function (order_id) {
                 var def = $q.defer();
                 $http({
@@ -61,6 +80,7 @@ angular.module('besafe')
             return {
                 getOrders:getOrders,
                 approveOrder:approveOrder,
+                getStoreExport:getStoreExport,
                 updateOrderStatus:updateOrderStatus
             };
         })

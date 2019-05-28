@@ -243,7 +243,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://t3.ftcdn.net/jpg/00/57/87/36/240_F_57873667_KjH0ABUBM4Cu8Dj24NaMAMvjghWCmrfx.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/248422/pexels-photo-248422.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -337,7 +337,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://cdn.pixabay.com/photo/2014/11/06/08/54/buffalo-wings-518828_960_720.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/1059943/pexels-photo-1059943.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -415,7 +415,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="images/t4_image7.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://www.foodiesfeed.com/wp-content/uploads/2018/03/stewed-chicken-with-three-cups-sauce-chinese-cuisine-1024x683.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -424,7 +424,7 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Vuernes 31
+                                                                                Viernes 31
                                                                             </td>
                                                                         </tr>
                                                                         <tr>

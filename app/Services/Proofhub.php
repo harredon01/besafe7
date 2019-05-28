@@ -2,7 +2,7 @@
 
 namespace App\Services;
 use App\Services\GoogleSheets;
-use App\Mail\ProofhubResults;
+use App\Mail\StoreReports;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use Excel;
@@ -275,14 +275,15 @@ class Proofhub {
                 });
             }
         })->store('xlsx',storage_path('app/exports'));
-//            $path = 'exports/'.$file->filename.".".$file->ext;
-//            $users = User::whereIn('id',[2])->get();
-//            Mail::to($users)->send(new ProofhubResults($path));
+            $path = 'exports/' . $file->filename . "." . $file->ext;
+            $users = User::whereIn('id', [2])->get();
+            Mail::to($users)->send(new StoreReports($path));
+
     }
 
     public function getProjects($copy, $type) {
         $projects = [
-            /*[
+            [
                 "name" => "TaxPayer Redesign and Dev",
                 "budget" => "0",
                 "country" => "COL",
@@ -307,7 +308,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2237106775",
                 "rows" => $copy,
-            ],*/ [
+            ], [
                 "name" => "Wellness",
                 "budget" => "15000000",
                 "country" => "COL",
@@ -323,7 +324,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "2836708259",
                 "rows" => $copy,
-            ],/* [
+            ], [
                 "name" => "La nuit ongoing",
                 "budget" => "3000000",
                 "country" => "COL",
@@ -801,7 +802,7 @@ class Proofhub {
                 "code" => "2547043347",
                 "rows" => $copy,
             ],
-            */[
+            [
                 "name" => "CONSTRUCTORA BOLIVAR",
                 "budget" => "0",
                 "country" => "COL",

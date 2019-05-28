@@ -45,6 +45,15 @@
 
                         });
             }
+            $scope.getStoreExport = function () {
+
+                Orders.getStoreExport().then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
             $scope.approveOrder = function (order) {
                 Orders.approveOrder(order.id).then(function (data) {
                     order.status = "scheduled";

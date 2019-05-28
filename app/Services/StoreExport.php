@@ -6,6 +6,8 @@ use App\Models\Merchant;
 use App\Models\Payment;
 use App\Models\Delivery;
 use App\Models\Item;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StoreReports;
 use App\Models\OrderCondition;
 use App\Models\Product;
 use App\Models\Order;
@@ -176,20 +178,23 @@ class StoreExport {
 
     public function writeFile($data, $title) {
         //dd($data);
-        Excel::create($title, function($excel) use($data, $title) {
+        $file = Excel::create($title, function($excel) use($data, $title) {
 
-            $excel->setTitle($title);
-            // Chain the setters
-            $excel->setCreator('Hoovert Arredondo')
-                    ->setCompany('Hoovert Arredondo SAS');
-            // Call them separately
-            $excel->setDescription('This report is clasified');
-            foreach ($data as $page) {
-                $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-                    $sheet->fromArray($page["rows"], null, 'A1', true);
-                });
-            }
-        })->store('xlsx');
+                    $excel->setTitle($title);
+                    // Chain the setters
+                    $excel->setCreator('Hoovert Arredondo')
+                            ->setCompany('Hoovert Arredondo SAS');
+                    // Call them separately
+                    $excel->setDescription('This report is clasified');
+                    foreach ($data as $page) {
+                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
+                            $sheet->fromArray($page["rows"], null, 'A1', true);
+                        });
+                    }
+                })->store('xlsx', storage_path('app/exports'));
+        $path = 'exports/' . $file->filename . "." . $file->ext;
+        $users = User::whereIn('id', [2, 77])->get();
+        Mail::to($users)->send(new StoreReports($path));
     }
 
     private function exportMerchant(Merchant $merchant, $startDate, $endDate) {
@@ -230,7 +235,7 @@ class StoreExport {
         $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
                         ->where('merchant_id', $merchant->id)
                         ->whereBetween('updated_at', [$startDate, $endDate])
-                        ->whereNotIn('user_id', [2, 77])
+                        ->whereNotIn('user_id', [2, 77,3])
                         ->with(['payments.user', 'items', 'orderConditions'])->get();
         foreach ($orders as $order) {
             $oTax = 0;

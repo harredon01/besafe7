@@ -325,7 +325,7 @@ class Food {
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
         
-        $followers = DB::select("select id,email from users where id IN (2,77) ");
+        $followers = DB::select("select id,email from users ");
         if (count($followers) > 0) {
             $payload = [
                 
