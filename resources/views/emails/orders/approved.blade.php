@@ -34,6 +34,8 @@
 |Subtotal          |${{number_format($order->payment->subtotal, 2, ',', '.')}}|
 |Transaccion       |${{number_format($order->payment->transaction_cost, 2, ',', '.')}}|
 |Total             |${{number_format($order->payment->total, 2, ',', '.')}}|
+|Base Gravable productos|${{number_format($order->totalCost, 2, ',', '.')}}|
+|ImpoConsumo       |${{number_format($order->tax, 2, ',', '.')}}|
 @endcomponent
 
 @component('mail::table')

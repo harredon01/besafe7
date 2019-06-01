@@ -263,6 +263,15 @@ class Food {
 //        $father = $dayConfig['father'];
 //        $keywords = $dayConfig['keywords'];
             //dd($father);
+            $facturas = [];
+            foreach ($deliveries as $delivery) {
+                $details = json_decode($delivery->details, true);
+                if (array_key_exists("factura", $details)) {
+                    if (array_key_exists("order_id", $details)) {
+                        array_push($facturas, $delivery->id);
+                    }
+                }
+            }
             $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
@@ -324,11 +333,10 @@ class Food {
         $date = date_create();
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
-        
+
         $followers = DB::select("select id,email from users ");
         if (count($followers) > 0) {
             $payload = [
-                
             ];
 
             $data = [
@@ -343,7 +351,7 @@ class Food {
             ];
             $date = date_create();
             $date = date_format($date, "Y-m-d");
-            
+
             $className = "App\\Services\\EditAlerts";
             $platFormService = new $className();
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
@@ -1528,6 +1536,62 @@ class Food {
         return array("status" => "success", "message" => "costs sent");
     }
 
+    private function getNextValidDate($date) {
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek > 0 && $dayofweek < 5) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else if ($dayofweek == 6) {
+            date_add($date, date_interval_create_from_date_string("2 days"));
+        } else if ($dayofweek == 7) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        }
+
+        $isHoliday = $this->checkIsHoliday($date);
+
+        while ($isHoliday) {
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("3 days"));
+            } else if ($dayofweek == 6) {
+                date_add($date, date_interval_create_from_date_string("2 days"));
+            } else {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            }
+            $isHoliday = $this->checkIsHoliday($date);
+        }
+        return $date;
+    }
+
+    private function checkIsHoliday($date) {
+        $holidays = [
+            "2019-06-03",
+            "2019-06-24",
+            "2019-07-01",
+            "2019-08-07",
+            "2019-08-19",
+            "2019-10-14",
+            "2019-11-04",
+            "2019-12-24",
+            "2019-12-25",
+            "2019-12-26",
+            "2019-12-27",
+            "2019-12-30",
+            "2019-12-31",
+            "2020-01-01",
+            "2020-01-02",
+            "2020-01-03",
+            "2020-01-06",
+        ];
+        foreach ($holidays as $day) {
+            if ($day == date_format($date, "Y-m-d")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function reprogramDeliveries() {
         $date = date_create();
 //        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
@@ -1555,16 +1619,7 @@ class Food {
             } else {
                 $date = date_create();
             }
-            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-            if ($dayofweek > 0 && $dayofweek < 5) {
-                date_add($date, date_interval_create_from_date_string("1 days"));
-            } else if ($dayofweek == 5) {
-                date_add($date, date_interval_create_from_date_string("3 days"));
-            } else if ($dayofweek == 6) {
-                date_add($date, date_interval_create_from_date_string("2 days"));
-            } else if ($dayofweek == 7) {
-                date_add($date, date_interval_create_from_date_string("1 days"));
-            }
+            $date = $this->getNextValidDate($date);
             if ($delivery) {
                 if ($delivery->status == "deposit") {
                     $item->delivery = $delivery->delivery;

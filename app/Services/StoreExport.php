@@ -52,7 +52,7 @@ class StoreExport {
     const PAYMENTS_AMOUNT = 'Cantidad Pagos';
     const ORDERS_AMOUNT = 'Cantidad Ordenes';
 
-    public function exportEverything($startDate,$endDate) {
+    public function exportEverything($startDate, $endDate) {
 //        $startDate = "2019-05-05";
 //        $endDate = "2021-05-19";
         $shipping = 0;
@@ -89,7 +89,13 @@ class StoreExport {
         $merchants = Merchant::whereIn("id", [1299, 1300, 1301])->get();
         foreach ($merchants as $merchant) {
 
-            $merchantResults = $this->exportMerchant($merchant, $startDate, $endDate);
+            $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
+                            ->where('merchant_id', $merchant->id)
+                            ->whereBetween('updated_at', [$startDate, $endDate])
+                            ->whereNotIn('user_id', [2, 77, 3])
+                            ->with(['payments.user', 'items', 'orderConditions'])->get();
+
+            $merchantResults = $this->exportOrderInvoices($orders, $merchant->name);
             $commision += $merchantResults[self::COMMISION_WO_DISCOUNT];
             $meDiscount += $merchantResults[self::DICOUNT_COMMISION];
             $comissionSub += $merchantResults[self::COMMISION_W_DISCOUNT];
@@ -173,10 +179,10 @@ class StoreExport {
             "rows" => $merchantsObserved
         ];
         array_unshift($results, $page);
-        $this->writeFile($results, "Total operacion_" . time());
+        $this->writeFile($results, "Total operacion_" . time(), true);
     }
 
-    public function writeFile($data, $title) {
+    public function writeFile($data, $title, $sendMail) {
         //dd($data);
         $file = Excel::create($title, function($excel) use($data, $title) {
 
@@ -193,11 +199,26 @@ class StoreExport {
                     }
                 })->store('xlsx', storage_path('app/exports'));
         $path = 'exports/' . $file->filename . "." . $file->ext;
-        $users = User::whereIn('id', [2, 77])->get();
-        Mail::to($users)->send(new StoreReports($path));
+        if ($sendMail) {
+            $users = User::whereIn('id', [2, 77])->get();
+            Mail::to($users)->send(new StoreReports($path));
+        } else {
+            return $path;
+        }
     }
 
-    private function exportMerchant(Merchant $merchant, $startDate, $endDate) {
+    public function dailyInvoices($ordersArray) {
+        $orders = Order::whereIn('id', $ordersArray)
+                        ->with(['payments.user', 'items', 'orderConditions'])->get();
+        $results = $this->exportOrderInvoices($orders, "Facturas diarias");
+        $page = [
+            "name" => "Facturas diarias",
+            "rows" => $results['operationData']
+        ];
+        return $this->writeFile([$page], "Facturas diarias" . time());
+    }
+
+    private function exportOrderInvoices($orders, $name) {
         $shipping = 0;
         $tax = 0;
         $discount = 0;
@@ -232,11 +253,6 @@ class StoreExport {
         $conditionsData = [];
         $itemsData = [];
         $paymentsData = [];
-        $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
-                        ->where('merchant_id', $merchant->id)
-                        ->whereBetween('updated_at', [$startDate, $endDate])
-                        ->whereNotIn('user_id', [2, 77,3])
-                        ->with(['payments.user', 'items', 'orderConditions'])->get();
         foreach ($orders as $order) {
             $oTax = 0;
             $oCost = 0;
@@ -471,7 +487,7 @@ class StoreExport {
         $comissionSub = $commision - $meDiscount;
         $operationData = array_merge($ordersData, $ordersData2);
         $summary = [
-            "name" => $merchant->name,
+            "name" => $name,
             self::COST_WO_DISCOUNT => $cost,
             self::LUNCHES => $lunches,
             self::DICOUNT_COST => $productDiscount,

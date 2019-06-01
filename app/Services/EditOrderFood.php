@@ -264,6 +264,7 @@ class EditOrderFood {
         } else {
             $date = date_create();
         }
+        $madeDeliveries = [];
         for ($x = 0; $x < $item->quantity; $x++) {
             date_add($date, date_interval_create_from_date_string("1 days"));
 
@@ -275,28 +276,36 @@ class EditOrderFood {
             }
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
-
             $details["merchant_id"] = $item->merchant_id;
+            $details["order_id"] = $item->order_id;
             $products = ["product" => $item->product_variant_id, "quantity" => 1];
             $details["products"] = $products;
             $delivery->shipping = $shippingPaid;
             $delivery->merchant_id = $item->merchant_id;
             $delivery->address_id = $address_id;
             $delivery->status = "pending";
-            $delivery->provider = "Rapigo";
-            if ($x > 0 && $returnDelivery) {
-                $details["pickup"] = "envase";
-            }
+            $delivery->provider = "Basilikum";
             if ($returnDelivery) {
                 $details["deliver"] = "envase";
-            }
-            if ($x == 0 ) {
-                $details["factura"] = "true";
+                $details["pickup"] = "envase";
             }
             $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
             $delivery->details = json_encode($details);
             $delivery->save();
+            array_push($madeDeliveries, $delivery);
         }
+        $firstDel = $madeDeliveries[0];
+        $detailsFirstDel = json_decode($firstDel->details, true);
+        $detailsFirstDel["factura"]="true";
+        if ($lastDelivery) {
+            if ($lastDelivery->status != "deposit") {
+                unset($detailsFirstDel["pickup"]);
+            }
+        } else {
+            unset($detailsFirstDel["pickup"]);
+        }
+        $firstDel->details = json_encode($detailsFirstDel);
+        $firstDel->save();
         if ($returnDelivery) {
             date_add($date, date_interval_create_from_date_string("1 days"));
             if ($hasDeposit) {
@@ -320,6 +329,10 @@ class EditOrderFood {
                 $delivery->save();
             }
         }
+    }
+
+    private function simpleAdd($x) {
+        return $x + 1;
     }
 
 }
