@@ -22,7 +22,7 @@ class FoodSeeder extends Seeder {
     public function run() {
         // $this->call(UsersTableSeeder::class);
 
-        $this->food->reprogramDeliveries();
+        $this->food->cleanDeliveries();
         $this->command->info('Food merchants seeded!');
     }
 

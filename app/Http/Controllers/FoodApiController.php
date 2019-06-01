@@ -77,16 +77,7 @@ class FoodApiController extends Controller {
      */
     public function getPurchaseOrder() {
         $date = date_create();
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek < 5 && $dayofweek > 0) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
-        } else if ($dayofweek == 5) {
-            date_add($date, date_interval_create_from_date_string("3 days"));
-        } else if ($dayofweek == 6) {
-            date_add($date, date_interval_create_from_date_string("2 days"));
-        } else {
-            return null;
-        }
+        $date = $this->food->getNextValidDate($date);
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::whereIn("status", ["scheduled", "enqueue"])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         $this->food->getPurchaseOrder($deliveries);
@@ -99,6 +90,11 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function sendReminder() {
+        $date = date_create();
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if($dayofweek < 1 || $dayofweek > 5){
+            return response()->json(array("status" => "success", "message" => "Reminder Sent"));
+        }
         $this->food->sendReminder();
         return response()->json(array("status" => "success", "message" => "Reminder Sent"));
     }

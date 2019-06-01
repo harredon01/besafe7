@@ -210,12 +210,12 @@ class StoreExport {
     public function dailyInvoices($ordersArray) {
         $orders = Order::whereIn('id', $ordersArray)
                         ->with(['payments.user', 'items', 'orderConditions'])->get();
-        $results = $this->exportOrderInvoices($orders, "Facturas diarias");
+        $results = $this->exportOrderInvoices($orders, "Facturas-diarias");
         $page = [
             "name" => "Facturas diarias",
             "rows" => $results['operationData']
         ];
-        return $this->writeFile([$page], "Facturas diarias" . time());
+        return $this->writeFile([$page], "Facturas-diarias" . time(),false);
     }
 
     private function exportOrderInvoices($orders, $name) {

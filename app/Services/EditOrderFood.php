@@ -266,14 +266,7 @@ class EditOrderFood {
         }
         $madeDeliveries = [];
         for ($x = 0; $x < $item->quantity; $x++) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
-
-            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-            if ($dayofweek == 6) {
-                date_add($date, date_interval_create_from_date_string("2 days"));
-            } else if ($dayofweek == 0) {
-                date_add($date, date_interval_create_from_date_string("1 days"));
-            }
+            $date = $this->getNextValidDate($date);
             $delivery = new Delivery();
             $delivery->user_id = $user_id;
             $details["merchant_id"] = $item->merchant_id;
@@ -296,7 +289,7 @@ class EditOrderFood {
         }
         $firstDel = $madeDeliveries[0];
         $detailsFirstDel = json_decode($firstDel->details, true);
-        $detailsFirstDel["factura"]="true";
+        $detailsFirstDel["factura"] = "true";
         if ($lastDelivery) {
             if ($lastDelivery->status != "deposit") {
                 unset($detailsFirstDel["pickup"]);
@@ -318,6 +311,9 @@ class EditOrderFood {
                 $products = ["product" => $item->product_variant_id, "quantity" => 1];
                 $details["products"] = $products;
                 $details["deliver"] = "deposit";
+                if ($returnDelivery) {
+                    $details["pickup"] = "envase";
+                }
                 $delivery->details = json_encode($details);
                 $delivery->user_id = $user_id;
                 $delivery->delivery = $date;
@@ -331,8 +327,60 @@ class EditOrderFood {
         }
     }
 
-    private function simpleAdd($x) {
-        return $x + 1;
+    private function getNextValidDate($date) {
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek > 0 && $dayofweek < 5) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else if ($dayofweek == 6) {
+            date_add($date, date_interval_create_from_date_string("2 days"));
+        } else if ($dayofweek == 7) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        }
+
+        $isHoliday = $this->checkIsHoliday($date);
+
+        while ($isHoliday) {
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("3 days"));
+            } else if ($dayofweek == 6) {
+                date_add($date, date_interval_create_from_date_string("2 days"));
+            } else {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            }
+            $isHoliday = $this->checkIsHoliday($date);
+        }
+        return $date;
+    }
+
+    private function checkIsHoliday($date) {
+        $holidays = [
+            "2019-06-03",
+            "2019-06-24",
+            "2019-07-01",
+            "2019-08-07",
+            "2019-08-19",
+            "2019-10-14",
+            "2019-11-04",
+            "2019-12-24",
+            "2019-12-25",
+            "2019-12-26",
+            "2019-12-27",
+            "2019-12-30",
+            "2019-12-31",
+            "2020-01-01",
+            "2020-01-02",
+            "2020-01-03",
+            "2020-01-06",
+        ];
+        foreach ($holidays as $day) {
+            if ($day == date_format($date, "Y-m-d")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

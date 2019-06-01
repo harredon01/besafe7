@@ -185,23 +185,24 @@ class Food {
         $keywords = $config['keywords'];
         foreach ($deliveries as $value) {
             $details = json_decode($value->details, true);
-
-            $dish = $details["dish"];
-            $father[$dish['type_id']]['count'] ++;
-            if (array_key_exists('starter_id', $dish)) {
-                if ($dish['starter_id']) {
-                    $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
-                }
-            }
-            $father[$dish['type_id']]['main'][$dish['main_id']] ++;
-            foreach ($keywords as $word) {
+            if (array_key_exists("dish", $details)) {
+                $dish = $details["dish"];
+                $father[$dish['type_id']]['count'] ++;
                 if (array_key_exists('starter_id', $dish)) {
-                    if (strpos($dish['starter_id'], $word) !== false) {
-                        $father["keywords"][$word] ++;
+                    if ($dish['starter_id']) {
+                        $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
                     }
                 }
-                if (strpos($dish['main_id'], $word) !== false) {
-                    $father["keywords"][$word] ++;
+                $father[$dish['type_id']]['main'][$dish['main_id']] ++;
+                foreach ($keywords as $word) {
+                    if (array_key_exists('starter_id', $dish)) {
+                        if (strpos($dish['starter_id'], $word) !== false) {
+                            $father["keywords"][$word] ++;
+                        }
+                    }
+                    if (strpos($dish['main_id'], $word) !== false) {
+                        $father["keywords"][$word] ++;
+                    }
                 }
             }
         }
@@ -268,15 +269,22 @@ class Food {
                 $details = json_decode($delivery->details, true);
                 if (array_key_exists("factura", $details)) {
                     if (array_key_exists("order_id", $details)) {
-                        array_push($facturas, $delivery->id);
+                        array_push($facturas, $details['order_id']);
                     }
                 }
             }
+            $path = "";
+            if (count($facturas) > 0) {
+                $className = "App\\Services\\StoreExport";
+                $billingService = new $className();
+                $path = $billingService->dailyInvoices($facturas);
+            }
+
             $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
             $users = User::whereIn('id', [2, 77])->get();
-            Mail::to($users)->send(new PurchaseOrder($dayConfig));
+            Mail::to($users)->send(new PurchaseOrder($dayConfig, $path));
             return $dayConfig;
         }
     }
@@ -284,18 +292,7 @@ class Food {
     public function sendReminder() {
         $date = date_create();
         $type = "program_reminder";
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek < 5 && $dayofweek > 0) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
-        } else if ($dayofweek == 5) {
-            $type = "program_reminder2";
-            date_add($date, date_interval_create_from_date_string("3 days"));
-        } else if ($dayofweek == 6) {
-            $type = "program_reminder2";
-            date_add($date, date_interval_create_from_date_string("2 days"));
-        } else {
-            return null;
-        }
+        $date = $this->getNextValidDate($date);
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         if (count($deliveries) > 0) {
@@ -815,10 +812,10 @@ class Food {
         $date = date_create();
         $datelimit = date_format($date, "Y-m-d");
         $now = date_format($date, "Y-m-d H:i:s");
-        $dateTimestampLimit = strtotime($datelimit . " 12:00:00");
+        $dateTimestampLimit = strtotime($datelimit . " 11:00:00");
         $dateTimestampNow = strtotime($now);
         if ($dateTimestampNow > $dateTimestampLimit) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
+            $date = $this->getNextValidDate($date);
         }
         $la = date_format($date, "Y-m-d");
         $thedata = [
@@ -1536,7 +1533,7 @@ class Food {
         return array("status" => "success", "message" => "costs sent");
     }
 
-    private function getNextValidDate($date) {
+    public function getNextValidDate($date) {
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         if ($dayofweek > 0 && $dayofweek < 5) {
             date_add($date, date_interval_create_from_date_string("1 days"));

@@ -17,15 +17,22 @@ class PurchaseOrder extends Mailable
      * @var Order
      */
     public $data;
+    /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $path;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($theData)
+    public function __construct($theData,$path)
     {
         $this->data = $theData;
+        $this->path = $path;
     }
 
     /**
@@ -35,6 +42,11 @@ class PurchaseOrder extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.purchase-order');
+        if($this->path){
+            return $this->markdown('emails.food.purchase-order')->attachFromStorageDisk('local', $this->path);
+        } else {
+            return $this->markdown('emails.food.purchase-order');
+        }
+        
     }
 }
