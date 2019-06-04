@@ -91,6 +91,9 @@ class FoodApiController extends Controller {
      */
     public function sendReminder() {
         $date = date_create();
+        if($this->food->checkIsHoliday($date)){
+            return true;
+        }
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         if($dayofweek < 1 || $dayofweek > 5){
             return response()->json(array("status" => "success", "message" => "Reminder Sent"));

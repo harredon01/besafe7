@@ -163,3 +163,6 @@ Route::get('/email_payment_cash', function () {
 Route::get('/test_newsletter', function () {
     return new App\Mail\Newsletter();
 });
+Route::get('/newsletter_padres', function () {
+    return new App\Mail\NewsletterPadre();
+});

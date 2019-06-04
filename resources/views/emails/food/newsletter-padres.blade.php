@@ -105,7 +105,7 @@
                                                                 <th class="column" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="text-header" style="color:#62be77; font-family:'Lato', Arial ,sans-serif; font-size:13px; line-height:18px; text-align:right; text-transform:uppercase;"><a href="https://lonchis.com.co/test_newsletter" target="_blank" class="link2" style="color:#62be77; text-decoration:none;"><span class="link2" style="color:#62be77; text-decoration:none;">Abre en tu explorador</span></a></td>
+                                                                            <td class="text-header" style="color:#62be77; font-family:'Lato', Arial ,sans-serif; font-size:13px; line-height:18px; text-align:right; text-transform:uppercase;"><a href="https://lonchis.com.co/newsletter_padres" target="_blank" class="link2" style="color:#62be77; text-decoration:none;"><span class="link2" style="color:#62be77; text-decoration:none;">Abre en tu explorador</span></a></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -134,7 +134,7 @@
                                         <td class="td" style="padding-top: 60px; width:650px; min-width:650px; font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                 <tr>
-                                                    <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://lonchis.com.co/assets/img/bg/opcion2home.jpg" width="650"border="0" alt="" /></td>
+                                                    <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/2312124/pexels-photo-2312124.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=2&h=650&w=940" width="650"border="0" alt="" /></td>
                                                 </tr>
                                             </table>
                                         </td>
@@ -165,10 +165,10 @@
                                                                 <td class="p30-15" style="padding: 60px 30px;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="h2 pb25" style="color:#444444; font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; padding-bottom:25px;">Frescos y deliciosos</td>
+                                                                            <td class="h2 pb25" style="color:#444444; font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; padding-bottom:25px;">¡Feliz día del Padre!</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text-center pb25" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; padding-bottom:25px;">Menú semana del 4 al 7 de Junio</td>
+                                                                            <td class="text-center pb25" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; padding-bottom:25px;">Regalale a papá una deliciosa cena en compañía de su familia y seres queridos listo para servir.</td>
                                                                         </tr>
 
                                                                     </table>
@@ -204,7 +204,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/784983/pexels-photo-784983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/1843244/pexels-photo-1843244.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -213,11 +213,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Martes 4 de Junio
+                                                                                5 % en Desayunos
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Filete de pescado apanado, acompañado de arroz con coco y ensalada (lechugas, crutones, huevo duro rallado, julianas de jamón y aderezo blanco tipo césar) </td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">¿Qué mejor regalo que empezar el día con el desayuno en la cama?.  Él merece esto y mucho más. Usa el cupón <b>DiaPadreLonchis</b> y recibe el 5% de descuento en todos los desayunos.  </td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -251,10 +251,11 @@
                                                                 <th class="column" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">Miércoles 5 de Junio </td>
+                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">5 % en Almuerzos</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Medallones de lomo de cerdo con salsa de ciruelas, zanahorias glaseadas y arroz negro.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Disfruta de una deliciosa comida en casa sin tener que cocinar, ni ensuciar, ni lavar. Y lo mejor...más barato y práctico que salir a comer a un restaurante. 
+                                                                                Usa el cupón <b>DiaPadreLonchis</b> y recibe el 5% de descuento en todos los platos <i>“listos para servir”.</i></td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -294,10 +295,10 @@
                                                     <td style="padding: 70px 30px 70px 30px;" class="p30-15" bgcolor="#62be77">
                                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                             <tr>
-                                                                <td class="h2 white pb25" style="font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; color:#ffffff; padding-bottom:25px;"><strong>Usa nuestros super cupones de descuento comprando por nuestra app</strong></td>
+                                                                <td class="h2 white pb25" style="font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; color:#ffffff; padding-bottom:25px;"><strong>Con listo para servir organiza toda una cena muy especial desde tu celular.</strong></td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">Con el cupon "conoceLonchis" obtienes 25% de descuento en almuerzos<br/>Con el cupon "2amigos" obtienes 30% de descuento en planes de almuerzo que compres con un amigo<br/>Con el cupon "3amigos" obtienes 40% de descuento en planes de almuerzo que compres con dos amigos</td>
+                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">Evítate todo el complique de buscar un espacio en un restaurante muy lleno.<br/>Sin parqueaderos ni filas dañando tu experiencia.<br/><b>¡Invita a tus familiares sin tener que gastar una fortuna en un restaurante!</b></td>
                                                             </tr>
                                                             <!-- Button -->
                                                             <tr>
@@ -323,137 +324,6 @@
                     <!-- END CTA -->
 
                     <!-- Articles Images On The Right -->
-                    <table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#ffffff">
-                        <tr>
-                            <td valign="top" align="center" class="p30-15" style="padding: 50px 0px 50px 0px;">
-                                <table width="650" border="0" cellspacing="0" cellpadding="0" class="mobile-shell">
-                                    <tr>
-                                        <td class="td" style="width:650px; min-width:650px; font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
-                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                <tr>
-                                                    <td style="padding-bottom: 30px;">
-                                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="direction: rtl;">
-                                                            <tr>
-                                                                <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://cdn.pixabay.com/photo/2015/12/08/19/08/steak-1083568_1280.jpg" width="310" height="233" border="0" alt="" /></td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </th>
-                                                                <th class="column-empty" dir="ltr" width="30" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;"></th>
-                                                                <th class="column-dir" dir="ltr" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Jueves 6 de Junio
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Filet mignon, pure de papa, brocoli salteado.</td>
-                                                                        </tr>
-                                                                        <!-- Button -->
-                                                                        <tr>
-                                                                            <td align="left" class="mpb30">
-                                                                                <table border="0" cellspacing="0" cellpadding="0">
-                                                                                    <tr>
-                                                                                        <td class="text-button" style="background:#f5a564; color:#ffffff; font-family:Arial ,sans-serif; font-size:14px; line-height:18px; padding:12px 20px; text-align:center; text-transform:uppercase; font-weight:bold;"><a href="https://lonchis.com.co/#download" target="_blank" class="link-white" style="color:#ffffff; text-decoration:none;"><span class="link-white" style="color:#ffffff; text-decoration:none;">Comprar</span></a></td>
-                                                                                    </tr>
-                                                                                </table>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <!-- END Button -->
-                                                                    </table>
-                                                                </th>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="direction: rtl;">
-                                                            <tr>
-                                                                <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/1352269/pexels-photo-1352269.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </th>
-                                                                <th class="column-empty" dir="ltr" width="30" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;"></th>
-                                                                <th class="column-dir" dir="ltr" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Viernes 7 de Junio
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Muchacho relleno, papas criollas y ensalada de la casa (mix de lechugas, cebolla dorada, tomate, zanahoria y vitiuta de plátano).</td>
-                                                                        </tr>
-                                                                        <!-- Button -->
-                                                                        <tr>
-                                                                            <td align="left" class="mpb30">
-                                                                                <table border="0" cellspacing="0" cellpadding="0">
-                                                                                    <tr>
-                                                                                        <td class="text-button" style="background:#f5a564; color:#ffffff; font-family:Arial ,sans-serif; font-size:14px; line-height:18px; padding:12px 20px; text-align:center; text-transform:uppercase; font-weight:bold;"><a href="https://lonchis.com.co/#download" target="_blank" class="link-white" style="color:#ffffff; text-decoration:none;"><span class="link-white" style="color:#ffffff; text-decoration:none;">Comprar</span></a></td>
-                                                                                    </tr>
-                                                                                </table>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <!-- END Button -->
-                                                                    </table>
-                                                                </th>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                <!--tr>
-                                                    <td>
-                                                        <table width="100%" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="direction: rtl;">
-                                                            <tr>
-                                                                <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://www.foodiesfeed.com/wp-content/uploads/2018/03/stewed-chicken-with-three-cups-sauce-chinese-cuisine-1024x683.jpg" width="310" height="233" border="0" alt="" /></td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </th>
-                                                                <th class="column-empty" dir="ltr" width="30" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;"></th>
-                                                                <th class="column-dir" dir="ltr" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr;">
-                                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                                        <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Viernes 31
-                                                                            </td>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">cuadritos de pollo apanados bañados en salsa agridulce, acompañado de arroz con ajonjolí y verduras orientales (pimentón verde y rojo, zanahoria, espinaca y brócoli)</td>
-                                                                        </tr>
-                                                                        <!-- Button>
-                                                                        <tr>
-                                                                            <td align="left" class="mpb30">
-                                                                                <table border="0" cellspacing="0" cellpadding="0">
-                                                                                    <tr>
-                                                                                        <td class="text-button" style="background:#f5a564; color:#ffffff; font-family:Arial ,sans-serif; font-size:14px; line-height:18px; padding:12px 20px; text-align:center; text-transform:uppercase; font-weight:bold;"><a href="https://lonchis.com.co/#download" target="_blank" class="link-white" style="color:#ffffff; text-decoration:none;"><span class="link-white" style="color:#ffffff; text-decoration:none;">Comprar</span></a></td>
-                                                                                    </tr>
-                                                                                </table>
-                                                                            </td>
-                                                                        </tr>
-                                                                        <!-- END Button >
-                                                                    </table>
-                                                                </th>
-                                                            </tr>
-                                                        </table>
-                                                    </td>
-                                                </tr-->
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
                     <!-- END Articles Images On The Right -->
 
                     <!-- Footer -->

@@ -284,6 +284,7 @@ class Food {
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
             $users = User::whereIn('id', [2, 77])->get();
+            dd($path);
             Mail::to($users)->send(new PurchaseOrder($dayConfig, $path));
             return $dayConfig;
         }
@@ -1561,7 +1562,7 @@ class Food {
         return $date;
     }
 
-    private function checkIsHoliday($date) {
+    public function checkIsHoliday($date) {
         $holidays = [
             "2019-06-03",
             "2019-06-24",
