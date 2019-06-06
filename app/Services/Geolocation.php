@@ -169,7 +169,7 @@ class Geolocation {
         return array("x" => $coordinates[0], "y" => $coordinates[1]);
     }
 
-    public function checkMerchantPolygons($latitude,$longitude, $merchant_id,$provider = "Rapigo") {
+    public function checkMerchantPolygons($latitude,$longitude, $merchant_id,$provider = "Basilikum") {
         $polygons = CoveragePolygon::where('merchant_id', $merchant_id)->where('provider', $provider)->get();
         $point = array("x" => $latitude, "y" => $longitude);
         foreach ($polygons as $item) {

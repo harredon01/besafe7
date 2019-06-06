@@ -229,7 +229,7 @@ class EditOrderFood {
     }
 
     public function createDeliveries($user_id, Item $item, $address_id) {
-        $lastDelivery = Delivery::where('user_id', $user_id)->whereIn('status', ["pending", "deposit"])->where('provider', "Rapigo")->orderBy('delivery', 'desc')->first();
+        $lastDelivery = Delivery::where('user_id', $user_id)->whereIn('status', ["pending", "deposit"])->orderBy('delivery', 'desc')->first();
 //        if($user_id!=1){
 //            dd($lastDelivery);
 //        }

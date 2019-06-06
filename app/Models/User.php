@@ -33,7 +33,7 @@ class User extends Authenticatable {
      *
      * @var array
      */
-    protected $fillable = ['id', 'firstName', 'lastName', 'name', 'gender', 'area_code','plan', 'cellphone',
+    protected $fillable = ['id', 'firstName', 'lastName', 'name', 'gender', 'area_code','plan', 'cellphone','optinMarketing','emailNotifications', 
         'docType', 'docNum', 'username', 'email', 'avatar', 'password', 'language'];
 
     /**
@@ -42,7 +42,7 @@ class User extends Authenticatable {
      * @var array
      */
     protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'write_report','code',
-        'emailNotifications', 'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
+        'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
     protected $encryptable = [
         'green',
         'red',

@@ -284,7 +284,7 @@ class Food {
             //dd($father);
             $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
             $users = User::whereIn('id', [2, 77])->get();
-            dd($path);
+            //dd($path);
             Mail::to($users)->send(new PurchaseOrder($dayConfig, $path));
             return $dayConfig;
         }

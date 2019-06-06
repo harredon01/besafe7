@@ -99,6 +99,7 @@ class AuthApiController extends Controller {
             'area_code',
             'cellphone',
             'email',
+            'optinMarketing',
             'password',
             'password_confirmation',
             'language',
