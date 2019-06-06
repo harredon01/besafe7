@@ -340,10 +340,11 @@ class UserApiController extends Controller {
      * @return Response
      */
     public function store(Request $request) {
-        $user = $request->user();
+        $user = $request->user(); 
         $data = $request->all([
             'id',
             'docNum',
+            'optinMarketing',
             'docType',
             'gender',
             'firstName',

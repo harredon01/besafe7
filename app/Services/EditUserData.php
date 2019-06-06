@@ -198,6 +198,7 @@ class EditUserData {
         if ($data['firstName']) {
             $user->firstName = $data['firstName'];
         }
+        $user->optinMarketing = $data['optinMarketing'];
         if ($data['lastName']) {
             $user->lastName = $data['lastName'];
         }

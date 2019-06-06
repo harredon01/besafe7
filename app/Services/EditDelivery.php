@@ -29,9 +29,13 @@ class EditDelivery {
                 $results = $this->checkDeliveryTime($delivery);
                 if ($results['status'] == 'success') {
                     $details = json_decode($delivery->details, true);
+                    $delivery->observation = $data['observation'];
                     if ($delivery->status == "deposit") {
                         $this->suspendCreditDeposits($delivery);
                         $details["deposit"] = true;
+                        $delivery->details = json_encode($details);
+                        $delivery->status = "enqueue";
+                        $delivery->save();
                     } else {
                         $validator = $this->validatorDeliveryMeal($data);
                         if ($validator->fails()) {
@@ -45,13 +49,11 @@ class EditDelivery {
                             'dessert_id' => $data['dessert_id']
                         ];
                         $details["dish"] = $dish;
+                        $delivery->details = json_encode($details);
+                        $delivery->status = "enqueue";
+                        $delivery->save();
                         $this->checkRecurringPosibility($user, $data['ip_address']);
                     }
-
-                    $delivery->observation = $data['observation'];
-                    $delivery->details = json_encode($details);
-                    $delivery->status = "enqueue";
-                    $delivery->save();
                     $date = date_create($delivery->delivery);
                     $data["date"] = date_format($date, "Y/m/d");
                     Mail::to($user)->send(new DeliveryScheduled($data));
@@ -79,7 +81,7 @@ class EditDelivery {
 
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
-        $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60 ;
+        $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60;
         if ($diff < 18) {
             return array("status" => "error", "message" => "Limit passed");
         } else if ($diff > 18 && $diff < 42) {
@@ -114,7 +116,7 @@ class EditDelivery {
                         return array("status" => "error", "message" => "Limit passed");
                     }
                 }
-            } 
+            }
         }
         return array("status" => "success", "message" => "Delivery in limit");
     }
@@ -126,8 +128,8 @@ class EditDelivery {
                 $results = $this->checkDeliveryTime($delivery);
                 if ($results['status'] == 'success') {
                     $details = json_decode($delivery->details, true);
-                    if(array_key_exists("deliver", $details)){
-                        if($details["deliver"]=="deposit"){
+                    if (array_key_exists("deliver", $details)) {
+                        if ($details["deliver"] == "deposit") {
                             $delivery->status = "deposit";
                             $this->activateCreditDeposits($delivery);
                         } else {
@@ -140,7 +142,7 @@ class EditDelivery {
                     }
                     $delivery->observation = "";
                     $delivery->details = json_encode($details);
-                    
+
                     $delivery->save();
                     return array("status" => "success", "message" => "Delivery canceled");
                 } else {
@@ -171,6 +173,7 @@ class EditDelivery {
             }
         }
     }
+
     private function activateCreditDeposits(Delivery $deliveryDep) {
         $push = Push::where("user_id", $deliveryDep->user_id)->where("platform", "food")->first();
         if ($push) {
