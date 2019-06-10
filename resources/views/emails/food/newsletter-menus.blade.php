@@ -204,7 +204,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/784983/pexels-photo-784983.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/1618898/pexels-photo-1618898.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -213,11 +213,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Martes 4 de Junio
+                                                                                Lunes 10 de Junio
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Filete de pescado apanado, acompañado de arroz con coco y ensalada (lechugas, crutones, huevo duro rallado, julianas de jamón y aderezo blanco tipo césar) </td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Plato Árabe:  Kibbes, falafel, arroz con nueces, tabule. Hummus y pan árabe </td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -243,7 +243,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/299347/pexels-photo-299347.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/ec/da/04/ecda04115bcecb43c4c4d3c153a14e97.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -251,10 +251,10 @@
                                                                 <th class="column" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">Miércoles 5 de Junio </td>
+                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">Martes 11 de Junio </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Medallones de lomo de cerdo con salsa de ciruelas, zanahorias glaseadas y arroz negro.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">sobrebarriga al horno bañado en salsa criolla, acompañado de papa chorriada y ensalada: mix de lechugas, cebolla dorada, tomate y viruta de plátano.</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -297,7 +297,7 @@
                                                                 <td class="h2 white pb25" style="font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; color:#ffffff; padding-bottom:25px;"><strong>Usa nuestros super cupones de descuento comprando por nuestra app</strong></td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">Con el cupon "conoceLonchis" obtienes 25% de descuento en almuerzos<br/>Con el cupon "2amigos" obtienes 30% de descuento en planes de almuerzo que compres con un amigo<br/>Con el cupon "3amigos" obtienes 40% de descuento en planes de almuerzo que compres con dos amigos</td>
+                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">Con el cupon "conoceLonchis" obtienes 25% de descuento en almuerzos<br/>Con el cupon "2amigos" obtienes 30% de descuento en planes de almuerzo que compres con un amigo<br/>Con el cupon "3amigos" obtienes 40% de descuento en planes de almuerzo que compres con dos amigos<br/>*Valido hasta 25 almuerzos por persona y una orden por persona.</td>
                                                             </tr>
                                                             <!-- Button -->
                                                             <tr>
@@ -337,7 +337,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://cdn.pixabay.com/photo/2015/12/08/19/08/steak-1083568_1280.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://cdn.pixabay.com/photo/2017/02/15/15/17/meal-2069021_960_720.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -346,11 +346,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Jueves 6 de Junio
+                                                                                Miércoles 12 de Junio
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Filet mignon, pure de papa, brocoli salteado.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Lasaña en salsa boloñesa, acompañada con ensalada verde (mix de lechugas arveja y aguacate) y pan francés</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -376,7 +376,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://images.pexels.com/photos/1352269/pexels-photo-1352269.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=2&h=650&w=940" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://s3.us-east-2.amazonaws.com/gohife/aguacate.jpeg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -385,11 +385,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Viernes 7 de Junio
+                                                                                Jueves 13 de Junio
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Muchacho relleno, papas criollas y ensalada de la casa (mix de lechugas, cebolla dorada, tomate, zanahoria y vitiuta de plátano).</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Aguacate relleno de atún condimentado con cebolla pequeña, tomate picado, cilantro, bañado con un poco de mostaza. Acompañado con puré de papa.</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -408,14 +408,14 @@
                                                         </table>
                                                     </td>
                                                 </tr>
-                                                <!--tr>
+                                                <tr>
                                                     <td>
                                                         <table width="100%" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="direction: rtl;">
                                                             <tr>
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://www.foodiesfeed.com/wp-content/uploads/2018/03/stewed-chicken-with-three-cups-sauce-chinese-cuisine-1024x683.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/64/c0/6b/64c06b3438ee4fba4ff29de6f843b013.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -424,11 +424,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Viernes 31
+                                                                                Viernes  14 de Junio
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">cuadritos de pollo apanados bañados en salsa agridulce, acompañado de arroz con ajonjolí y verduras orientales (pimentón verde y rojo, zanahoria, espinaca y brócoli)</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Sopa de ajiaco acompañado de arroz blanco, pechuga de pollo desmechada, mazorca, aguacate, crema de leche y alcaparras.</td>
                                                                         </tr>
                                                                         <!-- Button>
                                                                         <tr>
@@ -440,13 +440,13 @@
                                                                                 </table>
                                                                             </td>
                                                                         </tr>
-                                                                        <!-- END Button >
+                                                                        <!-- END Button -->
                                                                     </table>
                                                                 </th>
                                                             </tr>
                                                         </table>
                                                     </td>
-                                                </tr-->
+                                                </tr>
                                             </table>
                                         </td>
                                     </tr>

@@ -294,6 +294,14 @@ class Food {
         $date = date_create();
         $type = "program_reminder";
         $date = $this->getNextValidDate($date);
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek == 5) {
+            $type = "program_reminder2";
+        } else if ($dayofweek == 6) {
+            return true;
+        } else if ($dayofweek == 0) {
+            return true;
+        }
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         if (count($deliveries) > 0) {
@@ -332,7 +340,7 @@ class Food {
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
 
-        $followers = DB::select("select id,email from users ");
+        $followers = DB::select("select id,email from users where optinMarketing = 1 ");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -546,7 +554,7 @@ class Food {
                 array_push($results, $arrayRouteTitle);
                 $arrayRoute = [$route->id, $route->provider, $route->unit_cost, $route->unit_price];
                 array_push($results, $arrayRoute);
-                $arrayDelTitle = ["Parada", "Direccion", "Entrega", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato"];
+                $arrayDelTitle = ["Parada", "Direccion", "Entrega", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato", "Observacion"];
                 array_push($results, $arrayDelTitle);
                 $deliveries = $route->deliveries;
                 $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
@@ -603,6 +611,7 @@ class Food {
                         $delTotals = $this->printTotalsConfig($delConfig);
 
                         $arrayDel = array_merge($arrayDel, $delTotals['excel']);
+                        array_push($arrayDel, $delUser->observation);
                         array_push($results, $arrayDel);
                         $stopDel->totals = $delTotals;
 
@@ -839,7 +848,7 @@ class Food {
                         status = 'enqueue' AND provider = :provider
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
-                        . "", $thedata);
+                        . "", $thedata); 
         if ($polygon->provider == "Basilikum") {
             //dd($deliveries);
         }
@@ -1542,7 +1551,7 @@ class Food {
             date_add($date, date_interval_create_from_date_string("3 days"));
         } else if ($dayofweek == 6) {
             date_add($date, date_interval_create_from_date_string("2 days"));
-        } else if ($dayofweek == 7) {
+        } else if ($dayofweek == 0) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         }
 

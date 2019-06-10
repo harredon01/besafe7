@@ -11,7 +11,7 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-05-01';
+    const START_DATE = '2019-06-01';
     const END_DATE = '2119-04-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
@@ -1177,6 +1177,7 @@ class Proofhub {
         dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name)); 
         //$projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
+        return true;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
         //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
