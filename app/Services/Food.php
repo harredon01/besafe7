@@ -292,15 +292,15 @@ class Food {
 
     public function sendReminder() {
         $date = date_create();
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek == 0) {
+            return true;
+        }
         $type = "program_reminder";
         $date = $this->getNextValidDate($date);
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 5) {
+        if ($dayofweek == 1) {
             $type = "program_reminder2";
-        } else if ($dayofweek == 6) {
-            return true;
-        } else if ($dayofweek == 0) {
-            return true;
         }
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
@@ -535,6 +535,7 @@ class Food {
     }
 
     public function buildScenarioLogistics(array $input) {
+        //$input['status'] = "scheduled";
         $query = $this->buildRouteQuery($input);
         $routes = $query->with(['deliveries.user'])->orderBy('id')->get();
         if ($routes) {
@@ -611,7 +612,7 @@ class Food {
                         $delTotals = $this->printTotalsConfig($delConfig);
 
                         $arrayDel = array_merge($arrayDel, $delTotals['excel']);
-                        array_push($arrayDel, $delUser->observation);
+                        array_push($arrayDel, $stopDel->observation);
                         array_push($results, $arrayDel);
                         $stopDel->totals = $delTotals;
 

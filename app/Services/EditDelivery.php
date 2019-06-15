@@ -82,9 +82,9 @@ class EditDelivery {
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
         $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60;
-        if ($diff < 18) {
+        if ($diff < 14) {
             return array("status" => "error", "message" => "Limit passed");
-        } else if ($diff > 18 && $diff < 42) {
+        } else if ($diff > 14 && $diff < 42) {
             if ($dayofweek > 0 && $dayofweek < 6) {
                 date_add($date, date_interval_create_from_date_string("1 days"));
                 $tomorrow = date_format($date, "Y-m-d");
