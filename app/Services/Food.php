@@ -327,7 +327,7 @@ class Food {
                     "payload" => $payload,
                     "type" => $type,
                     "user_status" => "normal"
-                ];
+                ]; 
                 $date = date_create($deliveryObj->delivery);
                 $date = date_format($date, "Y-m-d");
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
