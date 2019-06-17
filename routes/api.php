@@ -243,3 +243,6 @@ Route::post('routes/{code?}/stop/{stop?}', 'RouteController@updateRouteStop');
 
 Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
+Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
+Route::get('bookings', 'BookingApiController@getBookingsObject');
+Route::post('bookings', 'BookingApiController@postAddBookingObject');

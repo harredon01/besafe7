@@ -15,6 +15,10 @@ class MerchantQueryBuilder extends QueryBuilder {
         return $query->join('group_merchant', 'merchants.id', '=', 'group_merchant.merchant_id')
                         ->where('group_merchant.group_id', '=', $id);
     }
+    public function filterByCategoryId($query, $id) {
+        return $query->join('category_merchant', 'merchants.id', '=', 'category_merchant.merchant_id')
+                        ->where('category_merchant.category_id', '=', $id);
+    }
 
     public function filterByFavoritesId($query, $id) {
         return $query->join('favorites', 'merchants.id', '=', 'favorites.object_id')

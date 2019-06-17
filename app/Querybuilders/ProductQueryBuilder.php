@@ -15,6 +15,10 @@ class ProductQueryBuilder extends QueryBuilder {
         return $query->join('favorites', 'products.id', '=', 'favorites.object_id')
                         ->where('favorites.type', '=', "Product");
     }
+    public function filterByCategoryId($query, $id) {
+        return $query->join('category_product', 'products.id', '=', 'category_product.product_id')
+                        ->where('category_product.category_id', '=', $id);
+    }
 
 }
 

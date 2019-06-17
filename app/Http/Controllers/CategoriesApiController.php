@@ -28,18 +28,8 @@ class CategoriesApiController extends Controller {
      *
      * @return Response
      */
-    public function getVehicleCategories() {
-        $categories = $this->editCategories->getCategories("vehicle");
-        return response()->json(compact('categories'));
-    }
-    
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function getCargoCategories() {
-        $categories = $this->editCategories->getCategories("cargo");
+    public function getCategoriesType($type) {
+        $categories = $this->editCategories->getCategories($type);
         return response()->json(compact('categories'));
     }
 
