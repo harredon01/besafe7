@@ -44,7 +44,7 @@ class PayU {
             "description" => "Pago Lonchis app # " . $payment->id,
             "language" => "es",
             "signature" => $sig,
-            "notifyUrl" => "https://lonchis.com.co/api/payu/webhook",
+            "notifyUrl" => env('APP_URL')."/api/payu/webhook",
         ];
         return $orderCont;
     }
@@ -467,7 +467,7 @@ class PayU {
 
 
         $extraParams = [
-            "RESPONSE_URL" => "https://lonchis.com.co/payu/return",
+            "RESPONSE_URL" => env('APP_URL')."/payu/return",
             "PSE_REFERENCE1" => $data['ip_address'],
             "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
             "USER_TYPE" => $data['user_type'],
@@ -1038,7 +1038,7 @@ class PayU {
             "customer" => $customer,
             "plan" => $plan,
             "deliveryAddress" => $address,
-            "notifyUrl" => "https://lonchis.com.co/api/payu/webhook",
+            "notifyUrl" => env('APP_URL')."/api/payu/webhook",
         ];
         $response = $this->sendPost($dataSent, $url);
         if (array_key_exists("id", $response)) {

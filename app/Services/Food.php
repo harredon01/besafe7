@@ -299,7 +299,7 @@ class Food {
         $type = "program_reminder";
         $date = $this->getNextValidDate($date);
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 1) {
+        if ($dayofweek == 2) {
             $type = "program_reminder2";
         }
         $tomorrow = date_format($date, "Y-m-d");

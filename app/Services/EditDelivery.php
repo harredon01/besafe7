@@ -82,7 +82,7 @@ class EditDelivery {
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
         $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60;
-        if ($diff < 14) {
+        if ($diff < 13) {
             return array("status" => "error", "message" => "Limit passed");
         } else if ($diff > 14 && $diff < 42) {
             if ($dayofweek > 0 && $dayofweek < 6) {
