@@ -100,6 +100,10 @@ class PayuController extends Controller {
     }
 
     public function cronPayU() {
+        $debug = env('APP_DEBUG');
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         $this->payU->checkOrders();
         //dispatch(new PayUCron());
     }

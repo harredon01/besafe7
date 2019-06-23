@@ -76,6 +76,9 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function getPurchaseOrder() {
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         $date = date_create();
         $date = $this->food->getNextValidDate($date);
         $tomorrow = date_format($date, "Y-m-d");
@@ -90,6 +93,10 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function sendReminder() {
+        $debug = env('APP_DEBUG');
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         $date = date_create();
         if($this->food->checkIsHoliday($date)){
             return true;
@@ -103,6 +110,10 @@ class FoodApiController extends Controller {
     }
     
     public function backups(){
+        $debug = env('APP_DEBUG');
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         Artisan::call('db:backup');
     }
     

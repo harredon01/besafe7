@@ -193,6 +193,10 @@ class FoodController extends Controller {
      * @return Response
      */
     public function reprogramDeliveries() {
+        $debug = env('APP_DEBUG');
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         $this->food->reprogramDeliveries();
     }
 

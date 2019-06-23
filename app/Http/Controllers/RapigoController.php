@@ -39,6 +39,10 @@ class RapigoController extends Controller
      * @return Response
      */
     public function getActiveRoutesUpdate() {
+        $debug = env('APP_DEBUG');
+        if($debug == 'true'){
+            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
+        }
         return $this->rapigo->getActiveRoutesUpdate();
     }
     
