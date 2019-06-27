@@ -46,6 +46,12 @@ class CreateMerchantsTable extends Migration {
             $table->double('minimum', 15, 2)->nullable();
             $table->string('delivery_time')->nullable();
             $table->double('delivery_price', 15, 2)->nullable();
+            $table->decimal('price')->nullable();
+            $table->decimal('unit_cost')->nullable();
+            $table->decimal('base_cost')->nullable();
+            $table->string('unit')->nullable();
+            $table->string('currency')->nullable();
+            $table->string('slug')->nullable();
             $table->string('status')->nullable();
             $table->string('plan')->nullable();
             $table->timestamps();

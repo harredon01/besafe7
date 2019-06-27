@@ -923,6 +923,11 @@ class EditOrder {
         
     }
 
+    public function validatePrevOrders($user, $theCondition) {
+        $sql = "select * from orders o join order_conditions oc on oc.order_id = o.id where o.status = 'approved' and oc.condition_id = $theCondition->id and o.user_id = $user->id;";
+        $orders = DB::select($sql);
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -996,6 +1001,11 @@ class EditOrder {
 
         if (!$item) {
             return array("status" => "error", "message" => "Product missing");
+        }
+        $sql = "select * from orders o join order_conditions oc on oc.order_id = o.id where o.status = 'approved' and oc.condition_id = $theCondition->id and o.user_id = $order->user_id;";
+        $orders = DB::select($sql);
+        if(count($orders)>0){
+            return array("status" => "error", "message" => "Coupon quantity");
         }
         if (array_key_exists("minquantity", $attributes)) {
             if ($item->quantity < $attributes["minquantity"]) {

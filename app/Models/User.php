@@ -9,7 +9,9 @@ use App\Traits\Encryptable;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\NotifyContacts;
 use App\Models\FileM;
+use App\Models\Booking;
 use DB;
+use Rinvex\Bookings\Traits\HasBookings;
 use DateTime;
 use Carbon\Carbon; 
 
@@ -18,7 +20,8 @@ class User extends Authenticatable {
 //    use HasApiTokens, Notifiable;
     use HasApiTokens,
         Notifiable,
-        Encryptable;
+        Encryptable,
+        HasBookings;
     const ACCESS_USER_OBJECT = 'userables';
     const ACCESS_USER_OBJECT_ID = 'userable_id';
     const ACCESS_USER_OBJECT_TYPE = 'userable_type';
@@ -319,6 +322,15 @@ class User extends Authenticatable {
             return 1;
         }
         return 0;
+    }
+    /**
+     * Get the booking model name.
+     *
+     * @return string
+     */
+    public static function getBookingModel(): string
+    {
+        return Booking::class;
     }
 
 }

@@ -1,10 +1,16 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Rinvex\Bookings\Traits\Bookable;
 use Cache;
+use App\Models\Availability;
+use App\Models\Booking;
+use App\Models\Rate;
 use Carbon\Carbon; 
 
 class Merchant extends Model {
+    
+    use Bookable;
 
 /**
      * The database table used by the model.
@@ -88,6 +94,51 @@ class Merchant extends Model {
     }
     public function postAddImg() {
         return null;
+    }
+    
+    /**
+     * Get the booking model name.
+     *
+     * @return string
+     */
+    public static function getBookingModel(): string
+    {
+        return Booking::class;
+    }
+
+    /**
+     * Get the rate model name.
+     *
+     * @return string
+     */
+    public static function getRateModel(): string
+    {
+        return Rate::class;
+    }
+
+    /**
+     * Get the availability model name.
+     *
+     * @return string
+     */
+    public static function getAvailabilityModel(): string
+    {
+        return Availability::class;
+    }
+    /**
+     * Get bookings starts between the given dates.
+     *
+     * @param string $startsAt
+     * @param string $endsAt
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function availabilityExistsBetween(string $startsAt, string $endsAt): MorphMany
+    {
+        return $this->availabilities()
+                    ->where('is_bookable', true)
+                    ->where('from', '>', new Carbon($startsAt))
+                    ->where('to', '<', new Carbon($endsAt));
     }
 
 }

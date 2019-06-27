@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Food;
+use App\Services\Routing;
 use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
 use App\Mail\RouteOrganize;
@@ -37,14 +38,17 @@ class FoodApiController extends Controller {
      */
 
     private $food;
+    
+    private $routing;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Food $food) {
+    public function __construct(Food $food,Routing $routing) {
         $this->food = $food;
+        $this->routing = $routing;
         $this->middleware('auth:api');
         $this->middleware('admin')->except('getRouteInfo');
     }
@@ -66,7 +70,7 @@ class FoodApiController extends Controller {
     public function getSummaryShipping(Request $request, $status) {
         $user = $request->user();
         //dispatch(new \App\Jobs\GetScenariosShippingCosts($user, $status));
-        $results = $this->food->getShippingCosts($user, $status);
+        $results = $this->routing->getShippingCosts($user, $status);
         return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
     }
 
@@ -76,6 +80,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function getPurchaseOrder() {
+        $debug = env('APP_DEBUG');
         if($debug == 'true'){
             return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
         }
@@ -122,18 +127,6 @@ class FoodApiController extends Controller {
         //dispatch(new \App\Jobs\SendNewsletter());
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function showOrganizeEmails(Request $request) {
-        $user = $request->user();
-        $results = $this->food->getStructureEmails($request->all());
-        Mail::to($user)->send(new RouteOrganize($results));
-        dispatch(new GetScenarioOrganizationStructure($user, $request->all()));
-        return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
-    }
 
     /**
      * Show the application dashboard to the user.
@@ -155,7 +148,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function buildScenarioLogistics(Request $request) {
-        $this->food->buildScenarioLogistics( $request->all());
+        $this->routing->buildScenarioLogistics( $request->all());
 
         //dispatch(new \App\Jobs\BuildScenarioLogistics($request->all()));
         return response()->json(array("status" => "success", "message" => "Scenario sent to build"));
@@ -170,8 +163,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function updateUserDeliveriesAddress($user,$address) {
-        $this->food->updateUserDeliveriesAddress($user,$address);
-        return response()->json(array("status" => "success", "message" => $this->food->updateUserDeliveriesAddress($user,$address)));
+        return response()->json(array("status" => "success", "message" => $this->routing->updateUserDeliveriesAddress($user,$address)));
     }
 
     /**
@@ -241,7 +233,7 @@ class FoodApiController extends Controller {
      */
     public function regenerateScenarios(Request $request) {
         //dispatch(new RegenerateScenarios());
-        $this->food->regenerateScenarios();
+        $this->routing->regenerateScenarios();
         return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
     }
 
@@ -251,7 +243,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function delegateDeliveries(Request $request) {
-        $this->food->delegateDeliveries($request->all());
+        $this->routing->delegateDeliveries($request->all());
         return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
     }
 
@@ -277,7 +269,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function getRouteInfo($delivery) {
-        $result = $this->food->getRouteInfo($delivery);
+        $result = $this->routing->getRouteInfo($delivery);
         if ($result) {
             return response()->json(array("status" => "success", "message" => "Route info", "route" => $result));
         }
@@ -290,7 +282,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function getLargestAddresses(Request $request) {
-        $results = $this->food->getLargestAddresses();
+        $results = $this->routing->getLargestAddresses();
         return response()->json(array("status" => "success", "message" => "Most common addresses", "data" => $results));
     }
 

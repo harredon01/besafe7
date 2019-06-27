@@ -9,13 +9,6 @@
 # Ruta {{ $route->id }}
 Proveedor: {{ $route->provider }} 
 # Resumen:  
-@foreach ($route->totals['keywords'] as $line)
-{{ $line }}  
-@endforeach 
-
-@foreach ($route->totals['dish'] as $line)
-{{ $line }}  
-@endforeach  
 @endcomponent
 
 @component('mail::panel')
@@ -25,32 +18,11 @@ Proveedor: {{ $route->provider }}
 Direccion: {{ $stop->address->address }}
 {{ $stop->address->notes }}  
 Telefono: {{ $stop->address->phone }}
-@foreach ($stop->totals['keywords'] as $line)
-{{ $line }}
-@endforeach 
-@foreach ($stop->totals['dish'] as $line)
-{{ $line }}
-@endforeach 
-@if (array_key_exists('starter',$stop->totals ))
-@foreach ($stop->totals['starter'] as $line)
-{{ $line }}
-@endforeach 
-@endif
+
 @foreach ($stop->deliveries as $delivery)
 {{ $delivery->id }} {{ $delivery->user->firstName }} {{ $delivery->user->lastName }}
-@foreach ($delivery->totals['keywords'] as $line)
-{{ $line }}
 @endforeach 
-@foreach ($delivery->totals['dish'] as $line)
-{{ $line }}
-@endforeach 
-@if (array_key_exists('starter',$delivery->totals ))
-@foreach ($delivery->totals['starter'] as $line)
-{{ $line }}
-@endforeach 
-@endif
-{{$delivery->region_name}}
-@endforeach 
+
 @endforeach 
 @endcomponent
 @endcomponent

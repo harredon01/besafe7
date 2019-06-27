@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Models\User;
-use App\Services\Food;
+use App\Services\Routing;
 use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -36,9 +36,13 @@ class BuildCompleteScenario implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food,EditAlerts $editAlerts)
+    public function handle(Routing $routing,EditAlerts $editAlerts)
     {
-        $food->buildCompleteScenario($this->scenario,$this->provider, $this->hash); 
+        $routes = Route::where("type", $this->scenario)->where("status", "pending")->where("provider", $this->provider)->with(['deliveries.user'])->orderBy('id')->get();
+        $checkResult = $routing->checkScenario($routes, $this->hash);
+        if ($checkResult) {
+            $routing->buildScenarioTransit($routes);
+        }
         $payload = ["scenario"=> $this->scenario." completo" ];
         $user = User::find(2);
         $followers = [$user];

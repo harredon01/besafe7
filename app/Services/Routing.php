@@ -8,28 +8,18 @@ use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
-use App\Models\Push;
 use App\Jobs\RegenerateScenarios;
-use App\Models\Merchant;
-use App\Models\Product;
-use App\Models\Address;
 use App\Models\CoveragePolygon;
-use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteDeliver;
-use App\Mail\RouteOrganize;
-use App\Mail\PurchaseOrder;
-use App\Mail\ScenarioSelect;
-use App\Mail\Newsletter;
-use App\Services\Rapigo;
 use DB;
 use Excel;
 
-class Food {
+class Routing {
 
     const OBJECT_ORDER = 'Order';
-    const CREDIT_PRICE = 10000;
+    const CREDIT_PRICE = 14000;
     const LUNCH_ROUTE = 15;
     const LUNCH_PROFIT = 1100;
     const ROUTE_HOUR_COST = 11000;
@@ -42,384 +32,11 @@ class Food {
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
-    public function suspendDelivery(User $user, $option) {
-        $className = "App\\Services\\EditAlerts";
-        $platFormService = new $className();
-        $payload = [];
-        $date = date("Y-m-d H:i:s");
-        $followers = [$user];
-        if ($option == "cancel") {
-            Delivery::where("user_id", $user->id)->where("status", "pending")->update(['status' => 'suspended']);
-            Delivery::where("user_id", $user->id)->where("status", "deposit")->delete();
-            $push = $user->push()->where("platform", "food")->first();
-            $push->credits = 0;
-            $push->save();
-            $data = [
-                "trigger_id" => $user->id,
-                "message" => "",
-                "subject" => "",
-                "object" => "Lonchis",
-                "sign" => true,
-                "payload" => $payload,
-                "type" => "food_meal_suspended",
-                "user_status" => "normal"
-            ];
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
-        } else {
-            $delivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('id', 'desc')->first();
-            if ($delivery) {
-                $delivery->delete();
-                $data = [
-                    "trigger_id" => $user->id,
-                    "message" => "",
-                    "subject" => "",
-                    "object" => "Lonchis",
-                    "sign" => true,
-                    "payload" => $payload,
-                    "type" => "food_meal_traded",
-                    "user_status" => "normal"
-                ];
-                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
-            } else {
-                $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->orderBy('id', 'desc')->first();
-                if ($deposit) {
-                    $deposit->delete();
-                    $push = $user->push()->where("platform", "food")->first();
-                    $push->credits = 0;
-                    $push->save();
-                    $data = [
-                        "trigger_id" => $user->id,
-                        "message" => "",
-                        "subject" => "",
-                        "object" => "Lonchis",
-                        "sign" => true,
-                        "payload" => $payload,
-                        "type" => "food_meal_suspended",
-                        "user_status" => "normal"
-                    ];
-                    $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
-                } else {
-                    $this->suspendDelivery($user, "cancel");
-                }
-            }
-        }
-    }
-
-    public function inviteUser(User $user) {
-        $className = "App\\Services\\EditAlerts";
-        $platFormService = new $className();
-        $deliveryObj = Delivery::find(8850);
-        $delivery = [
-            "delivery" => $deliveryObj
-        ];
-        $payload = [
-            "page" => "DeliveryProgramPage",
-            "page_payload" => $delivery
-        ];
-        $followers = [$user];
-        $data = [
-            "trigger_id" => $user->id,
-            "message" => "prueba mensaje programacion",
-            "subject" => "prueba mensaje programacion",
-            "object" => "Lonchis",
-            "sign" => true,
-            "payload" => $payload,
-            "type" => "program_reminder",
-            "user_status" => "normal"
-        ];
-        $date = date_create($deliveryObj->delivery);
-        $date = date_format($date, "Y-m-d");
-        $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
-    }
-
     public function updateUserDeliveriesAddress($user_id, $address_id) {
         $address = OrderAddress::find($address_id);
         if ($address) {
             $deliveries = Delivery::where('user_id', $user_id)->update(['address_id' => $address_id]);
             return $deliveries;
-        }
-    }
-
-    public function loadDayConfig($deliveryDate) {
-        //$date = date("Y-m-d",$deliveryDate);
-        $date = date_create($deliveryDate);
-        $dateUse = date_format($date, "Y-m-d");
-//        $deliveries = Delivery::where('delivery', $date)->get();
-        //$articles = Article::where('start_date',$date)->get();
-        $articles = Article::where('start_date', $dateUse)->get();
-        $father = [];
-        //$keywords = ['fruit', 'soup', 'meat', 'chicken'];
-        $keywords = ['fruit', 'soup'];
-        foreach ($articles as $article) {
-
-            $attributes = json_decode($article->attributes, true);
-            $entradas = [];
-            $entradasNombre = [];
-            foreach ($attributes['entradas'] as $value) {
-                $entradas[$value['codigo']] = 0;
-                $entradasNombre[$value['codigo']] = $value['valor'];
-            }
-            $main = [];
-            $mainNombre = [];
-            foreach ($attributes['plato'] as $item) {
-                $main[$item['codigo']] = 0;
-                $mainNombre[$item['codigo']] = $item['valor'];
-            }
-            foreach ($keywords as $keyword) {
-                $father['keywords'][$keyword] = 0;
-            }
-//            array_push($plate, [0 => $main]);
-//            array_push($plate, [0 => $entradas]);
-            $father[$article->id]['count'] = 0;
-            $father[$article->id]['starter'] = $entradas;
-            $father[$article->id]['main'] = $main;
-            $father[$article->id]['name'] = $article->name;
-            $father[$article->id]['starter_name'] = $entradasNombre;
-            $father[$article->id]['main_name'] = $mainNombre;
-        }
-        return array("father" => $father, "articles" => $articles, "keywords" => $keywords);
-    }
-
-    public function countConfigElements($deliveries, $config) {
-        $father = $config['father'];
-        $keywords = $config['keywords'];
-        foreach ($deliveries as $value) {
-            $details = json_decode($value->details, true);
-            if (array_key_exists("dish", $details)) {
-                $dish = $details["dish"];
-                $father[$dish['type_id']]['count'] ++;
-                if (array_key_exists('starter_id', $dish)) {
-                    if ($dish['starter_id']) {
-                        $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
-                    }
-                }
-                $father[$dish['type_id']]['main'][$dish['main_id']] ++;
-                foreach ($keywords as $word) {
-                    if (array_key_exists('starter_id', $dish)) {
-                        if (strpos($dish['starter_id'], $word) !== false) {
-                            $father["keywords"][$word] ++;
-                        }
-                    }
-                    if (strpos($dish['main_id'], $word) !== false) {
-                        $father["keywords"][$word] ++;
-                    }
-                }
-            }
-        }
-        return $father;
-    }
-
-    public function printTotalsConfig($config) {
-        $articles = $config['articles'];
-        $father = $config['father'];
-        $keywords = $config['keywords'];
-        $finalresult = [];
-        $finalresult['keywords'] = [];
-        $finalresult['totals'] = [];
-        $finalresult['dish'] = [];
-        $finalresult['excel'] = [];
-        foreach ($keywords as $keyword2) {
-            if ($father['keywords'][$keyword2] > 0) {
-                $keyPrint = "Total " . $keyword2 . ": " . $father['keywords'][$keyword2];
-                array_push($finalresult['keywords'], $keyPrint);
-            }
-        }
-        foreach ($articles as $art) {
-            $attributes = json_decode($art->attributes, true);
-            if ($father[$art->id]['count'] > 0) {
-                $title = $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . " ";
-                array_push($finalresult['totals'], $title);
-                $titulo = "### " . $father[$art->id]['name'] . ": " . $father[$art->id]['count'] . "  ";
-                $elTipo = ["Tipo", $father[$art->id]['name'], $father[$art->id]['count']
-                ];
-                array_push($finalresult['excel'], $father[$art->id]['name']);
-                array_push($finalresult['dish'], $titulo);
-            }
-
-            foreach ($attributes['entradas'] as $art2) {
-                if ($father[$art->id]['starter'][$art2['codigo']] > 0) {
-                    $entrada = $father[$art->id]['starter_name'][$art2['codigo']] . ": " . $father[$art->id]['starter'][$art2['codigo']] . "  ";
-                    array_push($finalresult['dish'], $entrada);
-                    $elTipo = ["Entrada", $father[$art->id]['starter_name'][$art2['codigo']], $father[$art->id]['starter'][$art2['codigo']]];
-                    array_push($finalresult['excel'], $father[$art->id]['starter_name'][$art2['codigo']]);
-                }
-            }
-            foreach ($attributes['plato'] as $art3) {
-                if ($father[$art->id]['main'][$art3['codigo']] > 0) {
-                    $fuerte = $father[$art->id]['main_name'][$art3['codigo']] . ": " . $father[$art->id]['main'][$art3['codigo']] . "  ";
-                    array_push($finalresult['dish'], $fuerte);
-                    $elTipo = ["Plato", $father[$art->id]['main_name'][$art3['codigo']], $father[$art->id]['main'][$art3['codigo']]];
-                    array_push($finalresult['excel'], $father[$art->id]['main_name'][$art3['codigo']]);
-                }
-            }
-        }
-
-        return $finalresult;
-    }
-
-    public function getPurchaseOrder($deliveries) {
-        if (count($deliveries) > 0) {
-            $dayConfig = $this->loadDayConfig($deliveries[0]->delivery);
-//        $articles = $dayConfig['articles'];
-//        $father = $dayConfig['father'];
-//        $keywords = $dayConfig['keywords'];
-            //dd($father);
-            $facturas = [];
-            foreach ($deliveries as $delivery) {
-                $details = json_decode($delivery->details, true);
-                if (array_key_exists("factura", $details)) {
-                    if (array_key_exists("order_id", $details)) {
-                        array_push($facturas, $details['order_id']);
-                    }
-                }
-            }
-            $path = "";
-            if (count($facturas) > 0) {
-                $className = "App\\Services\\StoreExport";
-                $billingService = new $className();
-                $path = $billingService->dailyInvoices($facturas);
-            }
-
-            $dayConfig['father'] = $this->countConfigElements($deliveries, $dayConfig);
-            //dd($father);
-            $dayConfig['totals'] = $this->printTotalsConfig($dayConfig);
-            $users = User::whereIn('id', [2, 77])->get();
-            //dd($path);
-            Mail::to($users)->send(new PurchaseOrder($dayConfig, $path));
-            return $dayConfig;
-        }
-    }
-
-    public function getStopDetails($results,$stop,$config) {
-        $stopDescription = "";
-        $address = $stop->address;
-        foreach ($stop->deliveries as $stopDel) {
-            $delUser = $stopDel->user;
-            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
-            $descr = $delUser->firstName . " " . $delUser->lastName . " ";
-            $details = json_decode($stopDel->details, true);
-            if (array_key_exists("deliver", $details)) {
-                if ($details['deliver'] == "envase") {
-                    $descr = $descr . "Envase Retornable,  ";
-                    array_push($arrayDel, "Retornable");
-                }
-            } else {
-                array_push($arrayDel, "Desechable");
-            }
-            if (array_key_exists("pickup", $details)) {
-                if ($details['pickup'] == "envase") {
-                    $descr = $descr . "Recoger envase,  ";
-                    array_push($arrayDel, "SI");
-                }
-            } else {
-                array_push($arrayDel, "NO");
-            }
-
-            if (array_key_exists("factura", $details)) {
-                $descr = $descr . "Enviar factura,  ";
-                array_push($arrayDel, "SI");
-            } else {
-                array_push($arrayDel, "NO");
-            }
-            $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
-            $stopDel->region_name = $descr;
-            $delConfig = $config;
-            $dels = [$stopDel];
-            $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-            $delTotals = $this->printTotalsConfig($delConfig);
-
-            $arrayDel = array_merge($arrayDel, $delTotals['excel']);
-            array_push($arrayDel, $stopDel->observation);
-
-            array_push($results, $arrayDel);
-            $stopDescription = $stopDescription . $descr;
-        }
-
-        if ($stop->stop_order == 1) {
-            $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
-            //array_push($arrayStop, $stopDescription);
-        }
-        if ($stop->stop_order == 3) {
-            $stopDescription = "Entregar los envases de la ruta: " . $route->id;
-            //array_push($arrayStop, $stopDescription);
-        }
-        return ["results" => $results, "description" => $stopDescription];
-    }
-
-    public function sendReminder() {
-        $date = date_create();
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 0) {
-            return true;
-        }
-        $type = "program_reminder";
-        $date = $this->getNextValidDate($date);
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 2) {
-            $type = "program_reminder2";
-        }
-        $tomorrow = date_format($date, "Y-m-d");
-        $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
-        if (count($deliveries) > 0) {
-            $followers = [];
-            $className = "App\\Services\\EditAlerts";
-            $platFormService = new $className();
-            foreach ($deliveries as $deliveryObj) {
-
-                $delivery = [
-                    "delivery" => $deliveryObj
-                ];
-                $payload = [
-                    "page" => "DeliveryProgramPage",
-                    "page_payload" => $delivery
-                ];
-                $followers = [$deliveryObj->user];
-                $data = [
-                    "trigger_id" => -1,
-                    "message" => "",
-                    "subject" => "Ya escogiste tu almuerzo de mañana?",
-                    "object" => "Lonchis",
-                    "sign" => true,
-                    "payload" => $payload,
-                    "type" => $type,
-                    "user_status" => "normal"
-                ];
-                $date = date_create($deliveryObj->delivery);
-                $date = date_format($date, "Y-m-d");
-                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
-            }
-        }
-    }
-
-    public function sendNewsletter() {
-        $date = date_create();
-        $type = "program_reminder";
-        $tomorrow = date_format($date, "Y-m-d");
-
-        $followers = DB::select("select id,email from users where optinMarketing = 1 ");
-        if (count($followers) > 0) {
-            $payload = [
-            ];
-
-            $data = [
-                "trigger_id" => -1,
-                "message" => "",
-                "subject" => "Visita tu correo para enterarte de nuestros menus y promociones de esta semana",
-                "object" => "Lonchis",
-                "sign" => true,
-                "payload" => $payload,
-                "type" => 'newsletter_food',
-                "user_status" => "normal"
-            ];
-            $date = date_create();
-            $date = date_format($date, "Y-m-d");
-
-            $className = "App\\Services\\EditAlerts";
-            $platFormService = new $className();
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
-            foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Newsletter());
-            }
         }
     }
 
@@ -511,15 +128,6 @@ class Food {
         return array("routes" => [], "result" => []);
     }
 
-    public function getStructureEmails(array $input) {
-        $query = $this->buildRouteQuery($input);
-        $routes = $query->with(['deliveries.user'])->get();
-        if ($routes) {
-            return $this->buildScenario($routes);
-        }
-        return array("routes" => [], "result" => []);
-    }
-
     public function checkScenario($results, $hash) {
         if (count($results) > 0) {
             $scenroute = $results[0];
@@ -531,10 +139,14 @@ class Food {
     public function regenerateScenarios() {
         $this->deleteOldData();
         $user = User::find(2);
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
-        $this->prepareRoutingSimulation($polygons);
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Basilikum")->get();
-        $this->prepareRoutingSimulation($polygons, "Basilikum");
+        $merchants = Merchant::all();
+        $shippingProviders = ["Rapigo", "Basilikum"];
+        foreach ($merchants as $merchant) {
+            foreach ($shippingProviders as $item) {
+                $polygons = CoveragePolygon::where('merchant_id', $merchant->id)->where("provider", $item)->get();
+                $this->prepareRoutingSimulation($polygons, $item);
+            }
+        }
         $this->getShippingCosts($user, "pending");
     }
 
@@ -543,32 +155,6 @@ class Food {
             return true;
         }
         return false;
-    }
-
-    public function buildScenarioRouteId($id, $hash) {
-        $routes = Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
-
-        $checkResult = $this->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $this->buildScenarioTransit($routes);
-        }
-    }
-
-    public function buildScenarioPositive($scenario, $provider, $hash) {
-        $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $this->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
-            $this->buildScenarioTransit($routes);
-        }
-    }
-
-    public function buildCompleteScenario($scenario, $provider, $hash) {
-        $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $this->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $this->buildScenarioTransit($routes);
-        }
     }
 
     public function buildScenarioTransit($routes) {
@@ -597,125 +183,55 @@ class Food {
         if ($routes) {
             $totalCost = 0;
             $deliveries = $routes[0]->deliveries;
-            $config = $this->loadDayConfig($deliveries[0]->delivery);
+            
             $totalIncomeShipping = 0;
             $className = "App\\Services\\Rapigo";
             $rapigo = new $className();
             $className2 = "App\\Services\\Basilikum";
             $basilikum = new $className2();
+            $className3 = "App\\Services\\Food";
+            $platform = new $className2();
+            $config = $platform->loadDayConfig($deliveries[0]->delivery);
             $totalLunches = 0;
-            $results = [];
+            $pages = [];
             foreach ($routes as $route) {
-                $routeConfig = $config;
+                $results = [];
                 $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
                 array_push($results, $arrayRouteTitle);
                 $arrayRoute = [$route->id, $route->provider, $route->unit_cost, $route->unit_price];
                 array_push($results, $arrayRoute);
                 $arrayDelTitle = ["Parada", "Direccion", "Entrega", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato", "Observacion"];
                 array_push($results, $arrayDelTitle);
-                $deliveries = $route->deliveries;
-                $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
-                $routeTotals = $this->printTotalsConfig($routeConfig);
                 //$results = array_merge($results,$routeTotals['excel']);
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
                 $queryStops = [];
                 foreach ($stops as $stop) {
-                    $stopConfig = $config;
-                    $arrayStop = ["Parada", $stop->id, $stop->address->phone, $stop->address->address];
-
-                    $stopDescription = "";
-                    $stopDeliveries = $stop->deliveries;
-                    $stopConfig['father'] = $this->countConfigElements($stopDeliveries, $stopConfig);
-                    $stopTotals = $this->printTotalsConfig($stopConfig);
-                    //$results = array_merge($results, $stopTotals['excel']);
-                    $stop->totals = $stopTotals;
-                    $address = $stop->address;
-
-                    foreach ($stop->deliveries as $stopDel) {
-                        $delUser = $stopDel->user;
-
-                        $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
-                        $descr = $delUser->firstName . " " . $delUser->lastName . " ";
-                        $details = json_decode($stopDel->details, true);
-                        if (array_key_exists("deliver", $details)) {
-                            if ($details['deliver'] == "envase") {
-                                $descr = $descr . "Envase Retornable,  ";
-                                array_push($arrayDel, "Retornable");
-                            }
-                        } else {
-                            array_push($arrayDel, "Desechable");
-                        }
-                        if (array_key_exists("pickup", $details)) {
-                            if ($details['pickup'] == "envase") {
-                                $descr = $descr . "Recoger envase,  ";
-                                array_push($arrayDel, "SI");
-                            }
-                        } else {
-                            array_push($arrayDel, "NO");
-                        }
-
-                        if (array_key_exists("factura", $details)) {
-                            $descr = $descr . "Enviar factura,  ";
-                            array_push($arrayDel, "SI");
-                        } else {
-                            array_push($arrayDel, "NO");
-                        }
-                        $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
-                        $stopDel->region_name = $descr;
-                        $delConfig = $config;
-                        $dels = [$stopDel];
-                        $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-                        $delTotals = $this->printTotalsConfig($delConfig);
-
-                        $arrayDel = array_merge($arrayDel, $delTotals['excel']);
-                        array_push($arrayDel, $stopDel->observation);
-                        array_push($results, $arrayDel);
-                        $stopDel->totals = $delTotals;
-
-                        $stopDescription = $stopDescription . $descr;
-                    }
-
-                    if ($stop->stop_order == 1) {
-                        $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
-                        //array_push($arrayStop, $stopDescription);
-                    }
-                    if ($stop->stop_order == 3) {
-                        $stopDescription = "Entregar los envases de la ruta: " . $route->id;
-                        //array_push($arrayStop, $stopDescription);
-                    }
-                    //array_push($results, $arrayStop);
+                    $resultData = $platform->getStopDetails($results,$stop,$config);
                     $querystop = [
-                        "address" => $address->address . " " . $address->notes,
-                        "description" => $stopDescription,
+                        "address" => $stop->address->address . " " . $stop->address->notes,
+                        "description" => $resultData['description'],
                         "type" => "point",
-                        "phone" => $address->phone
+                        "phone" => $stop->address->phone
                     ];
                     array_push($queryStops, $querystop);
+                    $results = $resultData['description'];
                 }
                 if ($route->provider == "Rapigo") {
                     $route = $rapigo->createRoute($queryStops, $route, $stops);
                 } else if ($route->provider == "Basilikum") {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
-                $route->totals = $routeTotals;
                 $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
-                foreach ($route->deliveries as $del) {
-                    $delConfig = $config;
-                    $del->status = "preparing";
-                    //$del->save();
-                    $dels = [$del];
-                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-                    $delTotals = $this->printTotalsConfig($delConfig);
-                    $del->totals = $delTotals;
-                }
+                $page = [
+                    "name" => "Ruta-".$route->id."-". $route->provider,
+                    "rows" => $results
+                ];
+                array_push($pages, $page);
             }
-            $page = [
-                "name" => "Rutas",
-                "rows" => $results
-            ];
-            $file = $this->writeFile([$page], "Rutas" . time());
+
+            $file = $this->writeFile($pages, "Rutas" . time());
             $path = 'exports/' . $file->filename . "." . $file->ext;
             $users = User::whereIn('id', [2, 77])->get();
             Mail::to($users)->send(new RouteDeliver($routes, $path));
@@ -753,19 +269,6 @@ class Food {
                     // Call them separately
                     $excel->setDescription('This report is clasified');
                     foreach ($data as $page) {
-//                foreach ($page["rows"] as $key => $value) {
-//                    if ($page["rows"][$key]) {
-//                        if (array_key_exists("labels", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["labels"]);
-//                        }
-//                        if (array_key_exists("projects", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["projects"]);
-//                        }
-//                        if (array_key_exists("people", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["people"]);
-//                        }
-//                    }
-//                }
                         $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
                             $sheet->fromArray($page["rows"], null, 'A1', true);
                         });
@@ -784,94 +287,6 @@ class Food {
         } else {
             return false;
         }
-    }
-
-    public function buildScenario($routes) {
-        if ($routes) {
-            $deliveries = $routes[0]->deliveries;
-            $config = $this->loadDayConfig($deliveries[0]->delivery);
-            foreach ($routes as $route) {
-                $routeConfig = $config;
-                $deliveries = $route->deliveries;
-                $routeConfig['father'] = $this->countConfigElements($deliveries, $routeConfig);
-                $routeTotals = $this->printTotalsConfig($routeConfig);
-                $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
-                $queryStops = [];
-                foreach ($stops as $stop) {
-                    //$stopDeliveries = $stop->deliveries;
-                    $deliveries = "";
-                    $stopConfig = $config;
-                    $stopConfig['father'] = $this->countConfigElements($stop->deliveries, $stopConfig);
-                    $stopTotals = $this->printTotalsConfig($stopConfig);
-                    $stop->totals = $stopTotals;
-                    foreach ($stop->deliveries as $stopDel) {
-                        $details = json_decode($stopDel->details, true);
-                        $delConfig = $config;
-                        $dels = [$stopDel];
-                        $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-                        $delTotals = $this->printTotalsConfig($delConfig);
-                        $stopDel->totals = $delTotals;
-                        $delUser = $stopDel->user;
-                        $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
-                        if (array_key_exists("pickup", $details)) {
-                            if ($details['pickup'] == "envase") {
-                                $descr = $descr . "Recoger envase, ";
-                            }
-                        }
-                        $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
-                        $stopDel->region_name = $descr;
-                        $deliveries = $deliveries . $descr;
-                    }
-
-                    if ($stop->stop_order == 2) {
-                        $stop->region_name = $deliveries;
-                    }
-                }
-                $totalDeliveries = [];
-                foreach ($route->deliveries as $del) {
-                    $delConfig = $config;
-                    $dels = [$del];
-                    $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-                    $delTotals = $this->printTotalsConfig($delConfig);
-                    $del->totals = $delTotals;
-                }
-
-                $route->hash = $this->generateHash($route->id, $route->created_at);
-                $route->totals = $routeTotals;
-                $route->stops = $stops;
-            }
-            return $routes;
-        }
-
-        //dd($results);
-    }
-
-    public function buildScenarioCredits(Route $route) {
-        $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
-        foreach ($stops as $stop) {
-            //$stopDeliveries = $stop->deliveries;
-            $deliveries = "";
-            foreach ($stop->deliveries as $stopDel) {
-                $details = json_decode($stopDel->details, true);
-                $delUser = $stopDel->user;
-                $descr = "Usuario: " . $delUser->firstName . " " . $delUser->lastName . " ";
-                if (array_key_exists("pickup", $details)) {
-                    if ($details['pickup'] == "envase") {
-                        $descr = $descr . "Recoger envase, ";
-                    }
-                }
-                $descr = $descr . "Entregar id: " . $stopDel->id . ".<br/> ";
-                $stopDel->region_name = $descr;
-                $stopDel->hash = $this->generateHash($stopDel->id, $stopDel->created_at);
-                $stopDel->detauls = $details;
-                $deliveries = $deliveries . $descr;
-            }
-            if ($stop->stop_order == 2) {
-                $stop->region_name = $deliveries;
-            }
-        }
-        $route->stops = $stops;
-        return [$route];
     }
 
     public function prepareRouteModel($results, $preOrganize, CoveragePolygon $polygon) {
@@ -951,23 +366,6 @@ class Food {
             return $results;
         }
         return $resultsGeo;
-    }
-
-    public function prepareQuadrantLimits($lat, $long) {
-//        $R = 6371;
-//        if ($x < 4) {
-//            $radiusInf = 0;
-//            $radius = 7;
-//        } else {
-//            $radiusInf = 3;
-//            $radius = 7;
-//        }
-        $thedata = [
-            'lat' => $lat,
-            'lat2' => $lat,
-            'long' => $long
-        ];
-        return $thedata;
     }
 
     private function addToExistingStop(Stop $itemSavedStop, Route $route, $stopContainer) {
@@ -1143,8 +541,8 @@ class Food {
                     "region_id" => 11,
                     "country_id" => 1,
                     "address" => "Carrera 1 este # 72a-90 Apto 202",
-                    "lat" => 4.721717,
-                    "long" => -74.069855,
+                    "lat" => 4.653610,
+                    "long" => -74.049822,
                     "phone" => "3103418432"
         ]);
         $details = ["pickups" => []];
@@ -1236,29 +634,6 @@ class Food {
             "lunch_route" => ($totalLunches / $totalRoutes),
             "profit" => $totalGains,
         ];
-    }
-
-    public function showScenario() {
-        
-    }
-
-    public function deleteUserScenario(User $user, $type, $date) {
-        $routes = Route::where("user_id", $user->id)->where("availability", $date)->get();
-        foreach ($routes as $rt) {
-
-            DB::table('delivery_route')
-                    ->where('route_id', $rt->id)
-                    ->delete();
-            $stops = $rt->stops;
-            $stopsnum = 0;
-            foreach ($stops as $st) {
-                DB::table('delivery_stop')
-                        ->where('stop_id', $st->id)
-                        ->delete();
-            }
-            $rt->stops()->delete();
-            $rt->delete();
-        }
     }
 
     public function getShippingCostArray() {
@@ -1517,87 +892,14 @@ class Food {
         }
     }
 
-    public function runRecurringTask() {
-        $user = User::find(2);
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Rapigo")->get();
-        $this->prepareRoutingSimulation($polygons);
-        $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider", "Basilikum")->get();
-        $this->prepareRoutingSimulation($polygons, "Basilikum");
-        $results = $this->getShippingCosts($user, "pending");
-        $deliveries = Delivery::where("status", "transit")->get();
-        $this->getPurchaseOrder($deliveries);
-    }
-
-    public function runInstructions() {
-        $user = User::find(2);
-        $routes = Route::where("status", "built")->with(['deliveries.user'])->get();
-        $results = $this->buildScenario($routes);
-        Mail::to($user)->send(new RouteOrganize($results));
-        Mail::to($user)->send(new RouteDeliver($results));
-    }
-
     public function getRouteInfo($delivery_id) {
         $theData = ["delivery" => $delivery_id];
-        $routes = DB::select(" select route_id from delivery_route where delivery_id = :delivery", $theData);
+        $routes = DB::select("select route_id from delivery_route where delivery_id = :delivery", $theData);
         if (count($routes) > 0) {
             $route = Route::where("id", $routes[0]->route_id)->with(['stops.address'])->first();
             return $route;
         }
         return null;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getShippingCosts($user, $status) {
-        $providers = ["Rapigo", "Basilikum"];
-        foreach ($providers as $provider) {
-            if ($provider == "Rapigo") {
-                $data = [
-                    "type" => "preorganize",
-                    "status" => $status,
-                    "provider" => $provider
-                ];
-
-                $resultsPre = $this->getTotalEstimatedShipping($data);
-                $resultsPre = $resultsPre['result'];
-                $resultsPre['route_provider'] = $provider;
-                $resultsPre['route_status'] = "pending";
-                $data = [
-                    "type" => "simple",
-                    "status" => $status,
-                    "provider" => $provider
-                ];
-                $resultsSimple = $this->getTotalEstimatedShipping($data);
-                $resultsSimple = $resultsSimple['result'];
-                $resultsSimple['route_provider'] = $provider;
-                $resultsSimple['route_status'] = "pending";
-            } else if ($provider == "Basilikum") {
-                $data = [
-                    "status" => $status,
-                    "provider" => $provider
-                ];
-                $resultsPre = $this->getTotalEstimatedShipping($data);
-                $resultsPre = $resultsPre['result'];
-                $resultsPre['route_provider'] = $provider;
-                $resultsPre['route_status'] = "pending";
-                $resultsSimple = $resultsPre;
-            }
-            $winningScenario = "";
-            if (!array_key_exists("day_profit", $resultsPre)) {
-                continue;
-            }
-            if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
-                $winningScenario = "Preorganize";
-            } else {
-                $winningScenario = "Simple";
-            }
-
-            Mail::to($user)->send(new ScenarioSelect($resultsPre, $resultsSimple, $winningScenario));
-        }
-        return array("status" => "success", "message" => "costs sent");
     }
 
     public function getNextValidDate($date) {
@@ -1654,55 +956,6 @@ class Food {
             }
         }
         return false;
-    }
-
-    public function reprogramDeliveries() {
-        $date = date_create();
-//        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-//        dd($dayofweek);
-//        if ($dayofweek < 5 && $dayofweek > 0) {
-//            date_add($date, date_interval_create_from_date_string("1 days"));
-//        } else if ($dayofweek == 5) {
-//            date_add($date, date_interval_create_from_date_string("3 days"));
-//        } else {
-//            return null;
-//        }
-        $la = date_format($date, "Y-m-d");
-//        $date = date_create($la . " 23:59:59");
-//        dd($date);
-        $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->orderBy('delivery', 'desc')->get();
-        foreach ($deliveries as $item) {
-            $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
-            $delivery2 = null;
-            if ($delivery) {
-                $date = date_create($delivery->delivery);
-                $delivery2 = Delivery::where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'asc')->first();
-                if ($delivery->id == $delivery2->id) {
-                    $delivery2 = null;
-                }
-            } else {
-                $date = date_create();
-            }
-            $date = $this->getNextValidDate($date);
-            if ($delivery) {
-                if ($delivery->status == "deposit") {
-                    $item->delivery = $delivery->delivery;
-                    $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
-                    $delivery->save();
-                } else {
-                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
-                }
-                if ($delivery2) {
-                    $tempAttrs = $delivery2->details;
-                    $delivery2->details = $item->details;
-                    $delivery2->save();
-                    $item->details = $tempAttrs;
-                }
-            } else {
-                $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
-            }
-            $item->save();
-        }
     }
 
 }

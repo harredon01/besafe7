@@ -41,7 +41,7 @@ class Rapigo {
     public function getEstimate(array $points) {
         //dd($points);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
         return $response;
@@ -65,7 +65,7 @@ class Rapigo {
         ];
         array_push($points, $querystop);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
         return $response;
@@ -87,12 +87,13 @@ class Rapigo {
         $deliveries = $route->deliveries;
         $date = date_create($deliveries[0]->delivery);
         $data['fecha_servicio'] = date_format($date, "m/d/Y");
-        $data['hora_servicio'] = "11:30";
+        $data['hora_servicio'] = "10:15";
 
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/request_service/";
-        //dd($data);
+        $query = env('RAPIGO_TEST') . "api/bogota/request_service/";
+        //dd($query);
         $serviceBookResponse = $this->sendPost($data, $query);
+        dd($serviceBookResponse);
         if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
             $stopCodes = $serviceBookResponse['paradas_referencia'];
             $route->provider_id = $serviceBookResponse['key'];
@@ -112,13 +113,13 @@ class Rapigo {
                 unset($stop->deliveries);
                 $stop->code = $stopCodes[$i]['ref_parada'];
                 $stop->status = "pending";
-                $stop->save();
+                //$stop->save();
                 $stop->totals = $totals;
                 $stop->deliveries = $deliveries;
                 $i++;
             }
             $route->status = "built";
-            $route->save();
+            //$route->save();
         }
 
         $route->stops = $stops;
@@ -127,14 +128,14 @@ class Rapigo {
 
     public function checkAddress($address) {
         $data['address'] = $address;
-        $query = env('RAPIGO_PROD') . "api/bogota/validate_address/";
+        $query = env('RAPIGO_TEST') . "api/bogota/validate_address/";
         $response = $this->sendPost($data, $query);
         return $response;
     }
 
     public function checkStatus($key) {
         $data['key'] = $key;
-        $query = env('RAPIGO_PROD') . "api/bogota/get_service_status/";
+        $query = env('RAPIGO_TEST') . "api/bogota/get_service_status/";
         $response = $this->sendPost($data, $query);
         return $response;
     }

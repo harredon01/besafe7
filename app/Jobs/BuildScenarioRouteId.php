@@ -2,8 +2,9 @@
 
 namespace App\Jobs;
 use Exception;
-use App\Services\Food;
+use App\Services\Routing;
 use App\Models\User;
+use App\Models\Route;
 use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -27,7 +28,6 @@ class BuildScenarioRouteId implements ShouldQueue
     {
         $this->id = $id;
         $this->hash = $hash;
-
     }
 
     /**
@@ -35,9 +35,13 @@ class BuildScenarioRouteId implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food,EditAlerts $editAlerts)
+    public function handle(Routing $routing,EditAlerts $editAlerts)
     {
-        $food->buildScenarioRouteId($this->id, $this->hash); 
+        $routes = Route::where("id", $this->id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+        $checkResult = $routing->checkScenario($routes, $this->hash);
+        if ($checkResult) {
+            $routing->buildScenarioTransit($routes);
+        }
         $payload = ["route"=> $this->id ];
         $user = User::find(2);
         $followers = [$user];
