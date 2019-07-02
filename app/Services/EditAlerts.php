@@ -64,11 +64,17 @@ class EditAlerts {
         DB::update($sql, $numbers);
         return ['success' => 'notifications updated'];
     }
-    public function buildMessage($userSending,$data){
+
+    public function buildMessage($userSending, $data) {
+        if ($data['type'] == "admin") {
+            $data['subject_es'] = $data['subject'];
+            $data['body_es'] = $data['subject'];
+            return $data;
+        }
         $translation = Translation::where('language', 'en-us')->where("code", $data['type'])->first();
         $translationEsp = Translation::where('language', 'es-co')->where("code", $data['type'])->first();
-        if($data['type']=="program_reminder2"){
-            $data['type']="program_reminder";
+        if ($data['type'] == "program_reminder2") {
+            $data['type'] = "program_reminder";
         }
         $arrayPayload = $data['payload'];
         if ($userSending) {
@@ -129,7 +135,7 @@ class EditAlerts {
         if ($pos) {
             $data['subject'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['subject']);
             $data['body'] = str_replace("{orderStatus}", $arrayPayload['order_status'], $data['body']);
-            $orderStatus = $this->translateStatus($arrayPayload['order_status'],"a");
+            $orderStatus = $this->translateStatus($arrayPayload['order_status'], "a");
             $data['subject_es'] = str_replace("{orderStatus}", $orderStatus, $data['subject_es']);
             $data['body_es'] = str_replace("{orderStatus}", $orderStatus, $data['body_es']);
         }
@@ -144,7 +150,7 @@ class EditAlerts {
         if ($pos) {
             $data['subject'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['subject']);
             $data['body'] = str_replace("{paymentStatus}", $arrayPayload['payment_status'], $data['body']);
-            $paymentStatus = $this->translateStatus($arrayPayload['payment_status'],"o");
+            $paymentStatus = $this->translateStatus($arrayPayload['payment_status'], "o");
             $data['subject_es'] = str_replace("{paymentStatus}", $paymentStatus, $data['subject_es']);
             $data['body_es'] = str_replace("{paymentStatus}", $paymentStatus, $data['body_es']);
         }
@@ -171,18 +177,18 @@ class EditAlerts {
         }
         return $data;
     }
-    
-    public function translateStatus($status,$male){
-        if($status == "approved"){
-            return "aprobad".$male;
+
+    public function translateStatus($status, $male) {
+        if ($status == "approved") {
+            return "aprobad" . $male;
         }
-        if($status == "pending"){
+        if ($status == "pending") {
             return "esperando aprobacion";
         }
-        if($status == "denied"){
-            return "rechazad".$male;
+        if ($status == "denied") {
+            return "rechazad" . $male;
         }
-        if($status == "payment_in_bank"){
+        if ($status == "payment_in_bank") {
             return "pago por consignación";
         }
         return $status;
@@ -427,6 +433,7 @@ class EditAlerts {
         ];
         return $data;
     }
+
     /**
      * Gets the messages between two users.
      *
@@ -565,7 +572,7 @@ class EditAlerts {
 
         if (count($userPush) > 0) {
             if ($platform == "food") {
-                $msg['subject']=$msg['subject_es'];
+                $msg['subject'] = $msg['subject_es'];
             }
             $content = array(
                 "en" => $msg['subject'],
@@ -604,7 +611,6 @@ class EditAlerts {
             $response = curl_exec($ch);
             curl_close($ch);
             $result['push'] = $response;
-            
         }
         if (count($userEmail) > 0) {
             $mail = Mail::to($userEmail)->send(new GeneralNotification($msg['subject_es'], $msg['body_es']));

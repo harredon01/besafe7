@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Location;
 use App\Models\HistoricLocation;
 use App\Models\HistoricLocation2;
+use App\Events\LocationEvent;
 use App\Models\Country;
 use Hash;
 use App\Models\Region;
@@ -246,6 +247,7 @@ class EditLocation {
         }
         $data["trip"] = $user->trip;
         $dalocation = Location::create($data);
+        event(new LocationEvent($dalocation));
         if ($extras) {
             if ($extras['trackingStatus'] == "finishing") {
                 if (array_key_exists("code", $extras)) {

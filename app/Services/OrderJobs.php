@@ -97,6 +97,7 @@ class OrderJobs {
     }
 
     public function createNewOrder(Order $order) {
+        $user = $order->user;
         $newOrder = Order::create([
                     'status' => 'pending',
                     'subtotal' => 0,
@@ -144,7 +145,7 @@ class OrderJobs {
 
         $address = $order->orderAddresses()->where("type", "shipping")->first();
         if ($address) {
-            $resultG = $this->geolocation->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id']);
+            $resultG = $this->geolocation->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'],"Basilikum");
             if ($resultG["status"] == "success") {
                 $polygon = $resultG['polygon'];
                 $orderAttributes['polygon'] = $polygon->id;

@@ -7,12 +7,14 @@ use App\Models\Article;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
+use App\Models\Merchant;
 use App\Models\Stop;
 use App\Jobs\RegenerateScenarios;
 use App\Models\CoveragePolygon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteDeliver;
+use App\Mail\ScenarioSelect;
 use DB;
 use Excel;
 
@@ -116,6 +118,60 @@ class Routing {
         }
         return $query;
     }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getShippingCosts($user, $status) {
+        $providers = ["Rapigo", "Basilikum"];
+        foreach ($providers as $provider) {
+            if ($provider == "Rapigo") {
+                $data = [
+                    "type" => "preorganize",
+                    "status" => $status,
+                    "provider" => $provider
+                ];
+
+                $resultsPre = $this->getTotalEstimatedShipping($data);
+                $resultsPre = $resultsPre['result'];
+                $resultsPre['route_provider'] = $provider;
+                $resultsPre['route_status'] = "pending";
+                $data = [
+                    "type" => "simple",
+                    "status" => $status,
+                    "provider" => $provider
+                ];
+                $resultsSimple = $this->getTotalEstimatedShipping($data);
+                $resultsSimple = $resultsSimple['result'];
+                $resultsSimple['route_provider'] = $provider;
+                $resultsSimple['route_status'] = "pending";
+            } else if ($provider == "Basilikum") {
+                $data = [
+                    "status" => $status,
+                    "provider" => $provider
+                ];
+                $resultsPre = $this->getTotalEstimatedShipping($data);
+                $resultsPre = $resultsPre['result'];
+                $resultsPre['route_provider'] = $provider;
+                $resultsPre['route_status'] = "pending";
+                $resultsSimple = $resultsPre;
+            }
+            $winningScenario = "";
+            if (!array_key_exists("day_profit", $resultsPre)) {
+                continue;
+            }
+            if ($resultsPre["day_profit"] > $resultsSimple["day_profit"]) {
+                $winningScenario = "Preorganize";
+            } else {
+                $winningScenario = "Simple";
+            }
+
+            Mail::to($user)->send(new ScenarioSelect($resultsPre, $resultsSimple, $winningScenario));
+        }
+        return array("status" => "success", "message" => "costs sent");
+    }
 
     public function getTotalEstimatedShipping(array $input) {
         $query = $this->buildRouteQuery($input);
@@ -190,7 +246,7 @@ class Routing {
             $className2 = "App\\Services\\Basilikum";
             $basilikum = new $className2();
             $className3 = "App\\Services\\Food";
-            $platform = new $className2();
+            $platform = new $className3();
             $config = $platform->loadDayConfig($deliveries[0]->delivery);
             $totalLunches = 0;
             $pages = [];
@@ -214,7 +270,7 @@ class Routing {
                         "phone" => $stop->address->phone
                     ];
                     array_push($queryStops, $querystop);
-                    $results = $resultData['description'];
+                    $results = $resultData['results'];
                 }
                 if ($route->provider == "Rapigo") {
                     $route = $rapigo->createRoute($queryStops, $route, $stops);
@@ -508,9 +564,9 @@ class Routing {
             $found = false;
             foreach ($routes as $route) {
                 $available = self::LUNCH_ROUTE - $route->unit;
-                if ($shipping == "Basilikum") {
-                    $available = 100 - $route->unit;
-                }
+//                if ($shipping == "Basilikum") {
+//                    $available = 100 - $route->unit;
+//                }
 
                 if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
                     $found = true;

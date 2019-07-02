@@ -126,7 +126,7 @@ class EditOrderFood {
         $className = "App\\Services\\Geolocation";
         $geo = new $className;
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id);
+        $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id,"Basilikum");
         $polygon = $result['polygon'];
         $address->polygon_id = $polygon->id;
         $address->save();

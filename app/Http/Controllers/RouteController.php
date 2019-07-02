@@ -123,18 +123,6 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function buildRoute(Request $request,$route)
-    {
-        $user = $request->user();
-        $routes = Route::where("id",$route)->get();
-        $this->food->buildScenario($routes);
-    }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Route  $route
-     * @return \Illuminate\Http\Response
-     */
     public function updateRouteStop(Request $request,$route,$stop)
     {
         $user = $request->user();

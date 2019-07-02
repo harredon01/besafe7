@@ -336,11 +336,11 @@ class Food {
         }
 
         if ($stop->stop_order == 1) {
-            $stopDescription = "Recoger los almuerzos de la ruta: " . $route->id;
+            $stopDescription = "Recoger los almuerzos de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
         if ($stop->stop_order == 3) {
-            $stopDescription = "Entregar los envases de la ruta: " . $route->id;
+            $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
         return ["results" => $results, "description" => $stopDescription];

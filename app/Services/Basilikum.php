@@ -29,7 +29,7 @@ class Basilikum {
     }
 
     public function createRoute(array $points,$route,$stops){
-        $route->unit_cost = self::ROUTE_HOUR_COST*self::ROUTE_HOURS_EST;
+        $route->unit_cost = 0;
         $route->provider_id = "route_".$route->id;
         $location = [
             "runner" => "",

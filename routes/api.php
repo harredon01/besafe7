@@ -246,3 +246,9 @@ Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
 Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
+
+Route::post('runner/route/start', 'RunnerApiController@postRouteStarted');
+Route::post('runner/route/complete', 'RunnerApiController@postRouteCompleted');
+Route::post('runner/stop/arrived', 'RunnerApiController@postStopArrived');
+Route::post('runner/stop/failed', 'RunnerApiController@postStopFailed');
+Route::post('runner/stop/complete', 'RunnerApiController@postStopCompleted');
