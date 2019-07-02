@@ -88,7 +88,6 @@ class StoreExport {
         $merchantsObserved = [];
         $merchants = Merchant::whereIn("id", [1299, 1300, 1301])->get();
         foreach ($merchants as $merchant) {
-
             $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
                             ->where('merchant_id', $merchant->id)
                             ->whereBetween('updated_at', [$startDate, $endDate])
@@ -179,6 +178,7 @@ class StoreExport {
             "rows" => $merchantsObserved
         ];
         array_unshift($results, $page);
+        $results = $this->deliveriesData($startDate, $endDate, $results);
         $this->writeFile($results, "Total operacion_" . time(), true);
     }
 
@@ -205,6 +205,27 @@ class StoreExport {
         } else {
             return $path;
         }
+    }
+    public function deliveriesData($startDate, $endDate,$results){
+        $deliveries = Delivery::whereNotIn("status",["deposit"])->whereNotIn("user_id",[2, 77, 3,82,161])->whereBetween('created_at', [$startDate, $endDate])->get();
+        $page = [
+            "name" => "Entregas Vendidas",
+            "rows" => $deliveries->toArray()
+        ];
+        array_push($results, $page);
+        $deliveries = Delivery::whereIn("status",["completed","preparing"])->whereNotIn("user_id",[2, 77, 3,82,161])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $page = [
+            "name" => "Entregas Ejecutadas",
+            "rows" => $deliveries->toArray()
+        ];
+        array_push($results, $page);
+        $deliveries = Delivery::whereIn("status",["completed","preparing"])->whereIn("user_id",[77,82])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $page = [
+            "name" => "Entregas Mluisa y Camila",
+            "rows" => $deliveries->toArray()
+        ];
+        array_push($results, $page);
+        return $results;
     }
 
     public function dailyInvoices($ordersArray) {
@@ -428,6 +449,17 @@ class StoreExport {
             $orderItem = [
                 "Orden" => $orderArray['id'],
                 self::LUNCHES => $oLunches,
+                self::COST_W_DISCOUNT => $oCostSub,
+                self::TAX_W_DISCOUNT => $oTaxSub,
+                self::COMMISION_W_DISCOUNT => $oComissionSub,
+                self::DEPOSIT => $oDeposit,
+                self::SUBTOTAL_ORDER => $orderArray['subtotal'],
+                self::SHIPPING => $oShipping,
+                self::DISCOUNT_MARKETING => $oMarketingDiscount,
+                self::TOTAL_ORDER => $orderArray['total'],
+                self::TRANSACTION_COST => $oTransactionCost,
+                self::TOTAL_PAYMENTS => $oPaymentsTotal,
+                "Usuario" => $orderArray['user_id'],
                 self::COST_WO_DISCOUNT => $oCost,
                 self::DICOUNT_COST => $oProductDiscount,
                 self::COST_W_DISCOUNT => $oCostSub,

@@ -17,7 +17,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -1177,7 +1177,7 @@ class Proofhub {
         dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name)); 
         //$projects = $this->getProjects($copy, self::CUENTAS);
         $full = false;
-        return true;
+        //return true;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
         //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
