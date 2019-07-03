@@ -138,6 +138,8 @@ class Merchant extends Model {
         return $this->availabilities()
                     ->where('is_bookable', true)
                     ->where('from', '>', new Carbon($startsAt))
+                    ->where('to', '<', new Carbon($startsAt))
+                    ->where('from', '>', new Carbon($endsAt))
                     ->where('to', '<', new Carbon($endsAt));
     }
 

@@ -118,7 +118,7 @@ class Routing {
         }
         return $query;
     }
-    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -239,7 +239,7 @@ class Routing {
         if ($routes) {
             $totalCost = 0;
             $deliveries = $routes[0]->deliveries;
-            
+
             $totalIncomeShipping = 0;
             $className = "App\\Services\\Rapigo";
             $rapigo = new $className();
@@ -262,7 +262,7 @@ class Routing {
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
                 $queryStops = [];
                 foreach ($stops as $stop) {
-                    $resultData = $platform->getStopDetails($results,$stop,$config);
+                    $resultData = $platform->getStopDetails($results, $stop, $config);
                     $querystop = [
                         "address" => $stop->address->address . " " . $stop->address->notes,
                         "description" => $resultData['description'],
@@ -281,7 +281,7 @@ class Routing {
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
                 $page = [
-                    "name" => "Ruta-".$route->id."-". $route->provider,
+                    "name" => "Ruta-" . $route->id . "-" . $route->provider,
                     "rows" => $results
                 ];
                 array_push($pages, $page);
@@ -590,26 +590,35 @@ class Routing {
     }
 
     private function addpickupStop(Route $route) {
-        $address = OrderAddress::create([
-                    "user_id" => 1,
-                    "name" => "test",
-                    "city_id" => 524,
-                    "region_id" => 11,
-                    "country_id" => 1,
-                    "address" => "Carrera 1 este # 72a-90 Apto 202",
-                    "lat" => 4.653610,
-                    "long" => -74.049822,
-                    "phone" => "3103418432"
-        ]);
-        $details = ["pickups" => []];
-        $firstStop = Stop::create([
-                    "address_id" => $address->id,
-                    "amount" => 0,
-                    "route_id" => $route->id,
-                    "region_name" => "Entregar los envases recogidos",
-                    "stop_order" => 3,
-                    "details" => json_encode($details)
-        ]);
+        $addStop = true;
+        foreach ($route->stops as $stop) {
+            $address = $stop->address;
+            if ($address->phone == "3103418432") {
+                $addStop = false;
+            }
+        }
+        if ($addStop) {
+            $address = OrderAddress::create([
+                        "user_id" => 1,
+                        "name" => "test",
+                        "city_id" => 524,
+                        "region_id" => 11,
+                        "country_id" => 1,
+                        "address" => "Carrera 1 este # 72a-90 Apto 202",
+                        "lat" => 4.653610,
+                        "long" => -74.049822,
+                        "phone" => "3103418432"
+            ]);
+            $details = ["pickups" => []];
+            $firstStop = Stop::create([
+                        "address_id" => $address->id,
+                        "amount" => 0,
+                        "route_id" => $route->id,
+                        "region_name" => "Entregar los envases recogidos",
+                        "stop_order" => 3,
+                        "details" => json_encode($details)
+            ]);
+        }
     }
 
     public function completeRoutes($routes) {

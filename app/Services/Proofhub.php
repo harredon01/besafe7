@@ -11,8 +11,8 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-06-01';
-    const END_DATE = '2119-04-01';
+    const START_DATE = '2018-11-01';
+    const END_DATE = '2018-12-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
@@ -364,31 +364,35 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1752852931",
                 "rows" => $copy,
-            ], [
-                "name" => "Afydi",
-                "budget" => "50000",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1767982047",
-                "rows" => $copy,
-            ], [
-                "name" => "Misi",
-                "budget" => "50000",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1793993272",
-                "rows" => $copy,
-            ], [
-                "name" => "CUCU",
-                "budget" => "50000",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1466430941",
-                "rows" => $copy,
-            ], [
+            ], 
+//            [
+//                "name" => "Afydi",
+//                "budget" => "50000",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1767982047",
+//                "rows" => $copy,
+//            ], 
+//            [
+//                "name" => "Misi",
+//                "budget" => "50000",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1793993272",
+//                "rows" => $copy,
+//            ], 
+//            [
+//                "name" => "CUCU",
+//                "budget" => "50000",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1466430941",
+//                "rows" => $copy,
+//            ], 
+            [
                 "name" => "Icapital",
                 "budget" => "0",
                 "country" => "COL",
@@ -437,14 +441,6 @@ class Proofhub {
                 "code" => "2382102056",
                 "rows" => $copy,
             ], [
-                "name" => "Blulogistics",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "2267161477",
-                "rows" => $copy,
-            ], [
                 "name" => "Volo",
                 "budget" => "0",
                 "country" => "COL",
@@ -476,23 +472,16 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "1768117734",
                 "rows" => $copy,
-            ], [
-                "name" => "CVU",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1753816309",
-                "rows" => $copy,
-            ], [
-                "name" => "Bodytech Peru",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1753979134",
-                "rows" => $copy,
-            ],
+            ], 
+//            [
+//                "name" => "Bodytech Peru",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1753979134",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Ongoing Development",
                 "budget" => "0",
@@ -511,14 +500,6 @@ class Proofhub {
                 "code" => "2312725220",
                 "rows" => $copy,
             ], [
-                "name" => "BVC",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1891932252",
-                "rows" => $copy,
-            ], [
                 "name" => "Auvenir",
                 "budget" => "0",
                 "country" => "COL",
@@ -535,15 +516,15 @@ class Proofhub {
                 "code" => "1714087114",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Primus",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "2400881156",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Primus",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "2400881156",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Daportare",
                 "budget" => "0",
@@ -562,15 +543,15 @@ class Proofhub {
                 "code" => "2581819961",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Xtech",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "2349279336",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Xtech",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "2349279336",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "NOVEDADES GUILLERS",
                 "budget" => "50000",
@@ -748,24 +729,24 @@ class Proofhub {
                 "code" => "2727195166",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Vilaseca",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1779963222",
-                "rows" => $copy,
-            ],
-            [
-                "name" => "Dial",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "1637613840",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Vilaseca",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1779963222",
+//                "rows" => $copy,
+//            ],
+//            [
+//                "name" => "Dial",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "1637613840",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Agency",
                 "budget" => "0",
@@ -793,15 +774,15 @@ class Proofhub {
                 "code" => "2646379904",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Balance ecuador",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CUENTAS,
-                "price" => "Retail",
-                "code" => "2547043347",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Balance ecuador",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CUENTAS,
+//                "price" => "Retail",
+//                "code" => "2547043347",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "CONSTRUCTORA BOLIVAR",
                 "budget" => "0",
@@ -1164,6 +1145,13 @@ class Proofhub {
         $people = $this->getPeople($labels);
         $copy = $people;
         //$projects = $this->getProjects($copy, null);
+        $full = false;
+        //return true;
+        $name = 'Total_cuentas_mes_' . time();
+        $ignoreDate = false;
+        //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
+        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name)); 
+        return true;
         $full = true;
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
@@ -1176,12 +1164,7 @@ class Proofhub {
         //$this->getSummary($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name);
         dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name)); 
         //$projects = $this->getProjects($copy, self::CUENTAS);
-        $full = false;
-        //return true;
-        $name = 'Total_cuentas_mes_' . time();
-        $ignoreDate = false;
-        //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name)); 
+        
         return true;
         $projects = $this->getProjects($copy, self::CANADA);
         $full = false;
