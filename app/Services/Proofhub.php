@@ -11,8 +11,8 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2018-11-01';
-    const END_DATE = '2018-12-01';
+    const START_DATE = '2018-08-01';
+    const END_DATE = '2018-09-01'; 
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';

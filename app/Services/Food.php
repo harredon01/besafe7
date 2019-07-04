@@ -290,62 +290,6 @@ class Food {
         }
     }
 
-    public function getStopDetails($results,$stop,$config) {
-        $stopDescription = "";
-        $address = $stop->address;
-        foreach ($stop->deliveries as $stopDel) {
-            $delUser = $stopDel->user;
-            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
-            $descr = $delUser->firstName . " " . $delUser->lastName . " ";
-            $details = json_decode($stopDel->details, true);
-            if (array_key_exists("deliver", $details)) {
-                if ($details['deliver'] == "envase") {
-                    $descr = $descr . "Envase Retornable,  ";
-                    array_push($arrayDel, "Retornable");
-                }
-            } else {
-                array_push($arrayDel, "Desechable");
-            }
-            if (array_key_exists("pickup", $details)) {
-                if ($details['pickup'] == "envase") {
-                    $descr = $descr . "Recoger envase,  ";
-                    array_push($arrayDel, "SI");
-                }
-            } else {
-                array_push($arrayDel, "NO");
-            }
-
-            if (array_key_exists("factura", $details)) {
-                $descr = $descr . "Enviar factura,  ";
-                array_push($arrayDel, "SI");
-            } else {
-                array_push($arrayDel, "NO");
-            }
-            $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
-            $stopDel->region_name = $descr;
-            $delConfig = $config;
-            $dels = [$stopDel];
-            $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
-            $delTotals = $this->printTotalsConfig($delConfig);
-
-            $arrayDel = array_merge($arrayDel, $delTotals['excel']);
-            array_push($arrayDel, $stopDel->observation);
-
-            array_push($results, $arrayDel);
-            $stopDescription = $stopDescription . $descr;
-        }
-
-        if ($stop->stop_order == 1) {
-            $stopDescription = "Recoger los almuerzos de la ruta: " . $stop->route_id;
-            //array_push($arrayStop, $stopDescription);
-        }
-        if ($stop->stop_order == 3) {
-            $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
-            //array_push($arrayStop, $stopDescription);
-        }
-        return ["results" => $results, "description" => $stopDescription];
-    }
-
     public function sendReminder() {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
@@ -355,7 +299,7 @@ class Food {
         $type = "program_reminder";
         $date = $this->getNextValidDate($date);
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 2) {
+        if ($dayofweek == 1) {
             $type = "program_reminder2";
         }
         $tomorrow = date_format($date, "Y-m-d");
@@ -604,8 +548,9 @@ class Food {
             $className2 = "App\\Services\\Basilikum";
             $basilikum = new $className2();
             $totalLunches = 0;
-            $results = [];
+            $pages = [];
             foreach ($routes as $route) {
+                $results = [];
                 $routeConfig = $config;
                 $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
                 array_push($results, $arrayRouteTitle);
@@ -710,12 +655,14 @@ class Food {
                     $delTotals = $this->printTotalsConfig($delConfig);
                     $del->totals = $delTotals;
                 }
+                $page = [
+                    "name" => "Ruta ". $route->provider."-".$route->id,
+                    "rows" => $results
+                ];
+                array_push($pages, $page);
             }
-            $page = [
-                "name" => "Rutas",
-                "rows" => $results
-            ];
-            $file = $this->writeFile([$page], "Rutas" . time());
+
+            $file = $this->writeFile($pages, "Rutas" . time());
             $path = 'exports/' . $file->filename . "." . $file->ext;
             $users = User::whereIn('id', [2, 77])->get();
             Mail::to($users)->send(new RouteDeliver($routes, $path));
@@ -906,7 +853,7 @@ class Food {
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
-        if ($polygon->provider == "Basilikum") {
+        if ($polygon->provider == "Rapigo" && count($deliveries)>0) {
             //dd($deliveries);
         }
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
@@ -1136,7 +1083,7 @@ class Food {
     }
 
     private function addpickupStop(Route $route) {
-        $address = OrderAddress::create([
+        /*$address = OrderAddress::create([
                     "user_id" => 1,
                     "name" => "test",
                     "city_id" => 524,
@@ -1155,7 +1102,7 @@ class Food {
                     "region_name" => "Entregar los envases recogidos",
                     "stop_order" => 3,
                     "details" => json_encode($details)
-        ]);
+        ]);*/
     }
 
     public function completeRoutes($routes) {

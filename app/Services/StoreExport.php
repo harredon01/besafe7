@@ -19,7 +19,7 @@ class StoreExport {
 
     const COMMISION_RATE = 0.1;
     const TAX_RATE = 0.08;
-    const PACKING_COST = 1150;
+    const PACKING_COST = 1450;
     const ORDER_APPORVED_STATUS = 'approved';
     const COMMISION_WO_DISCOUNT = 'Comision antes descuentos';
     const DICOUNT_COMMISION = 'Descuento Comision';

@@ -230,7 +230,7 @@ class Rapigo {
         $route = Route::where("provider_id", $data["key"])->with("deliveries")->first();
         if ($route) {
             $route->status = "transit";
-            $route->save();
+            $route->save(); 
             foreach ($route->deliveries as $delivery) {
                 $delivery->status = "transit";
                 $delivery->save();
