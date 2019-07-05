@@ -2,14 +2,58 @@
 
 namespace App\Services;
 
-use App\Models\Rating;
+use App\Models\Availability;
 use App\Models\Favorite;
 use App\Models\User;
 use Validator;
 
 class EditBooking {
 
-    private function checkAvailable($type, $id) {
+    const MODEL_PATH = 'App\\Models\\';
+
+    private function checkAvailable(array $data) {
+        $from = $date['from'];
+        $to = $date['to'];
+        $dayofweek = date('w', strtotime($from));
+        $dayName = "";
+        if ($dayofweek == 1) {
+            $dayName = "monday";
+        } else if ($dayofweek == 2) {
+            $dayName = "tuesday";
+        } else if ($dayofweek == 3) {
+            $dayName = "wednesday";
+        } else if ($dayofweek == 4) {
+            $dayName = "thursday";
+        } else if ($dayofweek == 5) {
+            $dayName = "friday";
+        } else if ($dayofweek == 6) {
+            $dayName = "saturday";
+        } else if ($dayofweek == 0) {
+            $dayName = "sunday";
+        }
+
+        $availabilities = Availability::where("range", $dayName)->get();
+        if (count($availabilities) > 0) {
+            $dateFrom = date_create($from);
+            $fromString = "2019-01-01 " . date_format($dateFrom, "H:i:s");
+            $dateTimestampFrom = strtotime($fromString);
+            $dateTo = date_create($to);
+            $toString = "2019-01-01 " . date_format($dateTo, "H:i:s");
+            $dateTimestampTo = strtotime($toString);
+            foreach ($availabilities as $av) {
+                $dateFrom = date_create($av->from);
+                $fromString = "2019-01-01 " . date_format($dateFrom, "H:i:s");
+                $dateTimestampUpper = strtotime($fromString);
+                $dateTo = date_create($av->to);
+                $toString = "2019-01-01 " . date_format($dateTo, "H:i:s");
+                $dateTimestampLower = strtotime($toString);
+                if ($dateTimestampFrom < $dateTimestampUpper && $dateTimestampFrom > $dateTimestampLower && $dateTimestampTo < $dateTimestampUpper && $dateTimestampTo > $dateTimestampLower) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         return true;
     }
 
@@ -19,17 +63,77 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function addBookingObject(array $data, User $user) {
-        $result = $this->checkAvailable($data['type'], $data['object_id']);
-        if ($result) {
-            $type = $data['type'];
-            $class = "App\\Models\\" . $type;
-            if (class_exists($class)) {
-                $object = $class::find($data['object_id']);
-                if ($object) {
-                    
+        $validator = $this->validatorCreateBooking($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                $result = $this->checkAvailable($data);
+                if ($result) {
+                    $object->newBooking($user, $data['from'], $data['to']);
+                    return response()->json(array("status" => "success", "message" => "Booking created"));
                 }
+                return response()->json(array("status" => "error", "message" => "Not available"));
             }
         }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function addAvailabilityObject(array $data, User $user) {
+        $validator = $this->validatorCreateAvailability($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                $result = $this->checkAvailable($data);
+                if ($result) {
+                    $serviceBooking = Availability();
+                    $serviceBooking->make(['range' => 'monday', 'from' => '08:00 am', 'to' => '12:30 pm', 'is_bookable' => true])
+                            ->bookable()->associate($object)
+                            ->save();
+                    return response()->json(array("status" => "success", "message" => "Availability created"));
+                }
+                return response()->json(array("status" => "error", "message" => "Not available"));
+            }
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getBookingsObject(array $data, User $user) {
+        $validator = $this->validatorGetBookings($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = "App\\Models\\" . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                if ($user->id == $object->user_id) {
+                    return response()->json(array("status" => "success", "message" => "", "data" => $object->bookingsStartsBetween($data['from'], $data['to'])->get()));
+                }
+                return response()->json(array("status" => "error", "message" => "Access denied"), 400);
+            }
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
     }
     
     /**
@@ -37,18 +141,20 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function getBookingsObject(array $data, User $user) {
-        $result = $this->checkAvailable($data['type'], $data['object_id']);
-        if ($result) {
-            $type = $data['type'];
-            $class = "App\\Models\\" . $type;
-            if (class_exists($class)) {
-                $object = $class::find($data['object_id']);
-                if ($object) {
-                    
-                }
+    public function getAvailabilitiesObject(array $data ) {
+        $validator = $this->validatorGetBookings($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = "App\\Models\\" . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                return response()->json(array("status" => "success", "message" => "", "data" => $object->availabilities));
             }
         }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
     }
 
     /**
@@ -68,7 +174,35 @@ class EditBooking {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorBooking() {
+    public function validatorGetBookings() {
+        return [
+            'type' => 'required|max:255',
+            'object_id' => 'required|max:255',
+            'from' => 'required|max:255',
+            'to' => 'required|max:255',
+        ];
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorCreateBooking() {
+        return [
+            'type' => 'required|max:255',
+            'object_id' => 'required|integer|min:1',
+        ];
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorCreateAvailability() {
         return [
             'type' => 'required|max:255',
             'object_id' => 'required|integer|min:1',
