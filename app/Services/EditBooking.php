@@ -32,7 +32,7 @@ class EditBooking {
             $dayName = "sunday";
         }
 
-        $availabilities = Availability::where("range", $dayName)->get();
+        $availabilities = Availability::where("range", $dayName)->where("bookable_type",self::MODEL_PATH .$data['type'] )->where("bookable_id",$data['object_id'])->get();
         if (count($availabilities) > 0) {
             $dateFrom = date_create($from);
             $fromString = "2019-01-01 " . date_format($dateFrom, "H:i:s");
@@ -48,7 +48,16 @@ class EditBooking {
                 $toString = "2019-01-01 " . date_format($dateTo, "H:i:s");
                 $dateTimestampLower = strtotime($toString);
                 if ($dateTimestampFrom < $dateTimestampUpper && $dateTimestampFrom > $dateTimestampLower && $dateTimestampTo < $dateTimestampUpper && $dateTimestampTo > $dateTimestampLower) {
-                    return true;
+                    $type = $data['type'];
+                    $class = self::MODEL_PATH . $type;
+                    $object = $class::find($data['object_id']);
+                    $results = $object->bookingsStartsBetween($data['from'], $data['to'])->get();
+                    if(count($results)>0){
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    
                 }
             }
 
@@ -135,13 +144,13 @@ class EditBooking {
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
-    
+
     /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
-    public function getAvailabilitiesObject(array $data ) {
+    public function getAvailabilitiesObject(array $data) {
         $validator = $this->validatorGetBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -193,6 +202,8 @@ class EditBooking {
         return [
             'type' => 'required|max:255',
             'object_id' => 'required|integer|min:1',
+            'from' => 'required|max:255',
+            'to' => 'required|max:255',
         ];
     }
 
