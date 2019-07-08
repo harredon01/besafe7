@@ -18,7 +18,7 @@
         "laravel/passport": "^7.0",
         "barryvdh/laravel-cors": "^0.11.1",
         "predis/predis": "^1.1",
-        "laravel/scout": "^3.0",
+        "laravel/scout": "^7.0",
         "algolia/algoliasearch-client-php": "^1.16",
         "laravel/cashier": "~9.0",
         "stripe/stripe-php": "6.*",
@@ -28,7 +28,8 @@
         "google/apiclient": "^2.0",
         "fideloper/proxy": "^4.1",
         "phpoffice/phpspreadsheet": "^1.6",
-        "rinvex/laravel-bookings": "^2.1"
+        "rinvex/laravel-bookings": "^2.1",
+        "yab/laravel-scout-mysql-driver": "^2.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
