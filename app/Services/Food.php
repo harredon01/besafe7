@@ -533,6 +533,63 @@ class Food {
         }
         return true;
     }
+    
+    public function getStopDetails($results,$stop,$config) {
+        $stopDescription = "";
+        $address = $stop->address;
+        foreach ($stop->deliveries as $stopDel) {
+            $delUser = $stopDel->user;
+            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
+            $descr = $delUser->firstName . " " . $delUser->lastName . " ";
+            $details = json_decode($stopDel->details, true);
+            if (array_key_exists("deliver", $details)) {
+                if ($details['deliver'] == "envase") {
+                    $descr = $descr . "Envase Retornable,  ";
+                    array_push($arrayDel, "Retornable");
+                }
+            } else {
+                array_push($arrayDel, "Desechable");
+            }
+            if (array_key_exists("pickup", $details)) {
+                if ($details['pickup'] == "envase") {
+                    $descr = $descr . "Recoger envase,  ";
+                    array_push($arrayDel, "SI");
+                }
+            } else {
+                array_push($arrayDel, "NO");
+            }
+
+            if (array_key_exists("factura", $details)) {
+                $descr = $descr . "Enviar factura,  ";
+                array_push($arrayDel, "SI");
+            } else {
+                array_push($arrayDel, "NO");
+            }
+            $descr = $descr . "Entregar id: " . $stopDel->id . ".  ";
+            $stopDel->region_name = $descr;
+            $delConfig = $config;
+            $dels = [$stopDel];
+            $delConfig['father'] = $this->countConfigElements($dels, $delConfig);
+            $delTotals = $this->printTotalsConfig($delConfig);
+
+            $arrayDel = array_merge($arrayDel, $delTotals['excel']);
+            array_push($arrayDel, $stopDel->observation);
+
+            array_push($results, $arrayDel);
+            $stopDescription = $stopDescription . $descr;
+        }
+
+        if ($stop->stop_order == 1) {
+            $stopDescription = "Recoger los almuerzos de la ruta: " . $stop->route_id;
+            //array_push($arrayStop, $stopDescription);
+        }
+        if ($stop->stop_order == 3) {
+            $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
+            //array_push($arrayStop, $stopDescription);
+        }
+        return ["results" => $results, "description" => $stopDescription];
+    }
+
 
     public function buildScenarioLogistics(array $input) {
         //$input['status'] = "scheduled";
@@ -1637,7 +1694,7 @@ class Food {
                     $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                     $delivery->save();
                 } else {
-                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
+                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00"; 
                 }
                 if ($delivery2) {
                     $tempAttrs = $delivery2->details;
