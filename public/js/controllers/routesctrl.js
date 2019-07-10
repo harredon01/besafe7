@@ -175,14 +175,16 @@
                 $scope.regionVisible = false;
                 $scope.cityVisible = false;
             }
-            $scope.updateRouteStop = function (stop, route_id) {
-                for (item in $scope.routes) {
-                    if ($scope.routes[item].id == stop.route_id) {
-                        $scope.routes.splice(item, 1);
-                        $scope.routes.push(address);
-                    }
-                }
-                Routes.updateRouteStop(stop, route_id).then(function (data) {
+            $scope.updateRouteStop = function (stop) {
+                Routes.updateRouteStop(stop.id, stop.route_id).then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.sendStopToNewRoute = function (stop) {
+                Routes.sendStopToNewRoute(stop).then(function (data) {
 
                 },
                         function (data) {

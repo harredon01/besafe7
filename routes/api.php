@@ -185,8 +185,8 @@ Route::patch('food/zones/{item?}', 'FoodApiController@updateZoneItem');
 Route::post('food/zones', 'FoodApiController@createZoneItem');
 Route::delete('food/messages/{item?}', 'FoodApiController@deleteMessageItem');
 Route::get('food/build_route_id/{id?}', 'FoodApiController@buildScenarioRouteId');
-Route::get('food/build_complete_scenario/{scenario?}', 'FoodApiController@buildCompleteScenario');
-Route::get('food/build_scenario_positive/{scenario?}', 'FoodApiController@buildScenarioPositive');
+Route::get('food/build_complete_scenario/{scenario?}/{provider?}', 'FoodApiController@buildCompleteScenario');
+Route::get('food/build_scenario_positive/{scenario?}/{provider?}', 'FoodApiController@buildScenarioPositive');
 Route::get('food/get_scenario_structure', 'FoodApiController@getScenarioStructure');
 Route::post('food/build_scenario_logistics', 'FoodApiController@buildScenarioLogistics');
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
@@ -240,6 +240,7 @@ Route::post('ratings', 'RatingController@postAddRatingObject');
 Route::get('routes', 'RouteController@index');
 Route::post('routes/{code?}/build', 'RouteController@buildRoute');
 Route::post('routes/{code?}/stop/{stop?}', 'RouteController@updateRouteStop');
+Route::post('routes/stop/{stop?}', 'RouteController@sendStopToNewRoute');
 
 Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');

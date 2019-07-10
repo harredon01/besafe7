@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 use Exception;
-use App\Services\Food;
+use App\Services\Routing;
 use App\Services\EditAlerts;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -32,8 +32,8 @@ class RegenerateScenarios implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(Food $food, EditAlerts $editAlerts) {
-        $food->regenerateScenarios();
+    public function handle(Routing $routing, EditAlerts $editAlerts) {
+        $routing->regenerateScenarios();
         $payload = [ ];
         $user = User::find(2);
         $followers = [$user];

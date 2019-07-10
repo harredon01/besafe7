@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Exception;
 use App\Services\Routing;
 use App\Models\User;
@@ -12,22 +13,26 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class BuildScenarioRouteId implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+class BuildScenarioRouteId implements ShouldQueue {
+
+    use Dispatchable,
+        InteractsWithQueue,
+        Queueable,
+        SerializesModels;
 
     protected $id;
     protected $hash;
+    protected $check;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($id, $hash )
-    {
+    public function __construct($id, $hash,$check) {
         $this->id = $id;
         $this->hash = $hash;
+        $this->check = $check;
     }
 
     /**
@@ -35,14 +40,18 @@ class BuildScenarioRouteId implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Routing $routing,EditAlerts $editAlerts)
-    {
+    public function handle(Routing $routing, EditAlerts $editAlerts) {
         $routes = Route::where("id", $this->id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $routing->checkScenario($routes, $this->hash);
-        if ($checkResult) {
+        if ($this->check) {
+            $checkResult = $routing->checkScenario($routes, $this->hash);
+            if ($checkResult) {
+                $routing->buildScenarioTransit($routes);
+            }
+        } else {
             $routing->buildScenarioTransit($routes);
         }
-        $payload = ["route"=> $this->id ];
+
+        $payload = ["route" => $this->id];
         $user = User::find(2);
         $followers = [$user];
         $data = [
@@ -58,16 +67,15 @@ class BuildScenarioRouteId implements ShouldQueue
         $date = date("Y-m-d H:i:s");
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
-    
+
     /**
      * The job failed to process.
      *
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception)
-    {
-        $payload = ["route"=> $this->id ];
+    public function failed(Exception $exception) {
+        $payload = ["route" => $this->id];
         $user = User::find(2);
         $followers = [$user];
         $data = [
@@ -85,4 +93,5 @@ class BuildScenarioRouteId implements ShouldQueue
         $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
+
 }

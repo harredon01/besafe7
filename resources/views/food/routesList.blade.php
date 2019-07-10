@@ -53,7 +53,8 @@
                     </table>
                     </td>
                     <td><input type="tel" name="Route" ng-model="stop.route_id" ng-show="stop.amount>0"/>
-                    <button ng-click="updateRouteStop()" ng-show="stop.amount>0">Actualizar</button></td>
+                    <button ng-click="updateRouteStop(stop)" ng-show="stop.amount>0">Actualizar</button></td>
+                    <td><button ng-click="sendStopToNewRoute(stop.id)" ng-show="stop.amount>0">Nueva Ruta</button></td>
                 </tr>
             </table>
             <!--ul>

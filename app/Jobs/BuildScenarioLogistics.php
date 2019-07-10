@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use App\Models\User;
 use Exception;
-use App\Services\Food;
+use App\Services\Routing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,12 +33,12 @@ class BuildScenarioLogistics implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food)
+    public function handle(Routing $routing)
     {
         if(!$this->user){
             $this->user = User::find(2);
         }
-        $food->buildScenarioLogistics($this->data); 
+        $routing->buildScenarioLogistics($this->data); 
     }
     
     /**

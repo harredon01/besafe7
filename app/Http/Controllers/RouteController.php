@@ -7,7 +7,7 @@ use App\Models\Stop;
 use App\Models\Delivery;
 use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
-use App\Services\Food;
+use App\Services\Routing;
 
 class RouteController extends Controller
 {
@@ -15,16 +15,17 @@ class RouteController extends Controller
      * The edit profile implementation.
      *
      */
-    protected $food;
+    protected $routing;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Food $food ) {
+    public function __construct(Routing $routing ) {
         $this->middleware('auth:api');
-        $this->food = $food;
+        $this->middleware('admin');
+        $this->routing = $routing;
     }
     /**
      * Display a listing of the resource.
@@ -123,13 +124,26 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function updateRouteStop(Request $request,$route,$stop)
+    public function updateRouteStop($route,$stop)
     {
-        $user = $request->user();
-        $stopContainer = Stop::find($stop);
-        $oldRoute = $stop->route;
-        $newRoute = Route::find($route);
-        $stop->route_id = $newRoute->id;
-        $stop->save();
+        $this->routing->updateRouteStop($route, $stop);
+        return response()->json([
+                    'status' => "success",
+                    'message' => "Stop updated"
+                        ]);
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function sendStopToNewRoute($stop)
+    {
+        $this->routing->sendStopToNewRoute($stop);
+        return response()->json([
+                    'status' => "success",
+                    'message' => "Stop added to new route"
+                        ]);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use App\Models\User;
 use Exception;
-use App\Services\Food;
+use App\Services\Routing;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -35,9 +35,9 @@ class GetScenarioStructure implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food)
+    public function handle(Routing $routing)
     {
-        $data = $food->getTotalEstimatedShipping($this->data); 
+        $data = $routing->getTotalEstimatedShipping($this->data); 
         if(!$this->user){
             $this->user = User::find(2);
         }

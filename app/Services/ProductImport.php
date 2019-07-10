@@ -59,13 +59,6 @@ class ProductImport {
         }
     }
 
-    public function checkUser(User $user) {
-        if ($user->id == 1 || $user->id == 2 || $user->id == 3) {
-            return true;
-        }
-        return false;
-    }
-
     public function importVariants($path) {
         $excel = Excel::load($path);
         $reader = $excel->toArray();

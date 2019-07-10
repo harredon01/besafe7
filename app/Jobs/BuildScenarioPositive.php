@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Jobs;
+
 use Exception;
 use App\Services\Routing;
 use App\Services\EditAlerts;
@@ -11,25 +12,28 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class BuildScenarioPositive implements ShouldQueue
-{
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+class BuildScenarioPositive implements ShouldQueue {
+
+    use Dispatchable,
+        InteractsWithQueue,
+        Queueable,
+        SerializesModels;
 
     protected $scenario;
     protected $provider;
     protected $hash;
+    protected $check;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($scenario,$provider, $hash )
-    {
+    public function __construct($scenario, $provider, $hash,$check) {
         $this->scenario = $scenario;
         $this->provider = $provider;
         $this->hash = $hash;
-
+        $this->check = $check;
     }
 
     /**
@@ -37,15 +41,20 @@ class BuildScenarioPositive implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Routing $routing, EditAlerts $editAlerts)
-    {
+    public function handle(Routing $routing, EditAlerts $editAlerts) {
         $routes = Route::where("type", $this->scenario)->where("status", "pending")->where("provider", $this->provider)->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $routing->checkScenario($routes, $this->hash);
-        if ($checkResult) {
+        if ($this->check) {
+            $checkResult = $routing->checkScenario($routes, $this->hash);
+            if ($checkResult) {
+                $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("provider", $this->provider)->where("type", $this->scenario)->with(['deliveries.user'])->orderBy('id')->get();
+                $routing->buildScenarioTransit($routes);
+            }
+        } else {
             $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("provider", $this->provider)->where("type", $this->scenario)->with(['deliveries.user'])->orderBy('id')->get();
             $routing->buildScenarioTransit($routes);
         }
-        $payload = ["scenario"=> $this->scenario." positivos" ];
+
+        $payload = ["scenario" => $this->scenario . " positivos"];
         $user = User::find(2);
         $followers = [$user];
         $data = [
@@ -61,16 +70,15 @@ class BuildScenarioPositive implements ShouldQueue
         $date = date("Y-m-d H:i:s");
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
-    
+
     /**
      * The job failed to process.
      *
      * @param  Exception  $exception
      * @return void
      */
-    public function failed(Exception $exception)
-    {
-        $payload = ["scenario"=> $this->scenario." positivos"  ];
+    public function failed(Exception $exception) {
+        $payload = ["scenario" => $this->scenario . " positivos"];
         $user = User::find(2);
         $followers = [$user];
         $data = [
@@ -88,4 +96,5 @@ class BuildScenarioPositive implements ShouldQueue
         $editAlerts = new $className;
         $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
     }
+
 }

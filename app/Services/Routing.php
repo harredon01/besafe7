@@ -42,6 +42,46 @@ class Routing {
         }
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function updateRouteStop($route, $stopContainer) {
+        $stop = Stop::find($stopContainer);
+        $oldRoute = $stop->route;
+        $oldRoute->unit--;
+        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
+        $oldRoute->save();
+        $newRoute = Route::find($route);
+        $newRoute->unit++;
+        $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
+        $newRoute->save();
+        $stop->route_id = $newRoute->id;
+        $stop->save();
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function sendStopToNewRoute($stopContainer) {
+        $stop = Stop::find($stopContainer);
+        $oldRoute = $stop->route;
+        $oldRoute->unit--;
+        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
+        $oldRoute->save();
+        $newRoute = $this->createNewRoute($oldRoute->type, $oldRoute->provider);
+        $newRoute->unit++;
+        $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
+        $newRoute->save();
+        $stop->route_id = $newRoute->id;
+        $stop->save();
+        return $newRoute;
+    }
+
     private function calculateRoutesShipping($routes) {
         $totalCost = 0;
         $totalIncomeShipping = 0;
@@ -204,13 +244,6 @@ class Routing {
             }
         }
         $this->getShippingCosts($user, "pending");
-    }
-
-    public function checkUser(User $user) {
-        if ($user->id == 1 || $user->id == 2 || $user->id == 3) {
-            return true;
-        }
-        return false;
     }
 
     public function buildScenarioTransit($routes) {
@@ -458,9 +491,8 @@ class Routing {
         }
     }
 
-    private function addToNewRouteAndStop($save, $scenario, $stopContainer, $shipping) {
+    private function createNewRoute($scenario, $shipping) {
         $route = new Route();
-        $routestops = [$stopContainer];
         $route->status = 'pending';
         $route->description = $scenario;
         $route->type = $scenario;
@@ -474,84 +506,67 @@ class Routing {
         ];
         $serviceBookResponse["location"] = $location;
         $route->coverage = json_encode($serviceBookResponse);
-        $route->unit = $stopContainer['amount'];
+        $route->unit = 0;
         $route->height = 1;
+        $route->unit_price = 0;
+        $route->save();
+        $address = OrderAddress::create([
+                    "user_id" => 1,
+                    "name" => "test",
+                    "city_id" => 524,
+                    "region_id" => 11,
+                    "country_id" => 1,
+                    "address" => "Carrera 58 D # 130 A - 43",
+                    "lat" => 4.721717,
+                    "long" => -74.069855,
+                    "phone" => "3202261525"
+        ]);
+        $details = ["pickups" => []];
+
+        Stop::create([
+            "address_id" => $address->id,
+            "amount" => 0,
+            "shipping" => 0,
+            "route_id" => $route->id,
+            "stop_order" => 1,
+            "details" => json_encode($details),
+            "region_name" => "Recoger los almuerzos de la ruta " . $route->id,
+        ]);
+        return $route;
+    }
+
+    private function addToNewRouteAndStop($scenario, $stopContainer, $shipping) {
+        $route = $this->createNewRoute($scenario, $shipping);
+        $route->unit = $stopContainer['amount'];
         $route->unit_price = $stopContainer['shipping'];
-        if ($save) {
-            $route->save();
-            $address = OrderAddress::create([
-                        "user_id" => 1,
-                        "name" => "test",
-                        "city_id" => 524,
-                        "region_id" => 11,
-                        "country_id" => 1,
-                        "address" => "Carrera 58 D # 130 A - 43",
-                        "lat" => 4.721717,
-                        "long" => -74.069855,
-                        "phone" => "3202261525"
-            ]);
-            $details = ["pickups" => []];
-
-            $firstStop = Stop::create([
-                        "address_id" => $address->id,
-                        "amount" => 0,
-                        "shipping" => 0,
-                        "route_id" => $route->id,
-                        "stop_order" => 1,
-                        "details" => json_encode($details),
-                        "region_name" => "Recoger los almuerzos de la ruta " . $route->id,
-            ]);
-
-            $details['pickups'] = $stopContainer["pickups"];
-            $stopCreated = Stop::create([
-                        "address_id" => $stopContainer["address_id"],
-                        "amount" => $stopContainer["amount"],
-                        "shipping" => $stopContainer['shipping'],
-                        "route_id" => $route->id,
-                        "stop_order" => 2,
-                        "details" => json_encode($details)
-            ]);
-            foreach ($stopContainer["deliveries"] as $del) {
-                $realDel = Delivery::find($del->id);
-                $stopCreated->deliveries()->save($realDel);
-                $route->deliveries()->save($realDel);
-            }
-        } else {
-            $route->stops2 = $routestops;
-            $route->deliveries2 = $stopContainer["deliveries"];
+        $details['pickups'] = $stopContainer["pickups"];
+        $stopCreated = Stop::create([
+                    "address_id" => $stopContainer["address_id"],
+                    "amount" => $stopContainer["amount"],
+                    "shipping" => $stopContainer['shipping'],
+                    "route_id" => $route->id,
+                    "stop_order" => 2,
+                    "details" => json_encode($details)
+        ]);
+        foreach ($stopContainer["deliveries"] as $del) {
+            $realDel = Delivery::find($del->id);
+            $stopCreated->deliveries()->save($realDel);
+            $route->deliveries()->save($realDel);
         }
         return $route;
     }
 
-    private function addStopToRoute(Route $route, $save, $stopContainer) {
+    private function addStopToRoute(Route $route, $stopContainer) {
         $route->unit += $stopContainer['amount'];
         $route->unit_price += $stopContainer['shipping'];
-        if ($save) {
-            $itemSavedStop = $route->stops()->where("address_id", $stopContainer["address_id"])->where("route_id", $route->id)->where("stop_order", 2)->first();
-            if ($itemSavedStop) {
-                $this->addToExistingStop($itemSavedStop, $route, $stopContainer);
-            } else {
-                $this->addToNewStop($route, $stopContainer);
-            }
-            $route->height++;
-            $route->save();
+        $itemSavedStop = $route->stops()->where("address_id", $stopContainer["address_id"])->where("route_id", $route->id)->where("stop_order", 2)->first();
+        if ($itemSavedStop) {
+            $this->addToExistingStop($itemSavedStop, $route, $stopContainer);
         } else {
-            $routeStops = $route->stops2;
-            $foundInRoutes = false;
-            foreach ($routeStops as $rts) {
-                if ($rts['address_id'] == $stopContainer["address_id"]) {
-                    $foundInRoutes = true;
-                    $key = array_search($rts, $routeStops);
-                    $routeStops[$key]['amount'] += $stopContainer['amount'];
-                }
-            }
-            if (!$foundInRoutes) {
-                array_push($routeStops, $stopContainer);
-                $route->height++;
-            }
-            $route->stops2 = $routeStops;
-            $route->deliveries2 = array_merge($route->deliveries2, $stopContainer["deliveries"]);
+            $this->addToNewStop($route, $stopContainer);
         }
+        $route->height++;
+        $route->save();
     }
 
     /**
@@ -570,12 +585,12 @@ class Routing {
 
                 if (($available > 0 && $available >= $stopContainer['amount']) && !$found) {
                     $found = true;
-                    $this->addStopToRoute($route, $save, $stopContainer);
+                    $this->addStopToRoute($route, $stopContainer);
                     break;
                 }
             }
             if ($found == false) {
-                $route = $this->addToNewRouteAndStop($save, $scenario, $stopContainer, $shipping);
+                $route = $this->addToNewRouteAndStop($scenario, $stopContainer, $shipping);
                 array_unshift($routes, $route);
             }
         }
@@ -590,6 +605,9 @@ class Routing {
     }
 
     private function addpickupStop(Route $route) {
+        if($route->provider=="Basilikum"){
+            return;
+        }
         $addStop = true;
         foreach ($route->stops as $stop) {
             $address = $stop->address;

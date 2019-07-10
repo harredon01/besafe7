@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Models\User;
-use App\Services\Food;
+use App\Services\Routing;
 use App\Services\EditAlerts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -38,10 +38,9 @@ class GetScenariosShippingCosts implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Food $food)
+    public function handle(Routing $routing)
     {
-        $data = $food->getShippingCosts($this->user,$this->status); 
-        
+        $routing->getShippingCosts($this->user,$this->status); 
     }
     
     /**
