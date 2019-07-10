@@ -40,10 +40,10 @@ class MerchantTableSeeder extends Seeder {
 
     public function run() {
 //        $this->cleanPhones();
-        $this->createConditions();
+        //$this->createConditions();
 //        $this->createProducts();
-//        $this->createExcel();
-        $this->createMerchants();
+        $this->createExcel();
+        //$this->createMerchants();
     }
 
     public function createProducts() {
@@ -191,7 +191,186 @@ class MerchantTableSeeder extends Seeder {
     }
 
     public function createExcel() {
-        
+        $dentists = Category::create(array(
+                    'name' => "Dentists",
+                    'type' => 'merchants',
+                    'level' => '1', 
+                    'description' => 'tend to peoples teeth',
+        ));
+        $dermatologist = Category::create(array(
+                    'name' => "Dermatologists",
+                    'type' => 'merchants',
+                    'level' => '1',
+                    'description' => 'tend to peoples skin',
+        ));
+        $oftalmologists = Category::create(array(
+                    'name' => "Oftalmologists",
+                    'type' => 'merchants',
+                    'level' => '1',
+                    'description' => 'tend to peoples eyes',
+        ));
+        $drdentist = Merchant::create(array(
+                    'name' => "Dr dentist",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drdentist->categories()->save($dentists);
+        $drdentist2 = Merchant::create(array(
+                    'name' => "Dr dentist2",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drdentist2->categories()->save($dentists);
+        $drdentist3 = Merchant::create(array(
+                    'name' => "Dr dentist3",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drdentist3->categories()->save($dentists);
+        $drderma = Merchant::create(array(
+                    'name' => "Dr derma",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drderma->categories()->save($dermatologist);
+        $drderma2 = Merchant::create(array(
+                    'name' => "Dr derma2",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drderma2->categories()->save($dermatologist);
+        $drderma3 = Merchant::create(array(
+                    'name' => "Dr derma3",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drderma3->categories()->save($dermatologist);
+        $drofta = Merchant::create(array(
+                    'name' => "Dr ofta",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drofta->categories()->save($oftalmologists);
+        $drofta2 = Merchant::create(array(
+                    'name' => "Dr ofta2",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drofta2->categories()->save($oftalmologists);
+        $drofta3 = Merchant::create(array(
+                    'name' => "Dr ofta3",
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor dentista",
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'status' => "active"
+        ));
+        $drofta3->categories()->save($oftalmologists);
     }
 
     public function createMerchants() {
