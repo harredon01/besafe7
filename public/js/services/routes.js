@@ -41,7 +41,7 @@ angular.module('besafe')
                 /**/
             }
 
-            var updateRouteStops = function (route_id,stop_id) {
+            var updateRouteStop = function (route_id,stop_id) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
@@ -73,11 +73,28 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var addReturnStop = function (route_id) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: "/api/routes/"+route_id+"/return",
+                        data: {}, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to sendStopToNewRoute");
+                        });
+                return def.promise;
+                /**/
+            }
 
             return {
                 getRoutes:getRoutes,
                 sendStopToNewRoute:sendStopToNewRoute,
                 buildRoute:buildRoute,
-                updateRouteStops:updateRouteStops
+                addReturnStop:addReturnStop,
+                updateRouteStop:updateRouteStop
             };
         })

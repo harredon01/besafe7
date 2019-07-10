@@ -205,4 +205,25 @@ class FoodController extends Controller {
         }
         $this->food->reprogramDeliveries();
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getRoutes() {
+        $user = $this->auth->user();
+
+        return view('food.routesDashboard')->with('user', $user);
+    }
+     
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getLargestAddresses() {
+        $user = $this->auth->user();
+
+        return view('food.addressesDashboard')->with('user', $user);
+    }
 }

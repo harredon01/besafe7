@@ -239,6 +239,7 @@ Route::post('ratings', 'RatingController@postAddRatingObject');
 
 Route::get('routes', 'RouteController@index');
 Route::post('routes/{code?}/build', 'RouteController@buildRoute');
+Route::post('routes/{code?}/return', 'RouteController@addReturnStop');
 Route::post('routes/{code?}/stop/{stop?}', 'RouteController@updateRouteStop');
 Route::post('routes/stop/{stop?}', 'RouteController@sendStopToNewRoute');
 

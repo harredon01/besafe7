@@ -191,6 +191,14 @@
 
                         });
             }
+            $scope.addReturnStop = function (route) {
+                Routes.addReturnStop(route).then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
             $scope.buildRoute = function (route) {
                 Food.buildScenarioRouteId(route.id).then(function (data) {
                     route.status = "scheduled";

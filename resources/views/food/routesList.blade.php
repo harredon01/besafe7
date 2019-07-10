@@ -30,6 +30,9 @@
                     <td>
                         Acciones
                     </td>
+                    <td>
+                        Acciones
+                    </td>
                 </tr>
                 <tr ng-repeat="stop in route.stops">
                     <td>
@@ -88,6 +91,7 @@
             </ul-->
             <br/><a href="javascript:;" ng-click="buildRoute(route)" class="editar">Construir</a>
             <br/><br/><a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
+            <br/><br/><a href="javascript:;" ng-click="addReturnStop(route.id)" class="editar">addReturnStop</a>
         </li>
         <li ng-show="showMore">
             <button ng-click="getRoutes()">Cargar mas</button>

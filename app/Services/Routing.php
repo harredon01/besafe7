@@ -59,7 +59,13 @@ class Routing {
         $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
-        $stop->save();
+        
+        $stopContainer = $stop->toArray();
+        unset($stopContainer['id']);
+        $newStop = Stop::create($stopContainer);
+        DB::statement( "UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
+        DB::statement( "UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id ;");
+        $stop->delete();
     }
     /**
      * Remove the specified resource from storage.
@@ -78,7 +84,13 @@ class Routing {
         $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
-        $stop->save();
+        $stopContainer = $stop->toArray();
+        unset($stopContainer['id']);
+        $newStop = Stop::create($stopContainer);
+        DB::statement( "UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
+        DB::statement( "UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id ;");
+        $stop->delete();
+        
         return $newRoute;
     }
 

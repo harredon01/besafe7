@@ -9,8 +9,8 @@ use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
 use App\Services\Routing;
 
-class RouteController extends Controller
-{
+class RouteController extends Controller {
+
     /**
      * The edit profile implementation.
      *
@@ -22,18 +22,18 @@ class RouteController extends Controller
      *
      * @return void
      */
-    public function __construct(Routing $routing ) {
+    public function __construct(Routing $routing) {
         $this->middleware('auth:api');
         $this->middleware('admin');
         $this->routing = $routing;
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         //$request2 = $this->cleanSearch->handle($request);
         if (true) {
             $queryBuilder = new QueryBuilder(new Route, $request);
@@ -57,8 +57,7 @@ class RouteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -68,8 +67,7 @@ class RouteController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         //
     }
 
@@ -79,8 +77,7 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function show(Route $route)
-    {
+    public function show(Route $route) {
         //
     }
 
@@ -90,8 +87,7 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function edit(Route $route)
-    {
+    public function edit(Route $route) {
         //
     }
 
@@ -102,8 +98,7 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Route $route)
-    {
+    public function update(Request $request, Route $route) {
         //
     }
 
@@ -113,37 +108,57 @@ class RouteController extends Controller
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Route $route)
-    {
+    public function destroy(Route $route) {
         //
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function updateRouteStop($route,$stop)
-    {
+    public function updateRouteStop($stop, $route) {
         $this->routing->updateRouteStop($route, $stop);
         return response()->json([
                     'status' => "success",
                     'message' => "Stop updated"
-                        ]);
+        ]);
     }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function sendStopToNewRoute($stop)
-    {
+    public function sendStopToNewRoute($stop) {
         $this->routing->sendStopToNewRoute($stop);
         return response()->json([
                     'status' => "success",
                     'message' => "Stop added to new route"
-                        ]);
+        ]);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function addReturnStop($routeId) {
+        $route = Route::find($routeId);
+        if ($route) {
+            $this->routing->completeRoutes([$route]);
+            return response()->json([
+                        'status' => "success",
+                        'message' => "Stop added to new route"
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "route not found"
+        ]);
+    }
+
 }
