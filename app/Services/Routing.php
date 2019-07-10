@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\User;
+use App\Models\User; 
 use App\Models\Article;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
@@ -56,7 +56,7 @@ class Routing {
         $oldRoute->save();
         $newRoute = Route::find($route);
         $newRoute->unit++;
-        $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
+        $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
         
@@ -81,7 +81,7 @@ class Routing {
         $oldRoute->save();
         $newRoute = $this->createNewRoute($oldRoute->type, $oldRoute->provider);
         $newRoute->unit++;
-        $newRoute->unit_price = $oldRoute->unit_price + $stop->shipping;
+        $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
         $stopContainer = $stop->toArray();
@@ -112,8 +112,10 @@ class Routing {
         foreach ($routes as $route) {
             $stops = $route->stops;
             $queryStops = [];
+            $income = 0;
             $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             foreach ($stops as $stop) {
+                $income +=$stop->shipping;
                 $address = $stop->address;
                 $querystop = [
                     "address" => $address->address,
@@ -131,6 +133,7 @@ class Routing {
             if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
                 $routeCost = $rapigoResponse['price'];
             }
+            $route->unit_price = $income;
             $route->unit_cost = $routeCost;
             $route->save();
             $route->hash = $this->generateHash($route->id, $route->created_at);
