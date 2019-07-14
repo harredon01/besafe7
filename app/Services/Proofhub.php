@@ -17,7 +17,7 @@ class Proofhub {
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = true;
+    const IS_ADMIN = false;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;

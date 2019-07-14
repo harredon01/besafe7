@@ -11,12 +11,13 @@ use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
 use App\Models\Rating;
+use App\Models\Availability;
 use Illuminate\Http\Response;
 use DB;
 use Cache;
 
 class EditMapObject {
-
+    const MODEL_PATH = 'App\\Models\\';
     const OBJECT_REPORT_GROUP = 'Report_Group';
     const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
     const OBJECT_REPORT_ACCESS_GROUP = 'Report_Access_Group';
@@ -127,31 +128,57 @@ class EditMapObject {
      * @return Response
      */
     public function getObjectUser(User $user, $objectId, $type) {
-
-        $data = Cache::remember($type . '_' . $objectId, 100, function ()use ($type, $objectId) {
-                    $target = "App\\Models\\" . $type;
-                    $object = $target::find($objectId);
-                    $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
-                    $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
-                    if ($type == self::OBJECT_REPORT) {
-                        if ($object->private == true && $type == "Report") {
-                            $object->email == "";
-                            $object->telephone == "";
+        if (false) {
+            $data = Cache::remember($type . '_' . $objectId, 100, function ()use ($type, $objectId) {
+                        $target = "App\\Models\\" . $type;
+                        $object = $target::find($objectId);
+                        $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+                        $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
+                        if ($type == self::OBJECT_REPORT) {
+                            if ($object->private == true && $type == "Report") {
+                                $object->email == "";
+                                $object->telephone == "";
+                            }
+                            $data = [
+                                "report" => $object,
+                                "files" => $files,
+                                "ratings" => $ratings
+                            ];
+                        } else if ($type == self::OBJECT_MERCHANT) {
+                            $data = [
+                                "merchant" => $object,
+                                "files" => $files,
+                                "ratings" => $ratings
+                            ];
                         }
-                        $data = [
-                            "report" => $object,
-                            "files" => $files,
-                            "ratings" => $ratings
-                        ];
-                    } else if ($type == self::OBJECT_MERCHANT) {
-                        $data = [
-                            "merchant" => $object,
-                            "files" => $files,
-                            "ratings" => $ratings
-                        ];
-                    }
-                    return $data;
-                });
+                        return $data;
+                    });
+        } else {
+            $target = "App\\Models\\" . $type;
+            $object = $target::find($objectId);
+            $files = FileM::where("type", $type)->where("trigger_id", $object->id)->get();
+            $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
+            if ($type == self::OBJECT_REPORT) {
+                if ($object->private == true && $type == "Report") {
+                    $object->email == "";
+                    $object->telephone == "";
+                }
+                $data = [
+                    "report" => $object,
+                    "files" => $files,
+                    "ratings" => $ratings
+                ];
+            } else if ($type == self::OBJECT_MERCHANT) {
+                $availability = Availability::where("bookable_type",self::MODEL_PATH. $type)->where("object_id", $object->id)->limit(25)->get();
+                $data = [
+                    "merchant" => $object,
+                    "files" => $files,
+                    "ratings" => $ratings,
+                    "availability" => $availability
+                ];
+            }
+        }
+
         $object = null;
         if ($type == self::OBJECT_REPORT) {
             $object = $data['report'];

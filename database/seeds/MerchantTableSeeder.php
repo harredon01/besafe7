@@ -227,6 +227,17 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drdentist->categories()->save($dentists);
+        $drdentist->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drdentist->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drdentist->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drdentist->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drdentist->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drdentist->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drdentist->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drdentist->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drdentist->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drdentist->newAvailability('fri', '02:00 pm', '06:00 pm');
+        
         $drdentist2 = Merchant::create(array(
                     'name' => "Dr dentist2",
                     'type' => 'medical',
@@ -245,6 +256,17 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drdentist2->categories()->save($dentists);
+        $drdentist2->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drdentist2->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drdentist2->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drdentist2->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drdentist2->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drdentist2->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drdentist2->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drdentist2->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drdentist2->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drdentist2->newAvailability('fri', '02:00 pm', '06:00 pm');
+        
         $drdentist3 = Merchant::create(array(
                     'name' => "Dr dentist3",
                     'type' => 'medical',
@@ -263,6 +285,16 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drdentist3->categories()->save($dentists);
+        $drdentist3->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drdentist3->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drdentist3->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drdentist3->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drdentist3->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drdentist3->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drdentist3->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drdentist3->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drdentist3->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drdentist3->newAvailability('fri', '02:00 pm', '06:00 pm');
         $drderma = Merchant::create(array(
                     'name' => "Dr derma",
                     'type' => 'medical',
@@ -281,6 +313,16 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drderma->categories()->save($dermatologist);
+        $drderma->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drderma->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drderma->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drderma->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drderma->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drderma->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drderma->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drderma->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drderma->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drderma->newAvailability('fri', '02:00 pm', '06:00 pm');
         $drderma2 = Merchant::create(array(
                     'name' => "Dr derma2",
                     'type' => 'medical',
@@ -299,6 +341,17 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drderma2->categories()->save($dermatologist);
+        $drderma2->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drderma2->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drderma2->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drderma2->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drderma2->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drderma2->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drderma2->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drderma2->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drderma2->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drderma2->newAvailability('fri', '02:00 pm', '06:00 pm');
+        
         $drderma3 = Merchant::create(array(
                     'name' => "Dr derma3",
                     'type' => 'medical',
@@ -317,6 +370,17 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drderma3->categories()->save($dermatologist);
+        $drderma3->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drderma3->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drderma3->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drderma3->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drderma3->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drderma3->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drderma3->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drderma3->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drderma3->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drderma3->newAvailability('fri', '02:00 pm', '06:00 pm');
+        
         $drofta = Merchant::create(array(
                     'name' => "Dr ofta",
                     'type' => 'medical',
@@ -335,6 +399,16 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drofta->categories()->save($oftalmologists);
+        $drofta->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drofta->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drofta->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drofta->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drofta->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drofta->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drofta->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drofta->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drofta->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drofta->newAvailability('fri', '02:00 pm', '06:00 pm');
         $drofta2 = Merchant::create(array(
                     'name' => "Dr ofta2",
                     'type' => 'medical',
@@ -353,6 +427,16 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drofta2->categories()->save($oftalmologists);
+        $drofta2->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drofta2->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drofta2->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drofta2->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drofta2->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drofta2->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drofta2->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drofta2->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drofta2->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drofta2->newAvailability('fri', '02:00 pm', '06:00 pm');
         $drofta3 = Merchant::create(array(
                     'name' => "Dr ofta3",
                     'type' => 'medical',
@@ -371,6 +455,16 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active"
         ));
         $drofta3->categories()->save($oftalmologists);
+        $drofta3->newAvailability('mon', '08:00 am', '12:30 pm');
+        $drofta3->newAvailability('mon', '02:00 pm', '06:00 pm');
+        $drofta3->newAvailability('tue', '08:00 am', '12:30 pm');
+        $drofta3->newAvailability('tue', '02:00 pm', '06:00 pm');
+        $drofta3->newAvailability('wed', '08:00 am', '12:30 pm');
+        $drofta3->newAvailability('wed', '02:00 pm', '06:00 pm');
+        $drofta3->newAvailability('thu', '08:00 am', '12:30 pm');
+        $drofta3->newAvailability('thu', '02:00 pm', '06:00 pm');
+        $drofta3->newAvailability('fri', '08:00 am', '12:30 pm');
+        $drofta3->newAvailability('fri', '02:00 pm', '06:00 pm');
     }
 
     public function createMerchants() {

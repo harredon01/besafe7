@@ -173,9 +173,9 @@
 <!-- screen slider area start -->
 <section class="screen-area bg-gray ptb--100" id="screenshot">
     <div class="container">
-        <div class="section-title">
+        <div class="section-title"> 
             <h2>Screenshot</h2>
-            <p>Nemo enim ipsam voluptatem quia voluptas sit</p>
+            <p></p>
         </div>
         <img class="screen-img" src="assets/img/mobile/screen-slider.png" alt="mobile screen">
         <div class="screen-slider owl-carousel">
