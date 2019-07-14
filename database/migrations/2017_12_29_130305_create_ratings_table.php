@@ -32,6 +32,7 @@ class CreateRatingsTable extends Migration {
             } else {
                 Schema::table('users', function (Blueprint $table) {
                     $table->double('rating')->nullable();
+                    $table->integer('rating_count')->unsigned()->nullable();
                 });
             }
         }
@@ -41,6 +42,7 @@ class CreateRatingsTable extends Migration {
             } else {
                 Schema::table('products', function (Blueprint $table) {
                     $table->double('rating')->nullable();
+                    $table->integer('rating_count')->unsigned()->nullable();
                 });
             }
         }
@@ -50,6 +52,7 @@ class CreateRatingsTable extends Migration {
             } else {
                 Schema::table('merchants', function (Blueprint $table) {
                     $table->double('rating')->nullable();
+                    $table->integer('rating_count')->unsigned()->nullable();
                 });
             }
         }
@@ -59,6 +62,7 @@ class CreateRatingsTable extends Migration {
             } else {
                 Schema::table('reports', function (Blueprint $table) {
                     $table->double('rating')->nullable();
+                    $table->integer('rating_count')->unsigned()->nullable();
                 });
             }
         }
@@ -68,6 +72,7 @@ class CreateRatingsTable extends Migration {
             } else {
                 Schema::table('groups', function (Blueprint $table) {
                     $table->double('rating')->nullable();
+                    $table->integer('rating_count')->unsigned()->nullable();
                 });
             }
         }
@@ -84,6 +89,7 @@ class CreateRatingsTable extends Migration {
             if (Schema::hasColumn('users', 'rating')) {
                 Schema::table('users', function (Blueprint $table) {
                     $table->dropColumn('rating');
+                    $table->dropColumn('rating_count');
                 });
             }
         }
@@ -91,6 +97,7 @@ class CreateRatingsTable extends Migration {
             if (Schema::hasColumn('products', 'rating')) {
                 Schema::table('products', function (Blueprint $table) {
                     $table->dropColumn('rating');
+                    $table->dropColumn('rating_count');
                 });
             }
         }
@@ -98,6 +105,7 @@ class CreateRatingsTable extends Migration {
             if (Schema::hasColumn('merchants', 'rating')) {
                 Schema::table('merchants', function (Blueprint $table) {
                     $table->dropColumn('rating');
+                    $table->dropColumn('rating_count');
                 });
             }
         }
@@ -105,6 +113,7 @@ class CreateRatingsTable extends Migration {
             if (Schema::hasColumn('reports', 'rating')) {
                 Schema::table('reports', function (Blueprint $table) {
                     $table->dropColumn('rating');
+                    $table->dropColumn('rating_count');
                 });
             }
         }
@@ -112,6 +121,7 @@ class CreateRatingsTable extends Migration {
             if (Schema::hasColumn('groups', 'rating')) {
                 Schema::table('groups', function (Blueprint $table) {
                     $table->dropColumn('rating');
+                    $table->dropColumn('rating_count');
                 });
             }
         } 

@@ -25,7 +25,7 @@ class Report extends Model {
      * @var array
      */
     protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "anonymous", "object", 'report_time', 'ends_at','plan'];
+        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "anonymous", "object", 'report_time', 'ends_at','plan','rating','rating_count'];
     protected $hidden = ['user_id'];
     protected $dates = [
         'created_at',
