@@ -22,6 +22,7 @@ use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
 use App\Mail\ScenarioSelect;
 use App\Mail\Newsletter;
+use App\Mail\NewsletterPadre;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -354,7 +355,7 @@ class Food {
             $platFormService = new $className();
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Newsletter());
+                Mail::to($user->email)->send(new NewsletterPadre());
             }
         }
     }

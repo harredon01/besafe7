@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Services\EditUserData;
 use App\Services\EditAlerts;
+use App\Services\Security;
 
 class AuthApiController extends Controller {
 
@@ -24,14 +25,14 @@ class AuthApiController extends Controller {
      *
      * @var Registrar
      */
-    protected $editUserData;
-
+    protected $editAlerts;
+    
     /**
      * The registrar implementation.
      *
      * @var Registrar
      */
-    protected $editAlerts;
+    protected $security;
 
     /**
      * Create a new authentication controller instance.
@@ -40,12 +41,12 @@ class AuthApiController extends Controller {
      * @param  \Illuminate\Contracts\Auth\Registrar  $registrar
      * @return void
      */
-    public function __construct(Guard $auth, EditUserData $editUserData, EditAlerts $editAlerts) {
+    public function __construct(Guard $auth, EditAlerts $editAlerts,Security $security) {
         //$this->registrar = $registrar;
         $this->auth = $auth;
-        $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
-        $this->middleware('auth:api', ['except' => ['authenticate', 'create']]);
+        $this->security = $security;
+        $this->middleware('auth:api');
     }
 
     /**
@@ -72,55 +73,11 @@ class AuthApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create(Request $request) {
-        $credentials = $request->all('area_code', 'cellphone', 'email','docNum','docType');
-        $validator = $this->editUserData->validatorRegister($request->all());
-
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $verifyemail = DB::select('select * from users where email = ?', [$credentials['email']]);
-        if ($verifyemail) {
-            return response()->json(['status' => 'error', 'message' => "email_exists"], 400);
-        }
-        $verifycel = DB::select('select * from users where cellphone = ? and area_code = ? ', [$credentials['cellphone'], $credentials['area_code']]);
-        if ($verifycel) {
-            return response()->json(['status' => 'error', 'message' => "cel_exists"], 400);
-        }
-        $verifyId = DB::select('select * from users where docNum = ? and docType = ? ', [$credentials['docNum'], $credentials['docType']]);
-        if ($verifyId) {
-            return response()->json(['status' => 'error', 'message' => "id_exists"], 400);
-        }
-        $data = $request->all([
-            'firstName',
-            'lastName',
-            'docNum',
-            'docType',
-            'area_code',
-            'cellphone',
-            'email',
-            'optinMarketing',
-            'password',
-            'password_confirmation',
-            'language',
-            'city_id',
-            'region_id',
-            'country_id',
-        ]);
-        return response()->json($this->editUserData->create($data));
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function verifyMedical(Request $request) {
         $user = $request->user();
         $data = $request->only('password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['password']])) {
-            return response()->json($this->editUserData->getMedical($user->id));
+            return response()->json($this->security->getMedical($user->id));
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
@@ -133,7 +90,7 @@ class AuthApiController extends Controller {
      */
     public function unlockMedical(Request $request) {
         $user = $request->user();
-        return response()->json($this->editUserData->unlockMedical($user, $request->all()));
+        return response()->json($this->security->unlockMedical($user, $request->all()));
     }
 
     /**
@@ -165,9 +122,39 @@ class AuthApiController extends Controller {
                 'other',
                 'eps'
             ]);
-            return response()->json($this->editUserData->updateMedical($user, $data));
+            return response()->json($this->security->updateMedical($user, $data));
         }
         return response()->json(['error' => 'invalid password'], 500);
+    }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function notificationMedical($id, Request $request) {
+        $user = $request->user();
+        return response()->json($this->security->notificationMedical($user, $id));
+    }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword(Request $request) {
+        $user = $request->user();
+        $data = $request->only('old_password');
+        if ($this->auth->attempt(['email' => $user->email, 'password' => $data['old_password']])) {
+            $validator = $this->editUserData->validatorPassword($request->all());
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+            return response()->json($this->security->updatePassword($user, $request->only("password")));
+        }
+        return response()->json(['error' => 'invalid password'], 403);
     }
 
     /**
@@ -180,7 +167,7 @@ class AuthApiController extends Controller {
         $user = $request->user();
         $data = $request->only('password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['password']])) {
-            return response()->json($this->editUserData->getCodes($user));
+            return response()->json($this->security->getCodes($user));
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
@@ -207,19 +194,8 @@ class AuthApiController extends Controller {
         $user = $request->user();
         $data = $request->only('password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['password']])) {
-            return response()->json($this->editUserData->updateCodes($user, $request->all()));
+            return response()->json($this->security->updateCodes($user, $request->all()));
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function cleanServer(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editUserData->cleanServer($user));
-    }
-
 }

@@ -59,25 +59,6 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function changePassword(Request $request) {
-        $user = $request->user();
-        $data = $request->only('old_password');
-        if ($this->auth->attempt(['email' => $user->email, 'password' => $data['old_password']])) {
-            $validator = $this->editUserData->validatorPassword($request->all());
-            if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-            }
-            return response()->json($this->editUserData->updatePassword($user, $request->only("password")));
-        }
-        return response()->json(['error' => 'invalid password'], 403);
-    }
-
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function getTokens(Request $request) {
         $tokens = $request->user()->tokens->filter(function ($token) {
                     return !$token->revoked;
@@ -135,17 +116,7 @@ class UserApiController extends Controller {
         return response()->json(["status"=>"error","message"=>"address does not belong to user"]);
     }
 
-    /**
-     * Handle a registration request for the application.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function notificationMedical($id, Request $request) {
-        $user = $request->user();
-
-        return response()->json($this->editUserData->notificationMedical($user, $id));
-    }
+    
 
     /**
      * Handle a registration request for the application.
@@ -324,14 +295,60 @@ class UserApiController extends Controller {
         // the token is valid and we have found the user via the sub claim
         return response()->json($data);
     }
-
+    
     /**
-     * Show the form for creating a new resource.
+     * Handle a registration request for the application.
      *
-     * @return Response
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function create(Request $request) {
-        //return $request;
+        $credentials = $request->all('area_code', 'cellphone', 'email','docNum','docType');
+        $validator = $this->editUserData->validatorRegister($request->all());
+
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $verifyemail = DB::select('select * from users where email = ?', [$credentials['email']]);
+        if ($verifyemail) {
+            return response()->json(['status' => 'error', 'message' => "email_exists"], 400);
+        }
+        $verifycel = DB::select('select * from users where cellphone = ? and area_code = ? ', [$credentials['cellphone'], $credentials['area_code']]);
+        if ($verifycel) {
+            return response()->json(['status' => 'error', 'message' => "cel_exists"], 400);
+        }
+        $verifyId = DB::select('select * from users where docNum = ? and docType = ? ', [$credentials['docNum'], $credentials['docType']]);
+        if ($verifyId) {
+            return response()->json(['status' => 'error', 'message' => "id_exists"], 400);
+        }
+        $data = $request->all([
+            'firstName',
+            'lastName',
+            'docNum',
+            'docType',
+            'area_code',
+            'cellphone',
+            'email',
+            'optinMarketing',
+            'password',
+            'password_confirmation',
+            'language',
+            'city_id',
+            'region_id',
+            'country_id',
+        ]);
+        return response()->json($this->editUserData->create($data));
+    }
+    
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function cleanServer(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->cleanServer($user));
     }
 
     /**

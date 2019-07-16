@@ -37,18 +37,17 @@ class BookingSeeder extends Seeder {
     }
 
     public function createBookingAvailability() {
-        $merchant = Merchant::find(1299);
+        $merchant = Merchant::find(1302);
         $theCondition = Condition::find(1);
         $user = User::find(2);
         $sql = "select * from orders o join order_conditions oc on oc.order_id = o.id where o.status = 'approved' and oc.condition_id = $theCondition->id and o.user_id = $user->id;";
         $orders = DB::select($sql);
-        dd(count($orders)>0);
         //dd($merchant->availabilities);
-        $serviceBooking = new \App\Models\Availability();
-        $serviceBooking->make(['range' => 'monday', 'from' => '08:00 am', 'to' => '12:30 pm', 'is_bookable' => true])
-                ->bookable()->associate($merchant)
-                ->save();
-        $merchant->newBooking($user, '2019-07-01 12:44:12', '2019-07-01 14:30:11');
+//        $serviceBooking = new \App\Models\Availability();
+//        $serviceBooking->make(['range' => 'monday', 'from' => '08:00 am', 'to' => '12:30 pm', 'is_bookable' => true])
+//                ->bookable()->associate($merchant)
+//                ->save();
+        $merchant->newBooking($user, '2019-07-15 15:44:12', '2019-07-15 16:30:11');
         dd($merchant->availabilities);
         $merchant->newAvailability('mon', '08:00 am', '12:30 pm');
         $merchant->newAvailability('mon', '02:00 pm', '06:00 pm');

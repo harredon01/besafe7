@@ -601,194 +601,13 @@
 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg_sect_full_grey_v2.png');background-position:top center;background-repeat:no-repeat;background-color:#005e5c;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
 <!--[if (mso)|(IE)]><td align="center" width="650" style="background-color:transparent;width:650px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:60px; padding-bottom:5px;"><![endif]-->
 <div class="col num12" data-body-width-son="650" rel="col-num-container-box-son" style="min-width: 320px; max-width: 650px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:60px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 60px; padding-bottom: 10px; font-family: 'Trebuchet MS', sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Varela Round', 'Trebuchet MS', Helvetica, sans-serif;line-height:120%;padding-top:60px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 14px; font-family: 'Varela Round', 'Trebuchet MS', Helvetica, sans-serif; color: #555555;">
-<p style="font-size: 14px; line-height: 40px; text-align: center; margin: 0;"><span style="font-size: 34px; color: #ffffff;"><strong>USA NUESTROS CUPONES DE DESCUENTO</strong></span></p>
-<p style="font-size: 14px; line-height: 16px; text-align: center; margin: 0;"> </p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
 <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
 </div>
 </div>
 </div>
-<div style="background-color:#FFFFFF;">
-<div class="block-grid two-up" data-body-width-father="650px" rel="col-num-container-box-father" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFFFFF;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="325" style="background-color:transparent;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 10px; padding-top:30px; padding-bottom:55px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:55px; padding-right: 0px; padding-left: 10px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: 'Trebuchet MS', sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Varela Round', 'Trebuchet MS', Helvetica, sans-serif;line-height:120%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="line-height: 14px; font-size: 12px; color: #555555; font-family: 'Varela Round', 'Trebuchet MS', Helvetica, sans-serif;">
-<p style="line-height: 14px; font-size: 12px; text-align: left; margin: 0;"> </p>
-<p style="line-height: 14px; font-size: 12px; text-align: left; margin: 0;"> </p>
-<p style="line-height: 14px; font-size: 12px; text-align: left; margin: 0;"><span style="line-height: 14px; font-size: 12px;"><span style="text-align: left; background-color: transparent; font-size: 24px; line-height: 28px;"><strong>*Cupón 20% </strong></span></span></p>
-<p style="line-height: 14px; font-size: 12px; text-align: left; margin: 0;"><span style="line-height: 14px; font-size: 12px;"><span style="text-align: left; background-color: transparent; font-size: 24px; line-height: 28px;"><strong>de descuento</strong></span><strong style="font-family: 'Varela Round', 'Trebuchet MS', Helvetica, sans-serif; font-size: 24px;"> </strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:150%;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; font-size: 12px; line-height: 18px; color: #555555;">
-<p style="font-size: 12px; line-height: 18px; text-align: left; margin: 0;"> </p>
-<p style="font-size: 12px; line-height: 22px; text-align: left; margin: 0;"><span style="font-size: 15px;">Úsalo para comprar un plan para 2 personas con mínimo 2 almuerzos para cada una  y podrás tener almuerzos desde $11.000</span></p>
-<p style="font-size: 12px; line-height: 24px; text-align: left; margin: 0;"><span style="font-size: 16px;"><strong>Entrada + plato fuere + Domicilio </strong>  </span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="325" style="background-color:transparent;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top:30px; padding-bottom:30px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:30px; padding-right: 10px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="right" class="img-container right fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="right"><![endif]--><img align="right" alt="Image" border="0" class="right fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/20%25+off!.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 267px; display: block;" title="Image" width="267"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:#F6F6F6;">
-<div class="block-grid two-up" data-body-width-father="650px" rel="col-num-container-box-father" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #f6f6f6;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#f6f6f6;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F6F6F6;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:#f6f6f6"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="325" style="background-color:#f6f6f6;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 10px; padding-top:30px; padding-bottom:30px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:30px; padding-right: 0px; padding-left: 10px;">
-<!--<![endif]-->
-<div align="left" class="img-container left autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="left"><![endif]-->
-<div style="font-size:1px;line-height:20px"> </div><img alt="Image" border="0" class="left autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/20%25+off!+(1).png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 315px; display: block;" title="Image" width="315"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="325" style="background-color:#f6f6f6;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top:30px; padding-bottom:40px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:40px; padding-right: 10px; padding-left: 0px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: 'Trebuchet MS', sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Varela Round', 'Trebuchet MS', Helvetica, sans-serif;line-height:120%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 14px; font-family: 'Varela Round', 'Trebuchet MS', Helvetica, sans-serif; color: #555555;">
-<p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;"> </p>
-<p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;"> </p>
-<p style="font-size: 14px; line-height: 16px; text-align: left; margin: 0;"> </p>
-<p style="font-size: 14px; line-height: 28px; text-align: left; margin: 0;"><span style="font-size: 24px;"><strong>*Cupón 30%</strong></span></p>
-<p style="font-size: 14px; line-height: 28px; text-align: left; margin: 0;"><span style="font-size: 24px;"><strong>de descuento.<br/></strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:150%;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; font-size: 12px; line-height: 18px; color: #555555;">
-<p style="font-size: 12px; line-height: 22px; margin: 0;"><span style="font-size: 15px;">Úsalo para comprar un plan para 3 personas con mínimo 2 almuerzos para cada una  y podrás tener almuerzos desde $9.100</span></p>
-<p style="font-size: 12px; line-height: 24px; margin: 0;"><span style="font-size: 16px;"><strong><span style="line-height: 24px; font-size: 16px;">Entrada + plato fuere + Domicilio  </span></strong> </span></p>
-<p style="font-size: 12px; line-height: 18px; margin: 0;"> </p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:#FFFFFF;">
-<div class="block-grid two-up" data-body-width-father="650px" rel="col-num-container-box-father" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFFFFF;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:650px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="325" style="background-color:transparent;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 10px; padding-top:30px; padding-bottom:40px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:40px; padding-right: 0px; padding-left: 10px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: 'Trebuchet MS', sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Varela Round', 'Trebuchet MS', Helvetica, sans-serif;line-height:120%;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="line-height: 14px; font-family: 'Varela Round', 'Trebuchet MS', Helvetica, sans-serif; font-size: 12px; color: #555555;">
-<p style="line-height: 28px; font-size: 12px; text-align: left; margin: 0;"><span style="font-size: 24px;"><strong>*Cupón 40% </strong></span></p>
-<p style="line-height: 28px; font-size: 12px; text-align: left; margin: 0;"><span style="font-size: 24px;"><strong>de descuento</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:150%;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; font-size: 12px; line-height: 18px; color: #555555;">
-<p style="font-size: 12px; line-height: 22px; margin: 0;"><span style="font-size: 15px;">Úsalo para comprar un plan  con 4 amigos o más  con mínimo 2 almuerzos para cada una  y podrás tener almuerzos desde $7.800</span></p>
-<p style="font-size: 12px; line-height: 24px; margin: 0;"><span style="font-size: 16px;"><strong><span style="line-height: 24px; font-size: 16px;">Entrada + plato fuere + Domicilio   </span></strong></span></p>
-<p style="font-size: 12px; line-height: 24px; text-align: right; margin: 0;"><span style="font-size: 16px;">.</span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="325" style="background-color:transparent;width:325px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 0px; padding-top:30px; padding-bottom:30px;"><![endif]-->
-<div class="col num6" data-body-width-son="325" rel="col-num-container-box-son" style="min-width: 320px; max-width: 325px; display: table-cell; vertical-align: top;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:30px; padding-right: 10px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="right" class="img-container right autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="right"><![endif]-->
-<div style="font-size:1px;line-height:30px"> </div><img align="right" alt="Image" border="0" class="right autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/20%25+off!+(2).png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 315px; display: block;" title="Image" width="315"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
+
 <div style="background-color:#005C5E;">
 <div class="block-grid" data-body-width-father="650px" rel="col-num-container-box-father" style="Margin: 0 auto; min-width: 320px; max-width: 650px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
@@ -802,7 +621,6 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
 <div style="color:#FFFFFF;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:150%;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <div style="line-height: 18px; font-size: 12px; color: #FFFFFF; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif;">
-    <p style="font-size: 12px; text-align: center; line-height: 18px; margin: 0;">*Promoción válida hasta el 14 de julio de 2019 y una sola orden por cupón por usuario</p>
 <p style="text-align: left; line-height: 36px; font-size: 12px; margin: 0;"><span style="font-size: 24px;"><strong>Contáctenos</strong></span></p>
 
 <ul>

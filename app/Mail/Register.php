@@ -2,13 +2,12 @@
 
 namespace App\Mail;
 
-use App\Models\Stop;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class NewsletterPadre extends Mailable
+class Register extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,6 +29,6 @@ class NewsletterPadre extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-referidos');
+        return $this->view('emails.food.newsletter-info')->subject("Bienvenido a Lonchis. te enviamos unos datos importantes");
     }
 }

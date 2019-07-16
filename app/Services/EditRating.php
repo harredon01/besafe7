@@ -47,6 +47,7 @@ class EditRating {
                 ]);
 
                 $rating = Rating::where('type', $type)->where('object_id', $data['object_id'])->avg('rating');
+                $count = Rating::where('type', $type)->where('object_id', $data['object_id'])->count();
                 if ($isReport) {
                     $reports = Rating::where('type', $type)
                             ->where('object_id', $data['object_id'])
@@ -58,6 +59,7 @@ class EditRating {
                 }
                 try {
                     $object->rating = $rating;
+                    $object->rating_count = $count;
                     $object->save();
                 } catch (Exception $ex) {
                     

@@ -125,22 +125,5 @@ class Merchant extends Model {
     {
         return Availability::class;
     }
-    /**
-     * Get bookings starts between the given dates.
-     *
-     * @param string $startsAt
-     * @param string $endsAt
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
-     */
-    public function availabilityExistsBetween(string $startsAt, string $endsAt): MorphMany
-    {
-        return $this->availabilities()
-                    ->where('is_bookable', true)
-                    ->where('from', '>', new Carbon($startsAt))
-                    ->where('to', '<', new Carbon($startsAt))
-                    ->where('from', '>', new Carbon($endsAt))
-                    ->where('to', '<', new Carbon($endsAt));
-    }
 
 }

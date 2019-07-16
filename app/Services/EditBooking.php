@@ -12,8 +12,8 @@ class EditBooking {
     const MODEL_PATH = 'App\\Models\\';
 
     private function checkAvailable(array $data) {
-        $from = $date['from'];
-        $to = $date['to'];
+        $from = $data['from'];
+        $to = $data['to'];
         $dayofweek = date('w', strtotime($from));
         $dayName = "";
         if ($dayofweek == 1) {
@@ -32,7 +32,7 @@ class EditBooking {
             $dayName = "sunday";
         }
 
-        $availabilities = Availability::where("range", $dayName)->where("bookable_type",self::MODEL_PATH .$data['type'] )->where("bookable_id",$data['object_id'])->get();
+        $availabilities = Availability::where("range", $dayName)->where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $data['object_id'])->get();
         if (count($availabilities) > 0) {
             $dateFrom = date_create($from);
             $fromString = "2019-01-01 " . date_format($dateFrom, "H:i:s");
@@ -47,17 +47,31 @@ class EditBooking {
                 $dateTo = date_create($av->to);
                 $toString = "2019-01-01 " . date_format($dateTo, "H:i:s");
                 $dateTimestampLower = strtotime($toString);
-                if ($dateTimestampFrom < $dateTimestampUpper && $dateTimestampFrom > $dateTimestampLower && $dateTimestampTo < $dateTimestampUpper && $dateTimestampTo > $dateTimestampLower) {
+//                $data2 = [
+//                    "sfr" => $dateFrom,
+//                    "sto" => $dateTo,
+//                    "dfr" => $fromString,
+//                    "dto" => $toString,
+//                    "fr" => $dateTimestampFrom,
+//                    "to" => $dateTimestampTo,
+//                    "up" => $dateTimestampUpper,
+//                    "lo" => $dateTimestampLower,
+//                    "a1" => $dateTimestampFrom >= $dateTimestampUpper,
+//                    "a2" => $dateTimestampFrom <= $dateTimestampLower,
+//                    "b1" => $dateTimestampTo >= $dateTimestampUpper,
+//                    "b2" => $dateTimestampTo <= $dateTimestampLower,
+//                ];
+//                dd($data2);
+                if ($dateTimestampFrom >= $dateTimestampUpper && $dateTimestampFrom <= $dateTimestampLower && $dateTimestampTo >= $dateTimestampUpper && $dateTimestampTo <= $dateTimestampLower) {
                     $type = $data['type'];
                     $class = self::MODEL_PATH . $type;
                     $object = $class::find($data['object_id']);
                     $results = $object->bookingsStartsBetween($data['from'], $data['to'])->get();
-                    if(count($results)>0){
+                    if (count($results) > 0) {
                         return false;
                     } else {
                         return true;
                     }
-                    
                 }
             }
 
@@ -78,6 +92,7 @@ class EditBooking {
         }
         $type = $data['type'];
         $class = self::MODEL_PATH . $type;
+
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
@@ -107,15 +122,11 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                $result = $this->checkAvailable($data);
-                if ($result) {
-                    $serviceBooking = Availability();
-                    $serviceBooking->make(['range' => 'monday', 'from' => '08:00 am', 'to' => '12:30 pm', 'is_bookable' => true])
-                            ->bookable()->associate($object)
-                            ->save();
-                    return response()->json(array("status" => "success", "message" => "Availability created"));
-                }
-                return response()->json(array("status" => "error", "message" => "Not available"));
+                $serviceBooking = new Availability();
+                $serviceBooking->make(['range' => $data['range'], 'from' => $data['from'], 'to' => $data['to'], 'is_bookable' => true])
+                        ->bookable()->associate($object)
+                        ->save();
+                return response()->json(array("status" => "success", "message" => "Availability created"));
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
@@ -183,13 +194,13 @@ class EditBooking {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorGetBookings() {
-        return [
-            'type' => 'required|max:255',
-            'object_id' => 'required|max:255',
-            'from' => 'required|max:255',
-            'to' => 'required|max:255',
-        ];
+    public function validatorGetBookings(array $data) {
+        return Validator::make($data, [
+                    'type' => 'required|max:255',
+                    'object_id' => 'required|max:255',
+                    'from' => 'required|max:255',
+                    'to' => 'required|max:255',
+        ]);
     }
 
     /**
@@ -198,13 +209,13 @@ class EditBooking {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorCreateBooking() {
-        return [
-            'type' => 'required|max:255',
-            'object_id' => 'required|integer|min:1',
-            'from' => 'required|max:255',
-            'to' => 'required|max:255',
-        ];
+    public function validatorCreateBooking(array $data) {
+        return Validator::make($data, [
+                    'type' => 'required|max:255',
+                    'object_id' => 'required|integer|min:1',
+                    'from' => 'required|max:255',
+                    'to' => 'required|max:255',
+        ]);
     }
 
     /**
@@ -213,11 +224,11 @@ class EditBooking {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorCreateAvailability() {
-        return [
-            'type' => 'required|max:255',
-            'object_id' => 'required|integer|min:1',
-        ];
+    public function validatorCreateAvailability(array $data) {
+        return Validator::make($data, [
+                    'type' => 'required|max:255',
+                    'object_id' => 'required|integer|min:1',
+        ]);
     }
 
 }

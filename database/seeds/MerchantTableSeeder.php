@@ -8,6 +8,8 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Services\EditOrder;
+use App\Services\EditRating;
+use App\Services\EditBooking;
 use App\Services\MerchantImport;
 use App\Models\OfficeHour;
 use App\Models\PaymentMethod;
@@ -24,6 +26,16 @@ class MerchantTableSeeder extends Seeder {
      *
      */
     protected $editOrder;
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $editRating;
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $editBooking;
 
     /**
      * The edit profile implementation.
@@ -31,9 +43,11 @@ class MerchantTableSeeder extends Seeder {
      */
     protected $merchantImport;
 
-    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport) {
+    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport, EditRating $editRating, EditBooking $editBooking) {
         $this->editOrder = $editOrder;
         $this->merchantImport = $merchantImport;
+        $this->editRating = $editRating;
+        $this->editBooking = $editBooking;
         /* $this->middleware('location.group', ['only' => 'postGroupLocation']);
           $this->middleware('location.group', ['only' => 'getGroupLocation']); */
     }
@@ -125,19 +139,19 @@ class MerchantTableSeeder extends Seeder {
             }
         }
     }
-    
+
     public function cleanPhones() {
         $merchants = Merchant::all();
-            foreach ($merchants as $merchant) {
-                $phone = $merchant->telephone;
-                
-                $phone = str_replace("Fijo:","+571",$phone);
-                
-                
-                
-                $merchant->telephone = $phone;
-                $merchant->save();
-            }
+        foreach ($merchants as $merchant) {
+            $phone = $merchant->telephone;
+
+            $phone = str_replace("Fijo:", "+571", $phone);
+
+
+
+            $merchant->telephone = $phone;
+            $merchant->save();
+        }
     }
 
     public function createConditions() {
@@ -157,322 +171,244 @@ class MerchantTableSeeder extends Seeder {
                     'id' => '4',
                     'name' => "Debito",
         ]);
-        /*$itemCondition = Condition::create(array(
-                    'name' => "Iva",
-                    'type' => 'tax',
-                    'target' => 'subtotal',
-                    'value' => '+16%',
-                    'country_id' => 1,
-                    'isActive' => true
+        /* $itemCondition = Condition::create(array(
+          'name' => "Iva",
+          'type' => 'tax',
+          'target' => 'subtotal',
+          'value' => '+16%',
+          'country_id' => 1,
+          'isActive' => true
+          ));
+          $itemCondition = Condition::create(array(
+          'name' => "Envios",
+          'type' => 'shipping',
+          'target' => 'subtotal',
+          'value' => '+5000',
+          'isActive' => true,
+          'country_id' => 1
+          ));
+          $itemCondition = Condition::create(array(
+          'name' => "Dia de la madre",
+          'type' => 'sale',
+          'target' => 'subtotal',
+          'value' => '-20%',
+          'isActive' => true
+          ));
+          $itemCondition = Condition::create(array(
+          'name' => "Cupon",
+          'type' => 'coupon',
+          'coupon' => 'trevooh',
+          'target' => 'subtotal',
+          'value' => '-10%',
+          'isActive' => true
+          )); */
+    }
+
+    public function createMerchant($category, $num,$categoryProds) {
+        $user = User::find(1);
+        $merchant = Merchant::create(array(
+                    'name' => "Dr " . $category->name . " " . $num,
+                    'type' => 'medical',
+                    'email' => 'hoov@hoov.com',
+                    'telephone' => '3152562356',
+                    'url' => "http://hoovert.com",
+                    'address' => "cra 1 # 45-56",
+                    'description' => "El mejor " . $category->name . " " . $num,
+                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
+                    'lat' => 4.656060000,
+                    'long' => -74.045932000,
+                    'price' => 40000,
+                    'unit_cost' => 30000,
+                    'base_cost' => 5000,
+                    'unit' => "hour",
+                    'currency' => "COP",
+                    'status' => "active"
         ));
-        $itemCondition = Condition::create(array(
-                    'name' => "Envios",
-                    'type' => 'shipping',
-                    'target' => 'subtotal',
-                    'value' => '+5000',
-                    'isActive' => true,
-                    'country_id' => 1
-        ));
-        $itemCondition = Condition::create(array(
-                    'name' => "Dia de la madre",
-                    'type' => 'sale',
-                    'target' => 'subtotal',
-                    'value' => '-20%',
-                    'isActive' => true
-        ));
-        $itemCondition = Condition::create(array(
-                    'name' => "Cupon",
-                    'type' => 'coupon',
-                    'coupon' => 'trevooh',
-                    'target' => 'subtotal',
-                    'value' => '-10%',
-                    'isActive' => true
-        ));*/
+        $merchant->categories()->save($category);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'monday',
+            "from"=>'08:00 am',
+            "to"=>'12:30 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'monday',
+            "from"=>'02:00 pm',
+            "to"=>'06:00 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'tuesday',
+            "from"=>'08:00 am',
+            "to"=>'12:30 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'tuesday',
+            "from"=>'02:00 pm',
+            "to"=>'06:00 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'wednesday',
+            "from"=>'08:00 am',
+            "to"=>'12:30 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'wednesday',
+            "from"=>'02:00 pm',
+            "to"=>'06:00 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'thursday',
+            "from"=>'08:00 am',
+            "to"=>'12:30 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'thursday',
+            "from"=>'02:00 pm',
+            "to"=>'06:00 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'friday',
+            "from"=>'08:00 am',
+            "to"=>'12:30 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "range"=>'friday',
+            "from"=>'02:00 pm',
+            "to"=>'06:00 pm'
+        ];
+        $this->editBooking->addAvailabilityObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "from"=>'2019-07-15 08:00:00',
+            "to"=>'2019-07-15 09:00:00'
+        ];
+        $this->editBooking->addBookingObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "from"=>'2019-07-16 08:00:00',
+            "to"=>'2019-07-16 09:00:00'
+        ];
+        $this->editBooking->addBookingObject($data, $user);
+        $data = [
+            "type"=>"Merchant",
+            "object_id" => $merchant->id,
+            "from"=>'2019-07-17 08:00:00',
+            "to"=>'2019-07-17 09:00:00'
+        ];
+        $this->editBooking->addBookingObject($data, $user);
+        for ($i = 0; $i < 3; $i++) {
+            $product = Product::create([
+                        'name' => "Product " . $i,
+                        'description' => "Description " . $i,
+                        'isActive' => true,
+                        'hash' => "",
+            ]);
+            for ($j = 0; $j < 3; $j++) {
+                $productVariant = ProductVariant::updateOrCreate([
+                            'product_id' => $product->id,
+                            'merchant_id' => $merchant->id,
+                            'sku' => "prod" . $i . "-" . $j,
+                            'ref2' => "prod2" . $i . "-" . $j,
+                            'isActive' => true,
+                            'price' => 10 * $i * $j,
+                            'sale' => 9 * $i * $j,
+                            'tax' =>$i * $j,
+                            'cost' => 8 * $i * $j,
+                            'quantity' => 10,
+                            'min_quantity' => 1,
+                            'is_digital' => true,
+                            'is_shippable' => true,
+                                //'attributes' => $sheet['attributes'],
+                ]);
+            }
+            $merchant->products()->save($product);
+            $categoryProds->products()->save($product);
+        }
+        for ($i = 1; $i < 4; $i++) {
+            $user = User::find($i);
+            $data = [
+                "type"=>"Merchant",
+                "object_id"=>$merchant->id,
+                "rating"=>$i+2,
+                "comment" => "Comment ".$i
+            ];
+            $this->editRating->addRatingObject($data, $user);
+        }
     }
 
     public function createExcel() {
         $dentists = Category::create(array(
                     'name' => "Dentists",
                     'type' => 'merchants',
-                    'level' => '1', 
+                    'level' => '1',
                     'description' => 'tend to peoples teeth',
         ));
+        $store = Category::create(array(
+                    'name' => "Store",
+                    'type' => 'products',
+                    'level' => '1',
+                    'description' => 'tend to peoples teeth',
+        ));
+        $this->createMerchant($dentists, 1,$store);
+        $this->createMerchant($dentists, 2,$store);
+        $this->createMerchant($dentists, 3,$store);
         $dermatologist = Category::create(array(
                     'name' => "Dermatologists",
                     'type' => 'merchants',
                     'level' => '1',
                     'description' => 'tend to peoples skin',
         ));
+        $this->createMerchant($dermatologist, 1,$store);
+        $this->createMerchant($dermatologist, 2,$store);
+        $this->createMerchant($dermatologist, 3,$store);
         $oftalmologists = Category::create(array(
                     'name' => "Oftalmologists",
                     'type' => 'merchants',
                     'level' => '1',
                     'description' => 'tend to peoples eyes',
         ));
-        $drdentist = Merchant::create(array(
-                    'name' => "Dr dentist",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drdentist->categories()->save($dentists);
-        $drdentist->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drdentist->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drdentist->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drdentist->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drdentist->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drdentist->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drdentist->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drdentist->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drdentist->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drdentist->newAvailability('fri', '02:00 pm', '06:00 pm');
-        
-        $drdentist2 = Merchant::create(array(
-                    'name' => "Dr dentist2",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drdentist2->categories()->save($dentists);
-        $drdentist2->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drdentist2->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drdentist2->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drdentist2->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drdentist2->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drdentist2->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drdentist2->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drdentist2->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drdentist2->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drdentist2->newAvailability('fri', '02:00 pm', '06:00 pm');
-        
-        $drdentist3 = Merchant::create(array(
-                    'name' => "Dr dentist3",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drdentist3->categories()->save($dentists);
-        $drdentist3->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drdentist3->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drdentist3->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drdentist3->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drdentist3->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drdentist3->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drdentist3->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drdentist3->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drdentist3->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drdentist3->newAvailability('fri', '02:00 pm', '06:00 pm');
-        $drderma = Merchant::create(array(
-                    'name' => "Dr derma",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drderma->categories()->save($dermatologist);
-        $drderma->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drderma->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drderma->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drderma->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drderma->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drderma->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drderma->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drderma->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drderma->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drderma->newAvailability('fri', '02:00 pm', '06:00 pm');
-        $drderma2 = Merchant::create(array(
-                    'name' => "Dr derma2",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drderma2->categories()->save($dermatologist);
-        $drderma2->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drderma2->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drderma2->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drderma2->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drderma2->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drderma2->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drderma2->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drderma2->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drderma2->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drderma2->newAvailability('fri', '02:00 pm', '06:00 pm');
-        
-        $drderma3 = Merchant::create(array(
-                    'name' => "Dr derma3",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drderma3->categories()->save($dermatologist);
-        $drderma3->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drderma3->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drderma3->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drderma3->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drderma3->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drderma3->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drderma3->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drderma3->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drderma3->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drderma3->newAvailability('fri', '02:00 pm', '06:00 pm');
-        
-        $drofta = Merchant::create(array(
-                    'name' => "Dr ofta",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drofta->categories()->save($oftalmologists);
-        $drofta->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drofta->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drofta->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drofta->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drofta->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drofta->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drofta->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drofta->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drofta->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drofta->newAvailability('fri', '02:00 pm', '06:00 pm');
-        $drofta2 = Merchant::create(array(
-                    'name' => "Dr ofta2",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drofta2->categories()->save($oftalmologists);
-        $drofta2->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drofta2->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drofta2->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drofta2->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drofta2->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drofta2->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drofta2->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drofta2->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drofta2->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drofta2->newAvailability('fri', '02:00 pm', '06:00 pm');
-        $drofta3 = Merchant::create(array(
-                    'name' => "Dr ofta3",
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "El mejor dentista",
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'status' => "active"
-        ));
-        $drofta3->categories()->save($oftalmologists);
-        $drofta3->newAvailability('mon', '08:00 am', '12:30 pm');
-        $drofta3->newAvailability('mon', '02:00 pm', '06:00 pm');
-        $drofta3->newAvailability('tue', '08:00 am', '12:30 pm');
-        $drofta3->newAvailability('tue', '02:00 pm', '06:00 pm');
-        $drofta3->newAvailability('wed', '08:00 am', '12:30 pm');
-        $drofta3->newAvailability('wed', '02:00 pm', '06:00 pm');
-        $drofta3->newAvailability('thu', '08:00 am', '12:30 pm');
-        $drofta3->newAvailability('thu', '02:00 pm', '06:00 pm');
-        $drofta3->newAvailability('fri', '08:00 am', '12:30 pm');
-        $drofta3->newAvailability('fri', '02:00 pm', '06:00 pm');
+        $this->createMerchant($oftalmologists, 1,$store);
+        $this->createMerchant($oftalmologists, 2,$store);
+        $this->createMerchant($oftalmologists, 3,$store);
     }
 
     public function createMerchants() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        
+
         $this->merchantImport->importPlans("plans.xlsx");
         $this->command->info('plans seeded!');
-        
+
         $this->merchantImport->importAttributes("attributes.xlsx");
         $this->merchantImport->importAttributeOptions("attributeOptions.xlsx");
         $this->command->info('Attributes seeded!');
@@ -484,53 +420,53 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('Followers seeded!');
         $this->merchantImport->importConditions("conditions.xlsx");
         $this->command->info('Conditions seeded!');
-        $this->merchantImport->importLocations("locations.xlsx",1);
-        $this->merchantImport->importLocations("locations2.xlsx",2);
-        $this->merchantImport->importLocations("locations3.xlsx",3);
-        $this->merchantImport->importLocations("locations4.xlsx",4);
+        $this->merchantImport->importLocations("locations.xlsx", 1);
+        $this->merchantImport->importLocations("locations2.xlsx", 2);
+        $this->merchantImport->importLocations("locations3.xlsx", 3);
+        $this->merchantImport->importLocations("locations4.xlsx", 4);
         $this->command->info('Locations seeded!');
         sleep(1);
         $this->merchantImport->importFollowers("followers.xlsx");
         $this->command->info('Followers seeded!');
-        $this->merchantImport->importLocations("locations.xlsx",1);
-        $this->merchantImport->importLocations("locations2.xlsx",2);
-        $this->merchantImport->importLocations("locations3.xlsx",3);
-        $this->merchantImport->importLocations("locations4.xlsx",4);
+        $this->merchantImport->importLocations("locations.xlsx", 1);
+        $this->merchantImport->importLocations("locations2.xlsx", 2);
+        $this->merchantImport->importLocations("locations3.xlsx", 3);
+        $this->merchantImport->importLocations("locations4.xlsx", 4);
         $this->command->info('Locations seeded!');
-        
+
         $this->merchantImport->importGroups("groups.xlsx");
         $this->command->info('Groups seeded!');
-        
+
         $this->merchantImport->inviteGroups("invitegroup.xlsx");
         $this->command->info('Groups shareLocationGroup!');
-        $this->merchantImport->importLocations("locations.xlsx",1);
-        $this->merchantImport->importLocations("locations2.xlsx",2);
-        $this->merchantImport->importLocations("locations3.xlsx",3);
-        $this->merchantImport->importLocations("locations4.xlsx",4);
-        $this->merchantImport->importLocations("locations.xlsx",5);
-        $this->merchantImport->importLocations("locations2.xlsx",6);
-        $this->merchantImport->importLocations("locations3.xlsx",7);
-        $this->merchantImport->importLocations("locations4.xlsx",8);
-        $this->merchantImport->importLocations("locations.xlsx",9);
-        $this->merchantImport->importLocations("locations2.xlsx",10);
-        $this->merchantImport->importLocations("locations3.xlsx",11);
-        $this->merchantImport->importLocations("locations4.xlsx",12);
-        $this->merchantImport->importLocations("locations.xlsx",13);
-        $this->merchantImport->importLocations("locations2.xlsx",14);
-        $this->merchantImport->importLocations("locations3.xlsx",15);
-        $this->merchantImport->importLocations("locations4.xlsx",16);
-        $this->merchantImport->importLocations("locations.xlsx",17);
-        $this->merchantImport->importLocations("locations2.xlsx",18);
-        $this->merchantImport->importLocations("locations3.xlsx",19);
-        $this->merchantImport->importLocations("locations4.xlsx",20);
-        $this->merchantImport->importLocations("locations4.xlsx",21);
-        $this->merchantImport->importLocations("locations4.xlsx",22);
-        $this->merchantImport->importLocations("locations4.xlsx",23);
-        $this->merchantImport->importLocations("locations4.xlsx",24);
+        $this->merchantImport->importLocations("locations.xlsx", 1);
+        $this->merchantImport->importLocations("locations2.xlsx", 2);
+        $this->merchantImport->importLocations("locations3.xlsx", 3);
+        $this->merchantImport->importLocations("locations4.xlsx", 4);
+        $this->merchantImport->importLocations("locations.xlsx", 5);
+        $this->merchantImport->importLocations("locations2.xlsx", 6);
+        $this->merchantImport->importLocations("locations3.xlsx", 7);
+        $this->merchantImport->importLocations("locations4.xlsx", 8);
+        $this->merchantImport->importLocations("locations.xlsx", 9);
+        $this->merchantImport->importLocations("locations2.xlsx", 10);
+        $this->merchantImport->importLocations("locations3.xlsx", 11);
+        $this->merchantImport->importLocations("locations4.xlsx", 12);
+        $this->merchantImport->importLocations("locations.xlsx", 13);
+        $this->merchantImport->importLocations("locations2.xlsx", 14);
+        $this->merchantImport->importLocations("locations3.xlsx", 15);
+        $this->merchantImport->importLocations("locations4.xlsx", 16);
+        $this->merchantImport->importLocations("locations.xlsx", 17);
+        $this->merchantImport->importLocations("locations2.xlsx", 18);
+        $this->merchantImport->importLocations("locations3.xlsx", 19);
+        $this->merchantImport->importLocations("locations4.xlsx", 20);
+        $this->merchantImport->importLocations("locations4.xlsx", 21);
+        $this->merchantImport->importLocations("locations4.xlsx", 22);
+        $this->merchantImport->importLocations("locations4.xlsx", 23);
+        $this->merchantImport->importLocations("locations4.xlsx", 24);
         $this->command->info('Groups Locations finished!');
         $this->merchantImport->sendMessageGroup("messageGroup.xlsx");
         $this->command->info('Group messages sent');
-        
+
         $this->merchantImport->importMerchants("medicos1.xlsx");
         $this->command->info('medicos1.xlsx seeded!');
         $this->merchantImport->importMerchants("medicos2.xlsx");
@@ -539,7 +475,6 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('policias.xlsx seeded!');
         $this->merchantImport->importReports("reports.xlsx");
         $this->command->info('reports.xlsx seeded!');
-        
     }
 
 }

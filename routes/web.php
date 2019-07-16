@@ -146,11 +146,8 @@ Route::get('/scenario_select', function () {
     return new App\Mail\ScenarioSelect($data['resultsPre'], $data['resultsSimple'], $data['winner']);
 });
 
-Route::get('/email_payment_pse', function () {
-    $user = App\Models\User::find(2);
-    $payment = App\Models\Payment::find(118);
-    $url = "http://www.google.com";
-    return new App\Mail\EmailPaymentPse($payment,$user,$url);
+Route::get('/email_register', function () {
+    return new App\Mail\Register();
 });
 
 Route::get('/email_payment_cash', function () {
@@ -163,6 +160,6 @@ Route::get('/email_payment_cash', function () {
 Route::get('/test_newsletter', function () {
     return new App\Mail\Newsletter();
 });
-Route::get('/newsletter_padres', function () {
+Route::get('/newsletter_referidos', function () {
     return new App\Mail\NewsletterPadre();
 });

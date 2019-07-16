@@ -17,6 +17,7 @@ use DB;
 use Cache;
 
 class EditMapObject {
+
     const MODEL_PATH = 'App\\Models\\';
     const OBJECT_REPORT_GROUP = 'Report_Group';
     const OBJECT_MERCHANT_GROUP = 'Merchant_Group';
@@ -145,10 +146,12 @@ class EditMapObject {
                                 "ratings" => $ratings
                             ];
                         } else if ($type == self::OBJECT_MERCHANT) {
+                            $availability = Availability::where("bookable_type", self::MODEL_PATH . $type)->where("bookable_id", $object->id)->limit(25)->get();
                             $data = [
                                 "merchant" => $object,
                                 "files" => $files,
-                                "ratings" => $ratings
+                                "ratings" => $ratings,
+                                "availabilities" => $availability
                             ];
                         }
                         return $data;
@@ -169,12 +172,12 @@ class EditMapObject {
                     "ratings" => $ratings
                 ];
             } else if ($type == self::OBJECT_MERCHANT) {
-                $availability = Availability::where("bookable_type",self::MODEL_PATH. $type)->where("object_id", $object->id)->limit(25)->get();
+                $availability = Availability::where("bookable_type", self::MODEL_PATH . $type)->where("bookable_id", $object->id)->limit(25)->get();
                 $data = [
                     "merchant" => $object,
                     "files" => $files,
                     "ratings" => $ratings,
-                    "availability" => $availability
+                    "availabilities" => $availability
                 ];
             }
         }
