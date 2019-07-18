@@ -309,31 +309,33 @@ class Proofhub {
 //                "price" => "Retail",
 //                "code" => "2237106775",
 //                "rows" => $copy,
-//            ], [
-//                "name" => "Wellness",
-//                "budget" => "15000000",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2727439403",
-//                "rows" => $copy,
-//            ],[
-//                "name" => "La nuit",
-//                "budget" => "15000000",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2836708259",
-//                "rows" => $copy,
-//            ], [
-//                "name" => "La nuit ongoing",
-//                "budget" => "3000000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2925895418",
-//                "rows" => $copy,
 //            ], 
+                [
+                "name" => "Wellness",
+                "budget" => "15000000",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2727439403",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "La nuit",
+                "budget" => "15000000",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2836708259",
+                "rows" => $copy,
+            ], [
+                "name" => "La nuit ongoing",
+                "budget" => "3000000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2925895418",
+                "rows" => $copy,
+            ],
             [
                 "name" => "Klip(Accvent)",
                 "budget" => "15000000",
@@ -351,15 +353,17 @@ class Proofhub {
 //                "price" => "Retail",
 //                "code" => "2555537362",
 //                "rows" => $copy,
-//            ], [
-//                "name" => "Cerromatoso",
-//                "budget" => "50000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2052138062",
-//                "rows" => $copy,
-//            ], [
+//            ], 
+            [
+                "name" => "Cerromatoso",
+                "budget" => "50000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2052138062",
+                "rows" => $copy,
+            ], 
+//            [
 //                "name" => "sheldon consulting",
 //                "budget" => "50000",
 //                "country" => "COL",
@@ -403,7 +407,8 @@ class Proofhub {
 //                "price" => "Retail",
 //                "code" => "1479511181",
 //                "rows" => $copy,
-//            ], [
+//            ], 
+//            [
 //                "name" => "Teck",
 //                "budget" => "0",
 //                "country" => "COL",
@@ -451,40 +456,41 @@ class Proofhub {
 //                "price" => "Retail",
 //                "code" => "1849937081",
 //                "rows" => $copy,
-//            ], [
-//                "name" => "Universidad Rosario",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1846653453",
-//                "rows" => $copy,
-//            ], [
-//                "name" => "Kava",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1833844586",
-//                "rows" => $copy,
-//            ], [
-//                "name" => "Seguros Mundial",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1768117734",
-//                "rows" => $copy,
 //            ], 
-//            [
-//                "name" => "Bodytech Peru",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1753979134",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "Universidad Rosario",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1846653453",
+                "rows" => $copy,
+            ], [
+                "name" => "Kava",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1833844586",
+                "rows" => $copy,
+            ], [
+                "name" => "Seguros Mundial",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1768117734",
+                "rows" => $copy,
+            ], 
+            [
+                "name" => "Bodytech Peru",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1753979134",
+                "rows" => $copy,
+            ],
 //            [
 //                "name" => "Ongoing Development",
 //                "budget" => "0",
@@ -510,15 +516,16 @@ class Proofhub {
 //                "price" => "Retail",
 //                "code" => "2502782201",
 //                "rows" => $copy,
-//            ], [
-//                "name" => "Archies",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1714087114",
-//                "rows" => $copy,
-//            ],
+//            ], 
+            [
+                "name" => "Archies",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1714087114",
+                "rows" => $copy,
+            ],
             [
                 "name" => "Primus",
                 "budget" => "0",
@@ -528,15 +535,15 @@ class Proofhub {
                 "code" => "2400881156",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Daportare",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2489878353",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "Daportare",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2489878353",
+                "rows" => $copy,
+            ],
             [
                 "name" => "Next Conn-Infrastructure",
                 "budget" => "0",
@@ -555,15 +562,15 @@ class Proofhub {
                 "code" => "2349279336",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "NOVEDADES GUILLERS",
-//                "budget" => "50000",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1871891261",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "NOVEDADES GUILLERS",
+                "budget" => "50000",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "1871891261",
+                "rows" => $copy,
+            ],
 //            [
 //                "name" => "Magic Flavors",
 //                "budget" => "30000000",
@@ -582,96 +589,97 @@ class Proofhub {
                 "code" => "2234243776",
                 "rows" => $copy,
             ],
+            [
+                "name" => "CBC",
+                "budget" => "2400000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1714114251",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Ezpot",
+                "budget" => "5000000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1498154595",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Juan Valdez",
+                "budget" => "5500000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1753802741",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Support Celsia",
+                "budget" => "2500000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2349062236",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Celsia epsa",
+                "budget" => "2500000",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "1934931508",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Papa Johns",
+                "budget" => "2400000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1753924859",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Super de alimentos",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1422726112",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dilucca",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1421925558",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "BYC en casa",
+                "budget" => "500000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1739080686",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Fonnegra",
+                "budget" => "1200000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1767995616",
+                "rows" => $copy,
+            ], 
 //            [
-//                "name" => "CBC",
-//                "budget" => "2400000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1714114251",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Ezpot",
-//                "budget" => "5000000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1498154595",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Juan Valdez",
-//                "budget" => "5500000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1753802741",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Support Celsia",
-//                "budget" => "2500000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2349062236",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Celsia epsa",
-//                "budget" => "2500000",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1934931508",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Papa Johns",
-//                "budget" => "2400000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1753924859",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Super de alimentos",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1422726112",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Dilucca",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1421925558",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "BYC en casa",
-//                "budget" => "500000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1739080686",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Fonnegra",
-//                "budget" => "1200000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1767995616",
-//                "rows" => $copy,
-//            ], [
 //                "name" => "Internal Management",
 //                "budget" => "1200000",
 //                "country" => "COL",
@@ -697,15 +705,15 @@ class Proofhub {
                 "code" => "1889991926",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Niños en movimiento",
-//                "budget" => "1200000",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2727778621",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "Niños en movimiento",
+                "budget" => "1200000",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2727778621",
+                "rows" => $copy,
+            ],
 //            [
 //                "name" => "Chambar",
 //                "budget" => "0",
@@ -715,15 +723,15 @@ class Proofhub {
 //                "code" => "1481790725",
 //                "rows" => $copy,
 //            ],
-//            [
-//                "name" => "DSRF",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1409523753",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "DSRF",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "1409523753",
+                "rows" => $copy,
+            ],
 //            [
 //                "name" => "Sales Proposals",
 //                "budget" => "0",
@@ -760,24 +768,24 @@ class Proofhub {
 //                "code" => "1694100398",
 //                "rows" => $copy,
 //            ],
-//            [
-//                "name" => "Support Daportare",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2065259008",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Marketing Xpr",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::INTERNO,
-//                "price" => "Retail",
-//                "code" => "2646379904",
-//                "rows" => $copy,
-//            ],
+            [
+                "name" => "Support Daportare",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "2065259008",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Marketing Xpr",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::INTERNO,
+                "price" => "Retail",
+                "code" => "2646379904",
+                "rows" => $copy,
+            ],
 //            [
 //                "name" => "Balance ecuador",
 //                "budget" => "0",
@@ -787,33 +795,33 @@ class Proofhub {
 //                "code" => "2547043347",
 //                "rows" => $copy,
 //            ],
-//            [
-//                "name" => "CONSTRUCTORA BOLIVAR",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2940400374",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Casa chiqui",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "3063142963",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Rivercol",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2944945893",
-//                "rows" => $copy,
-//            ]
+            [
+                "name" => "CONSTRUCTORA BOLIVAR",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2940400374",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Casa chiqui",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3063142963",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Rivercol",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2944945893",
+                "rows" => $copy,
+            ]
         ];
         if ($type) {
             $finalResult = [];
@@ -1386,14 +1394,14 @@ class Proofhub {
             ];
             if ($resultsPerson['id'] == "1871117844") {
                 //andres
-                $saveperson['cost'] = 57691;
-                $saveperson['retail'] = 71927;
+                $saveperson['cost'] = 59582;
+                $saveperson['retail'] = 65000;
                 $saveperson['cost_us'] = 19.23;
                 $saveperson['retail_us'] = 22.73;
             } else if ($resultsPerson['id'] == "4232277661") {
                 //Deyvid
-                $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 33139;
+                $saveperson['cost'] = 26400;
+                $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "3749231432") {
@@ -1404,20 +1412,20 @@ class Proofhub {
                 $saveperson['retail_us'] = 19.66;
             } else if ($resultsPerson['id'] == "1856477202") {
                 //Fabian Vargas
-                $saveperson['cost'] = 41412;
+                $saveperson['cost'] = 47290;
                 $saveperson['retail'] = 51631;
                 $saveperson['cost_us'] = 13.80;
                 $saveperson['retail_us'] = 16.31;
             } else if ($resultsPerson['id'] == "2133970978") {
                 //Gobert Perdomo
-                $saveperson['cost'] = 30887;
-                $saveperson['retail'] = 38508;
+                $saveperson['cost'] = 34034;
+                $saveperson['retail'] = 37084;
                 $saveperson['cost_us'] = 10.30;
                 $saveperson['retail_us'] = 12.17;
             } else if ($resultsPerson['id'] == "1923370963") {
                 //Juan Arredondo
-                $saveperson['cost'] = 29411;
-                $saveperson['retail'] = 36668;
+                $saveperson['cost'] = 35900;
+                $saveperson['retail'] = 39150;
                 $saveperson['cost_us'] = 9.8;
                 $saveperson['retail_us'] = 11.6;
             } else if ($resultsPerson['id'] == "2936451878") {
@@ -1428,21 +1436,21 @@ class Proofhub {
                 $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1923533788") {
                 //Victor Gil
-                $saveperson['cost'] = 30756;
-                $saveperson['retail'] = 38345;
+                $saveperson['cost'] = 34034;
+                $saveperson['retail'] = 37128;
                 $saveperson['cost_us'] = 10.25;
                 $saveperson['retail_us'] = 12.12;
             } else if ($resultsPerson['id'] == "1849041546") {
                 //Hoovert
-                $saveperson['cost'] = 111154;
-                $saveperson['retail'] = 138581;
+                $saveperson['cost'] = 116154;
+                $saveperson['retail'] = 127581;
                 $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 37.05;
                 $saveperson['retail_us'] = 43.79;
             } else if ($resultsPerson['id'] == "2316429479") {
                 //Julian
-                $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 33139;
+                $saveperson['cost'] = 26400;
+                $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "1856450064") {
@@ -1459,8 +1467,8 @@ class Proofhub {
                 $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4472620297") {
                 //Neiderson
-                $saveperson['cost'] = 26580;
-                $saveperson['retail'] = 33139;
+                $saveperson['cost'] = 26400;
+                $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "3464709062") {
@@ -1471,8 +1479,8 @@ class Proofhub {
                 $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1856110846") {
                 //David Mendez
-                $saveperson['cost'] = 81418;
-                $saveperson['retail'] = 101508;
+                $saveperson['cost'] = 84900;
+                $saveperson['retail'] = 92602;
                 $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 27.14;
                 $saveperson['retail_us'] = 32.07;
@@ -1484,8 +1492,8 @@ class Proofhub {
                 $saveperson['retail_us'] = 12.10;
             } else if ($resultsPerson['id'] == "3216537278") {
                 //Laura Aires
-                $saveperson['cost'] = 36600;
-                $saveperson['retail'] = 45631;
+                $saveperson['cost'] = 37084;
+                $saveperson['retail'] = 40500;
                 $saveperson['cost_us'] = 12.20;
                 $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4194692322") {
@@ -1517,6 +1525,12 @@ class Proofhub {
                 $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "4155953643") {
                 //Maria luisa
+                $saveperson['cost'] = 33580;
+                $saveperson['retail'] = 41866;
+                $saveperson['cost_us'] = 11.19;
+                $saveperson['retail_us'] = 13.23;
+            } else if ($resultsPerson['id'] == "5105315875") {
+                //Fabian Herrera
                 $saveperson['cost'] = 33580;
                 $saveperson['retail'] = 41866;
                 $saveperson['cost_us'] = 11.19;

@@ -40,6 +40,12 @@ class Rapigo {
 
     public function getEstimate(array $points) {
         //dd($points);
+        foreach ($points as $value) {
+            $result = $this->checkAddress($value['address']);
+            if(!$result['result']){
+                dd($value['address']);
+            }
+        }
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         //dd($query);
