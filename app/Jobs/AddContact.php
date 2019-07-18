@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 use App\Models\User;
-use App\Services\EditUserData;
+use App\Services\Contacts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,8 +33,8 @@ class AddContact implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EditUserData $editUserData)
+    public function handle(Contacts $contacts)
     {
-        $editUserData->addContact($this->user, $this->contact_id); 
+        $contacts->addContact($this->user, $this->contact_id); 
     }
 }

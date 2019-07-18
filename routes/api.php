@@ -57,16 +57,16 @@ Route::post('payu/webhook', 'PayuController@webhookPayU');
 Route::post('rapigo/webhook', 'RapigoController@webhook');
 
 
-Route::delete('contacts/{code?}', 'UserApiController@deleteContact');
-Route::get('contacts', 'UserApiController@getContacts');
-Route::post('contacts/check', 'UserApiController@checkContacts');
-Route::post('contacts', 'UserApiController@importContactsId');
-Route::post('contacts/level', 'UserApiController@updateContactsLevel');
-Route::post('contacts/add/{code?}', 'UserApiController@addContact');
-Route::get('contacts/block/{code?}', 'UserApiController@blockContact');
-Route::get('contacts/code/{code?}', 'UserApiController@getContactByCode');
-Route::get('contacts/email/{email?}', 'UserApiController@getContactByEmail');
-Route::get('contacts/unblock/{code?}', 'UserApiController@unblockContact');
+Route::delete('contacts/{code?}', 'ContactsApiController@deleteContact');
+Route::get('contacts', 'ContactsApiController@getContacts');
+Route::post('contacts/check', 'ContactsApiController@checkContacts');
+Route::post('contacts', 'ContactsApiController@importContactsId');
+Route::post('contacts/level', 'ContactsApiController@updateContactsLevel');
+Route::post('contacts/add/{code?}', 'ContactsApiController@addContact');
+Route::get('contacts/block/{code?}', 'ContactsApiController@blockContact');
+Route::get('contacts/code/{code?}', 'ContactsApiController@getContactByCode');
+Route::get('contacts/email/{email?}', 'ContactsApiController@getContactByEmail');
+Route::get('contacts/unblock/{code?}', 'ContactsApiController@unblockContact');
 Route::get('user/medical/{code?}', 'AuthApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
 Route::get('user/authtokens', 'UserApiController@getTokens');

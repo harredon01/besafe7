@@ -32,16 +32,14 @@ class PayuSeeder extends Seeder {
      * The edit profile implementation.
      *
      */
-    protected $food;
+    protected $payu;
 
-    public function __construct(PayU $proofhub) {
-        $this->proofhub = $proofhub;
+    public function __construct(PayU $payu) {
+        $this->payu = $payu;
     }
 
     public function run() {
-        $payment = Payment::find(446);
-        dispatch(new ApprovePayment($payment, "Food"));
-        //$this->proofhub->sendGet("https://maps.googleapis.com/maps/api/place/findplacefromtext/json?key=AIzaSyDMggl2vpY-NVNQNNqj8yAFUcbgSYI9wss&input=Carrera 7&inputtype=textquery&language=es&fields=formatted_address,geometry,icon,id,name&locationbias=circle:53000@4.694278,-74.067352");
+        $this->payu->checkOrders();
     }
 
 }

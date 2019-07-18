@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\User; 
+use App\Models\User;
 use App\Models\Article;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
@@ -59,14 +59,17 @@ class Routing {
         $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
-        
+
         $stopContainer = $stop->toArray();
         unset($stopContainer['id']);
         $newStop = Stop::create($stopContainer);
-        DB::statement( "UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
-        DB::statement( "UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id ;");
+        DB::statement("UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
+        foreach ($stop->deliveries as $value) {
+            DB::statement("UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id and delivery_id = $value->id ;");
+        }
         $stop->delete();
     }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -87,10 +90,13 @@ class Routing {
         $stopContainer = $stop->toArray();
         unset($stopContainer['id']);
         $newStop = Stop::create($stopContainer);
-        DB::statement( "UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
-        DB::statement( "UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id ;");
-        $stop->delete();
+        DB::statement("UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
+        foreach ($stop->deliveries as $value) {
+            DB::statement("UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id and delivery_id = $value->id ;");
+        }
         
+        $stop->delete();
+
         return $newRoute;
     }
 
@@ -115,7 +121,7 @@ class Routing {
             $income = 0;
             $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             foreach ($stops as $stop) {
-                $income +=$stop->shipping;
+                $income += $stop->shipping;
                 $address = $stop->address;
                 $querystop = [
                     "address" => $address->address,
@@ -127,6 +133,7 @@ class Routing {
             }
             if ($route->provider == "Rapigo") {
                 $rapigoResponse = $rapigo->getEstimate($queryStops);
+                //dd($rapigoResponse);
             } else if ($route->provider == "Basilikum") {
                 $rapigoResponse = $basilikum->getEstimate($queryStops);
             }
@@ -315,7 +322,7 @@ class Routing {
                         "address" => $stop->address->address . " " . $stop->address->notes,
                         "description" => $resultData['description'],
                         "type" => "point",
-                        "phone" => $stop->address->phone
+                        "phone" => $resultData['phone']
                     ];
                     array_push($queryStops, $querystop);
                     $results = $resultData['results'];
@@ -620,7 +627,7 @@ class Routing {
     }
 
     private function addpickupStop(Route $route) {
-        if($route->provider=="Basilikum"){
+        if ($route->provider == "Basilikum") {
             return;
         }
         $addStop = true;

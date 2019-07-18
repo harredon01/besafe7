@@ -22,7 +22,6 @@ use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
 use App\Mail\ScenarioSelect;
 use App\Mail\Newsletter;
-use App\Mail\NewsletterPadre;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -353,9 +352,9 @@ class Food {
 
             $className = "App\\Services\\EditAlerts";
             $platFormService = new $className();
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterPadre());
+                Mail::to($user->email)->send(new Newsletter());
             }
         }
     }
@@ -372,8 +371,10 @@ class Food {
     public function getStopDetails($results,$stop,$config) {
         $stopDescription = "";
         $address = $stop->address;
+        $phone = "";
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
+            $phone = $delUser->cellphone;
             $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
             $descr = $delUser->firstName . " " . $delUser->lastName . " ";
             $details = json_decode($stopDel->details, true);
@@ -422,7 +423,7 @@ class Food {
             $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
-        return ["results" => $results, "description" => $stopDescription];
+        return ["results" => $results, "description" => $stopDescription,"phone" => $phone];
     }
 
 
