@@ -70,6 +70,81 @@ class Routing {
         $stop->delete();
     }
 
+    public function updateRouteDelivery($route, $delContainer, $oldRoute, $oldStop) {
+        $delivery = Delivery::find($delContainer);
+        $details = json_decode($delivery->details,true);
+        $hasPickup = false;
+        $pickupString = "";
+        if(array_key_exists("pickup", $details)){
+            $user = $delivery->user;
+            $hasPickup = true;
+            $pickupString =  "Envase de " . $user->firstName . " " . $user->lastName;
+        }
+        $stop = Stop::where("route_id", $route)->where("address_id", $delivery->address_id)->first();
+        $newRoute = Route::find($route);
+        $oldStop = Stop::find($oldStop);
+        $oldRoute = Route::find($oldRoute);
+        if ($stop) {
+            DB::statement("UPDATE delivery_stop set stop_id=$stop->id where delivery_id = $delivery->id and stop_id = $oldStop->id ;");
+            
+            $stop->shipping += $delivery->shipping;
+            if($hasPickup){
+                $details = json_decode($stop->details,true);
+                if(array_key_exists("pickups", $details)){
+                    array_push($details["pickups"], $pickupString);
+                } else {
+                    $details["pickups"]=[$pickupString];
+                }
+            }
+            $stop->amount++;
+            $stop->save();
+        } else {
+            $stopContainer = [
+                "deliveries" => [$delivery],
+                "address_id"=> $delivery->address_id,
+                "amount" =>1,
+                "shipping" => $delivery->shipping
+            ];
+            if($hasPickup){
+                $stopContainer["pickups"] = [$pickupString];
+            }
+            $this->addToNewStop($newRoute, $stopContainer);
+        }
+        $oldStop->shipping -= $delivery->shipping;
+        $oldStop->amount--;
+        $oldStop->save();
+        $newRoute->unit++;
+        $newRoute->unit_price += $delivery->shipping;
+        $newRoute->save();
+        $oldRoute->unit--;
+        $oldRoute->unit_price = $oldRoute->unit_price - $delivery->shipping;
+        $oldRoute->save();
+        DB::statement("UPDATE delivery_route set route_id=$newRoute->id where delivery_id = $delivery->id and route_id = $oldRoute->id;");
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteRoute($route) {
+        $route = Route::find($route);
+        if ($route) {
+            $deliveries = $route->deliveries;
+            if (count($deliveries) > 0) {
+                return array("status" => "error", "message" => "Cant delete a route with deliveries");
+            } else {
+                foreach ($route->stops as $stop) {
+                    $stop->delete();
+                }
+                $route->delete();
+                return array("status" => "success", "message" => "Route deleted");
+            }
+        }
+        return array("status" => "error", "message" => "Route not found");
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -94,7 +169,7 @@ class Routing {
         foreach ($stop->deliveries as $value) {
             DB::statement("UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id and delivery_id = $value->id ;");
         }
-        
+
         $stop->delete();
 
         return $newRoute;
