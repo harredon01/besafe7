@@ -50,7 +50,7 @@ class UserApiController extends Controller {
         $this->cleanSearch = $cleanSearch;
         $this->editUserData = $editUserData;
         $this->auth = $auth;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('create');
     }
 
     /**

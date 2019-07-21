@@ -70,8 +70,8 @@ class Routing {
         $stop->delete();
     }
 
-    public function updateRouteDelivery($route, $delContainer, $oldRoute, $oldStop) {
-        $delivery = Delivery::find($delContainer);
+    public function updateRouteDelivery($data) {
+        $delivery = Delivery::find($data['delivery_id']);
         $details = json_decode($delivery->details,true);
         $hasPickup = false;
         $pickupString = "";
@@ -80,10 +80,10 @@ class Routing {
             $hasPickup = true;
             $pickupString =  "Envase de " . $user->firstName . " " . $user->lastName;
         }
-        $stop = Stop::where("route_id", $route)->where("address_id", $delivery->address_id)->first();
-        $newRoute = Route::find($route);
-        $oldStop = Stop::find($oldStop);
-        $oldRoute = Route::find($oldRoute);
+        $stop = Stop::where("route_id", $data['route_id'])->where("address_id", $delivery->address_id)->first();
+        $newRoute = Route::find($data['route_id']);
+        $oldStop = Stop::find($data['old_stop_id']);
+        $oldRoute = $oldStop->route;
         if ($stop) {
             DB::statement("UPDATE delivery_stop set stop_id=$stop->id where delivery_id = $delivery->id and stop_id = $oldStop->id ;");
             
@@ -143,6 +143,26 @@ class Routing {
             }
         }
         return array("status" => "error", "message" => "Route not found");
+    }
+    
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteStop($stop) {
+        $stop = Stop::find($stop);
+        if ($stop) {
+            $deliveries = $stop->deliveries;
+            if (count($deliveries) > 0) {
+                return array("status" => "error", "message" => "Cant delete a stop with deliveries");
+            } else {
+                $stop->delete();
+                return array("status" => "success", "message" => "Stop deleted");
+            }
+        }
+        return array("status" => "error", "message" => "Stop not found");
     }
 
     /**

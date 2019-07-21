@@ -125,6 +125,19 @@ class RouteController extends Controller {
                     'message' => "Stop updated"
         ]);
     }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function updateRouteDelivery(Request $request,$stop, $route) {
+        $this->routing->updateRouteDelivery($request->all());
+        return response()->json([
+                    'status' => "success",
+                    'message' => "Stop updated"
+        ]);
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -137,6 +150,32 @@ class RouteController extends Controller {
         return response()->json([
                     'status' => "success",
                     'message' => "Stop added to new route"
+        ]);
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteStop($stop) {
+        $this->routing->deleteStop($stop);
+        return response()->json([
+                    'status' => "success",
+                    'message' => "Stop deleted"
+        ]);
+    }
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Route  $route
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteRoute($route) {
+        $this->routing->deleteRoute($route);
+        return response()->json([
+                    'status' => "success",
+                    'message' => "Route deleted"
         ]);
     }
 

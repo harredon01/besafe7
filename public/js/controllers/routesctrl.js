@@ -78,6 +78,7 @@
                     stops[item].name = stops[item].address.address;
                     stops[item].lat = stops[item].address.lat;
                     stops[item].long = stops[item].address.long;
+                    stops[item].moving_delivery = null;
                     if ($scope.mapActive) {
                         stops[item].marker = MapService.createStop(stops[item]);
                     }
@@ -177,6 +178,30 @@
             }
             $scope.updateRouteStop = function (stop) {
                 Routes.updateRouteStop(stop.id, stop.route_id).then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.updateRouteDelivery = function (stop) {
+                Routes.updateRouteStop(stop.route_id,stop.moving_delivery,stop.id).then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.deleteRoute = function (route_id) {
+                Routes.deleteRoute(route_id).then(function (data) {
+
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.deleteStop = function (stop_id) {
+                Routes.deleteStop(stop_id).then(function (data) {
 
                 },
                         function (data) {

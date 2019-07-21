@@ -33,6 +33,12 @@
                     <td>
                         Acciones
                     </td>
+                    <td>
+                        Acciones
+                    </td>
+                    <td>
+                        Acciones
+                    </td>
                 </tr>
                 <tr ng-repeat="stop in route.stops">
                     <td>
@@ -55,9 +61,14 @@
                         </tr>
                     </table>
                     </td>
-                    <td><input type="tel" name="Route" ng-model="stop.route_id" ng-show="stop.amount>0"/>
-                    <button ng-click="updateRouteStop(stop)" ng-show="stop.amount>0">Actualizar</button></td>
-                    <td><button ng-click="sendStopToNewRoute(stop.id)" ng-show="stop.amount>0">Nueva Ruta</button></td>
+                    <td><input type="tel" name="Route" ng-model="stop.route_id"/>
+                    <button ng-click="updateRouteStop(stop)">Actualizar</button></td>
+                    <td><select name="moving_delivery" ng-model="stop.moving_delivery">
+                            <option ng-repeat="delivery in stop.deliveries" ng-value="delivery.id">@{{ delivery.id}}</option>
+                        </select>
+                    <button ng-click="updateRouteDelivery(stop)">Actualizar</button></td>
+                    <td><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
+                    <td><button ng-click="deleteStop(stop.id)">Borrar parada</button></td>
                 </tr>
             </table>
             <!--ul>
@@ -92,6 +103,7 @@
             <br/><a href="javascript:;" ng-click="buildRoute(route)" class="editar">Construir</a>
             <br/><br/><a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
             <br/><br/><a href="javascript:;" ng-click="addReturnStop(route.id)" class="editar">addReturnStop</a>
+            <br/><br/><a href="javascript:;" ng-click="deleteRoute(route.id)" class="editar">deleteRoute</a>
         </li>
         <li ng-show="showMore">
             <button ng-click="getRoutes()">Cargar mas</button>

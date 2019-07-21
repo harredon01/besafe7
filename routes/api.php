@@ -241,6 +241,9 @@ Route::get('routes', 'RouteController@index');
 Route::post('routes/{code?}/build', 'RouteController@buildRoute');
 Route::post('routes/{code?}/return', 'RouteController@addReturnStop');
 Route::post('routes/{code?}/stop/{stop?}', 'RouteController@updateRouteStop');
+Route::post('routes/add_delivery', 'RouteController@updateRouteDelivery');
+Route::delete('routes/{route?}', 'RouteController@deleteRoute');
+Route::delete('stops/{stop?}', 'RouteController@deleteStop');
 Route::post('routes/stop/{stop?}', 'RouteController@sendStopToNewRoute');
 
 Route::post('favorites', 'FavoriteController@postAddFavoriteObject');

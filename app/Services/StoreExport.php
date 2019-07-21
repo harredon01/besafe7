@@ -19,7 +19,7 @@ class StoreExport {
 
     const COMMISION_RATE = 0.1;
     const TAX_RATE = 0.08;
-    const PACKING_COST = 1450;
+    const PACKING_COST = 1400;
     const ORDER_APPORVED_STATUS = 'approved';
     const COMMISION_WO_DISCOUNT = 'Comision antes descuentos';
     const DICOUNT_COMMISION = 'Descuento Comision';
@@ -352,14 +352,14 @@ class StoreExport {
                     $oTax += $tTax;
                     if (array_key_exists('shipping', $attributes)) {
                         if (array_key_exists('requires_credits', $attributes)) {
-                            $tComision = $item->quantity * ($item->price - ($item->cost + $item->tax + ((double) $attributes['shipping'])));
+                            $tComision = $item->quantity * ($item->cost + $item->tax)*self::COMMISION_RATE;
                         } else {
 
                             $packing += $item->quantity * self::PACKING_COST * $buyers;
                             $oPacking += $item->quantity * self::PACKING_COST * $buyers;
                             $packingNum += $item->quantity * $buyers;
                             $oPackingNum += $item->quantity * $buyers;
-                            $tComision = $item->quantity * ($item->price - ($item->cost + (self::PACKING_COST * $buyers) + $item->tax + ((double) $attributes['shipping'])));
+                            $tComision = $item->quantity * ($item->cost + $item->tax)*self::COMMISION_RATE;
                         }
                     } else {
                         $tComision = $item->quantity * ($item->price - ($item->cost + $item->tax));
@@ -425,17 +425,9 @@ class StoreExport {
             $oProviderMarketingDiscount = 0;
             if ($oOperationDiscount > 0 || $oMarketingDiscount > 0) {
 
-                if (true) {
-                    $oProviderOperationDiscount = $oOperationDiscount / (1 + self::COMMISION_RATE);
-                } else {
-                    $oProviderOperationDiscount = $oOperationDiscount;
-                }
+                $oProviderOperationDiscount = $oOperationDiscount / (1 + self::COMMISION_RATE);
                 $oMeOperationDiscount = $oOperationDiscount - $oProviderOperationDiscount;
-                if (false) {
-                    $oProviderMarketingDiscount += $oMarketingDiscount / 2;
-                } else {
-                    $oProviderMarketingDiscount += $oMarketingDiscount;
-                }
+                $oProviderMarketingDiscount += $oMarketingDiscount;
                 $oMeMarketingDiscount = $oMarketingDiscount - $oProviderMarketingDiscount;
                 $oMeDiscount = $oMeOperationDiscount + $oMeMarketingDiscount;
                 $oProviderDiscount = $oProviderMarketingDiscount + $oProviderOperationDiscount;
@@ -497,17 +489,9 @@ class StoreExport {
             $ordersData2 = array_merge($ordersData2, $titleO, [$orderItem], $title, $OitemsData, $title2, $OconditionsData, $title3, $OpaymentsData);
         }
         if ($operationDiscount > 0 || $marketingDiscount > 0) {
-            if (true) {
-                $providerOperationDiscount = $operationDiscount / (1 + self::COMMISION_RATE);
-            } else {
-                $providerOperationDiscount = $operationDiscount;
-            }
+            $providerOperationDiscount = $operationDiscount / (1 + self::COMMISION_RATE);
             $meOperationDiscount = $operationDiscount - $providerOperationDiscount;
-            if (false) {
-                $providerMarketingDiscount += $marketingDiscount / 2;
-            } else {
-                $providerMarketingDiscount += $marketingDiscount;
-            }
+            $providerMarketingDiscount += $marketingDiscount;
             $meMarketingDiscount = $marketingDiscount - $providerMarketingDiscount;
             $meDiscount = $meOperationDiscount + $meMarketingDiscount;
             $providerDiscount = $providerMarketingDiscount + $providerOperationDiscount;

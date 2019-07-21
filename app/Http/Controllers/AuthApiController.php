@@ -7,7 +7,6 @@ use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
-use App\Services\EditUserData;
 use App\Services\EditAlerts;
 use App\Services\Security;
 
@@ -148,7 +147,7 @@ class AuthApiController extends Controller {
         $user = $request->user();
         $data = $request->only('old_password');
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['old_password']])) {
-            $validator = $this->editUserData->validatorPassword($request->all());
+            $validator = $this->security->validatorPassword($request->all());
             if ($validator->fails()) {
                 return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
             }

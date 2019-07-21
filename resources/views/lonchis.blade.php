@@ -293,12 +293,12 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>Personal</span>
-                        <h5><small>$</small>14.200c/u</h5>
+                        <h5><small>$</small>14.230c/u</h5>
                     </div>
                     <ul>
                         <li>1 Persona</li>
                         <li>11 Almuerzos</li>
-                        <li>$156.200</li>
+                        <li>$156.530</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
@@ -308,13 +308,13 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>3 Amigos</span>
-                        <h5><small>$</small>12.100c/u</h5>
+                        <h5><small>$</small>13.980c/u</h5>
                     </div>
                     <ul>
                         <li>3 Personas</li>
                         <li>11 Almuerzos/p</li>
                         <li>33 Almuerzos</li>
-                        <li>$399.300</li>
+                        <li>$461.340</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
@@ -324,13 +324,13 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>10 Amigos</span>
-                        <h5><small>$</small>11.400c/u</h5>
+                        <h5><small>$</small>12.780c/u</h5>
                     </div>
                     <ul>
                         <li>10 Personas</li>
                         <li>11 Almuerzos/p</li>
                         <li>110 Almuerzos</li>
-                        <li>$1.254.300</li>
+                        <li>$1.405.800</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
@@ -346,12 +346,12 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>Personal</span>
-                        <h5><small>$</small>15.100c/u</h5>
+                        <h5><small>$</small>15.330c/u</h5>
                     </div>
                     <ul>
                         <li>1 Persona</li>
                         <li>11 Almuerzos</li>
-                        <li>$166.100</li>
+                        <li>$168.630</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
@@ -361,13 +361,13 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>3 Amigos</span>
-                        <h5><small>$</small>13.000c/u</h5>
+                        <h5><small>$</small>15.080c/u</h5>
                     </div>
                     <ul>
                         <li>3 Personas</li>
                         <li>11 Almuerzos/p</li>
                         <li>33 Almuerzos</li>
-                        <li>$427.900</li>
+                        <li>$497.640</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
@@ -377,13 +377,13 @@
                 <div class="single-price">
                     <div class="prc-head">
                         <span>10 Amigos</span>
-                        <h5><small>$</small>12.250c/u</h5>
+                        <h5><small>$</small>13.880c/u</h5>
                     </div>
                     <ul>
                         <li>10 Personas</li>
                         <li>11 Almuerzos/p</li>
                         <li>110 Almuerzos</li>
-                        <li>$1.254.300</li>
+                        <li>$1.526.800</li>
                         <li>[ENTRADA + PLATO FUERTE + DOMICILIO]</li>
                     </ul>
                     <a style="display: none" href="#">Order Now</a>
