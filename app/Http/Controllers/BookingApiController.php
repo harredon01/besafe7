@@ -6,12 +6,6 @@ use Illuminate\Http\Request;
 
 class BookingApiController extends Controller
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $auth;
 
     /**
      * The edit alerts implementation.
@@ -21,12 +15,11 @@ class BookingApiController extends Controller
 
     /**
      * Create a new controller instance.
-     *
+     * 
      * @return void
      */
-    public function __construct(Guard $auth, EditBooking $editBooking) {
+    public function __construct(EditBooking $editBooking) {
         $this->editBooking = $editBooking;
-        $this->auth = $auth;
         $this->middleware('auth:api');
     }
 

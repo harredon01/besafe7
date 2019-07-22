@@ -137,7 +137,7 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function getBookingsObject(array $data, User $user) {
+    public function getBookingsObject(array $data) {
         $validator = $this->validatorGetBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
