@@ -418,7 +418,7 @@
 <p style="font-size: 12px; line-height: 27px; margin: 0;"><span style="font-size: 15px;">1. Retornable. </span></p>
 <ul>
 <li style="font-size: 12px; line-height: 21px;"><span style="font-size: 12px; line-height: 21px;">Más económico vs un desechable.</span></li>
-<li style="font-size: 12px; line-height: 21px;"><span style="font-size: 12px; line-height: 21px;">Deposito de $14.00 para asegurara el buen uso de los envases. Al finalizar el plan se devolverá el deposito*</span></li>
+<li style="font-size: 12px; line-height: 21px;"><span style="font-size: 12px; line-height: 21px;">Deposito de $14.00 para asegurara el buen uso de los envases. Al finalizar el plan se devolverá el deposito menos su transporte</span></li>
 <li style="font-size: 12px; line-height: 21px;"><span style="font-size: 12px; line-height: 21px;">Higiénicos, herméticos, resistentes a microondas y refrigeración.</span></li>
 </ul>
 <p style="font-size: 12px; line-height: 21px; margin: 0;"> </p>

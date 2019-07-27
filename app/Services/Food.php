@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteDeliver;
 use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
-use App\Mail\ScenarioSelect;
+use App\Mail\Register;
 use App\Mail\Newsletter;
 use App\Services\Rapigo;
 use DB;
@@ -332,7 +332,7 @@ class Food {
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
 
-        $followers = DB::select("select id,email from users where optinMarketing = 1 ");
+        $followers = DB::select("select id,email from users where id > 274");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -354,7 +354,7 @@ class Food {
             $platFormService = new $className();
             //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Newsletter());
+                Mail::to($user->email)->send(new Register());
             }
         }
     }

@@ -3,7 +3,7 @@
         .controller('DeliveriesCtrl', function ($scope, $rootScope, Food, MapService) {
             $scope.data = {};
             $scope.listArticles = {};
-            $scope.deliveries;
+            $scope.deliveries = [];
             $scope.page = 0;
             $scope.loadMore = true;
             $scope.status = 'enqueue';
@@ -38,34 +38,45 @@
             }
             $scope.createMapData = function () {
                 console.log("Creating map data")
-                for (item in $scope.deliveries) {
-                    $scope.deliveries[item].marker = MapService.createStop($scope.deliveries[item]);
+                let firstdelivery = $scope.deliveries[0];
+                let count = 0;
+                let i = 0;
+                for (let item in $scope.deliveries) {
+                    i++;
+                    if ($scope.deliveries[item].address_id == firstdelivery.address_id) {
+                        count++;
+                    } else {
+                        firstdelivery.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=' + count + '|FE6256|000000'
+                        MapService.createStop(firstdelivery);
+                        firstdelivery = $scope.deliveries[item];
+                        count = 1;
+                    }
+                    if (i == $scope.deliveries.length) {
+                        firstdelivery.icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=' + count + '|FE6256|000000'
+                        MapService.createStop(firstdelivery);
+                    }
                 }
-            }
-            $scope.buildDeliveryData = function (delivery) {
-                delivery.details = JSON.parse(delivery.details);
-                delivery.name = delivery.address.address;
-                delivery.lat = delivery.address.lat;
-                delivery.delivery = new Date(delivery.delivery);
-                delivery.long = delivery.address.long;
-                if ($scope.mapActive) {
-                    delivery.marker = MapService.createStop(delivery);
-                }
-                return delivery;
             }
             $scope.getDeliveries = function () {
                 console.log("Status", $scope.status);
                 $scope.page++;
-                let url = "includes=user,address&order_by=address_id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
+                let url = "includes=user,address&limit=50&order_by=address_id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
                 Food.getDeliveries(url).then(function (data) {
                     let deliveriesCont = data.data;
                     if (data.page == data.last_page) {
                         $scope.loadMore = false;
                     }
-                    for (item in deliveriesCont) {
-                        deliveriesCont[item] = $scope.buildDeliveryData(deliveriesCont[item]);
+                    if (deliveriesCont.length > 0) {
+                        for (item in deliveriesCont) {
+                            let delivery = deliveriesCont[item];
+                            delivery.details = JSON.parse(delivery.details);
+                            delivery.name = delivery.address.address;
+                            delivery.lat = delivery.address.lat;
+                            delivery.delivery = new Date(delivery.delivery);
+                            delivery.long = delivery.address.long;
+                            $scope.deliveries.push(delivery);
+                        }
                     }
-                    $scope.deliveries = deliveriesCont;
                     console.log("Deliveries", $scope.deliveries);
                     $scope.replaceFood();
                 },

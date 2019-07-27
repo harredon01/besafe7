@@ -98,6 +98,7 @@ angular.module('besafe')
                 console.log("creating stop", stop)
                 var marker = new google.maps.Marker({
                     id: stop.id,
+                    icon: stop.icon,
                     position: new google.maps.LatLng(stop.lat, stop.long),
                     map: damap,
                     animation: google.maps.Animation.DROP,

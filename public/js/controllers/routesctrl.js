@@ -59,7 +59,8 @@
                 for (route in $scope.routes) {
                     let stops = $scope.routes[route].stops;
                     for (item in stops) {
-                        console.log("Creating map data stop")
+                        console.log("Creating map data stop");
+                        stops[item].icon = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=' + stops[item].amount + '|FE6256|000000';
                         stops[item].marker = MapService.createStop(stops[item]);
                     }
                     $scope.routes[route].stops = stops;

@@ -11,7 +11,7 @@ use App\Services\EditOrder;
 use App\Services\EditRating;
 use App\Services\EditBooking;
 use App\Services\MerchantImport;
-use App\Models\OfficeHour;
+use App\Models\CoveragePolygon;
 use App\Models\PaymentMethod;
 
 class MerchantTableSeeder extends Seeder {
@@ -223,6 +223,17 @@ class MerchantTableSeeder extends Seeder {
                     'unit' => "hour",
                     'currency' => "COP",
                     'status' => "active"
+        ));
+        CoveragePolygon::create(array(
+                    'coverage' => '[{"lat":4.771282401176111,"lng":-74.05340362499999},{"lat":4.770644568191283,"lng":-74.11178957128908},{"lat":4.637031044614385,"lng":-74.19053613183593},{"lat":4.579612329671235,"lng":-74.16006166969612},{"lat":4.575574473123056,"lng":-74.06504795214846},{"lat":4.752122684529745,"lng":-74.00877166699217},{"lat":4.771282401176111,"lng":-74.05340362499999}]',
+                    'lat' => 4.721717000,
+                    'long' => -74.069855000,
+                    'country_id' => 1,
+                    'region_id' => 11,
+                    'city_id' => 524,
+                    'merchant_id' => $merchant->id,
+                    'address_id' => 14,
+                    'provider' => 'Basilikum',
         ));
         $merchant->categories()->save($category);
         $data = [
