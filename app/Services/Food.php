@@ -331,8 +331,8 @@ class Food {
         $date = date_create();
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
-
-        $followers = DB::select("select id,email from users where id > 274");
+        // id > 130 and id < 200 bota 500
+        $followers = DB::select("select id,email from users where id < 131 and optinMarketing = 1");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -340,7 +340,7 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Visita tu correo para enterarte de nuestros menus y promociones de esta semana",
+                "subject" => "Visita tu correo para enterarte de nuestros menus de esta semana",
                 "object" => "Lonchis",
                 "sign" => true,
                 "payload" => $payload,
@@ -352,9 +352,9 @@ class Food {
 
             $className = "App\\Services\\EditAlerts";
             $platFormService = new $className();
-            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Register());
+                Mail::to($user->email)->send(new Newsletter());
             }
         }
     }
