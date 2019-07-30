@@ -168,7 +168,7 @@
                                                                             <td class="h2 pb25" style="color:#444444; font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; padding-bottom:25px;">Frescos y deliciosos</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text-center pb25" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; padding-bottom:25px;">Menú semana del 17 al 21 de Junio</td>
+                                                                            <td class="text-center pb25" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; padding-bottom:25px;">Menú semana del 29 de Julio al 2 de Agosto</td>
                                                                         </tr>
 
                                                                     </table>
@@ -204,7 +204,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/28/6e/ad/286ead8ed049d165e6a9ba8f2944aabb.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/jul-pollo-champinones.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -213,11 +213,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Lunes 17 de Junio
+                                                                                Martes 30 de Julio
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Pollo Oriental: Cuadritos de pollo apanados bañados en salsa agridulce acompañado con arroz con ajonjolí y verduras orientales. </td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Lomitos de pollo en salsa de champiñones acompañado con arroz al parmesano y verduras calientes</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -243,7 +243,7 @@
                                                                 <th class="column-top" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/e7/c0/6c/e7c06c8c804e16ffd99c4db70a3ffe80.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/jul-sobre-barrilga.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -251,10 +251,10 @@
                                                                 <th class="column" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">Martes 18 de Junio </td>
+                                                                            <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">Miercoles 31 de Julio</td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Lomitos de pollo en salsa de champiñones acompañado con arroz al parmesano y verduras calientes.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Sobrebarriga en salsa criolla, papas sofritas y ensalada</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -294,10 +294,10 @@
                                                     <td style="padding: 70px 30px 70px 30px;" class="p30-15" bgcolor="#62be77">
                                                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                             <tr>
-                                                                <td class="h2 white pb25" style="font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; color:#ffffff; padding-bottom:25px;"><strong>Usa nuestros super cupones de descuento comprando por nuestra app</strong></td>
+                                                                <td class="h2 white pb25" style="font-family:'Lato', Arial ,sans-serif; font-size:30px; line-height:36px; text-align:center; color:#ffffff; padding-bottom:25px;"><strong>Cuida el planeta y alimentate bien con Lonchis App</strong></td>
                                                             </tr>
                                                             <tr>
-                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">Con el cupon "conoceLonchis" obtienes 25% de descuento en almuerzos<br/>Con el cupon "2amigos" obtienes 30% de descuento en planes de almuerzo que compres con un amigo<br/>Con el cupon "3amigos" obtienes 40% de descuento en planes de almuerzo que compres con dos amigos<br/>*Valido hasta 25 almuerzos por persona y una orden por persona.</td>
+                                                                <td class="text-center white pb30" style="font-family:'Lato', Arial,sans-serif; font-size:17px; line-height:30px; text-align:center; color:#ffffff; padding-bottom:30px;">El mejor servicio de almuerzos a domicilio. Comida deliciosa y nutritiva a buen precio cuidando el medio ambiente. <br/>Te recomendamos nuestros envases retornables que generan 0 basura. </td>
                                                             </tr>
                                                             <!-- Button -->
                                                             <tr>
@@ -337,7 +337,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/75/21/7a/75217a384d8a635baa13cebae01eb04c.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/jul-pollo-pernil-salsa-roja.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -346,11 +346,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Miércoles 19 de Junio
+                                                                                Jueves 1 de Agosto
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Sopa mexicana: Crema de tomate, acompañada con pollo desmechado, aguacate, queso en cuadritos, crema de leche y totopos.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Pierna pernil de pollo en salsa napolitana, papa criolla y ensalada (lechuga, tomate, zanahoria aguacate y vinagreta aparte )</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -376,7 +376,7 @@
                                                                 <th class="column-dir-top" dir="ltr" width="290" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; direction:ltr; vertical-align:top;">
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
-                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://i.pinimg.com/564x/e9/23/8a/e9238a6769584659a22772c6393d669d.jpg" width="310" height="233" border="0" alt="" /></td>
+                                                                            <td class="fluid-img" style="font-size:0pt; line-height:0pt; text-align:left;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/jul-posta-negra-cartagenera.jpg" width="310" height="233" border="0" alt="" /></td>
                                                                         </tr>
                                                                     </table>
                                                                 </th>
@@ -385,11 +385,11 @@
                                                                     <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                                                         <tr>
                                                                             <td class="h4 pb20" style="color:#000000; font-family:'Lato', Arial ,sans-serif; font-size:20px; line-height:28px; text-align:left; font-weight:bold; padding-bottom:20px;">
-                                                                                Jueves 20 de Junio
+                                                                                Viernes 2 de agosto
                                                                             </td>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Lomito teriyaki acompañado con arroz al perejil y torta de verduras.</td>
+                                                                            <td class="text pb20" style="color:#666666; font-family:'Lato', Arial,sans-serif; font-size:16px; line-height:28px; text-align:left; padding-bottom:20px;">Posta a la cartagenera, ensalada de papa y ensalada verde.</td>
                                                                         </tr>
                                                                         <!-- Button -->
                                                                         <tr>
@@ -408,7 +408,7 @@
                                                         </table>
                                                     </td>
                                                 </tr>
-                                                <tr>
+                                                <!--tr>
                                                     <td>
                                                         <table width="100%" border="0" cellspacing="0" cellpadding="0" dir="rtl" style="direction: rtl;">
                                                             <tr>
@@ -440,7 +440,7 @@
                                                                                 </table>
                                                                             </td>
                                                                         </tr>
-                                                                        <!-- END Button -->
+                                                                        <!-- END Button ->
                                                                     </table>
                                                                 </th>
                                                             </tr>
@@ -449,7 +449,7 @@
                                                 </tr>
                                             </table>
                                         </td>
-                                    </tr>
+                                    </tr-->
                                 </table>
                             </td>
                         </tr>
@@ -464,14 +464,14 @@
                                     <tr>
                                         <td class="td" style="width:650px; min-width:650px; font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal;">
                                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
-                                                <tr style="display:none;">
+                                                <tr >
                                                     <td align="center" style="padding-bottom: 30px;">
                                                         <table border="0" cellspacing="0" cellpadding="0">
                                                             <tr>
-                                                                    <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_facebook_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
-                                                                <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_twitter_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
-                                                                <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_instagram_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
-                                                                <td class="img" width="34" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_linkedin_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
+                                                                    <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://www.facebook.com/Lonchis-app-623852081448278" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_facebook_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
+                                                                <td class="img" width="55" style="display:none;font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_twitter_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
+                                                                <td class="img" width="55" style="font-size:0pt; line-height:0pt; text-align:left;"><a href="https://instagram.com/lonchisapp_col" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_instagram_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
+                                                                <td class="img" width="34" style="display:none;font-size:0pt; line-height:0pt; text-align:left;"><a href="#" target="_blank"><img src="https://lonchis.com.co/images/newsletter/ico_linkedin_white.jpg" width="34" height="34" border="0" alt="" /></a></td>
                                                             </tr>
                                                         </table>
                                                     </td>

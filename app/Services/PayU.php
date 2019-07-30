@@ -1559,8 +1559,8 @@ class PayU {
 
                         //return ["status" => "success", "transaction" => $transaction, "response" => $response];
                     } else {
-                        $payment->status = "invisible";
-                        $payment->save();
+                        /*$payment->status = "invisible";
+                        $payment->save();*/
                     }
                 }
             }

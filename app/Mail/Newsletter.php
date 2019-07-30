@@ -30,6 +30,6 @@ class Newsletter extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-menus')->subject("Conoce nuestro menu y descuentos de la semana");
+        return $this->view('emails.food.newsletter-menus')->subject("Lochis App, Conoce nuestro menu de la semana");
     }
 }
