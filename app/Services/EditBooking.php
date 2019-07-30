@@ -124,7 +124,7 @@ class EditBooking {
             if ($user->id == $object->user_id) {
                 $booking->total_paid = -1;
                 $booking->save();
-                return response()->json(array("status" => "success", "message" => "Booking approved"));
+                return response()->json(array("status" => "success", "message" => "Booking approved","booking"=>$booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
         }
@@ -164,7 +164,7 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function getBookingsObject(array $data) {
+    public function getBookingsObject(array $data, User $user) {
         $validator = $this->validatorGetBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
