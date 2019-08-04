@@ -22,7 +22,7 @@ class Routing {
 
     const OBJECT_ORDER = 'Order';
     const CREDIT_PRICE = 14000;
-    const LUNCH_ROUTE = 15;
+    const LUNCH_ROUTE = 14;
     const LUNCH_PROFIT = 1100;
     const ROUTE_HOUR_COST = 11000;
     const ROUTE_HOURS_EST = 3;
@@ -874,7 +874,7 @@ class Routing {
                 if ($preorganize) {
                     $totalCounter++;
                     if ($delivery->address == $initialAddress) {
-                        if (($delivery->provider == "Rapigo" && $deliveryCounter < 15) || ($delivery->provider == "Basilikum" && $deliveryCounter < 80)) {
+                        if (($delivery->provider == "Rapigo" && $deliveryCounter < self::LUNCH_ROUTE) || ($delivery->provider == "Basilikum" && $deliveryCounter < 80)) {
                             $deliveryCounter++;
                             $deliveryShipping += $delivery->shipping;
                             array_push($packages, $delivery);
