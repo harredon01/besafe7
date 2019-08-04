@@ -188,6 +188,8 @@ class Rapigo {
                 } else {
                     $user->lunchHash = null;
                 }
+                $delivery->status = "completed";
+                $delivery->save();
             }
             Mail::to($userAdmin)->send(new StopFailed($stop, $runnerName, $runnerPhone));
         }
@@ -216,7 +218,7 @@ class Rapigo {
             $className = "App\\Services\\EditAlerts";
             $editAlerts = new $className;
             $date = date("Y-m-d H:i:s");
-            $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+            $editAlerts->sendMassMessage($data, $followers, null, true, $date, false);
         }
 
         return true;
