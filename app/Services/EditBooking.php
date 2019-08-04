@@ -6,11 +6,36 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Favorite;
 use App\Models\User;
+use App\Services\EditAlerts;
 use Validator;
 
 class EditBooking {
 
     const MODEL_PATH = 'App\\Models\\';
+    const BOOKING_APPROVED = 'Booking_Approved';
+    const BOOKING_CREATED = 'Booking_Created';
+    const BOOKING_DENIED = 'Booking_Denied';
+    const BOOKING_CANCELED = 'Booking_Cancelled';
+    const BOOKING_RESCHEDULE = 'Booking_Reschedule';
+    const BOOKING_STARTING = 'Booking_Starting';
+    const BOOKING_COMPLETED = 'Booking_Completed';
+
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $editAlerts;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param  EventPusher  $pusher
+     * @return void
+     */
+    public function __construct(EditAlerts $editAlerts) {
+        $this->editAlerts = $editAlerts;
+    }
 
     private function checkAvailable(array $data) {
         $from = $data['from'];
@@ -107,24 +132,77 @@ class EditBooking {
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function rescheduleBookingObject(array $data, User $user) {
+        $validator = $this->validatorScheduleBooking($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                $result = $this->checkAvailable($data);
+                if ($result) {
+                    $object->newBooking($user, $data['from'], $data['to']);
+                    return response()->json(array("status" => "success", "message" => "Booking created"));
+                }
+                return response()->json(array("status" => "error", "message" => "Not available"));
+            }
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
 
     /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
-    public function approveBookingObject(array $data, User $user) {
-        $validator = $this->validatorApproveBooking($data);
+    public function changeStatusBookingObject(array $data, User $user) { 
+        $validator = $this->validatorStatusBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
+        $status = $data["status"]; 
         $booking = Booking::find($data['object_id']);
         $object = $booking->bookable;
         if ($object) {
             if ($user->id == $object->user_id) {
-                $booking->total_paid = -1;
-                $booking->save();
-                return response()->json(array("status" => "success", "message" => "Booking approved","booking"=>$booking));
+                $typeAlert = "";
+                $customer = $booking->customer;
+                $followers = [$customer];
+                if ($status == "accepted") {
+                    $booking->total_paid = -1;
+                    $booking->save();
+                    $typeAlert = self::BOOKING_APPROVED;
+                } elseif ($status == "denied") {
+                    $typeAlert = self::BOOKING_DENIED;
+                }
+                $payload = [
+                    "booking_id" => $booking->id,
+                    "first_name" => $user->firstName,
+                    "last_name" => $user->lastName,
+                    "booking_date" => $booking->starts_at,
+                    "status" => $status
+                ];
+                $data = [
+                    "trigger_id" => $user->id,
+                    "message" => "",
+                    "subject" => "",
+                    "object" => self::OBJECT_ORDER,
+                    "sign" => true,
+                    "payload" => $payload,
+                    "type" => $typeAlert,
+                    "user_status" => $user->getUserNotifStatus()
+                ];
+                $date = date("Y-m-d H:i:s");
+                $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
+                return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
         }
@@ -290,9 +368,23 @@ class EditBooking {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorApproveBookings(array $data) {
+    public function validatorStatusBookings(array $data) {
         return Validator::make($data, [
-                    'object_id' => 'required|max:255'
+                    'object_id' => 'required|max:255',
+                    'status' => 'required|max:255',
+        ]);
+    }
+    
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorScheduleBooking(array $data) {
+        return Validator::make($data, [
+                    'object_id' => 'required|max:255',
+                    'status' => 'required|max:255',
         ]);
     }
 

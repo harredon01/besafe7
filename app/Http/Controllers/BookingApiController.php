@@ -50,6 +50,25 @@ class BookingApiController extends Controller
         $user = $request->user();
         return $this->editBooking->addAvailabilityObject($request->all(), $user);
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postChangeStatusBookingObject(Request $request) {
+        $user = $request->user();
+        return $this->editBooking->changeStatusBookingObject($request->all(), $user);
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postRescheduleBookingObject(Request $request) {
+        $user = $request->user();
+        return $this->editBooking->rescheduleBookingObject($request->all(), $user);
+    }
     
     /**
      * Store a newly created resource in storage.
