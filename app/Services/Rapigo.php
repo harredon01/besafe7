@@ -78,18 +78,8 @@ class Rapigo {
     }
 
     public function createRoute(array $points, $route, $stops) {
-        $shippingResponse = $this->getEstimate($points);
-        $type = "stops";
-        if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $shippingResponse['price']) {
-            $route->unit_cost = $shippingResponse['price'];
-        } else {
-            $type = "hour";
-            $shippingResponse['price2'] = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-            $route->unit_cost = self::ROUTE_HOUR_COST * self::ROUTE_HOUR_COST;
-        }
-        if ($type == "hour") {
-            $data['type'] = 'hour';
-        }
+        $route->unit_cost = 20000;
+        $data['type'] = 'hour';
         $deliveries = $route->deliveries;
         $date = date_create($deliveries[0]->delivery);
         $data['fecha_servicio'] = date_format($date, "m/d/Y");

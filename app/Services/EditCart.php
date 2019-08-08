@@ -82,12 +82,12 @@ class EditCart {
           $saleTotal = 0;
           foreach ($saleItems as $item) {
           $saleTotal += $item->getCalculatedValue($subTotal);
-          } 
-        $couponItems = Cart::session($user->id)->getConditionsByType("coupon");
-        $couponTotal = 0;
-        foreach ($couponItems as $item) {
-            $couponTotal += $item->getCalculatedValue($subTotal);
-        }*/
+          }
+          $couponItems = Cart::session($user->id)->getConditionsByType("coupon");
+          $couponTotal = 0;
+          foreach ($couponItems as $item) {
+          $couponTotal += $item->getCalculatedValue($subTotal);
+          } */
         $taxItems = Cart::session($user->id)->getConditionsByType("tax");
         $taxTotal = 0;
 
@@ -170,10 +170,8 @@ class EditCart {
         if (!$item) {
             return true;
         } else {
-            if ($item->requires_authorization == $requires_authorization) {
-                if ($item->merchant_id == $merchant_id) {
-                    return true;
-                }
+            if ($item->merchant_id == $merchant_id) {
+                return true;
             }
             return false;
         }
@@ -470,17 +468,10 @@ class EditCart {
                 $order_id = $this->checkAddToOrder($user, $data);
                 $resultCheck = $this->checkCartAuth($user, true, $order_id, $data['merchant_id']);
                 if ($resultCheck) {
-
                     $losAttributes = array();
                     $losAttributes['is_digital'] = 1;
                     $losAttributes['is_shippable'] = 0;
-                    if (!array_key_exists("cost", $data)) {
-                        $losAttributes['cost'] = 0;
-                    }
-                    if (!array_key_exists("tax", $data)) {
-                        $losAttributes['tax'] = 0;
-                    }
-                    $losAttributes['requires_authorization'] = 1;
+                    $losAttributes['requires_authorization'] = $data['requires_authorization'];
                     $losAttributes['merchant_id'] = $data['merchant_id'];
                     if (array_key_exists("extras", $data)) {
                         foreach ($data["extras"] as $x => $x_value) {
@@ -490,9 +481,9 @@ class EditCart {
                     $item = Item::create([
                                 'name' => $losAttributes['name'],
                                 'user_id' => $user->id,
-                                'price' => $losAttributes['price'],
-                                'cost' => $losAttributes['cost'],
-                                'tax' => $losAttributes['tax'],
+                                'price' => $data['price'],
+                                'cost' => $data['cost'],
+                                'tax' => $data['tax'],
                                 'paid_status' => "unpaid",
                                 'fulfillment' => "unfulfilled",
                                 'quantity' => (int) $data['quantity'],
@@ -503,8 +494,8 @@ class EditCart {
                     ]);
                     Cart::session($user->id)->add(array(
                         'id' => $item->id,
-                        'name' => $losAttributes['name'],
-                        'price' => $losAttributes['price'],
+                        'name' => $data['name'],
+                        'price' => $data['price'],
                         'quantity' => (int) $data['quantity'],
                         'attributes' => $losAttributes
                     ));
@@ -656,6 +647,21 @@ class EditCart {
     public function validatorAddCart(array $data) {
         return Validator::make($data, [
                     'product_id' => 'required|max:255',
+                    'quantity' => 'required|max:255',
+        ]);
+    }
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorAddCartCustom(array $data) {
+        return Validator::make($data, [
+                    'merchant_id' => 'required|max:255',
+            'price' => 'required|max:255',
+            'cost' => 'required|max:255',
+            'tax' => 'required|max:255',
                     'quantity' => 'required|max:255',
         ]);
     }

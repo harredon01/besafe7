@@ -124,8 +124,8 @@ class EditBooking {
             if ($object) {
                 $result = $this->checkAvailable($data);
                 if ($result) {
-                    $object->newBooking($user, $data['from'], $data['to']);
-                    return response()->json(array("status" => "success", "message" => "Booking created"));
+                    $booking = $object->newBooking($user, $data['from'], $data['to']);
+                    return response()->json(array("status" => "success", "message" => "Booking created","booking" => $booking));
                 }
                 return response()->json(array("status" => "error", "message" => "Not available"));
             }

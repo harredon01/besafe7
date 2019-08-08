@@ -22,7 +22,7 @@ class Routing {
 
     const OBJECT_ORDER = 'Order';
     const CREDIT_PRICE = 14000;
-    const LUNCH_ROUTE = 14;
+    const LUNCH_ROUTE = 16;
     const LUNCH_PROFIT = 1100;
     const ROUTE_HOUR_COST = 11000;
     const ROUTE_HOURS_EST = 3;
@@ -175,7 +175,7 @@ class Routing {
         $stop = Stop::find($stopContainer);
         $oldRoute = $stop->route;
         $oldRoute->unit--;
-        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
+        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping; 
         $oldRoute->save();
         $newRoute = $this->createNewRoute($oldRoute->type, $oldRoute->provider);
         $newRoute->unit++;
@@ -185,10 +185,10 @@ class Routing {
         $stopContainer = $stop->toArray();
         unset($stopContainer['id']);
         $newStop = Stop::create($stopContainer);
-        DB::statement("UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
         foreach ($stop->deliveries as $value) {
             DB::statement("UPDATE delivery_route set route_id=$newRoute->id where route_id = $oldRoute->id and delivery_id = $value->id ;");
         }
+        DB::statement("UPDATE delivery_stop set stop_id=$newStop->id where stop_id = $stop->id ;");
 
         $stop->delete();
 
