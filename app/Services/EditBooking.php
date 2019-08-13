@@ -176,9 +176,15 @@ class EditBooking {
                 $typeAlert = "";
                 $customer = $booking->customer;
                 $followers = [$customer];
-                if ($status == "accepted") {
+                if ($status == "approved") {
+                    $updateData = [
+                        "total_paid" => -1,
+                        "updated_at" => date_create()
+                    ];
                     $booking->total_paid = -1;
-                    $booking->save();
+                    //return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
+                    Booking::where("id",$data['object_id'])->update($updateData);
+                    
                     $typeAlert = self::BOOKING_APPROVED;
                 } elseif ($status == "denied") {
                     $typeAlert = self::BOOKING_DENIED;
@@ -194,7 +200,7 @@ class EditBooking {
                     "trigger_id" => $user->id,
                     "message" => "",
                     "subject" => "",
-                    "object" => self::OBJECT_ORDER,
+                    "object" => "Merchant",
                     "sign" => true,
                     "payload" => $payload,
                     "type" => $typeAlert,
@@ -305,7 +311,7 @@ class EditBooking {
                         return response()->json(array(
                                     "status" => "success",
                                     "message" => "",
-                                    "data" => $object->pastBookings()->where('total_paid', -1)->with("customer")->get())
+                                    "data" => $object->futureBookings()->where('total_paid', 0)->with("customer")->get())
                         );
                     }
                 }

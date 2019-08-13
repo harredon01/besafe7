@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Booking;
 
 class EditOrderBooking {
+
     const MODEL_PATH = 'App\\Models\\';
     const OBJECT_ORDER = 'Order';
     const OBJECT_ORDER_REQUEST = 'OrderRequest';
@@ -59,7 +60,7 @@ class EditOrderBooking {
 //            }
 //        }
 
-        return array("status" => "success", "message" => "Conditions added","order" => $order);
+        return array("status" => "success", "message" => "Conditions added", "order" => $order);
     }
 
     public function approvePayment(Payment $payment) {
@@ -86,21 +87,22 @@ class EditOrderBooking {
             $item->attributes = $data;
 
             if (array_key_exists("type", $data)) {
-                if ($data['type'] == "booking") {
-                    $object = $data['object'];
+                if ($data['type'] == "Booking") {
                     $id = $data['id'];
-                    $payer = $order->user_id;
-                    $booking = Booking::where("bookable_type",self::MODEL_PATH.$data['object'])
-                            ->where("bookable_id",$id)
-                            ->where("customer_type",self::MODEL_PATH."User")
-                            ->where("customer_id",$item->user_id)->first();
-                    $attributes = $booking->options;
-                    $attributes['order_id'] = $order->id;
-                    $attributes['item_id'] = $item->id;
-                    $attributes['paid'] = date("Y-m-d h:m:s");
-                    $booking->options = $attributes;
-                    $booking->total_paid = $item->priceSumConditions;
-                    $booking->save();
+                    $booking = Booking::find($id);
+                    if ($booking) {
+                        $attributes = $booking->options;
+                        $attributes['order_id'] = $order->id;
+                        $attributes['item_id'] = $item->id;
+                        $attributes['payer'] = $order->user_id;
+                        $attributes['paid'] = date("Y-m-d h:m:s");
+                        $updateData = [
+                            "options" => $attributes,
+                            "total_paid" => $item->priceSumConditions,
+                            "updated_at" => date_create()
+                        ];
+                        Booking::where("id",$id)->update($updateData);
+                    }
                 }
             }
         }
@@ -108,4 +110,5 @@ class EditOrderBooking {
         $order->save();
         return array("status" => "success", "message" => "Order approved, subtasks completed", "order" => $order);
     }
+
 }
