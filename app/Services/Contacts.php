@@ -86,6 +86,7 @@ class Contacts {
                 "user_status" => $user->getUserNotifStatus()
             ];
             $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true, null);
+            $imports = array_map("unserialize", array_unique(array_map("serialize", $imports)));
             DB::table('contacts')->insert($imports);
             $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
         }

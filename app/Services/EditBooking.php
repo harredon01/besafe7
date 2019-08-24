@@ -8,6 +8,7 @@ use App\Models\Favorite;
 use App\Models\User;
 use App\Services\EditAlerts;
 use Validator;
+use DB;
 
 class EditBooking {
 
@@ -125,13 +126,14 @@ class EditBooking {
                 $result = $this->checkAvailable($data);
                 if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
-                    return response()->json(array("status" => "success", "message" => "Booking created","booking" => $booking));
+                    return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking));
                 }
                 return response()->json(array("status" => "error", "message" => "Not available"));
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
+
     /**
      * Show the application registration form.
      *
@@ -163,12 +165,12 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function changeStatusBookingObject(array $data, User $user) { 
+    public function changeStatusBookingObject(array $data, User $user) {
         $validator = $this->validatorStatusBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $status = $data["status"]; 
+        $status = $data["status"];
         $booking = Booking::find($data['object_id']);
         $object = $booking->bookable;
         if ($object) {
@@ -183,8 +185,8 @@ class EditBooking {
                     ];
                     $booking->total_paid = -1;
                     //return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
-                    Booking::where("id",$data['object_id'])->update($updateData);
-                    
+                    Booking::where("id", $data['object_id'])->update($updateData);
+
                     $typeAlert = self::BOOKING_APPROVED;
                 } elseif ($status == "denied") {
                     $typeAlert = self::BOOKING_DENIED;
@@ -241,6 +243,21 @@ class EditBooking {
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getObjectsWithBookingUser(User $user) {
+        $query .= " select id,name from merchants where user_id = $user->id and id in ( select distinct( bookable_id) from bookable_bookings )";
+        $objects = DB::select($query);
+        return response()->json(array(
+                    "status" => "success",
+                    "message" => "",
+                    "data" => $objects)
+        );
     }
 
     /**
@@ -380,7 +397,7 @@ class EditBooking {
                     'status' => 'required|max:255',
         ]);
     }
-    
+
     /**
      * Get a validator for an incoming edit profile request.
      *

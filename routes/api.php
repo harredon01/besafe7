@@ -250,6 +250,7 @@ Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
 Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
+Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
 Route::post('bookings/status', 'BookingApiController@postChangeStatusBookingObject');
 Route::post('bookings/schedule', 'BookingApiController@postRescheduleBookingObject');

@@ -239,15 +239,11 @@ class EditOrder {
      * Get the failed login message.
      *
      * @return string
-     */ 
+     */
     public function prepareOrder(User $user, $platform, array $info) {
         if (array_key_exists("order_id", $info)) {
             $order = Order::find($info['order_id']);
             if ($order) {
-                $className = "App\\Services\\EditOrder" . ucfirst($platform) ;
-                $gatewayPlat = new $className;
-                $resulting = $gatewayPlat->addDiscounts($user,$order);
-                $order = $resulting["order"];
                 if (array_key_exists("split_order", $info)) {
                     if ($info['split_order']) {
                         //$this->removeTransactionCost($order);
@@ -370,18 +366,18 @@ class EditOrder {
         $results = $this->checkOrderCreditsInternal($user, $order, $data);
         $results['status'] = "success";
         $results['message'] = "Order passed validation";
-        if ($results['requiredCredits'] > 0) {
-            $results['status'] = "error";
-            $results['message'] = "Order does not have enough deposits";
-            $results['required_credits'] = $results['requiredCredits'];
-            $results['type'] = "credits";
-            return $results;
-        }
         if ($results['requiredBuyers'] > 0) {
             $results['status'] = "error";
             $results['message'] = "Order does not have enough buyers";
             $results['required_buyers'] = $results['requiredBuyers'];
             $results['type'] = "buyers";
+            return $results;
+        }
+        if ($results['requiredCredits'] > 0) {
+            $results['status'] = "error";
+            $results['message'] = "Order does not have enough deposits";
+            $results['required_credits'] = $results['requiredCredits'];
+            $results['type'] = "credits";
             return $results;
         }
         if ($results['requiresShipping'] > 0) {
@@ -612,7 +608,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], "Basilikum");
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'],"Basilikum");
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
@@ -1008,13 +1004,20 @@ class EditOrder {
         }
         $sql = "select * from orders o join order_conditions oc on oc.order_id = o.id where o.status = 'approved' and oc.condition_id = $theCondition->id and o.user_id = $order->user_id;";
         $orders = DB::select($sql);
-        if (count($orders) > 0) {
+        if(count($orders)>0){
             return array("status" => "error", "message" => "Coupon quantity");
         }
         if (array_key_exists("minquantity", $attributes)) {
             if ($item->quantity < $attributes["minquantity"]) {
                 return array("status" => "error", "message" => "Coupon quantity");
             }
+        }
+        if (array_key_exists("address", $attributes)) {
+            $address = $order->orderAddresses()->first();
+            $requiredAddress = $attributes["address"];
+            if($requiredAddress["city_id"]!=$address->city_id || $requiredAddress["country_id"]!=$address->country_id || $requiredAddress["address"]!=$address->address){
+                return array("status" => "error", "message" => "Address Error");
+            } 
         }
         if ($item->quantity > 25) {
             return array("status" => "error", "message" => "Coupon quantity");

@@ -252,7 +252,14 @@ class UserApiController extends Controller {
      * @return Response
      */
     public function show($id) {
-        return response()->json($this->editUserData->getContact($id));
+        $user = User::find($id);
+        $user->plan = null;
+        $user->stripe_id = null;
+        $user->trial_ends_at = null;
+        $user->gender = null;
+        $user->docType = null;
+        $user->docNum = null;
+        return response()->json($user);
     }
 
     /**
