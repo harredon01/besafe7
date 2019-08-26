@@ -1015,7 +1015,7 @@ class EditOrder {
         if (array_key_exists("address", $attributes)) {
             $address = $order->orderAddresses()->first();
             $requiredAddress = $attributes["address"];
-            if($requiredAddress["city_id"]!=$address->city_id || $requiredAddress["country_id"]!=$address->country_id || $requiredAddress["address"]!=$address->address){
+            if($requiredAddress["city_id"]!=$address->city_id || $requiredAddress["country_id"]!=$address->country_id || trim($requiredAddress["address"])!=trim($address->address)){
                 return array("status" => "error", "message" => "Address Error");
             } 
         }

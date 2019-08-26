@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use Rinvex\Bookings\Traits\Bookable;
+use Laravel\Scout\Searchable;
 use Cache;
 use App\Models\Availability;
 use App\Models\Booking;
@@ -10,7 +11,7 @@ use Carbon\Carbon;
 
 class Merchant extends Model {
     
-    use Bookable;
+    use Bookable;use Searchable;
 
 /**
      * The database table used by the model.

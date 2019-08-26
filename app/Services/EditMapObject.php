@@ -289,57 +289,27 @@ class EditMapObject {
      * @return Response
      */
     public function getNearby(array $data) {
-        $merchants = $this->getNearbyMerchants($data);
-        $reports = $this->getNearbyReports($data);
-        return array("merchants" => $merchants['merchants'], "reports" => $reports['reports']);
+        $data['type']="Merchant";
+        $merchants = $this->getNearbyObjects($data);
+        $data['type']="Report";
+        $reports = $this->getNearbyObjects($data);
+        return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getNearbyMerchants(array $data) {
+    public function getNearbyObjects(array $data) {
         $radius = 1;
         $R = 6371;
         $lat = $data['lat'];
         $long = $data['long'];
-        $maxLat = $lat + rad2deg($radius / $R);
-        $minLat = $lat - rad2deg($radius / $R);
-        $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        $minLon = $long - rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
-        $thedata = [
-            'lat' => $lat,
-            'lat2' => $lat,
-            'long' => $long,
-            'latinf' => $minLat,
-            'latsup' => $maxLat,
-            'longinf' => $minLon,
-            'longsup' => $maxLon,
-            'radius' => $radius
-        ];
-        $merchants = DB::select(""
-                        . "SELECT m.id, name, description, icon, minimum, lat,`long`, type, telephone, address, 
-			( 6371 * acos( cos( radians( :lat ) ) *
-		         cos( radians( m.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
-		   sin( radians( :lat2 ) ) * sin( radians(  m.lat  ) ) ) ) AS Distance 
-                   FROM merchants m
-                    WHERE
-                        status = 'active'
-                            AND m.private = 0
-                            AND m.type <> ''
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
-                    HAVING distance < :radius order by distance asc limit 20 "
-                        . "", $thedata);
-        return array("merchants" => $merchants);
-    }
-
-    public function getNearbyReports(array $data) {
-        $radius = 1;
-        $R = 6371;
-        $lat = $data['lat'];
-        $long = $data['long'];
+        $type = "";
+        $additionalFields = "";
+        if($data['type']=="Merchant"){
+            $type = "merchants";
+            $additionalFields = " type, telephone, address, ";
+        } else if($data['type']=="Report"){
+            $type = "reports";
+            $additionalFields = " type, telephone, address, report_time, ";
+        } 
         $maxLat = $lat + rad2deg($radius / $R);
         $minLat = $lat - rad2deg($radius / $R);
         $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
@@ -355,12 +325,12 @@ class EditMapObject {
             'radius' => $radius,
         ];
         $reports = DB::select(" "
-                        . "SELECT r.id, name, description, icon, lat,`long`, type, telephone, address, report_time,
+                        . "SELECT r.id, name, description, icon, lat,`long`, ".$additionalFields." 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
                    FROM
-                        reports r
+                    "    .$type. " r
                     WHERE
                         status = 'active'
                             AND r.private = 0
@@ -370,7 +340,7 @@ class EditMapObject {
                     HAVING distance < :radius
                     order by distance asc limit 20 "
                         . "", $thedata);
-        return array("reports" => $reports);
+        return array("data"=> $reports);
     }
 
     function findLonBoundary($lat, $lon, $lat1, $lat2) {

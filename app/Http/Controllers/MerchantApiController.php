@@ -127,7 +127,9 @@ class MerchantApiController extends Controller {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMapObject->getNearbyMerchants($request->all()));
+        $data = $request->all();
+        $data['type']="Merchant";
+        return response()->json($this->editMapObject->getNearbyObjects($data));
     }
 
     /**

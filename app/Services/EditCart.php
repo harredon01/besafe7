@@ -471,7 +471,7 @@ class EditCart {
                     $losAttributes = array();
                     $losAttributes['is_digital'] = 1;
                     $losAttributes['is_shippable'] = 0;
-                    $losAttributes['requires_authorization'] = $data['requires_authorization'];
+                    $losAttributes['requires_authorization'] = 0;
                     $losAttributes['merchant_id'] = $data['merchant_id'];
                     if (array_key_exists("extras", $data)) {
                         foreach ($data["extras"] as $x => $x_value) {
@@ -595,7 +595,7 @@ class EditCart {
             $losAttributes = array();
             $losAttributes['is_digital'] = 1;
             $losAttributes['is_shippable'] = 0;
-            $losAttributes['requires_authorization'] = 1;
+            $losAttributes['requires_authorization'] = 0;
             if (array_key_exists("extras", $data)) {
                 foreach ($data["extras"] as $x => $x_value) {
                     $losAttributes[$x] = $x_value;

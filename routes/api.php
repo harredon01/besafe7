@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use DB;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -109,6 +109,17 @@ Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
+Route::get('reports/search', function (Request $request) {
+    $searchQuery = App\Models\Report::search($request->search);
+    if(is_array($request->filters)){
+        $filters = $request->filters;
+        foreach ($filters as $key => $value) {
+            
+            $searchQuery->where($key,$value);
+        }
+    }
+    return $searchQuery->paginate();
+});
 Route::delete('reports/group/{groupId?}/{objectId?}', 'ReportApiController@removeObjectGroup');
 Route::resource('reports', 'ReportApiController');
 
@@ -122,7 +133,16 @@ Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchan
 Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
-Route::post('merchants/search', 'MerchantApiController@findMerchant');
+Route::get('merchants/search', function (Request $request) {
+    $searchQuery = App\Models\Merchant::search($request->search);
+    if(is_array($request->filters)){
+        $filters = $request->filters;
+        foreach ($filters as $key => $value) {
+            $searchQuery->where($key,$value);
+        }
+    }
+    return $searchQuery->paginate();
+});
 Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::resource('merchants', 'MerchantApiController');

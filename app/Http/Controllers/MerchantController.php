@@ -94,7 +94,7 @@ class MerchantController extends Controller {
                     $request, $validator
             );
         }
-        return response()->json($this->editMapObject->getNearbyMerchants($request->all()));
+        return response()->json($this->editMapObject->getNearbyObjects($request->all()));
     }
 
     /**

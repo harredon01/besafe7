@@ -86,7 +86,9 @@ class ReportApiController extends Controller {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMapObject->getNearbyReports($request->all()));
+        $data = $request->all();
+        $data['type']="Report";
+        return response()->json($this->editMapObject->getNearbyObjects($data));
     }
 
     /**
