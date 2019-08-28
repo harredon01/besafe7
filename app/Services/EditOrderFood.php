@@ -171,6 +171,19 @@ class EditOrderFood {
 
     public function createMealPlan(Order $order, Item $item, $address_id) {
         $data = json_decode($order->attributes, true);
+        $condition = $order->orderConditions()->where("value", "-6%")->first();
+        if ($condition) {
+            $attributes = $item->attributes;
+            if (array_key_exists("shipping", $attributes)) {
+                if ($attributes["shipping"] > 0) {
+                    $shippingPaid = $attributes["shipping"];
+                    $shippingPaid = $shippingPaid - ($condition->total/$item->quantity);
+                    $attributes["shipping"] = $shippingPaid;
+                    $item->attributes = $attributes;
+                }
+            }
+        }
+        $attributes = $item->attributes;
         $buyers = $data['buyers'];
         for ($x = 0; $x < count($buyers); $x++) {
             $user = User::find($buyers[$x]);

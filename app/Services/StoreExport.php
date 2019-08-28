@@ -34,6 +34,8 @@ class StoreExport {
     const DEPOSIT = 'Deposito';
     const SUBTOTAL_ORDER = 'Subtotal Orden';
     const SHIPPING = 'Envio';
+    const SHIPPINGDISCOUNT = 'Descuento Envio';
+    const SHIPPINGPRE = 'Envio sin descuento';
     const PACKING = 'Desechable';
     const PACKING_AMOUNT = 'Desechables usados';
     const DISCOUNT = 'Descuento';
@@ -91,7 +93,7 @@ class StoreExport {
             $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
                             ->where('merchant_id', $merchant->id)
                             ->whereBetween('updated_at', [$startDate, $endDate])
-                            ->whereNotIn('user_id', [2, 77, 3,82,161])
+                            ->whereNotIn('user_id', [2, 77, 3, 82, 161])
                             ->with(['payments.user', 'items', 'orderConditions'])->get();
 
             $merchantResults = $this->exportOrderInvoices($orders, $merchant->name);
@@ -206,20 +208,21 @@ class StoreExport {
             return $path;
         }
     }
-    public function deliveriesData($startDate, $endDate,$results){
-        $deliveries = Delivery::whereNotIn("status",["deposit"])->whereNotIn("user_id",[2, 77, 3,82,161])->whereBetween('created_at', [$startDate, $endDate])->get();
+
+    public function deliveriesData($startDate, $endDate, $results) {
+        $deliveries = Delivery::whereNotIn("status", ["deposit"])->whereNotIn("user_id", [2, 77, 3, 82, 161])->whereBetween('created_at', [$startDate, $endDate])->get();
         $page = [
             "name" => "Entregas Vendidas",
             "rows" => $deliveries->toArray()
         ];
         array_push($results, $page);
-        $deliveries = Delivery::whereIn("status",["completed","preparing"])->whereNotIn("user_id",[2, 77, 3,82,161])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $deliveries = Delivery::whereIn("status", ["completed", "preparing"])->whereNotIn("user_id", [2, 77, 3, 82, 161])->whereBetween('delivery', [$startDate, $endDate])->get();
         $page = [
             "name" => "Entregas Ejecutadas",
             "rows" => $deliveries->toArray()
         ];
         array_push($results, $page);
-        $deliveries = Delivery::whereIn("status",["completed","preparing"])->whereIn("user_id",[77,82])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $deliveries = Delivery::whereIn("status", ["completed", "preparing"])->whereIn("user_id", [77, 82])->whereBetween('delivery', [$startDate, $endDate])->get();
         $page = [
             "name" => "Entregas Mluisa y Camila",
             "rows" => $deliveries->toArray()
@@ -236,11 +239,12 @@ class StoreExport {
             "name" => "Facturas diarias",
             "rows" => $results['operationData']
         ];
-        return $this->writeFile([$page], "Facturas-diarias" . time(),false);
+        return $this->writeFile([$page], "Facturas-diarias" . time(), false);
     }
 
     private function exportOrderInvoices($orders, $name) {
         $shipping = 0;
+        $shippingDiscount = 0;
         $tax = 0;
         $discount = 0;
         $commision = 0;
@@ -278,6 +282,7 @@ class StoreExport {
             $oTax = 0;
             $oCost = 0;
             $oShipping = 0;
+            $oShippingDiscount = 0;
             $oDeposit = 0;
             $oPacking = 0;
             $oPackingNum = 0;
@@ -299,8 +304,13 @@ class StoreExport {
                 $firstCharacter = $string[0];
                 if ($firstCharacter == "-") {
                     if ($condition->condition_id) {
-                        $marketingDiscount += $condition->total;
-                        $oMarketingDiscount += $condition->total;
+                        if ($condition->value == "-6%") {
+                            $shippingDiscount += $condition->total;
+                            $oShippingDiscount += $condition->total;
+                        } else {
+                            $marketingDiscount += $condition->total;
+                            $oMarketingDiscount += $condition->total;
+                        }
                     } else {
                         $operationDiscount += $condition->total;
                         $oOperationDiscount += $condition->total;
@@ -352,14 +362,14 @@ class StoreExport {
                     $oTax += $tTax;
                     if (array_key_exists('shipping', $attributes)) {
                         if (array_key_exists('requires_credits', $attributes)) {
-                            $tComision = $item->quantity * ($item->cost + $item->tax)*self::COMMISION_RATE;
+                            $tComision = $item->quantity * ($item->cost + $item->tax) * self::COMMISION_RATE;
                         } else {
 
                             $packing += $item->quantity * self::PACKING_COST * $buyers;
                             $oPacking += $item->quantity * self::PACKING_COST * $buyers;
                             $packingNum += $item->quantity * $buyers;
                             $oPackingNum += $item->quantity * $buyers;
-                            $tComision = $item->quantity * ($item->cost + $item->tax)*self::COMMISION_RATE;
+                            $tComision = $item->quantity * ($item->cost + $item->tax) * self::COMMISION_RATE;
                         }
                     } else {
                         $tComision = $item->quantity * ($item->price - ($item->cost + $item->tax));
@@ -377,7 +387,8 @@ class StoreExport {
                     "Impuesto" => $itemArray['tax'],
                     "CostoTotal" => $tCost,
                     "ImpuestoTotal" => $tTax,
-                    "envioTotal" => $tShipping,
+                    "envioPre" => $tShipping,
+                    "envioTotal" => $tShipping-($oShippingDiscount/$item->quantity),
                     "comisionTotal" => $tComision,
                     "Total" => $itemArray['priceSumConditions'],
                 ];
@@ -446,7 +457,9 @@ class StoreExport {
                 self::COMMISION_W_DISCOUNT => $oComissionSub,
                 self::DEPOSIT => $oDeposit,
                 self::SUBTOTAL_ORDER => $orderArray['subtotal'],
-                self::SHIPPING => $oShipping,
+                self::SHIPPING => $oShipping-$oShippingDiscount,
+                self::SHIPPINGPRE => $oShipping,
+                self::SHIPPINGDISCOUNT => $oShippingDiscount,
                 self::DISCOUNT_MARKETING => $oMarketingDiscount,
                 self::TOTAL_ORDER => $orderArray['total'],
                 self::TRANSACTION_COST => $oTransactionCost,
@@ -466,7 +479,7 @@ class StoreExport {
                 self::PACKING_AMOUNT => $oPackingNum,
                 self::DISCOUNT_VOLUME => $oOperationDiscount,
                 self::SUBTOTAL_ORDER => $orderArray['subtotal'],
-                self::SHIPPING => $oShipping,
+                self::SHIPPING => $oShipping-$oShippingDiscount,
                 self::DISCOUNT_MARKETING => $oMarketingDiscount,
                 self::TOTAL_ORDER => $orderArray['total'],
                 self::SUBTOTAL_PAYMENTS => $oPaymentsSubtotal,
@@ -520,7 +533,9 @@ class StoreExport {
             self::DISCOUNT_VOLUME => $operationDiscount,
             self::SUBTOTAL_ORDER => $subtotal,
             self::DISCOUNT_MARKETING => $marketingDiscount,
-            self::SHIPPING => $shipping,
+            self::SHIPPINGPRE => $shipping,
+            self::SHIPPINGDISCOUNT => $shippingDiscount,
+            self::SHIPPING => $shipping - $shippingDiscount,
             self::TOTAL_ORDER => $total,
             self::SUBTOTAL_PAYMENTS => $paymentsSubtotal,
             self::TRANSACTION_COST => $transactionCost,

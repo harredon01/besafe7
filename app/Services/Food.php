@@ -332,7 +332,7 @@ class Food {
         $type = "program_reminder";
         $tomorrow = date_format($date, "Y-m-d");
         // id > 130 and id < 200 bota 500
-        $followers = DB::select("select id,email from users where id < 131 and optinMarketing = 1");
+        $followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -352,7 +352,7 @@ class Food {
 
             $className = "App\\Services\\EditAlerts";
             $platFormService = new $className();
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
                 Mail::to($user->email)->send(new Newsletter());
             }
