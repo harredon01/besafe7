@@ -216,6 +216,43 @@ class EditMapObject {
         }
     }
 
+    public function sendCartItem(User $user, array $data) {
+        $validator = $this->validatorMerchantCartItem($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $target = User::find($data['customer_id']);
+        $followers = [$target];
+        if (count($followers) > 0) {
+            $payload = [
+                "name" => $data['item_name'],
+                "description" => $data['item_description'],
+                "price" => $data['item_price'],
+                "tax" => $data['item_tax'],
+                "shipping" => $data['item_shipping'],
+                "quantity" => $data['item_quantity'],
+                "merchant_id" => $data['object_id'],
+                "merchant_name" => $data['merchant_name'],
+            ];
+            $data = [
+                "trigger_id" => $data['object_id'],
+                "message" => "",
+                "subject" => "Visita tu correo para enterarte de nuestros menus de esta semana",
+                "object" => "Merchant",
+                "sign" => true,
+                "payload" => $payload,
+                "type" => 'merchant_item',
+                "user_status" => "normal"
+            ];
+            $date = date_create();
+            $date = date_format($date, "Y-m-d");
+            $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, false);
+            foreach ($followers as $user) {
+                Mail::to($target->email)->send(new Newsletter());
+            }
+        }
+    }
+
     public function getObjectByHash($code, $type) {
         $data = Cache::remember($type . '_hash_' . $code, 100, function ()use ($type, $code) {
                     $target = "App\\Models\\" . $type;
@@ -289,9 +326,9 @@ class EditMapObject {
      * @return Response
      */
     public function getNearby(array $data) {
-        $data['type']="Merchant";
+        $data['type'] = "Merchant";
         $merchants = $this->getNearbyObjects($data);
-        $data['type']="Report";
+        $data['type'] = "Report";
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
@@ -303,13 +340,13 @@ class EditMapObject {
         $long = $data['long'];
         $type = "";
         $additionalFields = "";
-        if($data['type']=="Merchant"){
+        if ($data['type'] == "Merchant") {
             $type = "merchants";
             $additionalFields = " type, telephone, address, ";
-        } else if($data['type']=="Report"){
+        } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
-        } 
+        }
         $maxLat = $lat + rad2deg($radius / $R);
         $minLat = $lat - rad2deg($radius / $R);
         $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
@@ -325,12 +362,12 @@ class EditMapObject {
             'radius' => $radius,
         ];
         $reports = DB::select(" "
-                        . "SELECT r.id, name, description, icon, lat,`long`, ".$additionalFields." 
+                        . "SELECT r.id, name, description, icon, lat,`long`, " . $additionalFields . " 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
                    FROM
-                    "    .$type. " r
+                    " . $type . " r
                     WHERE
                         status = 'active'
                             AND r.private = 0
@@ -340,7 +377,7 @@ class EditMapObject {
                     HAVING distance < :radius
                     order by distance asc limit 20 "
                         . "", $thedata);
-        return array("data"=> $reports);
+        return array("data" => $reports);
     }
 
     function findLonBoundary($lat, $lon, $lat1, $lat2) {
@@ -664,6 +701,25 @@ class EditMapObject {
         return Validator::make($data, [
                     'lat' => 'required',
                     'long' => 'required',
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorMerchantCartItem(array $data) {
+        return Validator::make($data, [
+                    "item_name" => 'required',
+                    "item_description" => 'required',
+                    "item_price" => 'required',
+                    "item_tax" => 'required',
+                    "item_quantity" => 'required',
+                    "object_id" => 'required',
+                    "customer_id" => 'required',
+                    "merchant_name" => 'required',
         ]);
     }
 

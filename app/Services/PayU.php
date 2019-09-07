@@ -44,7 +44,7 @@ class PayU {
             "description" => "Pago Lonchis app # " . $payment->id,
             "language" => "es",
             "signature" => $sig,
-            "notifyUrl" => env('APP_URL')."/api/payu/webhook",
+            "notifyUrl" => env('APP_URL') . "/api/payu/webhook",
         ];
         return $orderCont;
     }
@@ -280,7 +280,8 @@ class PayU {
             return response()->json(array("status" => "error", "message" => "No default card"), 400);
         }
         $buyer = $this->populateBuyerAddress($user);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, []);
+
+
         $extras = json_decode($source->extra, true);
         $payerAddress = [
             "street1" => $extras['billingAddress']['street1'],
@@ -305,7 +306,11 @@ class PayU {
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
-        $orderCont["shippingAddress"] = $ShippingAddress;
+        if ($payment->address_id) {
+            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, []);
+            $orderCont["shippingAddress"] = $ShippingAddress;
+        }
+
         $extraParams = [
             "INSTALLMENTS_NUMBER" => 1
         ];
@@ -353,7 +358,8 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+
+
         $payer = $this->populatePayer($data);
         $creditCard = $this->populateCC($data);
         $merchant = $this->populateMerchant($user);
@@ -361,7 +367,11 @@ class PayU {
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
-        $orderCont["shippingAddress"] = $ShippingAddress;
+        if ($payment->address_id) {
+            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+            $orderCont["shippingAddress"] = $ShippingAddress;
+        }
+
         $extraParams = [
             "INSTALLMENTS_NUMBER" => 1
         ];
@@ -402,7 +412,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+        
         $payer = $this->populatePayer($data);
         $validator = $this->validatorUseSource($data);
 
@@ -417,7 +427,10 @@ class PayU {
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
-        $orderCont["shippingAddress"] = $ShippingAddress;
+        if($payment->address_id){
+            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+            $orderCont["shippingAddress"] = $ShippingAddress;
+        }
         $extraParams = [
             "INSTALLMENTS_NUMBER" => 1
         ];
@@ -467,7 +480,7 @@ class PayU {
 
 
         $extraParams = [
-            "RESPONSE_URL" => env('APP_URL')."/payu/return",
+            "RESPONSE_URL" => env('APP_URL') . "/payu/return",
             "PSE_REFERENCE1" => $data['ip_address'],
             "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
             "USER_TYPE" => $data['user_type'],
@@ -1038,7 +1051,7 @@ class PayU {
             "customer" => $customer,
             "plan" => $plan,
             "deliveryAddress" => $address,
-            "notifyUrl" => env('APP_URL')."/api/payu/webhook",
+            "notifyUrl" => env('APP_URL') . "/api/payu/webhook",
         ];
         $response = $this->sendPost($dataSent, $url);
         if (array_key_exists("id", $response)) {
@@ -1209,14 +1222,17 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+
         $payer = $this->populatePayer($data);
         $merchant = $this->populateMerchant($user);
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $additionalValuesCont = $this->populateTotals($payment, "COP");
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
-        $orderCont["shippingAddress"] = $ShippingAddress;
+        if ($payment->address_id) {
+            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
+            $orderCont["shippingAddress"] = $ShippingAddress;
+        }
         $extraParams = [
             "INSTALLMENTS_NUMBER" => 1
         ];
@@ -1559,8 +1575,8 @@ class PayU {
 
                         //return ["status" => "success", "transaction" => $transaction, "response" => $response];
                     } else {
-                        /*$payment->status = "invisible";
-                        $payment->save();*/
+                        /* $payment->status = "invisible";
+                          $payment->save(); */
                     }
                 }
             }
@@ -1749,9 +1765,9 @@ class PayU {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnPayu(array $data) {
-        
+
         $ApiKey = env('PAYU_KEY');
-        
+
         $merchant_id = $data['merchantId'];
         $referenceCode = $data['referenceCode'];
         $TX_VALUE = $data['TX_VALUE'];

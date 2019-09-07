@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Services\Food;
 use App\Services\PayU;
-use App\Services\EditOrderFood;
+use App\Services\EditOrder;
 use App\Services\EditAlerts;
 use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
@@ -35,8 +35,8 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $food;
 
-    public function __construct(Food $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
-        $this->food = $editOrderfood;
+    public function __construct(EditOrder $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
+        $this->food = $food;
         $this->editOrderfood = $editOrderfood;
     }
 
@@ -47,9 +47,9 @@ class DeliveriesSeeder extends Seeder {
             "merchant_id" => 1299,
             "provider" => "Basilikum"
         ];
-        $payment = Payment::find(132);
+        $payment = Payment::find(630);
         //dispatch(new ApprovePayment($payment, "Food"));
-        $this->food->getActiveRoutesUpdate();
+        $this->food->approvePayment($payment,"Booking");
         
 //        $user = User::find(1);
 //        $user2 = User::find(2);

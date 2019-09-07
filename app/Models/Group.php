@@ -283,24 +283,7 @@ class Group extends Model {
         $res = $this->checkMemberType($user);
         if ($res) {
             if ($res->level != self::CONTACT_BLOCKED) {
-                if ($this->isPublicActive()) {
-                    if ($res->is_admin) {
-                        $data['is_admin'] = true;
-                        if (array_key_exists("target_id", $data)) {
-                            $followers = DB::select("select 
-                                user_id as id
-                                    from
-                                    group_user where group_id = $this->id AND level <> '" . self::GROUP_BLOCKED . "' AND level <> '" . self::GROUP_PENDING . "' "
-                                            . " and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
-                        } else {
-                            $followers = $this->getAllMembers();
-                        }
-                    } else {
-                        $data['is_admin'] = false;
-                        $followers = $this->getAllAdminMembers();
-                        $data['target_id'] = $user->id;
-                    }
-                } else if (!$this->is_public) {
+                if (!$this->is_public) {
                     if ($res->is_admin) {
                         $data['is_admin'] = true;
                     } else {
@@ -322,28 +305,7 @@ class Group extends Model {
         $followers = 0;
         if ($res) {
             if ($res->level != self::CONTACT_BLOCKED) {
-                if ($this->isPublicActive()) {
-                    if ($res->is_admin) {
-                        $data['is_admin'] = true;
-                        if (array_key_exists("target_id", $data)) {
-                            $followers = DB::select("select 
-                                count(id) as total
-                                    from
-                                    group_user where group_id = $this->id "
-                                            . "AND level <> '" . self::GROUP_BLOCKED . "' "
-                                            . "AND level <> '" . self::GROUP_PENDING . "' "
-                                            . " and (is_admin = 1 or user_id = ? ) ;", [$data['target_id']]);
-                            $res = $followers[0];
-                            $followers = $res->total;
-                        } else {
-                            $followers = $this->countAllMembers();
-                        }
-                    } else {
-                        $data['is_admin'] = false;
-                        $followers = $this->countAllAdminMembers();
-                        $data['target_id'] = $user->id;
-                    }
-                } else if (!$this->is_public) {
+                if (!$this->is_public) {
                     $followers = $this->countAllNonUserBlocked($user);
                 } else {
                     return 0;

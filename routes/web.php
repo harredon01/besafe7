@@ -157,9 +157,21 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment,$user,$url,$pdf);
 });
-Route::get('/test_newsletter', function () {
+Route::get('/newsletter_sistole_quadi', function () {
     return new App\Mail\Newsletter();
 });
-Route::get('/newsletter_referidos', function () {
-    return new App\Mail\NewsletterPadre();
+Route::get('/newsletter_sancho', function () {
+    return redirect('newsletter_sistole_quadi');
+});
+Route::get('/newsletter_lift', function () {
+    return new App\Mail\NewsletterLift();
+});
+Route::get('/newsletter_axure', function () {
+    return new App\Mail\NewsletterAxure();
+});
+Route::get('/newsletter_geometry', function () {
+    return new App\Mail\NewsletterGeometry();
+});
+Route::get('/newsletter_huge', function () {
+    return new App\Mail\NewsletterHuge();
 });

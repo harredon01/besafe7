@@ -113,6 +113,17 @@ class OrderApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editOrder->payOrder($user, $request->all()));
     }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getOrder(Request $request) {
+        $user = $request->user();
+        return response()->json(["status"=>"success","data"=>$this->editOrder->getOrder($user)]);
+    }
 
     /**
      * Handle a login request to the application.
@@ -123,7 +134,7 @@ class OrderApiController extends Controller {
     public function checkOrder(Request $request, $platform) {
         $order = Order::find($platform);
         $user = $request->user();
-        return response()->json($this->editOrder->checkOrder($user, $order, $request->all()));
+        return response()->json($this->editOrder->checkOrder($user, $order, $request->all())); 
     }
     
     /**

@@ -6,7 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\Booking;
-
+use DB;
 class EditOrderBooking {
 
     const MODEL_PATH = 'App\\Models\\';
@@ -88,18 +88,19 @@ class EditOrderBooking {
 
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "Booking") {
+                    DB::connection()->enableQueryLog();
                     $id = $data['id'];
                     $booking = Booking::find($id);
                     if ($booking) {
-                        $attributes = $booking->options;
-                        $attributes['order_id'] = $order->id;
-                        $attributes['item_id'] = $item->id;
-                        $attributes['payer'] = $order->user_id;
-                        $attributes['paid'] = date("Y-m-d h:m:s");
+                        $booking->options['order_id'] = $order->id;
+                        $booking->options['item_id'] = $item->id;
+                        $booking->options['payer'] = $order->user_id;
+                        $booking->options['paid'] = date("Y-m-d h:m:s");
+                        
+                        $booking->save();
+                        //$booking->options = [];
                         $updateData = [
-                            "options" => $attributes,
                             "total_paid" => $item->priceSumConditions,
-                            "updated_at" => date_create()
                         ];
                         Booking::where("id",$id)->update($updateData);
                     }

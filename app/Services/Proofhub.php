@@ -12,13 +12,13 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-08-01';
+    const START_DATE = '2019-09-01';
     const END_DATE = '2119-08-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = false;
+    const IS_ADMIN = true;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -373,15 +373,6 @@ class Proofhub {
                 "rows" => $copy,
             ],
             [
-                "name" => "Teck",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CANADA,
-                "price" => "Retail",
-                "code" => "1483921014",
-                "rows" => $copy,
-            ],
-            [
                 "name" => "Henkel",
                 "budget" => "0",
                 "country" => "COL",
@@ -389,23 +380,24 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "3088122966",
                 "rows" => $copy,
-            ], [
-                "name" => "FreshSt",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CANADA,
-                "price" => "Retail",
-                "code" => "1490963176",
-                "rows" => $copy,
-            ], [
-                "name" => "Volo",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::CANADA,
-                "price" => "Retail",
-                "code" => "1849937081",
-                "rows" => $copy,
-            ],
+            ], 
+//            [
+//                "name" => "FreshSt",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CANADA,
+//                "price" => "Retail",
+//                "code" => "1490963176",
+//                "rows" => $copy,
+//            ], [
+//                "name" => "Volo",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::CANADA,
+//                "price" => "Retail",
+//                "code" => "1849937081",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Universidad Rosario",
                 "budget" => "0",
@@ -664,15 +656,15 @@ class Proofhub {
 //                "code" => "1481790725",
 //                "rows" => $copy,
 //            ],
-            [
-                "name" => "DSRF",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "1409523753",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "DSRF",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "1409523753",
+//                "rows" => $copy,
+//            ],
 //            [
 //                "name" => "Sales Proposals",
 //                "budget" => "0",
@@ -761,6 +753,51 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2944945893",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Casa Reigner",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3347556783",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dunna",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3383378189",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Hipergas",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3313974215",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Backbone Print",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "2803356359",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Kannabis Latam",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3402238702",
                 "rows" => $copy,
             ]
         ];
@@ -1341,16 +1378,10 @@ class Proofhub {
                 $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
-            } else if ($resultsPerson['id'] == "3749231432") {
-                //Fabian Horta
-                $saveperson['cost'] = 49916;
-                $saveperson['retail'] = 62233;
-                $saveperson['cost_us'] = 16.64;
-                $saveperson['retail_us'] = 19.66;
             } else if ($resultsPerson['id'] == "1856477202") {
                 //Fabian Vargas
-                $saveperson['cost'] = 47290;
-                $saveperson['retail'] = 51631;
+                $saveperson['cost'] = 50000;
+                $saveperson['retail'] = 54749;
                 $saveperson['cost_us'] = 13.80;
                 $saveperson['retail_us'] = 16.31;
             } else if ($resultsPerson['id'] == "2133970978") {
@@ -1365,12 +1396,6 @@ class Proofhub {
                 $saveperson['retail'] = 39150;
                 $saveperson['cost_us'] = 9.8;
                 $saveperson['retail_us'] = 11.6;
-            } else if ($resultsPerson['id'] == "2936451878") {
-                //Manuel Correa
-                $saveperson['cost'] = 41940;
-                $saveperson['retail'] = 52288;
-                $saveperson['cost_us'] = 13.98;
-                $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1923533788") {
                 //Victor Gil
                 $saveperson['cost'] = 34034;
@@ -1390,30 +1415,12 @@ class Proofhub {
                 $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
-            } else if ($resultsPerson['id'] == "1856450064") {
-                //Jucaro
-                $saveperson['cost'] = 51451;
-                $saveperson['retail'] = 64147;
-                $saveperson['cost_us'] = 17.15;
-                $saveperson['retail_us'] = 20.27;
-            } else if ($resultsPerson['id'] == "4173918621") {
-                //Sabine
-                $saveperson['cost'] = 36600;
-                $saveperson['retail'] = 45631;
-                $saveperson['cost_us'] = 12.20;
-                $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4472620297") {
                 //Neiderson
                 $saveperson['cost'] = 26400;
                 $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
-            } else if ($resultsPerson['id'] == "3464709062") {
-                //Karina Rodriguez
-                $saveperson['cost'] = 41940;
-                $saveperson['retail'] = 52288;
-                $saveperson['cost_us'] = 13.98;
-                $saveperson['retail_us'] = 16.52;
             } else if ($resultsPerson['id'] == "1856110846") {
                 //David Mendez
                 $saveperson['cost'] = 84900;
@@ -1421,12 +1428,6 @@ class Proofhub {
                 $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 27.14;
                 $saveperson['retail_us'] = 32.07;
-            } else if ($resultsPerson['id'] == "2304516147") {
-                //Alejandra Archila
-                $saveperson['cost'] = 30726;
-                $saveperson['retail'] = 38308;
-                $saveperson['cost_us'] = 10.24;
-                $saveperson['retail_us'] = 12.10;
             } else if ($resultsPerson['id'] == "3216537278") {
                 //Laura Aires
                 $saveperson['cost'] = 37084;
@@ -1440,32 +1441,6 @@ class Proofhub {
                 $saveperson['cost_us'] = 14.42;
                 $saveperson['esperado'] = 50;
                 $saveperson['retail_us'] = 17.04;
-            } else if ($resultsPerson['id'] == "4151530242") {
-                //Juliana Acosta
-                $saveperson['cost'] = 43258;
-                $saveperson['retail'] = 53932;
-                $saveperson['esperado'] = 50;
-                $saveperson['cost_us'] = 14.42;
-                $saveperson['retail_us'] = 17.04;
-            } else if ($resultsPerson['id'] == "2791958639") {
-                //Oscar Gil
-                $saveperson['cost'] = 52770;
-                $saveperson['retail'] = 65791;
-                $saveperson['esperado'] = 50;
-                $saveperson['cost_us'] = 17.59;
-                $saveperson['retail_us'] = 20.79;
-            } else if ($resultsPerson['id'] == "2213225838") {
-                //Edinson Loaisa
-                $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 41866;
-                $saveperson['cost_us'] = 11.19;
-                $saveperson['retail_us'] = 13.23;
-            } else if ($resultsPerson['id'] == "4155953643") {
-                //Maria luisa
-                $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 41866;
-                $saveperson['cost_us'] = 11.19;
-                $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "5105315875") {
                 //Fabian Herrera
                 $saveperson['cost'] = 33580;
@@ -1480,6 +1455,18 @@ class Proofhub {
                 $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "5105315875") {
                 //Nestor Mosquera
+                $saveperson['cost'] = 26400;
+                $saveperson['retail'] = 28800;
+                $saveperson['cost_us'] = 8.86;
+                $saveperson['retail_us'] = 10.47;
+            } else if ($resultsPerson['id'] == "5450721066") {
+                //Hector Segura
+                $saveperson['cost'] = 26400;
+                $saveperson['retail'] = 28800;
+                $saveperson['cost_us'] = 8.86;
+                $saveperson['retail_us'] = 10.47;
+            } else if ($resultsPerson['id'] == "5402212913") {
+                //Mayra Salcedo
                 $saveperson['cost'] = 26400;
                 $saveperson['retail'] = 28800;
                 $saveperson['cost_us'] = 8.86;

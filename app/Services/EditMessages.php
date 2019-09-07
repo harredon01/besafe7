@@ -122,8 +122,8 @@ class EditMessages {
 //                . self::MESSAGE_RECIPIENT_ID . ' = ?) sorted_list  group by m.' . self::MESSAGE_AUTHOR_ID . ' order by m.id desc ', [ $user->id]);
 //        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,m.id,m.created_at,m.message from messages m join users u on m.' . self::MESSAGE_AUTHOR_ID . '=u.id where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ' 
 //                . self::MESSAGE_RECIPIENT_ID . ' = ? group by m.' . self::MESSAGE_AUTHOR_ID . ' order by m.id desc ', [ $user->id]);
-        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,m.id,m.created_at,m.message from messages m join users u on m.' . self::MESSAGE_AUTHOR_ID . '=u.id where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND ' 
-                . self::MESSAGE_RECIPIENT_ID . ' = ? order by m.id desc ', [ $user->id]);
+        $messages = DB::select('select u.firstName,u.lastName,u.id as user_id,m.id,m.created_at,m.message from messages m join users u on m.' . self::MESSAGE_AUTHOR_ID . '=u.id where ' . self::MESSAGE_RECIPIENT_TYPE . ' = "user_message" AND '
+                        . self::MESSAGE_RECIPIENT_ID . ' = ? order by m.id desc ', [$user->id]);
         return $messages;
     }
 
@@ -165,7 +165,7 @@ class EditMessages {
             //dispatch(new SendChat($data, $user, true));
             $this->sendChat($data, $user, true);
             return $message;
-        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
+        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
                 $fetched = $group->countRecipientsMessage($user, $data);
@@ -177,29 +177,7 @@ class EditMessages {
                     $dauser['from_user'] = $user->id;
                     $dauser['public'] = $group->is_public;
                     if ($group->is_public) {
-                        if (array_key_exists("target_id", $data)) {
-                            $dauser['target_id'] = $data['target_id'];
-                            $message = Message::create([
-                                        "status" => 'unread',
-                                        "message" => $data['message'],
-                                        self::MESSAGE_RECIPIENT_TYPE => self::GROUP_PRIVATE_MESSAGE_TYPE,
-                                        self::MESSAGE_AUTHOR_ID => $user->id,
-                                        self::MESSAGE_RECIPIENT_ID => $group->id,
-                                        'is_public' => $group->is_public,
-                                        'target_id' => $data['target_id']
-                            ]);
-                        } else {
-                            $message = Message::create([
-                                        "status" => 'unread',
-                                        "message" => $data['message'],
-                                        self::MESSAGE_RECIPIENT_TYPE => self::GROUP_PRIVATE_MESSAGE_TYPE,
-                                        self::MESSAGE_AUTHOR_ID => $user->id,
-                                        self::MESSAGE_RECIPIENT_ID => $group->id,
-                                        'is_public' => $group->is_public,
-                                        'target_id' => $user->id
-                            ]);
-                            $dauser['target_id'] = $user->id;
-                        }
+                        
                     } else {
                         $message = Message::create([
                                     "status" => 'unread',
@@ -246,8 +224,8 @@ class EditMessages {
                 array_push($followers, $recipient);
             }
             unset($data['to_id']);
-            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null,false);
-        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE || $data['type'] == self::GROUP_PRIVATE_MESSAGE_TYPE) {
+            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null, false);
+        } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
                 $fetched = $group->getRecipientsMessage($user, $data);
@@ -264,14 +242,38 @@ class EditMessages {
             }
         }
     }
-    
-    public function getSupportAgent($type,$object){
-        if($type == "platform"){
-            if($object == "food"){
+
+    public function getSupportAgent($type, $object) {
+        if ($type == "platform") {
+            if ($object == "food") {
                 $user = User::find(77);
                 $friend = [
                     "id" => $user->id,
-                    "name" => $user->firstName." ".$user->lastName                    
+                    "name" => $user->firstName . " " . $user->lastName
+                ];
+                return $friend;
+            }
+        } else if ($type == "Merchant" || $type == "Report") {
+            $className = "App\\Models\\".$type;
+            $objectActv = $className::find($object);
+            if ($objectActv) {
+                $user = $objectActv->user;
+                $friend = [
+                    "id" => $user->id,
+                    "name" => $user->firstName . " " . $user->lastName
+                ];
+                return $friend;
+            }
+        } else if ($type == "Group") {
+            $className = "App\\Models\\".$type;
+            $objectActv = $className::find($object);
+            if ($objectActv) {
+                $admins = $objectActv->getAllAdminMembers();
+                $winner = rand(0,(count($admins)-1));
+                $user = User::find($admins[$winner]->id);
+                $friend = [
+                    "id" => $user->id,
+                    "name" => $user->firstName . " " . $user->lastName
                 ];
                 return $friend;
             }

@@ -194,7 +194,11 @@ class EditOrder {
                         $payment = new Payment;
                     }
                     $payment->user_id = $buyer->id;
-                    $payment->address_id = $address->id;
+                    if ($address) {
+                        $payment->address_id = $address->id;
+                    } else {
+                        $payment->address_id = null;
+                    }
                     $payment->order_id = $order->id;
                     $payment->status = "pending";
                     $payment->subtotal = round($buyerTotal);
@@ -202,27 +206,27 @@ class EditOrder {
                     $payment->total = round($buyerTotal + $transactionCost);
                     $payment->tax = $buyerTax;
                     $payment->save();
+                    $payload = [
+                        "payment_id" => $payment->id,
+                        "payment_total" => $payment->total,
+                        "order_id" => $order->id,
+                        "first_name" => $user->firstName,
+                        "last_name" => $user->lastName,
+                    ];
+                    $data = [
+                        "trigger_id" => $payment->id,
+                        "message" => "",
+                        "subject" => "",
+                        "object" => self::OBJECT_ORDER,
+                        "sign" => true,
+                        "payload" => $payload,
+                        "type" => self::ORDER_PAYMENT_REQUEST,
+                        "user_status" => $user->getUserNotifStatus()
+                    ];
+                    $date = date("Y-m-d H:i:s");
+                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
                 }
             }
-            $payload = [
-                "payment_id" => $payment->id,
-                "payment_total" => $payment->total,
-                "order_id" => $order->id,
-                "first_name" => $user->firstName,
-                "last_name" => $user->lastName,
-            ];
-            $data = [
-                "trigger_id" => $payment->id,
-                "message" => "",
-                "subject" => "",
-                "object" => self::OBJECT_ORDER,
-                "sign" => true,
-                "payload" => $payload,
-                "type" => self::ORDER_PAYMENT_REQUEST,
-                "user_status" => $user->getUserNotifStatus()
-            ];
-            $date = date("Y-m-d H:i:s");
-            return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
         }
     }
 
@@ -331,7 +335,11 @@ class EditOrder {
                         $order->attributes = json_encode($records);
                         $payment->transaction_cost = $transactionCost;
                         $payment->user_id = $user->id;
-                        $payment->address_id = $address->id;
+                        if ($address) {
+                            $payment->address_id = $address->id;
+                        } else {
+                            $payment->address_id = null;
+                        }
                         $payment->order_id = $order->id;
                         $payment->status = "pending";
 
@@ -608,7 +616,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'],"Basilikum");
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], "Basilikum");
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
@@ -1004,7 +1012,7 @@ class EditOrder {
         }
         $sql = "select * from orders o join order_conditions oc on oc.order_id = o.id where o.status = 'approved' and oc.condition_id = $theCondition->id and o.user_id = $order->user_id;";
         $orders = DB::select($sql);
-        if(count($orders)>0){
+        if (count($orders) > 0) {
             return array("status" => "error", "message" => "Coupon quantity");
         }
         if (array_key_exists("minquantity", $attributes)) {
@@ -1015,9 +1023,9 @@ class EditOrder {
         if (array_key_exists("address", $attributes)) {
             $address = $order->orderAddresses()->first();
             $requiredAddress = $attributes["address"];
-            if($requiredAddress["city_id"]!=$address->city_id || $requiredAddress["country_id"]!=$address->country_id || trim($requiredAddress["address"])!=trim($address->address)){
+            if ($requiredAddress["city_id"] != $address->city_id || $requiredAddress["country_id"] != $address->country_id || trim($requiredAddress["address"]) != trim($address->address)) {
                 return array("status" => "error", "message" => "Address Error");
-            } 
+            }
         }
         if ($item->quantity > 25) {
             return array("status" => "error", "message" => "Coupon quantity");

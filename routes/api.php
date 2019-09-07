@@ -176,6 +176,7 @@ Route::get('cart/load', 'CartApiController@loadActiveCart');
 Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
 
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
+Route::get('orders/active', 'OrderApiController@getOrder');
 Route::post('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@setPlatformShippingCondition');
 Route::post('orders/tax', 'OrderApiController@setTaxesCondition');
 Route::post('orders/coupon', 'OrderApiController@setCouponCondition');

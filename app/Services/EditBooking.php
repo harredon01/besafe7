@@ -184,8 +184,8 @@ class EditBooking {
                         "updated_at" => date_create()
                     ];
                     $booking->total_paid = -1;
+                    $booking->save();
                     //return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
-                    Booking::where("id", $data['object_id'])->update($updateData);
 
                     $typeAlert = self::BOOKING_APPROVED;
                 } elseif ($status == "denied") {
@@ -251,7 +251,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function getObjectsWithBookingUser(User $user) {
-        $query .= " select id,name from merchants where user_id = $user->id and id in ( select distinct( bookable_id) from bookable_bookings )";
+        $query = " select id,name from merchants where user_id = $user->id and id in ( select distinct( bookable_id) from bookable_bookings )";
         $objects = DB::select($query);
         return response()->json(array(
                     "status" => "success",

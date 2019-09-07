@@ -42,8 +42,10 @@
 | Tus datos        | Valor            |
 |:-----------------|-----------------:|
 |Nombre:        |{{$user->firstName}} {{$user->lastName}}|
+@if ($shipping)
 |Dirección:       |{{$shipping->address}}|
-|Tel:       |{{$shipping->phone}}|
+@endif
+|Tel:       |{{$user->cellphone}}|
 @endcomponent
 
 Gracias,<br>
