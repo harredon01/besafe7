@@ -78,10 +78,8 @@ class MessagesApiController extends Controller {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $url = "";
-        if($data['type']=='user'){
-            $url = "api/messages/chat?order_by=id,desc";
-        }
+        $url = "api/messages/chat?order_by=id,desc";
+        
         if(array_key_exists("id_after", $data)){
             if(intval($data['id_after']>0)){
                 $url = "api/messages/chat?order_by=id,asc";
@@ -93,8 +91,12 @@ class MessagesApiController extends Controller {
                 $url = $url. "&page=".$data['page'];
             }
         }
+        if($data['type']=='user'){
+            $url = $url ."&user_chat=" . $user->id.','.$data['to_id'];
+        } else if($data['type']=='group'){
+            $url = $url ."&group_chat=" .$data['to_id'];
+        }
         
-        $url = $url ."&user_chat=" . $user->id.','.$data['to_id'];
         $request2 = Request::create($url, 'GET');
         $queryBuilder = new MessageQueryBuilder(new Message, $request2);
             $result = $queryBuilder->build()->paginate();

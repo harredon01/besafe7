@@ -8,7 +8,7 @@ class MessageQueryBuilder extends QueryBuilder {
 
     public function filterByUserChat($query, $id) {
         $vars = (explode(",", $id));
-        return $query->where('messageable_type', '=', 'user_message')
+        return $query->where('messageable_type', 'user_message')
                 ->where(function ($query) use ($vars) {
                     $query->where(function ($query) use ($vars) {
                         $query->where('user_id', $vars[0])
@@ -18,6 +18,11 @@ class MessageQueryBuilder extends QueryBuilder {
                                 ->where('messageable_id', $vars[0]);
                     });
                 });
+    }
+    
+    public function filterByGroupChat($query, $id) {
+        return $query->where('messageable_type','group_message')
+                ->where();
     }
 
     public function filterByIdAfter($query, $id) {
