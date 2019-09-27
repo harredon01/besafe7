@@ -205,10 +205,10 @@ class Rapigo {
                 "type" => "food_meal_arriving",
                 "user_status" => "normal"
             ];
-            $className = "App\\Services\\EditAlerts";
-            $editAlerts = new $className;
+            $className = "App\\Services\\Notifications";
+            $notifications = new $className;
             $date = date("Y-m-d H:i:s");
-            $editAlerts->sendMassMessage($data, $followers, null, true, $date, false);
+            $notifications->sendMassMessage($data, $followers, null, true, $date, false);
         }
 
         return true;

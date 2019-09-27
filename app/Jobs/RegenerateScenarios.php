@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Services\Routing;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -32,7 +32,7 @@ class RegenerateScenarios implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(Routing $routing, EditAlerts $editAlerts) {
+    public function handle(Routing $routing, Notifications $notifications) {
         $routing->regenerateScenarios();
         $payload = [ ];
         $user = User::find(2);
@@ -48,7 +48,7 @@ class RegenerateScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
     
     /**
@@ -73,9 +73,9 @@ class RegenerateScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
 }

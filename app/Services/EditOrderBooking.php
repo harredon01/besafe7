@@ -88,13 +88,14 @@ class EditOrderBooking {
 
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "Booking") {
-                    DB::connection()->enableQueryLog();
                     $id = $data['id'];
                     $booking = Booking::find($id);
                     if ($booking) {
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
+                        $booking->options['location'] = $data['location'];
+                        $booking->options['status'] = "pending";
                         $booking->options['paid'] = date("Y-m-d h:m:s");
                         
                         $booking->save();

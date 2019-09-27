@@ -11,7 +11,7 @@ use Validator;
 use App\Models\Region;
 use App\Models\City;
 use App\Models\Country;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 
 class Contacts {
 
@@ -28,7 +28,7 @@ class Contacts {
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * Create a new class instance.
@@ -36,8 +36,8 @@ class Contacts {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications) {
+        $this->notifications = $notifications;
     }
 
     public function getContact($contactId) {
@@ -85,7 +85,7 @@ class Contacts {
                 "sign" => true,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true, null);
+            $this->notifications->sendMassMessage($notification, $inviteUsers, $user, true, null);
             $imports = array_map("unserialize", array_unique(array_map("serialize", $imports)));
             DB::table('contacts')->insert($imports);
             $lastId = DB::getPdo()->lastInsertId() + (count($imports) - 1);
@@ -118,7 +118,7 @@ class Contacts {
     public function blockContact(User $user, $contactId) {
         $contact = User::find($contactId);
         if ($contact) {
-            $this->editAlerts->deleteObjectNotifs($user, $contactId, "User");
+            $this->notifications->deleteObjectNotifs($user, $contactId, "User");
             $count = DB::table('contacts')->where('contact_id', $contactId)->where('user_id', $user->id)->count();
             if ($count == 0) {
                 DB::table('contacts')->insert(array(
@@ -223,7 +223,7 @@ class Contacts {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $recipients = array($contact);
-                $this->editAlerts->sendMassMessage($notification, $recipients, $user, true, null);
+                $this->notifications->sendMassMessage($notification, $recipients, $user, true, null);
                 return $contact;
             }
             return $contact;
@@ -232,7 +232,7 @@ class Contacts {
     }
 
     public function deleteContact(User $user, $contactId) {
-        $this->editAlerts->deleteObjectNotifs($user, $contactId, "User");
+        $this->notifications->deleteObjectNotifs($user, $contactId, "User");
         return DB::table('contacts')
                         ->where('contacts.user_id', '=', $user->id)
                         ->where('contacts.contact_id', '=', $contactId)

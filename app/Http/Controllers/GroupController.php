@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Services\EditGroup;
 use App\Services\CleanSearch;
 use App\Querybuilders\GroupQueryBuilder;
-use App\Services\EditAlerts;
 use App\Models\Group;
 use App\Jobs\InviteUsers;
 use App\Jobs\LeaveGroup;
@@ -21,11 +20,7 @@ class GroupController extends Controller {
      */
     protected $editGroup;
 
-    /**
-     * The edit profile implementation.
-     *
-     */
-    protected $editAlerts;
+
 
     /**
      * The edit profile implementation.
@@ -33,9 +28,8 @@ class GroupController extends Controller {
      */
     protected $cleanSearch;
 
-    public function __construct(EditGroup $editGroup, EditAlerts $editAlerts, CleanSearch $cleanSearch) {
+    public function __construct(EditGroup $editGroup,  CleanSearch $cleanSearch) {
         $this->editGroup = $editGroup;
-        $this->editAlerts = $editAlerts;
         $this->cleanSearch = $cleanSearch;
         $this->middleware('auth:api');
         $this->middleware('location.group', ['only' => 'show']);

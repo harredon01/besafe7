@@ -17,7 +17,7 @@ use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\Stripe;
 use App\Services\Geolocation;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Mail\OrderApproved;
 use App\Mail\OrderApprovedInvoice;
 use Mail;
@@ -69,7 +69,7 @@ class EditOrder {
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * The Guard implementation.
@@ -84,9 +84,9 @@ class EditOrder {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, EditAlerts $editAlerts, Geolocation $geolocation) {
+    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, Notifications $notifications, Geolocation $geolocation) {
         $this->payU = $payU;
-        $this->editAlerts = $editAlerts;
+        $this->notifications = $notifications;
         $this->stripe = $stripe;
         $this->editCart = $editCart;
         $this->geolocation = $geolocation;
@@ -224,7 +224,7 @@ class EditOrder {
                         "user_status" => $user->getUserNotifStatus()
                     ];
                     $date = date("Y-m-d H:i:s");
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
+                    $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
                 }
             }
         }
@@ -834,7 +834,7 @@ class EditOrder {
             "user_status" => $user->getUserNotifStatus()
         ];
         $date = date("Y-m-d H:i:s");
-        $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
+        $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
     }
 
     /**
@@ -883,7 +883,7 @@ class EditOrder {
                 "user_status" => "normal"
             ];
             $date = date("Y-m-d H:i:s");
-            $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
         }
     }
 

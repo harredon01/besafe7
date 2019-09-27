@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Services\OrderJobs;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -32,7 +32,7 @@ class RecurringOrderCron implements ShouldQueue
      *
      * @return void
      */
-    public function handle(OrderJobs $orderJobs,EditAlerts $editAlerts)
+    public function handle(OrderJobs $orderJobs,Notifications $notifications)
     {
         $orders = Order::where("is_recurring",true)->where("status","approved")->get();
         $ip = gethostbyname(env('APP_URL'));
@@ -54,7 +54,7 @@ class RecurringOrderCron implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);*/
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);*/
     }
     
     /**
@@ -79,8 +79,8 @@ class RecurringOrderCron implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

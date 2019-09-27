@@ -2,14 +2,14 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\EditBooking;
-use App\Services\PayU;
+use App\Services\OpenTok;
 use App\Services\EditAlerts;
 use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
 use App\Models\Merchant;
 use App\Models\Condition;
 use App\Models\User;
-use App\Models\Delivery;
+use App\Models\Booking;
 use App\Models\Route;
 use App\Models\OrderAddress;
 
@@ -28,7 +28,7 @@ class BookingSeeder extends Seeder {
      */
     protected $editBooking;
 
-    public function __construct(EditBooking $editBooking) {
+    public function __construct(OpenTok $editBooking) {
         $this->editBooking = $editBooking;
     }
 
@@ -64,6 +64,16 @@ class BookingSeeder extends Seeder {
 
     public function createBooking() {
         
+    }
+
+    public function createChatroom() {
+        $booking = Booking::find(91);
+        $this->editBooking->createChatroom($booking);
+    }
+    
+    public function endChatroom() {
+        $booking = Booking::find(91);
+        $this->editBooking->endChatroom($booking);
     }
 
 }

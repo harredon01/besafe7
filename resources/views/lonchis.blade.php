@@ -155,7 +155,7 @@
             <div class="col-md-3 col-sm-3 col-xs-12">
                 <div class="ach-single">
                     <div class="icon"><i class="fa fa-users"></i></div>
-                    <p><span class="counter">18</span></p>
+                    <p><span class="counter">108</span></p>
                     <h5>Planes activos</h5>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                 <div class="ach-single">
                     <div class="icon"><i class="fa fa-trophy"></i></div>
                     <p>+<span class="counter">500</span></p>
-                    <h5>Eventos atendidos</h5>
+                    <h5>Almuerzos entregados</h5>
                 </div>
             </div>
         </div>

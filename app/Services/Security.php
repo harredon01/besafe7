@@ -4,14 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Medical;
-use App\Models\Address;
-use App\Models\Push;
 use DB;
 use Validator;
-use App\Models\Region;
-use App\Models\City;
-use App\Models\Country;
-use App\Services\EditAlerts;
 
 class Security {
 
@@ -20,22 +14,6 @@ class Security {
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
 
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $editAlerts;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
-    }
 
     /**
      * Get a validator for an incoming edit profile request.

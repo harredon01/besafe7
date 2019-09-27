@@ -44,6 +44,9 @@ class Report extends Model {
     public function city() {
         return $this->hasOne('App\Models\City');
     }
+    public function user() {
+        return $this->hasOne('App\Models\User');
+    }
 
     public function region() {
         return $this->hasOne('App\Models\Region');

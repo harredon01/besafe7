@@ -2,25 +2,14 @@
 
 namespace App\Services;
 
-use Validator;
 use App\Models\Order;
-use App\Models\OrderCondition;
 use App\Models\OrderAddress;
 use App\Models\Payment;
 use App\Models\User;
-use App\Models\Item;
-use App\Models\Condition;
-use App\Models\ProductVariant;
-use App\Models\Address;
 use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\EditBilling;
 use App\Services\Geolocation;
-use App\Services\EditAlerts;
-use Mail;
-use Darryldecode\Cart\CartCondition;
-use Cart;
-use DB;
 
 class OrderJobs {
 
@@ -53,12 +42,6 @@ class OrderJobs {
      */
     protected $payU;
 
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $editAlerts;
 
     /**
      * The Guard implementation.
@@ -87,9 +70,8 @@ class OrderJobs {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, EditCart $editCart, EditAlerts $editAlerts, Geolocation $geolocation, EditOrder $editOrder, EditBilling $editBilling) {
+    public function __construct(PayU $payU, EditCart $editCart,  Geolocation $geolocation, EditOrder $editOrder, EditBilling $editBilling) {
         $this->payU = $payU;
-        $this->editAlerts = $editAlerts;
         $this->editCart = $editCart;
         $this->geolocation = $geolocation;
         $this->editOrder = $editOrder;

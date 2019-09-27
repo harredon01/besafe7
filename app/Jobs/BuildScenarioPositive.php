@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use Exception;
 use App\Services\Routing;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -41,7 +41,7 @@ class BuildScenarioPositive implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(Routing $routing, EditAlerts $editAlerts) {
+    public function handle(Routing $routing, Notifications $notifications) {
         $routes = Route::where("type", $this->scenario)->where("status", "pending")->where("provider", $this->provider)->with(['deliveries.user'])->orderBy('id')->get();
         if ($this->check) {
             $checkResult = $routing->checkScenario($routes, $this->hash);
@@ -68,7 +68,7 @@ class BuildScenarioPositive implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
     /**
@@ -92,9 +92,9 @@ class BuildScenarioPositive implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
 }

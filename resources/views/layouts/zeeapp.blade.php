@@ -67,9 +67,10 @@
                                             <li><a href="#screenshot">Pantallazos</a></li>
                                             <li><a href="#pricing">Precios</a></li>
                                             <li style="display: none"><a href="#team">Team</a></li>
-                                            <li><a href="#download">Descárgalo</a></li>
+                                            <li><a href="#download">Descárgalo</a></li> 
                                             <li style="display: none"><a href="#blog">Blog</a></li>
                                             <li><a href="#contact">Contáctanos</a></li>
+                                            <li><a href="/zones">Cobertura</a></li>
                                         </ul>
                                     </nav>
                                 </div>

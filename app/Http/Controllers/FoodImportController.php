@@ -29,8 +29,8 @@ class FoodImportController extends Controller {
     public function __construct(Guard $auth, FoodImport $food) {
         $this->auth = $auth;
         $this->food = $food;
-        $this->middleware('auth');
-        $this->middleware('admin');
+        $this->middleware('auth')->except('getZonesPublic');
+        $this->middleware('admin')->except('getZonesPublic');
     }
 
     /**
@@ -122,6 +122,14 @@ class FoodImportController extends Controller {
      */
     public function getZones() {
         return view('food.zones');
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getZonesPublic() {
+        return view('content.zonespublic');
     }
 
     /**
