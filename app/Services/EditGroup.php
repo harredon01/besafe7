@@ -9,7 +9,7 @@ use App\Jobs\NotifyGroup;
 use App\Jobs\AdminGroup;
 use App\Models\User;
 use Illuminate\Http\Response;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use DB;
 
 class EditGroup {
@@ -33,7 +33,7 @@ class EditGroup {
      * The EditAlert implementation.
      *
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * Create a new class instance.
@@ -41,8 +41,8 @@ class EditGroup {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications) {
+        $this->notifications = $notifications;
     }
 
     public function getGroup($group_id) {
@@ -70,7 +70,7 @@ class EditGroup {
                 "payload" => $payload,
                 "user_status" => "useless"
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, null, true, $group->updated_at);
+            $this->notifications->sendMassMessage($data, $followers, null, true, $group->updated_at);
         }
     }
 
@@ -130,7 +130,7 @@ class EditGroup {
         $deleteGroup = false;
         if ($profile) {
             if ($profile->level != self::GROUP_BLOCKED) {
-                $this->editAlerts->deleteObjectNotifs($user, $group->id, "Group");
+                $this->notifications->deleteObjectNotifs($user, $group->id, "Group");
                 if (!$group->is_public) {
                     $deleted = DB::delete('delete from group_user where user_id = ? and group_id = ? ', [$user->id, $group->id]);
                     if ($profile->is_admin) {
@@ -221,7 +221,7 @@ class EditGroup {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $date = date("Y-m-d H:i:s");
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
+                $this->notifications->sendMassMessage($data, $followers, $user, true, $date);
                 if ($group->isPublicActive()) {
                     $sql = "UPDATE group_user set level = '" . self::GROUP_REMOVED . "' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                 } else if (!$group->is_public) {
@@ -284,7 +284,7 @@ class EditGroup {
                         "payload" => $payload,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
+                    $this->notifications->sendMassMessage($data, $followers, $user, true, $date);
                     $sql = "UPDATE group_user set is_admin = true,last_significant = '{$date}' WHERE  user_id IN ({$bindingsString}) AND group_id = $group->id ; ";
                     DB::statement($sql, $filename);
                     $sql = "SELECT user_id as id FROM group_user WHERE  user_id NOT IN ({$bindingsString}) AND group_id = $group->id AND level <> '" . self::GROUP_BLOCKED . "' && level <> '" . self::GROUP_PENDING . "'; ";
@@ -312,7 +312,7 @@ class EditGroup {
             "payload" => $payload,
             "user_status" => $user->getUserNotifStatus()
         ];
-        return $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
+        return $this->notifications->sendMassMessage($data, $followers, $user, true, $date);
     }
 
     public function requestChangeStatusGroup(User $user, array $data) {
@@ -525,7 +525,7 @@ class EditGroup {
                 "type" => self::NEW_GROUP,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($notification, $inviteUsers, $user, true, $group->updated_at);
+            $this->notifications->sendMassMessage($notification, $inviteUsers, $user, true, $group->updated_at);
             $i++;
             if ($isNew) {
                 
@@ -547,7 +547,7 @@ class EditGroup {
                         "type" => self::GROUP_INVITE,
                         "user_status" => $user->getUserNotifStatus()
                     ];
-                    $this->editAlerts->sendMassMessage($notification, $group->getAllMembers(), $user, true, null);
+                    $this->notifications->sendMassMessage($notification, $group->getAllMembers(), $user, true, null);
                 }
             }
             DB::table('group_user')->insert(

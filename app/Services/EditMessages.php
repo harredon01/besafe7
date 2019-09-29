@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Group;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\User;
 use App\Models\Message;
 use App\Jobs\SendChat;
@@ -55,7 +55,7 @@ class EditMessages {
      * The EditAlert implementation.
      *
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * Create a new class instance.
@@ -63,8 +63,8 @@ class EditMessages {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications) {
+        $this->notifications = $notifications;
     }
 
     /**
@@ -224,7 +224,7 @@ class EditMessages {
                 array_push($followers, $recipient);
             }
             unset($data['to_id']);
-            $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null, false);
+            $this->notifications->sendMassMessage($data, $followers, $user, $notif, null, false);
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {
@@ -237,7 +237,7 @@ class EditMessages {
                     $dauser['is_admin'] = $data['is_admin'];
                     unset($data['is_admin']);
                     $data['payload'] = $dauser;
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, $notif, null);
+                    $this->notifications->sendMassMessage($data, $followers, $user, $notif, null);
                 }
             }
         }
@@ -253,7 +253,18 @@ class EditMessages {
                 ];
                 return $friend;
             }
-        } else if ($type == "Merchant" || $type == "Report") {
+        } else if ($type == "Merchant" ) {
+            $className = "App\\Models\\".$type;
+            $objectActv = $className::find($object);
+            if ($objectActv) {
+                $user = $objectActv->users()->first();
+                $friend = [
+                    "id" => $user->id,
+                    "name" => $user->firstName . " " . $user->lastName
+                ];
+                return $friend;
+            }
+        } else if ($type == "Report") {
             $className = "App\\Models\\".$type;
             $objectActv = $className::find($object);
             if ($objectActv) {

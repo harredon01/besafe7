@@ -6,7 +6,8 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Favorite;
 use App\Models\User;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
+use App\Services\OpenTok;
 use Validator;
 use DB;
 
@@ -26,7 +27,14 @@ class EditBooking {
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
-    protected $editAlerts;
+    protected $notifications;
+
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $openTok;
 
     /**
      * Create a new class instance.
@@ -34,8 +42,9 @@ class EditBooking {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications, OpenTok $opentok) {
+        $this->notifications = $notifications;
+        $this->openTok = $opentok;
     }
 
     private function checkAvailable(array $data) {
@@ -93,7 +102,10 @@ class EditBooking {
                     $type = $data['type'];
                     $class = self::MODEL_PATH . $type;
                     $object = $class::find($data['object_id']);
-                    $results = $object->bookingsStartsBetween($data['from'], $data['to'])->get();
+
+                    $array1 = $object->bookingsStartsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
+                    $array2 = $object->bookingsEndsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
+                    $results = array_merge($array1->toArray(), $array2->toArray());
                     if (count($results) > 0) {
                         return false;
                     } else {
@@ -127,32 +139,6 @@ class EditBooking {
                 if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking));
-                }
-                return response()->json(array("status" => "error", "message" => "Not available"));
-            }
-        }
-        return response()->json(array("status" => "error", "message" => "Object not found"));
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function rescheduleBookingObject(array $data, User $user) {
-        $validator = $this->validatorScheduleBooking($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $type = $data['type'];
-        $class = self::MODEL_PATH . $type;
-        if (class_exists($class)) {
-            $object = $class::find($data['object_id']);
-            if ($object) {
-                $result = $this->checkAvailable($data);
-                if ($result) {
-                    $object->newBooking($user, $data['from'], $data['to']);
-                    return response()->json(array("status" => "success", "message" => "Booking created"));
                 }
                 return response()->json(array("status" => "error", "message" => "Not available"));
             }
@@ -209,10 +195,35 @@ class EditBooking {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $date = date("Y-m-d H:i:s");
-                $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date, true);
+                $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
                 return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    public function registerConnection(User $user, array $data) {
+        $booking = Booking::find($data["booking_id"]);
+        if ($booking) {
+            $options = $booking->options;
+            $found = false;
+            for ($x = 0; $x <= count($options["users"]); $x++) {
+                if ($options["users"][$x]["id"] == $user->id) {
+                    $found = true;
+                    $options["users"][$x]["connection_id"] = $data["connection_id"];
+                }
+            }
+            if (!$found) {
+                $container = [
+                    "id" => $user->id,
+                    "connection_id" => $data["connection_id"]
+                ];
+                array_push($options["users"], $container);
+            }
+            $booking->options = $options;
+            $booking->save();
+            return response()->json(array("status" => "success", "message" => "Connection registered", "booking" => $booking));
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
@@ -368,6 +379,68 @@ class EditBooking {
         Favorite::where('user_id', $user->id)
                 ->where('favorite_type', $data['type'])
                 ->where('object_id', $data['object_id'])->delete();
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function sendStartReminder() {
+        $bookings = DB::select(""
+                        . "SELECT 
+                                b.*,m.name as merchant_name,m.id as merchant_id
+                            FROM
+                                bookable_bookings b join merchants m on m.id=b.bookable_id
+                            WHERE
+                                starts_at < DATE_ADD(NOW(), INTERVAL 2 HOUR)
+                                    AND starts_at >= DATE_ADD(NOW(), INTERVAL 1 HOUR) and price = total_paid ");
+        foreach ($bookings as $booking) {
+            $payload = [
+                "booking_id" => $booking->id,
+                "booking_date" => $booking->starts_at
+            ];
+            $data = [
+                "trigger_id" => $booking->merchant_id,
+                "message" => "",
+                "subject" => "",
+                "object" => "Merchant",
+                "sign" => true,
+                "payload" => $payload,
+                "type" => "booking_soon",
+                "user_status" => "active"
+            ];
+            $user = json_decode(json_encode(["id" => $booking->customer_id]), false);
+            $followers = [$user];
+            $date = date("Y-m-d H:i:s");
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
+        }
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function startVirtualMeeting() {
+        $bookings = DB::select("SELECT 
+                                    *
+                                FROM
+                                    bookable_bookings b join merchants m on m.id=b.bookable_id
+                                WHERE
+                                    starts_at < DATE_ADD(NOW(), INTERVAL 5 MINUTE)
+                                        AND starts_at >= NOW()  and price = total_paid ");
+        foreach ($bookings as $booking) {
+            $this->openTok->createChatroom($booking);
+        }
+    }
+
+    public function changeStatusBooking($id, $status) {
+        $booking = Booking::find($id);
+        if ($booking) {
+            $booking->options['status'] = $status;
+            $booking->save();
+        }
     }
 
     /**

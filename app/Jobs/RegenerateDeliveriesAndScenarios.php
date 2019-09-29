@@ -3,7 +3,7 @@
 namespace App\Jobs;
 use Exception;
 use App\Services\Food;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\CoveragePolygon;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -33,7 +33,7 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
      *
      * @return void
      */
-    public function handle(Food $food, EditAlerts $editAlerts) {
+    public function handle(Food $food, Notifications $notifications) {
         $food->deleteRandomDeliveriesData();
         $user = User::find(2);
         $polygons = CoveragePolygon::where('merchant_id', 1299)->where("provider","Rapigo")->get();
@@ -56,7 +56,7 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
     
     /**
@@ -81,9 +81,9 @@ class RegenerateDeliveriesAndScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }*/
 
 }

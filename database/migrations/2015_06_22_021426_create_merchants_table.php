@@ -24,6 +24,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('url')->nullable();
             $table->string('address');
             $table->text('description')->nullable();
+            $table->text('attributes')->nullable();
             $table->string('icon')->nullable();
             $table->double('lat', 12, 9)->nullable();
             $table->double('long', 12, 9)->nullable();

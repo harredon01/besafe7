@@ -68,8 +68,8 @@ class GetScenarioStructure implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

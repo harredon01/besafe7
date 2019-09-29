@@ -11,6 +11,7 @@ use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
 use App\Models\Rating;
+use App\Services\Notifications;
 use App\Models\Availability;
 use Illuminate\Http\Response;
 use DB;
@@ -37,7 +38,7 @@ class EditMapObject {
      * The EditAlert implementation.
      *
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * The EditAlert implementation.
@@ -51,8 +52,8 @@ class EditMapObject {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts, EditGroup $editGroup) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications, EditGroup $editGroup) {
+        $this->notifications = $notifications;
         $this->editGroup = $editGroup;
     }
 
@@ -246,7 +247,7 @@ class EditMapObject {
             ];
             $date = date_create();
             $date = date_format($date, "Y-m-d");
-            $this->editAlerts->sendMassMessage($data, $followers, null, true, $date, false);
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
                 Mail::to($target->email)->send(new Newsletter());
             }
@@ -465,7 +466,7 @@ class EditMapObject {
                 "type" => $type,
                 "user_status" => $user->getUserNotifStatus()
             ];
-            $this->editAlerts->sendMassMessage($data, $followers, $user, true, null);
+            $this->notifications->sendMassMessage($data, $followers, $user, true, null);
         }
     }
 

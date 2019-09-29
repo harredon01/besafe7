@@ -49,8 +49,8 @@ class FoodApiController extends Controller {
     public function __construct(Food $food,Routing $routing) {
         $this->food = $food;
         $this->routing = $routing;
-        $this->middleware('auth:api');
-        $this->middleware('admin')->except('getRouteInfo');
+        $this->middleware('auth:api')->except('getZones');
+        $this->middleware('admin')->except(['getRouteInfo','getZones']);
     }
 
     /**

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" ng-app="besafe">
     <head>
         <!--- Basic Page Needs  -->
         <meta charset="utf-8">
@@ -18,6 +18,27 @@
         <link rel="stylesheet" href="assets/css/typography.css">
         <link rel="stylesheet" href="assets/css/style.css">
         <link rel="stylesheet" href="assets/css/responsive.css">
+        <!-- Scripts -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="/js/app.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
+        <script src="{{ asset('/js/app_1.js')}}"></script>
+        <script src="{{ asset('/js/constants.js')}}"></script>
+        <script src="{{ asset('/js/controllers/zonespubctrl.js')}}"></script>
+        <script src="{{ asset('/js/services/map.js')}}"></script>
+        <script src="{{ asset('/js/services/mapDash.js')}}"></script>
+        <script src="{{ asset('/js/services/food.js')}}"></script>
+        <script src="{{ asset('/js/services/location.js')}}"></script>
+        <script>
+            window.Laravel = <?php
+echo json_encode([
+    'csrfToken' => csrf_token(),
+]);
+?>;
+        </script>
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/png" href="assets/img/icon/favicon.ico">
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -62,15 +83,7 @@
                                 <div class="main-menu">
                                     <nav class="nav-menu">
                                         <ul>
-                                            <li class="active"><a href="#home">Home</a></li>
-                                            <li><a href="#feature">Beneficios</a></li>
-                                            <li><a href="#screenshot">Pantallazos</a></li>
-                                            <li><a href="#pricing">Precios</a></li>
-                                            <li style="display: none"><a href="#team">Team</a></li>
-                                            <li><a href="#download">Descárgalo</a></li> 
-                                            <li style="display: none"><a href="#blog">Blog</a></li>
-                                            <li><a href="#contact">Contáctanos</a></li>
-                                            <li><a href="/zones">Cobertura</a></li>
+                                            <li class="active"><a href="/">Home</a></li> 
                                         </ul>
                                     </nav>
                                 </div>

@@ -8,6 +8,8 @@ use App\Jobs\RecurringOrder;
 use App\Models\Push;
 use App\Models\Delivery;
 use App\Models\Order;
+use App\Models\OrderAddress;
+use App\Models\Address;
 use App\Mail\DeliveryScheduled;
 use Illuminate\Support\Facades\Mail;
 
@@ -55,9 +57,10 @@ class EditDelivery {
                         $this->checkRecurringPosibility($user, $data['ip_address']);
                     }
                     $date = date_create($delivery->delivery);
+                    $pending = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
                     $data["date"] = date_format($date, "Y/m/d");
                     Mail::to($user)->send(new DeliveryScheduled($data));
-                    return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details);
+                    return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details, "date" => $date, "pending_count" => $pending);
                 } else {
                     return $results;
                 }
@@ -65,6 +68,68 @@ class EditDelivery {
             return array("status" => "error", "message" => "Delivery does not belong to user");
         }
         return array("status" => "error", "message" => "Delivery does not exist");
+    }
+
+    public function changeDeliveryDate(User $user, array $data) {
+        if (array_key_exists("delivery", $data)) {
+            $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->count();
+            if ($sameDay > 0) {
+                $pending2 = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
+                if ($pending2 > 1) {
+                    $suspendedDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
+                    $suspendedDelivery->status = "suspended";
+                    $suspendedDelivery->save();
+                } else {
+                    return array("status" => "error", "message" => "Not Enough Pending");
+                }
+            }
+            $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->where("delivery", "<", $data["delivery"])->first();
+            if ($deposit) {
+                $date = $this->getNextValidDate($date);
+                $deposit->delivery = date_format($date, "Y-m-d") . " 12:00:00";
+                $deposit->save();
+            }
+            $reprogramDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
+            $reprogramDelivery->delivery = $data["delivery"];
+            $reprogramDelivery->save();
+            return array("status" => "success", "message" => "Delivery date changed", "delivery" => $reprogramDelivery);
+        }
+    }
+
+    public function changeDeliveryAddress(User $user, array $data) {
+        $validator = $this->validatorUpdateAddress($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $delivery = Delivery::find($data["delivery_id"]);
+        if ($delivery->user_id != $user->id) {
+            return array("status" => "error", "message" => "Access denied");
+        }
+        $attributes = json_decode($delivery->details, true);
+        $products = $attributes["products"];
+        $product = $products["product"];
+        if ($product == 210 || $product == 220) {
+            $theAddress = Address::find($data["address_id"]);
+            $className = "App\\Services\\Geolocation";
+            $geolocation = new $className;
+            $result = $geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], "Basilikum");
+            if ($result["status"] == "success") {
+                $orderAddresses = $theAddress->toarray();
+                unset($orderAddresses['id']);
+                unset($orderAddresses['is_default']);
+                $orderAddresses['order_id'] = $attributes["order_id"];
+                $orderAddresses['type'] = "shipping";
+                $polygon = $result['polygon'];
+                $orderAddresses['polygon_id'] = $polygon->id;
+                $newAddress = new OrderAddress();
+                $newAddress->fill($orderAddresses);
+                $newAddress->save();
+                $delivery->address_id = $newAddress->id;
+                $delivery->save();
+                return array("status" => "success", "message" => "Delivery Address Updated", "delivery" => $delivery);
+            }
+            return $result;
+        }
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
@@ -228,6 +293,76 @@ class EditDelivery {
                     'type_id' => 'required|max:255',
                     'main_id' => 'required|max:255',
         ]);
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorUpdateAddress(array $data) {
+        return Validator::make($data, [
+                    'delivery_id' => 'required|max:255',
+                    'address_id' => 'required|max:255',
+                    'merchant_id' => 'required|max:255',
+        ]);
+    }
+
+    public function getNextValidDate($date) {
+        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+        if ($dayofweek > 0 && $dayofweek < 5) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        } else if ($dayofweek == 5) {
+            date_add($date, date_interval_create_from_date_string("3 days"));
+        } else if ($dayofweek == 6) {
+            date_add($date, date_interval_create_from_date_string("2 days"));
+        } else if ($dayofweek == 0) {
+            date_add($date, date_interval_create_from_date_string("1 days"));
+        }
+
+        $isHoliday = $this->checkIsHoliday($date);
+
+        while ($isHoliday) {
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            if ($dayofweek == 5) {
+                date_add($date, date_interval_create_from_date_string("3 days"));
+            } else if ($dayofweek == 6) {
+                date_add($date, date_interval_create_from_date_string("2 days"));
+            } else {
+                date_add($date, date_interval_create_from_date_string("1 days"));
+            }
+            $isHoliday = $this->checkIsHoliday($date);
+        }
+        return $date;
+    }
+
+    public function checkIsHoliday($date) {
+        $holidays = [
+            "2019-06-03",
+            "2019-06-24",
+            "2019-07-01",
+            "2019-08-07",
+            "2019-08-19",
+            "2019-10-14",
+            "2019-11-04",
+            "2019-12-24",
+            "2019-12-25",
+            "2019-12-26",
+            "2019-12-27",
+            "2019-12-30",
+            "2019-12-31",
+            "2020-01-01",
+            "2020-01-02",
+            "2020-01-03",
+            "2020-01-06",
+        ];
+        foreach ($holidays as $day) {
+            if ($day == date_format($date, "Y-m-d")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

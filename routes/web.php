@@ -20,6 +20,9 @@ Route::get('/terms', function () {
 Route::get('/icons', function () {
     return view('content.icons');
 });
+Route::get('/zones', function () {
+    return view('content.zonespublic');
+});
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
@@ -174,4 +177,16 @@ Route::get('/newsletter_geometry', function () {
 });
 Route::get('/newsletter_huge', function () {
     return new App\Mail\NewsletterHuge();
+});
+Route::get('/newsletter_catering', function () {
+    return new App\Mail\Newsletter1();
+});
+Route::get('/newsletter_2', function () {
+    return new App\Mail\Newsletter2();
+});
+Route::get('/newsletter_3', function () {
+    return new App\Mail\Newsletter3();
+});
+Route::get('/newsletter_4', function () {
+    return new App\Mail\Newsletter4();
 });

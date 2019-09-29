@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use App\Models\Group;
 use App\Models\User;
 use DB;
@@ -25,7 +25,7 @@ class ShareObject {
      * The EditAlert implementation.
      *
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * Create a new class instance.
@@ -33,8 +33,8 @@ class ShareObject {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications) {
+        $this->notifications = $notifications;
     }
 
     /**
@@ -98,7 +98,7 @@ class ShareObject {
                     "user_status" => $userStatus
                 ];
                 if ($followers) {
-                    $this->editAlerts->sendMassMessage($data, $followers, $user, true, $date);
+                    $this->notifications->sendMassMessage($data, $followers, $user, true, $date);
                 }
             } else {
                 if (array_key_exists("object_id", $data)) {
@@ -215,7 +215,7 @@ class ShareObject {
             "payload" => $daobject,
             "user_status" => $user->getUserNotifStatus()
         ];
-        $notif = $this->editAlerts->sendMassMessage($notification, $followers, $user, true, $date);
+        $notif = $this->notifications->sendMassMessage($notification, $followers, $user, true, $date);
         return ['success' => 'followers notified', 'notification' => $notif];
     }
 

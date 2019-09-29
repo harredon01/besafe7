@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Medical;
 use App\Models\Address;
 use App\Models\Push;
 use Illuminate\Support\Facades\Mail;
@@ -11,9 +10,9 @@ use App\Mail\Register;
 use DB;
 use Validator;
 use App\Models\Region;
+use App\Jobs\SendMessage;
 use App\Models\City;
 use App\Models\Country;
-use App\Services\EditAlerts;
 
 class EditUserData {
 
@@ -24,23 +23,6 @@ class EditUserData {
     const RED_MESSAGE_TYPE = 'emergency';
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
-
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $editAlerts;
-
-    /**
-     * Create a new class instance.
-     *
-     * @param  EventPusher  $pusher
-     * @return void
-     */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
-    }
 
     /**
      * Get a validator for an incoming edit profile request.
@@ -100,6 +82,19 @@ class EditUserData {
         ]);
         $json = json_decode((string) $response->getBody(), true);
         Mail::to($user->email)->send(new Register());
+        $admin = User::find(77);
+        $message = "Hola ".$user->firstName. " somos lonchis. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
+        $package = [
+            "type" => "user_message",
+            "name" => "Servicio al cliente",
+            "message" => $message,
+            "from_id" => $admin->id,
+            "to_id" => $user->id,
+            "status" => "unread",
+            "target_id" => $user->id,
+            "created_at" => date("Y-m-d H:i:s")
+        ];
+        SendMessage::dispatch($admin,$package)->delay(now()->addMinutes(2)); 
         //$this->getUserCode($user);
         return ['status' => 'success', 'access_token' => $json['access_token']];
     }

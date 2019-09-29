@@ -4,7 +4,7 @@ namespace App\Jobs;
 use Exception;
 use App\Models\User;
 use App\Services\Routing;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -65,8 +65,8 @@ class GetScenariosShippingCosts implements ShouldQueue
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\EditAlerts";
-        $editAlerts = new $className;
-        $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+        $className = "App\\Services\\Notifications";
+        $notifications = new $className;
+        $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 }

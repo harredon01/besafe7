@@ -25,12 +25,15 @@ class Merchant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['merchant_id','city_id','region_id','country_id','name','type', 'email','telephone','address', 'description',
+    protected $fillable = ['merchant_id','city_id','region_id','country_id','name','type', 'email','telephone','address', 'description','attributes',
         'icon', 'lat','long', 'minimum','delivery_time','delivery_price','status','user_id','private','ends_at','plan','url','rating','rating_count'];
     protected $dates = [
         'created_at',
         'updated_at',
         'ends_at'
+    ];
+    protected $casts = [
+        'attributes' => 'array',
     ];
     
     public function isActive() {
@@ -73,8 +76,8 @@ class Merchant extends Model {
     public function paymentMethods() {
         return $this->belongsToMany('App\Models\PaymentMethod', 'merchant_payment_methods', 'merchant_id', 'payment_method_id')->withTimestamps();
     }
-    public function user() {
-        return $this->hasOne('App\Models\User');
+    public function users() {
+        return $this->belongsToMany('App\Models\User');
     }
     public function checkAddImg($user,$type) {
         if ($this->user_id == $user->id) {

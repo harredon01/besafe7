@@ -7,7 +7,7 @@ use App\Models\Location;
 use App\Models\HistoricLocation;
 use App\Models\HistoricLocation2; 
 use DB;
-use App\Services\EditAlerts;
+use App\Services\Notifications;
 
 class CleanTrash {
 
@@ -55,7 +55,7 @@ class CleanTrash {
      * The EditAlert implementation.
      *
      */
-    protected $editAlerts;
+    protected $notifications;
 
     /**
      * Create a new class instance.
@@ -63,8 +63,8 @@ class CleanTrash {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(EditAlerts $editAlerts) {
-        $this->editAlerts = $editAlerts;
+    public function __construct(Notifications $notifications) {
+        $this->notifications = $notifications;
     }
 
     /**
@@ -132,7 +132,7 @@ class CleanTrash {
                         ->where('contacts.contact_id',  $activeuser)
                         ->whereIn('contacts.user_id', $contacts)
                         ->update(array("last_significant" => $date));
-                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false,$date);
+                    $this->notifications->sendMassMessage($notification, $recipients, $model, false,$date);
                     $activeuser = $follower->user_id;
                     $stop = array();
                     $contacts = array();
@@ -158,7 +158,7 @@ class CleanTrash {
                         ->whereIn('contacts.user_id', $contacts)
                         ->update(array("last_significant" => $date));
 
-                    $this->editAlerts->sendMassMessage($notification, $recipients, $model, false,$date);
+                    $this->notifications->sendMassMessage($notification, $recipients, $model, false,$date);
                 }
             }
         }
@@ -173,7 +173,7 @@ class CleanTrash {
             "type" => self::TRACKING_LIMIT_TRACKING,
             "user_status" => "normal"
         ];
-        $this->editAlerts->sendMassMessage($notification, $tracking, $model, false,null);
+        $this->notifications->sendMassMessage($notification, $tracking, $model, false,null);
         return ['success' => 'followers notified'];
     }
 

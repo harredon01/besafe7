@@ -23,7 +23,7 @@ class Runner {
     }
 
     public function stopFailed($data) {
-        $className = "App\\Services\\EditAlerts";
+        $className = "App\\Services\\Notifications";
         $platFormService = new $className();
         $user = User::find($data["user_id"]);
         Delivery::where("user_id", $user->id)->where("status", "pending")->update(['status' => 'suspended']);
@@ -76,10 +76,10 @@ class Runner {
                 "type" => "food_meal_arriving",
                 "user_status" => "normal"
             ];
-            $className = "App\\Services\\EditAlerts";
-            $editAlerts = new $className;
+            $className = "App\\Services\\Notifications";
+            $notifications = new $className;
             $date = date("Y-m-d H:i:s");
-            $editAlerts->sendMassMessage($data, $followers, null, true, $date, true);
+            $notifications->sendMassMessage($data, $followers, null, true, $date, true);
         }
 
         return true;
@@ -103,7 +103,7 @@ class Runner {
             $editLocation->saveEndTrip($user);
             $followers = User::whereIn("id", [2, 77])->get();
             $payload = [];
-            $className = "App\\Services\\EditAlerts";
+            $className = "App\\Services\\Notifications";
             $platFormService = new $className;
             $data = [
                 "trigger_id" => $user->id,
