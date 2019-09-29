@@ -83,15 +83,23 @@ class EditDelivery {
                     return array("status" => "error", "message" => "Not Enough Pending");
                 }
             }
+            $date = $this->getNextValidDate(date_create($data["delivery"]));
             $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->where("delivery", "<", $data["delivery"])->first();
             if ($deposit) {
-                $date = $this->getNextValidDate($date);
                 $deposit->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                 $deposit->save();
             }
             $reprogramDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
             $reprogramDelivery->delivery = $data["delivery"];
             $reprogramDelivery->save();
+            $nextDelivery = Delivery::where("user_id", $user->id)->where("delivery", date_format($date, "Y-m-d") . " 12:00:00")->whereIn("status", ["pending", "deposit"])->first();
+            if ($nextDelivery) {
+                $details = json_decode($nextDelivery->details, true);
+                $sameDay++;
+                $details["pickup"] = $sameDay . " envases completos";
+                $nextDelivery->details = json_encode($details);
+                $nextDelivery->save();
+            }
             return array("status" => "success", "message" => "Delivery date changed", "delivery" => $reprogramDelivery);
         }
     }

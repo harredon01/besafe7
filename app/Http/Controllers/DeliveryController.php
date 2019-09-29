@@ -93,7 +93,20 @@ class DeliveryController extends Controller
         ]);
         $data['ip_address'] = $request->ip();
         return response()->json($this->editDelivery->postDeliveryOptions($user, $data));
-
+    }
+    
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function posUpdateDeliveryDate(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->all([
+            'delivery',
+        ]);
+        return response()->json($this->editDelivery->changeDeliveryDate($user, $data));
     }
     
     /**

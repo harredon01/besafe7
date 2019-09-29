@@ -76,6 +76,7 @@ Route::post('user/credits/{user?}', 'OrderApiController@checkUserCredits');
 Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
+Route::post('deliveries/date', 'DeliveryController@posUpdateDeliveryDate');
 Route::post('deliveries/cancel/{delivery?}', 'DeliveryController@postCancelDeliverySelection');
 Route::resource('deliveries', 'DeliveryController');
 Route::resource('articles', 'ArticleController');

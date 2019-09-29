@@ -29,7 +29,8 @@
         "fideloper/proxy": "^4.1",
         "phpoffice/phpspreadsheet": "^1.6",
         "rinvex/laravel-bookings": "^2.1",
-        "yab/laravel-scout-mysql-driver": "^2.3"
+        "yab/laravel-scout-mysql-driver": "^2.3",
+        "opentok/opentok": "^4.4"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
