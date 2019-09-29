@@ -178,7 +178,7 @@ Route::get('/newsletter_geometry', function () {
 Route::get('/newsletter_huge', function () {
     return new App\Mail\NewsletterHuge();
 });
-Route::get('/newsletter_1', function () {
+Route::get('/newsletter_catering', function () {
     return new App\Mail\Newsletter1();
 });
 Route::get('/newsletter_2', function () {

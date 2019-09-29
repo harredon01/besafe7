@@ -30,6 +30,6 @@ class Newsletter1 extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-codigos')->subject("Conoce nuestro menu de la semana!");
+        return $this->view('emails.food.newsletter-catering')->subject("Organiza la comida de tus eventos con Lonchis!");
     }
 }
