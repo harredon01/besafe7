@@ -28,7 +28,7 @@ class EditBooking {
      * @var \Illuminate\Contracts\Auth\Guard
      */
     protected $notifications;
-    
+
     /**
      * The Guard implementation.
      *
@@ -199,6 +199,31 @@ class EditBooking {
                 return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    public function registerConnection(User $user, array $data) {
+        $booking = Booking::find($data["booking_id"]);
+        if ($booking) {
+            $options = $booking->options;
+            $found = false;
+            for ($x = 0; $x <= count($options["users"]); $x++) {
+                if ($options["users"][$x]["id"] == $user->id) {
+                    $found = true;
+                    $options["users"][$x]["connection_id"] = $data["connection_id"];
+                }
+            }
+            if (!$found) {
+                $container = [
+                    "id" => $user->id,
+                    "connection_id" => $data["connection_id"]
+                ];
+                array_push($options["users"], $container);
+            }
+            $booking->options = $options;
+            $booking->save();
+            return response()->json(array("status" => "success", "message" => "Connection registered", "booking" => $booking));
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }

@@ -44,21 +44,21 @@ class OpenTok {
         $this->openTok = new OpenTok(env('OPENTOK_API_KEY'), env('OPENTOK_API_SECRET'));
     }
 
-    public function createSession() {
-        // Create a session that attempts to use peer-to-peer streaming:
-        $session = $opentok->createSession();
-        return $session;
-    }
-
     public function createChatroom($booking) {
         $bookable = $booking->bookable_type::find($booking->bookable_id);
+        $options = $booking->options;
+        $options["users"] = [];
         $user = $bookable->users()->first();
         $client = $booking->customer_type::find($booking->customer_id);
         $session = $this->openTok->createSession();
         $bookableToken = $session->generateToken();
+        $bookableUserContainer = ["id" => $user->id,"token"=>$bookableToken];
+        array_push($options["users"], $bookableUserContainer);
+        $sessionId = $session->getSessionId();
+        $options["session_id"] = $sessionId;
         $payload = [
             "booking_id" => $booking->id,
-            "sessionId" => $session->getSessionId(),
+            "sessionId" => $sessionId,
             "token" => $bookableToken
         ];
         $followers = [$user];
@@ -75,8 +75,13 @@ class OpenTok {
         $date = date("Y-m-d H:i:s");
         $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
         $clientToken = $session->generateToken();
+        $bookableClientContainer = ["id" => $client->id,"token"=>$clientToken];
+        array_push($options["users"], $bookableClientContainer);
+        $booking->options = $options;
+        $booking->save();
         $payload = [
             "booking_id" => $booking->id,
+            "sessionId" => $sessionId,
             "token" => $clientToken
         ];
         $followers = [$client];
@@ -95,7 +100,10 @@ class OpenTok {
     }
     
     public function endChatroom($booking) {
-        
+        $options = $booking->options;
+        foreach ($options["users"] as $user) {
+            $this->openTok->forceDisconnect($options["session_id"], $user["connection_id"]);
+        }
     }
     
 
