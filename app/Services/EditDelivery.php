@@ -72,7 +72,7 @@ class EditDelivery {
 
     public function changeDeliveryDate(User $user, array $data) {
         if (array_key_exists("delivery", $data)) {
-            $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->count();
+            $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->where("details","like", 'deliver":"envase')->count();
             if ($sameDay > 0) {
                 $pending2 = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
                 if ($pending2 > 1) {
