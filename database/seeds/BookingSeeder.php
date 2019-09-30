@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\EditBooking;
-use App\Services\OpenTok;
+use App\Services\OpenTokService;
 use App\Services\EditAlerts;
 use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
@@ -28,12 +28,12 @@ class BookingSeeder extends Seeder {
      */
     protected $editBooking;
 
-    public function __construct(OpenTok $editBooking) {
+    public function __construct(OpenTokService $editBooking) {
         $this->editBooking = $editBooking;
     }
 
     public function run() {
-        $this->createBookingAvailability();
+        $this->endChatroom();
     }
 
     public function createBookingAvailability() {
@@ -68,12 +68,12 @@ class BookingSeeder extends Seeder {
 
     public function createChatroom() {
         $booking = Booking::find(91);
-        $this->editBooking->createChatroom($booking);
+        $this->editBooking->endChatroom($booking->id);
     }
     
     public function endChatroom() {
         $booking = Booking::find(91);
-        $this->editBooking->endChatroom($booking);
+        $this->editBooking->endChatroom($booking->id);
     }
 
 }

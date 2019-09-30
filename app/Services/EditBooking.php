@@ -7,7 +7,7 @@ use App\Models\Booking;
 use App\Models\Favorite;
 use App\Models\User;
 use App\Services\Notifications;
-use App\Services\OpenTok;
+use App\Services\OpenTokService;
 use Validator;
 use DB;
 
@@ -42,7 +42,7 @@ class EditBooking {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications, OpenTok $opentok) {
+    public function __construct(Notifications $notifications, OpenTokService $opentok) {
         $this->notifications = $notifications;
         $this->openTok = $opentok;
     }
@@ -207,11 +207,14 @@ class EditBooking {
         $booking = Booking::find($data["booking_id"]);
         if ($booking) {
             $options = $booking->options;
+            $options = $options->toArray();
             $found = false;
-            for ($x = 0; $x <= count($options["users"]); $x++) {
-                if ($options["users"][$x]["id"] == $user->id) {
+            for ($x = 0; $x < count($options["users"]); $x++) {
+                $theUser = $options["users"][$x];
+                if ($theUser["id"] == $user->id) {
                     $found = true;
-                    $options["users"][$x]["connection_id"] = $data["connection_id"];
+                    $theUser["connection_id"] = $data["connection_id"];
+                    $options["users"][$x] = $theUser;
                 }
             }
             if (!$found) {

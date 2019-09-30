@@ -276,6 +276,7 @@ Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
 Route::post('bookings/status', 'BookingApiController@postChangeStatusBookingObject');
 Route::post('bookings/schedule', 'BookingApiController@postRescheduleBookingObject');
+Route::post('bookings/connection', 'BookingApiController@postRegisterConnection');
 Route::get('availabilities', 'BookingApiController@getAvailabilitiesObject');
 Route::post('availabilities', 'BookingApiController@postAddAvailabilitiesObject');
 
