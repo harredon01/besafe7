@@ -21,7 +21,7 @@ use App\Mail\RouteDeliver;
 use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
 use App\Mail\Register;
-use App\Mail\Newsletter;
+use App\Mail\Newsletter1;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -322,7 +322,7 @@ class Food {
                 ];
                 $date = date_create($deliveryObj->delivery);
                 $date = date_format($date, "Y-m-d");
-                $platFormService->sendMassMessage($data, $followers, null, true, $date, true);
+                $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             }
         }
     }
@@ -352,9 +352,9 @@ class Food {
 
             $className = "App\\Services\\Notifications";
             $platFormService = new $className();
-            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Newsletter());
+                Mail::to($user->email)->send(new Newsletter1());
             }
         }
     }
