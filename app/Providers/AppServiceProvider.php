@@ -3,16 +3,16 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Services\Notifications;
+use App\Services\Geolocation;
+class AppServiceProvider extends ServiceProvider {
 
-class AppServiceProvider extends ServiceProvider
-{
     /**
      * Bootstrap any application services.
      *
      * @return void
      */
-    public function boot()
-    {
+    public function boot() {
         //
     }
 
@@ -21,9 +21,14 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
-    {
+    public function register() {
         $this->app->alias('bugsnag.logger', \Illuminate\Contracts\Logging\Log::class);
         $this->app->alias('bugsnag.logger', \Psr\Log\LoggerInterface::class);
+        $this->app->singleton('Notifications', function () {
+            return new Notifications();
+        });
+        $this->app->singleton('Geolocation', function () {
+            return new Geolocation();
+        });
     }
 }

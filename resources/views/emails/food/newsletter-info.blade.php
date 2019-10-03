@@ -445,11 +445,11 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://d15k2d11r6t6rl.cloudfront.net/public/users/BeeFree/beefree-6u2m14364ke/instagram%20lonchis%20%282%29.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
+<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/instagram-lonchis-reg2.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:180%;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="color:#555555;font-family:'Lato', Tahoma, Verdana, Segoe, sans-serif;line-height:180%;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;"> 
 <div style="font-size: 12px; line-height: 21px; font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif; color: #555555;">
 <p style="font-size: 14px; line-height: 27px; text-align: left; margin: 0;"><span style="font-size: 15px;">Compra un plan con amigos y divide la cuenta en partes iguales. Entre más amigos, mayor ahorro.</span><br/><br/><span style="font-size: 15px; line-height: 27px;"><strong>Tener en cuenta:</strong></span><br/><span style="font-size: 15px; line-height: 27px;">1. Todos los miembros del plan reciben en la misma dirección.</span><br/><span style="font-size: 15px; line-height: 27px;">2. Todos tienen que tener la app descargada y tener una cuenta Lonchis.</span></p>
 </div>
@@ -511,13 +511,13 @@
 <div style="border-top:14px solid #f6f6f6; border-left:14px solid #f6f6f6; border-bottom:14px solid #f6f6f6; border-right:14px solid #f6f6f6; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://d15k2d11r6t6rl.cloudfront.net/public/users/BeeFree/beefree-6u2m14364ke/10.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--> 
+<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/10.jpeg" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Tahoma, Verdana, Segoe, sans-serif;line-height:180%;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 21px; font-family: Tahoma, Verdana, Segoe, sans-serif; color: #555555;">
+<div style="font-size: 12px; line-height: 21px; font-family: Tahoma, Verdana, Segoe, sans-serif; color: #555555;"> 
 <p style="font-size: 14px; line-height: 27px; text-align: left; margin: 0;"><span style="font-size: 15px;">Tienes que personalizar y confirmar tu menú a mas tardar el día anterior antes de las 9:30 pm. Cocinamos todas los días en las mañanas con los mejores ingredientes, y recibirás tu almuerzo fresco recién preparada por el cheff en la puerta de tu oficina entre las 10:30 am y las 12:30 pm.</span><br/><br/><em>*Para calentar en microondas.</em></p>
 </div>
 </div>
@@ -536,7 +536,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://d15k2d11r6t6rl.cloudfront.net/public/users/BeeFree/beefree-6u2m14364ke/instagram%20lonchis%20%281%29.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
+<div style="font-size:1px;line-height:30px"> </div><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/instagram-lonchis-reg.png" style="outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; clear: both; border: 0; height: auto; float: none; width: 100%; max-width: 297px; display: block;" title="Image" width="297"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->

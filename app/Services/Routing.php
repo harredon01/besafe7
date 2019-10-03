@@ -554,9 +554,8 @@ class Routing {
     }
 
     public function delegateDeliveries($data) {
-        $className = "App\\Services\\Geolocation";
         $address = OrderAddress::where("address", $data['address'])->first();
-        $geo = new $className();
+        $geo = app('Geolocation');
 
         $resultsGeo = $geo->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'], $data['provider']);
         if (array_key_exists('polygon', $resultsGeo)) {

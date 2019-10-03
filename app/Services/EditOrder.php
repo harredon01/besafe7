@@ -16,8 +16,6 @@ use App\Models\Merchant;
 use App\Services\EditCart;
 use App\Services\PayU;
 use App\Services\Stripe;
-use App\Services\Geolocation;
-use App\Services\Notifications;
 use App\Mail\OrderApproved;
 use App\Mail\OrderApprovedInvoice;
 use Mail;
@@ -84,12 +82,12 @@ class EditOrder {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart, Notifications $notifications, Geolocation $geolocation) {
+    public function __construct(PayU $payU, Stripe $stripe, EditCart $editCart) {
         $this->payU = $payU;
-        $this->notifications = $notifications;
+        $this->notifications = app('Notifications');
         $this->stripe = $stripe;
         $this->editCart = $editCart;
-        $this->geolocation = $geolocation;
+        $this->geolocation = app('Geolocation');
     }
 
     public function getOrder(User $user) {

@@ -11,7 +11,6 @@ use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
 use App\Models\Rating;
-use App\Services\Notifications;
 use App\Models\Availability;
 use Illuminate\Http\Response;
 use DB;
@@ -52,8 +51,8 @@ class EditMapObject {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications, EditGroup $editGroup) {
-        $this->notifications = $notifications;
+    public function __construct(EditGroup $editGroup) {
+        $this->notifications = app('Notifications');
         $this->editGroup = $editGroup;
     }
 

@@ -6,10 +6,8 @@ use Validator;
 use App\Models\Group;
 use App\Jobs\InviteUsers;
 use App\Jobs\NotifyGroup;
-use App\Jobs\AdminGroup;
 use App\Models\User;
 use Illuminate\Http\Response;
-use App\Services\Notifications;
 use DB;
 
 class EditGroup {
@@ -41,8 +39,8 @@ class EditGroup {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
     }
 
     public function getGroup($group_id) {

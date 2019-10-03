@@ -123,8 +123,7 @@ class EditOrderFood {
     public function approveOrder(Order $order) {
         $data = array();
         $items = $order->items;
-        $className = "App\\Services\\Geolocation";
-        $geo = new $className;
+        $geo = app('Geolocation');
         $address = $order->orderAddresses()->where("type", "shipping")->first();
         $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id,"Basilikum");
         $polygon = $result['polygon'];

@@ -43,8 +43,7 @@ class Food {
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
 
     public function suspendDelivery(User $user, $option) {
-        $className = "App\\Services\\Notifications";
-        $platFormService = new $className();
+        $platFormService = $this->app->make('Notifications');
         $payload = [];
         $date = date("Y-m-d H:i:s");
         $followers = [$user];
@@ -106,8 +105,7 @@ class Food {
     }
 
     public function inviteUser(User $user) {
-        $className = "App\\Services\\Notifications";
-        $platFormService = new $className();
+        $platFormService = $this->app->make('Notifications');
         $deliveryObj = Delivery::find(8850);
         $delivery = [
             "delivery" => $deliveryObj
@@ -298,8 +296,7 @@ class Food {
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         if (count($deliveries) > 0) {
             $followers = [];
-            $className = "App\\Services\\Notifications";
-            $platFormService = new $className();
+            $platFormService = $this->app->make('Notifications');
             foreach ($deliveries as $deliveryObj) {
 
                 $delivery = [
@@ -350,8 +347,7 @@ class Food {
             $date = date_create();
             $date = date_format($date, "Y-m-d");
 
-            $className = "App\\Services\\Notifications";
-            $platFormService = new $className();
+            $platFormService = $this->app->make('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
                 Mail::to($user->email)->send(new Newsletter1());

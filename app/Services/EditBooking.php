@@ -6,7 +6,6 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Favorite;
 use App\Models\User;
-use App\Services\Notifications;
 use App\Services\OpenTokService;
 use Validator;
 use DB;
@@ -42,8 +41,8 @@ class EditBooking {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications, OpenTokService $opentok) {
-        $this->notifications = $notifications;
+    public function __construct(OpenTokService $opentok) {
+        $this->notifications = app('Notifications');
         $this->openTok = $opentok;
     }
 
