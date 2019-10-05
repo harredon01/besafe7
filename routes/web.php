@@ -150,7 +150,7 @@ Route::get('/scenario_select', function () {
 });
 
 Route::get('/email_register', function () {
-    return new App\Mail\Register();
+    return new App\Mail\Register("testCoupon");
 });
 
 Route::get('/email_payment_cash', function () {

@@ -33,7 +33,7 @@ class BookingSeeder extends Seeder {
     }
 
     public function run() {
-        $this->endChatroom();
+        $this->createChatroom();
     }
 
     public function createBookingAvailability() {

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Address;
 use App\Models\Push;
+use App\Models\Condition;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\Register;
 use DB;
@@ -81,9 +82,9 @@ class EditUserData {
             ],
         ]);
         $json = json_decode((string) $response->getBody(), true);
-        Mail::to($user->email)->send(new Register());
+        Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
         $admin = User::find(77);
-        $message = "Hola ".$user->firstName. " somos lonchis. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
+        $message = "Hola ".$user->firstName. " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
         $package = [
             "type" => "user_message",
             "name" => "Servicio al cliente",
@@ -118,6 +119,31 @@ class EditUserData {
             }
         }
         return $hash;
+    }
+    
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    private function generateWelcomeCoupon(User $user) {
+        $attributes = [
+            "user_id"=>$user->id
+        ];
+        $coupon = $user->firstName."&Lonchis";
+        $condition = Condition::create([
+            "name" => "Descuento bienvenida",
+            "type" => "coupon",
+            "target" => "total",
+            "value" =>"-8000",
+            "coupon" => $user->firstName."&Lonchis",
+            "isReusable"=>0,
+            "used" => 0,
+            "attributes" => json_encode($attributes),
+            "status"=>"active",
+            "order"=>0
+        ]);
+        return $coupon;
     }
 
     /**

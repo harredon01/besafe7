@@ -10,6 +10,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class Register extends Mailable
 {
     use Queueable, SerializesModels;
+    
+    public $coupon;
 
     
     /**
@@ -17,9 +19,9 @@ class Register extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($coupon)
     {
-
+        $this->coupon = $coupon;
     }
 
     /**
