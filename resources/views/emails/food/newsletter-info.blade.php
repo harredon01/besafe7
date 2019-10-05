@@ -266,7 +266,7 @@
 <!--[if mso]></td></tr></table><![endif]-->
 <div align="center" class="button-container" style="padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="tel:3103418432" style="height:31.5pt; width:127.5pt; v-text-anchor:middle;" arcsize="10%" stroke="false" fillcolor="#ff8e54"><w:anchorlock/><v:textbox inset="0,0,0,0"><center style="color:#ffffff; font-family:Georgia, 'Times New Roman', serif; font-size:16px"><![endif]--><a href="tel:3103418432" style="-webkit-text-size-adjust: none; text-decoration: none; display: inline-block; color: #ffffff; background-color: #ff8e54; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; width: auto; width: auto; border-top: 1px solid #ff8e54; border-right: 1px solid #ff8e54; border-bottom: 1px solid #ff8e54; border-left: 1px solid #ff8e54; padding-top: 5px; padding-bottom: 5px; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; text-align: center; mso-border-alt: none; word-break: keep-all;" target="_blank"><span style="padding-left:20px;padding-right:20px;font-size:16px;display:inline-block;">
-<span style="font-size: 16px; line-height: 2; mso-line-height-alt: 32px;">Código: XXXXX </span>
+<span style="font-size: 16px; line-height: 2; mso-line-height-alt: 32px;">Código: {{ $coupon }}  </span>
 </span></a>
 <!--[if mso]></center></v:textbox></v:roundrect></td></tr></table><![endif]-->
 </div>
@@ -597,7 +597,6 @@
 <p style="font-size: 12px; line-height: 1.5; color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;">Compra un plan con amigos y divide la cuenta en partes iguales. Entre más amigos, mayor ahorro.</p>
 <p style="font-size: 12px; line-height: 1.5; color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;"> </p>
 <p style="font-size: 12px; line-height: 1.5; color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;">Para tener en cuenta:</p>
-<p style="font-size: 12px; line-height: 1.5; color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;"> </p>
 <ul style="color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; line-height: 1.5;">
 <li style="font-size: 12px; line-height: 1.5; text-align: justify; mso-line-height-alt: 18px;">Todos los miembros del plan reciben en la misma dirección.</li>
 <li style="font-size: 12px; line-height: 1.5; text-align: justify; mso-line-height-alt: 18px;"> Todos tienen que tener la app descargada y tener una cuenta Lonchis.</li>
@@ -1037,14 +1036,14 @@
 </tbody>
 </table>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
-<div style="color:#272932;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;">
+<div style="color:#272932;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-bottom:10px;padding-left:20px;">
 <div style="font-size: 14px; line-height: 1.2; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; color: #272932; mso-line-height-alt: 17px;">
 <p style="font-size: 14px; line-height: 1.2; text-align: left; mso-line-height-alt: 17px; margin: 0;"><strong><span style="font-size: 24px;">Proceso de compra</span></strong></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#272932;font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;">
+<div style="color:#272932;font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-bottom:10px;padding-left:20px;">
 <div style="font-size: 14px; line-height: 1.5; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #272932; mso-line-height-alt: 21px;">
 <ul>
 <li style="font-size: 14px; line-height: 1.5; text-align: left; mso-line-height-alt: 21px;">En la parte superior derecha encontraras el icono del carrito de compra, haz click ahí, verifica tu pedido y haz click en el botón de pagar.</li>
@@ -1127,12 +1126,12 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#272932;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;">
 <div style="line-height: 1.2; font-size: 12px; color: #272932; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: left; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span 24px;"="" font-size:="" new="" roman",="" serif;="" style="font-family: Bitter, Georgia, Times, " times=""><strong>Cupones, descuentos y </strong></span><span style="font-size: 24px;"><strong>métodos</strong></span><span 24px;"="" font-size:="" new="" roman",="" serif;="" style="font-family: Bitter, Georgia, Times, " times=""><strong> de pago</strong></span></span></p>
+<p style="line-height: 1.2; text-align: left; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span style="font-size: 24px;" 24px;"="" font-size:="" new="" roman",="" serif;="" style="font-family: Bitter, Georgia, Times, " times=""><strong>Cupones, descuentos y </strong></span><span style="font-size: 24px;"><strong>métodos</strong></span><span 24px;"="" style="font-size: 24px;" font-size:="" new="" roman",="" serif;="" style="font-family: Bitter, Georgia, Times, " times=""><strong> de pago</strong></span></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#272932;font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px;">
+<div style="color:#272932;font-family:'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;line-height:1.5;padding-bottom:10px;padding-left:20px;">
 <ul style="color: #272932; font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.5;">
 <li style="font-size: 15px; line-height: 1.5; mso-line-height-alt: 23px;"><span style="font-size: 15px;">En el resumen de la orden veras tu pedido con los descuentos aplicados, si cuentas con un cupón de descuento ingresarlo y el descuento se vera reflejado inmediatamente. haz click en continuar.</span></li>
 <li style="font-size: 15px; line-height: 1.5; mso-line-height-alt: 23px;"><span style="font-size: 15px;">selecciona el método de pago que más te convenga: TC, PSE, Efectivo o consignación- transferencia a una cuenta Davivienda. </span><span style="font-size: 15px;"></span></li>
