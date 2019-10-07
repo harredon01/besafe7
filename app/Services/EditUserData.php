@@ -130,13 +130,13 @@ class EditUserData {
         $attributes = [
             "user_id"=>$user->id
         ];
-        $coupon = $user->firstName."&Lonchis";
+        $coupon = $user->firstName."&Lonchis".$user->id;
         $condition = Condition::create([
             "name" => "Descuento bienvenida",
             "type" => "coupon",
             "target" => "total",
             "value" =>"-8000",
-            "coupon" => $user->firstName."&Lonchis",
+            "coupon" => $coupon,
             "isReusable"=>0,
             "used" => 0,
             "attributes" => json_encode($attributes),

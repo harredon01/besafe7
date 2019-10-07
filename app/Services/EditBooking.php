@@ -137,6 +137,12 @@ class EditBooking {
                 $result = $this->checkAvailable($data);
                 if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
+                    $attributes = $object->attributes;
+                    if (array_key_exists("booking_requires_authorization", $attributes)) {
+                        if($attributes["booking_requires_authorization"]){
+                            Booking::where("id",$booking->id)->update(["total_paid"=>-1]);
+                        }
+                    }
                     return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking));
                 }
                 return response()->json(array("status" => "error", "message" => "Not available"));
@@ -168,7 +174,7 @@ class EditBooking {
                         "total_paid" => -1,
                         "updated_at" => date_create()
                     ];
-                    $booking->total_paid = -1;
+                    $booking->total_paid = 0;
                     $booking->save();
                     //return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
 
@@ -290,13 +296,13 @@ class EditBooking {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->futureBookings()->where('total_paid', -1)->with("bookable")->get())
+                        "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->get())
             );
         } else if ($query == "customer_unapproved") {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->bookings()->where('total_paid', 0)->with("bookable")->get())
+                        "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->get())
             );
         } else if ($query == "customer_past") {
             return response()->json(array(
@@ -341,7 +347,7 @@ class EditBooking {
                         return response()->json(array(
                                     "status" => "success",
                                     "message" => "",
-                                    "data" => $object->futureBookings()->where('total_paid', 0)->with("customer")->get())
+                                    "data" => $object->futureBookings()->where('total_paid', -1)->with("customer")->get())
                         );
                     }
                 }
