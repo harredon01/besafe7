@@ -7,7 +7,6 @@ use App\Models\Location;
 use App\Models\HistoricLocation;
 use App\Models\HistoricLocation2; 
 use DB;
-use App\Services\Notifications;
 
 class CleanTrash {
 
@@ -63,8 +62,8 @@ class CleanTrash {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Services\Notifications;
 use App\Models\Group;
 use App\Models\User;
 use DB;
@@ -33,8 +32,8 @@ class ShareObject {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
     }
 
     /**

@@ -118,8 +118,7 @@ class EditDelivery {
         $product = $products["product"];
         if ($product == 210 || $product == 220) {
             $theAddress = Address::find($data["address_id"]);
-            $className = "App\\Services\\Geolocation";
-            $geolocation = new $className;
+            $geolocation = app('Geolocation');
             $result = $geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], "Basilikum");
             if ($result["status"] == "success") {
                 $orderAddresses = $theAddress->toarray();

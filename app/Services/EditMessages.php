@@ -4,10 +4,8 @@ namespace App\Services;
 
 use Validator;
 use App\Models\Group;
-use App\Services\Notifications;
 use App\Models\User;
 use App\Models\Message;
-use App\Jobs\SendChat;
 use DB;
 
 class EditMessages {
@@ -63,8 +61,8 @@ class EditMessages {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
     }
 
     /**

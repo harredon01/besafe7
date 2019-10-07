@@ -3,15 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Medical;
-use App\Models\Address;
-use App\Models\Push;
 use DB;
-use Validator;
-use App\Models\Region;
-use App\Models\City;
-use App\Models\Country;
-use App\Services\Notifications;
 
 class Contacts {
 
@@ -36,8 +28,8 @@ class Contacts {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
     }
 
     public function getContact($contactId) {

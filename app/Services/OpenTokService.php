@@ -5,7 +5,6 @@ namespace App\Services;
 use OpenTok\OpenTok;
 use OpenTok\MediaMode;
 use App\Models\Booking;
-use App\Services\Notifications;
 use Validator;
 
 class OpenTokService {
@@ -40,8 +39,8 @@ class OpenTokService {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(Notifications $notifications) {
-        $this->notifications = $notifications;
+    public function __construct() {
+        $this->notifications = app('Notifications');
         $this->openTok = new OpenTok(env('OPENTOK_API_KEY'), env('OPENTOK_API_SECRET'));
     }
 

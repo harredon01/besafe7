@@ -33,7 +33,7 @@ class BookingSeeder extends Seeder {
     }
 
     public function run() {
-        $this->endChatroom();
+        $this->createChatroom();
     }
 
     public function createBookingAvailability() {
@@ -68,7 +68,7 @@ class BookingSeeder extends Seeder {
 
     public function createChatroom() {
         $booking = Booking::find(91);
-        $this->editBooking->endChatroom($booking->id);
+        $this->editBooking->createChatroom($booking->id);
     }
     
     public function endChatroom() {
