@@ -141,6 +141,7 @@ class EditBooking {
                     if (array_key_exists("booking_requires_authorization", $attributes)) {
                         if($attributes["booking_requires_authorization"]){
                             Booking::where("id",$booking->id)->update(["total_paid"=>-1]);
+                            $booking->total_paid = -1;
                         }
                     }
                     return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking));

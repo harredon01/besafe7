@@ -339,21 +339,45 @@ class MerchantTableSeeder extends Seeder {
             "from" => '2019-07-15 08:00:00',
             "to" => '2019-07-15 09:00:00'
         ];
-        $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $result1->original;
+        if($result1['status']=="success"){
+            $booking = $result1['booking'];
+            echo "Paid".$booking->total_paid.PHP_EOL;
+            if($booking->total_paid == -1){
+                $this->editBooking->changeStatusBooking($booking->id, "approved");
+            }
+        }
         $data = [
             "type" => "Merchant",
             "object_id" => $merchant->id,
             "from" => '2019-07-16 08:00:00',
             "to" => '2019-07-16 09:00:00'
         ];
-        $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $result1->original;
+        if($result1['status']=="success"){
+            $booking = $result1['booking'];
+            echo "Paid".$booking->total_paid.PHP_EOL;
+            if($booking->total_paid == -1){
+                $this->editBooking->changeStatusBooking($booking->id, "approved");
+            }
+        }
         $data = [
             "type" => "Merchant",
             "object_id" => $merchant->id,
             "from" => '2019-07-17 08:00:00',
             "to" => '2019-07-17 09:00:00'
         ];
-        $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $this->editBooking->addBookingObject($data, $booker);
+        $result1 = $result1->original;
+        if($result1['status']=="success"){
+            $booking = $result1['booking'];
+            echo "Paid".$booking->total_paid.PHP_EOL;
+            if($booking->total_paid == -1){
+                $this->editBooking->changeStatusBooking($booking->id, "approved");
+            }
+        }
         for ($i = 1; $i < 4; $i++) {
             $product = Product::create([
                         'name' => "Product " . $i,
