@@ -184,8 +184,8 @@ Route::get('/newsletter_catering', function () {
 Route::get('/newsletter_menu', function () {
     return new App\Mail\NewsletterMenus();
 });
-Route::get('/newsletter_3', function () {
-    return new App\Mail\Newsletter3();
+Route::get('/newsletter_2', function () {
+    return new App\Mail\Newsletter2();
 });
 Route::get('/newsletter_4', function () {
     return new App\Mail\Newsletter4();
