@@ -72,15 +72,27 @@ class EditDelivery {
 
     public function changeDeliveryDate(User $user, array $data) {
         if (array_key_exists("delivery", $data)) {
-            $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->where("details","like", 'deliver":"envase')->count();
+            $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->where("details", "like", 'deliver":"envase')->count();
             if ($sameDay > 0) {
-                $pending2 = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
-                if ($pending2 > 1) {
-                    $suspendedDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
-                    $suspendedDelivery->status = "suspended";
-                    $suspendedDelivery->save();
-                } else {
-                    return array("status" => "error", "message" => "Not Enough Pending");
+                $push = Push::where("user_id", $user->id)->where("platform", "food")->first();
+                $suspend = false;
+                $sameDay++;
+                if ($push) {
+                    if ($push->credits < $sameDay) {
+                        $suspend = true;
+                    }
+                }
+                if ($suspend) {
+                    $pending2 = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
+                    if ($pending2 > 1) {
+                        $suspendedDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
+                        $suspendedDelivery->status = "suspended";
+                        $suspendedDelivery->save();
+                        $push->credits = $push->credits +1;
+                        $push->save();
+                    } else {
+                        return array("status" => "error", "message" => "Not Enough Pending");
+                    }
                 }
             }
             $date = $this->getNextValidDate(date_create($data["delivery"]));
@@ -249,9 +261,10 @@ class EditDelivery {
     private function activateCreditDeposits(Delivery $deliveryDep) {
         $push = Push::where("user_id", $deliveryDep->user_id)->where("platform", "food")->first();
         if ($push) {
+            $oldCredits = $push->credits;
             $push->credits = $push->credits + 1;
             $push->save();
-            if ($push->credits > 0) {
+            if ($oldCredits == 0) {
                 $deliveries = Delivery::where("user_id", $deliveryDep->user_id)->where("status", "suspended")->get();
                 foreach ($deliveries as $delivery) {
                     $details = json_decode($delivery->details, true);

@@ -13,13 +13,16 @@ use DB;
 class EditBooking {
 
     const MODEL_PATH = 'App\\Models\\';
-    const BOOKING_APPROVED = 'Booking_Approved';
-    const BOOKING_CREATED = 'Booking_Created';
-    const BOOKING_DENIED = 'Booking_Denied';
-    const BOOKING_CANCELED = 'Booking_Cancelled';
-    const BOOKING_RESCHEDULE = 'Booking_Reschedule';
-    const BOOKING_STARTING = 'Booking_Starting';
-    const BOOKING_COMPLETED = 'Booking_Completed';
+    const BOOKING_APPROVED = 'booking_approved';
+    const BOOKING_CREATED_CLIENT_PENDING = 'booking_created_client_pending';
+    const BOOKING_CREATED_CLIENT_APPROVED = 'booking_created_client_approved';
+    const BOOKING_CREATED_BOOKABLE_PENDING = 'booking_created_bookable_pending';
+    const BOOKING_CREATED_BOOKABLE_APPROVED = 'booking_created_bookable_approved';
+    const BOOKING_DENIED = 'booking_denied';
+    const BOOKING_CANCELLED = 'booking_cancelled';
+    const BOOKING_REMINDER = 'booking_reminder';
+    const BOOKING_STARTING = 'booking_starting';
+    const BOOKING_COMPLETED = 'booking_completed';
 
     /**
      * The Guard implementation.
