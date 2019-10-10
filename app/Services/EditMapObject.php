@@ -339,14 +339,31 @@ class EditMapObject {
         $lat = $data['lat'];
         $long = $data['long'];
         $type = "";
+        $joins = "";
+        $joinsWhere = "";
+        $category = false;
+        if (array_key_exists("category", $data)) {
+            if ($data["category"]) {
+                $category = true;
+            }
+        }
         $additionalFields = "";
         if ($data['type'] == "Merchant") {
             $type = "merchants";
             $additionalFields = " type, telephone, address, ";
+            if($category){
+                $joins = " join category_merchant cm on r.id = cm.merchant_id ";
+                $joinsWhere = " AND cm.category_id = :category ";
+            }
         } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
+            if($category){
+                $joins = " join category_report cr on r.id = cm.report_id ";
+                $joinsWhere = " AND cr.category_id = :category ";
+            }
         }
+
         $maxLat = $lat + rad2deg($radius / $R);
         $minLat = $lat - rad2deg($radius / $R);
         $maxLon = $long + rad2deg(asin($radius / $R) / cos(deg2rad($lat)));
@@ -361,19 +378,23 @@ class EditMapObject {
             'longsup' => $maxLon,
             'radius' => $radius,
         ];
+        if ($category) {
+            $thedata["category"] = $data["category"];
+        }
         $reports = DB::select(" "
                         . "SELECT r.id, name, description, icon, lat,`long`, " . $additionalFields . " 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
                    FROM
-                    " . $type . " r
+                    " . $type . " r " . $joins . "
                     WHERE
                         status = 'active'
                             AND r.private = 0
                             AND r.type <> ''
                             AND lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
+                            " . $joinsWhere . "
                     HAVING distance < :radius
                     order by distance asc limit 20 "
                         . "", $thedata);

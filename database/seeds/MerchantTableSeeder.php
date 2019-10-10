@@ -336,53 +336,77 @@ class MerchantTableSeeder extends Seeder {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         date_add($date, date_interval_create_from_date_string("1 days"));
+        $attributes = [
+            "pet" => "cat",
+            "weight" => "200lb"
+        ];
         $data = [
             "type" => "Merchant",
             "object_id" => $merchant->id,
-            "from" => date_format($date, "Y-m-d").' 08:00:00',
-            "to" => date_format($date, "Y-m-d").' 09:00:00'
+            "from" => date_format($date, "Y-m-d") . ' 08:00:00',
+            "to" => date_format($date, "Y-m-d") . ' 09:00:00',
+            "attributes" => $attributes
         ];
         $result1 = $this->editBooking->addBookingObject($data, $booker);
         $result1 = $result1->original;
-        if($result1['status']=="success"){
+
+        if ($result1['status'] == "success") {
             $booking = $result1['booking'];
-            echo "Paid".$booking->total_paid.PHP_EOL;
-            if($booking->total_paid == -1){
-                $this->editBooking->changeStatusBooking($booking->id, "approved");
+            $status = [
+                "status"=>"approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject( $status,$owner);
             }
         }
+        //$this->editBooking->deleteBooking($booker, $booking->id);
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
             "type" => "Merchant",
             "object_id" => $merchant->id,
-            "from" => date_format($date, "Y-m-d").' 08:00:00',
-            "to" => date_format($date, "Y-m-d").' 09:00:00'
+            "from" => date_format($date, "Y-m-d") . ' 08:00:00',
+            "to" => date_format($date, "Y-m-d") . ' 09:00:00',
+            "attributes" => $attributes
         ];
         $result1 = $this->editBooking->addBookingObject($data, $booker);
         $result1 = $result1->original;
-        if($result1['status']=="success"){
+        if ($result1['status'] == "success") {
             $booking = $result1['booking'];
-            echo "Paid".$booking->total_paid.PHP_EOL;
-            if($booking->total_paid == -1){
-                $this->editBooking->changeStatusBooking($booking->id, "approved");
+            $status = [
+                "status"=>"approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject( $status,$owner);
             }
         }
+        //$this->editBooking->deleteBooking($booker, $booking->id);
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
             "type" => "Merchant",
             "object_id" => $merchant->id,
-            "from" => date_format($date, "Y-m-d").' 08:00:00',
-            "to" => date_format($date, "Y-m-d").' 09:00:00'
+            "from" => date_format($date, "Y-m-d") . ' 08:00:00',
+            "to" => date_format($date, "Y-m-d") . ' 09:00:00',
+            "attributes" => $attributes
         ];
         $result1 = $this->editBooking->addBookingObject($data, $booker);
         $result1 = $result1->original;
-//        if($result1['status']=="success"){
-//            $booking = $result1['booking'];
-//            echo "Paid".$booking->total_paid.PHP_EOL;
-//            if($booking->total_paid == -1){
-//                $this->editBooking->changeStatusBooking($booking->id, "approved");
-//            }
-//        }
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status"=>"denied",
+                "booking_id" => $booking->id,
+                "reason" => "No me queda bien esa hora"
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject( $status,$owner);
+            }
+        }
+        //$this->editBooking->deleteBooking($booker, $booking->id);
         for ($i = 1; $i < 4; $i++) {
             $product = Product::create([
                         'name' => "Product " . $i,
@@ -412,7 +436,7 @@ class MerchantTableSeeder extends Seeder {
             $categoryProds->products()->save($product);
         }
         for ($i = 1; $i < 4; $i++) {
-            $user = User::whereNotIn("id",[$owner->id])->first();
+            $user = User::whereNotIn("id", [$owner->id])->first();
             $data = [
                 "type" => "Merchant",
                 "object_id" => $merchant->id,

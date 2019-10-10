@@ -141,13 +141,28 @@ class EditBooking {
                 if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
+                    $requiresAuth = false;
+                    $requiresUpdate = false;
+                    $update = [];
+                    if (array_key_exists("attributes", $data)) {
+                        $requiresUpdate = true;
+                        $update["options"] = $data["attributes"];
+                    }
+                    $update["options"]["status"] = "approved";
                     if (array_key_exists("booking_requires_authorization", $attributes)) {
-                        if($attributes["booking_requires_authorization"]){
-                            Booking::where("id",$booking->id)->update(["total_paid"=>-1]);
+                        if ($attributes["booking_requires_authorization"]) {
+                            $requiresUpdate = true;
+                            $update["total_paid"] = -1;
                             $booking->total_paid = -1;
+                            $requiresAuth = true;
+                            $update["options"]["status"] = "pending";
                         }
                     }
-                    return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking));
+                    if ($requiresUpdate) {
+                        $update["options"] = json_encode($update["options"]);
+                        Booking::where("id", $booking->id)->update($update);
+                    }
+                    return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth));
                 }
                 return response()->json(array("status" => "error", "message" => "Not available"));
             }
@@ -160,38 +175,41 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function changeStatusBookingObject(array $data, User $user) {
+    public function changeStatusBookingObject( array $data,User $user) {
         $validator = $this->validatorStatusBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $status = $data["status"];
-        $booking = Booking::find($data['object_id']);
+        $booking = Booking::find($data['booking_id']);
         $object = $booking->bookable;
         if ($object) {
             if ($user->id == $object->user_id) {
                 $typeAlert = "";
                 $customer = $booking->customer;
+                $options = $booking->options->toArray();
+                $updateData = [
+                    "options" => $options,
+                    "updated_at" => date_create()
+                ];
                 $followers = [$customer];
+                $updateData["options"]["status"] = $status;
                 if ($status == "approved") {
-                    $updateData = [
-                        "total_paid" => -1,
-                        "updated_at" => date_create()
-                    ];
-                    $booking->total_paid = 0;
-                    $booking->save();
-                    //return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
-
+                    $updateData["total_paid"] = 0;
                     $typeAlert = self::BOOKING_APPROVED;
                 } elseif ($status == "denied") {
+                    $updateData["options"]["reason"] = $data["reason"];
                     $typeAlert = self::BOOKING_DENIED;
                 }
+                $options = $updateData["options"];
+                $updateData["options"] = json_encode($updateData["options"]);
+                Booking::where("id", $booking->id)->update($updateData);
                 $payload = [
                     "booking_id" => $booking->id,
                     "first_name" => $user->firstName,
                     "last_name" => $user->lastName,
                     "booking_date" => $booking->starts_at,
-                    "status" => $status
+                    "options" => $options
                 ];
                 $data = [
                     "trigger_id" => $user->id,
@@ -204,7 +222,7 @@ class EditBooking {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $date = date("Y-m-d H:i:s");
-                $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
+                //$this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
                 return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
@@ -447,12 +465,16 @@ class EditBooking {
         }
     }
 
-    public function changeStatusBooking($id, $status) {
+    public function deleteBooking(User $user,$id) {
         $booking = Booking::find($id);
-        if ($booking) {
-            $booking->options['status'] = $status;
-            $booking->save();
+        if($booking){
+            if($booking->customer_id == $user->id){
+                $booking->delete();
+                return response()->json(array("status" => "success", "message" => "Booking Deleted"));
+            }
+            return response()->json(array("status" => "error", "message" => "Access denied"));
         }
+        return response()->json(array("status" => "error", "message" => "Booking not found"));
     }
 
     /**
@@ -478,7 +500,7 @@ class EditBooking {
      */
     public function validatorStatusBookings(array $data) {
         return Validator::make($data, [
-                    'object_id' => 'required|max:255',
+                    'booking_id' => 'required|max:255',
                     'status' => 'required|max:255',
         ]);
     }
