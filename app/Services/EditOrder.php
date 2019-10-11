@@ -899,7 +899,7 @@ class EditOrder {
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
                 $order->status = "approved";
-                $this->orderStatusUpdate($order);
+                //$this->orderStatusUpdate($order);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);

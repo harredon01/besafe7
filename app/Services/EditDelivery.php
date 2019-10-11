@@ -88,7 +88,7 @@ class EditDelivery {
                         $suspendedDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
                         $suspendedDelivery->status = "suspended";
                         $suspendedDelivery->save();
-                        $push->credits = $push->credits +1;
+                        $push->credits = $push->credits + 1;
                         $push->save();
                     } else {
                         return array("status" => "error", "message" => "Not Enough Pending");
@@ -96,21 +96,22 @@ class EditDelivery {
                 }
             }
             $date = $this->getNextValidDate(date_create($data["delivery"]));
-            $deposit = Delivery::where("user_id", $user->id)->where("status", "deposit")->where("delivery", "<", $data["delivery"])->first();
-            if ($deposit) {
-                $deposit->delivery = date_format($date, "Y-m-d") . " 12:00:00";
-                $deposit->save();
-            }
             $reprogramDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
             $reprogramDelivery->delivery = $data["delivery"];
             $reprogramDelivery->save();
-            $nextDelivery = Delivery::where("user_id", $user->id)->where("delivery", date_format($date, "Y-m-d") . " 12:00:00")->whereIn("status", ["pending", "deposit"])->first();
-            if ($nextDelivery) {
-                $details = json_decode($nextDelivery->details, true);
-                $sameDay++;
-                $details["pickup"] = $sameDay . " envases completos";
-                $nextDelivery->details = json_encode($details);
-                $nextDelivery->save();
+            $deliveryDetails = json_decode($reprogramDelivery->details, true);
+            if (array_key_exists("deliver", $deliveryDetails)) {
+                if (strpos($deliveryDetails['deliver'], 'envase') !== false) {
+                    if ($sameDay > 1) {
+                        $nextDelivery = Delivery::where("user_id", $user->id)->where("delivery", date_format($date, "Y-m-d") . " 12:00:00")->whereIn("status", ["pending", "deposit"])->first();
+                        if ($nextDelivery) {
+                            $details = json_decode($nextDelivery->details, true);
+                            $details["pickup"] = $sameDay . " envases completos";
+                            $nextDelivery->details = json_encode($details);
+                            $nextDelivery->save();
+                        }
+                    }
+                }
             }
             return array("status" => "success", "message" => "Delivery date changed", "delivery" => $reprogramDelivery);
         }

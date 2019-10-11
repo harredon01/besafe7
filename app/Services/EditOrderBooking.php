@@ -94,11 +94,11 @@ class EditOrderBooking {
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
-                        $booking->options['location'] = $data['location'];
                         $booking->options['status'] = "pending";
                         $booking->options['paid'] = date("Y-m-d h:m:s");
                         
                         $booking->save();
+                        //dd($booking);
                         //$booking->options = [];
                         $updateData = [
                             "total_paid" => $item->priceSumConditions,
