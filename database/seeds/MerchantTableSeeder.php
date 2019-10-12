@@ -13,6 +13,7 @@ use App\Services\EditBooking;
 use App\Services\MerchantImport;
 use App\Models\CoveragePolygon;
 use App\Models\PaymentMethod;
+use App\Models\Booking;
 
 class MerchantTableSeeder extends Seeder {
     /**
@@ -237,7 +238,8 @@ class MerchantTableSeeder extends Seeder {
                     'attributes' => [
                         "experience" => [["name" => "St judes hospital", "years" => "1.5"]],
                         "services" => [["name" => $category->name . "1", "icon" => "1.5"], ["name" => $category->name . "2", "icon" => "1.5"], ["name" => $category->name . "3", "icon" => "1.5"]],
-                        "booking_requires_authorization" => mt_rand(0, 1)
+                        "booking_requires_authorization" => mt_rand(0, 1),
+                        "max_per_hour" => 2
                     ]
         ));
         CoveragePolygon::create(array(
@@ -336,6 +338,8 @@ class MerchantTableSeeder extends Seeder {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         date_add($date, date_interval_create_from_date_string("1 days"));
+        $booker2 = User::find(3);
+        $booker3 = User::find(6);
         $attributes = [
             "pet" => "cat",
             "weight" => "200lb"
@@ -353,12 +357,54 @@ class MerchantTableSeeder extends Seeder {
         if ($result1['status'] == "success") {
             $booking = $result1['booking'];
             $status = [
-                "status"=>"approved",
+                "status" => "approved",
                 "booking_id" => $booking->id
             ];
             echo "Paid" . $booking->total_paid . PHP_EOL;
             if ($booking->total_paid == -1) {
-                $this->editBooking->changeStatusBookingObject( $status,$owner);
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $updateData = [
+            "total_paid" => $booking->price,
+            "updated_at" => date("Y-m-d hh:m:s")
+        ];
+        Booking::where("id", $booking->id)->update($updateData);
+        $array1 = $merchant->bookingsStartsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
+        //dd($array1);
+
+        $result1 = $this->editBooking->addBookingObject($data, $booker2);
+        $result1 = $result1->original;
+
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $updateData = [
+            "total_paid" => $booking->price,
+            "updated_at" => date("Y-m-d h:m:s")
+        ];
+        Booking::where("id", $booking->id)->update($updateData);
+        $array1 = $merchant->bookingsStartsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
+        $result1 = $this->editBooking->addBookingObject($data, $booker3);
+        $result1 = $result1->original;
+
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
             }
         }
         //$this->editBooking->deleteBooking($booker, $booking->id);
@@ -375,14 +421,55 @@ class MerchantTableSeeder extends Seeder {
         if ($result1['status'] == "success") {
             $booking = $result1['booking'];
             $status = [
-                "status"=>"approved",
+                "status" => "approved",
                 "booking_id" => $booking->id
             ];
             echo "Paid" . $booking->total_paid . PHP_EOL;
             if ($booking->total_paid == -1) {
-                $this->editBooking->changeStatusBookingObject( $status,$owner);
+                $this->editBooking->changeStatusBookingObject($status, $owner);
             }
         }
+        $updateData = [
+            "total_paid" => $booking->price,
+            "updated_at" => date("Y-m-d h:m:s")
+        ];
+        Booking::where("id", $booking->id)->update($updateData);
+        $result1 = $this->editBooking->addBookingObject($data, $booker2);
+        $result1 = $result1->original;
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $updateData = [
+            "total_paid" => $booking->price,
+            "updated_at" => date("Y-m-d h:m:s")
+        ];
+        Booking::where("id", $booking->id)->update($updateData);
+        $result1 = $this->editBooking->addBookingObject($data, $booker3);
+        $result1 = $result1->original;
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "approved",
+                "booking_id" => $booking->id
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $updateData = [
+            "total_paid" => $booking->price,
+            "updated_at" => date("Y-m-d h:m:s")
+        ];
+        Booking::where("id", $booking->id)->update($updateData);
         //$this->editBooking->deleteBooking($booker, $booking->id);
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
@@ -397,13 +484,41 @@ class MerchantTableSeeder extends Seeder {
         if ($result1['status'] == "success") {
             $booking = $result1['booking'];
             $status = [
-                "status"=>"denied",
+                "status" => "denied",
                 "booking_id" => $booking->id,
                 "reason" => "No me queda bien esa hora"
             ];
             echo "Paid" . $booking->total_paid . PHP_EOL;
             if ($booking->total_paid == -1) {
-                $this->editBooking->changeStatusBookingObject( $status,$owner);
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $result1 = $this->editBooking->addBookingObject($data, $booker2);
+        $result1 = $result1->original;
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "denied",
+                "booking_id" => $booking->id,
+                "reason" => "No me queda bien esa hora"
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
+            }
+        }
+        $result1 = $this->editBooking->addBookingObject($data, $booker3);
+        $result1 = $result1->original;
+        if ($result1['status'] == "success") {
+            $booking = $result1['booking'];
+            $status = [
+                "status" => "denied",
+                "booking_id" => $booking->id,
+                "reason" => "No me queda bien esa hora"
+            ];
+            echo "Paid" . $booking->total_paid . PHP_EOL;
+            if ($booking->total_paid == -1) {
+                $this->editBooking->changeStatusBookingObject($status, $owner);
             }
         }
         //$this->editBooking->deleteBooking($booker, $booking->id);
@@ -448,6 +563,11 @@ class MerchantTableSeeder extends Seeder {
     }
 
     public function createExcel() {
+        
+//        $merchant = Merchant::find(1302);
+//        DB::enableQueryLog();
+//        $array1 = $merchant->bookingsStartsBetween('2019-10-13 07:59:59', '2019-10-13 09:00:00')->get();
+//        dd($array1->toArray());
         $dentists = Category::create(array(
                     'name' => "Dentists",
                     'type' => 'merchants',

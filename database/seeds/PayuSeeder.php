@@ -39,7 +39,8 @@ class PayuSeeder extends Seeder {
     }
 
     public function run() {
-        $this->payu->checkOrders();
+        echo env('PAYU_ACCOUNT').PHP_EOL;
+        //$this->payu->checkOrders();
     }
 
 }

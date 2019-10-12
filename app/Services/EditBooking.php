@@ -49,7 +49,7 @@ class EditBooking {
         $this->openTok = $opentok;
     }
 
-    private function checkAvailable(array $data) {
+    private function checkAvailable(array $data, $object) {
         $from = $data['from'];
         $to = $data['to'];
         $dayofweek = date('w', strtotime($from));
@@ -101,24 +101,47 @@ class EditBooking {
 //                ];
 //                dd($data2);
                 if ($dateTimestampFrom >= $dateTimestampUpper && $dateTimestampFrom <= $dateTimestampLower && $dateTimestampTo >= $dateTimestampUpper && $dateTimestampTo <= $dateTimestampLower) {
-                    $type = $data['type'];
-                    $class = self::MODEL_PATH . $type;
-                    $object = $class::find($data['object_id']);
-
-                    $array1 = $object->bookingsStartsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
-                    $array2 = $object->bookingsEndsBetween($data['from'], $data['to'])->whereColumn("price", "total_paid")->get();
-                    $results = array_merge($array1->toArray(), $array2->toArray());
-                    if (count($results) > 0) {
-                        return false;
-                    } else {
-                        return true;
-                    }
+                    return $this->checkBooking($data,$object);
                 }
             }
 
             return false;
         }
-        return true;
+        return $this->checkBooking($data,$object);
+    }
+
+    public function checkBooking($data,$object) {
+        $attributes = $object->attributes;
+        $maxPerHour = 1;
+        if(array_key_exists("max_per_hour", $attributes)){
+            $maxPerHour = $attributes['max_per_hour'];
+        }
+        $date = date_create($data['from']);
+        date_sub($date, date_interval_create_from_date_string("1 seconds"));
+        $date2 = date_create($data['to']);
+        date_add($date2, date_interval_create_from_date_string("1 seconds"));
+        $array1 = $object->bookingsStartsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
+        $array2 = $object->bookingsEndsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
+        $array1 = $array1->toArray();
+        $array2 = $array2->toArray();
+        foreach ($array2 as $value) {
+            $found = false;
+            foreach ($array1 as $item) {
+                if($item['id']==$value['id']){
+                    $found = true;
+                    break;
+                }
+            }
+            if(!$found){
+                array_push($array1, $value);
+            }
+        }
+        $totalHoping = count($array1)+1;
+        if ($totalHoping > $maxPerHour) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -137,7 +160,7 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                $result = $this->checkAvailable($data);
+                $result = $this->checkAvailable($data, $object);
                 if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
@@ -175,7 +198,7 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function changeStatusBookingObject( array $data,User $user) {
+    public function changeStatusBookingObject(array $data, User $user) {
         $validator = $this->validatorStatusBookings($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -465,10 +488,10 @@ class EditBooking {
         }
     }
 
-    public function deleteBooking(User $user,$id) {
+    public function deleteBooking(User $user, $id) {
         $booking = Booking::find($id);
-        if($booking){
-            if($booking->customer_id == $user->id){
+        if ($booking) {
+            if ($booking->customer_id == $user->id) {
                 $booking->delete();
                 return response()->json(array("status" => "success", "message" => "Booking Deleted"));
             }

@@ -95,13 +95,14 @@ class EditOrderBooking {
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
                         $booking->options['status'] = "pending";
-                        $booking->options['paid'] = date("Y-m-d h:m:s");
+                        $booking->options['paid'] = date("Y-m-d H:i:s");
                         
                         $booking->save();
                         //dd($booking);
                         //$booking->options = [];
                         $updateData = [
                             "total_paid" => $item->priceSumConditions,
+                            "updated_at" => date("Y-m-d H:i:s")
                         ];
                         Booking::where("id",$id)->update($updateData);
                     }
