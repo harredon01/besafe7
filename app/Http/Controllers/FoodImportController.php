@@ -86,8 +86,8 @@ class FoodImportController extends Controller {
     public function postMenu(Request $request) {
         $user = $this->auth->user();
         if ($request->file('uploadfile')->isValid()) {
-            $path = $request->uploadfile->path();
-            $this->food->importDishes($path);
+            //$path = $request->uploadfile->path();
+            $this->food->importDishes(request()->file('uploadfile'));
         }
         return view('food.menu')->with('user', $user);
     }

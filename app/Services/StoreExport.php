@@ -12,6 +12,7 @@ use App\Models\OrderCondition;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\User;
+use App\Exports\ArrayMultipleSheetExport;
 use App\Models\ProductVariant;
 use Excel;
 
@@ -87,7 +88,39 @@ class StoreExport {
         $paymentsTotal = 0;
         $paymentsCount = 0;
         $results = [];
-        $merchantsObserved = [];
+        $merchantsObserved = [["name",
+            self::LUNCHES,
+            self::COST_WO_DISCOUNT,
+            self::DICOUNT_COST,
+            self::COST_W_DISCOUNT,
+            self::TAX_WO_DISCOUNT,
+            self::DICOUNT_TAX ,
+            self::TAX_W_DISCOUNT ,
+            self::COMMISION_WO_DISCOUNT,
+            self::DICOUNT_COMMISION,
+            self::COMMISION_W_DISCOUNT,
+            self::DEPOSIT,
+            self::PACKING,
+            self::PACKING_AMOUNT,
+            self::DISCOUNT_VOLUME,
+            self::SUBTOTAL_ORDER,
+            self::DISCOUNT_MARKETING,
+            self::SHIPPING,
+            self::TOTAL_ORDER,
+            self::SUBTOTAL_PAYMENTS,
+            self::TRANSACTION_COST,
+            self::TOTAL_PAYMENTS,
+            self::DISCOUNT,
+            self::DISCOUNT_VOLUME,
+            self::DISCOUNT_MARKETING,
+            self::DISCOUNT_PROVIDER,
+            self::DISCOUNT_PROVIDER_OPERATION,
+            self::DISCOUNT_PROVIDER_MARKETING,
+            self::DISCOUNT_HOOV,
+            self::DISCOUNT_HOOV_OPERATION,
+            self::DISCOUNT_HOOV_MARKETING,
+            self::PAYMENTS_AMOUNT,
+            self::ORDERS_AMOUNT]];
         $merchants = Merchant::whereIn("id", [1299, 1300, 1301])->get();
         foreach ($merchants as $merchant) {
             $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
@@ -186,21 +219,24 @@ class StoreExport {
 
     public function writeFile($data, $title, $sendMail) {
         //dd($data);
-        $file = Excel::create($title, function($excel) use($data, $title) {
-
-                    $excel->setTitle($title);
-                    // Chain the setters
-                    $excel->setCreator('Hoovert Arredondo')
-                            ->setCompany('Hoovert Arredondo SAS');
-                    // Call them separately
-                    $excel->setDescription('This report is clasified');
-                    foreach ($data as $page) {
-                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-                            $sheet->fromArray($page["rows"], null, 'A1', true);
-                        });
-                    }
-                })->store('xlsx', storage_path('app/exports'));
-        $path = 'exports/' . $file->filename . "." . $file->ext;
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/".$title.".xls","local");
+        $path = 'exports/' . $title.".xls";
+        //dd($file);
+//        $file = Excel::store($title, function($excel) use($data, $title) {
+//
+//                    $excel->setTitle($title);
+//                    // Chain the setters
+//                    $excel->setCreator('Hoovert Arredondo')
+//                            ->setCompany('Hoovert Arredondo SAS');
+//                    // Call them separately
+//                    $excel->setDescription('This report is clasified');
+//                    foreach ($data as $page) {
+//                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
+//                            $sheet->fromArray($page["rows"], null, 'A1', true);
+//                        });
+//                    }
+//                });
+        $path = 'exports/' . $title.".xls";
         if ($sendMail) {
             $users = User::whereIn('id', [2, 77])->get();
             Mail::to($users)->send(new StoreReports($path));
@@ -210,22 +246,31 @@ class StoreExport {
     }
 
     public function deliveriesData($startDate, $endDate, $results) {
-        $deliveries = Delivery::whereNotIn("status", ["deposit"])->whereNotIn("user_id", [2, 77, 3, 82, 161])->whereBetween('created_at', [$startDate, $endDate])->get();
+        $deliveries = Delivery::whereNotIn("status", ["deposit"])->whereNotIn("user_id", [2 , 77, 3, 82, 161])->whereBetween('created_at', [$startDate, $endDate])->get();
+        $attributes = array_keys($deliveries[0]->toArray());
+        $rows =[$attributes];
+        $rows = array_merge($rows, $deliveries->toArray());
         $page = [
             "name" => "Entregas Vendidas",
-            "rows" => $deliveries->toArray()
+            "rows" =>$rows
         ];
         array_push($results, $page);
         $deliveries = Delivery::whereIn("status", ["completed", "preparing"])->whereNotIn("user_id", [2, 77, 3, 82, 161])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $attributes = array_keys($deliveries[0]->toArray());
+        $rows =[$attributes];
+        $rows = array_merge($rows, $deliveries->toArray());
         $page = [
             "name" => "Entregas Ejecutadas",
-            "rows" => $deliveries->toArray()
+            "rows" => $rows
         ];
         array_push($results, $page);
         $deliveries = Delivery::whereIn("status", ["completed", "preparing"])->whereIn("user_id", [77, 82])->whereBetween('delivery', [$startDate, $endDate])->get();
+        $attributes = array_keys($deliveries[0]->toArray());
+        $rows =[$attributes];
+        $rows = array_merge($rows, $deliveries->toArray());
         $page = [
             "name" => "Entregas Mluisa y Camila",
-            "rows" => $deliveries->toArray()
+            "rows" => $rows
         ];
         array_push($results, $page);
         return $results;
@@ -273,7 +318,53 @@ class StoreExport {
         $titleO = array([]);
         $title2 = array([]);
         $title3 = array([]);
-        $ordersData = [];
+        $ordersData = [$orderItem = [
+                "Orden",
+                self::LUNCHES,
+                self::COST_W_DISCOUNT,
+                self::TAX_W_DISCOUNT,
+                self::COMMISION_W_DISCOUNT,
+                self::DEPOSIT,
+                self::SUBTOTAL_ORDER,
+                self::SHIPPING,
+                self::SHIPPINGPRE,
+                self::SHIPPINGDISCOUNT,
+                self::DISCOUNT_MARKETING,
+                self::TOTAL_ORDER,
+                self::TRANSACTION_COST,
+                self::TOTAL_PAYMENTS,
+                "Usuario",
+                self::COST_WO_DISCOUNT,
+                self::DICOUNT_COST,
+                self::COST_W_DISCOUNT,
+                self::TAX_WO_DISCOUNT,
+                self::DICOUNT_TAX,
+                self::TAX_W_DISCOUNT,
+                self::COMMISION_WO_DISCOUNT,
+                self::DICOUNT_COMMISION,
+                self::COMMISION_W_DISCOUNT,
+                self::DEPOSIT,
+                self::PACKING,
+                self::PACKING_AMOUNT,
+                self::DISCOUNT_VOLUME,
+                self::SUBTOTAL_ORDER,
+                self::SHIPPING,
+                self::DISCOUNT_MARKETING,
+                self::TOTAL_ORDER,
+                self::SUBTOTAL_PAYMENTS,
+                self::TRANSACTION_COST,
+                self::TOTAL_PAYMENTS,
+                self::DISCOUNT,
+                self::DISCOUNT_VOLUME,
+                self::DISCOUNT_MARKETING,
+                self::DISCOUNT_PROVIDER,
+                self::DISCOUNT_PROVIDER_OPERATION,
+                self::DISCOUNT_PROVIDER_MARKETING,
+                self::DISCOUNT_HOOV,
+                self::DISCOUNT_HOOV_OPERATION,
+                self::DISCOUNT_HOOV_MARKETING,
+                self::PAYMENTS_AMOUNT 
+            ]];
         $ordersData2 = [];
         $conditionsData = [];
         $itemsData = [];

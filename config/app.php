@@ -163,7 +163,6 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 	Maatwebsite\Excel\ExcelServiceProvider::class,
-	Davibennun\LaravelPushNotification\LaravelPushNotificationServiceProvider::class,
 	Bugsnag\BugsnagLaravel\BugsnagServiceProvider::class,
 	Intervention\Image\ImageServiceProvider::class,
 	Darryldecode\Cart\CartServiceProvider::class,
@@ -238,7 +237,6 @@ return [
 	'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
 	'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
 	'Excel' => Maatwebsite\Excel\Facades\Excel::class,
-	'PushNotification' => Davibennun\LaravelPushNotification\Facades\PushNotification::class,
 	'Image' => Intervention\Image\Facades\Image::class,
 	'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
 	'Bugsnag' => Bugsnag\BugsnagLaravel\Facades\Bugsnag::class

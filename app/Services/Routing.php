@@ -14,6 +14,7 @@ use App\Models\CoveragePolygon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteDeliver;
+use App\Exports\ArrayMultipleSheetExport;
 use App\Mail\ScenarioSelect;
 use DB;
 use Excel;
@@ -423,7 +424,7 @@ class Routing {
                     $results = $resultData['results'];
                 }
                 if ($route->provider == "Rapigo") {
-                    $route = $rapigo->createRoute($queryStops, $route, $stops);
+                    $route = $basilikum->createRoute($queryStops, $route, $stops);
                 } else if ($route->provider == "Basilikum") {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
@@ -437,8 +438,7 @@ class Routing {
                 array_push($pages, $page);
             }
 
-            $file = $this->writeFile($pages, "Rutas" . time());
-            $path = 'exports/' . $file->filename . "." . $file->ext;
+            $path = $this->writeFile($pages, "Rutas" . time());
             $users = User::whereIn('id', [2, 77])->get();
             Mail::to($users)->send(new RouteDeliver($routes, $path));
             $totalRoutes = count($routes);
@@ -466,6 +466,9 @@ class Routing {
     }
 
     public function writeFile($data, $title) {
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/".$title.".xls","local");
+        $path = 'exports/' . $title.".xls";
+        return $path;
         return Excel::create($title, function($excel) use($data, $title) {
 
                     $excel->setTitle($title);
@@ -505,7 +508,7 @@ class Routing {
         if ($dateTimestampNow > $dateTimestampLimit) {
             $date = $this->getNextValidDate($date);
         }
-        $la = date_format($date, "Y-m-d");
+        $la = "2019-10-08";
         $thedata = [
             'lat' => $polygon->lat,
             'lat2' => $polygon->lat,

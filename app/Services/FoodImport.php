@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Article;
 use App\Models\Merchant;
 use App\Models\Product;
+use App\Imports\ArrayImport;
 use App\Models\Address;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
@@ -125,17 +126,18 @@ class FoodImport {
             "postre" => $postres
         ];
         $saveDate = "";
-        if (gettype($activeRow['fecha']) == "string") {
-            $date = explode("/", $activeRow['fecha']);
-            $saveDate = $date[2] . "-" . $date[1] . "-" . $date[0];
+        if (gettype($activeRow[0]) == "string") {
+            $date = explode("/", $activeRow[0]);
+            $saveDate = $date[2] . "-" . $date[0] . "-" . $date[1];
         } else {
-            $saveDate = $activeRow['fecha'];
+            $saveDate = $activeRow[0];
         }
+        //dd($saveDate);
         //dd($date);
         $article = Article::create([
                     "type" => "lunch",
-                    "name" => $activeRow['almuerzo'],
-                    "description" => "Almuerzo " . $activeRow['almuerzo'],
+                    "name" => $activeRow[1],
+                    "description" => "Almuerzo " . $activeRow[1],
                     "start_date" => $saveDate,
                     "attributes" => json_encode($dishes)
         ]);
@@ -161,33 +163,38 @@ class FoodImport {
     }
 
     public function importDishes($path) {
-        $excel = Excel::load($path);
-        $reader = $excel->toArray();
+        //$excel = Excel::load($path);
+        $reader = Excel::toArray(new ArrayImport, $path);
+        $reader = $reader[0];
+        
+        array_shift($reader);
+        //array_shift($reader);
         $i = 0;
+        //dd($reader[0][0]);
         $activeRow = $reader[0];
-        $activeLunch = $activeRow['almuerzo'];
+        $activeLunch = $activeRow[1];
         $entradas = [];
         $principales = [];
         $postres = [];
         foreach ($reader as $row) {
-            if ($row['fecha']) {
-                if ($row['almuerzo'] != $activeLunch) {
-                    $activeLunch = $row['almuerzo'];
+            if ($row[0]) {
+                if ($row[1] != $activeLunch) {
+                    $activeLunch = $row[1];
                     $this->importDish($entradas, $principales, $postres, $activeRow);
                     $entradas = [];
                     $principales = [];
                     $postres = [];
                 }
                 $plato = [
-                    "valor" => $row['plato'],
-                    "codigo" => $row['codigo'],
-                    "descripcion" => $row['descripcion']
+                    "valor" => $row[3],
+                    "codigo" => $row[6],
+                    "descripcion" => $row[5]
                 ];
-                if ($row['tipo'] == "Entrada") {
+                if ($row[2] == "Entrada") {
                     array_push($entradas, $plato);
-                } else if ($row['tipo'] == "Principal") {
+                } else if ($row[2] == "Principal") {
                     array_push($principales, $plato);
-                } else if ($row['tipo'] == "Postre") {
+                } else if ($row[2] == "Postre") {
                     array_push($postres, $plato);
                 }
                 $activeRow = $row;
