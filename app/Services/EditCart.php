@@ -24,7 +24,12 @@ class EditCart {
         $data = array();
         $result = array();
         foreach ($items as $item) {
-            $dataitem = $item->toArray();
+            $dataitem = [];
+            $dataitem['id'] = $item->id; 
+            $dataitem['name'] = $item->name; 
+            $dataitem['price'] = $item->price; 
+            $dataitem['quantity'] = $item->quantity; 
+            $dataitem['attributes'] = $item->attributes; 
             $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
             $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
             $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
@@ -51,7 +56,12 @@ class EditCart {
         $totalItems = 0;
         foreach ($items as $item) {
             $totalItems++;
-            $dataitem = $item->toArray();
+            $dataitem = [];
+            $dataitem['id'] = $item->id; 
+            $dataitem['name'] = $item->name; 
+            $dataitem['price'] = $item->price; 
+            $dataitem['quantity'] = $item->quantity; 
+            $dataitem['attributes'] = $item->attributes; 
             $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
             $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
             $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
