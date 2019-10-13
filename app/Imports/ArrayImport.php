@@ -13,14 +13,6 @@ class ArrayImport implements ToModel
     */
     public function model(array $row)
     {
-        return [
-            'fecha'  => $row['fecha'],
-            'almuerzo' => $row['almuerzo'],
-            'tipo'    => $row['tipo'],
-            'plato'    => $row['plato'],
-            'select'    => $row['select'],
-            'descripcion'    => $row['descripcion'],
-            'codigo'    => $row['codigo'],
-        ];
+        return $row; 
     }
 }
