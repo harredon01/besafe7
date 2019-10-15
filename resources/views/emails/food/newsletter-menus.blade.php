@@ -262,7 +262,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#969696;font-family:'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <div style="line-height: 1.2; font-family: 'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px; color: #969696; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><strong><span style="color: #005c5e; font-size: 22px;">Menús del 7 de Octubre al 11 de Octubre.</span></strong></p>
+<p style="line-height: 1.2; text-align: center; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><strong><span style="color: #005c5e; font-size: 22px;">Menús del 15 de Octubre al 18 de Octubre.</span></strong></p>
 <p style="line-height: 1.2; text-align: center; font-size: 16px; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px; color: #005c5e;">Opciones vegetarianas, Light &amp; completas</span></p>
 </div>
 </div>
@@ -282,38 +282,6 @@
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFFFF;">
 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:645px"><tr class="layout-full-width" style="background-color:#FFFFFF"><![endif]-->
 <!--[if (mso)|(IE)]><td align="center" width="322" style="background-color:#FFFFFF;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
-<div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/21.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
-<div style="color:#EE2337;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 1.2; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #EE2337; mso-line-height-alt: 14px;">
-<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px; color: #005c5e;"><strong>Lunes 7 de Octubre</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
-<div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
-<ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Arroz atollado (verduras, pollo, res y cerdo) con cascabeles de plátano y ensalada</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Ratatouille (guiso de verduras al horno) acompañado con papas postizas y cuscús.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Cerdo a la plancha acompañado con ratatouille y cuscús.</span></li>
-</ul>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
 <!--[if (mso)|(IE)]></td><td align="center" width="322" style="background-color:#FFFFFF;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
 <div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
@@ -322,13 +290,13 @@
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/22.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/martes.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.2; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #005C5E; mso-line-height-alt: 14px;">
-<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Martes 8 de Octubre.</strong></span></p>
+<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Martes 15 de Octubre.</strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -336,9 +304,9 @@
 <div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
 <ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Rollo de carne en salsa de tamarindo, acompañado con torta de patatas y ensalada. </span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Tofu en salsa de tamarindo, acompañado con torta de patatas y ensalada.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Pechuga de pollo a la plancha, acompañado con ensalada waldorf y palitos de zanahoria y apio.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Cuadritos de pollo en salsa curry, acompañado con puré de papa y ensalada. </span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Pechuga a la plancha, ratatouille (guiso de verduras al horno), y arroz integral.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Pechuga a la plancha, ratatouille (guiso de verduras al horno), y arroz integral.</span></li>
 </ul>
 </div>
 </div>
@@ -350,6 +318,41 @@
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
 <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+<div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
+<!--<![endif]-->
+<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/miercoles.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #005C5E; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span style="background-color: transparent; font-size: 18px;"><strong>Miércoles</strong></span><strong style="font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; font-size: 18px;"> 16 de Octubre.</strong></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
+<div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
+<ul>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Lasaña en salsa boloñesa, acompañada con ensalada verde (mix de lechugas arveja y aguacate) y pan francés.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Lasaña en base de salsa napolitana, con champiñones, berenjenas, zucchini, pimentón y cebolla. Acompañada por ensalada verde (lechuga, arvejas y aguacate) y pan francés.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light:Pollo al horno relleno de queso y espinaca, berenjenas a la napolitana y ensalada.</span></li>
+</ul>
+</div>
+<p style="font-size: 13px; line-height: 1.5; color: #555555; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 20px; mso-ansi-font-size: 14px; margin: 0;"><span style="color: #000000; font-family: Arial; font-size: 13px; white-space: pre-wrap; background-color: #cfe2f3; mso-ansi-font-size: 14px;"> </span></p>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="322" style="background-color:#FFFFFF;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
 </div>
 </div>
 </div>
@@ -364,48 +367,13 @@
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/23.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
-<div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="line-height: 1.2; font-size: 12px; color: #005C5E; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span style="background-color: transparent; font-size: 18px;"><strong>Miércoles</strong></span><strong style="font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; font-size: 18px;"> 9 de Octubre.</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
-<div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
-<ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Tex-mex, Pechuga de pollo en julianas, arroz verde (con cilantro), pico de gallo, maíz tierno, frijol negro y aguacate.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Tex-mex vegetariano, champiñones,  arroz verde (con cilantro) , pico de gallo, maíz tierno, frijol negro y aguacate.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light:Ensalada mexicana,  lechuga,  aguacate, frijol negro, pico de gallo, maíz, cilantro y pollo en julianas (vinagreta  por aparte).</span></li>
-</ul>
-</div>
-<p style="font-size: 13px; line-height: 1.5; color: #555555; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 20px; mso-ansi-font-size: 14px; margin: 0;"><span style="color: #000000; font-family: Arial; font-size: 13px; white-space: pre-wrap; background-color: #cfe2f3; mso-ansi-font-size: 14px;"> </span></p>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="322" style="background-color:#FFFFFF;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
-<div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/jueves.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.2; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #005C5E; mso-line-height-alt: 14px;">
-<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Jueves 10 de Octubre.</strong></span></p>
+<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Jueves 17 de Octubre.</strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -413,9 +381,9 @@
 <div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú completo: Plato Árabe:  Quibbes, falafel, arroz con nueces y pasas y tabule.</li>
-<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú vegetariano: Plato Árabe vegetariano: Arroz con nueces y pasas, falafel (croquetas de garbanzo) y tabule.</li>
-<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú light: Ensalada de garbanzos y quibbes.</li>
+<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú completo: Lomitos de pollo en salsa de champiñones acompañado con arroz al parmesano y verduras calientes.</li>
+<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú vegetariano: Croquetas de zanahoria acompañado con arroz al parmesano y verduras calientes.</li>
+<li style="font-size: 14px; line-height: 1.5; mso-line-height-alt: 21px;">Menú light: Pollo desmechado, acompañado con arroz integral y  ensalada de friol negro, tomate, maíz y aguacate.</li>
 </ul>
 </div>
 </div>
@@ -427,27 +395,19 @@
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
 <!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:#F8F8F8;">
-<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 645px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFDFD;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFDFD;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F8F8;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:645px"><tr class="layout-full-width" style="background-color:#FFFDFD"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="322" style="background-color:#FFFDFD;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
 <div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 15px; padding-left: 15px;">
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/25.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/viernes.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 292px; display: block;" title="Image" width="292"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.2; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #005C5E; mso-line-height-alt: 14px;">
-<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Viernes 11 de Octubre </strong></span></p>
+<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Viernes 18 de Octubre </strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -455,9 +415,9 @@
 <div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
 <ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: </span><br/><span style="font-size: 12px;">Frijolada: Frijoles caldudos acompañado con arroz blanco, carne molida, aguacate y tajadas.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano:  Frijolada vegetariana: Frijoles caldudos acompañados con arroz blanco, aguacate, arepita blanca y tajadas.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Aguacate relleno de atún bañado con un toque de mostaza, acompañado con ensalada caprese.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: </span><br/><span style="font-size: 12px;">Cazuela de garbanzos con chorizo acompañada con pechuga a la plancha arroz blanco, tajadas y aguacate.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano:  Tofu a las finas hierbas, pasta al burro  y ensalada de la casa.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Pollo al horno relleno de jamón y queso, acompañado con torta de verduras y ensalada de la casa.</span></li>
 </ul>
 </div>
 </div>
@@ -469,6 +429,14 @@
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
 <!--[if (mso)|(IE)]></td><td align="center" width="322" style="background-color:#FFFDFD;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#F8F8F8;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 645px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFDFD;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFDFD;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F8F8F8;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:645px"><tr class="layout-full-width" style="background-color:#FFFDFD"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="322" style="background-color:#FFFDFD;width:322px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 15px; padding-top:15px; padding-bottom:15px;"><![endif]-->
 <div class="col num6" style="min-width: 320px; max-width: 322px; display: table-cell; vertical-align: top; width: 322px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->

@@ -424,7 +424,7 @@ class Routing {
                     $results = $resultData['results'];
                 }
                 if ($route->provider == "Rapigo") {
-                    $route = $basilikum->createRoute($queryStops, $route, $stops);
+                    $route = $rapigo->createRoute($queryStops, $route, $stops);
                 } else if ($route->provider == "Basilikum") {
                     $route = $basilikum->createRoute($queryStops, $route, $stops);
                 }
