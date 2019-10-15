@@ -73,8 +73,7 @@ class RegenerateScenarios implements ShouldQueue {
             "user_status" => "normal"
         ];
         $date = date("Y-m-d H:i:s");
-        $className = "App\\Services\\Notifications";
-        $notifications = new $className;
+        $notifications = app("Notifications");
         $notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 

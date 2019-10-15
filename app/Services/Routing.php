@@ -73,13 +73,13 @@ class Routing {
 
     public function updateRouteDelivery($data) {
         $delivery = Delivery::find($data['delivery_id']);
-        $details = json_decode($delivery->details,true);
+        $details = json_decode($delivery->details, true);
         $hasPickup = false;
         $pickupString = "";
-        if(array_key_exists("pickup", $details)){
+        if (array_key_exists("pickup", $details)) {
             $user = $delivery->user;
             $hasPickup = true;
-            $pickupString =  "Envase de " . $user->firstName . " " . $user->lastName;
+            $pickupString = "Envase de " . $user->firstName . " " . $user->lastName;
         }
         $stop = Stop::where("route_id", $data['route_id'])->where("address_id", $delivery->address_id)->first();
         $newRoute = Route::find($data['route_id']);
@@ -87,14 +87,14 @@ class Routing {
         $oldRoute = $oldStop->route;
         if ($stop) {
             DB::statement("UPDATE delivery_stop set stop_id=$stop->id where delivery_id = $delivery->id and stop_id = $oldStop->id ;");
-            
+
             $stop->shipping += $delivery->shipping;
-            if($hasPickup){
-                $details = json_decode($stop->details,true);
-                if(array_key_exists("pickups", $details)){
+            if ($hasPickup) {
+                $details = json_decode($stop->details, true);
+                if (array_key_exists("pickups", $details)) {
                     array_push($details["pickups"], $pickupString);
                 } else {
-                    $details["pickups"]=[$pickupString];
+                    $details["pickups"] = [$pickupString];
                 }
             }
             $stop->amount++;
@@ -102,11 +102,11 @@ class Routing {
         } else {
             $stopContainer = [
                 "deliveries" => [$delivery],
-                "address_id"=> $delivery->address_id,
-                "amount" =>1,
+                "address_id" => $delivery->address_id,
+                "amount" => 1,
                 "shipping" => $delivery->shipping
             ];
-            if($hasPickup){
+            if ($hasPickup) {
                 $stopContainer["pickups"] = [$pickupString];
             }
             $this->addToNewStop($newRoute, $stopContainer);
@@ -145,7 +145,7 @@ class Routing {
         }
         return array("status" => "error", "message" => "Route not found");
     }
-    
+
     /**
      * Remove the specified resource from storage.
      *
@@ -176,7 +176,7 @@ class Routing {
         $stop = Stop::find($stopContainer);
         $oldRoute = $stop->route;
         $oldRoute->unit--;
-        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping; 
+        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
         $oldRoute->save();
         $newRoute = $this->createNewRoute($oldRoute->type, $oldRoute->provider);
         $newRoute->unit++;
@@ -466,8 +466,8 @@ class Routing {
     }
 
     public function writeFile($data, $title) {
-        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/".$title.".xls","local");
-        $path = 'exports/' . $title.".xls";
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
+        $path = 'exports/' . $title . ".xls";
         return $path;
         return Excel::create($title, function($excel) use($data, $title) {
 
@@ -508,7 +508,7 @@ class Routing {
         if ($dateTimestampNow > $dateTimestampLimit) {
             $date = $this->getNextValidDate($date);
         }
-        $la = "2019-10-08";
+        $la = date_format($date, "Y-m-d");
         $thedata = [
             'lat' => $polygon->lat,
             'lat2' => $polygon->lat,
@@ -519,6 +519,11 @@ class Routing {
             'date2' => $la . " 23:59:59",
         ];
 
+
+# your laravel query builder goes here
+        if ($polygon->id == 27) {
+            //DB::enableQueryLog();
+        }
         $deliveries = DB::select(""
                         . "SELECT DISTINCT(d.id), d.delivery,d.provider,d.details,d.user_id,a.address,d.address_id,status,shipping, lat,`long`, 
 			( 6371 * acos( cos( radians( :lat ) ) *
@@ -530,8 +535,8 @@ class Routing {
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
-        if ($polygon->provider == "Basilikum") {
-            //dd($deliveries);
+        if ($polygon->id == 27) {
+            //dd(DB::getQueryLog());
         }
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
         //echo "Query results: " . count($deliveries) . PHP_EOL;
