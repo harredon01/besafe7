@@ -689,7 +689,7 @@
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#4E5264;font-family:'Bitter', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<p style="font-size: 12px; line-height: 1.5; color: #4E5264; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;">Zona 1: Direcciones ubicadas dentro de la calle 170 a la calle 80, de la Av Carrera 7ma, a la Av carrera Boyaca.</p>
+<p style="font-size: 12px; line-height: 1.5; color: #4E5264; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;">Zona 1: Direcciones ubicadas dentro de la calle 140 a la calle 80, de la Av Carrera 7ma, a la Av carrera Boyaca.</p>
 <p style="font-size: 12px; line-height: 1.5; color: #4E5264; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;"> </p>
 <p style="font-size: 12px; line-height: 1.5; color: #4E5264; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;">Zona 2: Direcciones ubicadas dentro de la Calle 80 a la Calle 53 de la Av. Cra. Circunvalar, a la Av. cra. Boyacá.</p>
 <p style="font-size: 12px; line-height: 1.5; color: #4E5264; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 18px; margin: 0;"> </p>
