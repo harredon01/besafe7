@@ -282,15 +282,16 @@ class Proofhub {
                 "code" => "2727439403",
                 "rows" => $copy,
             ],
+//              [
+//              "name" => "La nuit",
+//              "budget" => "15000000",
+//              "country" => "COL",
+//              "type" => self::PRODUCCION,
+//              "price" => "Retail",
+//              "code" => "2836708259",
+//              "rows" => $copy,
+//              ], 
             [
-                "name" => "La nuit",
-                "budget" => "15000000",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "2836708259",
-                "rows" => $copy,
-            ], [
                 "name" => "La nuit ongoing",
                 "budget" => "3000000",
                 "country" => "COL",
@@ -371,23 +372,23 @@ class Proofhub {
                 "code" => "3088122966",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "FreshSt",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CANADA,
-//                "price" => "Retail",
-//                "code" => "1490963176",
-//                "rows" => $copy,
-//            ], [
-//                "name" => "Volo",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CANADA,
-//                "price" => "Retail",
-//                "code" => "1849937081",
-//                "rows" => $copy,
-//            ],
+            //            [
+            //                "name" => "FreshSt",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CANADA,
+            //                "price" => "Retail",
+            //                "code" => "1490963176",
+            //                "rows" => $copy,
+            //            ], [
+            //                "name" => "Volo",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CANADA,
+            //                "price" => "Retail",
+            //                "code" => "1849937081",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "Universidad Rosario",
                 "budget" => "0",
@@ -431,15 +432,15 @@ class Proofhub {
                 "code" => "1479076983",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Auvenir",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CANADA,
-//                "price" => "Retail",
-//                "code" => "2502782201",
-//                "rows" => $copy,
-//            ], 
+            //            [
+            //                "name" => "Auvenir",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CANADA,
+            //                "price" => "Retail",
+            //                "code" => "2502782201",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "Archies",
                 "budget" => "0",
@@ -449,15 +450,15 @@ class Proofhub {
                 "code" => "1714087114",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Primus",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2400881156",
-//                "rows" => $copy,
-//            ],
+            //            [
+            //                "name" => "Primus",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::PRODUCCION,
+            //                "price" => "Retail",
+            //                "code" => "2400881156",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "Daportare",
                 "budget" => "0",
@@ -476,15 +477,15 @@ class Proofhub {
                 "code" => "2581819961",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Xtech",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "2349279336",
-//                "rows" => $copy,
-//            ],
+            //            [
+            //                "name" => "Xtech",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::PRODUCCION,
+            //                "price" => "Retail",
+            //                "code" => "2349279336",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "NOVEDADES GUILLERS",
                 "budget" => "50000",
@@ -602,23 +603,23 @@ class Proofhub {
                 "code" => "1767995616",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Internal Management",
-//                "budget" => "1200000",
-//                "country" => "COL",
-//                "type" => self::INTERNO,
-//                "price" => "Retail",
-//                "code" => "1753870584",
-//                "rows" => $copy,
-//            ], [
-//                "name" => "Internal Management 2019",
-//                "budget" => "1200000",
-//                "country" => "COL",
-//                "type" => self::INTERNO,
-//                "price" => "Retail",
-//                "code" => "2711279064",
-//                "rows" => $copy,
-//            ], 
+            //            [
+            //                "name" => "Internal Management",
+            //                "budget" => "1200000",
+            //                "country" => "COL",
+            //                "type" => self::INTERNO,
+            //                "price" => "Retail",
+            //                "code" => "1753870584",
+            //                "rows" => $copy,
+            //            ], [
+            //                "name" => "Internal Management 2019",
+            //                "budget" => "1200000",
+            //                "country" => "COL",
+            //                "type" => self::INTERNO,
+            //                "price" => "Retail",
+            //                "code" => "2711279064",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "El techo",
                 "budget" => "50000",
@@ -637,51 +638,51 @@ class Proofhub {
                 "code" => "2727778621",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Chambar",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CANADA,
-//                "price" => "Retail",
-//                "code" => "1481790725",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "DSRF",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1409523753",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Sales Proposals",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::INTERNO,
-//                "price" => "Retail",
-//                "code" => "2727195166",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Vilaseca",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::PRODUCCION,
-//                "price" => "Retail",
-//                "code" => "1779963222",
-//                "rows" => $copy,
-//            ],
-//            [
-//                "name" => "Dial",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "1637613840",
-//                "rows" => $copy,
-//            ],
+            //            [
+            //                "name" => "Chambar",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CANADA,
+            //                "price" => "Retail",
+            //                "code" => "1481790725",
+            //                "rows" => $copy,
+            //            ],
+            //            [
+            //                "name" => "DSRF",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::PRODUCCION,
+            //                "price" => "Retail",
+            //                "code" => "1409523753",
+            //                "rows" => $copy,
+            //            ],
+            //            [
+            //                "name" => "Sales Proposals",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::INTERNO,
+            //                "price" => "Retail",
+            //                "code" => "2727195166",
+            //                "rows" => $copy,
+            //            ],
+            //            [
+            //                "name" => "Vilaseca",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::PRODUCCION,
+            //                "price" => "Retail",
+            //                "code" => "1779963222",
+            //                "rows" => $copy,
+            //            ],
+            //            [
+            //                "name" => "Dial",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CUENTAS,
+            //                "price" => "Retail",
+            //                "code" => "1637613840",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "Agency",
                 "budget" => "0",
@@ -709,15 +710,15 @@ class Proofhub {
                 "code" => "2646379904",
                 "rows" => $copy,
             ],
-//            [
-//                "name" => "Balance ecuador",
-//                "budget" => "0",
-//                "country" => "COL",
-//                "type" => self::CUENTAS,
-//                "price" => "Retail",
-//                "code" => "2547043347",
-//                "rows" => $copy,
-//            ],
+            //            [
+            //                "name" => "Balance ecuador",
+            //                "budget" => "0",
+            //                "country" => "COL",
+            //                "type" => self::CUENTAS,
+            //                "price" => "Retail",
+            //                "code" => "2547043347",
+            //                "rows" => $copy,
+            //            ],
             [
                 "name" => "CONSTRUCTORA BOLIVAR",
                 "budget" => "0",
@@ -763,15 +764,15 @@ class Proofhub {
                 "code" => "3383378189",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Hipergas",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "3313974215",
-                "rows" => $copy,
-            ],
+//                  [
+//                  "name" => "Hipergas",
+//                  "budget" => "0",
+//                  "country" => "COL",
+//                  "type" => self::PRODUCCION,
+//                  "price" => "Retail",
+//                  "code" => "3313974215",
+//                  "rows" => $copy,
+//                  ],
             [
                 "name" => "Backbone Print",
                 "budget" => "0",
@@ -815,30 +816,16 @@ class Proofhub {
         $globalPendingMilestones = [];
         $summary = [];
         $summary["rows"] = [];
-        if ($type == self::CUENTAS) {
-            $summaryTitles = [
-                "Nombre",
-                "Horas",
-                "Presupuesto consumido",
-                "Presupuesto mensual",
-                "End",
-                "Tareas Abiertas",
-                "Tiempo p terminacion",
-                "Presupuesto estimado faltante",
-                "Milestones Abiertos",
-            ];
-        } else {
-            $summaryTitles = [
-                "Nombre",
-                "Horas",
-                "Presupuesto consumido",
-                "End",
-                "Tareas Abiertas",
-                "Tiempo p terminacion",
-                "Presupuesto estimado faltante",
-                "Milestones Abiertos",
-            ];
-        }
+        $summaryTitles = [
+            "Nombre",
+            "Horas",
+            "Presupuesto consumido",
+            "Presupuesto mensual",
+            "Tareas Abiertas",
+            "Tiempo p terminacion",
+            "Presupuesto estimado faltante",
+            "Milestones Abiertos",
+        ];
         $summary["rows"] = [$summaryTitles];
         $totalHours = 0;
         $totalCost = 0;
@@ -1041,6 +1028,11 @@ class Proofhub {
             }
             $project['people'] = $projectPeople;
             $title = array([
+                    "name" => "name",
+                    "hours" => "hours",
+                    "cost" => "cost"
+            ]);
+            $title1 = array([
                     "name" => "label name",
                     "hours" => "hours",
                     "cost" => "cost"
@@ -1070,7 +1062,7 @@ class Proofhub {
                 $projectPeople[$key]["total_cost"] = number_format((float) $projectPeople[$key]["total_cost"], 2, ',', '');
             }
             if (count($projectPersonLabels) > 0) {
-                $project["rows"] = array_merge($projectPeople, $title, $project['labels'], $title2, $projectPersonLabels, $title3, $projectMilestones);
+                $project["rows"] = array_merge($title, $projectPeople, $title1, $project['labels'], $title2, $projectPersonLabels, $title3, $projectMilestones);
             } else {
                 $project["rows"] = $projectPeople;
             }
@@ -1078,9 +1070,9 @@ class Proofhub {
             $projectResults = $this->calculateTotalsProject($project['people']);
             $projectData = [
                 "Nombre" => $project["name"],
-                //"Presupuesto mensual" => $project["budget"],
                 "Horas" => $projectResults["Hours"],
                 "Presupuesto consumido" => $projectResults["Consumed"],
+                "Presupuesto mensual" => $project["budget"],
                 //"Facturado" => "",
                 /* "billable" => $projectResults["billable"],
                   "billable_cost" => $projectResults["billable_cost"],
@@ -1094,9 +1086,7 @@ class Proofhub {
                 "Milestones Cerrados" => $totalCompletedMilestones,
                     //"Presupuesto Recogido" => $totalPaidBudget,
             ];
-            if ($type == self::CUENTAS) {
-                $projectData["Presupuesto mensual"] = $project["budget"];
-            }
+
             $projectResults["Hours"] = str_replace(",", ".", $projectResults["Hours"]);
             if (is_numeric($projectResults["Hours"])) {
                 $totalHours += $projectResults["Hours"];
@@ -1153,19 +1143,19 @@ class Proofhub {
         //return true;
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
-        //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name));
+        $this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
+        //dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name));
         $full = true;
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
-        //$this->getSummary($labels, $people, null, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, null, $full, $ignoreDate, $name));
+        $this->getSummary($labels, $people, null, $full, $ignoreDate, $name);
+        //dispatch(new ProofhubSummaryJob($labels, $people, null, $full, $ignoreDate, $name));
         //$projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
         $name = 'Total_produccion_' . time();
         $ignoreDate = true;
-        //$this->getSummary($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name));
+        $this->getSummary($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name);
+        //dispatch(new ProofhubSummaryJob($labels, $people, self::PRODUCCION, $full, $ignoreDate, $name));
         //$projects = $this->getProjects($copy, self::CUENTAS);
         return true;
         $projects = $this->getProjects($copy, self::CANADA);
@@ -1217,7 +1207,12 @@ class Proofhub {
         }
         $finalResults = [];
         $finalResults["name"] = "Resumen";
-        $finalResults["rows"] = [];
+        $titleH = array([
+                "name" => "Name",
+                "hours" => "hours",
+                "cost" => "cost"
+        ]);
+        $finalResults["rows"] = [$titleH];
         $totalResults = [];
         $title = array([
                 "name" => "label name",
@@ -1262,9 +1257,9 @@ class Proofhub {
                         "person_name" => "End",
                 ]);
                 if (false) {//if(count($finalPerson['milestones'])>0){
-                    $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels'], $title2, $finalPerson['milestones']);
+                    $resultsPerson["rows"] = array_merge($titleH, $finalPerson['projects'], $title, $finalPerson['labels'], $title2, $finalPerson['milestones']);
                 } else {
-                    $resultsPerson["rows"] = array_merge($finalPerson['projects'], $title, $finalPerson['labels']);
+                    $resultsPerson["rows"] = array_merge($titleH, $finalPerson['projects'], $title, $finalPerson['labels']);
                 }
 
                 array_push($totalResults, $resultsPerson);
@@ -1385,107 +1380,107 @@ class Proofhub {
             ];
             if ($resultsPerson['id'] == "1871117844") {
                 //andres
-                $saveperson['cost'] = 59582;
-                $saveperson['retail'] = 65000;
+                $saveperson['cost'] = 65240;
+                $saveperson['retail'] = 71171;
                 $saveperson['cost_us'] = 19.23;
                 $saveperson['retail_us'] = 22.73;
             } else if ($resultsPerson['id'] == "4232277661") {
                 //Deyvid
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 30957;
+                $saveperson['retail'] = 33771;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "1856477202") {
                 //Fabian Vargas
-                $saveperson['cost'] = 50000;
+                $saveperson['cost'] = 50186;
                 $saveperson['retail'] = 54749;
                 $saveperson['cost_us'] = 13.80;
                 $saveperson['retail_us'] = 16.31;
             } else if ($resultsPerson['id'] == "2133970978") {
                 //Gobert Perdomo
-                $saveperson['cost'] = 34034;
-                $saveperson['retail'] = 37084;
+                $saveperson['cost'] = 36930;
+                $saveperson['retail'] = 40287;
                 $saveperson['cost_us'] = 10.30;
                 $saveperson['retail_us'] = 12.17;
             } else if ($resultsPerson['id'] == "1923370963") {
                 //Juan Arredondo
-                $saveperson['cost'] = 35900;
-                $saveperson['retail'] = 39150;
+                $saveperson['cost'] = 38788;
+                $saveperson['retail'] = 42315;
                 $saveperson['cost_us'] = 9.8;
                 $saveperson['retail_us'] = 11.6;
             } else if ($resultsPerson['id'] == "1923533788") {
                 //Victor Gil
-                $saveperson['cost'] = 34034;
-                $saveperson['retail'] = 37128;
+                $saveperson['cost'] = 36930;
+                $saveperson['retail'] = 40287;
                 $saveperson['cost_us'] = 10.25;
                 $saveperson['retail_us'] = 12.12;
             } else if ($resultsPerson['id'] == "1849041546") {
                 //Hoovert
-                $saveperson['cost'] = 116154;
-                $saveperson['retail'] = 127581;
+                $saveperson['cost'] = 88459;
+                $saveperson['retail'] = 96501;
                 $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 37.05;
                 $saveperson['retail_us'] = 43.79;
             } else if ($resultsPerson['id'] == "2316429479") {
                 //Julian
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 30957;
+                $saveperson['retail'] = 33771;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "4472620297") {
                 //Neiderson
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 30957;
+                $saveperson['retail'] = 33771;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "1856110846") {
                 //David Mendez
-                $saveperson['cost'] = 84900;
-                $saveperson['retail'] = 92602;
+                $saveperson['cost'] = 87786;
+                $saveperson['retail'] = 95767;
                 $saveperson['esperado'] = 50;
                 $saveperson['cost_us'] = 27.14;
                 $saveperson['retail_us'] = 32.07;
             } else if ($resultsPerson['id'] == "3216537278") {
                 //Laura Aires
-                $saveperson['cost'] = 37084;
-                $saveperson['retail'] = 40500;
+                $saveperson['cost'] = 41447;
+                $saveperson['retail'] = 45214;
                 $saveperson['cost_us'] = 12.20;
                 $saveperson['retail_us'] = 14.42;
             } else if ($resultsPerson['id'] == "4194692322") {
                 //Paula Lozano
-                $saveperson['cost'] = 43258;
-                $saveperson['retail'] = 53932;
+                $saveperson['cost'] = 51482;
+                $saveperson['retail'] = 56162;
                 $saveperson['cost_us'] = 14.42;
                 $saveperson['esperado'] = 50;
                 $saveperson['retail_us'] = 17.04;
             } else if ($resultsPerson['id'] == "5105315875") {
                 //Fabian Herrera
-                $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 41866;
+                $saveperson['cost'] = 40994;
+                $saveperson['retail'] = 44721;
                 $saveperson['cost_us'] = 11.19;
                 $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "5262862217") {
                 //Nicolas Barrios
-                $saveperson['cost'] = 33580;
-                $saveperson['retail'] = 41866;
+                $saveperson['cost'] = 43842;
+                $saveperson['retail'] = 47828;
                 $saveperson['cost_us'] = 11.19;
                 $saveperson['retail_us'] = 13.23;
             } else if ($resultsPerson['id'] == "5105315875") {
                 //Nestor Mosquera
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 30957;
+                $saveperson['retail'] = 33771;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "5450721066") {
                 //Hector Segura
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 29293;
+                $saveperson['retail'] = 31956;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "5402212913") {
                 //Mayra Salcedo
-                $saveperson['cost'] = 26400;
-                $saveperson['retail'] = 28800;
+                $saveperson['cost'] = 44380;
+                $saveperson['retail'] = 48414;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
             } else {
