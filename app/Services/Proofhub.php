@@ -6,6 +6,7 @@ use App\Services\GoogleSheets;
 use App\Mail\StoreReports;
 use Illuminate\Support\Facades\Mail;
 use App\Jobs\ProofhubTotalsJob;
+use App\Exports\ArrayMultipleSheetExport;
 use App\Jobs\ProofhubSummaryJob;
 use Excel;
 
@@ -250,34 +251,23 @@ class Proofhub {
     }
 
     public function writeFile($data, $title) {
-        $file = Excel::create($title, function($excel) use($data, $title) {
-
-                    $excel->setTitle($title);
-                    // Chain the setters
-                    $excel->setCreator('Hoovert Arredondo')
-                            ->setCompany('Backbone Technology');
-                    // Call them separately
-                    $excel->setDescription('This report is clasified');
-                    foreach ($data as $page) {
-                        foreach ($page["rows"] as $key => $value) {
-                            if ($page["rows"][$key]) {
-                                if (array_key_exists("labels", $page["rows"][$key])) {
-                                    unset($page["rows"][$key]["labels"]);
-                                }
-                                if (array_key_exists("projects", $page["rows"][$key])) {
-                                    unset($page["rows"][$key]["projects"]);
-                                }
-                                if (array_key_exists("people", $page["rows"][$key])) {
-                                    unset($page["rows"][$key]["people"]);
-                                }
-                            }
-                        }
-                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-                            $sheet->fromArray($page["rows"], null, 'A1', true);
-                        });
+        foreach ($data as $page) {
+            foreach ($page["rows"] as $key => $value) {
+                if ($page["rows"][$key]) {
+                    if (array_key_exists("labels", $page["rows"][$key])) {
+                        unset($page["rows"][$key]["labels"]);
                     }
-                })->store('xlsx', storage_path('app/exports'));
-        $path = 'exports/' . $file->filename . "." . $file->ext;
+                    if (array_key_exists("projects", $page["rows"][$key])) {
+                        unset($page["rows"][$key]["projects"]);
+                    }
+                    if (array_key_exists("people", $page["rows"][$key])) {
+                        unset($page["rows"][$key]["people"]);
+                    }
+                }
+            }
+        }
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
+        $path = 'exports/' . $title . ".xls";
         Mail::to("hoovert@backbone.digital")->send(new StoreReports($path));
     }
 
@@ -380,7 +370,7 @@ class Proofhub {
                 "price" => "Retail",
                 "code" => "3088122966",
                 "rows" => $copy,
-            ], 
+            ],
 //            [
 //                "name" => "FreshSt",
 //                "budget" => "0",
@@ -825,6 +815,31 @@ class Proofhub {
         $globalPendingMilestones = [];
         $summary = [];
         $summary["rows"] = [];
+        if ($type == self::CUENTAS) {
+            $summaryTitles = [
+                "Nombre",
+                "Horas",
+                "Presupuesto consumido",
+                "Presupuesto mensual",
+                "End",
+                "Tareas Abiertas",
+                "Tiempo p terminacion",
+                "Presupuesto estimado faltante",
+                "Milestones Abiertos",
+            ];
+        } else {
+            $summaryTitles = [
+                "Nombre",
+                "Horas",
+                "Presupuesto consumido",
+                "End",
+                "Tareas Abiertas",
+                "Tiempo p terminacion",
+                "Presupuesto estimado faltante",
+                "Milestones Abiertos",
+            ];
+        }
+        $summary["rows"] = [$summaryTitles];
         $totalHours = 0;
         $totalCost = 0;
         foreach ($projects as $project) {
@@ -877,7 +892,6 @@ class Proofhub {
                             array_push($projectMilestones, $projectMilestone);
                             $projectMilestone2 = [
                                 "Nombre" => $project["name"],
-                                "Presupuesto mensual" => $event["title"],
                                 "Horas" => $event["description"],
                                 "Presupuesto consumido" => $event["start"],
                                 "End" => $event["end"],
@@ -885,10 +899,10 @@ class Proofhub {
                                 "Tiempo p terminacion" => "",
                                 "Presupuesto estimado faltante" => "",
                                 "Milestones Abiertos" => "",
-                                "Presupuesto por recoger" => "",
-                                "Milestones Cerrados" => "",
-                                "Presupuesto Recogido" => "",
                             ];
+                            if ($type == self::CUENTAS) {
+                                $projectMilestone2["Presupuesto mensual"] = $event["title"];
+                            }
                             array_push($globalPendingMilestones, $projectMilestone2);
                             $totalPendingMilestones++;
                             if ($event["description"]) {
@@ -1064,10 +1078,10 @@ class Proofhub {
             $projectResults = $this->calculateTotalsProject($project['people']);
             $projectData = [
                 "Nombre" => $project["name"],
-                "Presupuesto mensual" => $project["budget"],
+                //"Presupuesto mensual" => $project["budget"],
                 "Horas" => $projectResults["Hours"],
                 "Presupuesto consumido" => $projectResults["Consumed"],
-                "Facturado" => "",
+                //"Facturado" => "",
                 /* "billable" => $projectResults["billable"],
                   "billable_cost" => $projectResults["billable_cost"],
                   "non_billable_cost" => $projectResults["non_billable_cost"],
@@ -1076,10 +1090,13 @@ class Proofhub {
                 "Tiempo p terminacion" => $totalMissingHours,
                 "Presupuesto estimado faltante" => $estimatedMissingBudget,
                 "Milestones Abiertos" => $totalPendingMilestones,
-                "Presupuesto por recoger" => $totalMissingBudget,
+                //"Presupuesto por recoger" => $totalMissingBudget,
                 "Milestones Cerrados" => $totalCompletedMilestones,
-                "Presupuesto Recogido" => $totalPaidBudget,
+                    //"Presupuesto Recogido" => $totalPaidBudget,
             ];
+            if ($type == self::CUENTAS) {
+                $projectData["Presupuesto mensual"] = $project["budget"];
+            }
             $projectResults["Hours"] = str_replace(",", ".", $projectResults["Hours"]);
             if (is_numeric($projectResults["Hours"])) {
                 $totalHours += $projectResults["Hours"];
@@ -1137,12 +1154,12 @@ class Proofhub {
         $name = 'Total_cuentas_mes_' . time();
         $ignoreDate = false;
         //$this->getSummary($labels, $people, self::CUENTAS, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name)); 
+        dispatch(new ProofhubSummaryJob($labels, $people, self::CUENTAS, $full, $ignoreDate, $name));
         $full = true;
         $name = 'Total_mes_' . time();
         $ignoreDate = false;
         //$this->getSummary($labels, $people, null, $full, $ignoreDate, $name);
-        dispatch(new ProofhubSummaryJob($labels, $people, null, $full, $ignoreDate, $name)); 
+        dispatch(new ProofhubSummaryJob($labels, $people, null, $full, $ignoreDate, $name));
         //$projects = $this->getProjects($copy, self::PRODUCCION);
         $full = false;
         $name = 'Total_produccion_' . time();
