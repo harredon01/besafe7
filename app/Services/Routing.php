@@ -736,7 +736,7 @@ class Routing {
         foreach ($route->stops as $stop) {
             $address = $stop->address;
             if ($address->phone == "3103418432") {
-                $addStop = false;
+                $addStop = true;
             }
         }
         if ($addStop) {
