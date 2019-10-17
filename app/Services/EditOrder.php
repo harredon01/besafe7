@@ -900,6 +900,11 @@ class EditOrder {
             } else {
                 $order->status = "approved";
                 $this->orderStatusUpdate($order);
+                $updateData = [
+                    "paid_status" => "paid",
+                    "updated_at" => date("Y-m-d hh:m:s")
+                ];
+                Item::where("order_id", $order->id)->update($updateData);
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
