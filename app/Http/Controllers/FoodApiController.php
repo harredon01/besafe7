@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\Food;
 use App\Services\Routing;
+use App\Services\EditDelivery;
 use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
 use App\Mail\RouteOrganize;
@@ -40,15 +41,18 @@ class FoodApiController extends Controller {
     private $food;
     
     private $routing;
+    
+    private $delivery;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Food $food,Routing $routing) {
+    public function __construct(Food $food,Routing $routing, EditDelivery $editDelivery) {
         $this->food = $food;
         $this->routing = $routing;
+        $this->delivery = $editDelivery;
         $this->middleware('auth:api')->except('getZones');
         $this->middleware('admin')->except(['getRouteInfo','getZones']);
     }
@@ -164,6 +168,15 @@ class FoodApiController extends Controller {
      */
     public function updateUserDeliveriesAddress($user,$address) {
         return response()->json(array("status" => "success", "message" => $this->routing->updateUserDeliveriesAddress($user,$address)));
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function updateMissingDish(Request $request) {
+        return response()->json($this->delivery->adminPostDeliveryOptions($request->all()));
     }
 
     

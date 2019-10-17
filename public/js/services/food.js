@@ -150,6 +150,23 @@ angular.module('besafe')
                         });
                 return def.promise;
             }
+            var updateMissingDish = function (dish) {
+                let url = '/api/food/update_dish';
+                var def = $q.defer();
+                $http({
+                    method: 'post',
+                    url: url,
+                    data:dish
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to updateDeliveryAddress");
+                        });
+                return def.promise;
+            }
             var buildScenarioRouteId = function (route_id) {
                 let url = '/api/food/build_route_id/'+route_id ;
                 var def = $q.defer();
@@ -480,6 +497,7 @@ angular.module('besafe')
                 updateMessageItem:updateMessageItem,
                 sendNewsletter:sendNewsletter,
                 deleteZoneItem:deleteZoneItem,
+                updateMissingDish:updateMissingDish,
                 deleteMenuItem:deleteMenuItem,
                 deleteMessageItem:deleteMessageItem,
                 getLargestAddresses:getLargestAddresses

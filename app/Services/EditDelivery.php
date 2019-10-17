@@ -70,6 +70,48 @@ class EditDelivery {
         return array("status" => "error", "message" => "Delivery does not exist");
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function adminPostDeliveryOptions(array $data) {
+        $validator = $this->validatorDelivery($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $delivery = Delivery::find($data['delivery_id']);
+        if ($delivery) {
+            $details = json_decode($delivery->details, true);
+            $validator = $this->validatorDeliveryMeal($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+            if(!array_key_exists('starter_id', $data)){
+                $data['starter_id']="";
+            }
+            if(!array_key_exists('drink_id', $data)){
+                $data['drink_id']="";
+            }
+            if(!array_key_exists('dessert_id', $data)){
+                $data['dessert_id']="";
+            }
+            $dish = [
+                'type_id' => $data['type_id'],
+                'starter_id' => $data['starter_id'],
+                'drink_id' => $data['drink_id'],
+                'main_id' => $data['main_id'],
+                'dessert_id' => $data['dessert_id']
+            ];
+            $details["dish"] = $dish;
+            $delivery->details = json_encode($details);
+            $delivery->status = "enqueue";
+            $delivery->save();
+            return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details);
+        }
+        return array("status" => "error", "message" => "Delivery does not exist");
+    }
+
     public function changeDeliveryDate(User $user, array $data) {
         if (array_key_exists("delivery", $data)) {
             $sameDay = Delivery::where("user_id", $user->id)->where("delivery", $data["delivery"])->where("details", "like", 'deliver":"envase')->count();

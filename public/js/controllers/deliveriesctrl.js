@@ -151,16 +151,20 @@
                     console.log("delivery", $scope.deliveries[item].id);
                     let attributes = $scope.deliveries[item].details;
                     if (attributes.dish) {
+                        $scope.deliveries[item].build = false;
+                        $scope.deliveries[item].type_id = attributes.dish.type_id;
                         let article = $scope.getArticle(attributes.dish.type_id);
                         attributes.tipoAlmuerzo = article.name;
                         for (item2 in article.attributes.entradas) {
                             if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
                                 attributes.entrada = article.attributes.entradas[item2].valor;
+                                $scope.deliveries[item].starter_id = attributes.dish.starter_id;
                             }
                         }
                         for (item3 in article.attributes.plato) {
                             if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
                                 attributes.plato = article.attributes.plato[item3].valor;
+                                $scope.deliveries[item].main_id = attributes.dish.main_id;
                             }
                         }
                         delete attributes.dish;
@@ -168,8 +172,45 @@
                         delete attributes.merchant_id;
                         $scope.deliveries[item].details = attributes;
                         console.log("deliveryDone", $scope.deliveries[item].id);
+                    } else {
+                        $scope.deliveries[item].type_id = null;
+                        $scope.deliveries[item].starter_id = null;
+                        $scope.deliveries[item].main_id = null;
+                        $scope.deliveries[item].build = true;
                     }
                 }
+            }
+            $scope.selectMissingType = function (item) {
+                let article = $scope.getArticle(item.type_id);
+                item.starters = article.attributes.entradas;
+                item.mains = article.attributes.plato;
+            }
+            $scope.selectDish = function (item) {
+                let attributes = item.details;
+                let article = $scope.getArticle(item.type_id);
+                attributes.tipoAlmuerzo = article.name;
+                for (item2 in article.attributes.entradas) {
+                    if (article.attributes.entradas[item2].codigo == item.starter_id) {
+                        attributes.entrada = article.attributes.entradas[item2].valor;
+                    }
+                }
+                for (item3 in article.attributes.plato) {
+                    if (article.attributes.plato[item3].codigo == item.main_id) {
+                        attributes.plato = article.attributes.plato[item3].valor;
+                    }
+                }
+                item.details = attributes;
+                let container = {
+                    "delivery_id":item.id,
+                    "type_id":item.type_id,
+                    "main_id":item.main_id
+                };
+                if(item.starter_id){
+                    container.starter_id = item.starter_id;
+                }
+                item.build = false;
+                console.log("Updating dish: ",container);
+                Food.updateMissingDish(container);
             }
             $scope.getArticles = function (date) {
                 Food.getArticlesByDate($scope.activeDate).then(function (data) {

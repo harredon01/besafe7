@@ -214,6 +214,7 @@ Route::get('food/build_complete_scenario/{scenario?}/{provider?}', 'FoodApiContr
 Route::get('food/build_scenario_positive/{scenario?}/{provider?}', 'FoodApiController@buildScenarioPositive');
 Route::get('food/get_scenario_structure', 'FoodApiController@getScenarioStructure');
 Route::post('food/build_scenario_logistics', 'FoodApiController@buildScenarioLogistics');
+Route::post('food/update_dish', 'FoodApiController@updateMissingDish');
 Route::get('food/regenerate_scenarios', 'FoodApiController@regenerateScenarios');
 Route::get('food/regenerate_deliveries', 'FoodApiController@regenerateDeliveries');
 Route::get('food/summary/{status?}', 'FoodApiController@getSummaryShipping');
