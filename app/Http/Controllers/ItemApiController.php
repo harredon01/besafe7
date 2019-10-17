@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
+use Unlu\Laravel\Api\QueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Services\CleanSearch;
+use App\Models\Item;
 
 class ItemApiController extends Controller {
 
@@ -12,24 +14,40 @@ class ItemApiController extends Controller {
      * The edit profile implementation.
      *
      */
-    protected $editMapObject;
+    protected $cleanSearch;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(EditMapObject $editMapObject) {
-        $this->editMapObject = $editMapObject;
-        $this->middleware('auth:api')->except('index');
+    public function __construct(CleanSearch $cleanSearch) {
+        $this->cleanSearch = $cleanSearch;
+        $this->middleware('auth:api');
     }
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
-    public function index() {
-        //
+    public function index(Request $request) {
+        $user = $request->user();
+        $request2 = $this->cleanSearch->handleOrder($user,$request);
+        if ($request2) {
+            $queryBuilder = new QueryBuilder(new Item, $request2);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
     }
 
     /**
