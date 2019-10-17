@@ -239,7 +239,8 @@ class MerchantTableSeeder extends Seeder {
                         "experience" => [["name" => "St judes hospital", "years" => "1.5"]],
                         "services" => [["name" => $category->name . "1", "icon" => "1.5"], ["name" => $category->name . "2", "icon" => "1.5"], ["name" => $category->name . "3", "icon" => "1.5"]],
                         "booking_requires_authorization" => mt_rand(0, 1),
-                        "max_per_hour" => 2
+                        "max_per_hour" => 2,
+                        "years_experience" => mt_rand(1, 5)
                     ]
         ));
         CoveragePolygon::create(array(

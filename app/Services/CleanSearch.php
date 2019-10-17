@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
-
+use App\Models\Merchant;
 class CleanSearch {
 
     public function handle(User $user, Request $request) {

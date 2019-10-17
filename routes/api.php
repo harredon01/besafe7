@@ -192,6 +192,9 @@ Route::resource('orders', 'OrderApiController');
 Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
 Route::post('payments/{payment?}/approve', 'FoodApiController@approvePayment'); 
 
+Route::get('items', 'ItemApiController@index');
+Route::post('items/fulfillment', 'ItemApiController@fulfillItem'); 
+
 Route::get('admin/store/products', 'ProductImportApiController@getProducts'); 
 Route::get('admin/store/variants', 'ProductImportApiController@getVariants'); 
 Route::get('admin/store/merchants', 'ProductImportApiController@getMerchants'); 
