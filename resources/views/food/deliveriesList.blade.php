@@ -1,5 +1,5 @@
 <div style="height:400px; overflow:scroll">
-    Entregas<br><br>
+    Entregas(@{{ deliveries.length}})<br><br>
     <ul>
         <li id="item-@{{ item.id}}" ng-repeat="item in deliveries">
             Id: <span class="type">@{{ item.id}}</span><br/>

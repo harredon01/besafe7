@@ -29,12 +29,12 @@
                             Acciones
                         </td>
                     </tr>
-                    <tr ng-repeat="stop in route.stops">
+                    <tr ng-repeat="stop in route.stops" data-route="@{{ stop.route_id}}" data-stop="@{{ stop.id}}">
                         <td>
                             @{{ stop.id}}
                         </td>
                         <td>
-                            @{{ stop.amount}}
+                            --@{{ stop.amount}}
                         </td>
                         <td>
                             @{{ stop.shipping}}
@@ -52,17 +52,6 @@
             <br/><br/><a href="javascript:;" ng-click="deleteRoute(route.id)" class="editar">deleteRoute</a>
 
         </div>
-        <script>
-            $(function () {
-                setTimeout(function () {
-                    $(".route-detail").each(function () {
-                        var route_id = $(this).data("route");
-                        console.log("Ruta ", route_id)
-                        $('#route-' + route_id + '-table').sortable();
-                    });
-                }, 1000);
-            });
-        </script>
         <div ng-show="showMore">
             <button ng-click="getRoutes()">Cargar mas</button>
         </div>

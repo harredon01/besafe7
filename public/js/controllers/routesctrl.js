@@ -39,10 +39,10 @@
             }
             $scope.changeScenario = function () {
                 //$scope.provider= "Basilikum";
-                console.log("provider",$scope.provider);
+                console.log("provider", $scope.provider);
                 $scope.page = 0;
                 $scope.hideAll();
-                if($scope.provider == "Basilikum"){
+                if ($scope.provider == "Basilikum") {
                     $scope.scenario = "preorganize";
                 }
                 $scope.routes = [];
@@ -96,11 +96,103 @@
                     let color = $scope.getRouteColor();
                     route.polyline = MapService.createRoute(route, color);
                 }
+                setTimeout(function () {
+                    var el = document.getElementById('route-' + route.id + '-table');
+                    var sortable = new Sortable(el, {
+                        group: "routes",
+                        dataIdAttr: route.id,
+                        onAdd: function (/**Event*/evt) {
+                            console.log("On add", evt);
+                        },
+                        onUpdate: function (/**Event*/evt) {
+                            // same properties as onEnd
+                            let attributes = evt.item.attributes;
+                            let route = null;
+                            let stop = null;
+                            for (item in attributes) {
+                                if (attributes[item].name == "data-route") {
+                                    route = attributes[item].value;
+                                }
+                                if (attributes[item].name == "data-stop") {
+                                    stop = attributes[item].value;
+                                }
+                            }
+                            if (route && stop) {
+                                $scope.updateRouteLocation(route, stop, evt.newIndex, evt.oldIndex);
+                            }
+
+                        },
+                    });
+                    console.log("Setting sortable");
+                }, 1000);
+
+
                 return route;
             }
+            $scope.updateRouteLocation = function (route, stop, index, old) {
+                console.log("Route", route);
+                console.log("stop", stop);
+                console.log("index", index);
+                let movingStop = null
+                let displacedStops = [];
+                for (item in $scope.routes) {
+                    if ($scope.routes[item].id == route) {
+                        let container = $scope.routes[item];
+                        let counter = 1;
+
+                        for (stopI in container.stops) {
+                            if (container.stops[stopI].id == stop) {
+                                movingStop = container.stops[stopI];
+                            } else {
+                                if (old > index) {
+                                    if (counter >= index) {
+                                        displacedStops.push(container.stops[stopI]);
+                                    }
+                                } else {
+                                    if (counter > index) {
+                                        displacedStops.push(container.stops[stopI]);
+                                    }
+                                }
+
+                            }
+
+                            counter++;
+                        }
+                    }
+                }
+                console.log("Moving stop", movingStop);
+                console.log("displacedStops", displacedStops);
+                $scope.updateRouteStop(movingStop);
+                setTimeout(function () {
+                    let counter = 1;
+                    if (displacedStops.length > 0) {
+                        for (item in displacedStops) {
+                            $scope.updateSpeed(displacedStops[item], counter);
+                            counter++;
+                            console.log("displacing stop", displacedStops[item]);
+                            if (counter == displacedStops.length) {
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 300 * (counter + 1));
+                            }
+                        }
+                    } else {
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300 * (counter + 1));
+                    }
+
+                }, 1000);
+
+            }
+            $scope.updateSpeed = function (stop, counter) {
+                setTimeout(function () {
+                    $scope.updateRouteStop(stop);
+                }, 300 * (counter + 1));
+            }
             $scope.getRoutes = function () {
-                console.log("Status",$scope.status);
-                console.log("provider",$scope.provider);
+                console.log("Status", $scope.status);
+                console.log("provider", $scope.provider);
                 $scope.page++;
                 let url = "includes=stops.address&order_by=id,asc&page=" + $scope.page + "&type=" + $scope.scenario + "&status=" + $scope.status + "&provider=" + $scope.provider;
                 if ($scope.status != "pending") {
@@ -186,7 +278,7 @@
                         });
             }
             $scope.updateRouteDelivery = function (stop) {
-                Routes.updateRouteStop(stop.route_id,stop.moving_delivery,stop.id).then(function (data) {
+                Routes.updateRouteStop(stop.route_id, stop.moving_delivery, stop.id).then(function (data) {
 
                 },
                         function (data) {
@@ -279,15 +371,15 @@
             }
             $scope.getInputs = function () {
                 let data;
-                if($scope.status=="enqueue"){
+                if ($scope.status == "enqueue") {
                     data = {
-                        "status":"enqueue"
+                        "status": "enqueue"
                     };
-                }else {
+                } else {
                     data = {
-                        "status":$scope.status,
-                        "provider":$scope.provider,
-                        "type":$scope.scenario
+                        "status": $scope.status,
+                        "provider": $scope.provider,
+                        "type": $scope.scenario
                     };
                 }
                 return data;
