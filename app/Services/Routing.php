@@ -52,11 +52,11 @@ class Routing {
     public function updateRouteStop($route, $stopContainer) {
         $stop = Stop::find($stopContainer);
         $oldRoute = $stop->route;
-        $oldRoute->unit--;
-        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
+        $oldRoute->unit -= $stop->amount;
+        $oldRoute->unit_price -= $stop->shipping;
         $oldRoute->save();
         $newRoute = Route::find($route);
-        $newRoute->unit++;
+        $newRoute->unit+= $stop->amount;
         $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
@@ -175,11 +175,11 @@ class Routing {
     public function sendStopToNewRoute($stopContainer) {
         $stop = Stop::find($stopContainer);
         $oldRoute = $stop->route;
-        $oldRoute->unit--;
-        $oldRoute->unit_price = $oldRoute->unit_price - $stop->shipping;
+        $oldRoute->unit -= $stop->amount;
+        $oldRoute->unit_price -= $stop->shipping;
         $oldRoute->save();
         $newRoute = $this->createNewRoute($oldRoute->type, $oldRoute->provider);
-        $newRoute->unit++;
+        $newRoute->unit += $stop->amount;
         $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;

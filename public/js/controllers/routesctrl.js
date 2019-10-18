@@ -103,6 +103,18 @@
                         dataIdAttr: route.id,
                         onAdd: function (/**Event*/evt) {
                             console.log("On add", evt);
+                            let attributes = evt.item.attributes;
+                            let routeString = evt.target.id;
+                            routeString = routeString.replace("route-", "");
+                            routeString = routeString.replace("-table", "");
+                            let route = parseInt(routeString);
+                            let stop = null;
+                            for (item in attributes) {
+                                if (attributes[item].name == "data-stop") {
+                                    stop = attributes[item].value;
+                                }
+                            }
+                            $scope.updateRouteLocation(route, stop, evt.newIndex, 1000);
                         },
                         onUpdate: function (/**Event*/evt) {
                             // same properties as onEnd
@@ -139,7 +151,6 @@
                     if ($scope.routes[item].id == route) {
                         let container = $scope.routes[item];
                         let counter = 1;
-
                         for (stopI in container.stops) {
                             if (container.stops[stopI].id == stop) {
                                 movingStop = container.stops[stopI];
@@ -153,16 +164,21 @@
                                         displacedStops.push(container.stops[stopI]);
                                     }
                                 }
-
                             }
-
                             counter++;
                         }
                     }
                 }
-                console.log("Moving stop", movingStop);
+                
                 console.log("displacedStops", displacedStops);
+                if(!movingStop){
+                    movingStop = {};
+                    movingStop.route_id = route;
+                    movingStop.id = stop;
+                }
+                console.log("Moving stop", movingStop);
                 $scope.updateRouteStop(movingStop);
+                
                 setTimeout(function () {
                     let counter = 1;
                     if (displacedStops.length > 0) {
@@ -181,9 +197,7 @@
                             window.location.reload();
                         }, 300 * (counter + 1));
                     }
-
                 }, 1000);
-
             }
             $scope.updateSpeed = function (stop, counter) {
                 setTimeout(function () {
@@ -271,7 +285,7 @@
             }
             $scope.updateRouteStop = function (stop) {
                 Routes.updateRouteStop(stop.id, stop.route_id).then(function (data) {
-
+                    
                 },
                         function (data) {
 
@@ -303,7 +317,7 @@
             }
             $scope.sendStopToNewRoute = function (stop) {
                 Routes.sendStopToNewRoute(stop).then(function (data) {
-
+                    window.location.reload();
                 },
                         function (data) {
 
@@ -311,7 +325,7 @@
             }
             $scope.addReturnStop = function (route) {
                 Routes.addReturnStop(route).then(function (data) {
-
+                    window.location.reload();
                 },
                         function (data) {
 
