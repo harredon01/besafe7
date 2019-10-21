@@ -14,10 +14,9 @@ class EditBooking {
 
     const MODEL_PATH = 'App\\Models\\';
     const BOOKING_APPROVED = 'booking_approved';
-    const BOOKING_CREATED_CLIENT_PENDING = 'booking_created_client_pending';
-    const BOOKING_CREATED_CLIENT_APPROVED = 'booking_created_client_approved';
     const BOOKING_CREATED_BOOKABLE_PENDING = 'booking_created_bookable_pending';
-    const BOOKING_CREATED_BOOKABLE_APPROVED = 'booking_created_bookable_approved';
+    const BOOKING_BOOKABLE_APPROVED = 'booking_bookable_approved';
+    const BOOKING_BOOKABLE_DENIED = 'booking_bookable_denied';
     const BOOKING_DENIED = 'booking_denied';
     const BOOKING_CANCELLED = 'booking_cancelled';
     const BOOKING_REMINDER = 'booking_reminder';
@@ -101,19 +100,19 @@ class EditBooking {
 //                ];
 //                dd($data2);
                 if ($dateTimestampFrom >= $dateTimestampUpper && $dateTimestampFrom <= $dateTimestampLower && $dateTimestampTo >= $dateTimestampUpper && $dateTimestampTo <= $dateTimestampLower) {
-                    return $this->checkBooking($data,$object);
+                    return $this->checkBooking($data, $object);
                 }
             }
 
             return false;
         }
-        return $this->checkBooking($data,$object);
+        return $this->checkBooking($data, $object);
     }
 
-    public function checkBooking($data,$object) {
+    public function checkBooking($data, $object) {
         $attributes = $object->attributes;
         $maxPerHour = 1;
-        if(array_key_exists("max_per_hour", $attributes)){
+        if (array_key_exists("max_per_hour", $attributes)) {
             $maxPerHour = $attributes['max_per_hour'];
         }
         $date = date_create($data['from']);
@@ -127,16 +126,16 @@ class EditBooking {
         foreach ($array2 as $value) {
             $found = false;
             foreach ($array1 as $item) {
-                if($item['id']==$value['id']){
+                if ($item['id'] == $value['id']) {
                     $found = true;
                     break;
                 }
             }
-            if(!$found){
+            if (!$found) {
                 array_push($array1, $value);
             }
         }
-        $totalHoping = count($array1)+1;
+        $totalHoping = count($array1) + 1;
         if ($totalHoping > $maxPerHour) {
             return false;
         } else {
@@ -177,6 +176,7 @@ class EditBooking {
                             $requiresUpdate = true;
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
+                            $this->handleAuthorizationRequest($user, $booking, $object);
                             $requiresAuth = true;
                             $update["options"]["status"] = "pending";
                         }
@@ -191,6 +191,29 @@ class EditBooking {
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    private function handleAuthorizationRequest($user, $booking, $object) {
+        $followers = [$object->user];
+        $payload = [
+            "booking_id" => $booking->id,
+            "first_name" => $user->firstName,
+            "last_name" => $user->lastName,
+            "booking_date" => $booking->starts_at,
+            "status" => "pending"
+        ];
+        $data = [
+            "trigger_id" => $user->id,
+            "message" => "",
+            "subject" => "",
+            "object" => "Merchant",
+            "sign" => true,
+            "payload" => $payload,
+            "type" => self::BOOKING_CREATED_BOOKABLE_PENDING,
+            "user_status" => $user->getUserNotifStatus()
+        ];
+        $date = date("Y-m-d H:i:s");
+        $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
     }
 
     /**
@@ -219,10 +242,16 @@ class EditBooking {
                 $updateData["options"]["status"] = $status;
                 if ($status == "approved") {
                     $updateData["total_paid"] = 0;
-                    $typeAlert = self::BOOKING_APPROVED;
+                    $typeAlert = self::BOOKING_BOOKABLE_APPROVED;
                 } elseif ($status == "denied") {
                     $updateData["options"]["reason"] = $data["reason"];
-                    $typeAlert = self::BOOKING_DENIED;
+                    $typeAlert = self::BOOKING_BOOKABLE_DENIED;
+                } elseif ($status == "active") {
+                    $updateData["options"]["reason"] = $data["reason"];
+                    $typeAlert = self::BOOKING_BOOKABLE_DENIED;
+                } elseif ($status == "started") {
+                    $updateData["options"]["reason"] = $data["reason"];
+                    $typeAlert = self::BOOKING_BOOKABLE_DENIED;
                 }
                 $options = $updateData["options"];
                 $updateData["options"] = json_encode($updateData["options"]);
@@ -245,7 +274,7 @@ class EditBooking {
                     "user_status" => $user->getUserNotifStatus()
                 ];
                 $date = date("Y-m-d H:i:s");
-                //$this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
+                $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
                 return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
             }
             return response()->json(array("status" => "error", "message" => "Access denied"), 400);
