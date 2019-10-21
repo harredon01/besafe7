@@ -8,6 +8,7 @@
             fecha: <span class="type">@{{ item.delivery | date}}</span><br/>
             Usuario: <span class="type">@{{ item.user.firstName}} @{{ item.user.lastName}}</span><br/>
             Email: <span class="type">@{{ item.user.email}}</span><br/>
+            Cel: <span class="type">@{{ item.user.cellphone}}</span><br/>
             Transporte: <span class="type">@{{ item.shipping}}</span><br/>
             <div ng-if="item.build">
                 <select ng-model="item.type_id" name="type_id" ng-change="selectMissingType(item)">

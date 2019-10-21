@@ -34,13 +34,14 @@
                             @{{ stop.id}}
                         </td>
                         <td>
-                            --@{{ stop.amount}}
+                            -@{{ stop.amount}}
                         </td>
                         <td>
                             @{{ stop.shipping}}
                         </td>
                         <td><input type="tel" name="Route" ng-model="stop.route_id"/>
-                            <button ng-click="updateRouteStop(stop)">Actualizar</button></td>
+                            <button ng-click="updateRouteStop(stop)">Actualizar</button><br/>-@{{ stop.address.address}}
+                        </td>
                         <td><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
                         <td><button ng-click="deleteStop(stop.id)">Borrar parada</button></td>
                     </tr>
