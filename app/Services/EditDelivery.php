@@ -43,12 +43,30 @@ class EditDelivery {
                         if ($validator->fails()) {
                             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
                         }
+                        $starter = "";
+                        if(array_key_exists('starter_id', $data)){
+                            if($data['starter_id']){
+                                $starter = $data['starter_id'];
+                            }
+                        }
+                        $drink = "";
+                        if(array_key_exists('drink_id', $data)){
+                            if($data['drink_id']){
+                                $drink = $data['drink_id'];
+                            }
+                        }
+                        $dessert = "";
+                        if(array_key_exists('dessert_id', $data)){
+                            if($data['dessert_id']){
+                                $dessert = $data['dessert_id'];
+                            }
+                        }
                         $dish = [
                             'type_id' => $data['type_id'],
-                            'starter_id' => $data['starter_id'],
-                            'drink_id' => $data['drink_id'],
+                            'starter_id' => $starter,
+                            'drink_id' => $drink,
                             'main_id' => $data['main_id'],
-                            'dessert_id' => $data['dessert_id']
+                            'dessert_id' => $dessert
                         ];
                         $details["dish"] = $dish;
                         $delivery->details = json_encode($details);
