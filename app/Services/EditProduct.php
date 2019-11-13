@@ -53,16 +53,14 @@ class EditProduct {
 
         $result = $this->checkAccessProduct($user, $product_id);
         if ($result['access'] == true) {
-            $data = Cache::remember('products_' . $product_id, 100, function ()use ($product_id) {
-                        $product = Product::find($product_id);
-                        $data = [];
-                        if ($product) {
-                            $data['product'] = $product;
-                            $data['variants'] = $product->productVariants;
-                            $data['files'] = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
-                        }
-                        return $data;
-                    });
+            $product = Product::find($product_id);
+            $data = [];
+            if ($product) {
+                $data['product'] = $product;
+                $data['variants'] = $product->productVariants;
+                $data['files'] = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
+            }
+            return $data;
             if ($result['owner'] == true) {
                 $product = $data['product'];
                 $product->mine = true;
@@ -454,7 +452,7 @@ class EditProduct {
                                 $imgInfo = [
                                     "file" => $items['products_files'][$j]->file
                                 ];
-                                
+
                                 array_push($resultsCategory[$k]['products'][$i]['imgs'], $imgInfo);
                                 break;
                             }
@@ -538,63 +536,18 @@ class EditProduct {
         $damerchant = DB::select('SELECT 
                                             DISTINCT(m.id),m.user_id
                                         FROM
-                                            merchants m
+                                            merchants m join merchant_user mu on m.id = mu.merchant_id
                                         WHERE
                                                 m.status = "active"
-                                                AND m.private = false
+                                                AND mu.user_id = ?
                                                 AND m.id IN ( 
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 
                                                 )
 
-                ;', [$product_id]);
+                ;', [$user->id, $product_id]);
         if (sizeof($damerchant) > 0) {
             $access = true;
-            if ($damerchant[0]->user_id == $user->id) {
-                $owner = true;
-            } else {
-                $owner = false;
-            }
-        } else {
-            $members = DB::select('select user_id as id '
-                            . 'from userables '
-                            . 'where user_id  = ? '
-                            . 'and userable_type = "Merchant" '
-                            . 'and object_id IN ( 
-                                                SELECT merchant_id from merchant_product mp 
-                                                JOIN merchants m ON m.id = mp.merchant_id WHERE mp.product_id = ? AND m.status = "active"
-                                                ) ', [$user->id, $product_id]);
-            if (sizeof($members) > 0) {
-                $access = true;
-            } else {
-                $groups = DB::select('SELECT 
-                                            DISTINCT(m.id),m.user_id
-                                        FROM
-                                            groups g
-                                                JOIN
-                                            group_user gu ON gu.group_id = g.id
-                                                JOIN
-                                            group_merchant gm ON gm.group_id = g.id
-                                                JOIN
-                                            merchants m ON gm.merchant_id = m.id
-                                        WHERE
-                                            m.status = "active"
-                                                AND g.status = "active"
-                                                AND gm.status = "active"
-                                                AND gu.level = "active"
-                                                AND m.status = "active"
-                                                AND m.private = false
-                                                AND gu.user_id = ?
-                                                AND gm.merchant_id IN ( 
-                                                SELECT merchant_id from merchant_product WHERE product_id = ? 
-                                                )
-
-                    ;', [$user->id, $product_id]);
-                if (sizeof($groups) > 0) {
-                    $access = true;
-                } else {
-                    
-                }
-            }
+            $owner = true;
         }
         $data = [
             "access" => $access,

@@ -153,7 +153,7 @@ Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatu
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::resource('merchants', 'MerchantApiController');
 
-
+Route::get('imagesapi', 'FileApiController@getFiles');
 Route::post('imagesapi', 'FileApiController@postFile');
 Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 

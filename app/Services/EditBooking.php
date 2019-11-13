@@ -194,14 +194,15 @@ class EditBooking {
     }
 
     private function handleAuthorizationRequest($user, $booking, $object) {
-        $followers = [$object->user];
+        $owner = $object->users()->first();
+        $followers = [$owner];
         $payload = [
             "booking_id" => $booking->id,
             "first_name" => $user->firstName,
             "last_name" => $user->lastName,
             "booking_date" => $booking->starts_at,
             "status" => "pending"
-        ];
+        ]; 
         $data = [
             "trigger_id" => $user->id,
             "message" => "",

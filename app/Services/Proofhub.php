@@ -13,8 +13,8 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-09-01';
-    const END_DATE = '2119-08-01';
+    const START_DATE = '2019-10-01';
+    const END_DATE = '2019-11-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
@@ -313,9 +313,18 @@ class Proofhub {
                 "name" => "igastoresbc",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::CANADA,
+                "type" => self::CUENTAS,
                 "price" => "Retail",
                 "code" => "2555537362",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Eighth Avenue",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1969531729",
                 "rows" => $copy,
             ],
             [
@@ -789,6 +798,78 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "3402238702",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Kerr Village",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1671237114",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "SCHWARZKOPF ARGENTINA",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "3541209474",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dirty Apron",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1497978202",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dirty Apron",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1497978202",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Fonnegra Agency",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "3568862513",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Backbone Website",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1523338129",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Volo",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1849937081",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Dicorp",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::CUENTAS,
+                "price" => "Retail",
+                "code" => "1759949368",
                 "rows" => $copy,
             ]
         ];

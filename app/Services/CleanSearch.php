@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
 use App\Models\Merchant;
+
 class CleanSearch {
 
     public function handle(User $user, Request $request) {
@@ -48,19 +49,55 @@ class CleanSearch {
             }
             $data = $request->all("merchant_id");
             if ($data['merchant_id']) {
-                $merchant = Merchant::find($data['merchant_id']);
-                if ($merchant) {
-                    if ($merchant->user_id == $user->id) {
-                        $request2 = Request::create($mystring . "&merchant_id=" . $merchant->id, 'GET');
-                    } else {
-                        return null;
-                    }
+                $members = DB::select('select merchant_id as id from merchant_user where user_id  = ? and merchant_id = ? ', [$user->id, $data['merchant_id']]);
+                if (sizeof($members) > 0) {
+                    $request2 = Request::create($mystring . "&merchant_id=" . $members[0]->id, 'GET');
                 } else {
                     return null;
                 }
             } else {
                 $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
-            } 
+            }
+        }
+
+        return $request2;
+    }
+
+    public function handleFiles(User $user, Request $request) {
+        $mystring = $request->getRequestUri();
+        $findme = '?';
+        $pos = strpos($mystring, $findme);
+        if ($pos === false) {
+            $request2 = Request::create($mystring . "?user_id=" . $user->id, 'GET');
+        } else {
+            $check = explode("?", $mystring);
+            if (count($check) != 2) {
+                return null;
+            }
+            $data = $request->all("user_id");
+            if ($data['user_id']) {
+                return null;
+            }
+            $data = $request->all(["type","trigger_id"]);
+            if ($data['type']) {
+                if ($data['type'] == "Merchant") {
+                    $members = DB::select('select merchant_id as id from merchant_user where user_id  = ? and merchant_id = ? ', [$user->id, $data['trigger_id']]);
+                    if (sizeof($members) > 0) {
+                        $request2 = Request::create($mystring, 'GET');
+                    } else {
+                        return null;
+                    }
+                } else if ($data['type'] == "Product") {
+                    $members = DB::select('select mp.product_id as id from merchant_user mu join merchant_product mp on mu.merchant_id = mp.merchant_id where mu.user_id  = ? and mp.product_id = ? ', [$user->id, $data['trigger_id']]);
+                    if (sizeof($members) > 0) {
+                        $request2 = Request::create($mystring, 'GET');
+                    } else {
+                        return null;
+                    }
+                }
+            } else {
+                $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
+            }
         }
 
         return $request2;

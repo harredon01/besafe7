@@ -351,14 +351,14 @@ class EditMapObject {
         if ($data['type'] == "Merchant") {
             $type = "merchants";
             $additionalFields = " type, telephone, address, ";
-            if($category){
+            if ($category) {
                 $joins = " join category_merchant cm on r.id = cm.merchant_id ";
                 $joinsWhere = " AND cm.category_id = :category ";
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
-            if($category){
+            if ($category) {
                 $joins = " join category_report cr on r.id = cm.report_id ";
                 $joinsWhere = " AND cr.category_id = :category ";
             }
@@ -670,7 +670,114 @@ class EditMapObject {
     public function createObject(User $user, array $data, $type) {
         $data["user_id"] = $user->id;
         $object = "App\\Models\\" . $type;
+        
+        $services = [];
+        $specialties = [];
+        $experience = [];
+        $attributes = [];
+        if (array_key_exists("service1", $data)) {
+            if ($data["service1"]) {
+                $container = ["name" => $data['service1']];
+                unset($data['service1']);
+                array_push($services, $container);
+            }
+        }
+        if (array_key_exists("service2", $data)) {
+            if ($data["service2"]) {
+                $container = ["name" => $data['service2']];
+                array_push($services, $container);
+                unset($data['service2']);
+            }
+        }
+        if (array_key_exists("service3", $data)) {
+            if ($data["service3"]) {
+                $container = ["name" => $data['service3']];
+                array_push($services, $container);
+                unset($data['service3']);
+            }
+        }
+        if (array_key_exists("specialty1", $data)) {
+            if ($data["specialty1"]) {
+                $container = ["name" => $data['specialty1']];
+                array_push($specialties, $container);
+                unset($data['specialty1']);
+            }
+        }
+        if (array_key_exists("specialty2", $data)) {
+            if ($data["specialty2"]) {
+                $container = ["name" => $data['specialty2']];
+                array_push($specialties, $container);
+                unset($data['specialty2']);
+            }
+        }
+        if (array_key_exists("specialty3", $data)) {
+            if ($data["specialty3"]) {
+                $container = ["name" => $data['specialty3']];
+                array_push($specialties, $container);
+                unset($data['specialty3']);
+            }
+        }
+        if (array_key_exists("experience1", $data)) {
+            if ($data["experience1"]) {
+                $container = ["name" => $data['experience1']];
+                array_push($experience, $container);
+                unset($data['experience1']);
+            }
+        }
+        if (array_key_exists("experience2", $data)) {
+            if ($data["experience2"]) {
+                $container = ["name" => $data['experience2']];
+                array_push($experience, $container);
+                unset($data['experience2']);
+            }
+        }
+        if (array_key_exists("experience3", $data)) {
+            if ($data["experience3"]) {
+                $container = ["name" => $data['experience3']];
+                array_push($experience, $container);
+                unset($data['experience3']);
+            }
+        }
+        $attributes['booking_requires_auth']=false;
+        if (array_key_exists("booking_requires_auth", $data)) {
+            if ($data["booking_requires_auth"]) {
+                $attributes['booking_requires_auth']=$data['booking_requires_auth'];
+                unset($data['booking_requires_auth']);
+            }
+        }
+        $attributes['years_experience']=1;
+        if (array_key_exists("years_experience", $data)) {
+            if ($data["years_experience"]) {
+                $attributes['years_experience']=$data['years_experience'];
+                unset($data['years_experience']);
+            }
+        }
+        $attributes['max_per_hour']=1;
+        if (array_key_exists("max_per_hour", $data)) {
+            if ($data["max_per_hour"]) {
+                $attributes['max_per_hour']=$data['max_per_hour'];
+                unset($data['max_per_hour']);
+            }
+        }
+        if(count($experience)>0){
+            $attributes['experience'] = $experience;
+        }
+        if(count($services)>0){
+            $attributes['services'] = $services;
+        }
+        if(count($specialties)>0){
+            $attributes['specialties'] = $specialties;
+        }
+        $data['attributes'] = $attributes;
+        $data['unit'] = "hour";
+        $data['status'] = "pending";
+        $data['base_cost'] = 0;
+        if (!array_key_exists("unit_cost", $data)) {
+            $data['unit_cost'] = 0;
+        }
+        $data['currency'] = "COP";
         $result = $object::create($data);
+        $user->merchants()->save($result);
         if (array_key_exists("groups", $data)) {
             //$this->saveToGroups($user, $data, $type, $result);
             dispatch(new SaveGroupsObject($user, $data, $type, $result));

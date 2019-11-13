@@ -262,7 +262,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#969696;font-family:'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <div style="line-height: 1.2; font-family: 'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px; color: #969696; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><strong><span style="color: #005c5e; font-size: 22px;">Menús del 21 de Octubre al 25 de Octubre.</span></strong></p>
+<p style="line-height: 1.2; text-align: center; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><strong><span style="color: #005c5e; font-size: 22px;">Menús del 28 de Octubre al 1 de Noviembre.</span></strong></p>
 <p style="line-height: 1.2; text-align: center; font-size: 16px; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px; color: #005c5e;">Opciones vegetarianas, Light &amp; completas</span></p>
 </div>
 </div>
@@ -296,7 +296,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.2; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #005C5E; mso-line-height-alt: 14px;">
-<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Lunes  21 de Octubre.</strong></span></p>
+<p style="font-size: 18px; line-height: 1.2; mso-line-height-alt: 22px; margin: 0;"><span style="font-size: 18px;"><strong>Lunes  28 de Octubre.</strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -304,9 +304,9 @@
 <div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
 <ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Filete de pescado blanco apanado, acompañado con arroz con coco y ensalada.  (salsa tártara por aparte).</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Pimiento relleno de vegetales, acompañado de puré de papa y aguacate.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Lomo de cerdo en salsa de ciruela (por aparte), puré de papa y ensalada.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Sopa mexicana, Crema de tomate, acompañada con pollo desmechado, aguacate, queso en cuadritos, crema de leche y totopos.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Sopa mexicana vegetariana.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Filet mignon, puré de papa, brócoli salteado.</span></li>
 </ul>
 </div>
 </div>
@@ -330,7 +330,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#005C5E;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #005C5E; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span style="background-color: transparent; font-size: 18px;"><strong>Martes </strong></span><strong style="font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; font-size: 18px;"> 22 de Octubre.</strong></span></p>
+<p style="line-height: 1.2; font-size: 12px; mso-line-height-alt: 14px; margin: 0;"><span style="font-size: 12px;"><span style="background-color: transparent; font-size: 18px;"><strong>Martes </strong></span><strong style="font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; font-size: 18px;"> 29 de Octubre.</strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -338,9 +338,9 @@
 <div style="color:#555555;font-family:'Droid Serif', Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
 <div style="font-size: 12px; line-height: 1.5; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; color: #555555; mso-line-height-alt: 18px;">
 <ul>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Sobrebarriga en salsa criolla, papa dorada y ensalada.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Hamburguesas de lentejas acompañadas papas doradas y ensalada.</span></li>
-<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light:Albóndigas de pavo acompañado con pasta corta (integral) y ensalada.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú completo: Filete de cerdo a la plancha bañada con salsa de champiñones. Acompañado con arroz de ajonjolí y verduras calientes.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú vegetariano: Musaca vegetariana, pan frances y ensalada.</span></li>
+<li style="font-size: 12px; line-height: 1.5; mso-line-height-alt: 18px;"><span style="font-size: 12px;">Menú light: Pechuga al horno, rodajas de berenjenas y ensalada - vinagreta.</span></li>
 </ul>
 </div>
 <p style="font-size: 13px; line-height: 1.5; color: #555555; font-family: 'Droid Serif', Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 20px; mso-ansi-font-size: 14px; margin: 0;"><span style="color: #000000; font-family: Arial; font-size: 13px; white-space: pre-wrap; background-color: #cfe2f3; mso-ansi-font-size: 14px;"> </span></p>

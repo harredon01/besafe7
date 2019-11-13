@@ -196,6 +196,7 @@ class MerchantApiController extends Controller {
             'id',
             'type',
             'name',
+            'description',
             'email',
             'telephone',
             'address',
@@ -205,6 +206,19 @@ class MerchantApiController extends Controller {
             'city_id',
             'region_id',
             'country_id',
+            'service1',
+            'service2',
+            'service3',
+            'specialty1',
+            'specialty2',
+            'specialty3',
+            'unit_cost',
+            'experience1',
+            'experience2',
+            'experience3',
+            'booking_requires_auth',
+            'max_per_hour',
+            'years_experience',
             'private'
         ]);
         return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));

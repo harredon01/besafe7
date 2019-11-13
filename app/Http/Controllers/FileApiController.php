@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Services\EditFile;
+use App\Services\CleanSearch;
+use Unlu\Laravel\Api\QueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\FileM;
 
 class FileApiController extends Controller {
 
@@ -13,6 +16,11 @@ class FileApiController extends Controller {
      *
      */
     protected $editFile;
+    /**
+     * The edit alerts implementation.
+     *
+     */
+    protected $cleanSearch;
 
 
     /**
@@ -20,8 +28,9 @@ class FileApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(EditFile $editFile) {
+    public function __construct(EditFile $editFile,CleanSearch $cleanSearch ) {
         $this->editFile = $editFile;
+        $this->cleanSearch = $cleanSearch;
         $this->middleware('auth:api');
     }
 
@@ -48,6 +57,30 @@ class FileApiController extends Controller {
     public function delete($file_id,Request $request) {
         $user = $request->user();
         return response()->json($this->editFile->delete($user, $file_id));
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getFiles(Request $request) {
+        $user = $request->user();
+        $request2 = $this->cleanSearch->handleFiles($user,$request);
+        if ($request2) {
+            $queryBuilder = new QueryBuilder(new FileM, $request2);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
     }
 
 }
