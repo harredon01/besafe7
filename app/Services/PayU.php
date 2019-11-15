@@ -1404,7 +1404,8 @@ class PayU {
         $transactionContainer['transaction_date'] = date("Y-m-d h:m:s");
         $transactionContainer['operationDate'] = date("Y-m-d h:m:s");
         $response['transactionResponse'] = $transactionContainer;
-        return ["status" => "error", "response" => $response, "message" => $dataSent];
+        //return ["status" => "error", "response" => $response, "message" => $dataSent];
+        return ["status" => "error", "response" => $response, "message" => "Error"];
     }
 
     public function sendRequest(array $data, $query) {

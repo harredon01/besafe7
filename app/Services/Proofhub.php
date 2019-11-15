@@ -13,8 +13,8 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-10-01';
-    const END_DATE = '2019-11-01';
+    const START_DATE = '2019-11-01';
+    const END_DATE = '2119-11-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
@@ -781,7 +781,7 @@ class Proofhub {
 //                  "price" => "Retail",
 //                  "code" => "3313974215",
 //                  "rows" => $copy,
-//                  ],
+//                  ],https://backbone.proofhub.com/bapp/#overview/3669257430
             [
                 "name" => "Backbone Print",
                 "budget" => "0",
@@ -789,6 +789,15 @@ class Proofhub {
                 "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "2803356359",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "CRUX",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3669257430",
                 "rows" => $copy,
             ],
             [

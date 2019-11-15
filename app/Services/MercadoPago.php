@@ -15,6 +15,8 @@ use App\Jobs\ApprovePayment;
 use App\Jobs\DenyPayment;
 use App\Jobs\PendingPayment;
 use App\Jobs\SaveCard;
+use App\Mail\EmailPaymentCash;
+use App\Mail\EmailPaymentPse;
 use App\Models\Source;
 use Carbon\Carbon;
 use App\Models\Subscription;
@@ -44,271 +46,33 @@ class MercadoPago {
      */
     public function __construct() {
         MercadoPago\SDK::setAccessToken("ENV_ACCESS_TOKEN");
-        $this->openTok = new OpenTok(env('OPENTOK_API_KEY'), env('OPENTOK_API_SECRET'));
+        $this->notifications = app('Notifications');
     }
 
-    public function payCreditCardT(User $user,array $data) {
+    public function payCreditCardT(User $user, array $data) {
         $localPayment = Payment::find($data["payment_id"]);
-        $payment = new MercadoPago\Payment();
-        $payment->transaction_amount = $localPayment->total;
-        $payment->token = $data["token"];
-        $payment->description = "Heavy Duty Wool Bench";
-        $payment->installments = $data["installments"];
-        $payment->issuer_id = $data["issuer_id"];
-        $payment->payment_method_id = $data["payment_method_id"];
-        $payment->payer = array(
-            "email" => $data["email"]
-        );
-        // Save and posting the payment
-        $payment->save();
+        $this->useCreditCardOptions($user, $data, $localPayment, "Mevico");
     }
-    
+
     public function getPaymentMethods(array $data) {
-        $localPayment = Payment::find($data["payment_id"]);
-        $payment = new MercadoPago\Payment();
-        $payment->transaction_amount = $localPayment->total;
-        $payment->token = $data["token"];
-        $payment->description = "Heavy Duty Wool Bench";
-        $payment->installments = $data["installments"];
-        $payment->payment_method_id = $data["payment_method_id"];
-        $payment->payer = array(
-            "email" => $data["email"]
-        );
-        // Save and posting the payment
-        $payment->save();
-    }
-
-    private function populatePaymentContent(Payment $payment, $platform) {
-        if ($payment->user_id == 2 || $payment->user_id == 77) {
-            $accountId = env('PAYU_TEST_ACCOUNT', "512321");
-            $apiKey = env('PAYU_TEST_KEY');
-            $merchantId = env('PAYU_TEST_MERCHANT', "508029");
-        } else {
-            $accountId = env('PAYU_ACCOUNT');
-            $apiKey = env('PAYU_KEY');
-            $merchantId = env('PAYU_MERCHANT');
-        }
-
-        $reference = $payment->referenceCode;
-        $paymentTotal = $payment->total;
-        $currency = "COP";
-        $str = $apiKey . "~" . $merchantId . "~" . $reference . "~" . number_format($paymentTotal, 0, '.', '') . "~" . $currency;
-        $sig = sha1($str);
-        $orderCont = [
-            "accountId" => $accountId,
-            "referenceCode" => $reference,
-            "description" => "Pago Lonchis app # " . $payment->id,
-            "language" => "es",
-            "signature" => $sig,
-            "notifyUrl" => env('APP_URL') . "/api/payu/webhook",
-        ];
-        return $orderCont;
-    }
-
-    private function populateBuyer(User $user, array $data) {
-        $buyerAddress = [
-            "street1" => $data['buyer_address'],
-            "street2" => "",
-            "city" => $data['buyer_city'],
-            "state" => $data['buyer_state'],
-            "country" => $data['buyer_country'],
-            "postalCode" => $data['buyer_postal'],
-            "phone" => $data['buyer_phone']
-        ];
-        $buyer = [
-            "merchantBuyerId" => "1",
-            "fullName" => $user->firstName . " " . $user->lastName,
-            "emailAddress" => $user->email,
-            "contactPhone" => $user->cellphone,
-            "dniNumber" => $user->docNum,
-            "shippingAddress" => $buyerAddress
-        ];
-        return $buyer;
-    }
-
-    private function populateBuyerAddress(User $user) {
-        $address = $user->addresses()->where("type", "buyer")->first();
-        if ($address) {
-            $region = Region::find($address->region_id);
-            $country = Country::find($address->country_id);
-            $city = City::find($address->city_id);
-            $buyerAddress = [
-                "street1" => $address->address,
-                "street2" => "",
-                "city" => $city->name,
-                "state" => $region->name,
-                "country" => $country->code,
-                "postalCode" => $address->postal,
-                "phone" => $address->phone
-            ];
-            $buyer = [
-                "merchantBuyerId" => "1",
-                "fullName" => $user->firstName . " " . $user->lastName,
-                "emailAddress" => $user->email,
-                "contactPhone" => $user->cellphone,
-                "dniNumber" => $user->docNum,
-                "shippingAddress" => $buyerAddress
-            ];
-            return $buyer;
-        }
-        return null;
-    }
-
-    private function populateMerchant($user) {
-        $apiLogin = env('PAYU_LOGIN');
-        $apiKey = env('PAYU_KEY');
-        if ($user) {
-            if ($user->id == 2 || $user->id == 77) {
-                $apiLogin = env('PAYU_TEST_LOGIN');
-                $apiKey = env('PAYU_TEST_KEY');
-            }
-        }
-
-        $merchant = [
-            'apiLogin' => $apiLogin,
-            'apiKey' => $apiKey
-        ];
-        return $merchant;
-    }
-
-    private function populatePayer(array $data) {
-
-        $payerAddress = [
-            "street1" => $data['payer_address'],
-            "street2" => "",
-            "city" => $data['payer_city'],
-            "state" => $data['payer_state'],
-            "country" => $data['payer_country'],
-            "postalCode" => $data['payer_postal'],
-            "phone" => $data['payer_phone']
-        ];
-        $payer = [
-            "merchantPayerId" => "1",
-            "fullName" => $data['payer_name'],
-            "emailAddress" => $data['payer_email'],
-            "contactPhone" => $data['payer_phone'],
-            "dniNumber" => $data['payer_id'],
-            "dniType" => "CC",
-            "billingAddress" => $payerAddress
-        ];
-        return $payer;
-    }
-
-    private function populatePayerSimple(array $data) {
-
-        $payer = [
-            "merchantPayerId" => "1",
-            "fullName" => $data['payer_name'],
-            "emailAddress" => $data['payer_email'],
-            "contactPhone" => $data['payer_phone'],
-        ];
-        return $payer;
-    }
-
-    private function populateBuyerSimple(User $user) {
-        $buyer = [
-            "fullName" => $user->firstName . " " . $user->lastName,
-            "emailAddress" => $user->email,
-            "contactPhone" => $user->cellphone,
-            "dniNumber" => $user->docNum,
-        ];
-        return $buyer;
-    }
-
-    private function populateShipping(array $data) {
-        $ShippingAddress = [
-            "street1" => $data['shipping_address'],
-            "street2" => "",
-            "city" => $data['shipping_city'],
-            "state" => $data['shipping_state'],
-            "country" => $data['shipping_country'],
-            "postalCode" => $data['shipping_postal'],
-            "phone" => $data['shipping_phone']
-        ];
-        return $ShippingAddress;
-    }
-
-    public function populateShippingFromAddress($addressId, array $data) {
-        $address = OrderAddress::find($addressId);
-        if ($address) {
-            $region = Region::find($address->region_id);
-            $country = Country::find($address->country_id);
-            $city = City::find($address->city_id);
-            $data['shipping_address'] = $address->address;
-            $data['shipping_city'] = $city->name;
-            $data['shipping_state'] = $region->name;
-            $data['shipping_country'] = $country->code;
-            $data['shipping_postal'] = $address->postal;
-            $data['shipping_phone'] = $address->phone;
-        } else {
-            $data['shipping_address'] = $data['buyer_address'];
-            $data['shipping_city'] = $data['buyer_city'];
-            $data['shipping_state'] = $data['buyer_state'];
-            $data['shipping_country'] = $data['buyer_country'];
-            $data['shipping_postal'] = $data['buyer_postal'];
-            $data['shipping_phone'] = $data['buyer_phone'];
-        }
-        return $this->populateShipping($data);
-    }
-
-    private function populateCC(array $data) {
-
-        $creditCard = [
-            "number" => $data['cc_number'],
-            "securityCode" => $data['cc_security_code'],
-            "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
-            "name" => $data['cc_name']
-        ];
-        return $creditCard;
-    }
-
-    private function populateTotals(Payment $payment, $currency) {
-        $additionalValues = [
-            'value' => number_format($payment->total, 2, '.', ''),
-            'currency' => $currency
-        ];
-        $additionalValuesTax = [
-            'value' => number_format($payment->tax, 2, '.', ''),
-            'currency' => $currency
-        ];
-        $return = 0;
-        if ($payment->tax > 0) {
-            $return = $payment->total - $payment->tax;
-        }
-
-        $additionalValuesReturnBase = [
-            'value' => number_format($return, 2, '.', ''),
-            'currency' => $currency
-        ];
-        $additionalValuesCont = [
-            'TX_VALUE' => $additionalValues,
-            'TX_TAX' => $additionalValuesTax,
-            'TX_TAX_RETURN_BASE' => $additionalValuesReturnBase,
-        ];
-        return $additionalValuesCont;
+        return MercadoPago::get("/v1/payment_methods");
     }
 
     public function useCreditCardOptions(User $user, array $data, Payment $payment, $platform) {
         if (array_key_exists("quick", $data)) {
             return $this->quickPayCreditCard($user, $data, $payment, $platform);
         }
-        if (array_key_exists("token", $data)) {
-            return $this->useToken($user, $data, $payment, $platform);
-        } else {
-            $paymentResult = $this->payCreditCard($user, $data, $payment, $platform);
-            if ($paymentResult['response']['code'] == "SUCCESS") {
-                if ($paymentResult['response']['transactionResponse']['state'] == "APPROVED") {
-                    if (array_key_exists("save_card", $data)) {
-                        if ($data['save_card']) {
-                            dispatch(new SaveCard($user, $data, "PayU"));
-                            //return $gateway->createToken($user, $data);
-                        }
-                    }
+        $paymentResult = $this->payCreditCard($user, $data, $payment, $platform);
+        if ($paymentResult['status'] == "success") {
+            if (array_key_exists("save_card", $data)) {
+                if ($data['save_card']) {
+                    dispatch(new SaveCard($user, $data, "MercadoPago"));
+                    //return $gateway->createToken($user, $data);
                 }
             }
-
-            return $paymentResult;
         }
+
+        return $paymentResult;
     }
 
     private function getTestVar(User $user) {
@@ -329,70 +93,28 @@ class MercadoPago {
     }
 
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
-        $source = $user->sources()->where("has_default", true)->where("gateway", "PayU")->first();
+        $source = $user->sources()->where("has_default", true)->where("gateway", "MercadoPago")->first();
         if ($source) {
             
         } else {
             return response()->json(array("status" => "error", "message" => "No default card"), 400);
         }
-        $buyer = $this->populateBuyerAddress($user);
-
-
-        $extras = json_decode($source->extra, true);
-        $payerAddress = [
-            "street1" => $extras['billingAddress']['street1'],
-            "street2" => "",
-            "city" => $extras['billingAddress']['city'],
-            "state" => $extras['billingAddress']['state'],
-            "country" => $extras['billingAddress']['country'],
-            "postalCode" => $extras['billingAddress']['postalCode'],
-            "phone" => $extras['billingAddress']['phone']
-        ];
-        $payer = [
-            "merchantPayerId" => "1",
-            "fullName" => $extras['fullName'],
-            "emailAddress" => $extras['emailAddress'],
-            "contactPhone" => $extras['billingAddress']['phone'],
-            "dniNumber" => $extras['dniNumber'],
-            "dniType" => "CC",
-            "billingAddress" => $payerAddress
-        ];
-        $merchant = $this->populateMerchant($user);
-        $orderCont = $this->populatePaymentContent($payment, $platform);
-        $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont["additionalValues"] = $additionalValuesCont;
-        $orderCont["buyer"] = $buyer;
-        if ($payment->address_id) {
-            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, []);
-            $orderCont["shippingAddress"] = $ShippingAddress;
+        $validator = $this->validatorQuickPayment($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-
-        $extraParams = [
-            "INSTALLMENTS_NUMBER" => 1
-        ];
-        $deviceSessionId = md5(session_id() . microtime());
-        $cookie = md5($deviceSessionId);
-        $transaction = [
-            "order" => $orderCont,
-            "payer" => $payer,
-            "creditCardTokenId" => $source->source,
-            "extraParameters" => $extraParams,
-            "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => $extras['method'],
-            "paymentCountry" => $extras['billingAddress']['country'],
-            "deviceSessionId" => $deviceSessionId,
-            "ipAddress" => $data['ip_address'],
-            "cookie" => $cookie,
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "SUBMIT_TRANSACTION",
-            "merchant" => $merchant,
-            "transaction" => $transaction,
-            "test" => $this->getTestVar($user),
-        ];
-        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
+        $paymentM = new MercadoPago\Payment();
+        $paymentM->transaction_amount = $payment->total;
+        $paymentM->external_reference = $payment->referenceCode;
+        $paymentM->token = $data["token"];
+        $paymentM->description = "Pago Mevico app # " . $payment->id;
+        $paymentM->payer = array(
+            "type" => "customer",
+            "id" => $source->client_id
+        );
+        // Save and posting the payment
+        $paymentM->save();
+        return $this->handleTransactionResponse($paymentM, $user, $payment, $platform);
     }
 
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
@@ -401,169 +123,62 @@ class MercadoPago {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
 
-        $validator = $this->validatorBuyer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $validator = $this->validatorPayer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $validator = $this->validatorCC($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $buyer = $this->populateBuyer($user, $data);
-
-
-        $payer = $this->populatePayer($data);
-        $creditCard = $this->populateCC($data);
-        $merchant = $this->populateMerchant($user);
-        $orderCont = $this->populatePaymentContent($payment, $platform);
-        $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont["additionalValues"] = $additionalValuesCont;
-        $orderCont["buyer"] = $buyer;
-        if ($payment->address_id) {
-            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
-            $orderCont["shippingAddress"] = $ShippingAddress;
-        }
-
-        $extraParams = [
-            "INSTALLMENTS_NUMBER" => 1
-        ];
-        $deviceSessionId = md5(session_id() . microtime());
-        $cookie = md5($deviceSessionId);
-        $transaction = [
-            "order" => $orderCont,
-            "payer" => $payer,
-            "creditCard" => $creditCard,
-            "extraParameters" => $extraParams,
-            "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => $data['cc_branch'],
-            "paymentCountry" => $data['payer_country'],
-            "deviceSessionId" => $deviceSessionId,
-            "ipAddress" => $data['ip_address'],
-            "cookie" => $cookie,
-            "userAgent" => $data['user_agent']
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "SUBMIT_TRANSACTION",
-            "merchant" => $merchant,
-            "transaction" => $transaction,
-            "test" => $this->getTestVar($user),
-        ];
-        //dd($dataSent);
-        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
+        $paymentM = new MercadoPago\Payment();
+        $paymentM->transaction_amount = $payment->total;
+        $paymentM->token = $data["token"];
+        $paymentM->description = "Pago Mevico app # " . $payment->id;
+        $paymentM->installments = $data["installments"];
+        $paymentM->external_reference = $payment->referenceCode;
+        $paymentM->issuer_id = $data["issuer_id"];
+        $paymentM->payment_method_id = $data["payment_method_id"];
+        $paymentM->payer = array(
+            "email" => $data["email"]
+        );
+        // Save and posting the payment
+        $paymentM->save();
+        return $this->handleTransactionResponse($paymentM, $user, $payment, $platform);
     }
 
     public function useSource(User $user, array $data, Payment $payment, $platform) {
-        $validator = $this->validatorBuyer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $validator = $this->validatorPayer($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $buyer = $this->populateBuyer($user, $data);
-
-        $payer = $this->populatePayer($data);
-        $validator = $this->validatorUseSource($data);
-
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $merchant = $this->populateMerchant($user);
-
-        $creditCardTokenId = $data['source'];
-        $deviceSessionId = md5(session_id() . microtime());
-        $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont = $this->populatePaymentContent($payment, $platform);
-        $orderCont["additionalValues"] = $additionalValuesCont;
-        $orderCont["buyer"] = $buyer;
-        if ($payment->address_id) {
-            $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
-            $orderCont["shippingAddress"] = $ShippingAddress;
-        }
-        $extraParams = [
-            "INSTALLMENTS_NUMBER" => 1
-        ];
-        $transaction = [
-            "order" => $orderCont,
-            "payer" => $payer,
-            "creditCardTokenId" => $creditCardTokenId,
-            "extraParameters" => $extraParams,
-            "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => $data['cc_branch'],
-            "paymentCountry" => $data['payer_country'],
-            "deviceSessionId" => $deviceSessionId,
-            "ipAddress" => $data['ip_address'],
-            "cookie" => $data['cookie'],
-            "userAgent" => $data['user_agent']
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "SUBMIT_TRANSACTION",
-            "merchant" => $merchant,
-            "transaction" => $transaction,
-            "test" => $this->getTestVar($user),
-        ];
-//        return $dataSent;
-        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
-        return $this->handleTransactionResponse($result, $user, $payment, $dataSent, $platform, "COP");
+        return $this->quickPayCreditCard($user, $data, $payment, $platform);
     }
 
     public function payDebitCard(User $user, array $data, Payment $payment, $platform) {
 
-        $validator = $this->validatorPayerSimple($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
-        $payer = $this->populatePayerSimple($data);
-        $buyer = $this->populateBuyerSimple($user);
         $validator = $this->validatorDebit($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $merchant = $this->populateMerchant($user);
-        $deviceSessionId = md5(session_id() . microtime());
-        $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $orderCont = $this->populatePaymentContent($payment, $platform);
-        $orderCont["additionalValues"] = $additionalValuesCont;
-        $orderCont["buyer"] = $buyer;
-
-
-        $extraParams = [
-            "RESPONSE_URL" => env('APP_URL') . "/payu/return",
-            "PSE_REFERENCE1" => $data['ip_address'],
-            "FINANCIAL_INSTITUTION_CODE" => $data['financial_institution_code'],
-            "USER_TYPE" => $data['user_type'],
-            "PSE_REFERENCE2" => $data['doc_type'],
-            "PSE_REFERENCE3" => $data['payer_id']
-        ];
-        $transaction = [
-            "order" => $orderCont,
-            "payer" => $payer,
-            "extraParameters" => $extraParams,
-            "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => "PSE",
-            "paymentCountry" => "CO",
-            "deviceSessionId" => $deviceSessionId,
-            "ipAddress" => $data['ip_address'],
-            "cookie" => $data['cookie'],
-            "userAgent" => $data['user_agent']
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "SUBMIT_TRANSACTION",
-            "merchant" => $merchant,
-            "transaction" => $transaction,
-            "test" => "false",
-        ];
-
-        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        $paymentM = new MercadoPago\Payment();
+        $paymentM->transaction_amount = $payment->total;
+        $paymentM->external_reference = $payment->referenceCode;
+        $paymentM->description = "Pago Mevico app # " . $payment->id;
+        $paymentM->external_reference = $payment->referenceCode;
+        $paymentM->payer = array(
+            "email" => $data["email"],
+            "identification" => array(
+                "type" => $data["doc_type"],
+                "number" => $data["doc_num"]
+            ),
+            "entity_type" => "individual"
+        );
+        $paymentM->transaction_details = array(
+            "financial_institution" => $data["financial_institution"]
+        );
+        $paymentM->additional_info = array(
+            "ip_address" => $data['ip_address']
+        );
+        $paymentM->callback_url = "http://www.your-site.com";
+        $paymentM->payment_method_id = "pse";
+        $paymentM->save();
+        $url = "";
+        if (array_key_exists("email", $data)) {
+            if ($paymentM->pending_waiting_payment == 'pending_waiting_transfer') {
+                $transaction = $paymentM->transaction_details;
+                $url = $transaction->external_resource_url;
+                Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
+            }
+        }
     }
 
     public function payCash(User $user, array $data, Payment $payment, $platform) {
@@ -572,31 +187,22 @@ class MercadoPago {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
 
-        $additionalValuesCont = $this->populateTotals($payment, "COP");
-        $merchant = $this->populateMerchant($user);
-        $buyer = $this->populateBuyerSimple($user);
-        $orderCont = $this->populatePaymentContent($payment, $platform);
-        $orderCont["additionalValues"] = $additionalValuesCont;
-        $orderCont["buyer"] = $buyer;
-        $date = date_create();
-        date_add($date, date_interval_create_from_date_string("7 days"));
-        $date = date_format($date, "Y-m-d") . "T" . date_format($date, "G:i:s");
-        $transaction = [
-            "order" => $orderCont,
-            "type" => "AUTHORIZATION_AND_CAPTURE",
-            "paymentMethod" => $data['payment_method'],
-            "paymentCountry" => "CO",
-            "ipAddress" => $data['ip_address'],
-            "expirationDate" => $date,
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "SUBMIT_TRANSACTION",
-            "merchant" => $merchant,
-            "transaction" => $transaction,
-            "test" => "false",
-        ];
-        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        $paymentM = new MercadoPago\Payment();
+        $paymentM->transaction_amount = $payment->total;
+        $paymentM->external_reference = $payment->referenceCode;
+        $paymentM->description = "Pago Mevico app # " . $payment->id;
+        $paymentM->payer = array(
+            "email" => $data["email"]
+        );
+        $paymentM->payment_method_id = $data["payment_method_id"];
+        $paymentM->save();
+        if (array_key_exists("email", $data)) {
+            if ($paymentM->pending_waiting_payment == 'pending_waiting_payment') {
+                $transaction = $paymentM->transaction_details;
+                $url = $transaction->external_resource_url;
+                Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, null));
+            }
+        }
     }
 
     public function makeCharge(User $user, Order $order, array $payload) {
@@ -705,20 +311,7 @@ class MercadoPago {
     public function getSources(Source $source) {
         $client = $this->getClient($source);
         if ($client) {
-            if (array_key_exists('creditCards', $client)) {
-                $sources = $client['creditCards'];
-                $result = array();
-                foreach ($sources as $item) {
-                    if ($item['token'] == $source->source) {
-                        $item['is_default'] = true;
-                    } else {
-                        $item['is_default'] = false;
-                    }
-                    array_push($result, $item);
-                }
-                return $result;
-            }
-            return array();
+            return $client->cards();
         }
         return array();
     }
@@ -758,8 +351,18 @@ class MercadoPago {
     }
 
     public function getClient(Source $source) {
-        $url = $this->getTestUrl($source->user) . env('PAYU_REST') . 'customers/' . $source->client_id;
-        return $this->sendGet($url);
+        $user = $source->user;
+        $filters = array(
+            "email" => $user->email
+        );
+
+        $customers = MercadoPago\Customer::search($filters);
+        $paging = $customers->paging;
+        $results = $customers->results;
+        if (count($results) > 0) {
+            return $results[0];
+        }
+        return null;
     }
 
     public function deleteClient(User $user, $client) {
@@ -1158,51 +761,48 @@ class MercadoPago {
     }
 
     public function createToken(User $user, array $data) {
-        $source = $user->sources()->where("gateway", "PayU")->first();
+        $source = $user->sources()->where("gateway", "MercadoPago")->first();
+        $customer = null;
         if ($source) {
-            if ($source->source) {
-                $this->deleteToken($user);
+            $customer = MercadoPago\Customer::find_by_id($source->client_id);
+        } else {
+            $filters = array(
+                "email" => $user->email
+            );
+            $customers = MercadoPago\Customer::search($filters);
+            $results = $customers->results;
+            if (count($results) > 0) {
+                $customer = $customers[0];
             }
         }
-        $merchant = $this->populateMerchant($user);
-        $creditCardToken = [
-            "payerId" => $user->id,
-            "name" => $data['payer_name'],
-            "identificationNumber" => $data['payer_id'],
-            "paymentMethod" => $data['cc_branch'],
-            "number" => $data['cc_number'],
-            "expirationDate" => "20" . $data['cc_expiration_year'] . "/" . $data['cc_expiration_month'],
-            "name" => $data['cc_name']
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "CREATE_TOKEN",
-            "merchant" => $merchant,
-            "creditCardToken" => $creditCardToken,
-        ];
-        $payer = $this->populatePayer($data);
-        $payer['method'] = $data['cc_branch'];
-        //dd($dataSent);
-
-        $result = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
-        if ($result['code'] == "SUCCESS") {
-            $token = $result['creditCardToken'];
-            if ($source) {
-                $source->source = $token['creditCardTokenId'];
-                $source->extra = json_encode($payer);
-                $source->has_default = true;
-                $source->save();
-            } else {
-                $source = new Source([
-                    "gateway" => "PayU",
-                    "source" => $token['creditCardTokenId'],
-                    "has_default" => true,
-                    "extra" => json_encode($payer)
-                ]);
-                $user->sources()->save($source);
-            }
+        if ($customer) {
+            $card = new MercadoPago\Card();
+            $card->token = $data["token"];
+            $card->customer_id = $customer->id;
+            $card->save();
+        } else {
+            $customer = new MercadoPago\Customer();
+            $customer->email = $user->email;
+            $customer->save();
+            $card = new MercadoPago\Card();
+            $card->token = $data["token"];
+            $card->customer_id = $customer->id;
+            $card->save();
         }
-        return $result;
+        if ($source) {
+            $source->source = $data["token"];
+            $source->extra = json_encode($card);
+            $source->save();
+        } else {
+            $source = new Source([
+                "gateway" => "MercadoPago",
+                "client_id" => $customer->id,
+                "source" => $data["token"],
+                "has_default" => true,
+                "extra" => json_encode($card)
+            ]);
+            $user->sources()->save($source);
+        }
     }
 
     public function deleteToken(User $user) {
@@ -1258,7 +858,7 @@ class MercadoPago {
     }
 
     public function checkTokens() {
-        $sources = Source::where("has_default", true)->where("gateway", "PayU")->get();
+        $sources = Source::where("has_default", true)->where("gateway", "MercadoPago")->get();
         foreach ($sources as $value) {
             $this->checkToken($value);
         }
@@ -1347,24 +947,16 @@ class MercadoPago {
     }
 
     public function getStatusOrderRef($order_ref) {
-        $apiLogin = env('PAYU_LOGIN');
-        $apiKey = env('PAYU_KEY');
-        $merchant = [
-            'apiLogin' => $apiLogin,
-            'apiKey' => $apiKey
-        ];
-        $details = [
-            'referenceCode' => $order_ref
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "ORDER_DETAIL_BY_REFERENCE_CODE",
-            "merchant" => $merchant,
-            "details" => $details,
-            "test" => false,
-        ];
-
-        return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_REPORTS'));
+        $filters = array(
+            "external_reference" => $order_ref
+        );
+        $customers = MercadoPago\Payment::search($filters);
+        $paging = $customers->paging;
+        $results = $customers->results;
+        if (count($results) > 0) {
+            return $results[0];
+        }
+        return null;
     }
 
     public function getStatusTransaction($transaction_id) {
@@ -1388,163 +980,61 @@ class MercadoPago {
         return $this->sendRequest($dataSent, $this->getTestUrl(null) . env('PAYU_PAYMENTS'));
     }
 
-    public function handleTransactionResponse($response, User $user, Payment $payment, $dataSent, $platform, $currency) {
-        if ($response['code'] == "SUCCESS") {
-            if ($user) {
-                $transactionResponse = $response['transactionResponse'];
-                $transactionContainer = [];
-                $transactionContainer['order_id'] = $payment->order_id;
-                $transactionContainer['reference_sale'] = $payment->referenceCode;
-                $transactionContainer['user_id'] = $user->id;
-                $transactionContainer['gateway'] = 'PayU';
-                $transactionContainer['currency'] = $currency;
-                $transactionContainer['payment_method'] = 'CreditCard';
-                $transactionContainer['description'] = $transactionResponse['responseMessage'];
-                $transactionContainer['transaction_id'] = $transactionResponse['transactionId'];
-                $transactionContainer['transaction_state'] = $transactionResponse['state'];
-                $transactionContainer['response_code'] = $transactionResponse['responseCode'];
-                $transactionContainer['transaction_date'] = date("Y-m-d h:m:s", $transactionResponse['operationDate'] / 1000);
-                $transactionContainer["extras"] = json_encode($transactionResponse);
-                /* if (array_key_exists("extras", $transactionResponse)) {
-                  $extras = $transactionResponse['extras'];
-                  unset($transactionResponse['extras']);
-                  $transactionResponse['extras'] = json_encode($extras);
-                  } */
-                $transaction = Transaction::create($transactionContainer);
-                $payment->transactions()->save($transaction);
-                if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApprovePayment($payment, $platform));
-                } else if ($transactionResponse['state'] == 'PENDING') {
-                    dispatch(new PendingPayment($payment, $platform));
-                } else {
-                    dispatch(new DenyPayment($payment, $platform));
-                }
-                $transaction->ur = $this->getTestUrl($user);
-                return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
+    public function handleTransactionResponse($response, User $user, Payment $payment, $platform) {
+        if ($user) {
+            $transactionContainer = [];
+            $transactionContainer['order_id'] = $payment->order_id;
+            $transactionContainer['reference_sale'] = $payment->referenceCode;
+            $transactionContainer['user_id'] = $user->id;
+            $transactionContainer['gateway'] = 'MercadoPago';
+            $transactionContainer['currency'] = $response->currency_id;
+            $transactionContainer['payment_method'] = $response->payment_type_id;
+            $transactionContainer['description'] = $response->status_detail;
+            $transactionContainer['transaction_id'] = $response->id;
+            $transactionContainer['transaction_state'] = "complete";
+            $transactionContainer['response_code'] = $response->id;
+            $transactionContainer['transaction_date'] = $response->date_last_updated;
+            $transactionContainer["extras"] = json_encode($response);
+            $transaction = Transaction::create($transactionContainer);
+            $payment->transactions()->save($transaction);
+            $message = $this->getMessage($response);
+            if ($response->status == "approved") {
+                dispatch(new ApprovePayment($payment, $platform));
+            } else if ($response->status == "in_process") {
+                dispatch(new PendingPayment($payment, $platform));
+            } else {
+                dispatch(new DenyPayment($payment, $platform));
             }
+            $transaction->ur = $this->getTestUrl($user);
+            return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $message];
         }
-        $transactionContainer = [];
-        $transactionContainer['order_id'] = $payment->order_id;
-        $transactionContainer['orderId'] = $payment->order_id;
-        $transactionContainer['reference_sale'] = $payment->referenceCode;
-        $transactionContainer['user_id'] = $user->id;
-        $transactionContainer['gateway'] = 'PayU';
-        $transactionContainer['currency'] = $currency;
-        $transactionContainer["url"] = $this->getTestUrl($user);
-        $transactionContainer['payment_method'] = 'CreditCard';
-        $transactionContainer['description'] = "error";
-        $transactionContainer['transaction_id'] = "-1";
-        $transactionContainer['transaction_state'] = "ERROR";
-        $transactionContainer['response_code'] = "ERROR";
-        $transactionContainer['responseMessage'] = "ERROR";
-        $transactionContainer['transactionId'] = "-1";
-        $transactionContainer['state'] = "ERROR";
-        $transactionContainer['responseCode'] = "ERROR";
-        $transactionContainer['transaction_date'] = date("Y-m-d h:m:s");
-        $transactionContainer['operationDate'] = date("Y-m-d h:m:s");
-        $response['transactionResponse'] = $transactionContainer;
-        return ["status" => "error", "response" => $response, "message" => $dataSent];
+        return ["status" => "error", "response" => $response, "message" => "Error"];
     }
 
-    public function sendRequest(array $data, $query) {
-        $data_string = json_encode($data);
-        $curl = curl_init($query);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ' . strlen($data_string),
-            'Accept: application/json'
-                )
-        );
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
-        return $response;
-    }
-
-    public function sendPost(array $data, $query) {
-        $data_string = json_encode($data);
-        $curl = curl_init($query);
-        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
-        $headers = array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ' . strlen($data_string),
-            'Accept: application/json',
-            'Accept-language: es',
-            'Authorization: Basic ' . $auth,
-        );
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
-        return $response;
-    }
-
-    public function sendGet($query) {
-        $curl = curl_init($query);
-        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
-        $headers = array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ',
-            'Accept: application/json',
-            'Accept-language: es',
-            'Authorization: Basic ' . $auth,
-        );
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
-        );
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
-        return $response;
-    }
-
-    public function sendPut(array $data, $query) {
-        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
-        $headers = array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ',
-            'Accept: application/json',
-            'Accept-language: es',
-            'Authorization: Basic ' . $auth,
-        );
-        $data_string = json_encode($data);
-        $curl = curl_init($query);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
-        );
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
-        return $response;
-    }
-
-    public function sendDelete($query) {
-        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
-        $headers = array(
-            'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ',
-            'Accept: application/json',
-            'Accept-language: es',
-            'Authorization: Basic ' . $auth,
-        );
-        $curl = curl_init($query);
-        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
-        );
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode(str_replace("\\", "", $response), true);
-        return $response;
+    private function getMessage($response) {
+        $messages = [
+            "accredited" => "Listo, se acreditó tu pago! En tu resumen verás el cargo de amount como {statement_descriptor}.",
+            "pending_contingency" => "Estamos procesando el pago. En menos de 2 días hábiles te enviaremos por e-mail el resultado.",
+            "pending_review_manual" => "Estamos procesando el pago. En menos de 2 días hábiles te diremos por e-mail si se acreditó o si necesitamos más información.",
+            "cc_rejected_bad_filled_card_number" => "Revisa el número de tarjeta.",
+            "cc_rejected_bad_filled_date" => "Revisa la fecha de vencimiento.",
+            "cc_rejected_bad_filled_other" => "Revisa los datos.",
+            "cc_rejected_bad_filled_security_code" => "Revisa el código de seguridad.",
+            "cc_rejected_blacklist" => "No pudimos procesar tu pago.",
+            "cc_rejected_call_for_authorize" => "Debes autorizar ante {payment_method_id} el pago de amount a Mercado Pago",
+            "cc_rejected_card_disabled" => "Llama a {payment_method_id} para que active tu tarjeta. El teléfono está al dorso de tu tarjeta.",
+            "cc_rejected_card_error" => "No pudimos procesar tu pago.",
+            "cc_rejected_duplicated_payment" => "Ya hiciste un pago por ese valor. Si necesitas volver a pagar usa otra tarjeta u otro medio de pago.",
+            "cc_rejected_high_risk" => "Tu pago fue rechazado. Elige otro de los medios de pago, te recomendamos con medios en efectivo.",
+            "cc_rejected_insufficient_amount" => "Tu {payment_method_id} no tiene fondos suficientes.",
+            "cc_rejected_invalid_installments" => "{payment_method_id} no procesa pagos en installments cuotas.",
+            "cc_rejected_max_attempts" => "Llegaste al límite de intentos permitidos. Elige otra tarjeta u otro medio de pago.",
+            "cc_rejected_other_reason" => "{payment_method_id} no procesó el pago.",
+        ];
+        $message = $messages[$response->status_detail];
+        $message = str_replace("{statement_descriptor}", $response->statement_descriptor, $message);
+        $message = str_replace("{payment_method_id}", $response->payment_method_id, $message);
+        return $message;
     }
 
     /**
@@ -1565,57 +1055,27 @@ class MercadoPago {
                 $payment->save();
             } else {
 
-                $response = $this->getStatusOrderRef($payment->referenceCode);
-                if ($response['code'] == "SUCCESS") {
-                    $result = $response['result'];
-                    $payload = $result['payload'];
-                    if ($payload) {
-                        $transactions = [];
-                        foreach ($payload as $result) {
-                            if ($result['status'] == "IN_PROGRESS") {
-                                break;
-                            } else {
-                                $transactions = $result['transactions'];
-                                $payload = $result;
-                                break;
-                            }
+                $paymentD = $this->getStatusOrderRef($payment->referenceCode);
+                if ($paymentD) {
+                    if ($paymentD->status == "approved" || $paymentD->status == "rejected") {
+                        $transactionResponse = [];
+                        $transactionResponse['id'] = $paymentD->id;
+                        $transactionResponse['payment_method'] = $paymentD->payment_method_id;
+                        $transactionResponse['reference_code'] = $payment->referenceCode;
+                        $transactionResponse['order_id'] = $payment->order_id;
+                        $transactionResponse['user_id'] = $payment->user_id;
+                        $transactionResponse['state'] = $paymentD->status;
+                        $transactionResponse['responseMessage'] = $paymentD->status_detail;
+                        $transactionResponse['transactionDate'] = $paymentD->date_last_updated;
+                        $transactionResponse['referenceCode'] = $payment->referenceCode;
+                        $transactionResponse['gateway'] = 'MercadoPAgo';
+                        $this->saveTransactionQuery($transactionResponse, $payment);
+                        if ($paymentD->status == "approved") {
+                            dispatch(new ApprovePayment($payment, "Food"));
                         }
-                        $transactionResponse = null;
-                        if (count($transactions) > 0) {
-                            foreach ($transactions as $transaction) {
-                                $transactionResponse = $transaction['transactionResponse'];
-                                $transactionResponse['id'] = $transaction['id'];
-                                $transactionResponse['payment_method'] = $transaction["paymentMethod"];
-                                $transactionResponse['reference_code'] = $payload["referenceCode"];
-                                break;
-                            }
+                        if ($paymentD->status == "rejected") {
+                            dispatch(new DenyPayment($payment, "Food"));
                         }
-                        if ($transactionResponse) {
-                            $transactionResponse['order_id'] = $payment->order_id;
-                            $transactionResponse['user_id'] = $payment->user_id;
-                            $transactionResponse['referenceCode'] = $payment->referenceCode;
-                            $transactionResponse['gateway'] = 'PayU';
-                            $transaction = $this->saveTransactionQuery($transactionResponse, $payment);
-                            if ($transactionResponse['state'] == 'APPROVED') {
-                                dispatch(new ApprovePayment($payment, "Food"));
-                            }
-                            if ($transactionResponse['state'] == 'DECLINED' || $transactionResponse['state'] == 'ERROR' || $transactionResponse['state'] == 'EXPIRED') {
-                                dispatch(new DenyPayment($payment, "Food"));
-                            }
-                        }
-
-
-                        /* if (array_key_exists("extras", $transactionResponse)) {
-                          $extras = $transactionResponse['extras'];
-                          unset($transactionResponse['extras']);
-                          $transactionResponse['extras'] = json_encode($extras);
-                          } */
-
-
-                        //return ["status" => "success", "transaction" => $transaction, "response" => $response];
-                    } else {
-                        /* $payment->status = "invisible";
-                          $payment->save(); */
                     }
                 }
             }
@@ -1641,56 +1101,67 @@ class MercadoPago {
 //        $current .= PHP_EOL;
 //        $current .= PHP_EOL;
 //        file_put_contents($file, $current);
-        $ApiKey = env('PAYU_KEY');
-        $transactionId = $data['transaction_id'];
-        $merchant_id = $data['merchant_id'];
-        $referenceCode = $data['reference_sale'];
-        $TX_VALUE = $data['value'];
-        $New_value = number_format($TX_VALUE, 1, '.', '');
-        $currency = $data['currency'];
-        $transactionState = $data['state_pol'];
-        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        //dd($firma_cadena);
-        $firmacreada = sha1($firma_cadena);
-        $firma = $data['sign'];
-        if ($firmacreada == $firma) {
-            $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-            if ($transactionExists) {
-                return ["status" => "success", "message" => "transaction already processed", "data" => $data];
-            }
-            $payment = Payment::where("referenceCode", $referenceCode)->first();
-            if ($payment) {
-                $data['user_id'] = $payment->user_id;
-                $data['order_id'] = $payment->order_id;
-                $transaction = $this->saveTransactionConfirmacion($data, $payment);
-                if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment, "Food"));
-                } else {
-                    dispatch(new DenyPayment($payment, "Food"));
+        switch ($data["type"]) {
+            case "payment":
+                $transactionExists = Transaction::where("transaction_id", $data["id"])->where('gateway', 'PayU')->first();
+                if ($transactionExists) {
+                    return ["status" => "success", "message" => "transaction already processed", "data" => $data];
                 }
-            } else {
-                if (array_key_exists("reference_recurring_payment", $data)) {
-                    if ($data['state_pol'] == 4) {
-                        $results = explode("_", $data["reference_recurring_payment"]);
-                        $subscriptionL = Subscription::where("source_id", $results[0])->first();
-                        if ($subscriptionL) {
-                            $subscriptionL->ends_at = Date($data['date_next_payment']);
-                            $objectType = "App\\Models\\" . $subscriptionL->type;
-                            $object = new $objectType;
-                            $target = $object->find($subscriptionL->object_id);
-                            if ($target) {
-                                $target->ends_at = $subscriptionL->ends_at;
-                                $target->save();
+                $paymentM = MercadoPago\Payment . find_by_id($data["id"]);
+                $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
+                if ($payment) {
+                    $data['user_id'] = $payment->user_id;
+                    $data['order_id'] = $payment->order_id;
+                    $insert = [];
+                    $insert["reference_sale"] = $paymentM->external_reference;
+                    $insert["order_id"] = $payment->order_id;
+                    $insert["user_id"] = $payment->user_id;
+                    $insert["response_code"] = $paymentM->status;
+                    $insert["currency"] = $paymentM->currency_id;
+                    $insert["payment_method"] = $paymentM->payment_method_id;
+                    $insert["transaction_id"] = $paymentM->id;
+                    $insert["gateway"] = "MercadoPago";
+                    $insert["description"] = $paymentM->status_detail;
+                    $insert["transaction_date"] = $paymentM->date_last_updated;
+                    $insert["transaction_state"] = $paymentM->status;
+                    $insert["extras"] = json_encode($data);
+                    $transaction = $this->saveTransactionConfirmacion($data, $payment);
+                    if ($paymentM->status == "approved") {
+                        dispatch(new ApprovePayment($payment, "Food"));
+                    } else if ($paymentM->status == "rejected") {
+                        dispatch(new DenyPayment($payment, "Food"));
+                    }
+                } else {
+                    if (array_key_exists("reference_recurring_payment", $data)) {
+                        if ($data['state_pol'] == 4) {
+                            $results = explode("_", $data["reference_recurring_payment"]);
+                            $subscriptionL = Subscription::where("source_id", $results[0])->first();
+                            if ($subscriptionL) {
+                                $subscriptionL->ends_at = Date($data['date_next_payment']);
+                                $objectType = "App\\Models\\" . $subscriptionL->type;
+                                $object = new $objectType;
+                                $target = $object->find($subscriptionL->object_id);
+                                if ($target) {
+                                    $target->ends_at = $subscriptionL->ends_at;
+                                    $target->save();
+                                }
+                                $subscriptionL->save();
                             }
-                            $subscriptionL->save();
                         }
                     }
                 }
-            }
 
-            return ["status" => "success", "message" => "transaction processed", "data" => $data];
-        } else {
-            return ["status" => "error", "message" => "signature", "data" => $data];
+                return ["status" => "success", "message" => "transaction processed", "data" => $data];
+                break;
+            case "plan":
+                $plan = MercadoPago\Plan . find_by_id($data["id"]);
+                break;
+            case "subscription":
+                $plan = MercadoPago\Subscription . find_by_id($data["id"]);
+                break;
+            case "invoice":
+                $plan = MercadoPago\Invoice . find_by_id($data["id"]);
+                break;
         }
     }
 
@@ -1764,7 +1235,7 @@ class MercadoPago {
 
     private function saveTransactionQuery(array $data, Payment $payment) {
         $transactionId = $data['id'];
-        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
+        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'MercadoPago')->first();
         if ($transaction) {
             $transaction->transaction_state = $data['state'];
             $transaction->description = $data['responseMessage'];
@@ -1785,10 +1256,10 @@ class MercadoPago {
             $insert["transaction_id"] = $data["id"];
             $insert["user_id"] = $data["user_id"];
             $insert["order_id"] = $data["order_id"];
-            $insert["gateway"] = "PayU";
+            $insert["gateway"] = "MercadoPago";
             $insert["currency"] = "COP";
             $insert["description"] = $data["responseMessage"];
-            $insert["transaction_date"] = date("Y-m-d h:m:s", $data['operationDate'] / 1000);
+            $insert["transaction_date"] = $data['transactionDate'];
             $insert["transaction_state"] = $data["state"];
             $insert["extras"] = json_encode($data);
             $transaction = Transaction::create($insert);
@@ -1875,9 +1346,10 @@ class MercadoPago {
      */
     public function validatorDebit(array $data) {
         return Validator::make($data, [
-                    'financial_institution_code' => 'required|max:255',
-                    'user_type' => 'required|max:255',
+                    'financial_institution' => 'required|max:255',
                     'doc_type' => 'required|max:255',
+                    'doc_num' => 'required|max:255',
+                    'email' => 'required|max:255',
         ]);
     }
 
@@ -1980,7 +1452,7 @@ class MercadoPago {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function validatorBuyer(array $data) {
+    public function validatorQuickPayment(array $data) {
         return Validator::make($data, [
                     'buyer_address' => 'required|max:255',
                     'buyer_city' => 'required|max:255',
@@ -1999,29 +1471,7 @@ class MercadoPago {
      */
     public function validatorPayment(array $data) {
         return Validator::make($data, [
-                    'buyer_address' => 'required|max:255',
-                    'buyer_city' => 'required|max:255',
-                    'buyer_state' => 'required|max:255',
-                    'buyer_country' => 'required|max:255',
-                    'buyer_postal' => 'required|max:255',
-                        ]
-        );
-    }
-
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validatorCC(array $data) {
-        return Validator::make($data, [
-                    'cc_branch' => 'required|max:255',
-                    'cc_expiration_month' => 'required|max:255',
-                    'cc_expiration_year' => 'required|max:255',
-                    'cc_name' => 'required|max:255',
-                    'cc_number' => 'required|max:255',
-                    'cc_security_code' => 'required|max:255',
+                    'token' => 'required|max:255',
                         ]
         );
     }

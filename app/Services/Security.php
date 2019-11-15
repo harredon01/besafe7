@@ -14,7 +14,6 @@ class Security {
     const RED_MESSAGE_END = 'emergency_end';
     const RED_MESSAGE_MEDICAL_TYPE = 'medical_emergency';
 
-
     /**
      * Get a validator for an incoming edit profile request.
      *
@@ -47,7 +46,6 @@ class Security {
         ]);
     }
 
-
     /**
      * returns all current shared locations for the user
      *
@@ -67,6 +65,22 @@ class Security {
             }
         }
         return $hash;
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function verifyTwoFactorToken(User $user, array $data) {
+        if (array_key_exists("token", $data)) {
+            if ($data["token"] == $user->two_factor_token) {
+                $user->two_factor_expiry = \Carbon\Carbon::now()->addMinutes(config(session . lifetime));
+                $user->save();
+                return ["status"=>"success","Two factor verified"];
+            }
+        }
+        return ["status"=>"error","Two factor verification failed"];
     }
 
     /**
@@ -229,4 +243,5 @@ class Security {
         $user->save();
         return array("status" => "success", "message" => "User Profile Updated");
     }
+
 }

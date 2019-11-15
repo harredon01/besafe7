@@ -234,6 +234,7 @@ Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');
+Route::post('auth/verify_two_factor', 'AuthApiController@verifyTwoFactorToken');
 Route::post('auth/unlock', 'AuthApiController@unlockMedical');
 Route::post('auth/update_medical', 'AuthApiController@updateMedical');
 Route::post('auth/verify_codes', 'AuthApiController@verifyCodes');

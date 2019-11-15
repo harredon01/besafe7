@@ -78,7 +78,18 @@ class AuthApiController extends Controller {
         if ($this->auth->attempt(['email' => $user->email, 'password' => $data['password']])) {
             return response()->json($this->security->getMedical($user->id));
         }
-        return response()->json(['error' => 'invalid password'], 500);
+        return response()->json(['error' => 'invalid password'], 403);
+    }
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function verifyTwoFactorToken(Request $request) {
+        $user = $request->user();
+        $data = $request->only('token');
+        return response()->json($this->security->verifyTwoFactorToken($user,$data));
     }
 
     /**
