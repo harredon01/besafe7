@@ -95,6 +95,17 @@ class BillingApiController extends Controller {
         $status = $this->editBilling->payCreditCard($user,$source, $data);
         return response()->json($status);
     }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\ResponsepostPayCreditCard
+     */
+    public function postCompletePaidOrder(Request $request,$platform) {
+        $data = $request->all();
+        $status = $this->editBilling->completePaidOrder($data['payment_id'],$platform);
+        return response()->json($status);
+    }
     
     /**
      * Handle a login request to the application.

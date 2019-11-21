@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailPaymentCash;
 use App\Mail\EmailPaymentPse;
+use App\Jobs\ApprovePayment;
 use App\Mail\EmailPaymentInBank;
 use App\Services\EditGroup;
 use App\Services\EditOrder;
@@ -387,6 +388,15 @@ class EditBilling {
             "buyer_phone" => $data['buyer_phone']
         ];
         return $buyerAddress;
+    }
+    
+    public function completePaidOrder($paymentId,$platform) {
+        $payment = Payment::find($paymentId);
+        if($payment->total<1){
+            dispatch(new ApprovePayment($payment, $platform));
+            array("status" => "success", "message" => "Order Approved");
+        }
+        return array("status" => "error", "message" => "Payment must be paid" );
     }
 
     public function payCreditCard(User $user, $source, array $data) {

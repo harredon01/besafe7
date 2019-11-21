@@ -265,7 +265,7 @@ class MerchantTableSeeder extends Seeder {
                     'telephone' => '3152562356',
                     'url' => "http://hoovert.com",
                     'address' => "cra 1 # 45-56",
-                    'description' => "El mejor " . $category->name . " " . $num,
+                    'description' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " . $num,
                     'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
                     'lat' => 4.656060000,
                     'long' => -74.045932000,
@@ -278,7 +278,7 @@ class MerchantTableSeeder extends Seeder {
                     'status' => "active",
                     'attributes' => [
                         "experience" => [["name" => "St judes hospital", "years" => "1.5"]],
-                        "services" => [["name" => $category->name . "1", "icon" => "1.5"], ["name" => $category->name . "2", "icon" => "1.5"], ["name" => $category->name . "3", "icon" => "1.5"]],
+                        "services" => [["name" => "Servicio de ".$category->name . "1", "icon" => "1.5"], ["name" => "Servicio de ".$category->name . "2", "icon" => "1.5"], ["name" => "Servicio de ".$category->name . "3", "icon" => "1.5"]],
                         "booking_requires_authorization" => mt_rand(0, 1),
                         "max_per_hour" => 2,
                         "years_experience" => mt_rand(1, 5)
@@ -347,7 +347,7 @@ class MerchantTableSeeder extends Seeder {
         for ($i = 1; $i < 4; $i++) {
             $product = Product::create([
                         'name' => "Product " . $i,
-                        'description' => "Description " . $i,
+                        'description' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " . $i,
                         'isActive' => true,
                         'hash' => "",
             ]);

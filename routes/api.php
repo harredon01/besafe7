@@ -56,6 +56,7 @@ Route::get('billing/raw_sources/{source?}', 'BillingApiController@getRawSources'
 Route::get('billing/payments', 'BillingApiController@getPayments');
 Route::post('billing/pay_debit/{source?}', 'BillingApiController@postPayDebitCard');
 Route::post('billing/pay_cash/{source?}', 'BillingApiController@postPayCash');
+Route::post('billing/complete_paid/{platform?}', 'BillingApiController@postCompletePaidOrder');
 Route::post('billing/retry/{payment?}', 'BillingApiController@retryPayment');
 Route::post('payu/all', 'PayuController@postcreateAll');
 Route::post('payu/webhook', 'PayuController@webhookPayU');
