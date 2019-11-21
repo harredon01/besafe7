@@ -570,111 +570,13 @@ class EditMapObject {
                 }
             }
         }
-        if (array_key_exists('id', $data)) {
-            if ($data['id'] && $data['id'] > 0) {
-                foreach ($data as $key => $value) {
-                    if (!$value) {
-                        unset($data[$key]);
-                    }
-                }
-                $object = $this->updateObject($user, $data, $type);
-                return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
-            }
-        }
-        if (array_key_exists('private', $data)) {
-            if (!$data["private"]) {
-                $data["private"] = 0;
-            }
-        } else {
-            $data["private"] = 0;
-        }
-
-        $data['status'] = 'active';
-        if ($type == self::OBJECT_MERCHANT) {
-            $validator = $this->validatorMerchant($data);
-            if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-            }
-        } else if ($type == self::OBJECT_REPORT) {
-            $validator = $this->validatorReport($data);
-            if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-            }
-        }
-        $object = $this->createObject($user, $data, $type);
-        return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
-    }
-
-    /**
-     * returns all current shared locations for the user
-     *
-     * @return Location
-     */
-    public function updateObject(User $user, array $data, $type) {
-        $object = "App\\Models\\" . $type;
-        Cache::forget($type . '_' . $data['id']);
-        if (array_key_exists("groups", $data)) {
-            //$this->saveToGroups($user, $data, $type,$object);
-            dispatch(new SaveGroupsObject($user, $data, $type, $object));
-        }
-
-        $object::where('user_id', $user->id)
-                ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
-        $result = $object::find($data['id']);
-
-        if ($result) {
-            return $result;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * returns all current shared locations for the user
-     *
-     * @return Location
-     */
-    public function updateObjectStatus(User $user, array $data, $object) {
-        $object = "App\\Models\\" . $object;
-        $result = $object::find($data['id']);
-        if ($result && $data['status']) {
-            if (array_key_exists("group_id", $data)) {
-                if ($data['group_id']) {
-
-                    $group = Group::find($data['group_id']);
-                    if ($group) {
-                        $targetStatus = $data['status'];
-                        $data = $this->checkGroupStatus($user, $group, $data);
-                        if ($data['status'] == 'active') {
-                            $attributes['status'] = $targetStatus;
-                            $result->groups()->updateExistingPivot($group->id, $attributes);
-                            return ['status' => 'success', "message" => "status updated"];
-                        } else {
-                            return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
-                        }
-                    }
-                } else {
-                    return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
-                }
-            }
-        } else {
-            return ['status' => 'error', "message" => "please submit valid object and status"];
-        }
-    }
-
-    /**
-     * returns all current shared locations for the user
-     *
-     * @return Location
-     */
-    public function createObject(User $user, array $data, $type) {
-        $data["user_id"] = $user->id;
-        $object = "App\\Models\\" . $type;
-        
         $services = [];
         $specialties = [];
         $experience = [];
         $attributes = [];
+        if (!array_key_exists("unit_cost", $data)) {
+            $data["unit_cost"]=0;
+        }
         if (array_key_exists("service1", $data)) {
             if ($data["service1"]) {
                 $container = ["name" => $data['service1']];
@@ -776,6 +678,108 @@ class EditMapObject {
             $data['unit_cost'] = 0;
         }
         $data['currency'] = "COP";
+        if (array_key_exists('id', $data)) {
+            if ($data['id'] && $data['id'] > 0) {
+                foreach ($data as $key => $value) {
+                    if (!$value) {
+                        unset($data[$key]);
+                    }
+                }
+                $object = $this->updateObject($user, $data, $type);
+                return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
+            }
+        }
+        if (array_key_exists('private', $data)) {
+            if (!$data["private"]) {
+                $data["private"] = 0;
+            }
+        } else {
+            $data["private"] = 0;
+        }
+
+        $data['status'] = 'active';
+        if ($type == self::OBJECT_MERCHANT) {
+            $validator = $this->validatorMerchant($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+        } else if ($type == self::OBJECT_REPORT) {
+            $validator = $this->validatorReport($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+        }
+        $object = $this->createObject($user, $data, $type);
+        return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function updateObject(User $user, array $data, $type) {
+        $object = "App\\Models\\" . $type;
+        Cache::forget($type . '_' . $data['id']);
+        if (array_key_exists("groups", $data)) {
+            //$this->saveToGroups($user, $data, $type,$object);
+            dispatch(new SaveGroupsObject($user, $data, $type, $object));
+        }
+
+        $object::where('user_id', $user->id)
+                ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
+        $result = $object::find($data['id']);
+
+        if ($result) {
+            return $result;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function updateObjectStatus(User $user, array $data, $object) {
+        $object = "App\\Models\\" . $object;
+        $result = $object::find($data['id']);
+        if ($result && $data['status']) {
+            if (array_key_exists("group_id", $data)) {
+                if ($data['group_id']) {
+
+                    $group = Group::find($data['group_id']);
+                    if ($group) {
+                        $targetStatus = $data['status'];
+                        $data = $this->checkGroupStatus($user, $group, $data);
+                        if ($data['status'] == 'active') {
+                            $attributes['status'] = $targetStatus;
+                            $result->groups()->updateExistingPivot($group->id, $attributes);
+                            return ['status' => 'success', "message" => "status updated"];
+                        } else {
+                            return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+                        }
+                    }
+                } else {
+                    return ['status' => 'error', "message" => "you must own the report or be an admin in its hive"];
+                }
+            }
+        } else {
+            return ['status' => 'error', "message" => "please submit valid object and status"];
+        }
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function createObject(User $user, array $data, $type) {
+        $data["user_id"] = $user->id;
+        $object = "App\\Models\\" . $type;
+        
+        
         $result = $object::create($data);
         $user->merchants()->save($result);
         if (array_key_exists("groups", $data)) {

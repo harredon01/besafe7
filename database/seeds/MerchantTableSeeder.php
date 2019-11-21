@@ -158,7 +158,7 @@ class MerchantTableSeeder extends Seeder {
         }
     }
 
-    public function addBooking($data, $booker, $owner,$merchant) {
+    public function addBooking($data, $booker, $owner, $merchant) {
         $result1 = $this->editBooking->addBookingObject($data, $booker);
         $result1 = $result1->original;
         if ($result1['status'] == "success") {
@@ -179,17 +179,17 @@ class MerchantTableSeeder extends Seeder {
                 ];
                 Booking::where("id", $booking->id)->update($updateData);
                 $itemData = [
-                    "name" => "Reserva para ".$merchant->name,
+                    "name" => "Reserva para " . $merchant->name,
                     "price" => $booking->price,
                     "priceSum" => $booking->price,
                     "priceConditions" => $booking->price,
                     "priceSumConditions" => $booking->price,
-                    "quantity"=>$booking->quantity,
-                    "paid_status"=>"paid",
-                    "fulfillment"=>"unfulfilled",
-                    "requires_authorization"=>0,
-                    "user_id"=>$booker->id,
-                    "merchant_id"=>$merchant->id,
+                    "quantity" => $booking->quantity,
+                    "paid_status" => "paid",
+                    "fulfillment" => "unfulfilled",
+                    "requires_authorization" => 0,
+                    "user_id" => $booker->id,
+                    "merchant_id" => $merchant->id,
                     "created_at" => date("Y-m-d H:i:s"),
                     "updated_at" => date("Y-m-d H:i:s")
                 ];
@@ -270,15 +270,18 @@ class MerchantTableSeeder extends Seeder {
                     'lat' => 4.656060000,
                     'long' => -74.045932000,
                     'price' => 40000,
+                    'country_id' => 1,
+                    'region_id' => 11,
+                    'city_id' => 524,
                     'unit_cost' => 30000,
                     'base_cost' => 5000,
                     'unit' => "hour",
-                    'user_id' => $owner->id, 
+                    'user_id' => $owner->id,
                     'currency' => "COP",
                     'status' => "active",
                     'attributes' => [
                         "experience" => [["name" => "St judes hospital", "years" => "1.5"]],
-                        "services" => [["name" => "Servicio de ".$category->name . "1", "icon" => "1.5"], ["name" => "Servicio de ".$category->name . "2", "icon" => "1.5"], ["name" => "Servicio de ".$category->name . "3", "icon" => "1.5"]],
+                        "services" => [["name" => "Servicio de " . $category->name . "1", "icon" => "1.5"], ["name" => "Servicio de " . $category->name . "2", "icon" => "1.5"], ["name" => "Servicio de " . $category->name . "3", "icon" => "1.5"]],
                         "booking_requires_authorization" => mt_rand(0, 1),
                         "max_per_hour" => 2,
                         "years_experience" => mt_rand(1, 5)
@@ -318,9 +321,9 @@ class MerchantTableSeeder extends Seeder {
             "to" => date_format($date, "Y-m-d") . ' 09:00:00',
             "attributes" => $attributes
         ];
-        $this->addBooking($data, $booker, $owner,$merchant);
-        $this->addBooking($data, $booker2, $owner,$merchant);
-        $this->addBooking($data, $booker3, $owner,$merchant);
+        $this->addBooking($data, $booker, $owner, $merchant);
+        $this->addBooking($data, $booker2, $owner, $merchant);
+        $this->addBooking($data, $booker3, $owner, $merchant);
 
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
@@ -330,9 +333,9 @@ class MerchantTableSeeder extends Seeder {
             "to" => date_format($date, "Y-m-d") . ' 09:00:00',
             "attributes" => $attributes
         ];
-        $this->addBooking($data, $booker, $owner,$merchant);
-        $this->addBooking($data, $booker2, $owner,$merchant);
-        $this->addBooking($data, $booker3, $owner,$merchant);
+        $this->addBooking($data, $booker, $owner, $merchant);
+        $this->addBooking($data, $booker2, $owner, $merchant);
+        $this->addBooking($data, $booker3, $owner, $merchant);
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
             "type" => "Merchant",
@@ -341,9 +344,9 @@ class MerchantTableSeeder extends Seeder {
             "to" => date_format($date, "Y-m-d") . ' 09:00:00',
             "attributes" => $attributes
         ];
-        $this->addBooking($data, $booker, $owner,$merchant);
-        $this->addBooking($data, $booker2, $owner,$merchant);
-        $this->addBooking($data, $booker3, $owner,$merchant);
+        $this->addBooking($data, $booker, $owner, $merchant);
+        $this->addBooking($data, $booker2, $owner, $merchant);
+        $this->addBooking($data, $booker3, $owner, $merchant);
         for ($i = 1; $i < 4; $i++) {
             $product = Product::create([
                         'name' => "Product " . $i,
