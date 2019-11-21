@@ -29,7 +29,8 @@
         "phpoffice/phpspreadsheet": "^1.6",
         "rinvex/laravel-bookings": "^3.0",
         "yab/laravel-scout-mysql-driver": "^2.3",
-        "opentok/opentok": "^4.4"
+        "opentok/opentok": "^4.4",
+        "mercadopago/dx-php": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
