@@ -392,9 +392,9 @@ class EditBilling {
     
     public function completePaidOrder($paymentId,$platform) {
         $payment = Payment::find($paymentId);
-        if($payment->total<1){
+        if($payment->total == $payment->transaction_cost){
             dispatch(new ApprovePayment($payment, $platform));
-            array("status" => "success", "message" => "Order Approved");
+            return array("status" => "success", "message" => "Order Approved");
         }
         return array("status" => "error", "message" => "Payment must be paid" );
     }
