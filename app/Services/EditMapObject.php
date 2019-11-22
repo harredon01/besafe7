@@ -671,9 +671,15 @@ class EditMapObject {
             $attributes['specialties'] = $specialties;
         }
         $data['attributes'] = $attributes;
-        $data['unit'] = "hour";
-        $data['status'] = "pending";
-        $data['base_cost'] = 0;
+        if (!array_key_exists("unit", $data)) {
+            $data['unit'] = "hour";
+        }
+        if (!array_key_exists("status", $data)) {
+            $data['status'] = "pending";
+        }
+        if (!array_key_exists("base_cost", $data)) {
+            $data['base_cost'] = 0;
+        }
         if (!array_key_exists("unit_cost", $data)) {
             $data['unit_cost'] = 0;
         }

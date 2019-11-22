@@ -534,7 +534,7 @@ class EditProduct {
         $owner = false;
         $data = [];
         $damerchant = DB::select('SELECT 
-                                            DISTINCT(m.id),m.user_id
+                                            DISTINCT(m.id),mu.user_id
                                         FROM
                                             merchants m join merchant_user mu on m.id = mu.merchant_id
                                         WHERE
