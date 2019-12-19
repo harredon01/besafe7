@@ -46,6 +46,15 @@ class BookingApiController extends Controller
      *
      * @return Response
      */
+    public function deleteAvailabilityObject(Request $request) {
+        $user = $request->user();
+        return $this->editBooking->deleteAvailabilityObject($request->all(), $user);
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function postChangeStatusBookingObject(Request $request) {
         $user = $request->user();
         return $this->editBooking->changeStatusBookingObject($request->all(), $user);

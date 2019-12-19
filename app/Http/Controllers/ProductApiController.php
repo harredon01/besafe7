@@ -164,8 +164,19 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function edit($id) {
-        //
+    public function edit($id, Request $request) {
+        $user = $request->user();
+        $data = $request->all([
+            'merchant_id',
+            'id',
+            'name',
+            'description',
+            'availability',
+            'hash',
+            'isActive',
+        ]);
+        $data['id'] = $id;
+        return response()->json($this->editProduct->createOrUpdateProduct($user, $data));
     }
 
     /**

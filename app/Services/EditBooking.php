@@ -331,7 +331,36 @@ class EditBooking {
                     $serviceBooking->make(['range' => $data['range'], 'from' => $data['from'], 'to' => $data['to'], 'is_bookable' => true])
                             ->bookable()->associate($object)
                             ->save();
-                    return response()->json(array("status" => "success", "message" => "Availability created"));
+                    return response()->json(array("status" => "success", "message" => "Availability created","availability"=>$serviceBooking));
+                }
+                return response()->json(array("status" => "error", "message" => "Access denied"), 400);
+            }
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteAvailabilityObject(array $data, User $user) {
+        $validator = $this->validatorCreateAvailability($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                if ($user->id == $object->user_id) {
+                    $availability = Availability::find($data['id']);
+                    if($availability){
+                        if($availability->bookable_id == $object->id){
+                            $availability->delete();
+                            return response()->json(array("status" => "success", "message" => "Availability created"));
+                        }
+                    }
                 }
                 return response()->json(array("status" => "error", "message" => "Access denied"), 400);
             }
@@ -438,7 +467,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function getAvailabilitiesObject(array $data) {
-        $validator = $this->validatorGetBookings($data);
+        $validator = $this->validatorGetAvailabilities($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
@@ -542,6 +571,18 @@ class EditBooking {
                     'query' => 'required|max:255',
                     'object_id' => 'required|max:255',
                     'from' => 'required|max:255',
+        ]);
+    }
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorGetAvailabilities(array $data) {
+        return Validator::make($data, [
+                    'type' => 'required|max:255',
+                    'object_id' => 'required|max:255',
         ]);
     }
 

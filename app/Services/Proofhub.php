@@ -13,13 +13,13 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2019-11-01';
+    const START_DATE = '2019-12-01';
     const END_DATE = '2119-11-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
     const INTERNO = 'Interno';
-    const IS_ADMIN = true;
+    const IS_ADMIN = false;
     const DIAS_HABILES = 19;
     const MIN_HORAS_DIARIAS = 7;
     const COSTO_HORA_PROMEDIO = 54887;
@@ -273,15 +273,15 @@ class Proofhub {
 
     public function getProjects($copy, $type) {
         $projects = [
-            [
-                "name" => "Wellness",
-                "budget" => "15000000",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "2727439403",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Wellness",
+//                "budget" => "15000000",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "2727439403",
+//                "rows" => $copy,
+//            ],
 //              [
 //              "name" => "La nuit",
 //              "budget" => "15000000",
@@ -300,15 +300,15 @@ class Proofhub {
                 "code" => "2925895418",
                 "rows" => $copy,
             ],
-            [
-                "name" => "Klip(Accvent)",
-                "budget" => "15000000",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "2801511014",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Klip(Accvent)",
+//                "budget" => "15000000",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "2801511014",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "igastoresbc",
                 "budget" => "0",
@@ -495,15 +495,15 @@ class Proofhub {
             //                "code" => "2349279336",
             //                "rows" => $copy,
             //            ],
-            [
-                "name" => "NOVEDADES GUILLERS",
-                "budget" => "50000",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "1871891261",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "NOVEDADES GUILLERS",
+//                "budget" => "50000",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "1871891261",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "Magic Flavors",
                 "budget" => "30000000",
@@ -782,15 +782,15 @@ class Proofhub {
 //                  "code" => "3313974215",
 //                  "rows" => $copy,
 //                  ],https://backbone.proofhub.com/bapp/#overview/3669257430
-            [
-                "name" => "Backbone Print",
-                "budget" => "0",
-                "country" => "COL",
-                "type" => self::PRODUCCION,
-                "price" => "Retail",
-                "code" => "2803356359",
-                "rows" => $copy,
-            ],
+//            [
+//                "name" => "Backbone Print",
+//                "budget" => "0",
+//                "country" => "COL",
+//                "type" => self::PRODUCCION,
+//                "price" => "Retail",
+//                "code" => "2803356359",
+//                "rows" => $copy,
+//            ],
             [
                 "name" => "CRUX",
                 "budget" => "0",
@@ -837,12 +837,12 @@ class Proofhub {
                 "rows" => $copy,
             ],
             [
-                "name" => "Dirty Apron",
+                "name" => "Carcaicer", 
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::CUENTAS,
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
-                "code" => "1497978202",
+                "code" => "3696327015",
                 "rows" => $copy,
             ],
             [
@@ -858,7 +858,7 @@ class Proofhub {
                 "name" => "Backbone Website",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::CUENTAS,
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
                 "code" => "1523338129",
                 "rows" => $copy,
@@ -873,12 +873,39 @@ class Proofhub {
                 "rows" => $copy,
             ],
             [
-                "name" => "Dicorp",
+                "name" => "Mutante",
                 "budget" => "0",
                 "country" => "COL",
-                "type" => self::CUENTAS,
+                "type" => self::PRODUCCION,
                 "price" => "Retail",
-                "code" => "1759949368",
+                "code" => "3715404628",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "Henkel Asesores",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3669678060",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "South32",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3772216834",
+                "rows" => $copy,
+            ],
+            [
+                "name" => "South32B",
+                "budget" => "0",
+                "country" => "COL",
+                "type" => self::PRODUCCION,
+                "price" => "Retail",
+                "code" => "3764319843",
                 "rows" => $copy,
             ]
         ];

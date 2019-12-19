@@ -291,6 +291,7 @@ Route::post('bookings/schedule', 'BookingApiController@postRescheduleBookingObje
 Route::post('bookings/connection', 'BookingApiController@postRegisterConnection');
 Route::get('availabilities', 'BookingApiController@getAvailabilitiesObject');
 Route::post('availabilities', 'BookingApiController@postAddAvailabilitiesObject');
+Route::delete('availabilities', 'BookingApiController@deleteAvailabilityObject');
 
 Route::post('runner/route/start', 'RunnerApiController@postRouteStarted');
 Route::post('runner/route/complete', 'RunnerApiController@postRouteCompleted');

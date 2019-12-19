@@ -590,32 +590,10 @@ class EditProduct {
      *
      * @return Response
      */
-    public function writeAccessProduct(User $user, $product_id) {
-        $access = false;
-        $product = Product::find($product_id);
-        if ($product) {
-            if ($product->user_id == $user->id) {
-                $access = true;
-            }
-        } else {
-            $access = true;
-        }
-
-        $data = [
-            "access" => $access
-        ];
-        return $data;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
     public function deleteProduct(User $user, $productId) {
         $product = Product::find($productId);
         if ($product) {
-            $write = $this->writeAccessProduct($user, $productId);
+            $write = $this->checkAccessProduct($user, $productId);
             if ($write['access'] == true) {
                 $variants = $product->productVariants;
                 $product->conditions()->delete();
@@ -643,7 +621,7 @@ class EditProduct {
     public function deleteVariant(User $user, $variantId) {
         $variant = ProductVariant::find($variantId);
         if ($variant) {
-            $write = $this->writeAccessProduct($user, $variant->product_id);
+            $write = $this->checkAccessProduct($user, $variant->product_id);
             if ($write['access'] == true) {
                 $variant->conditions()->delete();
                 $variant->items()->delete();
@@ -653,7 +631,7 @@ class EditProduct {
     }
 
     public function createOrUpdateProduct(User $user, array $data) {
-        $result = $this->writeAccessProduct($user, $data["id"]);
+        $result = $this->checkAccessProduct($user, $data["id"]);
         $product = null;
         if ($result['access'] == true) {
             if ($data["id"]) {
@@ -667,6 +645,7 @@ class EditProduct {
                 Product::where('id', $productid)->update($data);
                 $product = Product::find($productid);
                 $product->clearCache();
+                $product->productVariants;
                 if ($product) {
                     return array("status" => "success", "message" => "product updated", "product" => $product);
                 }
@@ -694,7 +673,7 @@ class EditProduct {
     }
 
     public function createOrUpdateVariant(User $user, array $data) {
-        $result = $this->writeAccessProduct($user, $data['product_id']);
+        $result = $this->checkAccessProduct($user, $data['product_id']);
         if ($result['access'] == true) {
             if ($data["id"]) {
                 $variantid = $data['id'];
@@ -726,7 +705,7 @@ class EditProduct {
     }
 
     public function changeProductOwners(User $user, array $data) {
-        $result = $this->writeAccessProduct($user, $data['product_id']);
+        $result = $this->checkAccessProduct($user, $data['product_id']);
         if ($result['access'] == true) {
             $merchants = $data['merchants'];
             $product = Product::find($data['product_id']);

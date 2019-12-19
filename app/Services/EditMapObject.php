@@ -674,9 +674,9 @@ class EditMapObject {
         if (!array_key_exists("unit", $data)) {
             $data['unit'] = "hour";
         }
-        if (!array_key_exists("status", $data)) {
-            $data['status'] = "pending";
-        }
+//        if (!array_key_exists("status", $data)) {
+//            $data['status'] = "pending";
+//        }
         if (!array_key_exists("base_cost", $data)) {
             $data['base_cost'] = 0;
         }

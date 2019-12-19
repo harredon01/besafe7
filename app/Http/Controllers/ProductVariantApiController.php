@@ -91,10 +91,13 @@ class ProductVariantApiController extends Controller {
             'type',
             'is_digital',
             'is_shippable',
+            'is_on_sale',
             'price',
             'sale',
             'tax',
+            'cost',
             'quantity',
+            'min_quantity',
             'description',
             'merchant_id',
             'requires_authorization'

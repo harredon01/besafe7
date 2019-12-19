@@ -130,7 +130,7 @@ class EditUserData {
         $attributes = [
             "user_id"=>$user->id
         ];
-        $coupon = $user->firstName."&Lonchis".$user->id;
+        $coupon = trim($user->firstName)."&Lonchis".$user->id;
         $condition = Condition::create([
             "name" => "Descuento bienvenida",
             "type" => "coupon",
