@@ -21,6 +21,8 @@ use App\Mail\RouteDeliver;
 use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
 use App\Mail\Register;
+use App\Mail\NewsletterMenus;
+use App\Jobs\SendMessage;
 use App\Mail\Newsletter4;
 use App\Services\Rapigo;
 use DB;
@@ -283,14 +285,14 @@ class Food {
     public function sendReminder() {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 0) {
+        if ($dayofweek == 5) {
             return true;
         }
         $type = "program_reminder";
         $date = $this->getNextValidDate($date);
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         if ($dayofweek == 1) {
-            $type = "program_reminder2";
+            //$type = "program_reminder2";
         }
         $tomorrow = date_format($date, "Y-m-d");
         $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
@@ -326,7 +328,7 @@ class Food {
 
     public function sendNewsletter() {
         $date = date_create();
-        $type = "program_reminder";
+        $type = "gift";
         $tomorrow = date_format($date, "Y-m-d");
         // id > 130 and id < 200 bota 500
         $followers = DB::select("select id,email from users where optinMarketing = 1");
@@ -348,13 +350,12 @@ class Food {
             $date = date_format($date, "Y-m-d");
 
             $platFormService = app('Notifications');
-            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new Newsletter4());
+                Mail::to($user->email)->send(new NewsletterMenus());
             }
         }
     }
-
 
     public function checkScenario($results, $hash) {
         if (count($results) > 0) {
@@ -363,8 +364,8 @@ class Food {
         }
         return false;
     }
-   
-    public function getStopDetails($results,$stop,$config) {
+
+    public function getStopDetails($results, $stop, $config) {
         $stopDescription = "";
         $address = $stop->address;
         $phone = "";
@@ -419,9 +420,8 @@ class Food {
             $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
-        return ["results" => $results, "description" => $stopDescription,"phone" => $phone];
+        return ["results" => $results, "description" => $stopDescription, "phone" => $phone];
     }
-
 
     public function writeFile($data, $title) {
         return Excel::create($title, function($excel) use($data, $title) {
@@ -691,7 +691,7 @@ class Food {
                     $delivery->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                     $delivery->save();
                 } else {
-                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00"; 
+                    $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
                 }
                 if ($delivery2) {
                     $tempAttrs = $delivery2->details;

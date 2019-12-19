@@ -190,3 +190,6 @@ Route::get('/newsletter_2', function () {
 Route::get('/newsletter_4', function () {
     return new App\Mail\Newsletter4();
 });
+Route::get('/newsletter_3', function () {
+    return new App\Mail\Newsletter3();
+});

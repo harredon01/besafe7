@@ -213,12 +213,13 @@ class EditDelivery {
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
-        //return array("status" => "success", "message" => "Delivery in limit");
+        
         if ($delivery->status == "pending" || $delivery->status == "deposit" || $delivery->status == "enqueue") {
             
         } else {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
+        //return array("status" => "success", "message" => "Delivery in limit");
         $date = date_create();
         $now = date_format($date, "Y-m-d H:i:s");
         $dayofweek = date('w', strtotime($now));

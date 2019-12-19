@@ -111,7 +111,7 @@ class FoodApiController extends Controller {
             return true;
         }
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if($dayofweek < 1 || $dayofweek > 5){
+        if($dayofweek > 5){
             return response()->json(array("status" => "success", "message" => "Reminder Sent"));
         }
         $this->food->sendReminder();
