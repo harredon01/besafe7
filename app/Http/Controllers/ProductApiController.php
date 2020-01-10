@@ -101,9 +101,23 @@ class ProductApiController extends Controller {
         $user = $request->user();
         $data = $request->all([
             'merchant_id',
+            'category_id',
+            'category_name',
             'id',
             'name',
             'description',
+            'sku',
+            'description2',
+            'price',
+            'sale',
+            'tax',
+            'cost',
+            'quantity',
+            'min_quantity',
+            'requires_authorization',
+            'is_shippable',
+            'is_on_sale',
+            'is_digital',
             'availability',
             'hash',
             'isActive',
@@ -136,6 +150,15 @@ class ProductApiController extends Controller {
     public function getProductsMerchant($merchant,$page, Request $request) {
         $user = $request->user();
         return response()->json($this->editProduct->getProductsMerchant($user, $merchant,$page));
+    }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getProductCategories($merchant_id) {
+        return response()->json($this->editProduct->getProductCategories($merchant_id));
     }
     /**
      * Display the specified resource.

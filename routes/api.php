@@ -157,12 +157,12 @@ Route::resource('merchants', 'MerchantApiController');
 Route::get('imagesapi', 'FileApiController@getFiles');
 Route::post('imagesapi', 'FileApiController@postFile');
 Route::delete('imagesapi/{code?}', 'FileApiController@delete');
-
+Route::resource('products', 'ProductApiController');
 Route::get('products/group/{group?}/{page?}', 'ProductApiController@getProductsGroup');
 Route::get('products/merchant/private/{merchant?}/{page?}', 'ProductApiController@getProductsPrivateMerchant');
 Route::get('products/merchant/{merchant?}/{page?}', 'ProductApiController@getProductsMerchant');
 
-Route::resource('products', 'ProductApiController');
+Route::get('products/categories/{merchant_id?}', 'ProductApiController@getProductCategories');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
 Route::post('products/variant', 'ProductVariantApiController@store');
 Route::post('products/share', 'ShareApiController@postAddFollower');

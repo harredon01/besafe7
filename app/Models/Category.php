@@ -16,7 +16,7 @@ class Category extends Model {
      *
      * @var array
      */
-    protected $fillable = ['name','type','level','description','parent_id'];
+    protected $fillable = ['name','type','level','description','parent_id','merchant_id'];
 
 
     public function parentCategory() {

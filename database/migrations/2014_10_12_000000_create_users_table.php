@@ -47,6 +47,8 @@ class CreateUsersTable extends Migration {
             $table->string('docType')->nullable();
             $table->string('docNum')->nullable();
             $table->string('email')->nullable()->unique();
+            $table->string('two_factor_token')->nullable();
+            $table->timestamp('two_factor_expiry')->nullable();
             $table->string('username')->nullable();
             $table->string('password');
             $table->rememberToken();

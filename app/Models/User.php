@@ -45,7 +45,7 @@ class User extends Authenticatable {
      * @var array
      */
     protected $hidden = ['password', 'remember_token', 'notify_location', 'is_alerting', 'is_tracking', 'alert_type', 'write_report','code',
-        'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at'];
+        'pushNotifications', 'platform', 'token', 'green', 'red', 'trip', 'hash', 'token', 'platform', 'card_brand', 'card_last_four', 'ends_at','two_factor_token','two_factor_expiry'];
     protected $encryptable = [
         'green',
         'red',
@@ -55,7 +55,8 @@ class User extends Authenticatable {
     protected $dates = [
         'created_at',
         'updated_at',
-        'ends_at'
+        'ends_at',
+        'two_factor_expiry'
     ];
 
     public function userSocials() {

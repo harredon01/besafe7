@@ -8,6 +8,8 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Merchant;
 use App\Services\EditFile;
+use App\Models\Category;
+use Validator;
 use App\Services\EditMapObject;
 use Cache;
 use DB;
@@ -590,6 +592,19 @@ class EditProduct {
      *
      * @return Response
      */
+    public function getProductCategories($merchant_id) {
+        $categories = Category::where("merchant_id",$merchant_id)->get();
+        $data = [
+            "data" => $categories
+        ];
+        return $data;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function deleteProduct(User $user, $productId) {
         $product = Product::find($productId);
         if ($product) {
@@ -631,10 +646,10 @@ class EditProduct {
     }
 
     public function createOrUpdateProduct(User $user, array $data) {
-        $result = $this->checkAccessProduct($user, $data["id"]);
-        $product = null;
-        if ($result['access'] == true) {
-            if ($data["id"]) {
+        if ($data["id"]) {
+            $result = $this->checkAccessProduct($user, $data["id"]);
+            $product = null;
+            if ($result['access'] == true) {
                 $productid = $data['id'];
                 unset($data['id']);
                 unset($data['merchant_id']);
@@ -650,25 +665,61 @@ class EditProduct {
                     return array("status" => "success", "message" => "product updated", "product" => $product);
                 }
             } else {
-                $merchantid = $data['merchant_id'];
-                unset($data['merchant_id']);
-                $data['isActive'] = true;
-                $data['user_id'] = $user->id;
-                $data = (object) array_filter((array) $data, function ($val) {
-                            return !is_null($val);
-                        });
-                $data = (array) $data;
-                $product = Product::create($data);
-                $merchant = Merchant::find($merchantid);
-                if ($merchant) {
-                    if ($merchant->user_id == $user->id) {
-                        $merchant->products()->save($product);
-                    }
-                }
-                return array("status" => "success", "message" => "product created", "product" => $product);
+                return array("status" => "error", "message" => "access denied");
             }
         } else {
-            return array("status" => "error", "message" => "access denied");
+            $validator = $this->validatorProduct($data);
+            if ($validator->fails()) {
+                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            }
+            $categoryId = $data['category_id'];
+            $merchantid = $data['merchant_id'];
+            $catFound = false;
+            if($categoryId){
+                $category = Category::find($categoryId);
+                if($category){
+                    $catFound = true;
+                }
+            }
+            $categoryName = $data['category_name'];
+            if($categoryName){
+                $category = Category::create([
+                    "name"=>$data['category_name'],
+                    "merchant_id"=>$merchantid,
+                    "type"=>"Product"
+                ]);
+                $catFound = true;
+            }
+            if(!$catFound){
+                return response()->json(array("status" => "error", "message" => "Missing category"), 400);
+            }
+            $productData = [
+                "name"=>$data['name'],
+                "description"=>$data['description'],
+                "isActive"=>true,
+                "user_id"=>$user->id,
+            ];
+            unset($data['name']);
+            unset($data['description']);
+            $data['description']=$data['description2'];
+            unset($data['description2']);
+            $data = (object) array_filter((array) $data, function ($val) {
+                        return !is_null($val);
+                    });
+            $data = (array) $data;
+            
+            $product = Product::create($productData);
+            $data["product_id"]=$product->id;
+            $variant = ProductVariant::create($data);
+            $merchant = Merchant::find($merchantid);
+            $category->products()->save($product);
+            if ($merchant) {
+                if ($merchant->user_id == $user->id) {
+                    $merchant->products()->save($product);
+                }
+            }
+            $product->product_variants = [$variant];
+            return array("status" => "success", "message" => "product created", "product" => $product,"variant"=>$variant);
         }
     }
 
@@ -693,6 +744,10 @@ class EditProduct {
                     return array("status" => "success", "message" => "variant updated", "variant" => $variant);
                 }
             } else {
+                $validator = $this->validatorVariant($data);
+                if ($validator->fails()) {
+                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                }
                 $data = (object) array_filter((array) $data, function ($val) {
                             return !is_null($val);
                         });
@@ -725,6 +780,51 @@ class EditProduct {
             return array("status" => "success", "message" => "Owners updated");
         }
         return array("status" => "error", "message" => "Missing required merchant id or product id");
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorProduct(array $data) {
+        return Validator::make($data, [
+                    'name' => 'required|max:255',
+                    'merchant_id' => 'required|max:255',
+                    'description' => 'required|max:255',
+                    'sku' => 'required|max:255',
+                    'description2' => 'required|max:255',
+                    'price' => 'required|max:255',
+                    'sale' => 'required|max:255',
+                    'tax' => 'required|max:255',
+                    'cost' => 'required|max:255',
+                    'min_quantity' => 'required|max:255',
+                    'quantity' => 'required|max:255'
+        ]);
+    }
+
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorVariant(array $data) {
+        return Validator::make($data, [
+                    'sku' => 'required|max:255',
+                    'description' => 'required|max:255',
+                    'price' => 'required|max:255',
+                    'sale' => 'required|max:255',
+                    'tax' => 'required|max:255',
+                    'cost' => 'required|max:255',
+                    'min_quantity' => 'required|max:255',
+                    'quantity' => 'required|max:255',
+                    'requires_authorization' => 'required|max:255',
+                    'is_shippable' => 'required|max:255',
+                    'is_on_sale' => 'required|max:255',
+                    'is_digital' => 'required|max:255',
+        ]);
     }
 
 }

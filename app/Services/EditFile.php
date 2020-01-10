@@ -7,6 +7,7 @@ use App\Models\FileM;
 use App\Models\User;
 use App\Models\Group;
 use App\Models\Product;
+use App\Models\Merchant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Cache;
@@ -26,6 +27,8 @@ class EditFile {
                 $trigger = $user;
             } else if ($type == "group_avatar") {
                 $trigger = Group::find($intended_id);
+            } else if ($type == "Merchant_avatar") {
+                $trigger = Merchant::find($intended_id);
             } else {
                 $object = "App\\Models\\" . $type;
                 $trigger = $object::find($intended_id);

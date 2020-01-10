@@ -104,7 +104,7 @@ class EditBooking {
                 }
             }
 
-            return false;
+            return ['status'=>false,'message'=>'Not Available'];
         }
         return $this->checkBooking($data, $object);
     }
@@ -137,9 +137,9 @@ class EditBooking {
         }
         $totalHoping = count($array1) + 1;
         if ($totalHoping > $maxPerHour) {
-            return false;
+            return ['status'=>false,'message'=>'Max Reached'];
         } else {
-            return true;
+            return ['status'=>true,'message'=>'Booking available'];
         }
     }
 
@@ -160,7 +160,7 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 $result = $this->checkAvailable($data, $object);
-                if ($result) {
+                if ($result['status']) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
                     $requiresAuth = false;
@@ -187,7 +187,7 @@ class EditBooking {
                     }
                     return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth));
                 }
-                return response()->json(array("status" => "error", "message" => "Not available"));
+                return response()->json(array("status" => "error", "message" => $result['message']));
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
