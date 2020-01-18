@@ -250,6 +250,13 @@ class EditMessages {
                     "name" => $user->firstName . " " . $user->lastName
                 ];
                 return $friend;
+            } else if ($object == "mevico") {
+                $user = User::find(2);
+                $friend = [
+                    "id" => $user->id,
+                    "name" => $user->firstName . " " . $user->lastName
+                ];
+                return $friend;
             }
         } else if ($type == "Merchant" ) {
             $className = "App\\Models\\".$type;

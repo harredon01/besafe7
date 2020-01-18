@@ -1600,6 +1600,12 @@ class Proofhub {
                 $saveperson['retail'] = 48414;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
+            } else if ($resultsPerson['id'] == "6272048911") {
+                //Nataly 
+                $saveperson['cost'] = 68500;
+                $saveperson['retail'] = 74750;
+                $saveperson['cost_us'] = 8.86;
+                $saveperson['retail_us'] = 10.47;
             } else {
                 $saveperson['cost'] = 50000;
                 $saveperson['retail'] = 60000;

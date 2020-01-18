@@ -220,50 +220,14 @@ class EditDelivery {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
         //return array("status" => "success", "message" => "Delivery in limit");
-        $date = date_create();
+        $date = date_create(); 
         $now = date_format($date, "Y-m-d H:i:s");
-        $dayofweek = date('w', strtotime($now));
-        $today = date_format($date, "Y-m-d");
-
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
         $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60;
         if ($diff < 14) {
             return array("status" => "error", "message" => "Limit passed");
-        } else if ($diff > 14 && $diff < 42) {
-            if ($dayofweek > 0 && $dayofweek < 6) {
-                date_add($date, date_interval_create_from_date_string("1 days"));
-                $tomorrow = date_format($date, "Y-m-d");
-                $dateTomorrow = $tomorrow . " 23:59:59";
-                $dateToday = $today . " 22:00:00";
-                $dateTimestampToday = strtotime($dateToday);
-                $dateTimestampTomorrow = strtotime($dateTomorrow);
-                if ($datetimestampDelivery < $dateTimestampTomorrow) {
-                    if ($dateTimestampNow > $dateTimestampToday) {
-                        return array("status" => "error", "message" => "Limit passed");
-                    }
-                }
-            } else {
-                return array("status" => "error", "message" => "Limit passed");
-            }
-        } else if ($diff > 42 && $diff < 66) {
-            if ($dayofweek == 6) {
-                date_add($date, date_interval_create_from_date_string("2 days"));
-                $monday = date_format($date, "Y-m-d");
-                $dateMonday = $monday . " 23:59:59";
-                $dateToday = $today . " 22:00:00";
-                $dateTimestampToday = strtotime($dateToday);
-                $dateTimestampMonday = strtotime($dateMonday);
-                if ($datetimestampDelivery < $dateTimestampMonday) {
-                    $dateTimestampNow = strtotime($now);
-                    $dateToday = $today . " 12:00:00";
-                    $dateTimestampToday = strtotime($dateToday);
-                    if ($dateTimestampNow > $dateTimestampToday) {
-                        return array("status" => "error", "message" => "Limit passed");
-                    }
-                }
-            }
-        }
+        } 
         return array("status" => "success", "message" => "Delivery in limit");
     }
 

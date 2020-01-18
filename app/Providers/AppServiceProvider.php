@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Notifications;
 use App\Services\Geolocation;
+use OpenTok\OpenTok;
 class AppServiceProvider extends ServiceProvider {
 
     /**
@@ -29,6 +30,9 @@ class AppServiceProvider extends ServiceProvider {
         });
         $this->app->singleton('Geolocation', function () {
             return new Geolocation();
+        });
+        $this->app->singleton('OpenTok', function () {
+            return new OpenTok(env('OPENTOK_API_KEY'), env('OPENTOK_API_SECRET'));
         });
     }
 }

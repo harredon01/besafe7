@@ -6,7 +6,6 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Favorite;
 use App\Models\User;
-use App\Services\OpenTokService;
 use Validator;
 use DB;
 
@@ -21,6 +20,7 @@ class EditBooking {
     const BOOKING_CANCELLED = 'booking_cancelled';
     const BOOKING_REMINDER = 'booking_reminder';
     const BOOKING_STARTING = 'booking_starting';
+    const BOOKING_WAITING = 'booking_waiting';
     const BOOKING_COMPLETED = 'booking_completed';
 
     /**
@@ -31,21 +31,13 @@ class EditBooking {
     protected $notifications;
 
     /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $openTok;
-
-    /**
      * Create a new class instance.
      *
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(OpenTokService $opentok) {
+    public function __construct() {
         $this->notifications = app('Notifications');
-        $this->openTok = $opentok;
     }
 
     private function checkAvailable(array $data, $object) {
@@ -104,7 +96,7 @@ class EditBooking {
                 }
             }
 
-            return ['status'=>false,'message'=>'Not Available'];
+            return false;
         }
         return $this->checkBooking($data, $object);
     }
@@ -137,9 +129,9 @@ class EditBooking {
         }
         $totalHoping = count($array1) + 1;
         if ($totalHoping > $maxPerHour) {
-            return ['status'=>false,'message'=>'Max Reached'];
+            return false;
         } else {
-            return ['status'=>true,'message'=>'Booking available'];
+            return true;
         }
     }
 
@@ -160,20 +152,22 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 $result = $this->checkAvailable($data, $object);
-                if ($result['status']) {
+                if ($result) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
                     $requiresAuth = false;
-                    $requiresUpdate = false;
                     $update = [];
+                    $update["notes"] = "pending";
+                    $update["options"] = [];
                     if (array_key_exists("attributes", $data)) {
-                        $requiresUpdate = true;
                         $update["options"] = $data["attributes"];
+                    }
+                    if (array_key_exists("location", $data)) {
+                        $update["options"]["location"] = $data['location'];
                     }
                     $update["options"]["status"] = "approved";
                     if (array_key_exists("booking_requires_authorization", $attributes)) {
                         if ($attributes["booking_requires_authorization"]) {
-                            $requiresUpdate = true;
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
                             $this->handleAuthorizationRequest($user, $booking, $object);
@@ -181,13 +175,11 @@ class EditBooking {
                             $update["options"]["status"] = "pending";
                         }
                     }
-                    if ($requiresUpdate) {
-                        $update["options"] = json_encode($update["options"]);
-                        Booking::where("id", $booking->id)->update($update);
-                    }
+                    $update["options"] = json_encode($update["options"]);
+                    Booking::where("id", $booking->id)->update($update);
                     return response()->json(array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth));
                 }
-                return response()->json(array("status" => "error", "message" => $result['message']));
+                return response()->json(array("status" => "error", "message" => "Not available"));
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
@@ -202,7 +194,7 @@ class EditBooking {
             "last_name" => $user->lastName,
             "booking_date" => $booking->starts_at,
             "status" => "pending"
-        ]; 
+        ];
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -231,7 +223,7 @@ class EditBooking {
         $booking = Booking::find($data['booking_id']);
         $object = $booking->bookable;
         if ($object) {
-            if ($user->id == $object->user_id) {
+            if ($object->checkAdminAccess($user)) {
                 $typeAlert = "";
                 $customer = $booking->customer;
                 $options = $booking->options->toArray();
@@ -283,11 +275,51 @@ class EditBooking {
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
 
+    public function remindLates() {
+        $bookings = Booking::where('notes', 'waiting')->get();
+        foreach ($bookings as $booking) {
+            $options = $booking->options;
+            $options = $options->toArray();
+            $payloads = [];
+            $pending = false;
+            $found = false;
+            for ($x = 0; $x < count($options["users"]); $x++) {
+                $theUser = $options["users"][$x];
+                if (!array_key_exists("connection_id", $theUser)) {
+                    $payload = [
+                        "booking_id" => $booking->id,
+                        "booking" => $booking
+                    ];
+                    if (array_key_exists("session_id", $options)) {
+                        $payload['sessionId'] = $options['session_id'];
+                    }
+                    if (array_key_exists("token", $theUser)) {
+                        $payload['token'] = $options['token'];
+                    }
+                    $followers = [(object) $theUser];
+                    $data = [
+                        "trigger_id" => $booking->id,
+                        "message" => "",
+                        "subject" => "",
+                        "object" => self::OBJECT_BOOKING,
+                        "sign" => true,
+                        "payload" => $payload,
+                        "type" => self::BOOKING_WAITING,
+                        "user_status" => "normal"
+                    ];
+                    $date = date("Y-m-d H:i:s");
+                    $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
+                }
+            }
+        }
+    }
+
     public function registerConnection(User $user, array $data) {
         $booking = Booking::find($data["booking_id"]);
         if ($booking) {
             $options = $booking->options;
             $options = $options->toArray();
+            $pending = false;
             $found = false;
             for ($x = 0; $x < count($options["users"]); $x++) {
                 $theUser = $options["users"][$x];
@@ -296,19 +328,126 @@ class EditBooking {
                     $theUser["connection_id"] = $data["connection_id"];
                     $options["users"][$x] = $theUser;
                 }
-            }
-            if (!$found) {
-                $container = [
-                    "id" => $user->id,
-                    "connection_id" => $data["connection_id"]
-                ];
-                array_push($options["users"], $container);
+                if (!array_key_exists("connection_id", $theUser)) {
+                    $pending = true;
+                }
             }
             $booking->options = $options;
             $booking->save();
+            $update = [];
+            if ($pending) {
+                $update["notes"] = "waiting";
+            } else {
+                $update["notes"] = "started";
+                // si quisiera mover el start date seria aca
+            }
+            Booking::where("id", $booking->id)->update($update);
             return response()->json(array("status" => "success", "message" => "Connection registered", "booking" => $booking));
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
+    public function createChatroom($bookingId) {
+        $booking = Booking::find($bookingId);
+        if ($booking) {
+            $bookable = $booking->bookable;
+            $options = $booking->options;
+            $options = $options->toArray();
+            $users = [];
+            $payload = ["booking_id" => $booking->id, "location" => $options['location'], "booking" => $booking];
+            $user = $bookable->users()->first();
+            $bookableUserContainer = ["id" => $user->id];
+
+            if ($options['location'] == 'opentok') {
+                $openTok = app("OpenTok");
+                $session = $openTok->createSession();
+                $bookableToken = $session->generateToken();
+                $bookableUserContainer = ["id" => $user->id, "token" => $bookableToken];
+                $sessionId = $session->getSessionId();
+                $booking->options["session_id"] = $sessionId;
+                $payload["sessionId"] = $sessionId;
+                $payload["token"] = $bookableToken;
+            }
+            array_push($users, $bookableUserContainer);
+
+            $followers = [$user];
+            $data = [
+                "trigger_id" => $booking->id,
+                "message" => "",
+                "subject" => "",
+                "object" => self::OBJECT_BOOKING,
+                "sign" => true,
+                "payload" => $payload,
+                "type" => self::BOOKING_STARTING,
+                "user_status" => "normal"
+            ];
+            $date = date("Y-m-d H:i:s");
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
+            $client = $booking->customer;
+            $bookableClientContainer = ["id" => $client->id];
+            if ($options['location'] == 'opentok') {
+                $clientToken = $session->generateToken();
+                $bookableClientContainer = ["id" => $client->id, "token" => $clientToken];
+                $payload["sessionId"] = $sessionId;
+                $payload["token"] = $clientToken;
+                $data['payload'] = $payload;
+            }
+
+            array_push($users, $bookableClientContainer);
+            $booking->options["users"] = $users;
+            //dd($booking);
+            $booking->save();
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
+        }
+    }
+
+    public function terminateOpenChatRooms() {
+        $bookings = Booking::where("notes", "started")->where("ends_at", ">", date("Y-m-d H:i:s"));
+        foreach ($bookings as $booking) {
+            $this->endChatroom($booking);
+        }
+    }
+
+    public function leaveChatroom(User $user, array $data) {
+        $openTok = app("OpenTok");
+        $booking = Booking::find($data['booking_id']);
+        if ($booking) {
+            foreach ($booking->options["users"] as $userM) {
+                if ($userM['id'] == $user->id) {
+                    if ($booking->options["location"] == 'opentok') {
+                        $openTok->forceDisconnect($booking->options["session_id"], $userM["connection_id"]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function endChatroom(Booking $booking) {
+        $openTok = app("OpenTok");
+        $followers = [];
+        //$options = $booking->options;
+        foreach ($booking->options["users"] as $user) {
+            if ($booking->options["location"] == 'opentok') {
+                $openTok->forceDisconnect($booking->options["session_id"], $user["connection_id"]);
+            }
+            array_push($followers, (object) $user);
+        }
+        $payload = [
+            "booking_id" => $booking->id,
+        ];
+
+        $data = [
+            "trigger_id" => $booking->id,
+            "message" => "",
+            "subject" => "",
+            "object" => self::OBJECT_BOOKING,
+            "sign" => true,
+            "payload" => $payload,
+            "type" => self::BOOKING_COMPLETED,
+            "user_status" => "normal"
+        ];
+        $date = date("Y-m-d H:i:s");
+        $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
     }
 
     /**
@@ -331,13 +470,14 @@ class EditBooking {
                     $serviceBooking->make(['range' => $data['range'], 'from' => $data['from'], 'to' => $data['to'], 'is_bookable' => true])
                             ->bookable()->associate($object)
                             ->save();
-                    return response()->json(array("status" => "success", "message" => "Availability created","availability"=>$serviceBooking));
+                    return response()->json(array("status" => "success", "message" => "Availability created", "availability" => $serviceBooking));
                 }
                 return response()->json(array("status" => "error", "message" => "Access denied"), 400);
             }
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
+
     /**
      * Show the application registration form.
      *
@@ -355,8 +495,8 @@ class EditBooking {
             if ($object) {
                 if ($user->id == $object->user_id) {
                     $availability = Availability::find($data['id']);
-                    if($availability){
-                        if($availability->bookable_id == $object->id){
+                    if ($availability) {
+                        if ($availability->bookable_id == $object->id) {
                             $availability->delete();
                             return response()->json(array("status" => "success", "message" => "Availability created"));
                         }
@@ -534,16 +674,16 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function startVirtualMeeting() {
+    public function startMeeting() {
         $bookings = DB::select("SELECT 
-                                    *
+                                    id
                                 FROM
-                                    bookable_bookings b join merchants m on m.id=b.bookable_id
+                                    bookable_bookings b 
                                 WHERE
                                     starts_at < DATE_ADD(NOW(), INTERVAL 5 MINUTE)
-                                        AND starts_at >= NOW()  and price = total_paid ");
+                                        AND starts_at >= NOW()  and price = total_paid order by m.id ");
         foreach ($bookings as $booking) {
-            $this->openTok->createChatroom($booking);
+            $this->createChatroom($booking->id);
         }
     }
 
@@ -573,6 +713,7 @@ class EditBooking {
                     'from' => 'required|max:255',
         ]);
     }
+
     /**
      * Get a validator for an incoming edit profile request.
      *

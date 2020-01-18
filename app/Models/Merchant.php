@@ -4,7 +4,6 @@ use Illuminate\Database\Eloquent\Model;
 use Rinvex\Bookings\Traits\Bookable;
 use Laravel\Scout\Searchable;
 use Cache;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Rate;
@@ -97,13 +96,17 @@ class Merchant extends Model {
         }
         return false;
     }
-    public function postAddImg($user, $type, $filename) {
-        if ($type == "Merchant_avatar") {
-            FileM::where("file", $this->icon)->delete();
-            Storage::delete($this->icon);
-            $this->icon = $filename;
-            $this->save();
+    public function checkAdminAccess($user_id) {
+        $test = DB::table('merchant_user')
+                        ->where('user_id', $user_id)
+                        ->where("merchant_id", $this->id)->first();
+        if ($test) {
+            return true;
         }
+        return false;
+    }
+    public function postAddImg() {
+        return null;
     }
     
     /**

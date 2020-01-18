@@ -111,6 +111,15 @@ class BookingApiController extends Controller
      *
      * @return Response
      */
+    public function postleaveChatroom(Request $request) {
+        $user = $request->user();
+        return $this->editBooking->leaveChatroom($user,$request->all());
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function postRegisterConnection(Request $request) {
         $user = $request->user();
         return $this->editBooking->registerConnection($user,$request->all());

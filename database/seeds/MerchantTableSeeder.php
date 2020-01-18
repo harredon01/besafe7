@@ -249,9 +249,9 @@ class MerchantTableSeeder extends Seeder {
     }
 
     public function createMerchant($category, $num, $categoryProds) {
-        $userId = mt_rand(1, 2);
+        $userId = mt_rand(1, 3);
         $bookerId = 1;
-        if ($userId == 1) {
+        if ($userId == 1||$userId == 3) {
             $bookerId = 2;
         } else {
             $bookerId = 1;
