@@ -655,7 +655,7 @@ class EditBooking {
                                 bookable_bookings b join merchants m on m.id=b.bookable_id
                             WHERE
                                 starts_at < DATE_ADD(NOW(), INTERVAL 2 HOUR)
-                                    AND starts_at >= DATE_ADD(NOW(), INTERVAL 1 HOUR) and price = total_paid ");
+                                    AND notes = 'pending'");
         foreach ($bookings as $booking) {
             $payload = [
                 "booking_id" => $booking->id,
@@ -689,7 +689,7 @@ class EditBooking {
                                 FROM
                                     bookable_bookings b
                                 WHERE
-                                    starts_at < DATE_ADD(NOW(), INTERVAL 5 MINUTE)
+                                    starts_at < DATE_ADD(NOW(), INTERVAL 2 MINUTE)
                                         AND notes = 'pending'
                                 ORDER BY b.bookable_id");
         foreach ($bookings as $booking) {

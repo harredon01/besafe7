@@ -92,6 +92,38 @@ class BookingApiController extends Controller
         $user = $request->user();
         return $this->editBooking->rescheduleBookingObject($request->all(), $user);
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function startMeeting() {
+        return $this->editBooking->startMeeting();
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function terminateOpenChatRooms() {
+        return $this->editBooking->terminateOpenChatRooms();
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function sendStartReminder() {
+        return $this->editBooking->sendStartReminder();
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function remindLates() {
+        return $this->editBooking->remindLates();
+    }
     
     /**
      * Store a newly created resource in storage.
