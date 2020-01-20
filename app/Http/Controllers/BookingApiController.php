@@ -30,7 +30,21 @@ class BookingApiController extends Controller
      */
     public function postAddBookingObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->addBookingObject($request->all(), $user);
+        return $this->editBooking->addBookingObject($request->all(), $user,true);
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function postImmediateBookingObject(Request $request) {
+        $user = $request->user();
+        $data = $request->all();
+        $date = date_create();
+        $data["from"] =  date_format($date, "Y-m-d H:i:s");
+        date_add($date, date_interval_create_from_date_string("1 hour"));
+        $data['to'] = date_format($date, "Y-m-d H:i:s");
+        return $this->editBooking->addBookingObject($data, $user,false);
     }
     /**
      * Store a newly created resource in storage.
