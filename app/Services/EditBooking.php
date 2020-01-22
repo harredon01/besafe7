@@ -141,7 +141,7 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function addBookingObject(array $data, User $user, bool $auth) {
+    public function addBookingObject(array $data, User $user) {
         $validator = $this->validatorCreateBooking($data);
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
@@ -153,7 +153,7 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 $result = $this->checkAvailable($data, $object);
-                if ($result) {
+                if ($result||$object->status=='online') { 
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
                     $requiresAuth = false;
@@ -167,7 +167,7 @@ class EditBooking {
                         $update["options"]["location"] = $data['location'];
                     }
                     $update["options"]["status"] = "approved";
-                    if (array_key_exists("booking_requires_authorization", $attributes) && $auth) {
+                    if (array_key_exists("booking_requires_authorization", $attributes) && $object->status!='online') {
                         if ($attributes["booking_requires_authorization"]) {
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
@@ -343,6 +343,11 @@ class EditBooking {
                 // si quisiera mover el start date seria aca
             }
             Booking::where("id", $booking->id)->update($update);
+            $bookable = $booking->bookable;
+            if($bookable->checkAdminAccess($user->id)){
+                $bookable->status = "in consult";
+                $bookable->save();
+            }
             return response()->json(array("status" => "success", "message" => "Connection registered", "booking" => $booking));
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
@@ -362,7 +367,8 @@ class EditBooking {
             if ($options['location'] == 'opentok') {
                 $openTok = app("OpenTok");
                 $session = $openTok->createSession();
-                $bookableToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
+                $bookableToken = $session->generateToken();
+                //$bookableToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
                 $bookableUserContainer = ["id" => $user->id, "token" => $bookableToken];
                 $sessionId = $session->getSessionId();
                 $booking->options["session_id"] = $sessionId;
@@ -388,8 +394,8 @@ class EditBooking {
             $bookableClientContainer = ["id" => $client->id];
             $followers = [$client];
             if ($options['location'] == 'opentok') {
-                //$clientToken = $session->generateToken();
-                $clientToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
+                $clientToken = $session->generateToken();
+//                $clientToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
                 $bookableClientContainer = ["id" => $client->id, "token" => $clientToken];
                 $payload["sessionId"] = $sessionId;
                 $payload["token"] = $clientToken;
@@ -413,7 +419,6 @@ class EditBooking {
     }
 
     public function leaveChatroom(User $user, array $data) {
-        $openTok = app("OpenTok");
         $booking = Booking::find($data['booking_id']);
         if ($booking) {
             $users = $booking->options["users"];
@@ -426,6 +431,11 @@ class EditBooking {
             }
             $booking->options["users"] = $users;
             $booking->save();
+            $bookable = $booking->bookable;
+            if($bookable->checkAdminAccess($user->id)){
+                $bookable->status = "online";
+                $bookable->save();
+            }
         }
     }
 
@@ -655,7 +665,7 @@ class EditBooking {
                                 bookable_bookings b join merchants m on m.id=b.bookable_id
                             WHERE
                                 starts_at < DATE_ADD(NOW(), INTERVAL 2 HOUR)
-                                    AND notes = 'pending'");
+                                    AND notes = 'pending' AND b.price = b.total_paid");
         foreach ($bookings as $booking) {
             $payload = [
                 "booking_id" => $booking->id,
@@ -690,7 +700,7 @@ class EditBooking {
                                     bookable_bookings b
                                 WHERE
                                     starts_at < DATE_ADD(NOW(), INTERVAL 2 MINUTE)
-                                        AND notes = 'pending'
+                                        AND notes = 'pending' and b.price=b.price
                                 ORDER BY b.bookable_id");
         foreach ($bookings as $booking) {
             $this->createChatroom($booking->id);

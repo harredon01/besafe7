@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Services\MercadoPago;
+use App\Services\MercadoPagoService;
 use App\Jobs\PayUCron;
 use Illuminate\Http\RedirectResponse;
 
-class PayuController extends Controller {
+class MercadoPagoController extends Controller {
 
     /**
      * The edit order implementation.
@@ -21,7 +21,7 @@ class PayuController extends Controller {
      *
      * @return void
      */
-    public function __construct(MercadoPago $mercadoPago) {
+    public function __construct(MercadoPagoService $mercadoPago) {
         $this->mercadoPago = $mercadoPago;
         $this->middleware('auth:api', ['except' => ['cartTest', 'cronPayU', 'webhookPayU', 'returnPayU']]);
     }

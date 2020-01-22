@@ -8,7 +8,7 @@ use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Rate;
 use Carbon\Carbon; 
-
+use DB;
 class Merchant extends Model {
     
     use Bookable;use Searchable;
