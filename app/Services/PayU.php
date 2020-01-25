@@ -14,6 +14,9 @@ use App\Models\Region;
 use App\Jobs\ApprovePayment;
 use App\Jobs\DenyPayment;
 use App\Jobs\PendingPayment;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EmailPaymentCash;
+use App\Mail\EmailPaymentPse;
 use App\Jobs\SaveCard;
 use App\Models\Source;
 use Carbon\Carbon;
@@ -412,7 +415,7 @@ class PayU {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $buyer = $this->populateBuyer($user, $data);
-        
+
         $payer = $this->populatePayer($data);
         $validator = $this->validatorUseSource($data);
 
@@ -427,7 +430,7 @@ class PayU {
         $orderCont = $this->populatePaymentContent($payment, $platform);
         $orderCont["additionalValues"] = $additionalValuesCont;
         $orderCont["buyer"] = $buyer;
-        if($payment->address_id){
+        if ($payment->address_id) {
             $ShippingAddress = $this->populateShippingFromAddress($payment->address_id, $data);
             $orderCont["shippingAddress"] = $ShippingAddress;
         }
@@ -507,7 +510,15 @@ class PayU {
             "test" => "false",
         ];
 
-        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        $results = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        $url = "";
+        if ($results['code'] == "SUCCESS") {
+            if ($results['transactionResponse']['state'] == "PENDING") {
+                $url = $results['transactionResponse']['extraParameters']['BANK_URL'];
+                Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
+            }
+        }
+        return $results;
     }
 
     public function payCash(User $user, array $data, Payment $payment, $platform) {
@@ -540,7 +551,15 @@ class PayU {
             "transaction" => $transaction,
             "test" => "false",
         ];
-        return $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        $results = $this->sendRequest($dataSent, $this->getTestUrl($user) . env('PAYU_PAYMENTS'));
+        if ($results['code'] == "SUCCESS") {
+            if ($results['transactionResponse']['state'] == "PENDING") {
+                $url = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_HTML'];
+                $pdf = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_PDF'];
+                Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, $pdf));
+            }
+        }
+        return $results;
     }
 
     public function makeCharge(User $user, Order $order, array $payload) {

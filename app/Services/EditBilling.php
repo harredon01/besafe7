@@ -518,15 +518,6 @@ class EditBilling {
                 $payment->status = "payment_created";
                 $payment->save();
                 $results = $gateway->payDebitCard($user, $data, $payment, $data['platform']);
-                $url = "";
-                if (array_key_exists("email", $data)) {
-                    if ($results['code'] == "SUCCESS") {
-                        if ($results['transactionResponse']['state'] == "PENDING") {
-                            $url = $results['transactionResponse']['extraParameters']['BANK_URL'];
-                            Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
-                        }
-                    }
-                }
                 return $results;
             }
         }
@@ -548,16 +539,6 @@ class EditBilling {
                 $payment->status = "payment_created";
                 $payment->save();
                 $results = $gateway->payCash($user, $data, $payment, $data['platform']);
-                $url = "";
-                if (array_key_exists("email", $data)) {
-                    if ($results['code'] == "SUCCESS") {
-                        if ($results['transactionResponse']['state'] == "PENDING") {
-                            $url = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_HTML'];
-                            $pdf = $results['transactionResponse']['extraParameters']['URL_PAYMENT_RECEIPT_PDF'];
-                            Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, $pdf));
-                        }
-                    }
-                }
                 return $results;
             }
         }
