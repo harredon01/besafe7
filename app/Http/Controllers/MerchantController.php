@@ -115,6 +115,26 @@ class MerchantController extends Controller {
         $user = $this->auth->user();
         return view('merchants.merchant')->with('merchant', $this->editMapObject->getMerchantOrders($user,$id));
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getRegisterMerchant() {
+        return view('merchant.register');
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function postRegisterMerchant(Request $request)  {
+        
+        $this->editMapObject->createUserObject( $request->all());
+        
+        return view('merchant.complete');
+    }
 
     /**
      * Show the form for creating a new resource.

@@ -30,7 +30,9 @@ class BookingApiController extends Controller
      */
     public function postAddBookingObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->addBookingObject($request->all(), $user);
+        $data = $request->all();
+        $data['call'] = false;
+        return $this->editBooking->addBookingObject($data, $user);
     }
     /**
      * Store a newly created resource in storage.
@@ -44,6 +46,7 @@ class BookingApiController extends Controller
         $data["from"] =  date_format($date, "Y-m-d H:i:s"); 
         date_add($date, date_interval_create_from_date_string("1 hour"));
         $data['to'] = date_format($date, "Y-m-d H:i:s");
+        $data['call'] = true;
         return $this->editBooking->addBookingObject($data, $user);
     }
     /**

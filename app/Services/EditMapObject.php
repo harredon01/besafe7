@@ -795,6 +795,30 @@ class EditMapObject {
 
         return $result;
     }
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function createUserObject(array $data) {
+        $user = User::create([
+            "firstName" => $data['firstName'],
+            "lastName" => $data['lastName'],
+            "name" => $data['firstName'].' '.$data['lastName'],
+            "email" => $data['lastName'],
+            "cellphone" => $data['lastName'],
+            "lastName" => $data['lastName'],
+            "area_code" => $data['area_code'],
+            "docType" => $data['docType'],
+            "docNum" => $data['docNum'],
+            'password' => bcrypt($data['password']),
+        ]);
+        
+        $object = "App\\Models\\" . $data['type'];
+        $result = $object::create($data);
+        $user->merchants()->save($result);
+        return $result;
+    }
 
     /**
      * Get a validator for an incoming edit profile request.

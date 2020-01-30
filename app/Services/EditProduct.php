@@ -70,6 +70,7 @@ class EditProduct {
             }
         } else {
             $data['message'] = "You dont have access";
+            $data['status'] = "error";
         }
         return $data;
     }
@@ -540,7 +541,7 @@ class EditProduct {
                                         FROM
                                             merchants m join merchant_user mu on m.id = mu.merchant_id
                                         WHERE
-                                                m.status = "active"
+                                                m.status <> "suspended"
                                                 AND mu.user_id = ?
                                                 AND m.id IN ( 
                                                 SELECT merchant_id from merchant_product WHERE product_id = ? 

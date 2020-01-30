@@ -44,24 +44,9 @@ class EditBooking {
     private function checkAvailable(array $data, $object) {
         $from = $data['from'];
         $to = $data['to'];
-        $dayofweek = date('w', strtotime($from));
-        $dayName = "";
-        if ($dayofweek == 1) {
-            $dayName = "monday";
-        } else if ($dayofweek == 2) {
-            $dayName = "tuesday";
-        } else if ($dayofweek == 3) {
-            $dayName = "wednesday";
-        } else if ($dayofweek == 4) {
-            $dayName = "thursday";
-        } else if ($dayofweek == 5) {
-            $dayName = "friday";
-        } else if ($dayofweek == 6) {
-            $dayName = "saturday";
-        } else if ($dayofweek == 0) {
-            $dayName = "sunday";
-        }
-
+        $dayofweek = date('l', strtotime($from));
+        
+        $dayName = strtolower($dayofweek);
         $availabilities = Availability::where("range", $dayName)->where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $data['object_id'])->get();
         if (count($availabilities) > 0) {
             $dateFrom = date_create($from);
@@ -77,29 +62,21 @@ class EditBooking {
                 $dateTo = date_create($av->to);
                 $toString = "2019-01-01 " . date_format($dateTo, "H:i:s");
                 $dateTimestampLower = strtotime($toString);
-//                $data2 = [
-//                    "sfr" => $dateFrom,
-//                    "sto" => $dateTo,
-//                    "dfr" => $fromString,
-//                    "dto" => $toString,
-//                    "fr" => $dateTimestampFrom,
-//                    "to" => $dateTimestampTo,
-//                    "up" => $dateTimestampUpper,
-//                    "lo" => $dateTimestampLower,
-//                    "a1" => $dateTimestampFrom >= $dateTimestampUpper,
-//                    "a2" => $dateTimestampFrom <= $dateTimestampLower,
-//                    "b1" => $dateTimestampTo >= $dateTimestampUpper,
-//                    "b2" => $dateTimestampTo <= $dateTimestampLower,
-//                ];
-//                dd($data2);
                 if ($dateTimestampFrom >= $dateTimestampUpper && $dateTimestampFrom <= $dateTimestampLower && $dateTimestampTo >= $dateTimestampUpper && $dateTimestampTo <= $dateTimestampLower) {
-                    return $this->checkBooking($data, $object);
+                    return true;
                 }
             }
 
             return false;
         }
-        return $this->checkBooking($data, $object);
+        return true;
+    }
+    
+    public function checkBookingAvailability($data, $object){
+        if($this->checkAvailable($data, $object)){
+            return $this->checkBooking($data, $object);
+        }
+        return false;
     }
 
     public function checkBooking($data, $object) {
@@ -152,8 +129,8 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                $result = $this->checkAvailable($data, $object);
-                if ($result||$object->status=='online') { 
+                $result = $this->checkBookingAvailability($data, $object);
+                if ($result || ($object->status == 'online'&&$data['call'])) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
                     $requiresAuth = false;
@@ -167,7 +144,7 @@ class EditBooking {
                         $update["options"]["location"] = $data['location'];
                     }
                     $update["options"]["status"] = "approved";
-                    if (array_key_exists("booking_requires_authorization", $attributes) && $object->status!='online') {
+                    if (array_key_exists("booking_requires_authorization", $attributes) &&! ($object->status == 'online'&&$data['call'])) {
                         if ($attributes["booking_requires_authorization"]) {
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
@@ -344,10 +321,6 @@ class EditBooking {
             }
             Booking::where("id", $booking->id)->update($update);
             $bookable = $booking->bookable;
-            if($bookable->checkAdminAccess($user->id)){
-                $bookable->status = "in consult";
-                $bookable->save();
-            }
             return response()->json(array("status" => "success", "message" => "Connection registered", "booking" => $booking));
         }
         return response()->json(array("status" => "error", "message" => "Object not found"));
@@ -406,6 +379,7 @@ class EditBooking {
             $booking->options["users"] = $users;
             //dd($booking);
             $booking->save();
+            $bookable->status = "busy";
             $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
             Booking::where("id", $booking->id)->update(['notes' => 'ready']);
         }
@@ -432,7 +406,7 @@ class EditBooking {
             $booking->options["users"] = $users;
             $booking->save();
             $bookable = $booking->bookable;
-            if($bookable->checkAdminAccess($user->id)){
+            if ($bookable->checkAdminAccess($user->id)) {
                 $bookable->status = "online";
                 $bookable->save();
             }
@@ -486,7 +460,9 @@ class EditBooking {
             if ($object) {
                 if ($user->id == $object->user_id) {
                     $serviceBooking = new Availability();
-                    $serviceBooking->make(['range' => $data['range'], 'from' => $data['from'], 'to' => $data['to'], 'is_bookable' => true])
+                    $dateFrom = date_create($data['from']);
+                    $dateTo = date_create($data['to']);
+                    $serviceBooking->make(['range' => $data['range'], 'from' => date_format($dateFrom, "h:i a"), 'to' => date_format($dateTo, "h:i a"), 'is_bookable' => true])
                             ->bookable()->associate($object)
                             ->save();
                     return response()->json(array("status" => "success", "message" => "Availability created", "availability" => $serviceBooking));
@@ -559,25 +535,31 @@ class EditBooking {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->get())
+                        "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->orderBy('starts_at')->get())
             );
         } else if ($query == "customer_unapproved") {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->get())
+                        "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->orderBy('starts_at')->get())
             );
         } else if ($query == "customer_past") {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->pastBookings()->whereColumn('price', 'total_paid')->with("bookable")->get())
+                        "data" => $user->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get())
             );
         } else if ($query == "customer_upcoming") {
             return response()->json(array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $user->futureBookings()->whereColumn('price', 'total_paid')->with("bookable")->get())
+                        "data" => $user->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get())
+            );
+        } else if ($query == "customer_all") {
+            return response()->json(array(
+                        "status" => "success",
+                        "message" => "",
+                        "data" => $user->futureBookings()->with("bookable")->orderBy('starts_at')->get())
             );
         }
         if (class_exists($class)) {
@@ -587,31 +569,35 @@ class EditBooking {
                     return response()->json(array(
                                 "status" => "success",
                                 "message" => "",
-                                "data" => $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->whereColumn('price', 'total_paid')->get())
+                                "data" => $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get())
                     );
-                } else if ($query == "bookable_upcoming") {
+                } else {
                     if ($user->id == $object->user_id) {
-                        return response()->json(array(
-                                    "status" => "success",
-                                    "message" => "",
-                                    "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->with("customer")->get())
-                        );
-                    }
-                } else if ($query == "bookable_past") {
-                    if ($user->id == $object->user_id) {
-                        return response()->json(array(
-                                    "status" => "success",
-                                    "message" => "",
-                                    "data" => $object->pastBookings()->whereColumn('price', 'total_paid')->with("customer")->get())
-                        );
-                    }
-                } else if ($query == "bookable_unapproved") {
-                    if ($user->id == $object->user_id) {
-                        return response()->json(array(
-                                    "status" => "success",
-                                    "message" => "",
-                                    "data" => $object->futureBookings()->where('total_paid', -1)->with("customer")->get())
-                        );
+                        if ($query == "bookable_upcoming") {
+                            return response()->json(array(
+                                        "status" => "success",
+                                        "message" => "",
+                                        "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get())
+                            );
+                        } else if ($query == "bookable_past") {
+                            return response()->json(array(
+                                        "status" => "success",
+                                        "message" => "",
+                                        "data" => $object->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get())
+                            );
+                        } else if ($query == "bookable_unapproved") {
+                            return response()->json(array(
+                                        "status" => "success",
+                                        "message" => "",
+                                        "data" => $object->futureBookings()->where('total_paid', -1)->orderBy('starts_at')->with("customer")->get())
+                            );
+                        } else if ($query == "bookable_all") {
+                            return response()->json(array(
+                                        "status" => "success",
+                                        "message" => "",
+                                        "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get())
+                            );
+                        }
                     }
                 }
                 return response()->json(array("status" => "error", "message" => "Access denied"), 400);
@@ -700,7 +686,7 @@ class EditBooking {
                                     bookable_bookings b
                                 WHERE
                                     starts_at < DATE_ADD(NOW(), INTERVAL 2 MINUTE)
-                                        AND notes = 'pending' and b.price=b.price
+                                        AND notes = 'pending' and b.price=b.total_paid
                                 ORDER BY b.bookable_id");
         foreach ($bookings as $booking) {
             $this->createChatroom($booking->id);
