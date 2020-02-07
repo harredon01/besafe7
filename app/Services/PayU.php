@@ -26,7 +26,7 @@ use App\Models\Transaction;
 class PayU {
 
     private function populatePaymentContent(Payment $payment, $platform) {
-        if ($payment->user_id == 2 || $payment->user_id == 77) {
+        if ($payment->user_id == 1 ||$payment->user_id == 2 || $payment->user_id == 77) {
             $accountId = env('PAYU_TEST_ACCOUNT', "512321");
             $apiKey = env('PAYU_TEST_KEY');
             $merchantId = env('PAYU_TEST_MERCHANT', "508029");
@@ -105,7 +105,7 @@ class PayU {
         $apiLogin = env('PAYU_LOGIN');
         $apiKey = env('PAYU_KEY');
         if ($user) {
-            if ($user->id == 2 || $user->id == 77) {
+            if ($user->id == 1 ||$user->id == 2 || $user->id == 77) {
                 $apiLogin = env('PAYU_TEST_LOGIN');
                 $apiKey = env('PAYU_TEST_KEY');
             }
@@ -259,7 +259,7 @@ class PayU {
     }
 
     private function getTestVar(User $user) {
-        if ($user->id == 2 || $user->id == 77) {
+        if ($user->id == 1 ||$user->id == 2 || $user->id == 77) {
             return "true";
         } else {
             return false;
@@ -268,7 +268,7 @@ class PayU {
 
     private function getTestUrl($user) {
         if ($user) {
-            if ($user->id == 2 || $user->id == 77) {
+            if ($user->id == 1 ||$user->id == 2 || $user->id == 77) {
                 return "https://sandbox.api.payulatam.com";
             }
         }

@@ -64,6 +64,7 @@ Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::get('payu/return', 'PayuController@returnPayU');
+Route::get('mercado/return', 'MercadoPagoController@returnMerc');
 Route::get('payu/cron', 'PayuController@cronPayU');
 Route::get('billing/orders', 'BillingController@getOrders');
 Route::get('billing/payments', 'BillingController@getPayments');

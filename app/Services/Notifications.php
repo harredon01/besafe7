@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use Validator;
-
 use App\Models\User;
 use App\Models\Translation;
 use App\Models\Notification;
@@ -361,23 +360,13 @@ class Notifications {
                 "en" => $msg['subject'],
                 "es" => $msg['subject_es']
             );
-            if ($platform == "hife") {
-                $fields = array(
-                    'app_id' => env('ONESIGNAL_APP_ID_HIFE'),
-                    'include_player_ids' => $userPush,
-                    'data' => $msg,
-                    'contents' => $content
-                );
-                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_HIFE');
-            } elseif ($platform == "food") {
-                $fields = array(
-                    'app_id' => env('ONESIGNAL_APP_ID_FOOD'),
-                    'include_player_ids' => $userPush,
-                    'data' => $msg,
-                    'contents' => $content
-                );
-                $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_FOOD');
-            }
+            $fields = array(
+                'app_id' => env('ONESIGNAL_APP_ID_FOOD'),
+                'include_player_ids' => $userPush,
+                'data' => $msg,
+                'contents' => $content 
+            );
+            $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_FOOD');
 
             $fields = json_encode($fields);
 
@@ -414,7 +403,6 @@ class Notifications {
                     'message' => 'required|max:255',
         ]);
     }
-
 
     /**
      * Get a validator for an incoming edit profile request.

@@ -91,8 +91,8 @@ class MercadoPagoService {
         if ($paymentResult['status'] == "success") {
             if (array_key_exists("save_card", $data)) {
                 if ($data['save_card']) {
-                    dispatch(new SaveCard($user, $data, "MercadoPago"));
-                    return $this->createToken($user, $data);
+                    //dispatch(new SaveCard($user, $data, "MercadoPago"));
+                    return $this->createToken($user, $data); 
                 }
             }
         }
@@ -811,7 +811,7 @@ class MercadoPagoService {
         return null;
     }
     public function handleTransactionResponse($response, User $user, Payment $payment, $platform) {
-        if ($user) {
+        if ($response->status) {
             $transactionContainer = [];
             $transactionContainer['order_id'] = $payment->order_id;
             $transactionContainer['reference_sale'] = $payment->referenceCode;
@@ -835,10 +835,11 @@ class MercadoPagoService {
             } else {
                 dispatch(new DenyPayment($payment, $platform));
             }
-            $transaction->ur = $this->getTestUrl($user);
             return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $message];
         }
-        return ["status" => "error", "response" => $response, "message" => "Error"];
+        $response = $response->toArray();
+        $error = $response['error'];
+        return ["status" => "error", "response" => $response, "message" => $error->causes];
     }
 
     private function getMessage($response) {

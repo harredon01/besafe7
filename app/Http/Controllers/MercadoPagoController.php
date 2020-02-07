@@ -95,7 +95,20 @@ class MercadoPagoController extends Controller {
      */
     public function getBanks(Request $request) {
         $user = $request->user();
-        $status = $this->payU->getBanks($user);
+        $status = $this->mercadoPago->getBanks();
+        return response()->json($status);
+    }
+    
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCards(Request $request) {
+        $user = $request->user();
+        $source = $user->sources()->where("platform","MercadoPago")->first(); 
+        $status = $this->mercadoPago->getCards($source);
         return response()->json($status);
     }
 
@@ -111,27 +124,18 @@ class MercadoPagoController extends Controller {
     }
 
     public function cronPayU() {
-        $debug = env('APP_DEBUG');
-        if($debug == 'true'){
-            return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
-        }
-        $this->payU->checkOrders();
+        $this->mercadoPago->checkOrders();
         //dispatch(new PayUCron());
     }
 
     public function webhook(Request $request) {
-        return response()->json($this->payU->webhook($request->all()));
-        //dispatch(new PayUCron());
-    }
-    public function postcreateAll(Request $request) {
-        $user = $request->user();
-        return $this->payU->createAll($user,$request->all());
+        return response()->json($this->mercadoPago->webhook($request->all()));
         //dispatch(new PayUCron());
     }
 
-    public function returnPayU(Request $request) {
-        $data = $this->payU->returnPayu($request->all());
-        return view('billing.PayU.return', $data);
+    public function returnMerc(Request $request) {
+        $data = $this->mercadoPago->returnMerc($request->all());
+        return view('billing.MercadoPago.return', $data);
     }
 
 }
