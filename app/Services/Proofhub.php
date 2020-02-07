@@ -13,7 +13,7 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2020-01-01';
+    const START_DATE = '2020-02-01';
     const END_DATE = '2119-11-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';

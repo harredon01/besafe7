@@ -107,7 +107,7 @@ class MercadoPagoController extends Controller {
      */
     public function getCards(Request $request) {
         $user = $request->user();
-        $source = $user->sources()->where("platform","MercadoPago")->first(); 
+        $source = $user->sources()->where("gateway","MercadoPago")->first(); 
         $status = $this->mercadoPago->getCards($source);
         return response()->json($status);
     }

@@ -92,7 +92,7 @@ class MercadoPagoService {
             if (array_key_exists("save_card", $data)) {
                 if ($data['save_card']) {
                     //dispatch(new SaveCard($user, $data, "MercadoPago"));
-                    return $this->createToken($user, $data); 
+                    return $this->createToken($user, $data);
                 }
             }
         }
@@ -258,13 +258,13 @@ class MercadoPagoService {
     }
 
     public function editCard(Source $source, array $data) {
-
+        
     }
 
     public function deleteCard(Source $source, $cardId) {
         $cards = $this->getCards($source);
         foreach ($cards as $item) {
-            if($item->id == $cardId){
+            if ($item->id == $cardId) {
                 $item->delete();
                 return true;
             }
@@ -273,16 +273,17 @@ class MercadoPagoService {
 
     public function getCards(Source $source) {
         $client = $this->getClient($source);
+        dd($client->cards);
         if ($client) {
             return $client->cards();
         }
         return array();
     }
-    
+
     public function createToken(User $user, array $data) {
         $source = $user->sources()->where("gateway", "MercadoPago")->first();
         $customer = null;
-        if($source){
+        if ($source) {
             $customer = $this->getClient($source);
         }
         if ($customer) {
@@ -340,8 +341,6 @@ class MercadoPagoService {
         }
     }
 
-    
-
     public function getSource(Source $source, $token) {
         return null;
     }
@@ -363,7 +362,16 @@ class MercadoPagoService {
         $customer = new Customer();
         $customer->email = $user->email;
         $customer->save();
-        $source = $user->sources()->where("gateway","MercadoPago")->first();
+        if ($customer->id) {
+            
+        } else {
+            $filters = array(
+                "email" => $user->email
+            );
+            $customers = Customer::search($filters);
+            $customer = $customers[0];
+        }
+        $source = $user->sources()->where("gateway", "MercadoPago")->first();
         if ($source) {
             $source->client_id = $customer->id;
             $source->save();
@@ -373,14 +381,13 @@ class MercadoPagoService {
                 "client_id" => $customer->id
             ]);
             $user->sources()->save($source);
-            
         }
         return $source;
     }
 
     public function getClient(Source $source) {
         $customer = Customer::find_by_id($source->client_id);
-        if($customer){
+        if ($customer) {
             return $customer;
         }
         $user = $source->user;
@@ -790,8 +797,6 @@ class MercadoPagoService {
         return null;
     }
 
-    
-
     public function deleteSubscription(User $user, $subscription) {
         $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/' . $subscription;
         $result = $this->sendDelete($url);
@@ -810,6 +815,7 @@ class MercadoPagoService {
         }
         return null;
     }
+
     public function handleTransactionResponse($response, User $user, Payment $payment, $platform) {
         if ($response->status) {
             $transactionContainer = [];
@@ -832,10 +838,12 @@ class MercadoPagoService {
                 dispatch(new ApprovePayment($payment, $platform));
             } else if ($response->status == "in_process") {
                 dispatch(new PendingPayment($payment, $platform));
+            } else if ($response->status_detail == "cc_rejected_bad_filled_card_number" || $response->status_detail == "cc_rejected_bad_filled_date" || $response->status_detail == "cc_rejected_bad_filled_other" || $response->status_detail == "cc_rejected_bad_filled_security_code") {
+                return ["status" => "error", "response" => $response, "message" => $message];
             } else {
                 dispatch(new DenyPayment($payment, $platform));
             }
-            return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $message];
+            return ["status" => "success", "responsedet" => $response->status_detail, "response" => $response->status, "message" => $message];
         }
         $response = $response->toArray();
         $error = $response['error'];
@@ -934,53 +942,35 @@ class MercadoPagoService {
 //        file_put_contents($file, $current);
         switch ($data["type"]) {
             case "payment":
-                $transactionExists = Transaction::where("transaction_id", $data["id"])->where('gateway', 'PayU')->first();
-                if ($transactionExists) {
-                    return ["status" => "success", "message" => "transaction already processed", "data" => $data];
-                }
-                $paymentM = MercadoPago\Payment . find_by_id($data["id"]);
-                $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
-                if ($payment) {
-                    $data['user_id'] = $payment->user_id;
-                    $data['order_id'] = $payment->order_id;
-                    $insert = [];
-                    $insert["reference_sale"] = $paymentM->external_reference;
-                    $insert["order_id"] = $payment->order_id;
-                    $insert["user_id"] = $payment->user_id;
-                    $insert["response_code"] = $paymentM->status;
-                    $insert["currency"] = $paymentM->currency_id;
-                    $insert["payment_method"] = $paymentM->payment_method_id;
-                    $insert["transaction_id"] = $paymentM->id;
-                    $insert["gateway"] = "MercadoPago";
-                    $insert["description"] = $paymentM->status_detail;
-                    $insert["transaction_date"] = $paymentM->date_last_updated;
-                    $insert["transaction_state"] = $paymentM->status;
-                    $insert["extras"] = json_encode($data);
-                    $transaction = $this->saveTransactionConfirmacion($data, $payment);
-                    if ($paymentM->status == "approved") {
-                        dispatch(new ApprovePayment($payment, "Food"));
-                    } else if ($paymentM->status == "rejected") {
-                        dispatch(new DenyPayment($payment, "Food"));
-                    }
-                } else {
-                    if (array_key_exists("reference_recurring_payment", $data)) {
-                        if ($data['state_pol'] == 4) {
-                            $results = explode("_", $data["reference_recurring_payment"]);
-                            $subscriptionL = Subscription::where("source_id", $results[0])->first();
-                            if ($subscriptionL) {
-                                $subscriptionL->ends_at = Date($data['date_next_payment']);
-                                $objectType = "App\\Models\\" . $subscriptionL->type;
-                                $object = new $objectType;
-                                $target = $object->find($subscriptionL->object_id);
-                                if ($target) {
-                                    $target->ends_at = $subscriptionL->ends_at;
-                                    $target->save();
-                                }
-                                $subscriptionL->save();
-                            }
+                if ($data["action"] == "payment.updated") {
+                    $paymentM = MercadoPago\Payment . find_by_id($data["id"]);
+
+                    $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
+                    if ($payment) {
+                        $data['user_id'] = $payment->user_id;
+                        $data['order_id'] = $payment->order_id;
+                        $insert = [];
+                        $insert["reference_sale"] = $paymentM->external_reference;
+                        $insert["order_id"] = $payment->order_id;
+                        $insert["user_id"] = $payment->user_id;
+                        $insert["response_code"] = $paymentM->status;
+                        $insert["currency"] = $paymentM->currency_id;
+                        $insert["payment_method"] = $paymentM->payment_method_id;
+                        $insert["transaction_id"] = $paymentM->id;
+                        $insert["gateway"] = "MercadoPago";
+                        $insert["description"] = $paymentM->status_detail;
+                        $insert["transaction_date"] = $paymentM->date_last_updated;
+                        $insert["transaction_state"] = $paymentM->status;
+                        $insert["extras"] = json_encode($data);
+                        $transaction = $this->saveTransactionConfirmacion($data, $payment);
+                        if ($paymentM->status == "approved") {
+                            dispatch(new ApprovePayment($payment, "Food"));
+                        } else if ($paymentM->status == "rejected") {
+                            dispatch(new DenyPayment($payment, "Food"));
                         }
                     }
                 }
+
 
                 return ["status" => "success", "message" => "transaction processed", "data" => $data];
                 break;

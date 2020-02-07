@@ -45,6 +45,7 @@ Route::post('payu/pay_cc', 'PayuController@postPayCreditCard');
 Route::post('payu/pay_debit', 'PayuController@postPayDebitCard');
 Route::post('payu/pay_cash', 'PayuController@postPayCash');
 Route::get('mercadopago/payment_methods', 'MercadoPagoController@getPaymentMethods');
+Route::get('mercadopago/cards', 'MercadoPagoController@getCards');
 Route::post('mercadopago/pay_cc', 'MercadoPagoController@postPayCreditCard');
 Route::post('mercadopago/pay_debit', 'MercadoPagoController@postPayDebitCard');
 Route::post('mercadopago/pay_cash', 'MercadoPagoController@postPayCash');
