@@ -40,8 +40,9 @@ class BillingSeeder extends Seeder {
 
     public function run() {
         $user = User::find(1);
-        $this->mercadoPago->createClient($user);
-
+        $source = $user->sources()->where("gateway","MercadoPago")->first();
+        $client = $this->mercadoPago->getClient($source);
+        dd($client->cards);
         $payment = Payment::find(630);
         $data = ["payment_id"=>630];
         $user = User::find(2);

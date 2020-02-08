@@ -92,7 +92,7 @@ class MercadoPagoService {
             if (array_key_exists("save_card", $data)) {
                 if ($data['save_card']) {
                     //dispatch(new SaveCard($user, $data, "MercadoPago"));
-                    return $this->createToken($user, $data);
+                    return $this->createToken($user, $data, $paymentResult);
                 }
             }
         }
@@ -101,7 +101,7 @@ class MercadoPagoService {
     }
 
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
-        $source = $user->sources()->where("has_default", true)->where("gateway", "MercadoPago")->first();
+        $source = $user->sources()->where("gateway", "MercadoPago")->first();
         if ($source) {
             
         } else {
@@ -115,6 +115,8 @@ class MercadoPagoService {
         $paymentM->transaction_amount = $payment->total;
         $paymentM->external_reference = $payment->referenceCode;
         $paymentM->token = $data["token"];
+        $paymentM->issuer_id = $data["issuer_id"];
+        $paymentM->installments = $data["installments"];
         $paymentM->description = "Pago Mevico app # " . $payment->id;
         $paymentM->payer = array(
             "type" => "customer",
@@ -270,12 +272,12 @@ class MercadoPagoService {
     public function getCards(Source $source) {
         $client = $this->getClient($source);
         if ($client) {
-            return $client->cards();
+            return $client->cards;
         }
         return array();
     }
 
-    public function createToken(User $user, array $data) {
+    public function createToken(User $user, array $data, $paymentResult) {
         $source = $user->sources()->where("gateway", "MercadoPago")->first();
         $customer = null;
         if ($source) {
@@ -287,7 +289,9 @@ class MercadoPagoService {
             $card->customer_id = $customer->id;
             $card->save();
         } else {
-            $customer = $this->createClient($user);
+            $results = $this->createClient($user);
+            $customer = $results['customer'];
+            $source = $results['source'];
             $card = new Card();
             $card->token = $data["token"];
             $card->customer_id = $customer->id;
@@ -307,7 +311,8 @@ class MercadoPagoService {
             ]);
             $user->sources()->save($source);
         }
-        return $card;
+        $paymentResult['card'] = $card;
+        return $paymentResult;
     }
 
     public function deleteToken(User $user) {
@@ -377,7 +382,7 @@ class MercadoPagoService {
             ]);
             $user->sources()->save($source);
         }
-        return $source;
+        return ["customer" => $customer, "source" => $source];
     }
 
     public function getClient(Source $source) {
@@ -839,7 +844,7 @@ class MercadoPagoService {
             } else {
                 dispatch(new DenyPayment($payment, $platform));
             }
-            return ["status" => "success", "responsedet" => $response->status_detail, "response" => $response->status, "message" => $message];
+            return ["status" => "success", "status_detail" => $response->status_detail, "response" => $response->status, "message" => $message];
         }
         $response = $response->toArray();
         $error = $response['error'];
@@ -1127,8 +1132,11 @@ class MercadoPagoService {
         return Validator::make($data, [
                     'financial_institution' => 'required|max:255',
                     'doc_type' => 'required|max:255',
-                    'doc_num' => 'required|max:255',
+                    'payer_id' => 'required|max:255',
                     'email' => 'required|max:255',
+                    'payment_id' => 'required|max:255',
+                    'platform' => 'required|max:255',
+                    'entity_type' => 'required|max:255',
         ]);
     }
 
@@ -1140,8 +1148,10 @@ class MercadoPagoService {
      */
     public function validatorCash(array $data) {
         return Validator::make($data, [
-                    'payer_email' => 'required|email|max:255',
-                    'payment_method' => 'required|max:255',
+                    'email' => 'required|email|max:255',
+                    'payment_method_id' => 'required|max:255',
+                    'payment_id' => 'required|max:255',
+                    'platform' => 'required|max:255'
         ]);
     }
 
@@ -1233,11 +1243,11 @@ class MercadoPagoService {
      */
     public function validatorQuickPayment(array $data) {
         return Validator::make($data, [
-                    'buyer_address' => 'required|max:255',
-                    'buyer_city' => 'required|max:255',
-                    'buyer_state' => 'required|max:255',
-                    'buyer_country' => 'required|max:255',
-                    'buyer_postal' => 'required|max:255',
+                    'payment_id' => 'required|max:255',
+                    'platform' => 'required|max:255',
+                    'token' => 'required|max:255',
+                    'installments' => 'required|max:255',
+                    'issuer_id' => 'required|max:255',
                         ]
         );
     }

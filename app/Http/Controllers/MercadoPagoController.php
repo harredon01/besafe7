@@ -41,6 +41,7 @@ class MercadoPagoController extends Controller {
         $status = $this->mercadoPago->payCreditCardT($user, $data);
         return response()->json($status);
     }
+
     /**
      * Handle a login request to the application.
      *
@@ -98,7 +99,7 @@ class MercadoPagoController extends Controller {
         $status = $this->mercadoPago->getBanks();
         return response()->json($status);
     }
-    
+
     /**
      * Handle a login request to the application.
      *
@@ -107,9 +108,12 @@ class MercadoPagoController extends Controller {
      */
     public function getCards(Request $request) {
         $user = $request->user();
-        $source = $user->sources()->where("gateway","MercadoPago")->first(); 
-        $status = $this->mercadoPago->getCards($source);
-        return response()->json($status);
+        $source = $user->sources()->where("gateway", "MercadoPago")->first();
+        if ($source) {
+            $status = $this->mercadoPago->getCards($source);
+            return response()->json($status);
+        }
+        return response()->json([]);
     }
 
     /**
