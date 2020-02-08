@@ -180,12 +180,10 @@ class MercadoPagoService {
         $paymentM->payment_method_id = "pse";
         $paymentM->save();
         $url = "";
-        if (array_key_exists("email", $data)) {
-            if ($paymentM->pending_waiting_payment == 'pending_waiting_transfer') {
-                $transaction = $paymentM->transaction_details;
-                $url = $transaction->external_resource_url;
-                Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
-            }
+        if ($paymentM->pending_waiting_payment == 'pending_waiting_transfer') {
+            $transaction = $paymentM->transaction_details;
+            $url = $transaction->external_resource_url;
+            Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
         }
         return $paymentM;
     }
@@ -205,12 +203,10 @@ class MercadoPagoService {
         );
         $paymentM->payment_method_id = $data["payment_method_id"];
         $paymentM->save();
-        if (array_key_exists("email", $data)) {
-            if ($paymentM->pending_waiting_payment == 'pending_waiting_payment') {
-                $transaction = $paymentM->transaction_details;
-                $url = $transaction->external_resource_url;
-                Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, null));
-            }
+        if ($paymentM->pending_waiting_payment == 'pending_waiting_payment') {
+            $transaction = $paymentM->transaction_details;
+            $url = $transaction->external_resource_url;
+            Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, null));
         }
         return $paymentM;
     }
@@ -273,7 +269,6 @@ class MercadoPagoService {
 
     public function getCards(Source $source) {
         $client = $this->getClient($source);
-        dd($client->cards);
         if ($client) {
             return $client->cards();
         }
@@ -838,8 +833,9 @@ class MercadoPagoService {
                 dispatch(new ApprovePayment($payment, $platform));
             } else if ($response->status == "in_process") {
                 dispatch(new PendingPayment($payment, $platform));
-            } else if ($response->status_detail == "cc_rejected_bad_filled_card_number" || $response->status_detail == "cc_rejected_bad_filled_date" || $response->status_detail == "cc_rejected_bad_filled_other" || $response->status_detail == "cc_rejected_bad_filled_security_code") {
-                return ["status" => "error", "response" => $response, "message" => $message];
+            } else if ($response->status == "rejected" && (
+                    $response->status_detail == "cc_rejected_bad_filled_card_number" || $response->status_detail == "cc_rejected_bad_filled_date" || $response->status_detail == "cc_rejected_bad_filled_other" || $response->status_detail == "cc_rejected_bad_filled_security_code")) {
+                return ["status" => "denied", "response" => $response, "message" => $message];
             } else {
                 dispatch(new DenyPayment($payment, $platform));
             }
@@ -907,7 +903,7 @@ class MercadoPagoService {
                         $transactionResponse['responseMessage'] = $paymentD->status_detail;
                         $transactionResponse['transactionDate'] = $paymentD->date_last_updated;
                         $transactionResponse['referenceCode'] = $payment->referenceCode;
-                        $transactionResponse['gateway'] = 'MercadoPAgo';
+                        $transactionResponse['gateway'] = 'MercadoPago';
                         $this->saveTransactionQuery($transactionResponse, $payment);
                         if ($paymentD->status == "approved") {
                             dispatch(new ApprovePayment($payment, "Food"));
@@ -944,36 +940,36 @@ class MercadoPagoService {
             case "payment":
                 if ($data["action"] == "payment.updated") {
                     $paymentM = MercadoPago\Payment . find_by_id($data["id"]);
-
                     $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
                     if ($payment) {
-                        $data['user_id'] = $payment->user_id;
-                        $data['order_id'] = $payment->order_id;
-                        $insert = [];
-                        $insert["reference_sale"] = $paymentM->external_reference;
-                        $insert["order_id"] = $payment->order_id;
-                        $insert["user_id"] = $payment->user_id;
-                        $insert["response_code"] = $paymentM->status;
-                        $insert["currency"] = $paymentM->currency_id;
-                        $insert["payment_method"] = $paymentM->payment_method_id;
-                        $insert["transaction_id"] = $paymentM->id;
-                        $insert["gateway"] = "MercadoPago";
-                        $insert["description"] = $paymentM->status_detail;
-                        $insert["transaction_date"] = $paymentM->date_last_updated;
-                        $insert["transaction_state"] = $paymentM->status;
-                        $insert["extras"] = json_encode($data);
-                        $transaction = $this->saveTransactionConfirmacion($data, $payment);
-                        if ($paymentM->status == "approved") {
-                            dispatch(new ApprovePayment($payment, "Food"));
-                        } else if ($paymentM->status == "rejected") {
-                            dispatch(new DenyPayment($payment, "Food"));
+                        if ($payment->status == "payment_created" || $payment->status == "pending") {
+                            $data['user_id'] = $payment->user_id;
+                            $data['order_id'] = $payment->order_id;
+                            $insert = [];
+                            $insert["reference_sale"] = $paymentM->external_reference;
+                            $insert["order_id"] = $payment->order_id;
+                            $insert["user_id"] = $payment->user_id;
+                            $insert["response_code"] = $paymentM->status;
+                            $insert["currency"] = $paymentM->currency_id;
+                            $insert["payment_method"] = $paymentM->payment_method_id;
+                            $insert["transaction_id"] = $paymentM->id;
+                            $insert["gateway"] = "MercadoPago";
+                            $insert["description"] = $paymentM->status_detail;
+                            $insert["transaction_date"] = $paymentM->date_last_updated;
+                            $insert["transaction_state"] = $paymentM->status;
+                            $insert["extras"] = json_encode($data);
+                            $transaction = $this->saveTransactionConfirmacion($data, $payment);
+                            if ($paymentM->status == "approved") {
+                                dispatch(new ApprovePayment($payment, "Food"));
+                            } else if ($paymentM->status == "rejected") {
+                                dispatch(new DenyPayment($payment, "Food"));
+                            }
                         }
                     }
+                    return ["status" => "success", "message" => "transaction processed"];
+                    break;
                 }
 
-
-                return ["status" => "success", "message" => "transaction processed", "data" => $data];
-                break;
             case "plan":
                 $plan = MercadoPago\Plan . find_by_id($data["id"]);
                 break;
@@ -1095,67 +1091,29 @@ class MercadoPagoService {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function returnPayu(array $data) {
-
-        $ApiKey = env('PAYU_KEY');
-
-        $merchant_id = $data['merchantId'];
-        $referenceCode = $data['referenceCode'];
-        $TX_VALUE = $data['TX_VALUE'];
-        $New_value = number_format($TX_VALUE, 1, '.', '');
-        $currency = $data['currency'];
-        $transactionState = $data['transactionState'];
-        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        $firmacreada = sha1($firma_cadena);
-        $firma = $data['signature'];
-        $estadoTx = "";
-        $transactionId = $data['transactionId'];
-        if ($firma == $firmacreada) {
-            //if (strtoupper($firma) == strtoupper($firmacreada)) {
-            if ($data['transactionState'] == 4) {
-                $estadoTx = "Transaction approved";
-            } else if ($data['transactionState'] == 6) {
-                $estadoTx = "Transaction rejected";
-            } else if ($data['transactionState'] == 104) {
-                $estadoTx = "Error";
-            } else if ($data['transactionState'] == 7) {
-                $estadoTx = "Pending payment";
-            } else {
-                $estadoTx = $data['mensaje'];
-            }
-
-            $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-            if ($transaction) {
-                $data['estadoTx'] = $transaction->transaction_state;
-                $data['transaction'] = $transaction;
-                return $data;
-            }
-            $payment = Payment::where("referenceCode", $referenceCode)->first();
-            if ($payment) {
-                $data['user_id'] = $payment->user_id;
-                $data['order_id'] = $payment->order_id;
-                $transaction = $this->saveTransactionRespuesta($data, $payment);
-                $data['transaction'] = $transaction;
-                if ($data['transactionState'] == 4) {
-                    $estadoTx = "Transaction approved";
-                    dispatch(new ApprovePayment($payment, "Food"));
-                } else if ($data['transactionState'] == 6) {
-                    $estadoTx = "Transaction rejected";
-                    dispatch(new DenyPayment($payment, "Food"));
-                } else if ($data['transactionState'] == 104) {
-                    $estadoTx = "Error";
-                    dispatch(new DenyPayment($payment, "Food"));
-                } else if ($data['transactionState'] == 7) {
-                    $estadoTx = "Pending payment";
-                    dispatch(new PendingPayment($payment, "Food"));
-                } else {
-                    $estadoTx = $data['mensaje'];
-                }
-            }
-        } else {
-            $estadoTx = "Transaction failed security check";
-        }
-        $data['estadoTx'] = $estadoTx;
+    public function returnMerc(array $data) {
+//        $payment = Payment::where("referenceCode", $referenceCode)->first();
+//        if ($payment) {
+//            $data['user_id'] = $payment->user_id;
+//            $data['order_id'] = $payment->order_id;
+//            $transaction = $this->saveTransactionRespuesta($data, $payment);
+//            $data['transaction'] = $transaction;
+//            if ($data['transactionState'] == 4) {
+//                $estadoTx = "Transaction approved";
+//                dispatch(new ApprovePayment($payment, "Food"));
+//            } else if ($data['transactionState'] == 6) {
+//                $estadoTx = "Transaction rejected";
+//                dispatch(new DenyPayment($payment, "Food"));
+//            } else if ($data['transactionState'] == 104) {
+//                $estadoTx = "Error";
+//                dispatch(new DenyPayment($payment, "Food"));
+//            } else if ($data['transactionState'] == 7) {
+//                $estadoTx = "Pending payment";
+//                dispatch(new PendingPayment($payment, "Food"));
+//            } else {
+//                $estadoTx = $data['mensaje'];
+//            }
+//        }
         return $data;
     }
 
