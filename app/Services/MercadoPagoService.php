@@ -15,6 +15,7 @@ use App\Jobs\ApprovePayment;
 use App\Jobs\DenyPayment;
 use App\Jobs\PendingPayment;
 use App\Jobs\SaveCard;
+use Illuminate\Support\Facades\Mail;
 use App\Mail\EmailPaymentCash;
 use App\Mail\EmailPaymentPse;
 use App\Models\Source;
@@ -168,7 +169,7 @@ class MercadoPagoService {
             "email" => $data["email"],
             "identification" => array(
                 "type" => $data["doc_type"],
-                "number" => $data["doc_num"]
+                "number" => $data["payer_id"]
             ),
             "entity_type" => "individual"
         );
@@ -182,12 +183,12 @@ class MercadoPagoService {
         $paymentM->payment_method_id = "pse";
         $paymentM->save();
         $url = "";
-        if ($paymentM->pending_waiting_payment == 'pending_waiting_transfer') {
+        if ($paymentM->status_detail == 'pending_waiting_transfer') {
             $transaction = $paymentM->transaction_details;
             $url = $transaction->external_resource_url;
             Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
         }
-        return $paymentM;
+        return ["status" => "success","response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
     }
 
     public function payCash(User $user, array $data, Payment $payment, $platform) {
@@ -205,12 +206,12 @@ class MercadoPagoService {
         );
         $paymentM->payment_method_id = $data["payment_method_id"];
         $paymentM->save();
-        if ($paymentM->pending_waiting_payment == 'pending_waiting_payment') {
+        if ($paymentM->status_detail == 'pending_waiting_payment') {
             $transaction = $paymentM->transaction_details;
             $url = $transaction->external_resource_url;
             Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, null));
         }
-        return $paymentM;
+        return ["status" => "success","response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
     }
 
     public function makeCharge(User $user, Order $order, array $payload) {
