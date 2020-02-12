@@ -39,6 +39,7 @@
         <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/merchantsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/deliveriesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
@@ -48,6 +49,7 @@
         <script src="{{ asset('/js/controllers/foodmessagesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
+        <script src="{{ asset('/js/services/merchants.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
         <script src="{{ asset('/js/services/location.js')}}"></script>

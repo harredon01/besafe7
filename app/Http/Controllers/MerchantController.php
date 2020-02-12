@@ -45,7 +45,7 @@ class MerchantController extends Controller {
         $this->editMapObject = $editMapObject;
         $this->merchantImport = $merchantImport;
         $this->auth = $auth;
-        $this->middleware('auth')->except(['getRegisterMerchant','postRegisterMerchant']);
+        $this->middleware('auth');
     }
 
     /**
@@ -122,7 +122,8 @@ class MerchantController extends Controller {
      * @return Response
      */
     public function getRegisterMerchant() {
-        return view('merchants.register');
+        $user = $this->auth->user();
+        return view('merchants.editMerchant')->with('user', $user);
     }
     /**
      * Show the application dashboard to the user.
@@ -133,7 +134,7 @@ class MerchantController extends Controller {
         
         $this->editMapObject->createUserObject( $request->all());
         
-        return view('merchantss.complete');
+        return view('merchants.complete');
     }
 
     /**
