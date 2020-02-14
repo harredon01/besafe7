@@ -1,7 +1,7 @@
 <form class="form-horizontal" role="form" name="myForm" ng-submit="save(myForm.$valid)" novalidate>
     <input type="hidden" name="_token" value="{{ csrf_token()}}">
     <input type="hidden" ng-model="data.id" name="id" value="">
-    <div class="form-group" ng-show="categoriesVisible">
+    <div class="form-group">
         <label class="col-md-4 control-label">Categories</label>
         <div class="col-md-12">
             <div class="checkbox-item" ng-repeat="cat in categories">
@@ -88,7 +88,7 @@
     <div class="form-group">
         <label class="col-md-4 control-label">Es necesario que tu confirmes la reserva antes de que el usuario pueda pagar?</label>
         <div class="col-md-6">
-            <input type="text" ng-model="data.booking_requires_auth" class="form-control" name="booking_requires_auth" value="{{ old('booking_requires_auth')}}" required>
+            <input type="checkbox" ng-model="data.booking_requires_auth" name="booking_requires_auth" value="{{ old('booking_requires_auth')}}" required>
         </div>
     </div>
     <div class="form-group">
@@ -129,6 +129,26 @@
         <label class="col-md-4 control-label">Especialidad 3</label>
         <div class="col-md-6">
             <input type="text" ng-model="data.specialty3" class="form-control" name="specialty3" value="{{ old('specialty3')}}" >
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label">Experiencia 1</label>
+        <div class="col-md-6">
+            <input type="text" ng-model="data.experience1" class="form-control" name="experience1" value="{{ old('experience1')}}" required>
+            <span style="color:red" ng-show="(myForm.experience1.$dirty && myForm.experience1.$invalid) || submitted && myForm.experience1.$invalid">
+                <span ng-show="submitted && myForm.experience1.$error.required">Porfavor ingresa una previa experiencia</span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label">Experiencia 2</label>
+        <div class="col-md-6">
+            <input type="text" ng-model="data.experience2" class="form-control" name="experience2" value="{{ old('experience2')}}" >
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-4 control-label">Experiencia 3</label>
+        <div class="col-md-6">
+            <input type="text" ng-model="data.experience3" class="form-control" name="experience3" value="{{ old('experience3')}}" >
         </div>
     </div>
 

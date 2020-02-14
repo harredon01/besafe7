@@ -50,6 +50,7 @@
         <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
         <script src="{{ asset('/js/services/map.js')}}"></script>
         <script src="{{ asset('/js/services/merchants.js')}}"></script>
+        <script src="{{ asset('/js/services/categories.js')}}"></script>
         <script src="{{ asset('/js/services/mapDash.js')}}"></script>
         <script src="{{ asset('/js/services/users.js')}}"></script>
         <script src="{{ asset('/js/services/location.js')}}"></script>

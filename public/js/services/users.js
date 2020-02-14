@@ -74,6 +74,20 @@ angular.module('besafe')
                 /**/
 
             }
+            var getUser = function () {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/api/user',
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to get user");
+                        });
+                return def.promise;
+            }
             var deleteAddress = function (address) {
                 var def = $q.defer();
                 $http({
@@ -120,6 +134,7 @@ angular.module('besafe')
                 saveAddress:saveAddress,
                 deleteAddress:deleteAddress,
                 saveUser:saveUser,
-                getContacts:getContacts
+                getContacts:getContacts,
+                getUser:getUser
             };
         })

@@ -1,16 +1,32 @@
 ﻿angular.module('besafe')
 
-        .controller('MerchantsCtrl', function ($scope, LocationService, Merchants) {
+        .controller('MerchantsCtrl', function ($scope, LocationService, Merchants,Users,Categories) {
             $scope.data = {};
-            $scope.merchants;
+            $scope.user = {};
+            $scope.page = 0;
+            $scope.merchants=[];
+            $scope.categories=[];
             $scope.regionVisible = false;
             $scope.editMerchant = false;
             $scope.submitted = false;
             angular.element(document).ready(function () {
-                $scope.getMerchants();
                 var where = "";
                 LocationService.getCountries(where).then(function (data) {
                     $scope.countries = data.data;
+                },
+                        function (data) {
+
+                        });
+                Categories.getCategories("merchants").then(function (data) {
+                    $scope.categories = data.categories;
+                },
+                        function (data) {
+
+                        });
+                Users.getUser().then(function (data) {
+                    console.log("Get User",data);
+                    $scope.user = data.user;
+                    $scope.getMerchants();
                 },
                         function (data) {
 
@@ -40,7 +56,9 @@
                 }
             }
             $scope.getMerchants = function () {
-                Merchants.getMerchants().then(function (data) {
+                $scope.page++;
+                var where = "owner_id="+$scope.user.id+"&page="+$scope.page;
+                Merchants.getMerchants(where).then(function (data) {
                     $scope.merchants = data.merchants;
 
                 },

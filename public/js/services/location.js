@@ -5,7 +5,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: "get",
-                    url: API.address + "/locations" + where,
+                    url: "/api/locations" + where,
                 })
                         .success(function (data) {
                             def.resolve(data);
@@ -45,7 +45,7 @@ angular.module('besafe')
                 console.log(JSON.stringify(data));
                 $http({
                     method: "get",
-                    url: API.address + "/merchants/nearby",
+                    url:  "/api/merchants/nearby",
                     params: data
                 })
                         .success(function (data) {
@@ -84,7 +84,7 @@ angular.module('besafe')
 
                 $http({
                     method: "get",
-                    url: API.address + "/locations/hash",
+                    url: "/api/locations/hash",
                 })
                         .success(function (data) {
                             def.resolve(data);
@@ -102,7 +102,7 @@ angular.module('besafe')
 
                 $http({
                     method: "get",
-                    url: API.address + "/cities?limit=50&region_id=" + regionId,
+                    url:  "/api/cities?limit=50&region_id=" + regionId,
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -116,7 +116,7 @@ angular.module('besafe')
             };
             var getRegionFromCity = function (city) {
                 var def = $q.defer();
-                $http.post(API.address + "/cities/from", city
+                $http.post( "/api/cities/from", city
                         )
                         .success(function (data) {
                             // console.log(data);
@@ -134,7 +134,7 @@ angular.module('besafe')
 
                 $http({
                     method: "get",
-                    url: API.address + "/regions?limit=40&country_id=" + countryID,
+                    url:  "/api/regions?limit=40&country_id=" + countryID,
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -150,7 +150,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: "get",
-                    url: API.address + "/countries?id=" + id,
+                    url:  "/api/countries?id=" + id,
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -166,7 +166,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                     method: "get",
-                    url: API.address + "/countries?limit=50&order_by=name,asc",
+                    url:  "/api/countries?limit=50&order_by=name,asc",
                 })
                         .success(function (data) {
                             // console.log(data);
