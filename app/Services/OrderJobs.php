@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\Payment;
+use App\Models\CoveragePolygon; 
 use App\Models\User;
 use App\Services\EditCart;
 use App\Services\PayU;
@@ -42,7 +43,6 @@ class OrderJobs {
      */
     protected $payU;
 
-
     /**
      * The Guard implementation.
      *
@@ -70,7 +70,7 @@ class OrderJobs {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, EditCart $editCart,  Geolocation $geolocation, EditOrder $editOrder, EditBilling $editBilling) {
+    public function __construct(PayU $payU, EditCart $editCart, Geolocation $geolocation, EditOrder $editOrder, EditBilling $editBilling) {
         $this->payU = $payU;
         $this->editCart = $editCart;
         $this->geolocation = $geolocation;
@@ -127,20 +127,23 @@ class OrderJobs {
 
         $address = $order->orderAddresses()->where("type", "shipping")->first();
         if ($address) {
-            $resultG = $this->geolocation->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'],"Basilikum");
-            if ($resultG["status"] == "success") {
-                $polygon = $resultG['polygon'];
-                $orderAttributes['polygon'] = $polygon->id;
-                $orderAttributes['origin'] = $polygon->address_id;
+            $polygon = CoveragePolygon::find($orderAttributes['polygon']);
+            if ($polygon) {
+                $resultG = $this->geolocation->checkMerchantPolygons($address->lat, $address->long, $data['merchant_id'], $polygon->provider );
+                if ($resultG["status"] == "success") {
+                    $polygon = $resultG['polygon'];
+                    $orderAttributes['polygon'] = $polygon->id;
+                    $orderAttributes['origin'] = $polygon->address_id;
+                }
+                $addressCont = $address->toArray();
+                unset($addressCont['id']);
+                $newAddress = new OrderAddress($addressCont);
+                $newOrder->orderAddresses()->save($newAddress);
+                $newOrder->attributes = $orderAttributes;
+                $order->is_recurring = false;
+                $order->save();
+                return $newOrder;
             }
-            $addressCont = $address->toArray();
-            unset($addressCont['id']);
-            $newAddress = new OrderAddress($addressCont);
-            $newOrder->orderAddresses()->save($newAddress);
-            $newOrder->attributes = $orderAttributes;
-            $order->is_recurring = false;
-            $order->save();
-            return $newOrder;
         } else {
             $newOrder->items()->delete();
             $newOrder->delete();
@@ -164,9 +167,9 @@ class OrderJobs {
         $user = $order->user;
         $this->editCart->clearCartSession($order->user_id);
         $checkResult = $this->checkOrder($order);
-        if($checkResult){
+        if ($checkResult) {
             $newOrder = $this->createNewOrder($order);
-            if($newOrder){
+            if ($newOrder) {
                 return $this->postPrepareOrder($user, $newOrder, $ip_address);
             }
         } else {

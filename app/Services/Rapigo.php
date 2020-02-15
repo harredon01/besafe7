@@ -74,6 +74,7 @@ class Rapigo {
         $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
+        $response['status']="success"; 
         return $response;
     }
 

@@ -22,9 +22,10 @@ class Basilikum {
         return $response;
     }
 
-    public function getOrderShippingPrice(array $origin, array $destination) {
+    public function getOrderShippingPrice(array $origin, array $destination) { 
         $response['price'] = 25000;
         $response['price2'] = 25000;
+        $response['status']="success";
         return $response;
     }
 

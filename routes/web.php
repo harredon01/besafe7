@@ -69,7 +69,7 @@ Route::get('payu/cron', 'PayuController@cronPayU');
 Route::get('billing/orders', 'BillingController@getOrders');
 Route::get('billing/payments', 'BillingController@getPayments');
 
-Route::get('merchant/register', 'MerchantController@getRegisterMerchant'); 
+Route::get('merchant/register', 'MerchantController@getRegisterMerchant');
 Route::get('merchant/{code?}', 'MerchantController@getMerchantOrders');
 Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 
