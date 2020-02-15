@@ -246,16 +246,6 @@ class EditOrder {
         if (array_key_exists("order_id", $info)) {
             $order = Order::find($info['order_id']);
             if ($order) {
-                if (array_key_exists("split_order", $info)) {
-                    if ($info['split_order']) {
-                        //$this->removeTransactionCost($order);
-                    }
-                } else {
-//                    $condition = $order->orderConditions()->where("name","Costo variable transaccion")->first();
-//                    $cartCond = Cart::session($order->user_id)::getCondition("Costo variable transaccion");
-                }
-
-
                 $cart = $this->editCart->getCheckoutCart($user);
                 if (count($cart['items']) > 0) {
                     if (array_key_exists("merchant_id", $info)) {
@@ -614,7 +604,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], "Basilikum");
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'] ,null);
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
@@ -724,29 +714,33 @@ class EditOrder {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
                         $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
-                        $insertCondition = array(
-                            'name' => "Servicio de transporte",
-                            'type' => "shipping",
-                            'target' => 'total',
-                            'value' => $result['price'],
-                            'order' => 0
-                        );
-                        $condition = new CartCondition($insertCondition);
-                        $insertCondition['order_id'] = $order->id;
-                        $insertCondition['total'] = $result['price'];
-                        $order->orderConditions()->where('type', "shipping")->delete();
-                        Cart::removeConditionsByType("shipping");
-                        OrderCondition::insert($insertCondition);
-                        Cart::session($user->id)->condition($condition);
-                        $cart = $this->editCart->getCheckoutCart($user);
-                        $order->subtotal = $cart["subtotal"];
-                        $order->tax = $cart["tax"];
-                        $order->shipping = $cart["shipping"];
-                        $order->discount = $cart["discount"];
-                        $order->total = $cart["total"];
-                        $order->save();
+                        if ($result['status'] == 'success') {
+                            $insertCondition = array(
+                                'name' => "Servicio de transporte",
+                                'type' => "shipping",
+                                'target' => 'total',
+                                'value' => $result['price'],
+                                'order' => 0
+                            );
+                            $condition = new CartCondition($insertCondition);
+                            $insertCondition['order_id'] = $order->id;
+                            $insertCondition['total'] = $result['price'];
+                            $order->orderConditions()->where('type', "shipping")->delete();
+                            Cart::removeConditionsByType("shipping");
+                            OrderCondition::insert($insertCondition);
+                            Cart::session($user->id)->condition($condition);
+                            $cart = $this->editCart->getCheckoutCart($user);
+                            $order->subtotal = $cart["subtotal"];
+                            $order->tax = $cart["tax"];
+                            $order->shipping = $cart["shipping"];
+                            $order->discount = $cart["discount"];
+                            $order->total = $cart["total"];
+                            $order->save();
+                            return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order, "cart" => $cart);
+                        }
+                        return array("status" => "error", "message" => "Shipping provider does not have coverage");
                     }
-                    return array("status" => "success", "message" => "Shipping condition set on the cart", "order" => $order, "cart" => $cart);
+                    return array("status" => "error", "message" => "Order has no origin" );
                 }
                 return array("status" => "error", "message" => "Order does not have an origin address");
             }
@@ -967,7 +961,7 @@ class EditOrder {
 
                 Cart::session($user->id)->removeConditionsByType($type);
                 $order->orderConditions()->where('type', $type)->delete();
-                
+
                 $insertCondition = array(
                     'name' => $theCondition->name,
                     'condition_id' => $theCondition->id,
@@ -1034,10 +1028,10 @@ class EditOrder {
                 return array("status" => "error", "message" => "Address Error");
             }
         }
-        
+
         //User Id
         if (array_key_exists("user_id", $attributes)) {
-            if ($attributes["user_id"] != $user->id ) {
+            if ($attributes["user_id"] != $user->id) {
                 return array("status" => "error", "message" => "User Error");
             }
         }

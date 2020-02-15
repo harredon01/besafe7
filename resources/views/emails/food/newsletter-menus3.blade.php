@@ -10,8 +10,6 @@
 <!--<![endif]-->
 <title></title>
 <!--[if !mso]><!-->
-<link href="https://fonts.googleapis.com/css?family=Arvo" rel="stylesheet" type="text/css"/>
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css"/>
 <!--<![endif]-->
 <style type="text/css">
 		body {
@@ -36,7 +34,7 @@
 		}
 	</style>
 <style id="media-query" type="text/css">
-		@media (max-width: 720px) {
+		@media (max-width: 645px) {
 
 			.block-grid,
 			.col {
@@ -122,120 +120,46 @@
 <tr style="vertical-align: top;" valign="top">
 <td style="word-break: break-word; vertical-align: top;" valign="top">
 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color:#FFFFFF"><![endif]-->
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/thanks2.jpg');background-position:center top;background-repeat:no-repeat;background-color:#000909;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:40px; padding-bottom:10px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/thanks2.jpg');background-position:center top;background-repeat:no-repeat;background-color:#000909;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:15px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:40px; padding-bottom:10px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top: 20px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#ffffff;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:0px;padding-bottom:20px;padding-left:0px;">
+<div style="font-family: Georgia, Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.2; color: #ffffff; mso-line-height-alt: 14px;">
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><em><span style="font-size: 22px;"><span style="">Fresco,  Balanceado  &amp;  Delicioso</span></span></em></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://www.lonchis.com.co/" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_22.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 140px; display: block;" title="Image" width="140"/></a>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://www.lonchis.com.co/" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_21_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 218px; display: block;" title="Image" width="218"/></a>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:10px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:10px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#ff8e54;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:0px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.2; color: #ff8e54; mso-line-height-alt: 14px;">
-<p style="font-size: 26px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 31px; margin: 0;"><span style="font-size: 26px;"><span style=""><strong style="font-family: Arvo, 'Courier New', Courier, monospace;">Antójate, programa &amp; </strong><strong>aliméntate</strong><strong style="font-family: Arvo, 'Courier New', Courier, monospace;"> saludable.</strong></span></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg_top.jpg');background-position:top center;background-repeat:repeat;background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg_top.jpg');background-position:top center;background-repeat:repeat;background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Happy Sandwich Day!" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_12_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 700px; display: block;" title="Happy Sandwich Day!" width="700"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_12_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 625px; display: block;" title="Image" width="625"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top: 0px; padding-bottom: 5px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:0px;padding-right:0px;padding-bottom:5px;padding-left:0px;">
+<div style="font-family: Georgia, Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.2; color: #555555; mso-line-height-alt: 14px;">
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ff9900;"><span style="font-size: 24px;"><strong><em>Las especialidades del chef </em></strong></span></span></p>
 </div>
 </div>
-</div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg.jpg');background-position:top left;background-repeat:repeat;background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:30px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:30px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div></div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Divider.png');background-position:top center;background-repeat:repeat;background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Divider.png');background-position:top center;background-repeat:repeat;background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
+<!--[if mso]></td></tr></table><![endif]-->
 <table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
-<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 0px; width: 100%;" valign="top" width="100%">
+<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px dotted #F8CC46; width: 0%;" valign="top" width="0%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
 </tr>
 </tbody>
 </table>
@@ -243,6 +167,13 @@
 </tr>
 </tbody>
 </table>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:0px;padding-bottom:20px;padding-left:0px;">
+<div style="font-family: Georgia, Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.2; color: #555555; mso-line-height-alt: 14px;">
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><span style=""><span style="font-size: 15px;"><strong><em>Del 10 al 14 de febrero</em></strong></span></span></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
@@ -253,32 +184,48 @@
 </div>
 </div>
 </div>
-<div style="background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-color:#ff8e54;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ff8e54;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.2; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px;">
+<p style="font-size: 14px; text-align: center; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><strong><span style="font-size: 16px;">Antójate, programa &amp; aliméntate saludable </span></strong></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div class="mobile_hide">
-<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 0px; width: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_41.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
+<div style="font-size:1px;line-height:15px"> </div>
+<!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if (!mso)&(!IE)]><!-->
 </div>
@@ -286,199 +233,27 @@
 </div>
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:30px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:30px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 2px dotted #E3C3A8; height: 0px; width: 50%;" valign="top" width="50%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 5px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#854006;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:5px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; font-size: 12px; line-height: 1.2; color: #854006; mso-line-height-alt: 14px;">
-<p style="font-size: 28px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 34px; margin: 0;"><span style="font-size: 28px;">Las especialidades del chef para esta semana ...</span></p>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; text-align: right; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Lunes 10 </strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.5; color: #555555; mso-line-height-alt: 18px;">
-<p style="font-size: 18px; line-height: 1.5; text-align: center; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: 27px; margin: 0;"><span style="font-size: 18px;">Aenean sed neque convallis, viverra lectus ut, aliquam justo.</span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 2px dotted #E3C3A8; height: 0px; width: 50%;" valign="top" width="50%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/breadcrumbs_alte.png');background-position:top center;background-repeat:no-repeat;background-color:#FFE3CB;">
-<div class="block-grid three-up" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/breadcrumbs_alte.png');background-position:top center;background-repeat:no-repeat;background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#e05b18;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#e05b18;width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidthOnMobile fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidthOnMobile fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_21.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 223px; display: block;" title="Image" width="223"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#FFFFFF;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; line-height: 1.2; font-size: 12px; color: #FFFFFF; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>Lunes 13</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#F4F4F4;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; line-height: 1.5; font-size: 12px; color: #F4F4F4; mso-line-height-alt: 18px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="line-height: 1.5; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;">
 <ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><span style="">Completo: Pollo a la naranja, acompañado con arroz con pimentón y vegetales al wok.   Una receta con un toque agridulce. </span></span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano: Quinoa con verduras al horno</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light: Pimentón rellenos de carne desmechada</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: Ropa vieja, Carne desmechada acompañada de fréjol negro, tajadas, arroz blanco y ensalada</span></li>
 </ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light:  Pechuga de pollo al horno rellena de espinaca y queso. Un plato ideal para la dieta por su bajo contenido calórico y su gran aporte nutricional. Acompaña este plato con cous cous, un cereal con importante contenido de fibra y vegetales al wok.</span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano:  Tomates rellenos de cous cous, Un plato delicioso y antioxidante relleno con uno de los cereales con mayor aporte proteico e importante contenido de fibra. Acompaña este plato marroquí con papas con cebollín y vegetales al wok.</span></li>
-</ul>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#F1773A;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#F1773A;width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidthOnMobile fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidthOnMobile fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_22.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 223px; display: block;" title="Image" width="223"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#FFFFFF;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; line-height: 1.2; font-size: 12px; color: #FFFFFF; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>Martes 14 </strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#F4F4F4;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="line-height: 1.5; font-size: 12px; color: #F4F4F4; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; mso-line-height-alt: 18px;">
-<ul>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"> Completo: Sopa Mexicana, Un plato para armar; Sopa de tomate, totopos, pollo desmechado, queso, aguacate, pico de gallo y crema. una receta tipica mexicana para chuparse los dedos.</span></li>
-</ul>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light: Ensalada mexicana, Mix de lechugas, pollo, aguacate, tomate, maíz, queso, aceitunas, pimentones &amp; huevo duro. (vinagreta por aparte). Una receta ligera rica en proteínas.</span>
-<p style="line-height: 1.5; word-break: break-word; font-size: 14px; mso-line-height-alt: 21px; margin: 0;"><span style="font-size: 14px;"> </span></p>
-</li>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano:  Burritos,  tortillas con vegetales, aguacate, arroz con maiz; acompañados de totopos con crema agria.</span></li>
-</ul>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#FF9864;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#FF9864;width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidthOnMobile fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidthOnMobile fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_23.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 223px; display: block;" title="Image" width="223"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#FFFFFF;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; line-height: 1.2; font-size: 12px; color: #FFFFFF; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><span style="font-size: 20px;"><strong>Miércoles </strong></span><strong style="font-family: Arvo, 'Courier New', Courier, monospace; font-size: 20px;"> 15</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#F4F4F4;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; line-height: 1.5; font-size: 12px; color: #F4F4F4; mso-line-height-alt: 18px;">
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: Milanesa de pollo a la napolitana, acompañada con pasta corta a las finas hierbas y ratatoulle. Un plato lleno de sabor, texturas, vitaminas y minerales.</span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Ligth: Filete de pescado  a la plancha con un toque de limón y perejil, acompaña con ratatoulle y arroz integral. Un plato ligero con una importante fuente de nutrientes ideal para una dieta saludable y balanceada.</span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano: Ratatoulle, receta a base de verduras horneadas en aceite de oliva originaria de la gastronomía francesa. Acompáñalo con pasta corta a las finas hierbas y pan francés. </span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -492,21 +267,189 @@
 </div>
 </div>
 </div>
-<div style="background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Martes 11</strong></span></em></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px;">
+<ul>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Vegetariano: Pasta al pesto con vegetales.</span></li>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Light: Pasta al pesto con pollo y vegetales</span></li>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Completo: Filete de pescado apanado con arroz con coco.</span></li>
+</ul>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_42.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_43.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; text-align: right; font-size: 20px; mso-line-height-alt: 24px; margin: 0;"><span style="background-color: transparent; font-size: 20px;"><span style="color: #180a01;"><strong><em>Miércoles</em></strong></span></span><em style="font-size: 12px;"><span style="color: #180a01; font-size: 20px;"><strong> 12</strong></span></em></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
+<ul>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Vegetariano: Árabe vegetariano.  Hummus, pita, falafel, arroz con nueces y tabule.</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Light: Ensalada de tabule, a base de trigo, perejil, tomate, hierbabuena, limon y garbanzos; añadimos pedacitos de jugoso filete de res.</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Completo: Plato Arabe, Quibbes, Hummus, pita, Falafel, arroz con nueces y tabule.</li>
+</ul>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Jueves 13</strong></span></em></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.2; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px;">
+<ul>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Vegetariano: Pimentones horneados rellenos de vegetales frescos, </li>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Light: Aguacate relleno de mariscos.</li>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Completo: Arroz con mariscos </li>
+</ul>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_44.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#eeeade;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
 <table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 5px; padding-right: 5px; padding-bottom: 5px; padding-left: 5px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 0px; width: 100%;" valign="top" width="100%">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid #BBBBBB; height: 0px; width: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
@@ -527,89 +470,52 @@
 </div>
 </div>
 </div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/breadcrumbs.png');background-position:top center;background-repeat:no-repeat;background-color:#FFE3CB;">
-<div class="block-grid three-up" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/breadcrumbs.png');background-position:top center;background-repeat:no-repeat;background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#FF9864;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#FF9864;width:100% !important;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:15px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div align="center" class="img-container center autowidthOnMobile fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidthOnMobile fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_17.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 223px; display: block;" title="Image" width="223"/>
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Alitas-de-pollo-buffalo-wings.jpg" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
+<div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#FFFFFF;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; line-height: 1.2; font-size: 12px; color: #FFFFFF; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>Jueves 16</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#F4F4F4;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; line-height: 1.5; font-size: 12px; color: #F4F4F4; mso-line-height-alt: 18px;">
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: Plato Árabe, Kibbes, falafel (croquetas de garbanzo), arroz con nueces y tabule; Un plato delicioso y sano tradicional de la cocina libanesa.</span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">light: Wok de carne, receta oriental en la que combinamos carne de res con unas variadas verduras cocinadas al wok con un toque de salsa soya. Un plato muy sabroso y completo acompañado de arroz integral.</span></li>
-</ul>
-<p style="line-height: 1.5; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"> </p>
-<ul>
-<li style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano:  Árabe vegetariano, Falafel (croquetas de garbanzo), arroz con nueces y tabule; Un plato fresco, delicioso y muy sano tradicional de la cocina libanesa.</span></li>
-</ul>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
 </div>
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#F1773A;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#F1773A;width:100% !important;">
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:15px; padding-bottom:5px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div align="center" class="img-container center autowidthOnMobile fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidthOnMobile fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lo_mejor_de_lo_mejor_24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 223px; display: block;" title="Image" width="223"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 0px; font-family: 'Courier New', Courier, monospace"><![endif]-->
-<div style="color:#FFFFFF;font-family:'Arvo', 'Courier New', Courier, monospace;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:0px;padding-left:10px;">
-<div style="font-family: 'Arvo', 'Courier New', Courier, monospace; line-height: 1.2; font-size: 12px; color: #FFFFFF; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; text-align: center; font-size: 20px; word-break: break-word; font-family: Arvo, Courier New, Courier, monospace; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>Viernes 17</strong></span></p>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; text-align: right; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Viernes 14</strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 25px; padding-left: 25px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#F4F4F4;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.5;padding-top:0px;padding-right:25px;padding-bottom:20px;padding-left:25px;">
-<div style="font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; line-height: 1.5; font-size: 12px; color: #F4F4F4; mso-line-height-alt: 18px;">
-<p style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; mso-line-height-alt: 21px; margin: 0;"><span style="font-size: 14px;">Completo: Carne teriyaki, Jugosa carne de res bañada en salsa teriyaki y semillas de ajonjolí, acompañado con arroz blanco y verduras calientes.</span></p>
-<p style="line-height: 1.5; font-size: 12px; word-break: break-word; text-align: left; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; mso-line-height-alt: 18px; margin: 0;"><br/><span style="font-size: 14px;">light: Albondigas de pavo bañadas en salsa napolitana, acompañadas con pasta integral y ensalada. Un plato saludable, completo y bajo en grasas.</span></p>
-<p style="line-height: 1.5; font-size: 14px; word-break: break-word; text-align: left; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; mso-line-height-alt: 21px; margin: 0;"><span style="font-size: 14px;"> </span><br/><span style="font-size: 14px;">Vegetariano:  Hamburguesa de lentejas,Acompaña con arroz y ensalada. Debido a sus propiedades, las lentejas siempre deben formar parte de tu dieta. A pesar de tener muy pocas calorías ayuda a reducir posibles problemas digestivos, baja el colesterol y estabiliza el azúcar en sangre.</span> </p>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
+<ul>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Vegetariano: Croquetas de zanahoria.</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Light: Albóndigas de pavo.</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Completo: Alitas al estilo Buffalo.</li>
+</ul>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 5px solid #FFE3CB; border-left: 5px solid #FFE3CB; border-bottom: 5px solid #FFE3CB; border-right: 5px solid #FFE3CB;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:5px;background-color:#e05b18;"><![endif]-->
-<div class="col num4" style="max-width: 320px; min-width: 233px; display: table-cell; vertical-align: top; width: 223px;">
-<div style="background-color:#e05b18;width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:5px solid #FFE3CB; border-left:5px solid #FFE3CB; border-bottom:5px solid #FFE3CB; border-right:5px solid #FFE3CB; padding-top:0px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div></div>
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
@@ -620,12 +526,12 @@
 </div>
 </div>
 </div>
-<div style="background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-color:#eeeade;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
@@ -634,7 +540,7 @@
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 15px; padding-right: 15px; padding-bottom: 15px; padding-left: 15px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 0px; width: 100%;" valign="top" width="100%">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid #BBBBBB; height: 0px; width: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
@@ -655,24 +561,24 @@
 </div>
 </div>
 </div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Divider_bottom.png');background-position:top left;background-repeat:repeat;background-color:#FFE3CB;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/675312f1-59a0-47e1-9801-ae33941f7510.png');background-position:center top;background-repeat:repeat;background-color:#180a01;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Divider_bottom.png');background-position:top left;background-repeat:repeat;background-color:#FFE3CB;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:10px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/675312f1-59a0-47e1-9801-ae33941f7510.png');background-position:center top;background-repeat:repeat;background-color:#180a01;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:20px; padding-bottom:45px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:10px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:20px; padding-bottom:45px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
 <table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 0px; width: 100%;" valign="top" width="100%">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid #BBBBBB; width: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
 </tr>
 </tbody>
 </table>
@@ -690,49 +596,39 @@
 </div>
 </div>
 </div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg-2.png');background-position:top left;background-repeat:repeat;background-color:#180a01;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid #E9503D; border-left: 0px solid #E9503D; border-bottom: 0px solid #E9503D; border-right: 0px solid #E9503D;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg-2.png');background-position:top left;background-repeat:repeat;background-color:#180a01;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="625" style="background-color:transparent;width:625px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 625px; display: table-cell; vertical-align: top; width: 625px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid #E9503D; border-left:0px solid #E9503D; border-bottom:0px solid #E9503D; border-right:0px solid #E9503D; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
+<div style="font-size:16px;text-align:center;font-family:Arial, Helvetica Neue, Helvetica, sans-serif">
+<div style="height:30px;"> </div>
+</div>
 <div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://d15k2d11r6t6rl.cloudfront.net/public/users/BeeFree/beefree-6u2m14364ke/8.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 455px; display: block;" title="Image" width="455"/>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://www.lonchis.com.co/" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_21_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 187px; display: block;" title="Image" width="187"/></a>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#FFFFFF;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.2; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; color: #FFFFFF; mso-line-height-alt: 17px;">
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff; font-size: 14px;">Síguenos en redes Sociales</span></p>
 </div>
 </div>
-</div>
-<div style="background-color:#F69666;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F69666;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="700" style="background-color:transparent;width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:15px; padding-bottom:10px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 700px; display: table-cell; vertical-align: top; width: 700px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:10px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
+<!--[if mso]></td></tr></table><![endif]-->
 <table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
+<td style="word-break: break-word; vertical-align: top; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px;" valign="top">
 <table align="center" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" valign="top">
 <tbody>
 <tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 10px; padding-left: 10px;" valign="top"><a href="https://www.facebook.com/Lonchis-app-623852081448278" target="_blank"><img alt="Facebook" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/facebook2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Facebook" width="32"/></a></td>
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 10px; padding-left: 10px;" valign="top"><a href="https://www.instagram.com/lonchisapp_col/" target="_blank"><img alt="Instagram" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/instagram2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Instagram" width="32"/></a></td>
+<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 8px; padding-left: 8px;" valign="top"><a href="https://www.facebook.com/Lonchis-app-623852081448278" target="_blank"><img alt="Facebook" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/facebook2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Facebook" width="32"/></a></td>
+<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 8px; padding-left: 8px;" valign="top"><a href="https://www.instagram.com/lonchisapp_col/" target="_blank"><img alt="Instagram" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/instagram2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Instagram" width="32"/></a></td>
 </tr>
 </tbody>
 </table>
@@ -740,55 +636,18 @@
 </tr>
 </tbody>
 </table>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:#F1773A;">
-<div class="block-grid mixed-two-up" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#F1773A;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:700px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="233" style="background-color:transparent;width:233px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num4" style="display: table-cell; vertical-align: top; max-width: 320px; min-width: 232px; width: 233px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:10px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/output-onlinepngtools_21.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 175px; display: block;" title="Image" width="175"/>
-<div style="font-size:1px;line-height:10px"> </div>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td><td align="center" width="466" style="background-color:transparent;width:466px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num8" style="display: table-cell; vertical-align: top; min-width: 320px; max-width: 464px; width: 466px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 15px; padding-left: 10px; padding-top: 15px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#FDFDFD;font-family:Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;line-height:1.2;padding-top:15px;padding-right:15px;padding-bottom:25px;padding-left:10px;">
-<div style="font-size: 14px; line-height: 1.2; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; color: #FDFDFD; mso-line-height-alt: 17px;">
-<p style="font-size: 20px; line-height: 1.2; text-align: left; word-break: break-word; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; mso-line-height-alt: 24px; margin: 0;"><span style="font-size: 20px;"><strong>Contáctenos</strong></span></p>
-<ul style="list-style-type: square;">
-<li style="font-size: 14px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 17px;"><a href="mailto:Servicioalcliente@lonchis.com.co" style="text-decoration: underline; color: #0068A5;" title="Servicioalcliente@lonchis.com.co">Servicioalcliente@lonchis.com.co</a></li>
-<li style="font-size: 20px; line-height: 1.2; text-align: left; word-break: break-word; mso-line-height-alt: 24px;"><span style="font-size: 20px;"><span style="font-size: 16px;">whatsapp: </span><a href="tel:3103418432" style="text-decoration: underline; color: #0068A5;" title="tel:3103418432">310 3418432</a></span></li>
-</ul>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#C0C0C0;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="color: #C0C0C0; font-size: 12px; line-height: 1.2; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px;">
+<p style="font-size: 12px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px; margin: 0;"><span style="background-color: transparent;"><span style="color: #ffffff;"><strong>Contáctenos</strong></span></span><strong style="color: #c0c0c0; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px;"><span style="color: #ffffff; font-size: 12px;"><span style="font-size: 12px;"><span style="font-size: 12px;">:</span></span></span></strong></p>
+<p style="font-size: 12px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px; margin: 0;"><span style="color: #ffffff; font-size: 12px;"><span style="font-size: 12px;"><br/></span></span><a href="mailto:servicioalcliente@lonchis.com.co" style="text-decoration: underline; color: #C0C0C0;" title="servicioalcliente@lonchis.com.co"> Servicioalcliente@lonchis.com.co</a> - <a href="tel:3103418432" style="text-decoration: underline; color: #C0C0C0;" title="tel:3103418432">+57 3103418432</a></p>
+<p style="font-size: 12px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px; margin: 0;"><strong><span style="color: #ffffff; font-size: 12px;"> </span></strong></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
+<div style="font-size:16px;text-align:center;font-family:Arial, Helvetica Neue, Helvetica, sans-serif">
+<div style="height: 40px;"> </div>
+</div>
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
@@ -806,4 +665,4 @@
 </table>
 <!--[if (IE)]></div><![endif]-->
 </body>
-</html> 
+</html>
