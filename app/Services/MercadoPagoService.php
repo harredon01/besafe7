@@ -83,6 +83,10 @@ class MercadoPagoService {
         $url = "https://api.mercadopago.com/v1/payment_methods?access_token=" . env("MERCADOPAGO_TOKEN");
         return $this->sendGet($url);
     }
+    public function getPayment($payment_id) {
+        $url = "https://api.mercadopago.com/v1/payments/".$payment_id."?access_token=" . env("MERCADOPAGO_TOKEN");
+        return $this->sendGet($url);
+    }
 
     public function useCreditCardOptions(User $user, array $data, Payment $payment, $platform) {
         if (array_key_exists("quick", $data)) {
@@ -841,7 +845,7 @@ class MercadoPagoService {
                 dispatch(new PendingPayment($payment, $platform));
             } else if ($response->status == "rejected" && (
                     $response->status_detail == "cc_rejected_bad_filled_card_number" || $response->status_detail == "cc_rejected_bad_filled_date" || $response->status_detail == "cc_rejected_bad_filled_other" || $response->status_detail == "cc_rejected_bad_filled_security_code")) {
-                return ["status" => "denied", "response" => $response, "message" => $message];
+                return ["status" => "denied", "status_detail" => $response->status_detail, "response" => $response->status, "message" => $message];
             } else {
                 dispatch(new DenyPayment($payment, $platform));
             }
@@ -938,14 +942,15 @@ class MercadoPagoService {
 //
 //        $current .= json_encode($data);
 //        $current .= PHP_EOL;
-//        $current .= PHP_EOL;4Vj8eK4rloUd272L48hsrarnUA~508029~payment_42_order_43_1543377788~72000.0~COP~4
+//        $current .= PHP_EOL;
 //        $current .= PHP_EOL;
 //        $current .= PHP_EOL;
 //        file_put_contents($file, $current);
         switch ($data["type"]) {
             case "payment":
                 if ($data["action"] == "payment.updated") {
-                    $paymentM = MercadoPago\Payment . find_by_id($data["id"]);
+                    $paymentM = $this->getPayment($data['data']['id']);
+                    $paymentM = json_decode(json_encode($paymentM),false);
                     $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
                     if ($payment) {
                         if ($payment->status == "payment_created" || $payment->status == "pending") {
@@ -977,49 +982,50 @@ class MercadoPagoService {
                 }
 
             case "plan":
-                $plan = MercadoPago\Plan . find_by_id($data["id"]);
+                //$plan = MercadoPago\Plan . find_by_id($data["id"]);
                 break;
             case "subscription":
-                $plan = MercadoPago\Subscription . find_by_id($data["id"]);
+                //$plan = MercadoPago\Subscription . find_by_id($data["id"]);
                 break;
             case "invoice":
-                $plan = MercadoPago\Invoice . find_by_id($data["id"]);
+                //$plan = MercadoPago\Invoice . find_by_id($data["id"]);
                 break;
         }
     }
 
     private function saveTransactionConfirmacion(array $data, Payment $payment) {
-        $transactionId = $data['transaction_id'];
-        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-        if ($transaction) {
-            $transaction->currency = $data['currency'];
-            $transaction->transaction_state = $data['response_message_pol'];
-            $transaction->description = $data['response_message_pol'];
-            $transaction->reference_sale = $data['reference_sale'];
-            $transaction->payment_method = $data['payment_method_name'];
-            $transaction->transaction_id = $data['transaction_id'];
-            $transaction->transaction_date = $data['transaction_date'];
-            $transaction->response_code = $data['response_code_pol'];
-            $transaction->extras = json_encode($data);
-            $transaction->save();
-        } else {
-            $insert = [];
-            $insert["reference_sale"] = $data["reference_sale"];
-            $insert["order_id"] = $data["order_id"];
-            $insert["user_id"] = $data["user_id"];
-            $insert["response_code"] = $data["response_message_pol"];
-            $insert["currency"] = $data["currency"];
-            $insert["payment_method"] = $data["payment_method_type"];
-            $insert["transaction_id"] = $data["transaction_id"];
-            $insert["gateway"] = "PayU";
-            $insert["description"] = $data["response_message_pol"];
-            $insert["transaction_date"] = $data["transaction_date"];
-            $insert["transaction_state"] = $data["response_message_pol"];
-            $insert["extras"] = json_encode($data);
-            $transaction = Transaction::create($insert);
-            $payment->transactions()->save($transaction);
-        }
-        return $transaction;
+//        dd($data);
+//        $transactionId = $data['transaction_id'];
+//        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
+//        if ($transaction) {
+//            $transaction->currency = $data['currency'];
+//            $transaction->transaction_state = $data['response_message_pol'];
+//            $transaction->description = $data['response_message_pol'];
+//            $transaction->reference_sale = $data['reference_sale'];
+//            $transaction->payment_method = $data['payment_method_name'];
+//            $transaction->transaction_id = $data['transaction_id'];
+//            $transaction->transaction_date = $data['transaction_date'];
+//            $transaction->response_code = $data['response_code_pol'];
+//            $transaction->extras = json_encode($data);
+//            $transaction->save();
+//        } else {
+//            $insert = [];
+//            $insert["reference_sale"] = $data["reference_sale"];
+//            $insert["order_id"] = $data["order_id"];
+//            $insert["user_id"] = $data["user_id"];
+//            $insert["response_code"] = $data["response_message_pol"];
+//            $insert["currency"] = $data["currency"];
+//            $insert["payment_method"] = $data["payment_method_type"];
+//            $insert["transaction_id"] = $data["transaction_id"];
+//            $insert["gateway"] = "PayU";
+//            $insert["description"] = $data["response_message_pol"];
+//            $insert["transaction_date"] = $data["transaction_date"];
+//            $insert["transaction_state"] = $data["response_message_pol"];
+//            $insert["extras"] = json_encode($data);
+//            $transaction = Transaction::create($insert);
+//            $payment->transactions()->save($transaction);
+//        }
+        return $data;
     }
 
     private function saveTransactionRespuesta(array $data, Payment $payment) {
