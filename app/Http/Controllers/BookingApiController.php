@@ -142,6 +142,15 @@ class BookingApiController extends Controller
      *
      * @return Response
      */
+    public function getBooking(Request $request,$code) {
+        $user = $request->user();
+        return $this->editBooking->getBooking($user, $code);
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function getObjectsWithBookingUser(Request $request) {
         $user = $request->user();
         return $this->editBooking->getObjectsWithBookingUser($user);

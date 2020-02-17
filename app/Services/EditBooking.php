@@ -517,6 +517,34 @@ class EditBooking {
                     "data" => $objects)
         );
     }
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getBooking(User $user,$booking) {
+        $booking = Booking::find($booking);
+        $client = $booking->customer;
+        $bookable = $booking->bookable;
+        $send = false;
+        if($user->id == $client->id){
+            $send = true;
+        }
+        if($bookable->checkAdminAccess($user->id)){
+            $send = true;
+        }
+        if($send){
+            return response()->json(array(
+                    "status" => "success",
+                    "message" => "",
+                    "booking" => $booking)
+        );
+        }
+        return response()->json(array(
+                    "status" => "error",
+                    "message" => "no access")
+        );
+    }
 
     /**
      * Show the application registration form.

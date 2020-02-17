@@ -284,6 +284,7 @@ Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
 Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
+Route::get('bookings/{code?}', 'BookingApiController@getBooking');
 Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
 Route::delete('bookings/{booking?}', 'BookingApiController@deleteBookingObject');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
