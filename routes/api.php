@@ -236,6 +236,7 @@ Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');
+Route::post('auth/social', 'AuthApiController@checkSocialToken');
 Route::post('auth/verify_two_factor', 'AuthApiController@verifyTwoFactorToken');
 Route::post('auth/unlock', 'AuthApiController@unlockMedical');
 Route::post('auth/update_medical', 'AuthApiController@updateMedical');
@@ -284,8 +285,9 @@ Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
 Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
-Route::get('bookings/{code?}', 'BookingApiController@getBooking');
 Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
+Route::get('bookings/{code?}', 'BookingApiController@getBooking');
+
 Route::delete('bookings/{booking?}', 'BookingApiController@deleteBookingObject');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
 Route::post('bookings/now', 'BookingApiController@postImmediateBookingObject');

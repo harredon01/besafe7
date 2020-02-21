@@ -30,7 +30,8 @@
         "rinvex/laravel-bookings": "^3.0",
         "yab/laravel-scout-mysql-driver": "^2.3",
         "opentok/opentok": "^4.4",
-        "mercadopago/dx-php": "dev-master"
+        "mercadopago/dx-php": "dev-master",
+        "laravel/socialite": "^4.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
