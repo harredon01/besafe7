@@ -725,6 +725,7 @@ class EditOrder {
                             $condition = new CartCondition($insertCondition);
                             $insertCondition['order_id'] = $order->id;
                             $insertCondition['total'] = $result['price'];
+                            $insertCondition['attributes'] = json_encode(["platform" => $platform]);
                             $order->orderConditions()->where('type', "shipping")->delete();
                             Cart::removeConditionsByType("shipping");
                             OrderCondition::insert($insertCondition);
@@ -837,8 +838,12 @@ class EditOrder {
     public function OrderStatusUpdate(Order $order) {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
-        $adminUser = User::find(2);
-        $adminUser2 = User::find(77);
+        $merchant = $order->merchant;
+        if($merchant){
+            $admins = $merchant->users;
+        } else {
+            $admins = User::whereIn("id",[2,77])->get();
+        }
         $sendEmail = true;
         if ($order->status == "approved") {
             $shipping = $order->orderAddresses()->where("type", "shipping")->first();
@@ -848,8 +853,8 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
-                Mail::to($user)->bcc($adminUser)->send(new OrderApproved($order, $user, $shipping, "no"));
-                Mail::to($adminUser2)->cc($adminUser)->send(new OrderApproved($order, $user, $shipping, "yes"));
+                Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no"));
+                Mail::to($admins)->send(new OrderApproved($order, $user, $shipping, "yes"));
                 unset($order->payment);
                 unset($order->totalCost);
                 unset($order->totalPlatform);

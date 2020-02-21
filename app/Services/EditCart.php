@@ -394,7 +394,9 @@ class EditCart {
                                 $losAttributes = array();
                             }
                             $losAttributes['is_digital'] = $productVariant->is_digital;
+                            $losAttributes['weight'] = $productVariant->weight;
                             $losAttributes['conditions'] = $applyConditions;
+                            $losAttributes['type'] = "Product";
                             $losAttributes['image'] = $productVariant->getCartImg();
                             $losAttributes['is_shippable'] = $productVariant->is_shippable;
                             $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
