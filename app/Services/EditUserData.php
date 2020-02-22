@@ -306,6 +306,21 @@ class EditUserData {
         }
         return array("status" => "error", "message" => "Bad request");
     }
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  User, array  $data
+     * 
+     */
+    public function registerPhone(User $user, array $data) {
+        if (array_key_exists("cellphone", $data) && array_key_exists("area_code", $data)) {
+            $user->cellphone = $data['cellphone'];
+            $user->area_code = $data['area_code'];
+            $user->save();
+            return array("status" => "success", "message" => "User phone registered");
+        }
+        return array("status" => "error", "message" => "Bad request");
+    }
 
     public function createOrUpdateAddress(User $user, array $data) {
         if (array_key_exists("address_id", $data)) {

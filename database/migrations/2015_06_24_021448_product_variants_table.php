@@ -31,6 +31,7 @@ class ProductVariantsTable extends Migration {
                         $table->double('sale', 15, 2);
                         $table->double('tax', 15, 2);
                         $table->double('cost', 15, 2);
+                        $table->double('weight', 15, 2)->default(1);
                         $table->integer('quantity');
                         $table->integer('min_quantity')->default(1);
                         $table->text('attributes'); 

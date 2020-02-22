@@ -380,6 +380,7 @@ class EditBooking {
             //dd($booking);
             $booking->save();
             $bookable->status = "busy";
+            $bookable->save();
             $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
             Booking::where("id", $booking->id)->update(['notes' => 'ready']);
         }
@@ -394,17 +395,24 @@ class EditBooking {
 
     public function leaveChatroom(User $user, array $data) {
         $booking = Booking::find($data['booking_id']);
+        $activecount = 0;
         if ($booking) {
             $users = $booking->options["users"];
             foreach ($users as $userM) {
                 if ($userM['id'] == $user->id) {
                     if ($booking->options["location"] == 'opentok') {
-                        unset($userM["connection_id"]);
+                        $userM["connection_id"]=null;
                     }
+                }
+                if($userM["connection_id"]){
+                    $activecount++;
                 }
             }
             $booking->options["users"] = $users;
             $booking->save();
+            if($booking->notes == 'started' && $activecount == 0){
+                Booking::where("id", $booking->id)->update(['notes' => 'completed']);
+            }
             $bookable = $booking->bookable;
             if ($bookable->checkAdminAccess($user->id)) {
                 $bookable->status = "online";
@@ -515,6 +523,34 @@ class EditBooking {
                     "status" => "success",
                     "message" => "",
                     "data" => $objects)
+        );
+    }
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getBooking(User $user,$booking) {
+        $booking = Booking::find($booking);
+        $client = $booking->customer;
+        $bookable = $booking->bookable;
+        $send = false;
+        if($user->id == $client->id){
+            $send = true;
+        }
+        if($bookable->checkAdminAccess($user->id)){
+            $send = true;
+        }
+        if($send){
+            return response()->json(array(
+                    "status" => "success",
+                    "message" => "",
+                    "booking" => $booking)
+        );
+        }
+        return response()->json(array(
+                    "status" => "error",
+                    "message" => "no access")
         );
     }
 

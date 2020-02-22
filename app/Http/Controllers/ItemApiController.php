@@ -6,6 +6,7 @@ use Unlu\Laravel\Api\QueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\CleanSearch;
+use App\Services\EditItem;
 use App\Models\Item;
 
 class ItemApiController extends Controller {
@@ -15,14 +16,21 @@ class ItemApiController extends Controller {
      *
      */
     protected $cleanSearch;
+    
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $editItem;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(CleanSearch $cleanSearch) {
+    public function __construct(CleanSearch $cleanSearch, EditItem $editItem) {
         $this->cleanSearch = $cleanSearch;
+        $this->editItem = $editItem;
         $this->middleware('auth:api');
     }
     /**
@@ -114,12 +122,9 @@ class ItemApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function fulfillItem(Request $request, $item) {
-        if ($request->file('photo')->isValid()) {
-            $path = $request->photo->path();
-        }
+    public function fulfillItem(Request $request) {
         $user = $request->user();
-        return response()->json($this->editOrder->prepareOrder($user, $platform, $request->all()));
+        return response()->json($this->editItem->changeStatusItems($user, $request->all()));
     }
 
     /**

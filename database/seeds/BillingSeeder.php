@@ -39,6 +39,9 @@ class BillingSeeder extends Seeder {
     }
 
     public function run() {
+        $token = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc5YzgwOWRkMTE4NmNjMjI4YzRiYWY5MzU4NTk5NTMwY2U5MmI0YzgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI2NTAwNjUzMTI3NzctZzV0NjNqMjI3bmNhMjV1ZThhMm5pMGN2ZWpnazlmZTMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI2NTAwNjUzMTI3NzctaDZzcTlsZWVoY3FvNzczMm0wcjhvdDNnZWsxYnRpZzkuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTA3ODM0MzgxNTEwMTYxMjcxOTgiLCJlbWFpbCI6ImhhcnJlZG9uMDFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJIb292ZXJ0IEFycmVkb25kbyIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vLWtlTHhqU21MMkNvL0FBQUFBQUFBQUFJL0FBQUFBQUFBQUFBL0FDSGkzcmVmd3JUcC1xeDcxaTdleGw3WHR3YjNkenFLQlEvczk2LWMvcGhvdG8uanBnIiwiZ2l2ZW5fbmFtZSI6Ikhvb3ZlcnQiLCJmYW1pbHlfbmFtZSI6IkFycmVkb25kbyIsImxvY2FsZSI6ImVuIiwiaWF0IjoxNTgyMjU0ODg4LCJleHAiOjE1ODIyNTg0ODh9.Itmow9IGXYatz8YSxiqd-KmrIUWW-ItNvni3oMHo5A4bISoTz7R7w-0rHbh2jklmCuWuyqXLALGvvhOFdU2969fpDxYFOx0BztJGygx_CSw9oOmuWdUyEjfA_GtIXyVpXN5jrpd_0Ajg_rbSH08-2A2MINtxQ6zFgRTFvXIqKMAPuuvrT241pHKEHflo1jMnLDrK04HmMee5NLab4y3AkEWt71C_ADQ69EURWD34Td-LMlv-algYwt_RTekwCB89prYgX6dXszA81yaIEwswtKvYqOFiOUtCW-4Tmw6ks1qMdUu4c2yXSMSDet-G7Nx0BHShkvJb8Cz07NGqnlTing";
+        $user = Socialite::driver('google')->userFromToken($token);
+        dd($user);
         $user = User::find(1);
         $source = $user->sources()->where("gateway","MercadoPago")->first();
         $client = $this->mercadoPago->getClient($source);

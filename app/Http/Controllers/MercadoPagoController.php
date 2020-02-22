@@ -23,7 +23,7 @@ class MercadoPagoController extends Controller {
      */
     public function __construct(MercadoPagoService $mercadoPago) {
         $this->mercadoPago = $mercadoPago;
-        $this->middleware('auth:api', ['except' => ['cartTest', 'cronPayU', 'webhookPayU', 'returnPayU']]);
+        $this->middleware('auth:api', ['except' => ['cartTest', 'cronPayU', 'webhook', 'returnMerc']]);
     }
 
     /**

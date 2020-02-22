@@ -76,6 +76,7 @@ Route::get('contacts/email/{email?}', 'ContactsApiController@getContactByEmail')
 Route::get('contacts/unblock/{code?}', 'ContactsApiController@unblockContact');
 Route::get('user/medical/{code?}', 'AuthApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
+Route::post('user/phone', 'UserApiController@registerPhone');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'AuthApiController@changePassword');
 Route::post('user/address/{address?}/{type?}', 'UserApiController@setAddressType');
@@ -236,6 +237,7 @@ Route::get('food/route_organize', 'FoodApiController@showOrganizeEmails');
 
 Route::get('auth/logout', 'AuthApiController@getLogout');
 Route::post('auth/verify_medical', 'AuthApiController@verifyMedical');
+Route::post('auth/social', 'AuthApiController@checkSocialToken');
 Route::post('auth/verify_two_factor', 'AuthApiController@verifyTwoFactorToken');
 Route::post('auth/unlock', 'AuthApiController@unlockMedical');
 Route::post('auth/update_medical', 'AuthApiController@updateMedical');
@@ -285,6 +287,8 @@ Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
 Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
 Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
+Route::get('bookings/{code?}', 'BookingApiController@getBooking');
+
 Route::delete('bookings/{booking?}', 'BookingApiController@deleteBookingObject');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
 Route::post('bookings/now', 'BookingApiController@postImmediateBookingObject');

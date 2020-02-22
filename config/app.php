@@ -172,6 +172,7 @@ return [
         Laravel\Scout\ScoutServiceProvider::class,
         Laravel\Cashier\CashierServiceProvider::class,
         Dusterio\AwsWorker\Integrations\LaravelServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
 	/*
          * Package Service Providers...
          */
@@ -223,6 +224,7 @@ return [
         'Notification' => Illuminate\Support\Facades\Notification::class,
         'Password' => Illuminate\Support\Facades\Password::class,
         'Queue' => Illuminate\Support\Facades\Queue::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Redirect' => Illuminate\Support\Facades\Redirect::class,
         'Redis' => Illuminate\Support\Facades\Redis::class,
         'Request' => Illuminate\Support\Facades\Request::class,

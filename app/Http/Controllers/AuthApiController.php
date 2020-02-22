@@ -7,8 +7,10 @@ use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use App\Models\User;
 use App\Services\EditAlerts;
 use App\Services\Security;
+use Socialite;
 
 class AuthApiController extends Controller {
 
@@ -25,7 +27,7 @@ class AuthApiController extends Controller {
      * @var Registrar
      */
     protected $editAlerts;
-    
+
     /**
      * The registrar implementation.
      *
@@ -40,12 +42,12 @@ class AuthApiController extends Controller {
      * @param  \Illuminate\Contracts\Auth\Registrar  $registrar
      * @return void
      */
-    public function __construct(Guard $auth, EditAlerts $editAlerts,Security $security) {
+    public function __construct(Guard $auth, EditAlerts $editAlerts, Security $security) {
         //$this->registrar = $registrar;
         $this->auth = $auth;
         $this->editAlerts = $editAlerts;
         $this->security = $security;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except("checkSocialToken");
     }
 
     /**
@@ -80,6 +82,7 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 403);
     }
+
     /**
      * Handle a registration request for the application.
      *
@@ -89,7 +92,7 @@ class AuthApiController extends Controller {
     public function verifyTwoFactorToken(Request $request) {
         $user = $request->user();
         $data = $request->only('token');
-        return response()->json($this->security->verifyTwoFactorToken($user,$data));
+        return response()->json($this->security->verifyTwoFactorToken($user, $data));
     }
 
     /**
@@ -136,7 +139,7 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
-    
+
     /**
      * Handle a registration request for the application.
      *
@@ -147,7 +150,34 @@ class AuthApiController extends Controller {
         $user = $request->user();
         return response()->json($this->security->notificationMedical($user, $id));
     }
-    
+
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function checkSocialToken(Request $request) {
+        $data = $request->all();
+        $user = Socialite::driver($data['driver'])->userFromToken($data['token']);
+        $authUser = User::where("email", $user['email'])->first();
+        if (!$authUser) {
+            $str = rand();
+            $result = md5($str);
+            $authUser = User::create([
+                'firstName' => $user['user']['given_name'],
+                'lastName' => $user['user']['family_name'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'cellphone' => '11',
+                'area_code' => '11',
+                'password' => bcrypt($result),
+            ]);
+        }
+        $token = $authUser->createToken($data['driver'])->accessToken;
+        return response()->json(['status'=>"success","token"=>$token]);
+    }
+
     /**
      * Handle a registration request for the application.
      *
@@ -208,4 +238,5 @@ class AuthApiController extends Controller {
         }
         return response()->json(['error' => 'invalid password'], 500);
     }
+
 }
