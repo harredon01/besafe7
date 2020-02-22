@@ -94,6 +94,16 @@ class UserApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function registerPhone(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editUserData->registerPhone($user, $request->all()));
+    }
+    /**
+     * Handle a registration request for the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function checkUserCredits(Request $request) {
         $user = $request->user();
         return response()->json($this->editUserData->checkUserCredits($user, $request->all()));

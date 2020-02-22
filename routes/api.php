@@ -76,6 +76,7 @@ Route::get('contacts/email/{email?}', 'ContactsApiController@getContactByEmail')
 Route::get('contacts/unblock/{code?}', 'ContactsApiController@unblockContact');
 Route::get('user/medical/{code?}', 'AuthApiController@notificationMedical');
 Route::post('user/token', 'UserApiController@registerToken');
+Route::post('user/phone', 'UserApiController@registerPhone');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'AuthApiController@changePassword');
 Route::post('user/address/{address?}/{type?}', 'UserApiController@setAddressType');

@@ -37,7 +37,7 @@ return [
     'facebook' => [
 	'client_id' => env('FACEBOOK_CLIENT_ID'),
 	'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-	'redirect' => 'http://www.hoovert.com/login/facebook',
+	'redirect' => '/login/facebook',
     ],
     'twitter' => [
         'client_id' => env('TWITTER_CLIENT_ID'),
