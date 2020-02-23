@@ -85,6 +85,7 @@ Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
 Route::post('deliveries/date', 'DeliveryController@posUpdateDeliveryDate');
+Route::post('deliveries/address', 'DeliveryController@posUpdateDeliveryAddress');
 Route::post('deliveries/cancel/{delivery?}', 'DeliveryController@postCancelDeliverySelection');
 Route::resource('deliveries', 'DeliveryController');
 Route::resource('articles', 'ArticleController');

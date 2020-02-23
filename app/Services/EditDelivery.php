@@ -44,20 +44,20 @@ class EditDelivery {
                             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
                         }
                         $starter = "";
-                        if(array_key_exists('starter_id', $data)){
-                            if($data['starter_id']){
+                        if (array_key_exists('starter_id', $data)) {
+                            if ($data['starter_id']) {
                                 $starter = $data['starter_id'];
                             }
                         }
                         $drink = "";
-                        if(array_key_exists('drink_id', $data)){
-                            if($data['drink_id']){
+                        if (array_key_exists('drink_id', $data)) {
+                            if ($data['drink_id']) {
                                 $drink = $data['drink_id'];
                             }
                         }
                         $dessert = "";
-                        if(array_key_exists('dessert_id', $data)){
-                            if($data['dessert_id']){
+                        if (array_key_exists('dessert_id', $data)) {
+                            if ($data['dessert_id']) {
                                 $dessert = $data['dessert_id'];
                             }
                         }
@@ -105,14 +105,14 @@ class EditDelivery {
             if ($validator->fails()) {
                 return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
             }
-            if(!array_key_exists('starter_id', $data)){
-                $data['starter_id']="";
+            if (!array_key_exists('starter_id', $data)) {
+                $data['starter_id'] = "";
             }
-            if(!array_key_exists('drink_id', $data)){
-                $data['drink_id']="";
+            if (!array_key_exists('drink_id', $data)) {
+                $data['drink_id'] = "";
             }
-            if(!array_key_exists('dessert_id', $data)){
-                $data['dessert_id']="";
+            if (!array_key_exists('dessert_id', $data)) {
+                $data['dessert_id'] = "";
             }
             $dish = [
                 'type_id' => $data['type_id'],
@@ -204,8 +204,13 @@ class EditDelivery {
                 $newAddress = new OrderAddress();
                 $newAddress->fill($orderAddresses);
                 $newAddress->save();
-                $delivery->address_id = $newAddress->id;
-                $delivery->save();
+                if ($data['all']) {
+                    Delivery::where("user_id", $user->id)->where("status", "pending")->update(['address_id' => $newAddress->id, "updated_at" => date("Y-m-d H:i:s")]);
+                } else {
+                    $delivery->address_id = $newAddress->id;
+                    $delivery->save();
+                }
+
                 return array("status" => "success", "message" => "Delivery Address Updated", "delivery" => $delivery);
             }
             return $result;
@@ -213,21 +218,21 @@ class EditDelivery {
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
-        
+
         if ($delivery->status == "pending" || $delivery->status == "deposit" || $delivery->status == "enqueue") {
             
         } else {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
         //return array("status" => "success", "message" => "Delivery in limit");
-        $date = date_create(); 
+        $date = date_create();
         $now = date_format($date, "Y-m-d H:i:s");
         $datetimestampDelivery = strtotime($delivery->delivery);
         $dateTimestampNow = strtotime($now);
         $diff = ($datetimestampDelivery - $dateTimestampNow) / 60 / 60;
         if ($diff < 14) {
             return array("status" => "error", "message" => "Limit passed");
-        } 
+        }
         return array("status" => "success", "message" => "Delivery in limit");
     }
 
@@ -352,6 +357,7 @@ class EditDelivery {
                     'delivery_id' => 'required|max:255',
                     'address_id' => 'required|max:255',
                     'merchant_id' => 'required|max:255',
+                    'all' => 'required|max:255',
         ]);
     }
 

@@ -108,6 +108,17 @@ class DeliveryController extends Controller
         ]);
         return response()->json($this->editDelivery->changeDeliveryDate($user, $data));
     }
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function posUpdateDeliveryAddress(Request $request)
+    {
+        $user = $request->user();
+        $data = $request->all();
+        return response()->json($this->editDelivery->changeDeliveryAddress($user, $data));
+    }
     
     /**
      * Show the form for creating a new resource.
