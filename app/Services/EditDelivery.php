@@ -207,7 +207,7 @@ class EditDelivery {
                 if ($data['all']) {
                     Delivery::where("user_id", $user->id)->where("status", "pending")->update(['address_id' => $newAddress->id, "updated_at" => date("Y-m-d H:i:s")]);
                 } else {
-                    $delivery->address_id = $newAddress->id;
+                    $delivery->address_id = $newAddress->id; 
                     $delivery->save();
                 }
 
@@ -215,6 +215,7 @@ class EditDelivery {
             }
             return $result;
         }
+        return array("status" => "error", "message" => "Forbidden product");
     }
 
     public function checkDeliveryTime(Delivery $delivery) {
