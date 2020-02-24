@@ -160,22 +160,40 @@ class AuthApiController extends Controller {
     public function checkSocialToken(Request $request) {
         $data = $request->all();
         $user = Socialite::driver($data['driver'])->userFromToken($data['token']);
+        $user = json_decode(json_encode($user), true);
         $authUser = User::where("email", $user['email'])->first();
         if (!$authUser) {
             $str = rand();
             $result = md5($str);
-            $authUser = User::create([
-                'firstName' => $user['user']['given_name'],
-                'lastName' => $user['user']['family_name'],
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'cellphone' => '11',
-                'area_code' => '11',
-                'password' => bcrypt($result),
-            ]);
+            if ($data['driver'] == 'google') {
+                $authUser = User::create([
+                            'firstName' => $user['user']['given_name'],
+                            'lastName' => $user['user']['family_name'],
+                            'name' => $user['name'],
+                            'email' => $user['email'],
+                            'cellphone' => '11',
+                            'area_code' => '11',
+                            'password' => bcrypt($result),
+                            'emailNotifications' => 1,
+                            'optinMarketing' => 1
+                ]);
+            } else {
+                $theName = explode(" ",$user['name']);
+                $authUser = User::create([
+                            'firstName' => $theName[0],
+                            'lastName' => $theName[1],
+                            'name' => $user['name'],
+                            'email' => $user['email'],
+                            'cellphone' => '11',
+                            'area_code' => '11',
+                            'password' => bcrypt($result),
+                            'emailNotifications' => 1,
+                            'optinMarketing' => 1
+                ]);
+            }
         }
         $token = $authUser->createToken($data['driver'])->accessToken;
-        return response()->json(['status'=>"success","token"=>$token]);
+        return response()->json(['status' => "success", "token" => $token]);
     }
 
     /**
