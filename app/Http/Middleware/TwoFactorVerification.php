@@ -18,9 +18,9 @@ class TwoFactorVerification {
         if ($user->two_factor_expiry > \Carbon\Carbon::now()) {
             return $next($request);
         }
-        $user->two_factor_token = str_random(10);
+        $user->two_factor_token = str_random(8);
         $user->save();
-        \Mail::to($user)->send(new TwoFactorAuthMail($user->two_factor_token));
+        \Mail::to($user)->send(new TwoFactorAuthMail($user,$user->two_factor_token));
         return response()->json(['message' => 'Requires two factor authentication'], 403);
     }
 

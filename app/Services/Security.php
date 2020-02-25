@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Medical;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TwoFactorAuthMail;
+use Carbon\Carbon;
 use DB;
 use Validator;
 
@@ -75,12 +78,46 @@ class Security {
     public function verifyTwoFactorToken(User $user, array $data) {
         if (array_key_exists("token", $data)) {
             if ($data["token"] == $user->two_factor_token) {
-                $user->two_factor_expiry = \Carbon\Carbon::now()->addMinutes(config(session . lifetime));
+                $user->two_factor_expiry = \Carbon\Carbon::now()->addMinutes(config('session.lifetime'));
                 $user->save();
-                return ["status"=>"success","Two factor verified"];
+                return ["status" => "success", "Two factor verified"];
             }
         }
-        return ["status"=>"error","Two factor verification failed"];
+        return ["status" => "error", "Two factor verification failed"];
+    }
+
+    public function changePasswordRequest(array $data) {
+        $user = User::where("email", $data["email"])->first();
+        $user->two_factor_expiry = Carbon::now()->addMinutes(config('session.lifetime'));
+        $user->two_factor_token = str_random(8);
+        $user->save();
+        Mail::to($user)->send(new TwoFactorAuthMail($user,$user->two_factor_token));
+        return ['message' => 'Requires two factor authentication'];
+    }
+
+    public function changePasswordUpdate(array $data) {
+        $user = User::where("email", $data["email"])->first();
+        if ($user->two_factor_expiry > \Carbon\Carbon::now() && $data['code'] == $user->two_factor_token) {
+            $validator = $this->validatorPassword($data);
+            if ($validator->fails()) {
+                return array("status" => "error", "message" => $validator->getMessageBag());
+            }
+            $this->updatePassword($user, $data["password"]);
+            $http = new \GuzzleHttp\Client;
+            $response = $http->post(env('APP_URL') . '/oauth/token', [
+                'form_params' => [
+                    'grant_type' => 'password',
+                    'client_id' => '1',
+                    'client_secret' => 'nuoLagU2jqmzWqN6zHMEo82vNhiFpbsBsqcs2DPt',
+                    'username' => $data['email'],
+                    'password' => $data['password'],
+                    'scope' => '*',
+                ],
+            ]);
+            $json = json_decode((string) $response->getBody(), true);
+            return ['status' => 'success', 'access_token' => $json['access_token']];
+        }
+        return ['status' => 'error', 'message' => 'verification failed'];
     }
 
     /**

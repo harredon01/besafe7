@@ -389,14 +389,14 @@ class EditBilling {
         ];
         return $buyerAddress;
     }
-    
-    public function completePaidOrder($paymentId,$platform) {
+
+    public function completePaidOrder($paymentId, $platform) {
         $payment = Payment::find($paymentId);
-        if($payment->total == $payment->transaction_cost){
+        if ($payment->total == $payment->transaction_cost) {
             dispatch(new ApprovePayment($payment, $platform));
             return array("status" => "success", "message" => "Order Approved");
         }
-        return array("status" => "error", "message" => "Payment must be paid" );
+        return array("status" => "error", "message" => "Payment must be paid");
     }
 
     public function payCreditCard(User $user, $source, array $data) {
@@ -415,7 +415,22 @@ class EditBilling {
                 if (array_key_exists('buyer_address', $data)) {
                     $payment->attributes = json_encode($this->extractBuyer($data));
                 }
-
+                if (!$user->docType) {
+                    $change = false;
+                    if ($source == "PayU") {
+                        if (array_key_exists("doc_type", $data)) {
+                            $user->docType = $data["doc_type"];
+                            $change = true;
+                        }
+                        if (array_key_exists("payer_id", $data)) {
+                            $user->docNum = $data["payer_id"];
+                            $change = true;
+                        }
+                    }
+                    if($change){
+                        $user->save();
+                    }
+                }
                 $payment->save();
                 return $gateway->useCreditCardOptions($user, $data, $payment, $data['platform']);
             }
@@ -427,14 +442,14 @@ class EditBilling {
         if (array_key_exists("payment_id", $data)) {
             $payment = Payment::find($data['payment_id']);
             if ($payment) {
-                $order = $payment->order()->with("items","orderConditions")->first();
-                /*if (Payment::where("order_id",$payment->order_id)->count() == 1) {
-                    $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
-                    $order->total = $payment->total - $payment->transaction_cost;
-                    $order->subtotal = $order->total - $order->shipping;
-                    $order->save();
-                    $this->changeOrderStatus($order->id);
-                }*/
+                $order = $payment->order()->with("items", "orderConditions")->first();
+                /* if (Payment::where("order_id",$payment->order_id)->count() == 1) {
+                  $order->orderConditions()->where("type", self::TRANSACTION_CONDITION)->delete();
+                  $order->total = $payment->total - $payment->transaction_cost;
+                  $order->subtotal = $order->total - $order->shipping;
+                  $order->save();
+                  $this->changeOrderStatus($order->id);
+                  } */
                 $this->changeOrderStatus($payment->order_id);
                 $payment->total = $payment->total - $payment->transaction_cost;
                 $payment->transaction_cost = 0;
@@ -457,32 +472,32 @@ class EditBilling {
         if ($payment) {
             if ($payment->user_id == $user->id) {
                 if ($payment->status == "payment_in_bank") {
-                    $order = $payment->order()->with("items","orderConditions")->first();
+                    $order = $payment->order()->with("items", "orderConditions")->first();
                     $payment->transaction_cost = $this->editOrder->getTransactionTotal($payment->total);
                     $payment->total = $payment->total + $payment->transaction_cost;
                     $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                     $payment->status = "pending";
                     $payment->save();
                     /*
-                    if (Payment::where("order_id",$payment->order_id)->count() == 1) {
-                        $conditionV = new OrderCondition(array(
-                            'name' => "Costo variable transaccion",
-                            'target' => "total",
-                            'type' => self::TRANSACTION_CONDITION,
-                            'value' => "3.49%",
-                            'total' => $payment->transaction_cost-900,
-                        ));
-                        $conditionF = new OrderCondition(array(
-                            'name' => "Costo fijo transaccion",
-                            'target' => "subtotal",
-                            'type' => self::TRANSACTION_CONDITION,
-                            'value' => "+900",
-                            'total' => 900,
-                        ));
-                        $order->orderConditions()->saveMany([$conditionF, $conditionV]);
-                        $order->total = $payment->total;
-                        $order->save();
-                    }
+                      if (Payment::where("order_id",$payment->order_id)->count() == 1) {
+                      $conditionV = new OrderCondition(array(
+                      'name' => "Costo variable transaccion",
+                      'target' => "total",
+                      'type' => self::TRANSACTION_CONDITION,
+                      'value' => "3.49%",
+                      'total' => $payment->transaction_cost-900,
+                      ));
+                      $conditionF = new OrderCondition(array(
+                      'name' => "Costo fijo transaccion",
+                      'target' => "subtotal",
+                      'type' => self::TRANSACTION_CONDITION,
+                      'value' => "+900",
+                      'total' => 900,
+                      ));
+                      $order->orderConditions()->saveMany([$conditionF, $conditionV]);
+                      $order->total = $payment->total;
+                      $order->save();
+                      }
                      * */
                     $payment->order = $order;
                     return array("status" => "success", "message" => "Payment Created", "payment" => $payment);
@@ -517,6 +532,22 @@ class EditBilling {
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
                 $payment->status = "payment_created";
                 $payment->save();
+                if (!$user->docType) {
+                    $change = false;
+                    if ($source == "PayU") {
+                        if (array_key_exists("doc_type", $data)) {
+                            $user->docType = $data["doc_type"];
+                            $change = true;
+                        }
+                        if (array_key_exists("payer_id", $data)) {
+                            $user->docNum = $data["payer_id"];
+                            $change = true;
+                        }
+                    }
+                    if($change){
+                        $user->save();
+                    }
+                }
                 $results = $gateway->payDebitCard($user, $data, $payment, $data['platform']);
                 return $results;
             }

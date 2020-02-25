@@ -3,23 +3,47 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use App\Models\User;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class TwoFactorAuthMail extends Mailable {
+class TwoFactorAuthMail extends Mailable
+{
+    use Queueable, SerializesModels;
 
-    use Queueable,
-        SerializesModels;
-
+    /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $user;
+    
+    /**
+     * The order instance.
+     *
+     * @var Order
+     */
     public $token;
 
-    public function __construct($token) {
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct(User $user,$token)
+    {
+        $this->user = $user;
         $this->token = $token;
     }
 
-    public function build() {
-        return $this->view('email.2fa')->subject('Your Authentication Token');
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        return $this->markdown('emails.two-factor-email');
     }
-
 }

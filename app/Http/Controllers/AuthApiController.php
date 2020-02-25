@@ -7,10 +7,12 @@ use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+
 use App\Models\User;
 use App\Services\EditAlerts;
 use App\Services\Security;
 use Socialite;
+
 
 class AuthApiController extends Controller {
 
@@ -178,7 +180,7 @@ class AuthApiController extends Controller {
                             'optinMarketing' => 1
                 ]);
             } else {
-                $theName = explode(" ",$user['name']);
+                $theName = explode(" ", $user['name']);
                 $authUser = User::create([
                             'firstName' => $theName[0],
                             'lastName' => $theName[1],
@@ -255,6 +257,16 @@ class AuthApiController extends Controller {
             return response()->json($this->security->updateCodes($user, $request->all()));
         }
         return response()->json(['error' => 'invalid password'], 500);
+    }
+
+    public function changePasswordRequest($request) {
+        $data = $request->all();
+        return response()->json($this->security->changePasswordRequest($data));
+    }
+
+    public function changePasswordUpdate($request) {
+        $data = $request->all();
+        return response()->json($this->security->changePasswordUpdate($data)); 
     }
 
 }
