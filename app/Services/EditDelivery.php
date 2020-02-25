@@ -157,7 +157,7 @@ class EditDelivery {
             }
             $date = $this->getNextValidDate(date_create($data["delivery"]));
             $reprogramDelivery = Delivery::where("user_id", $user->id)->where("status", "pending")->orderBy('delivery', 'desc')->first();
-            $reprogramDelivery->delivery = $data["delivery"];
+            $reprogramDelivery->delivery = date_format(date_create($data["delivery"]), "Y-m-d") . " 12:00:00";
             $reprogramDelivery->save();
             $deliveryDetails = json_decode($reprogramDelivery->details, true);
             if (array_key_exists("deliver", $deliveryDetails)) {
@@ -392,23 +392,28 @@ class EditDelivery {
 
     public function checkIsHoliday($date) {
         $holidays = [
-            "2019-06-03",
-            "2019-06-24",
-            "2019-07-01",
-            "2019-08-07",
-            "2019-08-19",
-            "2019-10-14",
-            "2019-11-04",
-            "2019-12-24",
-            "2019-12-25",
-            "2019-12-26",
-            "2019-12-27",
-            "2019-12-30",
-            "2019-12-31",
             "2020-01-01",
             "2020-01-02",
             "2020-01-03",
             "2020-01-06",
+            "2020-03-23",
+            "2020-04-09",
+            "2020-04-10",
+            "2020-05-01",
+            "2020-05-25",
+            "2020-06-15",
+            "2020-06-22",
+            "2020-06-29",
+            "2020-07-20",
+            "2020-08-07",
+            "2020-08-17",
+            "2020-10-12",
+            "2020-11-02",
+            "2020-11-16",
+            "2020-12-08",
+            "2020-12-24",
+            "2020-12-25",
+            "2020-12-31",
         ];
         foreach ($holidays as $day) {
             if ($day == date_format($date, "Y-m-d")) {
