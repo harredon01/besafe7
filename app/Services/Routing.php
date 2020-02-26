@@ -521,8 +521,8 @@ class Routing {
 
 
 # your laravel query builder goes here
-        if ($polygon->id == 27) {
-            //DB::enableQueryLog();
+        if ($polygon->id == 31) {
+//            DB::enableQueryLog();
         }
         $deliveries = DB::select(""
                         . "SELECT DISTINCT(d.id), d.delivery,d.provider,d.details,d.user_id,a.address,d.address_id,status,shipping, lat,`long`, 
@@ -535,8 +535,8 @@ class Routing {
                         AND d.delivery >= :date1 AND d.delivery <= :date2 
                             AND a.polygon_id = :polygon order by Distance asc"
                         . "", $thedata);
-        if ($polygon->id == 27) {
-            //dd(DB::getQueryLog());
+        if ($polygon->id == 31) {
+//            dd(DB::getQueryLog());
         }
         //echo "Query params: ". json_encode($thedata). PHP_EOL;
         //echo "Query results: " . count($deliveries) . PHP_EOL;
