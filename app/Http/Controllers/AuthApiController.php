@@ -7,12 +7,10 @@ use Illuminate\Contracts\Auth\Guard;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
-
 use App\Models\User;
 use App\Services\EditAlerts;
 use App\Services\Security;
 use Socialite;
-
 
 class AuthApiController extends Controller {
 
@@ -49,7 +47,7 @@ class AuthApiController extends Controller {
         $this->auth = $auth;
         $this->editAlerts = $editAlerts;
         $this->security = $security;
-        $this->middleware('auth:api')->except(["checkSocialToken","changePasswordRequest","changePasswordUpdate"]);
+        $this->middleware('auth:api')->except(["checkSocialToken", "changePasswordRequest", "changePasswordUpdate"]);
     }
 
     /**
@@ -174,6 +172,7 @@ class AuthApiController extends Controller {
                             'name' => $user['name'],
                             'email' => $user['email'],
                             'cellphone' => '11',
+                            'language' => 'es',
                             'area_code' => '11',
                             'password' => bcrypt($result),
                             'emailNotifications' => 1,
@@ -187,6 +186,7 @@ class AuthApiController extends Controller {
                             'name' => $user['name'],
                             'email' => $user['email'],
                             'cellphone' => '11',
+                            'language' => 'es',
                             'area_code' => '11',
                             'password' => bcrypt($result),
                             'emailNotifications' => 1,
@@ -266,7 +266,7 @@ class AuthApiController extends Controller {
 
     public function changePasswordUpdate(Request $request) {
         $data = $request->all();
-        return response()->json($this->security->changePasswordUpdate($data)); 
+        return response()->json($this->security->changePasswordUpdate($data));
     }
 
 }
