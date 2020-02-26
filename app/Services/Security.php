@@ -91,18 +91,20 @@ class Security {
         $user->two_factor_expiry = Carbon::now()->addMinutes(config('session.lifetime'));
         $user->two_factor_token = str_random(8);
         $user->save();
-        Mail::to($user)->send(new TwoFactorAuthMail($user,$user->two_factor_token));
-        return ['message' => 'Requires two factor authentication'];
+        Mail::to($user)->send(new TwoFactorAuthMail($user, $user->two_factor_token));
+        return ['status' => 'success', 'message' => 'Two factor authentication initiated'];
     }
 
     public function changePasswordUpdate(array $data) {
+        $validator = $this->validatorPasswordUpdate($data);
+        if ($validator->fails()) {
+            return array("status" => "error", "message" => $validator->getMessageBag());
+        }
         $user = User::where("email", $data["email"])->first();
-        if ($user->two_factor_expiry > \Carbon\Carbon::now() && $data['code'] == $user->two_factor_token) {
-            $validator = $this->validatorPassword($data);
-            if ($validator->fails()) {
-                return array("status" => "error", "message" => $validator->getMessageBag());
-            }
-            $this->updatePassword($user, $data["password"]);
+        if ($user->two_factor_expiry > \Carbon\Carbon::now() && $data['token'] == $user->two_factor_token) {
+            
+
+            $this->updatePassword($user, $data);
             $http = new \GuzzleHttp\Client;
             $response = $http->post(env('APP_URL') . '/oauth/token', [
                 'form_params' => [
@@ -128,6 +130,19 @@ class Security {
      */
     public function validatorPassword(array $data) {
         return Validator::make($data, [
+                    'password' => 'required|confirmed|min:6',
+        ]);
+    }
+    /**
+     * Get a validator for an incoming edit profile request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    public function validatorPasswordUpdate(array $data) {
+        return Validator::make($data, [
+                    'token' => 'required|max:255',
+                    'email' => 'required|max:255',
                     'password' => 'required|confirmed|min:6',
         ]);
     }

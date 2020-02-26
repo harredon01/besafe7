@@ -49,7 +49,7 @@ class AuthApiController extends Controller {
         $this->auth = $auth;
         $this->editAlerts = $editAlerts;
         $this->security = $security;
-        $this->middleware('auth:api')->except("checkSocialToken");
+        $this->middleware('auth:api')->except(["checkSocialToken","changePasswordRequest","changePasswordUpdate"]);
     }
 
     /**
@@ -259,12 +259,12 @@ class AuthApiController extends Controller {
         return response()->json(['error' => 'invalid password'], 500);
     }
 
-    public function changePasswordRequest($request) {
+    public function changePasswordRequest(Request $request) {
         $data = $request->all();
         return response()->json($this->security->changePasswordRequest($data));
     }
 
-    public function changePasswordUpdate($request) {
+    public function changePasswordUpdate(Request $request) {
         $data = $request->all();
         return response()->json($this->security->changePasswordUpdate($data)); 
     }
