@@ -85,12 +85,17 @@ class EditOrderBooking {
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
-
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "Booking") {
                     $id = $data['id'];
                     $booking = Booking::find($id);
                     if ($booking) {
+//                        $updateData = [
+//                            "total_paid" => $item->priceSumConditions,
+//                            "updated_at" => date("Y-m-d H:i:s")
+//                        ];
+//                        Booking::where("id",$id)->update($updateData);
+//                        $booking->total_paid = $item->priceSumConditions;
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;

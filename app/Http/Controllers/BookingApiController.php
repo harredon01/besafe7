@@ -32,7 +32,7 @@ class BookingApiController extends Controller
         $user = $request->user();
         $data = $request->all();
         $data['call'] = false;
-        return $this->editBooking->addBookingObject($data, $user);
+        return response()->json($this->editBooking->addBookingObject($data, $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -47,7 +47,7 @@ class BookingApiController extends Controller
         date_add($date, date_interval_create_from_date_string("1 hour"));
         $data['to'] = date_format($date, "Y-m-d H:i:s");
         $data['call'] = true;
-        return $this->editBooking->addBookingObject($data, $user);
+        return response()->json($this->editBooking->addBookingObject($data, $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -56,7 +56,7 @@ class BookingApiController extends Controller
      */
     public function postAddAvailabilitiesObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->addAvailabilityObject($request->all(), $user);
+        return response()->json($this->editBooking->addAvailabilityObject($request->all(), $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -65,7 +65,7 @@ class BookingApiController extends Controller
      */
     public function deleteAvailabilityObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->deleteAvailabilityObject($request->all(), $user);
+        return response()->json($this->editBooking->deleteAvailabilityObject($request->all(), $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -74,7 +74,7 @@ class BookingApiController extends Controller
      */
     public function postChangeStatusBookingObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->changeStatusBookingObject($request->all(), $user);
+        return response()->json($this->editBooking->changeStatusBookingObject($request->all(), $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -83,7 +83,7 @@ class BookingApiController extends Controller
      */
     public function deleteBookingObject(Request $request,$booking) {
         $user = $request->user();
-        return $this->editBooking->deleteBooking( $user,$booking);
+        return response()->json($this->editBooking->deleteBooking( $user,$booking));
     }
     
     /**
@@ -93,7 +93,7 @@ class BookingApiController extends Controller
      */
     public function postRescheduleBookingObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->rescheduleBookingObject($request->all(), $user);
+        return response()->json($this->editBooking->rescheduleBookingObject($request->all(), $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -135,7 +135,7 @@ class BookingApiController extends Controller
      */
     public function getBookingsObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->getBookingsObject($request->all(), $user);
+        return response()->json($this->editBooking->getBookingsObject($request->all(), $user));
     }
     /**
      * Store a newly created resource in storage.
@@ -144,7 +144,7 @@ class BookingApiController extends Controller
      */
     public function getBooking(Request $request,$code) {
         $user = $request->user();
-        return $this->editBooking->getBooking($user, $code);
+        return response()->json($this->editBooking->getBooking($user, $code));
     }
     /**
      * Store a newly created resource in storage.
@@ -153,7 +153,7 @@ class BookingApiController extends Controller
      */
     public function getObjectsWithBookingUser(Request $request) {
         $user = $request->user();
-        return $this->editBooking->getObjectsWithBookingUser($user);
+        return response()->json($this->editBooking->getObjectsWithBookingUser($user));
     }
     /**
      * Store a newly created resource in storage.
@@ -162,7 +162,7 @@ class BookingApiController extends Controller
      */
     public function getAvailabilitiesObject(Request $request) {
         $user = $request->user();
-        return $this->editBooking->getAvailabilitiesObject($request->all());
+        return response()->json($this->editBooking->getAvailabilitiesObject($request->all()));
     }
     /**
      * Store a newly created resource in storage.
@@ -171,7 +171,7 @@ class BookingApiController extends Controller
      */
     public function postleaveChatroom(Request $request) {
         $user = $request->user();
-        return $this->editBooking->leaveChatroom($user,$request->all());
+        return response()->json($this->editBooking->leaveChatroom($user,$request->all()));
     }
     /**
      * Store a newly created resource in storage.
@@ -180,6 +180,6 @@ class BookingApiController extends Controller
      */
     public function postRegisterConnection(Request $request) {
         $user = $request->user();
-        return $this->editBooking->registerConnection($user,$request->all());
+        return response()->json($this->editBooking->registerConnection($user,$request->all()));
     }
 }
