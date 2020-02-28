@@ -5,11 +5,13 @@ namespace App\Services;
 use Validator;
 use App\Models\User;
 use App\Jobs\RecurringOrder;
+use App\Jobs\AddDeliveryInfo;
 use App\Models\Push;
 use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\OrderAddress;
 use App\Models\Address;
+use App\Models\Article;
 use App\Mail\DeliveryScheduled;
 use Illuminate\Support\Facades\Mail;
 
@@ -73,11 +75,13 @@ class EditDelivery {
                         $delivery->status = "enqueue";
                         $delivery->save();
                         $this->checkRecurringPosibility($user, $data['ip_address']);
+                        dispatch(new AddDeliveryInfo($delivery));
                     }
                     $date = date_create($delivery->delivery);
                     $pending = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
                     $data["date"] = date_format($date, "Y/m/d");
                     Mail::to($user)->send(new DeliveryScheduled($data));
+                    
                     return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details, "date" => $date, "pending_count" => $pending);
                 } else {
                     return $results;
@@ -125,6 +129,7 @@ class EditDelivery {
             $delivery->details = json_encode($details);
             $delivery->status = "enqueue";
             $delivery->save();
+            dispatch(new AddDeliveryInfo($delivery));
             return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details);
         }
         return array("status" => "error", "message" => "Delivery does not exist");
@@ -207,7 +212,7 @@ class EditDelivery {
                 if ($data['all']) {
                     Delivery::where("user_id", $user->id)->where("status", "pending")->update(['address_id' => $newAddress->id, "updated_at" => date("Y-m-d H:i:s")]);
                 } else {
-                    $delivery->address_id = $newAddress->id; 
+                    $delivery->address_id = $newAddress->id;
                     $delivery->save();
                 }
 
@@ -318,6 +323,84 @@ class EditDelivery {
             if ($order) {
                 dispatch(new RecurringOrder($order, $ip_address));
             }
+        }
+    }
+
+    public function addInfoToDelivery(Delivery $delivery) {
+        $details = json_decode($delivery->details, true);
+        $dish = $details["dish"];
+        $additionalInfo = [
+            "foto_entrada" => "",
+            "foto_plato" => "",
+            "foto_postre" => "",
+            "p_principal" => 0,
+            "p_harinas" => 0,
+            "p_verduras" => 0,
+            "p_otro" => 0,
+        ];
+        $article = Article::find($dish["type_id"]);
+        if ($article) {
+            $attributes = json_decode($article->attributes, true);
+            foreach ($attributes['entradas'] as $value) {
+                if ($dish["starter_id"] == $value['codigo']) {
+                    if(array_key_exists("imagen", $value)){
+                        $additionalInfo["foto_entrada"] = $value["imagen"];
+                    }
+                    if(array_key_exists("p_principal", $value)){
+                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    }
+                    if(array_key_exists("p_harinas", $value)){
+                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    }
+                    if(array_key_exists("p_verduras", $value)){
+                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    }
+                    if(array_key_exists("p_otro", $value)){
+                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    }
+                }
+            }
+            foreach ($attributes['plato'] as $value) {
+                if ($dish["main_id"] == $value['codigo']) {
+                    if(array_key_exists("imagen", $value)){
+                        $additionalInfo["foto_plato"] = $value["imagen"];
+                    }
+                    if(array_key_exists("p_principal", $value)){
+                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    }
+                    if(array_key_exists("p_harinas", $value)){
+                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    }
+                    if(array_key_exists("p_verduras", $value)){
+                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    }
+                    if(array_key_exists("p_otro", $value)){
+                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    }
+                }
+            }
+            foreach ($attributes['postre'] as $value) {
+                if ($dish["dessert_id"] == $value['codigo']) {
+                    if(array_key_exists("imagen", $value)){
+                        $additionalInfo["foto_postre"] = $value["imagen"];
+                    }
+                    if(array_key_exists("p_principal", $value)){
+                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    }
+                    if(array_key_exists("p_harinas", $value)){
+                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    }
+                    if(array_key_exists("p_verduras", $value)){
+                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    }
+                    if(array_key_exists("p_otro", $value)){
+                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    }
+                }
+            }
+            $details['add'] = $additionalInfo;
+            $delivery->details = json_encode($details);
+            $delivery->save();
         }
     }
 

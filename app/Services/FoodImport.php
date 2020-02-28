@@ -188,7 +188,12 @@ class FoodImport {
                 $plato = [
                     "valor" => $row[3],
                     "codigo" => $row[6],
-                    "descripcion" => $row[5]
+                    "descripcion" => $row[5],
+                    "imagen" => $row[7],
+                    "p_principal" => $row[8],
+                    "p_harinas" => $row[9],
+                    "p_verduras" => $row[10],
+                    "p_otro" => $row[11],
                 ];
                 if ($row[2] == "Entrada") {
                     array_push($entradas, $plato);
