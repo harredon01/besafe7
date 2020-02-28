@@ -90,6 +90,7 @@ class AlertsApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editAlerts->countNotificationsUnread($user));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -120,7 +121,6 @@ class AlertsApiController extends Controller {
                         ], 403);
     }
 
-
     /**
      * Handle a registration request for the application.
      *
@@ -140,7 +140,7 @@ class AlertsApiController extends Controller {
      */
     public function postEmergency(Request $request) {
         $user = $request->user();
-        dispatch(new PostEmergency($user, $request->all("type"),false));
+        dispatch(new PostEmergency($user, $request->all("type"), false));
         return response()->json(['status' => 'success', 'message' => 'postEmergency queued']);
     }
 
@@ -192,6 +192,7 @@ class AlertsApiController extends Controller {
      * @return Response
      */
     public function show($id) {
+        
     }
 
     /**

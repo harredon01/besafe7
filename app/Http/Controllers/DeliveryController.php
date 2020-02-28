@@ -7,15 +7,16 @@ use App\Services\CleanSearch;
 use App\Services\EditDelivery;
 use Unlu\Laravel\Api\QueryBuilder;
 use Illuminate\Http\Request;
+
 //use DB;
-class DeliveryController extends Controller
-{
+class DeliveryController extends Controller {
+
     /**
      * The edit profile implementation.
      *
      */
     protected $cleanSearch;
-    
+
     /**
      * The edit profile implementation.
      *
@@ -32,15 +33,15 @@ class DeliveryController extends Controller
         $this->editDelivery = $editDelivery;
         $this->middleware('auth:api');
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
-    {
+    public function index(Request $request) {
         $user = $request->user();
-        $request2 = $this->cleanSearch->handle($user,$request);
+        $request2 = $this->cleanSearch->handle($user, $request);
         if ($request2) {
             //DB::enableQueryLog();
             $queryBuilder = new QueryBuilder(new Delivery, $request2);
@@ -65,18 +66,16 @@ class DeliveryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
- 
+    public function create() {
+        
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function postDeliveryOptions(Request $request)
-    {
+    public function postDeliveryOptions(Request $request) {
         $user = $request->user();
         $data = $request->all([
             'type_name',
@@ -94,39 +93,37 @@ class DeliveryController extends Controller
         $data['ip_address'] = $request->ip();
         return response()->json($this->editDelivery->postDeliveryOptions($user, $data));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function posUpdateDeliveryDate(Request $request)
-    {
+    public function posUpdateDeliveryDate(Request $request) {
         $user = $request->user();
         $data = $request->all([
             'delivery',
         ]);
         return response()->json($this->editDelivery->changeDeliveryDate($user, $data));
     }
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function posUpdateDeliveryAddress(Request $request)
-    {
+    public function posUpdateDeliveryAddress(Request $request) {
         $user = $request->user();
         $data = $request->all();
         return response()->json($this->editDelivery->changeDeliveryAddress($user, $data));
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function postCancelDeliverySelection(Request $request,$delivery)
-    {
+    public function postCancelDeliverySelection(Request $request, $delivery) {
         $user = $request->user();
         return response()->json($this->editDelivery->cancelDeliverySelection($user, $delivery));
     }
@@ -137,8 +134,7 @@ class DeliveryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         //
     }
 
@@ -148,8 +144,7 @@ class DeliveryController extends Controller
      * @param  \App\Models\Delivery  $delivery
      * @return \Illuminate\Http\Response
      */
-    public function show(Delivery $delivery)
-    {
+    public function show(Delivery $delivery) {
         //
     }
 
@@ -159,8 +154,7 @@ class DeliveryController extends Controller
      * @param  \App\Models\Delivery  $delivery
      * @return \Illuminate\Http\Response
      */
-    public function edit(Delivery $delivery)
-    {
+    public function edit(Delivery $delivery) {
         //
     }
 
@@ -171,8 +165,7 @@ class DeliveryController extends Controller
      * @param  \App\Models\Delivery  $delivery
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Delivery $delivery)
-    {
+    public function update(Request $request, Delivery $delivery) {
         //
     }
 
@@ -182,8 +175,8 @@ class DeliveryController extends Controller
      * @param  \App\Models\Delivery  $delivery
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Delivery $delivery)
-    {
+    public function destroy(Delivery $delivery) {
         //
     }
+
 }
