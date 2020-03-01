@@ -621,6 +621,13 @@ class EditOrder {
                     $order->merchant_id = $data['merchant_id'];
                     $order->save();
                     OrderAddress::insert($orderAddresses);
+                    if($user->cellphone =='11'){
+                        if($orderAddresses['country_id']=='1'){
+                            $user->area_code = 57;
+                        }
+                        $user->cellphone = $orderAddresses['phone'];
+                        $user->save();
+                    }
                     return array("status" => "success", "message" => "Address added to order", "order" => $order);
                 }
                 return $result;

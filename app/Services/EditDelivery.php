@@ -81,7 +81,7 @@ class EditDelivery {
                     $pending = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
                     $data["date"] = date_format($date, "Y/m/d");
                     Mail::to($user)->send(new DeliveryScheduled($data));
-                    
+
                     return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details, "date" => $date, "pending_count" => $pending);
                 } else {
                     return $results;
@@ -343,58 +343,82 @@ class EditDelivery {
             $attributes = json_decode($article->attributes, true);
             foreach ($attributes['entradas'] as $value) {
                 if ($dish["starter_id"] == $value['codigo']) {
-                    if(array_key_exists("imagen", $value)){
+                    if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_entrada"] = $value["imagen"];
                     }
-                    if(array_key_exists("p_principal", $value)){
-                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    if (array_key_exists("p_principal", $value)) {
+                        if ($value["p_principal"]) {
+                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                        }
                     }
-                    if(array_key_exists("p_harinas", $value)){
-                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    if (array_key_exists("p_harinas", $value)) {
+                        if ($value["p_harinas"]) {
+                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
+                        }
                     }
-                    if(array_key_exists("p_verduras", $value)){
-                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    if (array_key_exists("p_verduras", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
+                        }
                     }
-                    if(array_key_exists("p_otro", $value)){
-                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    if (array_key_exists("p_otro", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        }
                     }
                 }
             }
             foreach ($attributes['plato'] as $value) {
                 if ($dish["main_id"] == $value['codigo']) {
-                    if(array_key_exists("imagen", $value)){
+                    if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_plato"] = $value["imagen"];
                     }
-                    if(array_key_exists("p_principal", $value)){
-                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    if (array_key_exists("p_principal", $value)) {
+                        if ($value["p_principal"]) {
+                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                        }
                     }
-                    if(array_key_exists("p_harinas", $value)){
-                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    if (array_key_exists("p_harinas", $value)) {
+                        if ($value["p_harinas"]) {
+                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
+                        }
                     }
-                    if(array_key_exists("p_verduras", $value)){
-                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    if (array_key_exists("p_verduras", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
+                        }
                     }
-                    if(array_key_exists("p_otro", $value)){
-                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    if (array_key_exists("p_otro", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        }
                     }
                 }
             }
             foreach ($attributes['postre'] as $value) {
                 if ($dish["dessert_id"] == $value['codigo']) {
-                    if(array_key_exists("imagen", $value)){
+                    if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_postre"] = $value["imagen"];
                     }
-                    if(array_key_exists("p_principal", $value)){
-                        $additionalInfo["p_principal"] += $value["p_principal"];
+                    if (array_key_exists("p_principal", $value)) {
+                        if ($value["p_principal"]) {
+                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                        }
                     }
-                    if(array_key_exists("p_harinas", $value)){
-                        $additionalInfo["p_harinas"] += $value["p_harinas"];
+                    if (array_key_exists("p_harinas", $value)) {
+                        if ($value["p_harinas"]) {
+                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
+                        }
                     }
-                    if(array_key_exists("p_verduras", $value)){
-                        $additionalInfo["p_verduras"] += $value["p_verduras"];
+                    if (array_key_exists("p_verduras", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
+                        }
                     }
-                    if(array_key_exists("p_otro", $value)){
-                        $additionalInfo["p_otro"] += $value["p_otro"];
+                    if (array_key_exists("p_otro", $value)) {
+                        if ($value["p_verduras"]) {
+                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        }
                     }
                 }
             }

@@ -33,6 +33,6 @@ class AddDeliveryInfo implements ShouldQueue
      */
     public function handle(EditDelivery $editDelivery)
     {
-        $editDelivery->addInfoToDelivery($editDelivery); 
+        $editDelivery->addInfoToDelivery($this->delivery); 
     }
 }

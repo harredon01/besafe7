@@ -177,7 +177,13 @@ class FoodImport {
         $principales = [];
         $postres = [];
         foreach ($reader as $row) {
+            
             if ($row[0]) {
+                foreach ($row as &$item) {
+                    if(!$item){
+                        $item = "";
+                    }
+                }
                 if ($row[1] != $activeLunch) {
                     $activeLunch = $row[1];
                     $this->importDish($entradas, $principales, $postres, $activeRow);
@@ -185,11 +191,15 @@ class FoodImport {
                     $principales = [];
                     $postres = [];
                 }
+                $imagen ="";
+                if($row[7]){
+                    $imagen ="https://gohife.s3.us-east-2.amazonaws.com/public/dishes/".$row[7];
+                }
                 $plato = [
                     "valor" => $row[3],
                     "codigo" => $row[6],
                     "descripcion" => $row[5],
-                    "imagen" => $row[7],
+                    "imagen" => $imagen,
                     "p_principal" => $row[8],
                     "p_harinas" => $row[9],
                     "p_verduras" => $row[10],
