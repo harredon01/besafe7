@@ -108,11 +108,11 @@ Route::post('food/messages', 'FoodImportController@postMessages');
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";
     $rapigoClassName = "App\\Services\\Rapigo";
-    $deliveries = App\Models\Delivery::where("status","transit")->get();
+    $deliveries = App\Models\Delivery::where("status", "transit")->get();
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
     $data = $gateway->getPurchaseOrder($deliveries);
-    $data['level']="";
+    $data['level'] = "";
     return new App\Mail\PurchaseOrder($data);
 });
 Route::get('/route_organize', function () {
@@ -138,7 +138,7 @@ Route::get('/route_choose', function () {
     $rapigoClassName = "App\\Services\\Rapigo";
     $rapigo = new $rapigoClassName;
     $gateway = new $className($rapigo); //// <--- this thing will be autoloaded
-    $data = $gateway->getTotalEstimatedShipping("preorganize","pending");
+    $data = $gateway->getTotalEstimatedShipping("preorganize", "pending");
     return new App\Mail\RouteChoose($data['routes']);
 });
 Route::get('/scenario_select', function () {
@@ -159,7 +159,7 @@ Route::get('/email_payment_cash', function () {
     $payment = App\Models\Payment::find(118);
     $url = "http://www.google.com";
     $pdf = "http://www.google.com";
-    return new App\Mail\EmailPaymentCash($payment,$user,$url,$pdf);
+    return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
 });
 Route::get('/newsletter_sistole_quadi', function () {
     return new App\Mail\Newsletter();
@@ -183,7 +183,10 @@ Route::get('/newsletter_catering', function () {
     return new App\Mail\Newsletter1();
 });
 Route::get('/newsletter_menu', function () {
-    return new App\Mail\NewsletterMenus();
+    $className = "App\\Services\\Food";
+    $gateway = new $className();
+    $days =$gateway->getDataNewsletter();
+    return new App\Mail\NewsletterMenus($days,"Marzo","Marzo");
 });
 Route::get('/newsletter_2', function () {
     return new App\Mail\Newsletter2();
