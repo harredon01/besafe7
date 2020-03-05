@@ -132,7 +132,7 @@ class FoodImport {
         } else {
             $saveDate = $activeRow[0];
         }
-        //dd($saveDate);
+//        dd($saveDate);
         //dd($date);
         $article = Article::create([
                     "type" => "lunch",
@@ -206,7 +206,7 @@ class FoodImport {
                 if($row[9]){
                     $wght = [
                         "name"=>"Carb.",
-                        "value" => $row[10]
+                        "value" => $row[9]
                     ];
                     array_push($pesos, $wght);
                 }
