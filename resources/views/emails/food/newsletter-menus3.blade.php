@@ -170,7 +170,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:0px;padding-bottom:20px;padding-left:0px;">
 <div style="font-family: Georgia, Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.2; color: #555555; mso-line-height-alt: 14px;">
-<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><span style=""><span style="font-size: 15px;"><strong><em>Del 24 al 28 de febrero</em></strong></span></span></span></p>
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><span style=""><span style="font-size: 15px;"><strong><em>Del {{$days[0]["titulo"]}} al {{$days[4]["titulo"]}} de {{$month2}}</em></strong></span></span></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -223,7 +223,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Lunes24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[0]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
 <div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -242,7 +242,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Lunes 24 </strong></span></em></p>
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Lunes {{$days[0]["titulo"]}} </strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -250,9 +250,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="line-height: 1.5; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;">
 <ul>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Vegetariano: Espinacas a la crema, acompaña con tortillas de coliflor y papas postizas. Un plato que favorece el funcionamiento del sistema inmunológico.</span></li>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light: Pechuga a la Florentina, con espinacas, salsa bechamel, con un toque de queso parmesano. Acompaña  bolitas de puré de papas horneadas con queso parmesano y zanahorias glaseadas. </span></li>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: Sopa de ajiaco acompañado de arroz blanco, pechuga de pollo desmechada, mazorca, aguacate, crema de leche y alcaparras.</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano {{$days[0]["vegetariano_t"]}}</b>: {{$days[0]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light: <b>{{$days[0]["light_t"]}}</b>: {{$days[0]["light_d"]}} </span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: <b>{{$days[0]["completo_t"]}}</b>: {{$days[0]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
@@ -280,7 +280,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Martes 25</strong></span></em></p>
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Martes {{$days[1]["titulo"]}}</strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -288,9 +288,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px;">
 <ul>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Vegetariano: Noodles con verduras en salsa agridulce, tallarines, cebolla, pimiento, raices chinas, aceite de oliva y un toque de miel.</span></li>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Light: Pasta al pesto con pollo, a base de albahaca,  piñones y aceite de oliva, agregamos queso fresco y pechuga de pollo.</span></li>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;">Completo: Filete de pescado apanado,  acompañado con una deliciosa porción de arroz con coco y ensalada de la casa.</span></li>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Vegetariano {{$days[1]["vegetariano_t"]}}</b>: {{$days[1]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Light {{$days[1]["light_t"]}}</b>: {{$days[1]["light_d"]}}</span></li>
+<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Completo {{$days[1]["completo_t"]}}</b>: {{$days[1]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
@@ -309,7 +309,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Martes24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[1]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
 <div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -335,7 +335,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Miercoles24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[2]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
 <div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -354,7 +354,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; word-break: break-word; font-size: 20px; mso-line-height-alt: 24px; margin: 0;"><span style="background-color: transparent; font-size: 20px;"><span style="color: #180a01;"><strong><em>Miércoles</em></strong></span></span><em style="font-size: 12px;"><span style="color: #180a01; font-size: 20px;"><strong> 26</strong></span></em></p>
+<p style="line-height: 1.2; word-break: break-word; font-size: 20px; mso-line-height-alt: 24px; margin: 0;"><span style="background-color: transparent; font-size: 20px;"><span style="color: #180a01;"><strong><em>Miércoles</em></strong></span></span><em style="font-size: 12px;"><span style="color: #180a01; font-size: 20px;"><strong> {{$days[2]["titulo"]}}</strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -362,9 +362,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Vegetariano: Pimentónes horneados rellenos de vegetales frescos, acompañado de cuscús con champiñones y ensalada de la casa.</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Light: Aguacate relleno de mariscos ( Camarones, palmitos, calamares & pescado blanco), acompañado con cous cous con champiñones y Sticks de zanahoria. Un plato bajo en grasa y calorías pero alto en proteínas, fuente de energía y de nutrientes.</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Completo: Arroz con mariscos: Camarones, palmitos, calamares & pescado blanco. Acompaña con moneditas de patacón y ensalada de la casa.</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Vegetariano {{$days[2]["vegetariano_t"]}}</b>: {{$days[2]["vegetariano_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Light {{$days[2]["light_t"]}}</b>: {{$days[2]["light_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Completo {{$days[2]["completo_t"]}}</b>: {{$days[2]["completo_d"]}}</li>
 </ul>
 </div>
 </div>
@@ -392,7 +392,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Jueves 27</strong></span></em></p>
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Jueves {{$days[3]["titulo"]}}</strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -400,9 +400,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.2; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Vegetariano: Árabe vegetariano,falafel (croquetas de garbanzo), arroz con nueces y tabule (ensalada a base de trigo, perejil, tomate, hierbabuena  y limón).</li>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Light: Wok de res, Una receta típica oriental que combina la carne de res con una variedad de verduras cocinadas al wok y bañadas en un  toque de salsa soya.  Acompaña con  arroz integral.</li>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;">Completo: Plato Árabe, Kibbes, falafel (croquetas de garbanzo), arroz con nueces y tabule (ensalada a base de trigo, perejil, tomate, hierbabuena  y limón).</li>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Vegetariano {{$days[3]["vegetariano_t"]}}</b>: {{$days[3]["vegetariano_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Light {{$days[3]["light_t"]}}</b>: {{$days[3]["light_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Completo {{$days[3]["completo_t"]}}</b>: {{$days[3]["completo_d"]}}</li>
 </ul>
 </div>
 </div>
@@ -421,7 +421,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Jueves24.jpg" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[3]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
 <div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -482,7 +482,7 @@
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Viernes24.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[4]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 275px; display: block;" title="Image" width="275"/>
 <div style="font-size:1px;line-height:15px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -501,7 +501,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 20px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:20px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
-<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Viernes 28</strong></span></em></p>
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Viernes {{$days[4]["titulo"]}}</strong></span></em></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -509,9 +509,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Vegetariano: Ratatoulle, receta a base de verduras horneadas en aceite de oliva originaria de la gastronomía francesa. Acompañalo con pasta corta a las finas hierbas y pan francés.</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Light: Filete de pescado con un toque de limón y perejil, acompañado con ratatoulle y arroz integral.</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;">Completo: Milanesa de pollo a la napolitana, acompañada con pasta corta a las finas hierbas y ratatoulle.</li>
+    <li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Vegetariano {{$days[4]["vegetariano_t"]}}</b>: {{$days[4]["vegetariano_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Light {{$days[4]["light_t"]}}</b>: {{$days[4]["light_d"]}}</li>
+<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Completo {{$days[4]["completo_t"]}}</b>: {{$days[4]["completo_d"]}}</li>
 </ul>
 </div>
 </div>

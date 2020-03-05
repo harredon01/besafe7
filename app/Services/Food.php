@@ -326,10 +326,47 @@ class Food {
         }
     }
 
+    public function getDataNewsletter() {
+        $start_date = "2020-03-02 00:00:00";
+        $end_date = "2020-03-06 23:59:59";
+        $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
+        $days = [];
+        for ($x = 0; $x < 5; $x++) {
+            $day = [
+                "imagen" => "",
+                "titulo" => "",
+                "vegetariano_t" => "",
+                "light_t" => "",
+                "completo_t" => "",
+                "vegetariano_d" => "",
+                "light_d" => "",
+                "completo_d" => "",
+            ];
+            array_push($days, $day);
+        }
+        foreach ($articles as $article) {
+            $date = date_create($article->start_date);
+            $attributes = json_decode($article->attributes, true);
+            $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
+            $dateMonth = date('d', strtotime(date_format($date, "Y-m-d H:i:s")));
+            $days[($dayofweek - 1)]["titulo"] = $dateMonth;
+            if (!$days[($dayofweek - 1)]["imagen"]) {
+                $days[($dayofweek - 1)]["imagen"] = $attributes["plato"][0]["imagen"];
+            }
+            if (!$days[($dayofweek - 1)][strtolower($article->name) . "_t"]) {
+                $days[($dayofweek - 1)][strtolower($article->name) . "_t"] = $attributes["plato"][0]["valor"];
+            }
+            if (!$days[($dayofweek - 1)][strtolower($article->name) . "_d"]) {
+                $days[($dayofweek - 1)][strtolower($article->name) . "_d"] = $attributes["plato"][0]["descripcion"];
+            }
+        }
+        return $days;
+    }
+
     public function sendNewsletter() {
+        $days = $this->getDataNewsletter();
+
         $date = date_create();
-        $type = "gift";
-        $tomorrow = date_format($date, "Y-m-d");
         // id > 130 and id < 200 bota 500
         $followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
@@ -352,7 +389,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus());
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Marzo","Marzo"));
             }
         }
     }
@@ -653,7 +690,8 @@ class Food {
             "2020-12-24",
             "2020-12-25",
             "2020-12-31",
-        ];;
+        ];
+        ;
         foreach ($holidays as $day) {
             if ($day == date_format($date, "Y-m-d")) {
                 return true;

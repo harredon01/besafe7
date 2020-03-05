@@ -12,15 +12,19 @@ class NewsletterMenus extends Mailable
 {
     use Queueable, SerializesModels;
 
-    
+    public $days;
+    public $month1;
+    public $month2;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($days,$month1,$month2)
     {
-
+        $this->days = $days;
+        $this->month1 = $month1;
+        $this->month2 = $month2;
     }
 
     /**
