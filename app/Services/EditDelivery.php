@@ -347,20 +347,22 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_entrada"] = $value["imagen"];
                     }
-                    foreach ($value['pesos'] as $peso) {
-                        $found = false;
-                        foreach ($pesosFinal as $pesoF) {
-                            if ($pesoF["name"] == $peso["name"]) {
-                                $found = true;
-                                $pesoF["value"] += $peso["value"];
+                    if (array_key_exists("pesos", $value)) {
+                        foreach ($value['pesos'] as $peso) {
+                            $found = false;
+                            foreach ($pesosFinal as $pesoF) {
+                                if ($pesoF["name"] == $peso["name"]) {
+                                    $found = true;
+                                    $pesoF["value"] += $peso["value"];
+                                }
                             }
-                        }
-                        if (!$found) {
-                            $wght = [
-                                "name" => $peso["name"],
-                                "value" => $peso["value"]
-                            ];
-                            array_push($pesosFinal, $wght);
+                            if (!$found) {
+                                $wght = [
+                                    "name" => $peso["name"],
+                                    "value" => $peso["value"]
+                                ];
+                                array_push($pesosFinal, $wght);
+                            }
                         }
                     }
                 }
@@ -370,20 +372,22 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_plato"] = $value["imagen"];
                     }
-                    foreach ($value['pesos'] as $peso) {
-                        $found = false;
-                        foreach ($pesosFinal as $pesoF) {
-                            if ($pesoF["name"] == $peso["name"]) {
-                                $found = true;
-                                $pesoF["value"] += $peso["value"];
+                    if (array_key_exists("pesos", $value)) {
+                        foreach ($value['pesos'] as $peso) {
+                            $found = false;
+                            foreach ($pesosFinal as $pesoF) {
+                                if ($pesoF["name"] == $peso["name"]) {
+                                    $found = true;
+                                    $pesoF["value"] += $peso["value"];
+                                }
                             }
-                        }
-                        if (!$found) {
-                            $wght = [
-                                "name" => $peso["name"],
-                                "value" => $peso["value"]
-                            ];
-                            array_push($pesosFinal, $wght);
+                            if (!$found) {
+                                $wght = [
+                                    "name" => $peso["name"],
+                                    "value" => $peso["value"]
+                                ];
+                                array_push($pesosFinal, $wght);
+                            }
                         }
                     }
                 }
@@ -393,20 +397,22 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_postre"] = $value["imagen"];
                     }
-                    foreach ($value['pesos'] as $peso) {
-                        $found = false;
-                        foreach ($pesosFinal as $pesoF) {
-                            if ($pesoF["name"] == $peso["name"]) {
-                                $found = true;
-                                $pesoF["value"] += $peso["value"];
+                    if (array_key_exists("pesos", $value)) {
+                        foreach ($value['pesos'] as $peso) {
+                            $found = false;
+                            foreach ($pesosFinal as $pesoF) {
+                                if ($pesoF["name"] == $peso["name"]) {
+                                    $found = true;
+                                    $pesoF["value"] += $peso["value"];
+                                }
                             }
-                        }
-                        if (!$found) {
-                            $wght = [
-                                "name" => $peso["name"],
-                                "value" => $peso["value"]
-                            ];
-                            array_push($pesosFinal, $wght);
+                            if (!$found) {
+                                $wght = [
+                                    "name" => $peso["name"],
+                                    "value" => $peso["value"]
+                                ];
+                                array_push($pesosFinal, $wght);
+                            }
                         }
                     }
                 }
