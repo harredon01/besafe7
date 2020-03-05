@@ -195,15 +195,52 @@ class FoodImport {
                 if($row[7]){
                     $imagen ="https://gohife.s3.us-east-2.amazonaws.com/public/dishes/".$row[7];
                 }
+                $pesos = [];
+                if($row[8]){
+                    $wght = [
+                        "name"=>"Cal.",
+                        "value" => $row[8]
+                    ];
+                    array_push($pesos, $wght);
+                }
+                if($row[9]){
+                    $wght = [
+                        "name"=>"Carb.",
+                        "value" => $row[10]
+                    ];
+                    array_push($pesos, $wght);
+                }
+                if($row[10]){
+                    $wght = [
+                        "name"=>"Prot.",
+                        "value" => $row[10]
+                    ];
+                    array_push($pesos, $wght);
+                }
+                if($row[11]){
+                    $wght = [
+                        "name"=>"Grasas.",
+                        "value" => $row[11]
+                    ];
+                    array_push($pesos, $wght);
+                }
+                if($row[12]){
+                    $wght = [
+                        "name"=>"Fibra.",
+                        "value" => $row[12]
+                    ];
+                    array_push($pesos, $wght);
+                }
                 $plato = [
                     "valor" => $row[3],
                     "codigo" => $row[6],
                     "descripcion" => $row[5],
                     "imagen" => $imagen,
-                    "p_principal" => $row[8],
-                    "p_harinas" => $row[9],
-                    "p_verduras" => $row[10],
-                    "p_otro" => $row[11],
+                    "p_principal" => "",
+                    "p_harinas" => "",
+                    "p_verduras" => "",
+                    "p_otro" => "",
+                    "pesos" => $pesos
                 ];
                 if ($row[2] == "Entrada") {
                     array_push($entradas, $plato);

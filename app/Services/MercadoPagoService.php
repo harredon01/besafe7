@@ -374,7 +374,12 @@ class MercadoPagoService {
                 "email" => $user->email
             );
             $customers = Customer::search($filters);
-            $customer = $customers[0];
+            if(count($customers)>0){
+                $customer = $customers[0];
+            } else {
+                return $customer;
+            }
+            
         }
         $source = $user->sources()->where("gateway", "MercadoPago")->first();
         if ($source) {
