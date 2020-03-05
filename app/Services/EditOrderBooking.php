@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
+use App\Jobs\CreateChatroom;
 use App\Models\Booking;
 use DB;
 class EditOrderBooking {
@@ -90,12 +91,6 @@ class EditOrderBooking {
                     $id = $data['id'];
                     $booking = Booking::find($id);
                     if ($booking) {
-//                        $updateData = [
-//                            "total_paid" => $item->priceSumConditions,
-//                            "updated_at" => date("Y-m-d H:i:s")
-//                        ];
-//                        Booking::where("id",$id)->update($updateData);
-//                        $booking->total_paid = $item->priceSumConditions;
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
@@ -103,13 +98,14 @@ class EditOrderBooking {
                         $booking->options['paid'] = date("Y-m-d H:i:s");
                         
                         $booking->save();
-                        //dd($booking);
-                        //$booking->options = [];
                         $updateData = [
                             "total_paid" => $item->priceSumConditions,
                             "updated_at" => date("Y-m-d H:i:s")
                         ];
                         Booking::where("id",$id)->update($updateData);
+                    }
+                    if($data["call"]){
+                        dispatch(new CreateChatroom($booking->id)); 
                     }
                 }
             }

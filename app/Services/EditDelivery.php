@@ -338,6 +338,7 @@ class EditDelivery {
             "p_verduras" => 0,
             "p_otro" => 0,
         ];
+        $pesosFinal = [];
         $article = Article::find($dish["type_id"]);
         if ($article) {
             $attributes = json_decode($article->attributes, true);
@@ -346,24 +347,20 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_entrada"] = $value["imagen"];
                     }
-                    if (array_key_exists("p_principal", $value)) {
-                        if ($value["p_principal"]) {
-                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                    foreach ($value['pesos'] as $peso) {
+                        $found = false;
+                        foreach ($pesosFinal as $pesoF) {
+                            if ($pesoF["name"] == $peso["name"]) {
+                                $found = true;
+                                $pesoF["value"] += $peso["value"];
+                            }
                         }
-                    }
-                    if (array_key_exists("p_harinas", $value)) {
-                        if ($value["p_harinas"]) {
-                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
-                        }
-                    }
-                    if (array_key_exists("p_verduras", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
-                        }
-                    }
-                    if (array_key_exists("p_otro", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        if (!$found) {
+                            $wght = [
+                                "name" => $peso["name"],
+                                "value" => $peso["value"]
+                            ];
+                            array_push($pesosFinal, $wght);
                         }
                     }
                 }
@@ -373,24 +370,20 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_plato"] = $value["imagen"];
                     }
-                    if (array_key_exists("p_principal", $value)) {
-                        if ($value["p_principal"]) {
-                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                    foreach ($value['pesos'] as $peso) {
+                        $found = false;
+                        foreach ($pesosFinal as $pesoF) {
+                            if ($pesoF["name"] == $peso["name"]) {
+                                $found = true;
+                                $pesoF["value"] += $peso["value"];
+                            }
                         }
-                    }
-                    if (array_key_exists("p_harinas", $value)) {
-                        if ($value["p_harinas"]) {
-                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
-                        }
-                    }
-                    if (array_key_exists("p_verduras", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
-                        }
-                    }
-                    if (array_key_exists("p_otro", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        if (!$found) {
+                            $wght = [
+                                "name" => $peso["name"],
+                                "value" => $peso["value"]
+                            ];
+                            array_push($pesosFinal, $wght);
                         }
                     }
                 }
@@ -400,28 +393,25 @@ class EditDelivery {
                     if (array_key_exists("imagen", $value)) {
                         $additionalInfo["foto_postre"] = $value["imagen"];
                     }
-                    if (array_key_exists("p_principal", $value)) {
-                        if ($value["p_principal"]) {
-                            $additionalInfo["p_principal"] += intval($value["p_principal"]);
+                    foreach ($value['pesos'] as $peso) {
+                        $found = false;
+                        foreach ($pesosFinal as $pesoF) {
+                            if ($pesoF["name"] == $peso["name"]) {
+                                $found = true;
+                                $pesoF["value"] += $peso["value"];
+                            }
                         }
-                    }
-                    if (array_key_exists("p_harinas", $value)) {
-                        if ($value["p_harinas"]) {
-                            $additionalInfo["p_harinas"] += intval($value["p_harinas"]);
-                        }
-                    }
-                    if (array_key_exists("p_verduras", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_verduras"] += intval($value["p_verduras"]);
-                        }
-                    }
-                    if (array_key_exists("p_otro", $value)) {
-                        if ($value["p_verduras"]) {
-                            $additionalInfo["p_otro"] += intval($value["p_otro"]);
+                        if (!$found) {
+                            $wght = [
+                                "name" => $peso["name"],
+                                "value" => $peso["value"]
+                            ];
+                            array_push($pesosFinal, $wght);
                         }
                     }
                 }
             }
+            $details['pesos'] = $pesosFinal;
             $details['add'] = $additionalInfo;
             $delivery->details = json_encode($details);
             $delivery->save();

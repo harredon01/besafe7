@@ -144,6 +144,7 @@ class EditBooking {
                         $update["options"]["location"] = $data['location'];
                     }
                     $update["options"]["status"] = "approved";
+                    $update["options"]["call"] = $data['call'];
                     if (array_key_exists("booking_requires_authorization", $attributes) &&! ($object->status == 'online'&&$data['call'])) {
                         if ($attributes["booking_requires_authorization"]) {
                             $update["total_paid"] = -1;
