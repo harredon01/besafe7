@@ -20,7 +20,7 @@ class CheckAdminRequest {
         $findme = '?';
         $pos = strpos($mystring, $findme);
         if ($user->id < 3 || $user->id == 77) {
-            return $next($request2);
+            return $next($request);
         }
         return response()->json(['message' => 'Access denied'], 402);
     }
