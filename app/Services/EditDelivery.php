@@ -341,7 +341,6 @@ class EditDelivery {
             "p_otro" => 0,
         ];
         $pesosFinal = [];
-        $article = Article::find($dish["type_id"]);
         if ($article) {
             $attributes = json_decode($article->attributes, true);
             foreach ($attributes['entradas'] as $value) {
