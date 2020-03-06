@@ -329,8 +329,10 @@ class EditDelivery {
     public function addInfoToDelivery(Delivery $delivery) {
         $details = json_decode($delivery->details, true);
         $dish = $details["dish"];
+        $article = Article::find($dish["type_id"]);
         $additionalInfo = [
             "foto_entrada" => "",
+            "tipo_p" => $article->name,
             "foto_plato" => "",
             "foto_postre" => "",
             "p_principal" => 0,
