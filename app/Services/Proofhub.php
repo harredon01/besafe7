@@ -13,8 +13,8 @@ use Excel;
 class Proofhub {
 
     const TYPE_COST = 'retail';
-    const START_DATE = '2020-02-01';
-    const END_DATE = '2020-03-01';
+    const START_DATE = '2020-03-01';
+    const END_DATE = '2025-03-01';
     const PRODUCCION = 'Produccion';
     const CUENTAS = 'Cuentas';
     const CANADA = 'Canada';
@@ -1636,8 +1636,14 @@ class Proofhub {
                 $saveperson['retail'] = 48414;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
-            } else if ($resultsPerson['id'] == "6272048911") {
-                //Nataly 
+            } else if ($resultsPerson['id'] == "6460464077") {
+                //Leonardo 
+                $saveperson['cost'] = 68500;
+                $saveperson['retail'] = 74750;
+                $saveperson['cost_us'] = 8.86;
+                $saveperson['retail_us'] = 10.47;
+            } else if ($resultsPerson['id'] == "2185287855") {
+                //Angelica 
                 $saveperson['cost'] = 68500;
                 $saveperson['retail'] = 74750;
                 $saveperson['cost_us'] = 8.86;
@@ -1650,5 +1656,4 @@ class Proofhub {
         }
         return $orderedPeople;
     }
-
 }
