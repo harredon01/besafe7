@@ -121,9 +121,10 @@ class MercadoPagoService {
 
         return $paymentResult;
     }
-    private function getMerchantToken(Payment $payment){
+
+    private function getMerchantToken(Payment $payment) {
         $paymentM = new Pago();
-        
+
         $users = DB::table('payments')
                 ->join('orders', 'payments.order_id', '=', 'orders.id')
                 ->join('merchant_user', 'orders.merchant_id', '=', 'merchant_user.merchant_id')
@@ -133,14 +134,14 @@ class MercadoPagoService {
                 ->select('source.extra as extra')
                 ->distinct()
                 ->first();
-        if(count($users)>0){
+        if (count($users) > 0) {
             $user = $users[0];
             $attributes = json_decode($user->extra);
-            if(array_key_exists("access_token", $attributes)){
-                $paymentM->user_token =  $attributes['access_token'];
-                $paymentM->application_fee = $payment->total/10;
+            if (array_key_exists("access_token", $attributes)) {
+                $paymentM->user_token = $attributes['access_token'];
+                $paymentM->application_fee = $payment->total / 10;
             }
-        } 
+        }
         return $paymentM;
     }
 
@@ -1014,7 +1015,7 @@ class MercadoPagoService {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnMerc(array $data) {
-        if(array_key_exists('AUTHORIZATION_CODE', $data)){
+        if (array_key_exists('AUTHORIZATION_CODE', $data) && array_key_exists('user_id', $data)) {
             $this->returnMerchant($data);
         }
         return $data;
