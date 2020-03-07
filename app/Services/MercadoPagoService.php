@@ -121,6 +121,28 @@ class MercadoPagoService {
 
         return $paymentResult;
     }
+    private function getMerchantToken(Payment $payment){
+        $paymentM = new Pago();
+        
+        $users = DB::table('payments')
+                ->join('orders', 'payments.order_id', '=', 'orders.id')
+                ->join('merchant_user', 'orders.merchant_id', '=', 'merchant_user.merchant_id')
+                ->join('sources', 'merchant_user.user_id', '=', 'sources.user_id')
+                ->where('payments.id', $payment->id)
+                ->where('sources.gateway', 'MercadoPago')
+                ->select('source.extra as extra')
+                ->distinct()
+                ->first();
+        if(count($users)>0){
+            $user = $users[0];
+            $attributes = json_decode($user->extra);
+            if(array_key_exists("access_token", $attributes)){
+                $paymentM->user_token =  $attributes['access_token'];
+                $paymentM->application_fee = $payment->total/10;
+            }
+        } 
+        return $paymentM;
+    }
 
     public function quickPayCreditCard(User $user, array $data, Payment $payment, $platform) {
         $source = $user->sources()->where("gateway", "MercadoPago")->first();
@@ -133,7 +155,7 @@ class MercadoPagoService {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $paymentM = new Pago();
+        $paymentM = $this->getMerchantToken($payment);
         $paymentM->transaction_amount = $payment->total;
         $paymentM->external_reference = $payment->referenceCode;
         $paymentM->token = $data["token"];
@@ -155,7 +177,7 @@ class MercadoPagoService {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
 
-        $paymentM = new Pago();
+        $paymentM = $this->getMerchantToken($payment);
         $paymentM->transaction_amount = $payment->total;
         $paymentM->token = $data["token"];
         $paymentM->description = "Pago Mevico app # " . $payment->id;
@@ -181,7 +203,7 @@ class MercadoPagoService {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        $paymentM = new Pago();
+        $paymentM = $this->getMerchantToken($payment);
         $paymentM->transaction_amount = $payment->total;
         $paymentM->external_reference = $payment->referenceCode;
         $paymentM->description = "Pago Mevico app # " . $payment->id;
@@ -218,7 +240,7 @@ class MercadoPagoService {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
 
-        $paymentM = new Pago();
+        $paymentM = $this->getMerchantToken($payment);
         $paymentM->transaction_amount = $payment->total;
         $paymentM->external_reference = $payment->referenceCode;
         $paymentM->description = "Pago Mevico app # " . $payment->id;
@@ -905,6 +927,9 @@ class MercadoPagoService {
                 break;
             case "subscription":
                 //$plan = MercadoPago\Subscription . find_by_id($data["id"]);
+                break;
+            case "invoice":
+                //$plan = MercadoPago\Invoice . find_by_id($data["id"]);
                 break;
             case "invoice":
                 //$plan = MercadoPago\Invoice . find_by_id($data["id"]);
