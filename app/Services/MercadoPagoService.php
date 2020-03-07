@@ -62,13 +62,11 @@ class MercadoPagoService {
 
     public function sendGet($query) {
         $curl = curl_init($query);
-        $auth = base64_encode(env('PAYU_LOGIN') . ":" . env('PAYU_KEY'));
         $headers = array(
             'Content-Type: application/json; charset=utf-8',
             'Content-Length: ',
             'Accept: application/json',
             'Accept-language: es',
-            'Authorization: Basic ' . $auth,
         );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
@@ -79,12 +77,31 @@ class MercadoPagoService {
         return $response;
     }
 
+    public function sendPost(array $data, $query) {
+        $data_string = json_encode($data);
+        $curl = curl_init($query);
+        $headers = array(
+            'Content-Length: ' . strlen($data_string),
+            'Accept: application/json',
+            'Accept-language: es',
+        );
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode($response, true);
+        return $response;
+    }
+
     public function getPaymentMethods() {
         $url = "https://api.mercadopago.com/v1/payment_methods?access_token=" . env("MERCADOPAGO_TOKEN");
         return $this->sendGet($url);
     }
+
     public function getPayment($payment_id) {
-        $url = "https://api.mercadopago.com/v1/payments/".$payment_id."?access_token=" . env("MERCADOPAGO_TOKEN");
+        $url = "https://api.mercadopago.com/v1/payments/" . $payment_id . "?access_token=" . env("MERCADOPAGO_TOKEN");
         return $this->sendGet($url);
     }
 
@@ -192,7 +209,7 @@ class MercadoPagoService {
             $url = $transaction->external_resource_url;
             Mail::to($user)->send(new EmailPaymentPse($payment, $user, $url));
         }
-        return ["status" => "success","response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
+        return ["status" => "success", "response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
     }
 
     public function payCash(User $user, array $data, Payment $payment, $platform) {
@@ -215,7 +232,7 @@ class MercadoPagoService {
             $url = $transaction->external_resource_url;
             Mail::to($user)->send(new EmailPaymentCash($payment, $user, $url, null));
         }
-        return ["status" => "success","response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
+        return ["status" => "success", "response" => $paymentM->status, "status_detail" => $paymentM->status_detail, "url" => $url];
     }
 
     public function makeCharge(User $user, Order $order, array $payload) {
@@ -374,12 +391,11 @@ class MercadoPagoService {
                 "email" => $user->email
             );
             $customers = Customer::search($filters);
-            if(count($customers)>0){
+            if (count($customers) > 0) {
                 $customer = $customers[0];
             } else {
                 return $customer;
             }
-            
         }
         $source = $user->sources()->where("gateway", "MercadoPago")->first();
         if ($source) {
@@ -697,108 +713,6 @@ class MercadoPagoService {
         return $response;
     }
 
-    public function createAll(User $user, array $data) {
-        $planL = Plan::where("plan_id", $data['plan_id'])->first();
-        $source = $user->sources()->where("gateway", "PayU")->first();
-        $url = $this->getTestUrl($user) . env('PAYU_REST') . 'subscriptions/';
-        $additionalValues = [
-            "name" => "PLAN_VALUE",
-            "value" => "20000",
-            "currency" => "COP"
-        ];
-
-        $plan = [
-            "accountId" => "512321",
-            "planCode" => $planL->plan_id,
-            "description" => $planL->name,
-            "interval" => "MONTH",
-            "intervalCount" => "1",
-            "maxPaymentsAllowed" => "12",
-            "maxPaymentAttempts" => "3",
-            "paymentAttemptsDelay" => "1",
-            "maxPendingPayments" => "1",
-            "trialDays" => "30",
-            "additionalValues" => array($additionalValues),
-        ];
-        $address = [
-            "line1" => "Calle 73 # 0 - 24 ",
-            "line2" => "Apto 202",
-            "line3" => "",
-            "postalCode" => "",
-            "city" => "Bogota",
-            "state" => "Cundinamarca",
-            "country" => "CO",
-            "phone" => "3105507245"
-        ];
-
-        $creditCard = [
-            "name" => "APPROVED",
-            "document" => "1231231232",
-            "number" => "4111111111111111",
-            "expMonth" => "12",
-            "expYear" => "2020",
-            "type" => "VISA",
-            "address" => $address
-        ];
-        $creditCards = array($creditCard);
-        $customer = [
-            "fullName" => "Hoovert Arredondo",
-            "email" => "harredon01@gmail.com",
-            "creditCards" => $creditCards,
-        ];
-        $dataSent = [
-            "quantity" => 1,
-            "installments" => 1,
-            "trialDays" => 0,
-            "immediatePayment" => true,
-            "recurringBillItems" => array(),
-            "extra1" => "",
-            "extra2" => "",
-            "customer" => $customer,
-            "plan" => $plan,
-            "deliveryAddress" => $address,
-            "notifyUrl" => env('APP_URL') . "/api/payu/webhook",
-        ];
-        $response = $this->sendPost($dataSent, $url);
-        if (array_key_exists("id", $response)) {
-            $subscription = new Subscription([
-                "gateway" => "PayU",
-                "status" => "active",
-                "type" => $planL->type,
-                "name" => $planL->name,
-                "plan" => $planL->plan_id,
-                "plan_id" => $planL->id,
-                "level" => $planL->level,
-                "source_id" => $response['id'],
-                "client_id" => $source->client_id,
-                "object_id" => $data['object_id'],
-                "interval" => $planL->interval,
-                "interval_type" => $planL->interval_type,
-                "quantity" => 1,
-                "ends_at" => date("Y-m-d")
-            ]);
-            $user->subscriptions()->save($subscription);
-        }
-        if (array_key_exists("customer", $response)) {
-            $customerReply = $response['customer'];
-            $response['status'] = "success";
-            $response["subscription"] = $subscription;
-            if (array_key_exists("creditCards", $customerReply)) {
-                $card = $customerReply['creditCards'][0];
-                if ($card) {
-                    if (array_key_exists("default", $data)) {
-                        if ($data["default"]) {
-                            $source->source = $card['token'];
-                            $source->has_default = true;
-                            $source->save();
-                        }
-                    }
-                }
-            }
-        }
-        return $response;
-    }
-
     public function createSubscriptionSourceClient(User $user, Plan $planL, array $data) {
         $source = $this->createClient($user);
         if ($source) {
@@ -955,7 +869,7 @@ class MercadoPagoService {
             case "payment":
                 if ($data["action"] == "payment.updated") {
                     $paymentM = $this->getPayment($data['data']['id']);
-                    $paymentM = json_decode(json_encode($paymentM),false);
+                    $paymentM = json_decode(json_encode($paymentM), false);
                     $payment = Payment::where("referenceCode", $paymentM->external_reference)->first();
                     if ($payment) {
                         if ($payment->status == "payment_created" || $payment->status == "pending") {
@@ -1033,40 +947,6 @@ class MercadoPagoService {
         return $data;
     }
 
-    private function saveTransactionRespuesta(array $data, Payment $payment) {
-        $transactionId = $data['transactionId'];
-        $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-        if ($transaction) {
-            $transaction->currency = $data['currency'];
-            $transaction->transaction_state = $data['transactionState'];
-            $transaction->description = $data['message'];
-            $transaction->reference_sale = $data['referenceCode'];
-            $transaction->payment_method = $data['polPaymentMethodType'];
-            $transaction->transaction_id = $data['transactionId'];
-            //$transaction->transaction_date = $data['processingDate'];
-            $transaction->response_code = $data['lapResponseCode'];
-            $transaction->extras = json_encode($data);
-            $transaction->save();
-        } else {
-            $insert = [];
-            $insert["reference_sale"] = $data["referenceCode"];
-            $insert["order_id"] = $data["order_id"];
-            $insert["user_id"] = $data["user_id"];
-            $insert["response_code"] = $data["lapResponseCode"];
-            $insert["currency"] = $data["currency"];
-            $insert["payment_method"] = $data["polPaymentMethodType"];
-            $insert["transaction_id"] = $data["transactionId"];
-            $insert["gateway"] = "PayU";
-            $insert["description"] = $data["message"];
-            //$insert["transaction_date"] = $data["processingDate"];
-            $insert["transaction_state"] = $data["transactionState"];
-            $insert["extras"] = json_encode($data);
-            $transaction = Transaction::create($insert);
-            $payment->transactions()->save($transaction);
-        }
-        return $transaction;
-    }
-
     private function saveTransactionQuery(array $data, Payment $payment) {
         $transactionId = $data['id'];
         $transaction = Transaction::where("transaction_id", $transactionId)->where('gateway', 'MercadoPago')->first();
@@ -1109,28 +989,66 @@ class MercadoPagoService {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnMerc(array $data) {
-//        $payment = Payment::where("referenceCode", $referenceCode)->first();
-//        if ($payment) {
-//            $data['user_id'] = $payment->user_id;
-//            $data['order_id'] = $payment->order_id;
-//            $transaction = $this->saveTransactionRespuesta($data, $payment);
-//            $data['transaction'] = $transaction;
-//            if ($data['transactionState'] == 4) {
-//                $estadoTx = "Transaction approved";
-//                dispatch(new ApprovePayment($payment, "Food"));
-//            } else if ($data['transactionState'] == 6) {
-//                $estadoTx = "Transaction rejected";
-//                dispatch(new DenyPayment($payment, "Food"));
-//            } else if ($data['transactionState'] == 104) {
-//                $estadoTx = "Error";
-//                dispatch(new DenyPayment($payment, "Food"));
-//            } else if ($data['transactionState'] == 7) {
-//                $estadoTx = "Pending payment";
-//                dispatch(new PendingPayment($payment, "Food"));
-//            } else {
-//                $estadoTx = $data['mensaje'];
-//            }
-//        }
+        if(array_key_exists('AUTHORIZATION_CODE', $data)){
+            $this->returnMerchant($data);
+        }
+        return $data;
+    }
+
+    public function returnMerchant(array $data) {
+        $user = User::find('user_id', $data['user_id']);
+        if ($user) {
+            $url = "https://api.mercadopago.com/oauth/token";
+            $post = [
+                "client_secret" => env("MERCADOPAGO_TOKEN"),
+                "grant_type" => "authorization_code",
+                "code" => $data['AUTHORIZATION_CODE'],
+                "redirect_uri" => env('APP_URL') . "/mercado/return",
+            ];
+            $results = $this->sendPost($url);
+            if (array_key_exists('access_token', $results)) {
+                $source = $user->sources()->where("gateway", "MercadoPago")->first();
+                if ($source) {
+                    $source->extra = json_encode($results);
+                    $source->save();
+                } else {
+                    $source = new Source([
+                        "client_id" => $results['user_id'],
+                        "gateway" => "MercadoPago",
+                        "extra" => json_encode($results)
+                    ]);
+                    $user->sources()->save($source);
+                }
+            }
+        }
+        return $data;
+    }
+
+    public function refreshMerchants() {
+        $users = DB::table('users')
+                ->join('merchant_user', 'users.id', '=', 'merchant_user.user_id')
+                ->join('merchants', 'merchants.id', '=', 'merchant_user.merchant_id')
+                ->where('merchants.status', '!=', 'inactive')
+                ->select('users.id')
+                ->distinct()
+                ->get();
+        $sources = Source::whereIn('user_id', $users)->where('gateway', 'MercadoPago');
+        foreach ($sources as $source) {
+            $details = json_decode($source->extra);
+            if (array_key_exists("access_token", $details)) {
+                $url = "https://api.mercadopago.com/oauth/token";
+                $post = [
+                    "client_secret" => $details['access_token'],
+                    "grant_type" => "refresh_token",
+                    "refresh_token" => $details['refresh_token'],
+                ];
+                $results = $this->sendPost($url);
+                if (array_key_exists('access_token', $results)) {
+                    $source->extra = json_encode($results);
+                    $source->save();
+                }
+            }
+        }
         return $data;
     }
 
