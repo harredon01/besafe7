@@ -208,6 +208,7 @@ class EditMapObject {
                 } else {
                     $data['favorite'] = false;
                 }
+                $data['status']='success';
                 return $data;
             }
             return ['status' => "error", "message" => $type . ' not found for user'];

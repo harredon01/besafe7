@@ -27,10 +27,7 @@ class CreateVehiclesTable extends Migration {
                         $table->string('make');
                         $table->string('model');
                         $table->string('color');
-                        $table->string('vin_number');
                         $table->integer('year');
-                        $table->double('full_length');
-                        $table->string('horse_power');
                         $table->double('cargo_width');
                         $table->double('cargo_length');
                         $table->double('cargo_height');

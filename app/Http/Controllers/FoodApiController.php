@@ -53,8 +53,8 @@ class FoodApiController extends Controller {
         $this->food = $food;
         $this->routing = $routing;
         $this->delivery = $editDelivery;
-        $this->middleware('auth:api')->except('getZones');
-        $this->middleware('admin')->except(['getRouteInfo','getZones']);
+        $this->middleware('auth:api')->except('getZones','getActiveIndicators');
+        $this->middleware('admin')->except(['getRouteInfo','getZones','getActiveIndicators']);
     }
 
     /**
@@ -129,6 +129,12 @@ class FoodApiController extends Controller {
     public function sendNewsletter(){
         $this->food->sendNewsletter();
         //dispatch(new \App\Jobs\SendNewsletter());
+    }
+    public function getActiveIndicators(){
+        $data = [
+            "Cal.","Carb.","Prot.","Grasas.","Fibra."
+        ];
+        return $data;
     }
 
 

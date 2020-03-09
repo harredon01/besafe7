@@ -1644,7 +1644,7 @@ class Proofhub {
                 $saveperson['retail_us'] = 10.47;
             } else if ($resultsPerson['id'] == "2185287855") {
                 //Angelica 
-                $saveperson['cost'] = 68500;
+                $saveperson['cost'] = 45500;
                 $saveperson['retail'] = 74750;
                 $saveperson['cost_us'] = 8.86;
                 $saveperson['retail_us'] = 10.47;
