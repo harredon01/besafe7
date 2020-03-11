@@ -51,8 +51,8 @@ class FoodApiController extends Controller {
         $this->food = $food;
         $this->routing = $routing;
         $this->delivery = $editDelivery;
-        $this->middleware('auth:api')->except('getZones', 'getActiveIndicators');
-        $this->middleware('admin')->except(['getRouteInfo', 'getZones', 'getActiveIndicators']);
+        $this->middleware('auth:api')->except('getZones', 'getActiveIndicators', 'getTips');
+        $this->middleware('admin')->except(['getRouteInfo', 'getZones', 'getActiveIndicators', 'getTips']);
     }
 
     /**
@@ -136,6 +136,17 @@ class FoodApiController extends Controller {
             ["name" => "Prot.", "totals" => 15000],
             ["name" => "Grasas.", "totals" => 15000],
             ["name" => "Fibra.", "totals" => 15000]
+        ];
+        return ["status" => 'success', "results" => $data];
+    }
+    public function getTips() {
+        $data = [
+            ["Profesionales en la cocina, expertos en nutrición."],
+            ["Un servicio práctico y delicioso que te ayudará a llevar una alimentación sana y balanceada."],
+            ["Cada día 3 opciones de menús diferentes (selecciona 1 entrada y 1 plato fuerte)"],
+            ["Personaliza y confirma tu menú antes de las 10 Pm. del día anterior."],
+            ["Entregamos tus Almuerzos frescos entre las 10:30 Am y las 12:30 Pm  (puedes calentar en microondas)."],
+            ["¡Tus almuerzos no se vencen! Prográmalos en cualquier fechas durante todo un año."],
         ];
         return ["status" => 'success', "results" => $data];
     }

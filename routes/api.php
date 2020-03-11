@@ -212,6 +212,7 @@ Route::get('admin/store/categories', 'ProductImportApiController@getCategories')
 Route::get('food/menu', 'FoodApiController@getMenu');
 Route::get('food/zones', 'FoodApiController@getZones');
 Route::get('food/indicators', 'FoodApiController@getActiveIndicators');
+Route::get('food/tips', 'FoodApiController@getTips');
 Route::get('food/newsletter', 'FoodApiController@sendNewsletter');
 Route::get('food/messages', 'FoodApiController@getMessages');
 Route::delete('food/content/{item?}', 'FoodApiController@deleteContentItem');
