@@ -39,9 +39,7 @@ class FoodApiController extends Controller {
      */
 
     private $food;
-    
     private $routing;
-    
     private $delivery;
 
     /**
@@ -49,12 +47,12 @@ class FoodApiController extends Controller {
      *
      * @return void
      */
-    public function __construct(Food $food,Routing $routing, EditDelivery $editDelivery) {
+    public function __construct(Food $food, Routing $routing, EditDelivery $editDelivery) {
         $this->food = $food;
         $this->routing = $routing;
         $this->delivery = $editDelivery;
-        $this->middleware('auth:api')->except('getZones','getActiveIndicators');
-        $this->middleware('admin')->except(['getRouteInfo','getZones','getActiveIndicators']);
+        $this->middleware('auth:api')->except('getZones', 'getActiveIndicators');
+        $this->middleware('admin')->except(['getRouteInfo', 'getZones', 'getActiveIndicators']);
     }
 
     /**
@@ -85,7 +83,7 @@ class FoodApiController extends Controller {
      */
     public function getPurchaseOrder() {
         $debug = env('APP_DEBUG');
-        if($debug == 'true'){
+        if ($debug == 'true') {
             return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
         }
         $date = date_create();
@@ -103,40 +101,44 @@ class FoodApiController extends Controller {
      */
     public function sendReminder() {
         $debug = env('APP_DEBUG');
-        if($debug == 'true'){
+        if ($debug == 'true') {
             return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
         }
         $date = date_create();
-        if($this->food->checkIsHoliday($date)){
+        if ($this->food->checkIsHoliday($date)) {
             return true;
         }
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if($dayofweek > 5){
+        if ($dayofweek > 5) {
             return response()->json(array("status" => "success", "message" => "Reminder Sent"));
         }
         $this->food->sendReminder();
         return response()->json(array("status" => "success", "message" => "Reminder Sent"));
     }
-    
-    public function backups(){
+
+    public function backups() {
         $debug = env('APP_DEBUG');
-        if($debug == 'true'){
+        if ($debug == 'true') {
             return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
         }
         Artisan::call('db:backup');
     }
-    
-    public function sendNewsletter(){
+
+    public function sendNewsletter() {
         $this->food->sendNewsletter();
         //dispatch(new \App\Jobs\SendNewsletter());
     }
-    public function getActiveIndicators(){ 
-        $data = [
-            "Cal."=>15000,"Carb."=>15000,"Prot."=>15000,"Grasas."=>15000,"Fibra."=>15000
-        ];
-        return $data;
-    }
 
+    public function getActiveIndicators() {
+        $data = [
+            ["name" => "Cal.", "totals" => 15000],
+            ["name" => "Carb.", "totals" => 15000],
+            ["name" => "Prot.", "totals" => 15000],
+            ["name" => "Grasas.", "totals" => 15000],
+            ["name" => "Fibra.", "totals" => 15000]
+        ];
+        return ["status" => 'success', "results" => $data];
+    }
 
     /**
      * Show the application dashboard to the user.
@@ -158,7 +160,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function buildScenarioLogistics(Request $request) {
-        $this->routing->buildScenarioLogistics( $request->all());
+        $this->routing->buildScenarioLogistics($request->all());
 
         //dispatch(new \App\Jobs\BuildScenarioLogistics($request->all()));
         return response()->json(array("status" => "success", "message" => "Scenario sent to build"));
@@ -172,10 +174,10 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function updateUserDeliveriesAddress($user,$address) {
-        return response()->json(array("status" => "success", "message" => $this->routing->updateUserDeliveriesAddress($user,$address)));
+    public function updateUserDeliveriesAddress($user, $address) {
+        return response()->json(array("status" => "success", "message" => $this->routing->updateUserDeliveriesAddress($user, $address)));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
@@ -184,8 +186,6 @@ class FoodApiController extends Controller {
     public function updateMissingDish(Request $request) {
         return response()->json($this->delivery->adminPostDeliveryOptions($request->all()));
     }
-
-    
 
     /**
      * Show the application dashboard to the user.
@@ -197,19 +197,19 @@ class FoodApiController extends Controller {
         dispatch(new \App\Jobs\ApprovePayment($payment, "Food"));
         return response()->json(array("status" => "success", "message" => "Payment scheduled"));
     }
-    
+
     /**
      * Show the application dashboard to the user.
      *
      * @return Response
      */
     public function buildScenarioRouteId($id) {
-        dispatch(new \App\Jobs\BuildScenarioRouteId($id, "",false));
-        /*$routes = Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $this->routing->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $this->routing->buildScenarioTransit($routes);
-        }*/
+        dispatch(new \App\Jobs\BuildScenarioRouteId($id, "", false));
+        /* $routes = Route::where("id", $id)->where("status", "pending")->with(['deliveries.user'])->orderBy('id')->get();
+          $checkResult = $this->routing->checkScenario($routes, $hash);
+          if ($checkResult) {
+          $this->routing->buildScenarioTransit($routes);
+          } */
         return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
     }
 
@@ -218,14 +218,14 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function buildScenarioPositive( $scenario,$provider) {
-        dispatch(new \App\Jobs\BuildScenarioPositive($scenario,$provider, "",false));
-        /*$routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $this->routing->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("provider", $provider)->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
-            $this->routing->buildScenarioTransit($routes);
-        }*/
+    public function buildScenarioPositive($scenario, $provider) {
+        dispatch(new \App\Jobs\BuildScenarioPositive($scenario, $provider, "", false));
+        /* $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
+          $checkResult = $this->routing->checkScenario($routes, $hash);
+          if ($checkResult) {
+          $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("provider", $provider)->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
+          $this->routing->buildScenarioTransit($routes);
+          } */
         return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
     }
 
@@ -234,13 +234,13 @@ class FoodApiController extends Controller {
      *
      * @return Response
      */
-    public function buildCompleteScenario( $scenario,$provider) {
-        dispatch(new \App\Jobs\BuildCompleteScenario($scenario,$provider, "",false));
-        /*$routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
-        $checkResult = $this->routing->checkScenario($routes, $hash);
-        if ($checkResult) {
-            $this->routing->buildScenarioTransit($routes);
-        }*/
+    public function buildCompleteScenario($scenario, $provider) {
+        dispatch(new \App\Jobs\BuildCompleteScenario($scenario, $provider, "", false));
+        /* $routes = Route::where("type", $scenario)->where("status", "pending")->where("provider", $provider)->with(['deliveries.user'])->orderBy('id')->get();
+          $checkResult = $this->routing->checkScenario($routes, $hash);
+          if ($checkResult) {
+          $this->routing->buildScenarioTransit($routes);
+          } */
         return response()->json(array("status" => "success", "message" => "Scenario Scheduled"));
     }
 
@@ -391,6 +391,7 @@ class FoodApiController extends Controller {
                     "last_page" => $result->lastPage(),
         ]);
     }
+
     /**
      * Display a listing of the resource.
      *
