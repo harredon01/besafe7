@@ -208,7 +208,7 @@ class EditMapObject {
                 } else {
                     $data['favorite'] = false;
                 }
-                $data['status']='success';
+                $data['status'] = 'success';
                 return $data;
             }
             return ['status' => "error", "message" => $type . ' not found for user'];
@@ -576,7 +576,7 @@ class EditMapObject {
         $experience = [];
         $attributes = [];
         if (!array_key_exists("unit_cost", $data)) {
-            $data["unit_cost"]=0;
+            $data["unit_cost"] = 0;
         }
         if (array_key_exists("service1", $data)) {
             if ($data["service1"]) {
@@ -641,34 +641,34 @@ class EditMapObject {
                 unset($data['experience3']);
             }
         }
-        $attributes['booking_requires_auth']=false;
+        $attributes['booking_requires_auth'] = false;
         if (array_key_exists("booking_requires_auth", $data)) {
             if ($data["booking_requires_auth"]) {
-                $attributes['booking_requires_auth']=$data['booking_requires_auth'];
+                $attributes['booking_requires_auth'] = $data['booking_requires_auth'];
                 unset($data['booking_requires_auth']);
             }
         }
-        $attributes['years_experience']=1;
+        $attributes['years_experience'] = 1;
         if (array_key_exists("years_experience", $data)) {
             if ($data["years_experience"]) {
-                $attributes['years_experience']=$data['years_experience'];
+                $attributes['years_experience'] = $data['years_experience'];
                 unset($data['years_experience']);
             }
         }
-        $attributes['max_per_hour']=1;
+        $attributes['max_per_hour'] = 1;
         if (array_key_exists("max_per_hour", $data)) {
             if ($data["max_per_hour"]) {
-                $attributes['max_per_hour']=$data['max_per_hour'];
+                $attributes['max_per_hour'] = $data['max_per_hour'];
                 unset($data['max_per_hour']);
             }
         }
-        if(count($experience)>0){
+        if (count($experience) > 0) {
             $attributes['experience'] = $experience;
         }
-        if(count($services)>0){
+        if (count($services) > 0) {
             $attributes['services'] = $services;
         }
-        if(count($specialties)>0){
+        if (count($specialties) > 0) {
             $attributes['specialties'] = $specialties;
         }
         $data['attributes'] = $attributes;
@@ -693,7 +693,11 @@ class EditMapObject {
                     }
                 }
                 $object = $this->updateObject($user, $data, $type);
-                return ['status' => 'success', "message" => "Result saved: " . $object->name, "object" => $object];
+                if ($object) {
+                    return ['status' => 'success', "message" => "Result saved ", "object" => $object];
+                } else {
+                    return ['status' => 'error', "message" => "access denied"];
+                }
             }
         }
         if (array_key_exists('private', $data)) {
@@ -727,21 +731,23 @@ class EditMapObject {
      */
     public function updateObject(User $user, array $data, $type) {
         $object = "App\\Models\\" . $type;
-        Cache::forget($type . '_' . $data['id']);
-        if (array_key_exists("groups", $data)) {
-            //$this->saveToGroups($user, $data, $type,$object);
-            dispatch(new SaveGroupsObject($user, $data, $type, $object));
-        }
 
-        $object::where('user_id', $user->id)
-                ->where('id', $data['id'])->whereIn('status', ['active', 'pending'])->update($data);
-        $result = $object::find($data['id']);
-
-        if ($result) {
-            return $result;
-        } else {
-            return null;
+        $checker = $object::find($data['id']);
+        if ($checker) {
+            if ($checker->checkAdminAccess($user->id)) {
+                Cache::forget($type . '_' . $data['id']);
+                if (array_key_exists("groups", $data)) {
+                    //$this->saveToGroups($user, $data, $type,$object);
+                    dispatch(new SaveGroupsObject($user, $data, $type, $object));
+                }
+                $object::where('id', $data['id'])->whereIn('status', ['active', 'online', 'inactive', 'pending'])->update($data);
+                $result = $this->getObjectUser($user, $data['id'], $type);
+                if ($result) {
+                    return $result;
+                }
+            }
         }
+        return null;
     }
 
     /**
@@ -785,8 +791,8 @@ class EditMapObject {
     public function createObject(User $user, array $data, $type) {
         $data["user_id"] = $user->id;
         $object = "App\\Models\\" . $type;
-        
-        
+
+
         $result = $object::create($data);
         $user->merchants()->save($result);
         if (array_key_exists("groups", $data)) {
@@ -796,6 +802,7 @@ class EditMapObject {
 
         return $result;
     }
+
     /**
      * returns all current shared locations for the user
      *
@@ -803,18 +810,18 @@ class EditMapObject {
      */
     public function createUserObject(array $data) {
         $user = User::create([
-            "firstName" => $data['firstName'],
-            "lastName" => $data['lastName'],
-            "name" => $data['firstName'].' '.$data['lastName'],
-            "email" => $data['lastName'],
-            "cellphone" => $data['lastName'],
-            "lastName" => $data['lastName'],
-            "area_code" => $data['area_code'],
-            "docType" => $data['docType'],
-            "docNum" => $data['docNum'],
-            'password' => bcrypt($data['password']),
+                    "firstName" => $data['firstName'],
+                    "lastName" => $data['lastName'],
+                    "name" => $data['firstName'] . ' ' . $data['lastName'],
+                    "email" => $data['lastName'],
+                    "cellphone" => $data['lastName'],
+                    "lastName" => $data['lastName'],
+                    "area_code" => $data['area_code'],
+                    "docType" => $data['docType'],
+                    "docNum" => $data['docNum'],
+                    'password' => bcrypt($data['password']),
         ]);
-        
+
         $object = "App\\Models\\" . $data['type'];
         $result = $object::create($data);
         $user->merchants()->save($result);

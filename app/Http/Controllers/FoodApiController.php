@@ -130,9 +130,9 @@ class FoodApiController extends Controller {
         $this->food->sendNewsletter();
         //dispatch(new \App\Jobs\SendNewsletter());
     }
-    public function getActiveIndicators(){
+    public function getActiveIndicators(){ 
         $data = [
-            "Cal.","Carb.","Prot.","Grasas.","Fibra."
+            "Cal."=>15000,"Carb."=>15000,"Prot."=>15000,"Grasas."=>15000,"Fibra."=>15000
         ];
         return $data;
     }
