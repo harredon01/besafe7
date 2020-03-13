@@ -88,6 +88,7 @@ class UserApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editUserData->registerToken($user, $request->all()));
     }
+
     /**
      * Handle a registration request for the application.
      *
@@ -98,6 +99,7 @@ class UserApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editUserData->registerPhone($user, $request->all()));
     }
+
     /**
      * Handle a registration request for the application.
      *
@@ -108,22 +110,23 @@ class UserApiController extends Controller {
         $user = $request->user();
         return response()->json($this->editUserData->checkUserCredits($user, $request->all()));
     }
+
     /**
      * Handle a registration request for the application.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function setAddressType($address,$type, Request $request) {
+    public function setAddressType($address, $type, Request $request) {
         $user = $request->user();
         $addresCont = Address::find($address);
-        if($addresCont->user_id == $user->id){
+        if ($addresCont->user_id == $user->id) {
             $addresCont->type = $type;
             $addresCont->save();
-            $user->addresses()->where("id","<>",$address)->where("type",$type)->update(["type"=>null]);
-            return response()->json(["status"=>"success","message"=>"address type changed"]);
+            $user->addresses()->where("id", "<>", $address)->where("type", $type)->update(["type" => null]);
+            return response()->json(["status" => "success", "message" => "address type changed"]);
         }
-        return response()->json(["status"=>"error","message"=>"address does not belong to user"]);
+        return response()->json(["status" => "error", "message" => "address does not belong to user"]);
     }
 
     public function deleteAddress($address_id, Request $request) {
@@ -146,7 +149,7 @@ class UserApiController extends Controller {
         //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
         $count = Medical::where('user_id', $user->id)->count();
         $data['savedCard'] = false;
-        $sources = $user->sources()->where("has_default",true)->get();
+        $sources = $user->sources()->where("has_default", true)->get();
         $data['savedCards'] = [];
         foreach ($sources as $value) {
             $data['savedCard'] = true;
@@ -154,14 +157,14 @@ class UserApiController extends Controller {
         }
         $data['current_time'] = date("Y-m-d H:i:s");
         $data['user'] = $user;
-        $data['push'] = $user->push()->where("platform","Food")->first();
+        $data['push'] = $user->push()->where("platform", "Food")->first();
         $data['count'] = $count;
         $data['green'] = $green;
         //$data['followers'] = count($users2);
         // the token is valid and we have found the user via the sub claim
         return response()->json($data);
     }
-    
+
     /**
      * Handle a registration request for the application.
      *
@@ -169,7 +172,7 @@ class UserApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create(Request $request) {
-        $credentials = $request->all('area_code', 'cellphone', 'email','docNum','docType');
+        $credentials = $request->all('area_code', 'cellphone', 'email', 'docNum', 'docType');
         $validator = $this->editUserData->validatorRegister($request->all());
 
         if ($validator->fails()) {
@@ -205,7 +208,7 @@ class UserApiController extends Controller {
         ]);
         return response()->json($this->editUserData->create($data));
     }
-    
+
     /**
      * Handle a registration request for the application.
      *
@@ -223,7 +226,7 @@ class UserApiController extends Controller {
      * @return Response
      */
     public function store(Request $request) {
-        $user = $request->user(); 
+        $user = $request->user();
         $data = $request->all([
             'id',
             'docNum',
