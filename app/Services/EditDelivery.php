@@ -328,6 +328,9 @@ class EditDelivery {
 
     public function addInfoToDelivery(Delivery $delivery) {
         $details = json_decode($delivery->details, true);
+        if(!array_key_exists("dish", $details)){
+            return;
+        }
         $dish = $details["dish"];
         $article = Article::find($dish["type_id"]);
         $additionalInfo = [
@@ -376,7 +379,7 @@ class EditDelivery {
                     if (array_key_exists("pesos", $value)) {
                         foreach ($value['pesos'] as $peso) {
                             $found = false;
-                            foreach ($pesosFinal as $pesoF) {
+                            foreach ($pesosFinal as &$pesoF) {
                                 if ($pesoF["name"] == $peso["name"]) {
                                     $found = true;
                                     $pesoF["value"] += $peso["value"];
@@ -401,7 +404,7 @@ class EditDelivery {
                     if (array_key_exists("pesos", $value)) {
                         foreach ($value['pesos'] as $peso) {
                             $found = false;
-                            foreach ($pesosFinal as $pesoF) {
+                            foreach ($pesosFinal as &$pesoF) {
                                 if ($pesoF["name"] == $peso["name"]) {
                                     $found = true;
                                     $pesoF["value"] += $peso["value"];

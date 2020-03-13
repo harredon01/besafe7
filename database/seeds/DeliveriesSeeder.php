@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\Food;
+use App\Services\EditDelivery;
 use App\Services\PayU;
 use App\Services\EditOrder;
 use App\Services\EditAlerts;
@@ -35,9 +35,8 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $food;
 
-    public function __construct(EditOrder $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
+    public function __construct(EditDelivery $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
         $this->food = $food;
-        $this->editOrderfood = $editOrderfood;
     }
 
     public function run() {
@@ -47,9 +46,13 @@ class DeliveriesSeeder extends Seeder {
             "merchant_id" => 1299,
             "provider" => "Basilikum"
         ];
-        $payment = Payment::find(630);
+        $deliveries = Delivery::where("status","completed")->where("delivery",">","2020-03-08")->get();
+        
         //dispatch(new ApprovePayment($payment, "Food"));
-        $this->food->approvePayment($payment,"Booking");
+        foreach ($deliveries as $delivery) {
+            $this->food->addInfoToDelivery($delivery);
+        }
+        
         
 //        $user = User::find(1);
 //        $user2 = User::find(2);
