@@ -131,11 +131,11 @@ class FoodApiController extends Controller {
 
     public function getActiveIndicators() {
         $data = [
-            ["name" => "Cal.", "totals" => 15000],
-            ["name" => "Carb.", "totals" => 15000],
-            ["name" => "Prot.", "totals" => 15000],
-            ["name" => "Grasas.", "totals" => 15000],
-            ["name" => "Fibra.", "totals" => 15000]
+            ["name" => "Cal.", "totals" => 56000],
+            ["name" => "Carb.", "totals" => 8250],
+            ["name" => "Prot.", "totals" => 1500],
+            ["name" => "Grasas.", "totals" => 1800],
+            ["name" => "Fibra.", "totals" => 840]
         ];
         return ["status" => 'success', "results" => $data];
     }
