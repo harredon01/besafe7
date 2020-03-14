@@ -27,7 +27,7 @@ use MercadoPago\SDK;
 use MercadoPago\Customer;
 use MercadoPago\Card;
 use MercadoPago\Payment as Pago;
-
+use DB;
 class MercadoPagoService {
 
     /**
@@ -118,24 +118,21 @@ class MercadoPagoService {
                 }
             }
         }
-
         return $paymentResult;
     }
 
     private function getMerchantToken(Payment $payment) {
         $paymentM = new Pago();
-
-        $users = DB::table('payments')
+        $user = DB::table('payments')
                 ->join('orders', 'payments.order_id', '=', 'orders.id')
                 ->join('merchant_user', 'orders.merchant_id', '=', 'merchant_user.merchant_id')
                 ->join('sources', 'merchant_user.user_id', '=', 'sources.user_id')
                 ->where('payments.id', $payment->id)
                 ->where('sources.gateway', 'MercadoPago')
-                ->select('source.extra as extra')
+                ->select('sources.extra as extra')
                 ->distinct()
                 ->first();
-        if (count($users) > 0) {
-            $user = $users[0];
+        if ($user) {
             $attributes = json_decode($user->extra);
             if (array_key_exists("access_token", $attributes)) {
                 $paymentM->user_token = $attributes['access_token'];
