@@ -169,9 +169,8 @@ class EditBooking {
         $followers = [$owner];
         $payload = [
             "booking_id" => $booking->id,
-            "first_name" => $user->firstName,
-            "last_name" => $user->lastName,
-            "booking_date" => $booking->starts_at,
+            "bookclient" => $user->firstName." ".$user->lastName,
+            "date" => $booking->starts_at,
             "status" => "pending"
         ];
         $data = [
@@ -210,7 +209,7 @@ class EditBooking {
                     "options" => $options,
                     "updated_at" => date_create()
                 ];
-                $followers = [$customer];
+                $followers = [$customer]; 
                 $updateData["options"]["status"] = $status;
                 if ($status == "approved") {
                     $updateData["total_paid"] = 0;
@@ -225,9 +224,8 @@ class EditBooking {
                 Booking::where("id", $booking->id)->update($updateData);
                 $payload = [
                     "booking_id" => $booking->id,
-                    "first_name" => $user->firstName,
-                    "last_name" => $user->lastName,
-                    "booking_date" => $booking->starts_at,
+                    "bookable" => $booking->name,
+                    "date" => $booking->starts_at,
                     "options" => $options
                 ];
                 $data = [

@@ -172,6 +172,27 @@ class Notifications {
             $data['body'] = str_replace("{route}", $arrayPayload['route'], $data['body']);
             $data['body_es'] = str_replace("{route}", $arrayPayload['route'], $data['body_es']);
         }
+        $pos = strpos($data['subject'], '{date}');
+        if ($pos) { 
+            $data['subject'] = str_replace("{date}", $arrayPayload['date'], $data['subject']);
+            $data['subject_es'] = str_replace("{date}", $arrayPayload['date'], $data['subject_es']);
+            $data['body'] = str_replace("{date}", $arrayPayload['date'], $data['body']);
+            $data['body_es'] = str_replace("{date}", $arrayPayload['date'], $data['body_es']);
+        } 
+        $pos = strpos($data['subject'], '{bookclient}');
+        if ($pos) {
+            $data['subject'] = str_replace("{bookclient}", $arrayPayload['bookclient'], $data['subject']);
+            $data['subject_es'] = str_replace("{bookclient}", $arrayPayload['bookclient'], $data['subject_es']);
+            $data['body'] = str_replace("{bookclient}", $arrayPayload['bookclient'], $data['body']);
+            $data['body_es'] = str_replace("{bookclient}", $arrayPayload['bookclient'], $data['body_es']);
+        }
+        $pos = strpos($data['subject'], '{bookable}');
+        if ($pos) {
+            $data['subject'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['subject']);
+            $data['subject_es'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['subject_es']);
+            $data['body'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['body']);
+            $data['body_es'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['body_es']);
+        }
         return $data;
     }
 
