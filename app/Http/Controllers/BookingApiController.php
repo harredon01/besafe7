@@ -39,6 +39,16 @@ class BookingApiController extends Controller
      *
      * @return Response
      */
+    public function postEditBookingObject(Request $request) {
+        $user = $request->user();
+        $data = $request->all();
+        return response()->json($this->editBooking->editBookingObject($data, $user));
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function postImmediateBookingObject(Request $request) {
         $user = $request->user();
         $data = $request->all();

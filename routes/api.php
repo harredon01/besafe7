@@ -296,6 +296,7 @@ Route::get('bookings/{code?}', 'BookingApiController@getBooking');
 
 Route::delete('bookings/{booking?}', 'BookingApiController@deleteBookingObject');
 Route::post('bookings', 'BookingApiController@postAddBookingObject');
+Route::post('bookings/edit', 'BookingApiController@postEditBookingObject');
 Route::post('bookings/now', 'BookingApiController@postImmediateBookingObject');
 Route::post('bookings/status', 'BookingApiController@postChangeStatusBookingObject');
 Route::post('bookings/schedule', 'BookingApiController@postRescheduleBookingObject');

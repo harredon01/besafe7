@@ -3,6 +3,8 @@
 use Illuminate\Database\Eloquent\Model;
 use Rinvex\Bookings\Traits\Bookable;
 use Laravel\Scout\Searchable;
+use Illuminate\Support\Facades\Storage;
+use App\Models\FileM;
 use Cache;
 use App\Models\Availability;
 use App\Models\Booking;
@@ -105,8 +107,13 @@ class Merchant extends Model {
         }
         return false;
     }
-    public function postAddImg() {
-        return null;
+    public function postAddImg($user, $type, $filename)  {
+        if ($type == "Merchant_avatar") {
+            Storage::delete($this->icon);
+            FileM::where("file", $this->icon)->delete();
+            $this->icon = $filename;
+            $this->save();
+        }
     }
     
     /**
