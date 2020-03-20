@@ -15,6 +15,7 @@ class EditBooking {
     const BOOKING_APPROVED = 'booking_approved';
     const OBJECT_BOOKING = 'Booking';
     const BOOKING_CREATED_BOOKABLE_PENDING = 'booking_created_bookable_pending';
+    const BOOKING_UPDATED_BOOKABLE_PENDING = 'booking_updated_bookable_pending';
     const BOOKING_BOOKABLE_APPROVED = 'booking_bookable_approved';
     const BOOKING_BOOKABLE_DENIED = 'booking_bookable_denied';
     const BOOKING_DENIED = 'booking_denied';
@@ -45,7 +46,7 @@ class EditBooking {
         $from = $data['from'];
         $to = $data['to'];
         $dayofweek = date('l', strtotime($from));
-        
+
         $dayName = strtolower($dayofweek);
         $availabilities = Availability::where("range", $dayName)->where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $data['object_id'])->get();
         if (count($availabilities) > 0) {
@@ -71,9 +72,9 @@ class EditBooking {
         }
         return true;
     }
-    
-    public function checkBookingAvailability($data, $object){
-        if($this->checkAvailable($data, $object)){
+
+    public function checkBookingAvailability($data, $object) {
+        if ($this->checkAvailable($data, $object)) {
             return $this->checkBooking($data, $object);
         }
         return false;
@@ -130,7 +131,7 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 $result = $this->checkBookingAvailability($data, $object);
-                if ($result || ($object->status == 'online'&&$data['call'])) {
+                if ($result || ($object->status == 'online' && $data['call'])) {
                     $booking = $object->newBooking($user, $data['from'], $data['to']);
                     $attributes = $object->attributes;
                     $requiresAuth = false;
@@ -145,7 +146,7 @@ class EditBooking {
                     }
                     $update["options"]["status"] = "approved";
                     $update["options"]["call"] = $data['call'];
-                    if (array_key_exists("booking_requires_authorization", $attributes) &&! ($object->status == 'online'&&$data['call'])) {
+                    if (array_key_exists("booking_requires_authorization", $attributes) && !($object->status == 'online' && $data['call'])) {
                         if ($attributes["booking_requires_authorization"]) {
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
@@ -155,6 +156,8 @@ class EditBooking {
                         }
                     }
                     $update["options"] = json_encode($update["options"]);
+                    unset($update['bookable']);
+                    unset($update['client']);
                     Booking::where("id", $booking->id)->update($update);
                     return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
                 }
@@ -164,15 +167,79 @@ class EditBooking {
         return response()->json(array("status" => "error", "message" => "Object not found"));
     }
 
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function editBookingObject(array $data, User $user) {
+        $validator = $this->validatorCreateBooking($data);
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                $booking = Booking::find($data['booking_id']);
+                if ($booking) {
+                    if ($object->checkAdminAccess($user->id) || $booking->customer_id == $user->id) {
+                        $result = $this->checkBookingAvailability($data, $object);
+                        if ($result) {
+                            $booking->starts_at = $data['from'];
+                            $booking->ends_at = $data['to'];
+                            $attributes = $booking->options;
+                            foreach ($data as $key => $value) {
+                                $attributes[$key] = $data[$key];
+                            }
+                            $booking->total_paid = 0;
+                            if ($booking->customer_id == $user->id) {
+                                $attributes2 = $object->attributes;
+                                if (array_key_exists("booking_requires_authorization", $attributes2)) {
+                                    if ($attributes2["booking_requires_authorization"]) {
+                                        $booking->total_paid = -1;
+                                    }
+                                }
+                            }
+                            $booking->options = $attributes;
+                            $booking->updated_at = date("Y-m-d H:i:s");
+                            $update = $booking->toArray();
+                            $update["options"] = json_encode($attributes);
+                            Booking::where("id", $booking->id)->update($update);
+                            $this->handleAuthorizationRequest($user, $booking, $object);
+                            return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
+                        }
+                        return response()->json(array("status" => "error", "message" => "Not available"));
+                    }
+                    return response()->json(array("status" => "error", "message" => "Access Denied"));
+                }
+                return response()->json(array("status" => "error", "message" => "Booking not found"));
+            }
+        }
+        return response()->json(array("status" => "error", "message" => "Object not found"));
+    }
+
     private function handleAuthorizationRequest($user, $booking, $object) {
-        $owner = $object->users()->first();
-        $followers = [$owner];
+        $owner = null;
+        $type = null;
         $payload = [
             "booking_id" => $booking->id,
-            "bookclient" => $user->firstName." ".$user->lastName,
             "date" => $booking->starts_at,
-            "status" => "pending"
+            "status" => "pending",
+            "bookable" => $booking->bookable->name
         ];
+        if ($booking->customer_id == $user->id) {
+            $owner = $object->users()->first();
+            $payload['bookclient'] =  $user->firstName . " " . $user->lastName;
+            $type = self::BOOKING_UPDATED_BOOKABLE_PENDING;
+        } else {
+            $owner = $booking->client;
+            $type = self::BOOKING_CREATED_BOOKABLE_PENDING;
+        }
+        $followers = [$owner];
+        
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -180,7 +247,7 @@ class EditBooking {
             "object" => "Merchant",
             "sign" => true,
             "payload" => $payload,
-            "type" => self::BOOKING_CREATED_BOOKABLE_PENDING,
+            "type" => $type,
             "user_status" => $user->getUserNotifStatus()
         ];
         $date = date("Y-m-d H:i:s");
@@ -209,7 +276,7 @@ class EditBooking {
                     "options" => $options,
                     "updated_at" => date_create()
                 ];
-                $followers = [$customer]; 
+                $followers = [$customer];
                 $updateData["options"]["status"] = $status;
                 if ($status == "approved") {
                     $updateData["total_paid"] = 0;
@@ -218,7 +285,7 @@ class EditBooking {
                     $updateData["total_paid"] = -1;
                     $updateData["options"]["reason"] = $data["reason"];
                     $typeAlert = self::BOOKING_BOOKABLE_DENIED;
-                } 
+                }
                 $options = $updateData["options"];
                 $updateData["options"] = json_encode($updateData["options"]);
                 Booking::where("id", $booking->id)->update($updateData);
@@ -377,7 +444,7 @@ class EditBooking {
             $bookable->status = "busy";
             $bookable->save();
             $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'ready','total_paid' =>$booking->total_paid]);
+            Booking::where("id", $booking->id)->update(['notes' => 'ready', 'total_paid' => $booking->total_paid]);
         }
     }
 
@@ -396,26 +463,26 @@ class EditBooking {
             foreach ($users as &$userM) {
                 if ($userM['id'] == $user->id) {
                     if ($booking->options["location"] == 'opentok') {
-                        $userM["connection_id"]=null;
+                        $userM["connection_id"] = null;
                     }
                 }
-                if($userM["connection_id"]){
+                if ($userM["connection_id"]) {
                     $activecount++;
                 }
             }
             $booking->options["users"] = $users;
             $booking->save();
-            if($booking->notes == 'started' && $activecount == 0){
-                Booking::where("id", $booking->id)->update(['notes' => 'completed','total_paid' =>$booking->total_paid]);
+            if ($booking->notes == 'started' && $activecount == 0) {
+                Booking::where("id", $booking->id)->update(['notes' => 'completed', 'total_paid' => $booking->total_paid]);
             }
             $bookable = $booking->bookable;
             if ($bookable->checkAdminAccess($user->id)) {
                 $bookable->status = "online";
                 $bookable->save();
             }
-            return ["status"=>"success","message"=>"left meeting"];
+            return ["status" => "success", "message" => "left meeting"];
         }
-        return ["status"=>"error","message"=>"booking not found"];
+        return ["status" => "error", "message" => "booking not found"];
     }
 
     public function endChatroom(Booking $booking) {
@@ -517,35 +584,36 @@ class EditBooking {
         $query = " select id,name from merchants where user_id = $user->id and id in ( select distinct( bookable_id) from bookable_bookings )";
         $objects = DB::select($query);
         return array(
-                    "status" => "success",
-                    "message" => "",
-                    "data" => $objects);
+            "status" => "success",
+            "message" => "",
+            "data" => $objects);
     }
+
     /**
      * Show the application registration form.
      *
      * @return \Illuminate\Http\Response
      */
-    public function getBooking(User $user,$booking) {
+    public function getBooking(User $user, $booking) {
         $booking = Booking::find($booking);
         $client = $booking->customer;
         $bookable = $booking->bookable;
         $send = false;
-        if($user->id == $client->id){
+        if ($user->id == $client->id) {
             $send = true;
         }
-        if($bookable->checkAdminAccess($user->id)){
+        if ($bookable->checkAdminAccess($user->id)) {
             $send = true;
         }
-        if($send){
+        if ($send) {
             return array(
-                    "status" => "success",
-                    "message" => "",
-                    "booking" => $booking);
+                "status" => "success",
+                "message" => "",
+                "booking" => $booking);
         }
         return array(
-                    "status" => "error",
-                    "message" => "no access");
+            "status" => "error",
+            "message" => "no access");
     }
 
     /**
@@ -563,60 +631,60 @@ class EditBooking {
         $class = "App\\Models\\" . $type;
         if ($query == "customer_unpaid") {
             return array(
-                        "status" => "success",
-                        "message" => "",
-                        "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->orderBy('starts_at')->get());
+                "status" => "success",
+                "message" => "",
+                "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->orderBy('starts_at')->get());
         } else if ($query == "customer_unapproved") {
             return array(
-                        "status" => "success",
-                        "message" => "",
-                        "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->orderBy('starts_at')->get());
+                "status" => "success",
+                "message" => "",
+                "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->orderBy('starts_at')->get());
         } else if ($query == "customer_past") {
             return array(
-                        "status" => "success",
-                        "message" => "",
-                        "data" => $user->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
+                "status" => "success",
+                "message" => "",
+                "data" => $user->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
         } else if ($query == "customer_upcoming") {
             return array(
-                        "status" => "success",
-                        "message" => "",
-                        "data" => $user->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
+                "status" => "success",
+                "message" => "",
+                "data" => $user->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
         } else if ($query == "customer_all") {
             return array(
-                        "status" => "success",
-                        "message" => "",
-                        "data" => $user->futureBookings()->with("bookable")->orderBy('starts_at')->get());
+                "status" => "success",
+                "message" => "",
+                "data" => $user->futureBookings()->with("bookable")->orderBy('starts_at')->get());
         }
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
                 if ($query == "day") {
                     return array(
-                                "status" => "success",
-                                "message" => "",
-                                "data" => $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get());
+                        "status" => "success",
+                        "message" => "",
+                        "data" => $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get());
                 } else {
                     if ($user->id == $object->user_id) {
                         if ($query == "bookable_upcoming") {
                             return array(
-                                        "status" => "success",
-                                        "message" => "",
-                                        "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "status" => "success",
+                                "message" => "",
+                                "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
                         } else if ($query == "bookable_past") {
                             return array(
-                                        "status" => "success",
-                                        "message" => "",
-                                        "data" => $object->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "status" => "success",
+                                "message" => "",
+                                "data" => $object->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
                         } else if ($query == "bookable_unapproved") {
                             return array(
-                                        "status" => "success",
-                                        "message" => "",
-                                        "data" => $object->futureBookings()->where('total_paid', -1)->orderBy('starts_at')->with("customer")->get());
+                                "status" => "success",
+                                "message" => "",
+                                "data" => $object->futureBookings()->where('total_paid', -1)->orderBy('starts_at')->with("customer")->get());
                         } else if ($query == "bookable_all") {
                             return array(
-                                        "status" => "success",
-                                        "message" => "",
-                                        "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "status" => "success",
+                                "message" => "",
+                                "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
                         }
                     }
                 }
