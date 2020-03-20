@@ -23,7 +23,7 @@ use App\Mail\PurchaseOrder;
 use App\Mail\Register;
 use App\Mail\NewsletterMenus;
 use App\Jobs\SendMessage;
-use App\Mail\Newsletter4;
+use App\Mail\Newsletter2;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -327,8 +327,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-03-09 00:00:00";
-        $end_date = "2020-03-013 23:59:59";
+        $start_date = "2020-03-16 00:00:00";
+        $end_date = "2020-03-20 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 5; $x++) {
