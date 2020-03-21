@@ -19,17 +19,17 @@ class EditCart {
      */
     protected $auth;
 
-    public function getCart(User $user) {
+    public function getCart($user) {
         $items = Cart::session($user->id)->getContent();
         $data = array();
         $result = array();
         foreach ($items as $item) {
             $dataitem = [];
-            $dataitem['id'] = $item->id; 
-            $dataitem['name'] = $item->name; 
-            $dataitem['price'] = $item->price; 
-            $dataitem['quantity'] = $item->quantity; 
-            $dataitem['attributes'] = $item->attributes; 
+            $dataitem['id'] = $item->id;
+            $dataitem['name'] = $item->name;
+            $dataitem['price'] = $item->price;
+            $dataitem['quantity'] = $item->quantity;
+            $dataitem['attributes'] = $item->attributes;
             $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
             $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
             $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
@@ -57,11 +57,11 @@ class EditCart {
         foreach ($items as $item) {
             $totalItems++;
             $dataitem = [];
-            $dataitem['id'] = $item->id; 
-            $dataitem['name'] = $item->name; 
-            $dataitem['price'] = $item->price; 
-            $dataitem['quantity'] = $item->quantity; 
-            $dataitem['attributes'] = $item->attributes; 
+            $dataitem['id'] = $item->id;
+            $dataitem['name'] = $item->name;
+            $dataitem['price'] = $item->price;
+            $dataitem['quantity'] = $item->quantity;
+            $dataitem['attributes'] = $item->attributes;
             $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
             $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
             $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
@@ -152,7 +152,7 @@ class EditCart {
      *
      * @return Response
      */
-    public function clearCart(User $user) {
+    public function clearCart($user) {
 
         Cart::session($user->id)->clear();
         $order = Order::where('status', 'pending')->where('user_id', $user->id)->first();
@@ -174,8 +174,13 @@ class EditCart {
      *
      * @return Response
      */
-    public function checkCartAuth(User $user, $requires_authorization, $order_id, $merchant_id) {
-        $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
+    public function checkCartAuth($user, $requires_authorization, $order_id, $merchant_id) {
+        if (isset($user->email)) {
+            $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
+        } else {
+            $item = Item::where('ref2', $user->id)->where('order_id', $order_id)->first();
+        }
+
         //dd($item->toArray());
         if (!$item) {
             return true;
@@ -235,7 +240,7 @@ class EditCart {
      *
      * @return Response
      */
-    public function checkAddToOrder(User $user, array $data) {
+    public function checkAddToOrder($user, array $data) {
         if (array_key_exists('order_id', $data)) {
             $order = Order::find($data['order_id']);
             if ($order) {
@@ -303,6 +308,31 @@ class EditCart {
         }
         return array("status" => "success", "message" => "Cart Loaded");
     }
+    private function getItemUser($user,$order_id,$data){
+        $item = null;
+        if (isset($user->email)) {
+            if (array_key_exists('item_id', $data)) {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('user_id', $user->id)
+                                ->where('order_id', $order_id)->first();
+            } else if (array_key_exists('product_variant_id', $data)) {
+                $item = Item::where('product_variant_id', intval($data['product_variant_id']))
+                                ->where('user_id', $user->id)
+                                ->where('order_id', $order_id)->first();
+            }
+        } else {
+            if (array_key_exists('item_id', $data)) {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('ref2', $user->id)
+                                ->where('order_id', $order_id)->first();
+            } else if (array_key_exists('product_variant_id', $data)) {
+                $item = Item::where('product_variant_id', intval($data['product_variant_id']))
+                                ->where('ref2', $user->id)
+                                ->where('order_id', $order_id)->first();
+            }
+        }
+        return $item;
+    }
 
     /**
      * Create a new user instance after a valid registration.
@@ -310,7 +340,8 @@ class EditCart {
      * @param  User, array  $data
      * 
      */
-    public function addCartItem(User $user, array $data) {
+    public function addCartItem($user, array $data) {
+
         if (array_key_exists('quantity', $data)) {
             if ((int) $data['quantity'] <= 0) {
                 return array("status" => "error", "message" => "amount must be a positive integer");
@@ -328,16 +359,8 @@ class EditCart {
         }
         $order_id = $this->checkAddToOrder($user, $data);
 
-        $item = null;
-        if (array_key_exists('item_id', $data)) {
-            $item = Item::where('id', intval($data['item_id']))
-                            ->where('user_id', $user->id)
-                            ->where('order_id', $order_id)->first();
-        } else if (array_key_exists('product_variant_id', $data)) {
-            $item = Item::where('product_variant_id', intval($data['product_variant_id']))
-                            ->where('user_id', $user->id)
-                            ->where('order_id', $order_id)->first();
-        }
+        $item = $this->getItemUser($user, $order_id,$data);
+
 
         if ($item) {
             $quantity = (int) $data['quantity'];
@@ -415,23 +438,27 @@ class EditCart {
                                     $losAttributes[$x] = $x_value;
                                 }
                             }
+                            $itemsArr = [
+                                'product_variant_id' => $productVariant->id,
+                                'name' => $product->name,
+                                'price' => $productVariant->getActivePrice(),
+                                'cost' => $productVariant->cost,
+                                'tax' => $productVariant->tax,
+                                'requires_authorization' => $productVariant->requires_authorization,
+                                'paid_status' => "unpaid",
+                                'fulfillment' => "unfulfilled",
+                                'quantity' => (int) $data['quantity'],
+                                'merchant_id' => $data['merchant_id'],
+                                'attributes' => json_encode($losAttributes),
+                                'order_id' => $order_id,
+                            ];
+                            if (isset($user->email)) {
+                                $itemsArr['user_id'] = $user->id;
+                            } else {
+                                $itemsArr['ref2'] = $user->id;
+                            }
 
-
-                            $item = Item::create([
-                                        'product_variant_id' => $productVariant->id,
-                                        'name' => $product->name,
-                                        'user_id' => $user->id,
-                                        'price' => $productVariant->getActivePrice(),
-                                        'cost' => $productVariant->cost,
-                                        'tax' => $productVariant->tax,
-                                        'requires_authorization' => $productVariant->requires_authorization,
-                                        'paid_status' => "unpaid",
-                                        'fulfillment' => "unfulfilled",
-                                        'quantity' => (int) $data['quantity'],
-                                        'merchant_id' => $data['merchant_id'],
-                                        'attributes' => json_encode($losAttributes),
-                                        'order_id' => $order_id,
-                            ]);
+                            $item = Item::create($itemsArr);
 
                             Cart::session($user->id)->add(array(
                                 'id' => $item->id,
@@ -463,7 +490,7 @@ class EditCart {
         }
     }
 
-    public function addCustomCartItem(User $user, array $data) {
+    public function addCustomCartItem($user, array $data) {
         if (array_key_exists('merchant_id', $data)) {
             if ($data['merchant_id']) {
                 $merchant = Merchant::find($data['merchant_id']);
@@ -490,20 +517,25 @@ class EditCart {
                             $losAttributes[$x] = $x_value;
                         }
                     }
-                    $item = Item::create([
-                                'name' => $losAttributes['name'],
-                                'user_id' => $user->id,
-                                'price' => $data['price'],
-                                'cost' => $data['cost'],
-                                'tax' => $data['tax'],
-                                'paid_status' => "unpaid",
-                                'fulfillment' => "unfulfilled",
-                                'quantity' => (int) $data['quantity'],
-                                'merchant_id' => $data['merchant_id'],
-                                'attributes' => json_encode($losAttributes),
-                                'status' => 'active',
-                                'order_id' => $order_id
-                    ]);
+                    $itemsArr = [
+                        'name' => $losAttributes['name'],
+                        'price' => $data['price'],
+                        'cost' => $data['cost'],
+                        'tax' => $data['tax'],
+                        'paid_status' => "unpaid",
+                        'fulfillment' => "unfulfilled",
+                        'quantity' => (int) $data['quantity'],
+                        'merchant_id' => $data['merchant_id'],
+                        'attributes' => json_encode($losAttributes),
+                        'status' => 'active',
+                        'order_id' => $order_id
+                    ];
+                    if (isset($user->email)) {
+                        $itemsArr['user_id'] = $user->id;
+                    } else {
+                        $itemsArr['ref2'] = $user->id;
+                    }
+                    $item = Item::create($itemsArr);
                     Cart::session($user->id)->add(array(
                         'id' => $item->id,
                         'name' => $data['name'],
@@ -530,6 +562,30 @@ class EditCart {
         }
         return array("status" => "error", "message" => "NO_MERCHANT");
     }
+    
+    private function getCustomItemUser($user,$order_id,$data){
+        $item = null;
+        if (isset($user->email)) {
+            if ($order_id) {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('user_id', $user->id)
+                                ->where('order_id', $order_id)->first();
+            } else {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('user_id', $user->id)->first();
+            }
+        } else {
+            if ($order_id) {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('ref2', $user->id)
+                                ->where('order_id', $order_id)->first();
+            } else {
+                $item = Item::where('id', intval($data['item_id']))
+                                ->where('ref2', $user->id)->first();
+            }
+        }
+        return $item;
+    }
 
     /**
      * Create a new user instance after a valid registration.
@@ -537,17 +593,9 @@ class EditCart {
      * @param  User, array  $data
      * 
      */
-    public function updateCartItem(User $user, array $data) {
+    public function updateCartItem($user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        if ($order_id) {
-            $item = Item::where('id', intval($data['item_id']))
-                            ->where('user_id', $user->id)
-                            ->where('order_id', $order_id)->first();
-        } else {
-            $item = Item::where('id', intval($data['item_id']))
-                            ->where('user_id', $user->id)->first();
-        }
-
+        $item = $this->getItemUser($user, $order_id,$data);
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
@@ -593,11 +641,9 @@ class EditCart {
      * @param  User, array  $data
      * 
      */
-    public function updateCustomCartItem(User $user, array $data) {
+    public function updateCustomCartItem($user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        $item = Item::where('id', intval($data['item_id']))
-                        ->where('user_id', $user->id)
-                        ->where('order_id', $order_id)->first();
+        $item = $this->getCustomItemUser($user, $order_id,$data);
         if ($item) {
             if ($item->productVariant) {
                 return array("status" => "error", "message" => "This is not a custom item");
@@ -641,7 +687,7 @@ class EditCart {
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    public function updateCartItems(User $user, array $data) {
+    public function updateCartItems($user, array $data) {
         $items = $data['items'];
         foreach ($items as $value) {
             $value['order_id'] = $data['order_id'];
@@ -662,6 +708,7 @@ class EditCart {
                     'quantity' => 'required|max:255',
         ]);
     }
+
     /**
      * Get a validator for an incoming edit profile request.
      *
@@ -671,9 +718,9 @@ class EditCart {
     public function validatorAddCartCustom(array $data) {
         return Validator::make($data, [
                     'merchant_id' => 'required|max:255',
-            'price' => 'required|max:255',
-            'cost' => 'required|max:255',
-            'tax' => 'required|max:255',
+                    'price' => 'required|max:255',
+                    'cost' => 'required|max:255',
+                    'tax' => 'required|max:255',
                     'quantity' => 'required|max:255',
         ]);
     }

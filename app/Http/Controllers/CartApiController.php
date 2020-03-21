@@ -39,7 +39,8 @@ class CartApiController extends Controller {
         $this->editCart = $editCart;
         $this->editUserData = $editUserData;
         $this->payU = $payU;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except(["postAddCartItem","postAddCustomCartItem",'postUpdateCartItems',"postUpdateCartItem",
+            "postUpdateCustomCartItem","postClearCart","getCart"]);
     }
 
     /**
@@ -49,9 +50,24 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postAddCartItem(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->addCartItem($user, $request->all());
         return response()->json($status);
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCartUser(Request $request) {
+        $user = auth('api')->user();
+        if($user){
+            return $user;
+        }
+        $user = json_decode(json_encode(["id"=>$request->header('x-device-id')]));
+        return $user;
+        
     }
 
     /**
@@ -61,7 +77,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postAddCustomCartItem(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->addCustomCartItem($user, $request->all());
         return response()->json($status);
     }
@@ -75,7 +91,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postUpdateCartItems(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->updateCartItems($user, $request->all() );
         return response()->json($status);
     }
@@ -87,7 +103,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postUpdateCartItem(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->updateCartItem($user, $request->all());
         return response()->json($status);
     }
@@ -100,7 +116,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postUpdateCustomCartItem(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->updateCustomCartItem($user, $request->all());
         return response()->json($status);
     }
@@ -113,7 +129,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function postClearCart(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $status = $this->editCart->clearCart($user);
         return response()->json($status);
     }
@@ -149,7 +165,7 @@ class CartApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function getCart(Request $request) {
-        $user = $request->user();
+        $user = $this->getCartUser($request);
         $items = $this->editCart->getCart($user);
         return response()->json($items);
     }

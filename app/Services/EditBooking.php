@@ -161,10 +161,10 @@ class EditBooking {
                     Booking::where("id", $booking->id)->update($update);
                     return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
                 }
-                return response()->json(array("status" => "error", "message" => "Not available"));
+                return array("status" => "error", "message" => "Not available");
             }
         }
-        return response()->json(array("status" => "error", "message" => "Object not found"));
+        return array("status" => "error", "message" => "Object not found");
     }
 
     /**
@@ -188,11 +188,20 @@ class EditBooking {
                     if ($object->checkAdminAccess($user->id) || $booking->customer_id == $user->id) {
                         $result = $this->checkBookingAvailability($data, $object);
                         if ($result) {
+                            if (strpos($data['from'], '.') !== false) {
+                                $a = explode(".", $data['from']);
+                                $data['from'] = str_replace("T"," ",$a[0]);
+                            }
+                            if (strpos($data['to'], '.') !== false) {
+                                $a = explode(".", $data['to']);
+                                $data['to'] = str_replace("T"," ",$a[0]);
+                            }
                             $booking->starts_at = $data['from'];
                             $booking->ends_at = $data['to'];
                             $attributes = $booking->options;
-                            foreach ($data as $key => $value) {
-                                $attributes[$key] = $data[$key];
+                            $reqAttrs = $data['attributes'];
+                            foreach ($reqAttrs as $key => $value) {
+                                $attributes[$key] = $reqAttrs[$key];
                             }
                             $booking->total_paid = 0;
                             if ($booking->customer_id == $user->id) {
@@ -211,14 +220,14 @@ class EditBooking {
                             $this->handleAuthorizationRequest($user, $booking, $object);
                             return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
                         }
-                        return response()->json(array("status" => "error", "message" => "Not available"));
+                        return array("status" => "error", "message" => "Not available");
                     }
-                    return response()->json(array("status" => "error", "message" => "Access Denied"));
+                    return array("status" => "error", "message" => "Access Denied");
                 }
-                return response()->json(array("status" => "error", "message" => "Booking not found"));
+                return array("status" => "error", "message" => "Booking not found");
             }
         }
-        return response()->json(array("status" => "error", "message" => "Object not found"));
+        return array("status" => "error", "message" => "Object not found");
     }
 
     private function handleAuthorizationRequest($user, $booking, $object) {
@@ -232,14 +241,14 @@ class EditBooking {
         ];
         if ($booking->customer_id == $user->id) {
             $owner = $object->users()->first();
-            $payload['bookclient'] =  $user->firstName . " " . $user->lastName;
+            $payload['bookclient'] = $user->firstName . " " . $user->lastName;
             $type = self::BOOKING_UPDATED_BOOKABLE_PENDING;
         } else {
             $owner = $booking->client;
             $type = self::BOOKING_CREATED_BOOKABLE_PENDING;
         }
         $followers = [$owner];
-        
+
         $data = [
             "trigger_id" => $user->id,
             "message" => "",
@@ -596,24 +605,29 @@ class EditBooking {
      */
     public function getBooking(User $user, $booking) {
         $booking = Booking::find($booking);
-        $client = $booking->customer;
-        $bookable = $booking->bookable;
-        $send = false;
-        if ($user->id == $client->id) {
-            $send = true;
-        }
-        if ($bookable->checkAdminAccess($user->id)) {
-            $send = true;
-        }
-        if ($send) {
+        if ($booking) {
+            $client = $booking->customer;
+            $bookable = $booking->bookable;
+            $send = false;
+            if ($user->id == $client->id) {
+                $send = true;
+            }
+            if ($bookable->checkAdminAccess($user->id)) {
+                $send = true;
+            }
+            if ($send) {
+                return array(
+                    "status" => "success",
+                    "message" => "",
+                    "booking" => $booking);
+            }
             return array(
-                "status" => "success",
-                "message" => "",
-                "booking" => $booking);
+                "status" => "error",
+                "message" => "no access");
         }
         return array(
             "status" => "error",
-            "message" => "no access");
+            "message" => "Booking not found");
     }
 
     /**
