@@ -165,7 +165,12 @@ class EditCart {
             $order->total = 0;
             $order->save();
         }
-        Item::where('user_id', $user->id)->where('order_id', null)->delete();
+        if(isset($user->email)){
+            Item::where('user_id', $user->id)->where('order_id', null)->delete();
+        } else {
+            Item::where('ref2', $user->id)->where('order_id', null)->delete();
+        }
+        
         Cart::clearCartConditions();
     }
 
