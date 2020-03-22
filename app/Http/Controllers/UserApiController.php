@@ -12,7 +12,7 @@ use App\Models\User;
 use App\Models\Address;
 use App\Models\Medical;
 use App\Jobs\ImportContactsId;
-use App\Jobs\AddContact;
+use App\Jobs\MigrateCart;
 use DB;
 
 class UserApiController extends Controller {
@@ -142,26 +142,30 @@ class UserApiController extends Controller {
     public function index(Request $request) {
         $data = [];
         $user = $request->user();
-        $green = false;
-        if ($user->green) {
-            $green = true;
+        if ($user) {
+            $green = false;
+            if ($user->green) {
+                $green = true;
+            }
+            //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
+            $count = Medical::where('user_id', $user->id)->count();
+            $data['savedCard'] = false;
+            $sources = $user->sources()->where("has_default", true)->get();
+            $data['savedCards'] = [];
+            foreach ($sources as $value) {
+                $data['savedCard'] = true;
+                array_push($data['savedCards'], $value->gateway);
+            }
+            $data['current_time'] = date("Y-m-d H:i:s");
+            $data['user'] = $user;
+            $data['push'] = $user->push()->where("platform", "Food")->first();
+            $data['count'] = $count;
+            $data['green'] = $green;
+            dispatch(new MigrateCart($user, $request->header('x-device-id')));
+            //$data['followers'] = count($users2);
+            // the token is valid and we have found the user via the sub claim
         }
-        //$users2 = DB::select("SELECT user_id FROM " . self::ACCESS_USER_OBJECT . " where " . self::ACCESS_USER_OBJECT_ID . " = $user->id and " . self::ACCESS_USER_OBJECT_TYPE . " = '" . self::OBJECT_LOCATION . "' ");
-        $count = Medical::where('user_id', $user->id)->count();
-        $data['savedCard'] = false;
-        $sources = $user->sources()->where("has_default", true)->get();
-        $data['savedCards'] = [];
-        foreach ($sources as $value) {
-            $data['savedCard'] = true;
-            array_push($data['savedCards'], $value->gateway);
-        }
-        $data['current_time'] = date("Y-m-d H:i:s");
-        $data['user'] = $user;
-        $data['push'] = $user->push()->where("platform", "Food")->first();
-        $data['count'] = $count;
-        $data['green'] = $green;
-        //$data['followers'] = count($users2);
-        // the token is valid and we have found the user via the sub claim
+
         return response()->json($data);
     }
 

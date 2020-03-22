@@ -169,6 +169,47 @@ class EditCart {
         Cart::clearCartConditions();
     }
 
+    public function migrateCart($user, $device) {
+        if ($device) {
+            $items = Cart::session($device)->getContent();
+            $data = array();
+            $result = array();
+            foreach ($items as $item) {
+                $dataitem = $item->attributes;
+                $dataitem = $dataitem->toArray();
+                if (array_key_exists("product_variant_id", $dataitem)) {
+                    $data = [
+                        "product_variant_id" => $dataitem["product_variant_id"],
+                        "quantity" => $item->quantity,
+                        "item_id" => null,
+                        "merchant_id" => $dataitem["merchant_id"]
+                    ];
+                    $this->addCartItem($user, $data);
+                } else {
+                    $data = [
+                        "name" => $dataitem["name"],
+                        "quantity" => $item->quantity,
+                        "merchant_id" => $dataitem["merchant_id"],
+                        "price" => $item->price,
+                        "tax" => 0,
+                        "cost" => 0,
+                        "extras" => [
+                            "id" => $dataitem["id"],
+                            "type" => $dataitem["type"],
+                            "name" => $dataitem["name"],
+                        ]
+                    ];
+                    $this->addCustomCartItem($user, $data);
+                }
+                // the subtotal with conditions applied
+                // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
+                // so you can do things like below:
+            }
+            $userDel = json_decode(json_encode(["id" => $device]));
+            $this->clearCart($userDel);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -308,7 +349,8 @@ class EditCart {
         }
         return array("status" => "success", "message" => "Cart Loaded");
     }
-    private function getItemUser($user,$order_id,$data){
+
+    private function getItemUser($user, $order_id, $data) {
         $item = null;
         if (isset($user->email)) {
             if (array_key_exists('item_id', $data)) {
@@ -359,7 +401,7 @@ class EditCart {
         }
         $order_id = $this->checkAddToOrder($user, $data);
 
-        $item = $this->getItemUser($user, $order_id,$data);
+        $item = $this->getItemUser($user, $order_id, $data);
 
 
         if ($item) {
@@ -562,8 +604,8 @@ class EditCart {
         }
         return array("status" => "error", "message" => "NO_MERCHANT");
     }
-    
-    private function getCustomItemUser($user,$order_id,$data){
+
+    private function getCustomItemUser($user, $order_id, $data) {
         $item = null;
         if (isset($user->email)) {
             if ($order_id) {
@@ -595,7 +637,7 @@ class EditCart {
      */
     public function updateCartItem($user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        $item = $this->getItemUser($user, $order_id,$data);
+        $item = $this->getItemUser($user, $order_id, $data);
         if ($item) {
             $productVariant = $item->productVariant;
             if ((int) $data['quantity'] > 0) {
@@ -643,7 +685,7 @@ class EditCart {
      */
     public function updateCustomCartItem($user, array $data) {
         $order_id = $this->checkAddToOrder($user, $data);
-        $item = $this->getCustomItemUser($user, $order_id,$data);
+        $item = $this->getCustomItemUser($user, $order_id, $data);
         if ($item) {
             if ($item->productVariant) {
                 return array("status" => "error", "message" => "This is not a custom item");

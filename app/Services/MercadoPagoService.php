@@ -1012,23 +1012,31 @@ class MercadoPagoService {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnMerc(array $data) {
-        if (array_key_exists('AUTHORIZATION_CODE', $data) && array_key_exists('user_id', $data)) {
+        if ((array_key_exists('AUTHORIZATION_CODE', $data)||array_key_exists('code', $data) ) && array_key_exists('user_id', $data)) {
+            $code = "";
+            if(array_key_exists('AUTHORIZATION_CODE', $data)){
+                $code = $data['AUTHORIZATION_CODE'];
+            }
+            if(array_key_exists('code', $data)){
+                $code = $data['code'];
+            }
+            $data['code'] = $code;
             $this->returnMerchant($data);
         }
         return $data;
     }
 
     public function returnMerchant(array $data) {
-        $user = User::find('user_id', $data['user_id']);
+        $user = User::find($data['user_id']);
         if ($user) {
             $url = "https://api.mercadopago.com/oauth/token";
             $post = [
                 "client_secret" => env("MERCADOPAGO_TOKEN"),
                 "grant_type" => "authorization_code",
-                "code" => $data['AUTHORIZATION_CODE'],
+                "code" => $data['code'],
                 "redirect_uri" => env('APP_URL') . "/mercado/return",
             ];
-            $results = $this->sendPost($url);
+            $results = $this->sendPost($post,$url);
             if (array_key_exists('access_token', $results)) {
                 $source = $user->sources()->where("gateway", "MercadoPago")->first();
                 if ($source) {
