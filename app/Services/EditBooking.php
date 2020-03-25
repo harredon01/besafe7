@@ -635,7 +635,7 @@ class EditBooking {
      *
      * @return \Illuminate\Http\Response
      */
-    public function getBookingsObject(array $data, User $user) {
+    public function getBookingsObject(array $data, $user) {
         $validator = $this->validatorGetBookings($data);
         if ($validator->fails()) {
             return array("status" => "error", "message" => $validator->getMessageBag());
@@ -673,10 +673,18 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 if ($query == "day") {
+                    $results = $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get();
+                    foreach ($results as $value) {
+                        unset($value->price);
+                        unset($value->total_paid);
+                        unset($value->notes);
+                        unset($value->formula);
+                        unset($value->options);
+                    }
                     return array(
                         "status" => "success",
                         "message" => "",
-                        "data" => $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get());
+                        "data" => $results);
                 } else {
                     if ($user->id == $object->user_id) {
                         if ($query == "bookable_upcoming") {

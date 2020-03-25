@@ -128,7 +128,7 @@ class EditMapObject {
      *
      * @return Response
      */
-    public function getObjectUser(User $user, $objectId, $type) {
+    public function getObjectUser( $user, $objectId, $type) {
         if (false) {
             $data = Cache::remember($type . '_' . $objectId, 100, function ()use ($type, $objectId) {
                         $target = "App\\Models\\" . $type;
@@ -191,23 +191,23 @@ class EditMapObject {
 
         if ($object) {
             $send = false;
-            if ($object->user_id == $user->id) {
-                $object->mine = true;
-                $send = true;
-            } else {
-                if ($object->private) {
+            if ($object->private) {
+                if ($user) {
                     $send = $object->checkUserAccess($user);
                 } else {
-                    $send = true;
+                    $send = false;
                 }
+            } else {
+                $send = true;
             }
             if ($send == true) {
-                $favor = Favorite::where('user_id', $user->id)->where("favorite_type", $type)->where("object_id", $object->id)->first();
-                if ($favor) {
-                    $data['favorite'] = true;
-                } else {
-                    $data['favorite'] = false;
-                }
+                $data['favorite'] = false;
+                if ($user) {
+                    $favor = Favorite::where('user_id', $user->id)->where("favorite_type", $type)->where("object_id", $object->id)->first();
+                    if ($favor) {
+                        $data['favorite'] = true;
+                    } 
+                } 
                 $data['status'] = 'success';
                 return $data;
             }
@@ -591,7 +591,7 @@ class EditMapObject {
                 $attributes[$value] = $services;
             }
         }
-        
+
         $attributes['booking_requires_auth'] = false;
         $attributes['years_experience'] = 1;
         $attributes['max_per_hour'] = 1;

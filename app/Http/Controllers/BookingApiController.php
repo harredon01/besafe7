@@ -20,7 +20,7 @@ class BookingApiController extends Controller
      */
     public function __construct(EditBooking $editBooking) {
         $this->editBooking = $editBooking;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except("getBookingsObject");
     }
 
     /**
@@ -144,8 +144,14 @@ class BookingApiController extends Controller
      * @return Response
      */
     public function getBookingsObject(Request $request) {
-        $user = $request->user();
-        return response()->json($this->editBooking->getBookingsObject($request->all(), $user));
+        $user = auth('api')->user();
+        $data = $request->all();
+        if($data['query']!="day"){
+            if(!$user){
+                response()->json(["status"=>"error","message"=>"access denied"],401);
+            }
+        }
+        return response()->json($this->editBooking->getBookingsObject($data, $user));
     }
     /**
      * Store a newly created resource in storage.

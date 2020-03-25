@@ -49,7 +49,7 @@ class MerchantApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api')->except('index');
+        $this->middleware('auth:api')->except(['index','show']);
     }
 
     /**
@@ -156,8 +156,8 @@ class MerchantApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function show($id, Request $request) {
-        $user = $request->user();
+    public function show($id ) {
+        $user = auth('api')->user();
         return $this->editMapObject->getObjectUser($user, $id, self::OBJECT_MERCHANT);
     }
     
