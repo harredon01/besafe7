@@ -256,26 +256,24 @@ class EditDelivery {
                         } else {
                             $delivery->status = "pending";
                             unset($details['dish']);
+                            unset($details['pesos']);
+                            unset($details['add']);
                         }
                     } else {
                         $delivery->status = "pending";
                         unset($details['dish']);
+                        unset($details['pesos']);
+                        unset($details['add']);
                     }
                     $delivery->observation = "";
                     $delivery->details = json_encode($details);
-                    $delTest = Delivery::where("delivery",$delivery->delivery)->where("id","<>",$delivery->id)->where("user_id",$user->id)->first();
-                    if($delTest){
-                        $delTest = Delivery::where("user_id",$user->id)->where("status","pending")->where("id","<>",$delivery->id)->orderBy("delivery","desc")->first();
-                        return array("status" => "success", "message" => $delTest);
-                        $delivery->delivery = $this->getNextValidDate($delTest->delivery);
-                        $deposit = Delivery::where("user_id",$user->id)->where("status","deposit")->first();
-                        if($deposit){
-                            $deposit->delivery = $this->getNextValidDate($delivery->delivery);
-                            $deposit->save();
+                    $delTest = Delivery::where("delivery", $delivery->delivery)->where("id", "<>", $delivery->id)->where("user_id", $user->id)->first();
+                    if ($delTest) {
+                        $delTest = Delivery::where("user_id", $user->id)->where("status", "pending")->where("id", "<>", $delivery->id)->orderBy("delivery", "desc")->first();
+                        if ($delTest) {
+                            $delivery->delivery = $this->getNextValidDate(date_create($delTest->delivery));
                         }
-                        
                     }
-
                     $delivery->save();
                     return array("status" => "success", "message" => "Delivery canceled");
                 } else {
@@ -340,7 +338,7 @@ class EditDelivery {
 
     public function addInfoToDelivery(Delivery $delivery) {
         $details = json_decode($delivery->details, true);
-        if(!array_key_exists("dish", $details)){
+        if (!array_key_exists("dish", $details)) {
             return;
         }
         $dish = $details["dish"];
