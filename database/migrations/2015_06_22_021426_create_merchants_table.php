@@ -22,7 +22,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('telephone')->nullable();
             $table->string('hash')->nullable();
             $table->string('url')->nullable();
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->text('description')->nullable();
             $table->text('attributes')->nullable();
             $table->string('icon')->nullable();

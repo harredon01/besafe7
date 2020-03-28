@@ -9,7 +9,7 @@ use App\Models\Item;
 use App\Models\Push;
 use App\Models\Condition;
 use App\Models\Delivery;
-use App\Models\OrderAddress;
+use App\Jobs\PostPurchase;
 use App\Models\Route;
 use App\Models\Stop;
 use App\Models\OrderCondition;
@@ -104,6 +104,25 @@ class EditOrderFood {
         return array("status" => "error", "message" => "Address does not exist");
     }
 
+    public function postPurchase(User $user) {
+        $delivery = Delivery::where('user_id', $user->id)->where("status", "enqueue")->first();
+        if (!$delivery) {
+            $admin = User::find(77);
+            $message = "Ya compraste ahora no olvides ingresar y escoger que quieres recibir. ";
+            $package = [
+                "type" => "user_message",
+                "name" => "Servicio al cliente",
+                "message" => $message,
+                "from_id" => $admin->id,
+                "to_id" => $user->id,
+                "status" => "unread",
+                "target_id" => $user->id,
+                "created_at" => date("Y-m-d H:i:s")
+            ];
+            SendMessage::dispatch($admin, $package);
+        }
+    }
+
     public function approvePayment(Payment $payment) {
         
     }
@@ -125,7 +144,7 @@ class EditOrderFood {
         $items = $order->items;
         $geo = app('Geolocation');
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id,"Basilikum");
+        $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id, "Basilikum");
         $polygon = $result['polygon'];
         $address->polygon_id = $polygon->id;
         $address->save();
@@ -176,7 +195,7 @@ class EditOrderFood {
             if (array_key_exists("shipping", $attributes)) {
                 if ($attributes["shipping"] > 0) {
                     $shippingPaid = $attributes["shipping"];
-                    $shippingPaid = $shippingPaid - ($condition->total/$item->quantity);
+                    $shippingPaid = $shippingPaid - ($condition->total / $item->quantity);
                     $attributes["shipping"] = $shippingPaid;
                     $item->attributes = $attributes;
                 }
@@ -188,6 +207,8 @@ class EditOrderFood {
             $user = User::find($buyers[$x]);
             if ($user) {
                 $this->createDeliveries($user->id, $item, $address_id);
+                PostPurchase::dispatch($user)
+                ->delay(now()->addMinutes(10));
             }
         }
     }

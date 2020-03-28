@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\EditAlerts;
 use App\Services\Security;
+use App\Jobs\PostRegistration;
 use Socialite;
 
 class AuthApiController extends Controller {
@@ -193,6 +194,7 @@ class AuthApiController extends Controller {
                             'optinMarketing' => 1
                 ]);
             }
+            dispatch(new PostRegistration($authUser));
         }
         $token = $authUser->createToken($data['driver'])->accessToken;
         return response()->json(['status' => "success", "token" => $token]);

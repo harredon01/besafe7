@@ -772,7 +772,6 @@ class EditMapObject {
         return Validator::make($data, [
                     'name' => 'required|max:255',
                     'telephone' => 'required|max:255',
-                    'address' => 'required|max:255',
         ]);
     }
 

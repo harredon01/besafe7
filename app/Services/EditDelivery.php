@@ -263,6 +263,18 @@ class EditDelivery {
                     }
                     $delivery->observation = "";
                     $delivery->details = json_encode($details);
+                    $delTest = Delivery::where("delivery",$delivery->delivery)->where("id","<>",$delivery->id)->where("user_id",$user->id)->first();
+                    if($delTest){
+                        $delTest = Delivery::where("user_id",$user->id)->where("status","pending")->where("id","<>",$delivery->id)->orderBy("delivery","desc")->first();
+                        return array("status" => "success", "message" => $delTest);
+                        $delivery->delivery = $this->getNextValidDate($delTest->delivery);
+                        $deposit = Delivery::where("user_id",$user->id)->where("status","deposit")->first();
+                        if($deposit){
+                            $deposit->delivery = $this->getNextValidDate($delivery->delivery);
+                            $deposit->save();
+                        }
+                        
+                    }
 
                     $delivery->save();
                     return array("status" => "success", "message" => "Delivery canceled");

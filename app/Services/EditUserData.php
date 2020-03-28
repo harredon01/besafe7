@@ -12,6 +12,7 @@ use DB;
 use Validator;
 use App\Models\Region;
 use App\Jobs\SendMessage;
+use App\Jobs\PostRegistration;
 use App\Models\City;
 use App\Models\Country;
 
@@ -71,7 +72,7 @@ class EditUserData {
         $data['emailNotifications'] = 1;
         $user = User::create($data);
         $http = new \GuzzleHttp\Client;
-        $response = $http->post(env('APP_URL').'/oauth/token', [
+        $response = $http->post(env('APP_URL') . '/oauth/token', [
             'form_params' => [
                 'grant_type' => 'password',
                 'client_id' => '1',
@@ -82,9 +83,15 @@ class EditUserData {
             ],
         ]);
         $json = json_decode((string) $response->getBody(), true);
+        dispatch(new PostRegistration($user));
+        //$this->getUserCode($user);
+        return ['status' => 'success', 'access_token' => $json['access_token']];
+    }
+
+    public function postRegistration(User $user) {
         Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
         $admin = User::find(77);
-        $message = "Hola ".$user->firstName. " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
+        $message = "Hola " . $user->firstName . " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
         $package = [
             "type" => "user_message",
             "name" => "Servicio al cliente",
@@ -95,9 +102,7 @@ class EditUserData {
             "target_id" => $user->id,
             "created_at" => date("Y-m-d H:i:s")
         ];
-        SendMessage::dispatch($admin,$package)->delay(now()->addMinutes(2)); 
-        //$this->getUserCode($user);
-        return ['status' => 'success', 'access_token' => $json['access_token']];
+        SendMessage::dispatch($admin, $package)->delay(now()->addMinutes(2));
     }
 
     /**
@@ -120,7 +125,7 @@ class EditUserData {
         }
         return $hash;
     }
-    
+
     /**
      * returns all current shared locations for the user
      *
@@ -128,20 +133,21 @@ class EditUserData {
      */
     private function generateWelcomeCoupon(User $user) {
         $attributes = [
-            "user_id"=>$user->id
+            "user_id" => $user->id
         ];
-        $coupon = trim($user->firstName)."&Lonchis".$user->id;
+        $coupon = trim($user->firstName) . "&Lonchis" . $user->id;
+        $coupon = str_replace(' ', '', $coupon);
         $condition = Condition::create([
-            "name" => "Descuento bienvenida",
-            "type" => "coupon",
-            "target" => "total",
-            "value" =>"-8000",
-            "coupon" => $coupon,
-            "isReusable"=>0,
-            "used" => 0,
-            "attributes" => json_encode($attributes),
-            "status"=>"active",
-            "order"=>0
+                    "name" => "Descuento bienvenida",
+                    "type" => "coupon",
+                    "target" => "total",
+                    "value" => "-8000",
+                    "coupon" => $coupon,
+                    "isReusable" => 0,
+                    "used" => 0,
+                    "attributes" => json_encode($attributes),
+                    "status" => "active",
+                    "order" => 0
         ]);
         return $coupon;
     }
@@ -232,7 +238,7 @@ class EditUserData {
         }
         $user->name = $user->firstName . " " . $user->lastName;
         $user->save();
-        return array("status" => "success", "message" => "User Profile Updated","user" => $user);
+        return array("status" => "success", "message" => "User Profile Updated", "user" => $user);
     }
 
     /**
@@ -306,6 +312,7 @@ class EditUserData {
         }
         return array("status" => "error", "message" => "Bad request");
     }
+
     /**
      * Create a new user instance after a valid registration.
      *
