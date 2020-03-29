@@ -10,6 +10,7 @@ use App\Models\Push;
 use App\Models\Condition;
 use App\Models\Delivery;
 use App\Jobs\PostPurchase;
+use App\Jobs\SendMessage;
 use App\Models\Route;
 use App\Models\Stop;
 use App\Models\OrderCondition;

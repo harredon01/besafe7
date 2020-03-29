@@ -36,8 +36,6 @@ class EditUserData {
         return Validator::make($data, [
                     'firstName' => 'required|max:255',
                     'lastName' => 'required|max:255',
-                    'docNum' => 'required|max:255',
-                    'docType' => 'required|max:255',
                     'cellphone' => 'required|max:255',
                     'area_code' => 'required|max:255',
                     'email' => 'required|email|max:255|unique:users',
