@@ -85,7 +85,13 @@ class EditMapObject {
     public function getPaymentMethodsMerchant($id) {
         $merchant = Merchant::find($id);
         $merchant->paymentMethods;
-        return $merchant;
+        return ['status'=>"success","data"=>$merchant->paymentMethods];
+    }
+    
+    public function getCategoriesMerchant($id) {
+        $merchant = Merchant::find($id);
+        $merchant->categories;
+        return ['status'=>"success","data"=>$merchant->categories];
     }
 
     /**

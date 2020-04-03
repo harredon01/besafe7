@@ -23,7 +23,7 @@ use App\Mail\PurchaseOrder;
 use App\Mail\Register;
 use App\Mail\NewsletterMenus;
 use App\Jobs\SendMessage;
-use App\Mail\Newsletter2;
+use App\Mail\Newsletter;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -366,7 +366,7 @@ class Food {
     public function sendNewsletter() {
         $days = $this->getDataNewsletter();
 
-        $date = date_create();
+        $date = date_create(); 
         // id > 130 and id < 200 bota 500
         $followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
@@ -378,7 +378,7 @@ class Food {
                 "message" => "",
                 "subject" => "Visita tu correo para enterarte de nuestros menus de esta semana",
                 "object" => "Lonchis",
-                "sign" => true,
+                "sign" => true, 
                 "payload" => $payload,
                 "type" => 'newsletter_food',
                 "user_status" => "normal"
@@ -387,9 +387,10 @@ class Food {
             $date = date_format($date, "Y-m-d");
 
             $platFormService = app('Notifications');
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Marzo","Marzo"));
+                //Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
+                Mail::to($user->email)->send(new Newsletter());
             }
         }
     }
@@ -649,9 +650,7 @@ class Food {
         } else if ($dayofweek == 0) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         }
-
         $isHoliday = $this->checkIsHoliday($date);
-
         while ($isHoliday) {
             $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
             if ($dayofweek == 5) {

@@ -160,10 +160,10 @@ Route::get('/email_payment_cash', function () {
     $url = "http://www.google.com";
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
-});
-Route::get('/newsletter_sistole_quadi', function () {
+}); 
+Route::get('/newsletter_paella', function () {
     return new App\Mail\Newsletter();
-});
+}); 
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
 });

@@ -143,6 +143,7 @@ Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchan
 Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
+Route::get('merchants/{code?}/categories', 'MerchantApiController@getCategoriesMerchant');
 Route::get('merchants/search', function (Request $request) {
     $searchQuery = App\Models\Merchant::search($request->search);
     if(is_array($request->filters)){

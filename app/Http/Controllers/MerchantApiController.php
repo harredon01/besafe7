@@ -140,6 +140,14 @@ class MerchantApiController extends Controller {
     public function getPaymentMethodsMerchant($id) {
         return response()->json($this->editMapObject->getPaymentMethodsMerchant($id));
     }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getCategoriesMerchant($id) {
+        return response()->json($this->editMapObject->getCategoriesMerchant($id));
+    }
 
     /**
      * Show the form for creating a new resource.

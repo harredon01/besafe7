@@ -157,15 +157,6 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function getProductCategories($merchant_id) {
-        return response()->json($this->editProduct->getProductCategories($merchant_id));
-    }
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return Response
-     */
     public function getProductsPrivateMerchant($merchant,$page, Request $request) {
         $user = $request->user();
         return response()->json($this->editProduct->getProductsPrivateMerchant($user, $merchant,$page));

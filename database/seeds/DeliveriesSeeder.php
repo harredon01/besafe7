@@ -3,7 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Services\EditDelivery;
 use App\Services\PayU;
-use App\Services\EditOrder;
+use App\Services\Food;
 use App\Services\EditAlerts;
 use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
@@ -34,24 +34,25 @@ class DeliveriesSeeder extends Seeder {
      *
      */
     protected $food;
-
-    public function __construct(EditDelivery $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
+ 
+    public function __construct(Food $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
         $this->food = $food;
     }
 
     public function run() {
-        $data = [
-            "address" => "Calle 73 # 0 - 24",
-            "complete" => false, 
-            "merchant_id" => 1299,
-            "provider" => "Basilikum"
-        ];
-        $deliveries = Delivery::where("status","completed")->where("delivery",">","2020-03-08")->get();
-        
-        //dispatch(new ApprovePayment($payment, "Food"));
-        foreach ($deliveries as $delivery) {
-            $this->food->addInfoToDelivery($delivery);
-        }
+        $this->food->reprogramDeliveries();
+//        $data = [
+//            "address" => "Calle 73 # 0 - 24",
+//            "complete" => false, 
+//            "merchant_id" => 1299,
+//            "provider" => "Basilikum"
+//        ];
+//        $deliveries = Delivery::where("status","completed")->where("delivery",">","2020-03-08")->get();
+//        
+//        //dispatch(new ApprovePayment($payment, "Food"));
+//        foreach ($deliveries as $delivery) {
+//            $this->food->addInfoToDelivery($delivery);
+//        }
         
         
 //        $user = User::find(1);

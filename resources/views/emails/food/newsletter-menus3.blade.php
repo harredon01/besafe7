@@ -1,7 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
-<head>
+<head> 
 <!--[if gte mso 9]><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
 <meta content="width=device-width" name="viewport"/>
@@ -170,7 +169,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
 <div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:0px;padding-bottom:20px;padding-left:0px;">
 <div style="font-family: Georgia, Times, 'Times New Roman', serif; font-size: 12px; line-height: 1.2; color: #555555; mso-line-height-alt: 14px;">
-<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><span style=""><span style="font-size: 15px;"><strong><em>Del {{$days[0]["titulo"]}} al {{$days[4]["titulo"]}} de {{$month2}}</em></strong></span></span></span></p>
+<p style="font-size: 14px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Georgia, Times, Times New Roman, serif; mso-line-height-alt: 17px; margin: 0;"><span style="color: #ffffff;"><span style=""><span style="font-size: 15px;"><strong><em>Del {{$days[0]["titulo"]}} al {{$days[4]["titulo"]}} de Abril</em></strong></span></span></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->

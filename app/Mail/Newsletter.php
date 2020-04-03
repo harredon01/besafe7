@@ -12,7 +12,6 @@ class Newsletter extends Mailable
 {
     use Queueable, SerializesModels;
 
-    
     /**
      * Create a new message instance.
      *
@@ -21,7 +20,7 @@ class Newsletter extends Mailable
     public function __construct()
     {
 
-    }
+    } 
 
     /**
      * Build the message.
@@ -30,6 +29,6 @@ class Newsletter extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-codigos')->subject("Conoce nuestro menu de la semana!");
+        return $this->view('emails.food.newsletter-codigos')->subject("Lonchis Super menú de Sábado!");
     }
 }

@@ -588,18 +588,6 @@ class EditProduct {
         return $data;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @return Response
-     */
-    public function getProductCategories($merchant_id) {
-        $categories = Category::where("merchant_id",$merchant_id)->get();
-        $data = [
-            "data" => $categories
-        ];
-        return $data;
-    }
 
     /**
      * Store a newly created resource in storage.

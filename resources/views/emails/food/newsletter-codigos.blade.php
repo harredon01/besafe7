@@ -10,6 +10,7 @@
 <!--<![endif]-->
 <title></title>
 <!--[if !mso]><!-->
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css"/>
 <!--<![endif]-->
 <style type="text/css">
 		body {
@@ -34,7 +35,7 @@
 		}
 	</style>
 <style id="media-query" type="text/css">
-		@media (max-width: 680px) {
+		@media (max-width: 620px) {
 
 			.block-grid,
 			.col {
@@ -113,54 +114,19 @@
 		}
 	</style>
 </head>
-<body class="clean-body" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: #DAE9FF;">
+<body class="clean-body" style="margin: 0; padding: 0; -webkit-text-size-adjust: 100%; background-color: #222222;">
 <!--[if IE]><div class="ie-browser"><![endif]-->
-<table bgcolor="#DAE9FF" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="table-layout: fixed; vertical-align: top; min-width: 320px; Margin: 0 auto; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #DAE9FF; width: 100%;" valign="top" width="100%">
+<table bgcolor="#222222" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="table-layout: fixed; vertical-align: top; min-width: 320px; Margin: 0 auto; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #222222; width: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td style="word-break: break-word; vertical-align: top;" valign="top">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color:#DAE9FF"><![endif]-->
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="background-color:#222222"><![endif]-->
+<div style="background-color:#ff8e53;">
+<div class="block-grid three-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:transparent;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="15" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; height: 15px; width: 100%;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td height="15" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:transparent;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ff8e53;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="200" style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
@@ -172,26 +138,44 @@
 </div>
 </div>
 <!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #005c5e;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#005c5e;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:#005c5e"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:#005c5e;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
+<!--[if (mso)|(IE)]></td><td align="center" width="200" style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div align="center" class="img-container center fixedwidth" style="padding-right: 25px;padding-left: 25px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 25px;padding-left: 25px;" align="center"><![endif]-->
-    <div style="font-size:1px;line-height:10px"> </div><a href="https://lonchis.com.co"><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/lonchis-blanco-transparente.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 132px; display: block;" title="Image" width="132"/></a>
-<div style="font-size:1px;line-height:25px"> </div>
+<div align="center" class="img-container center autowidth" style="padding-right: 0px;padding-left: 0px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://app.lonchis.com.co/" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center autowidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/output-onlinepngtools_21_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 200px; display: block;" title="Image" width="200"/></a>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="200" style="background-color:transparent;width:200px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num4" style="max-width: 320px; min-width: 200px; display: table-cell; vertical-align: top; width: 200px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td style="word-break: break-word; vertical-align: top; padding-top: 15px; padding-right: 0px; padding-bottom: 20px; padding-left: 0px;" valign="top">
+<table align="center" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" valign="top">
+<tbody>
+<tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top">
+<td style="word-break: break-word; vertical-align: top; padding-bottom: 0; padding-right: 1px; padding-left: 1px;" valign="top"><a href="https://www.facebook.com/Lonchis-app-623852081448278" target="_blank"><img alt="Facebook" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/facebook2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Facebook" width="32"/></a></td>
+<td style="word-break: break-word; vertical-align: top; padding-bottom: 0; padding-right: 1px; padding-left: 1px;" valign="top"><a href="https://www.instagram.com/lonchisapp_col/" target="_blank"><img alt="Instagram" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/instagram2x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Instagram" width="32"/></a></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
@@ -202,36 +186,12 @@
 </div>
 </div>
 </div>
-<div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg_hero.jpg');background-position:top center;background-repeat:no-repeat;background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #00FFB3;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#00FFB3;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bg_hero.jpg');background-position:top center;background-repeat:no-repeat;background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:#00FFB3"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:#00FFB3;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:35px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:35px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Sale-1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 660px; display: block;" title="Image" width="660"/>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #00ffb3;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#00ffb3;background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/Lo mejor de lonchis.png');background-position:top center;background-repeat:no-repeat">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:#00ffb3"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:#00ffb3;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
+<div style="background-color:#000000;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
@@ -240,10 +200,10 @@
 <tbody>
 <tr style="vertical-align: top;" valign="top">
 <td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" height="0" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 6px solid #FF8E54; height: 0px; width: 100%;" valign="top" width="100%">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; width: 100%;" valign="top" width="100%">
 <tbody>
 <tr style="vertical-align: top;" valign="top">
-<td height="0" style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
 </tr>
 </tbody>
 </table>
@@ -261,167 +221,217 @@
 </div>
 </div>
 </div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #005c5e;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#005c5e;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:#005c5e"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:#005c5e;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:30px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:30px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 0px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#FF8097;font-family:'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%;padding-top:0px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="line-height: 14px; font-family: 'Oswald', Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px; color: #FF8097;">
-<p style="line-height: 14px; text-align: center; font-size: 12px; margin: 0;"><span style="color: #ffffff; font-size: 12px; line-height: 14px;"><strong><span style="font-size: 38px; line-height: 45px;">Usa el cupón</span></strong></span></p>
-<p style="line-height: 45px; text-align: center; font-size: 12px; margin: 0;"><span style="font-size: 38px; color: #ffffff;"><strong>"<span style="color: #ff8e54; font-size: 34px; line-height: 45px;"><em><span style="text-decoration: underline; font-size: 34px; line-height: 45px;">Quadi&amp;Lonchis</span></em></span>"</strong></span></p>
-<p style="line-height: 45px; text-align: center; font-size: 12px; margin: 0;"><span style="font-size: 38px; color: #ffffff;"><strong>"<span style="color: #ff8e54; font-size: 34px; line-height: 45px;"><em><span style="text-decoration: underline; font-size: 34px; line-height: 45px;">Sistole&amp;Lonchis</span></em></span>"</strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 50px; padding-left: 50px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#FFFFFF;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:180%;padding-top:0px;padding-right:50px;padding-bottom:20px;padding-left:50px;">
-<div style="line-height: 21px; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #FFFFFF;">
-    <p style="text-align: center;" 0;"="" 12px;="" 36px;="" center;="" font-size:="" helvetica="" helvetica,="" line-height:="" margin:="" neue",="" sans-serif;="" style="margin: 0; font-family: Arial,;" text-align:=""><span style="font-size: 20px; color: #ffffff;"><strong><span style="line-height: 36px; font-size: 20px;">Y adquiere un plan personal en envase retornable por menor precio que un plan de 6 amigos. </span></strong></span></p>
-<p 0;"="" 12px;="" 21px;="" center;="" font-size:="" helvetica="" helvetica,="" line-height:="" margin:="" neue",="" sans-serif;="" style="margin: 0; font-family: Arial,;" text-align:=""> </p>
-<p style="line-height: 21px; text-align: center; font-size: 12px; margin: 0;"><span style="line-height: 21px; font-size: 12px; color: #ffffff;"><span style="line-height: 21px; font-size: 12px;"><span style="line-height: 21px; font-size: 12px;"><strong style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px;">Descomplícate con Lonchis y olvídate de esperar a tus amigos para renovar tu plan.  Ya no tienes que comprar en combo para obtener</strong><strong style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px;"><span style="color: #ffffff; font-size: 20px; line-height: 36px;"> </span>mejores precios.</strong></span></span></span></p>
-<p style="line-height: 21px; text-align: center; font-size: 12px; margin: 0;"> </p>
-<p style="line-height: 21px; text-align: center; font-size: 12px; margin: 0;"><span style="line-height: 21px; font-size: 12px; color: #ffffff;"><span style="line-height: 21px; font-size: 12px;"><span style="line-height: 21px; font-size: 12px;"><strong style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 20px;">Para redimir el cupón asegúrate quede registrado en la dirección de tu oficina</strong></span><span 20px;="" 36px;"="" font-size:="" helvetica="" helvetica,="" line-height:="" neue",="" sans-serif;="" style="font-family: Arial, "> </span></span><strong style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px;"><span style="font-size: 18px; line-height: 32px;"><span style="font-size: 14px; line-height: 25px;"><span style="font-size: 20px; line-height: 36px;">(Cl. 99 #7A-77, Bogotá, Colombia</span>)</span></span></strong></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 50px; padding-left: 50px; padding-top: 0px; padding-bottom: 20px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#FFFFFF;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:180%;padding-top:0px;padding-right:50px;padding-bottom:20px;padding-left:50px;">
-<div style="font-size: 12px; line-height: 21px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #FFFFFF;">
-<p style="font-size: 14px; line-height: 25px; text-align: center; margin: 0;"><span style="font-size: 14px; line-height: 25px; color: #ffffff;"><em><span style="line-height: 25px; font-size: 14px;">*Valido únicamente en planes personales registrados en la dirección de Sístole y Quadi.</span></em></span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table activate="activate" align="center" alignment="alignment" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: undefined; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" to="to" valign="top">
-<tbody>
-<tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 3px; padding-left: 3px;" valign="top"><a href="https://play.google.com/store/apps/details?id=com.recurring.food" target="_blank"><img alt="" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/googleplay.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Custom" width="108"/></a></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table activate="activate" align="center" alignment="alignment" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: undefined; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" to="to" valign="top">
-<tbody>
-<tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 3px; padding-left: 3px;" valign="top"><a href="https://apps.apple.com/us/app/lonchis/id1459807225?ls=1" target="_blank"><img alt="" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/appstore.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Custom" width="108"/></a></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFFFF;">
-<div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFFFF;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:#FFFFFF"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:#FFFFFF;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:15px; padding-bottom:15px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
-<div style="width:100% !important;">
-<!--[if (!mso)&(!IE)]><!-->
-<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:15px; padding-bottom:15px; padding-right: 0px; padding-left: 0px;">
-<!--<![endif]-->
-<div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://lonchis.com.co"><img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/logo-verde-transparente.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 132px; display: block;" title="Image" width="132"/></a>
-<!--[if mso]></td></tr></table><![endif]-->
-</div>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 50px; padding-left: 50px; padding-top: 15px; padding-bottom: 15px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:150%;padding-top:15px;padding-right:50px;padding-bottom:15px;padding-left:50px;">
-<div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px; line-height: 18px; color: #555555;">
-<p style="font-size: 12px; line-height: 18px; margin: 0;"><br/></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table activate="activate" align="center" alignment="alignment" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: undefined; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" to="to" valign="top">
-<tbody>
-<tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 3px; padding-left: 3px;" valign="top"><a href="https://www.facebook.com/Lonchis-app-623852081448278/" target="_blank"><img alt="Facebook" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/facebook.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Facebook" width="32"/></a></td>
-<td style="word-break: break-word; vertical-align: top; padding-bottom: 5px; padding-right: 3px; padding-left: 3px;" valign="top"><a href="https://www.instagram.com/lonchisapp_col/" target="_blank"><img alt="Instagram" height="32" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/instagram@3x.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; display: block;" title="Instagram" width="32"/></a></td>
-</tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<table cellpadding="0" cellspacing="0" class="social_icons" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt;" valign="top" width="100%">
-<tbody>
-<tr style="vertical-align: top;" valign="top">
-<td style="word-break: break-word; vertical-align: top; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
-<table activate="activate" align="center" alignment="alignment" cellpadding="0" cellspacing="0" class="social_table" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: undefined; mso-table-tspace: 0; mso-table-rspace: 0; mso-table-bspace: 0; mso-table-lspace: 0;" to="to" valign="top">
-<tbody>
-<tr align="center" style="vertical-align: top; display: inline-block; text-align: center;" valign="top"></tr>
-</tbody>
-</table>
-</td>
-</tr>
-</tbody>
-</table>
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Arial, sans-serif"><![endif]-->
-<div style="color:#555555;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:120%;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
-<div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; font-size: 12px; line-height: 14px; color: #555555;">
-<p style="font-size: 14px; line-height: 16px; text-align: center; margin: 0;"><strong><span style="font-size: 18px; line-height: 21px;">Escríbenos</span></strong></p>
-<p style="font-size: 14px; line-height: 16px; text-align: center; margin: 0;"> </p>
-<p style="font-size: 14px; line-height: 21px; text-align: center; margin: 0;"><span style="font-size: 18px;">WhatsApp: <a href="tel:+573103418432" style="color:#FF8E54">+573103418432</a> </span></p>
-<p style="font-size: 14px; line-height: 21px; text-align: center; margin: 0;"><span style="font-size: 18px;"><a href="mailto:servicioalcliente@lonchis.com.co" style="color:#FF8E54">servicioalcliente@lonchis.com.co</a> </span></p>
-</div>
-</div>
-<!--[if mso]></td></tr></table><![endif]-->
-<!--[if (!mso)&(!IE)]><!-->
-</div>
-<!--<![endif]-->
-</div>
-</div>
-<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
-<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
-</div>
-</div>
-</div>
-<div style="background-color:transparent;">
-<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 660px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="background-color:#000000;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
-<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:660px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
-<!--[if (mso)|(IE)]><td align="center" width="660" style="background-color:transparent;width:660px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
-<div class="col num12" style="min-width: 320px; max-width: 660px; display: table-cell; vertical-align: top; width: 660px;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!--> 
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;"> 
+<!--<![endif]-->
+<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://app.lonchis.com.co" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/SABADO_de_paella_1.jpg" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 600px; display: block;" title="Image" width="600"/></a>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#000000;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
 <div style="width:100% !important;">
 <!--[if (!mso)&(!IE)]><!-->
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
-<div align="center" class="img-container center autowidth fullwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bottom_rounded.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 660px; display: block;" title="Image" width="660"/>
+<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 15px; padding-right: 0px; padding-bottom: 15px; padding-left: 0px;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 5px solid #FF8E54; width: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+<div style="color:#f2f2f2;font-family:Roboto, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="font-size: 14px; line-height: 1.2; color: #f2f2f2; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 17px;">
+<p style="font-size: 15px; line-height: 1.2; word-break: break-word; text-align: center; mso-line-height-alt: 18px; margin: 0;"><span style="font-size: 15px;">Por que tu lo pediste, ahora  en lonchis los sábados también entregaremos almuerzos frescos  y saludables.  Y para inaugurar esta fecha, no te pierdas este sábado 4 de abril  la especialidad  de la casa .</span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#000000;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #FFFFFF;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:#FFFFFF;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:#FFFFFF"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="300" style="background-color:#FFFFFF;width:300px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;background-color:#FFFFFF;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 300px; display: table-cell; vertical-align: top; width: 300px;">
+<div style="background-color:#FFFFFF;width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center autowidth fullwidth">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="" align="center"><![endif]--><img align="center" alt="Image" border="0" class="center autowidth fullwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/fotos_menus_de_la_semana__9.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 300px; display: block;" title="Image" width="300"/>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="300" style="background-color:#FFFFFF;width:300px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:10px; padding-bottom:10px;background-color:#FFFFFF;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 300px; display: table-cell; vertical-align: top; width: 300px;">
+<div style="background-color:#FFFFFF;width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:10px; padding-bottom:10px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 30px; padding-left: 30px; padding-top: 30px; padding-bottom: 5px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+<div style="color:#111111;font-family:Roboto, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:30px;padding-right:30px;padding-bottom:5px;padding-left:30px;">
+<div style="font-size: 12px; line-height: 1.2; color: #111111; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+<p style="font-size: 16px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px;"><strong><span style="font-size: 16px;">Paella valenciana </span></strong></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 30px; padding-left: 30px; padding-top: 5px; padding-bottom: 0px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#888888;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.5;padding-top:5px;padding-right:30px;padding-bottom:0px;padding-left:30px;">
+<div style="font-size: 12px; line-height: 1.5; font-family: Georgia, Times, 'Times New Roman', serif; color: #888888; mso-line-height-alt: 18px;">
+<p style="font-size: 14px; line-height: 1.5; word-break: break-word; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 21px; margin: 0;"><span style="font-size: 14px;">Acompaña tu plato con pan francés.</span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<div align="center" class="button-container" style="padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://app.lonchis.com.co/" style="height:30.75pt; width:127.5pt; v-text-anchor:middle;" arcsize="10%" stroke="false" fillcolor="#ff8e54"><w:anchorlock/><v:textbox inset="0,0,0,0"><center style="color:#ffffff; font-family:Tahoma, Verdana, sans-serif; font-size:16px"><![endif]--><a href="https://app.lonchis.com.co/" style="-webkit-text-size-adjust: none; text-decoration: none; display: inline-block; color: #ffffff; background-color: #ff8e54; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; width: auto; width: auto; border-top: 1px solid #ff8e54; border-right: 1px solid #ff8e54; border-bottom: 1px solid #ff8e54; border-left: 1px solid #ff8e54; padding-top: 5px; padding-bottom: 5px; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif; text-align: center; mso-border-alt: none; word-break: keep-all;" target="_blank"><span style="padding-left:20px;padding-right:20px;font-size:16px;display:inline-block;"><span style="font-size: 16px; line-height: 2; word-break: break-word; mso-line-height-alt: 32px;">Programa ya</span></span></a>
+<!--[if mso]></center></v:textbox></v:roundrect></td></tr></table><![endif]-->
+</div>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#000000;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; width: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#ff8e54;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#ff8e54;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:0px; padding-bottom:0px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:0px; padding-bottom:0px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td class="divider_inner" style="word-break: break-word; vertical-align: top; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px;" valign="top">
+<table align="center" border="0" cellpadding="0" cellspacing="0" class="divider_content" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-top: 0px solid transparent; width: 100%;" valign="top" width="100%">
+<tbody>
+<tr style="vertical-align: top;" valign="top">
+<td style="word-break: break-word; vertical-align: top; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top"><span></span></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+<div style="background-color:#000000;">
+<div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#000000;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="600" style="background-color:transparent;width:600px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:5px; padding-bottom:5px;"><![endif]-->
+<div class="col num12" style="min-width: 320px; max-width: 600px; display: table-cell; vertical-align: top; width: 600px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:5px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="https://www.lonchis.com.co/" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Image" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/paella/output-onlinepngtools_21_1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: none; width: 100%; max-width: 210px; display: block;" title="Image" width="210"/></a>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 10px; font-family: Tahoma, Verdana, sans-serif"><![endif]-->
+<div style="color:#888888;font-family:Roboto, Tahoma, Verdana, Segoe, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #888888; font-family: Roboto, Tahoma, Verdana, Segoe, sans-serif; mso-line-height-alt: 14px;">
+<p style="text-align: center; line-height: 1.2; word-break: break-word; font-size: 14px; mso-line-height-alt: 17px; margin: 0;"><span style="font-size: 14px;"><strong>Contáctenos:  <a href="tel:3103418432" style="text-decoration: underline; color: #a17c44;" title="tel:3103418432">+57 3103418432</a>    -      <a href="mailto:servicioalcliente@lonchis.com.co" style="text-decoration: underline; color: #a17c44;" title="servicioalcliente@lonchis.com.co">Servicioalcliente@lonchis.com.co</a></strong></span></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->
