@@ -85,13 +85,13 @@ class EditMapObject {
     public function getPaymentMethodsMerchant($id) {
         $merchant = Merchant::find($id);
         $merchant->paymentMethods;
-        return ['status'=>"success","data"=>$merchant->paymentMethods];
+        return ['status' => "success", "data" => $merchant->paymentMethods];
     }
-    
+
     public function getCategoriesMerchant($id) {
         $merchant = Merchant::find($id);
         $merchant->categories;
-        return ['status'=>"success","data"=>$merchant->categories];
+        return ['status' => "success", "data" => $merchant->categories];
     }
 
     /**
@@ -134,7 +134,7 @@ class EditMapObject {
      *
      * @return Response
      */
-    public function getObjectUser( $user, $objectId, $type) {
+    public function getObjectUser($user, $objectId, $type) {
         if (false) {
             $data = Cache::remember($type . '_' . $objectId, 100, function ()use ($type, $objectId) {
                         $target = "App\\Models\\" . $type;
@@ -212,8 +212,8 @@ class EditMapObject {
                     $favor = Favorite::where('user_id', $user->id)->where("favorite_type", $type)->where("object_id", $object->id)->first();
                     if ($favor) {
                         $data['favorite'] = true;
-                    } 
-                } 
+                    }
+                }
                 $data['status'] = 'success';
                 return $data;
             }
@@ -646,6 +646,13 @@ class EditMapObject {
             }
         } else {
             $data["private"] = 0;
+        }
+        if (array_key_exists("virtual_meeting", $data)) {
+            if ($data["virtual_meeting"]) {
+                $zoom = app("ZoomMeetings");
+                $zoom->createUser($user);
+            }
+            $attributes['virtual_meeting'] = $data["virtual_meeting"]; 
         }
 
         $data['status'] = 'active';

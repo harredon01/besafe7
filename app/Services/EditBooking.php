@@ -126,27 +126,37 @@ class EditBooking {
         }
         $type = $data['type'];
         $class = self::MODEL_PATH . $type;
+        if ($object->status != 'online' && $data['call']) {
+            return response()->json(array("status" => "error", "message" => "call only allowed to online"), 400);
+        }
 
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
                 $result = $this->checkBookingAvailability($data, $object);
-                if ($result || ($object->status == 'online' && $data['call'])) {
-                    $booking = $object->newBooking($user, $data['from'], $data['to']);
-                    $attributes = $object->attributes;
-                    $requiresAuth = false;
+                if ($result || $data['call']) {
                     $update = [];
                     $update["notes"] = "pending";
                     $update["options"] = [];
+                    $cost = 0;
+                    if (array_key_exists("location", $data)) {
+                        $update["options"]["location"] = $data['location'];
+                        if ($data['location'] == "zoom") {
+                            $cost = $object->unit_cost;
+                            $object->unit_cost = $object->unit_cost * 0.5;
+                        }
+                    }
+                    $booking = $object->newBooking($user, $data['from'], $data['to']);
+                    $attributes = $object->attributes;
+                    $requiresAuth = false;
+
                     if (array_key_exists("attributes", $data)) {
                         $update["options"] = $data["attributes"];
                     }
-                    if (array_key_exists("location", $data)) {
-                        $update["options"]["location"] = $data['location'];
-                    }
+
                     $update["options"]["status"] = "approved";
                     $update["options"]["call"] = $data['call'];
-                    if (array_key_exists("booking_requires_authorization", $attributes) && !($object->status == 'online' && $data['call'])) {
+                    if (array_key_exists("booking_requires_authorization", $attributes) && !$data['call']) {
                         if ($attributes["booking_requires_authorization"]) {
                             $update["total_paid"] = -1;
                             $booking->total_paid = -1;
@@ -190,11 +200,11 @@ class EditBooking {
                         if ($result) {
                             if (strpos($data['from'], '.') !== false) {
                                 $a = explode(".", $data['from']);
-                                $data['from'] = str_replace("T"," ",$a[0]);
+                                $data['from'] = str_replace("T", " ", $a[0]);
                             }
                             if (strpos($data['to'], '.') !== false) {
                                 $a = explode(".", $data['to']);
-                                $data['to'] = str_replace("T"," ",$a[0]);
+                                $data['to'] = str_replace("T", " ", $a[0]);
                             }
                             $booking->starts_at = $data['from'];
                             $booking->ends_at = $data['to'];
@@ -407,7 +417,7 @@ class EditBooking {
             $payload = ["booking_id" => $booking->id, "location" => $options['location'], "booking" => $booking];
             $user = $bookable->users()->first();
             $bookableUserContainer = ["id" => $user->id];
-
+            $meeting = null;
             if ($options['location'] == 'opentok') {
                 $openTok = app("OpenTok");
                 $session = $openTok->createSession();
@@ -417,10 +427,17 @@ class EditBooking {
                 $sessionId = $session->getSessionId();
                 $booking->options["session_id"] = $sessionId;
                 $payload["sessionId"] = $sessionId;
-                $payload["token"] = $bookableToken;
+                $payload["token"] = $bookableToken; 
             }
+            if ($options['location'] == 'zoom') {
+                $zoom = app("ZoomMeetings");
+                $meeting = $zoom->createMeeting($user, $booking);
+                $booking->options["session_id"] = $meeting['id'];
+                $payload["url"] = $meeting['start_url'];
+            }
+            $payload["location"] = $options['location'];
             array_push($users, $bookableUserContainer);
-
+ 
             $followers = [$user];
             $data = [
                 "trigger_id" => $booking->id,
@@ -443,8 +460,13 @@ class EditBooking {
                 $bookableClientContainer = ["id" => $client->id, "token" => $clientToken];
                 $payload["sessionId"] = $sessionId;
                 $payload["token"] = $clientToken;
-                $data['payload'] = $payload;
             }
+            if ($options['location'] == 'zoom') {
+                unset($payload['url']);
+                $bookableClientContainer = ["id" => $client->id];
+                $payload['url'] = $meeting['join_url'];
+            }
+            $data['payload'] = $payload;
 
             array_push($users, $bookableClientContainer);
             $booking->options["users"] = $users;
@@ -495,16 +517,27 @@ class EditBooking {
     }
 
     public function endChatroom(Booking $booking) {
-        $openTok = app("OpenTok");
+        $options = $booking->options;
+        $options = $options->toArray();
         $followers = [];
+        $meetingProvider = null;
+        if ($options['location'] == 'opentok') {
+            $meetingProvider = app("OpenTok");
+        }
+        if ($options['location'] == 'zoom') {
+            $meetingProvider = app("ZoomMeetings");
+        }
         //$options = $booking->options;
         foreach ($booking->options["users"] as $user) {
             if ($booking->options["location"] == 'opentok') {
                 if (array_key_exists("connection_id", $user)) {
-                    $openTok->forceDisconnect($booking->options["session_id"], $user["connection_id"]);
+                    $meetingProvider->forceDisconnect($booking->options["session_id"], $user["connection_id"]);
                 }
             }
             array_push($followers, (object) $user);
+        }
+        if ($booking->options["location"] == 'zoom') {
+            $meetingProvider->endMeeting($booking->options["session_id"]);
         }
         $payload = [
             "booking_id" => $booking->id,

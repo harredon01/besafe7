@@ -554,11 +554,13 @@ class EditOrder {
         }
         if ($requiresShipping == 0) {
             $order->orderConditions()->where('type', "shipping")->delete();
-            Cart::removeConditionsByType("shipping");
+            Cart::session($user->id)->removeConditionsByType("shipping");
         } else {
             $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
             if ($shippingCondition) {
                 $requiresShipping = 0;
+            } else {
+                Cart::session($user->id)->removeConditionsByType("shipping");
             }
         }
         return array(
@@ -604,7 +606,7 @@ class EditOrder {
         if ($theAddress) {
             if ($theAddress->user_id == $user->id) {
                 $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'] ,null);
+                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], null);
                 if ($result["status"] == "success") {
                     $orderAddresses = $theAddress->toarray();
                     unset($orderAddresses['id']);
@@ -621,8 +623,10 @@ class EditOrder {
                     $order->merchant_id = $data['merchant_id'];
                     $order->save();
                     OrderAddress::insert($orderAddresses);
-                    if($user->cellphone =='11'){
-                        if($orderAddresses['country_id']=='1'){
+                    Cart::session($user->id)->removeConditionsByType("shipping");
+                    $order->orderConditions()->where('type', "shipping")->delete();
+                    if ($user->cellphone == '11') {
+                        if ($orderAddresses['country_id'] == '1') {
                             $user->area_code = 57;
                         }
                         $user->cellphone = $orderAddresses['phone'];
@@ -680,7 +684,7 @@ class EditOrder {
         $condition = $condition['condition_id'];
         $theCondition = Condition::find(intval($condition));
         if ($theCondition) {
-            Cart::removeConditionsByType("shipping");
+            Cart::session($user->id)->removeConditionsByType("shipping");
             $order = $this->getOrder($user);
             // add single condition on a cart bases
             $condition = new CartCondition(array(
@@ -734,7 +738,7 @@ class EditOrder {
                             $insertCondition['total'] = $result['price'];
                             $insertCondition['attributes'] = json_encode(["platform" => $platform]);
                             $order->orderConditions()->where('type', "shipping")->delete();
-                            Cart::removeConditionsByType("shipping");
+                            Cart::session($user->id)->removeConditionsByType("shipping");
                             OrderCondition::insert($insertCondition);
                             Cart::session($user->id)->condition($condition);
                             $cart = $this->editCart->getCheckoutCart($user);
@@ -748,7 +752,39 @@ class EditOrder {
                         }
                         return array("status" => "error", "message" => "Shipping provider does not have coverage");
                     }
-                    return array("status" => "error", "message" => "Order has no origin" );
+                    return array("status" => "error", "message" => "Order has no origin");
+                }
+                return array("status" => "error", "message" => "Order does not have an origin address");
+            }
+            return array("status" => "error", "message" => "Order not users");
+        }
+        return array("status" => "error", "message" => "Order not found");
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getPlatformShippingPrice(User $user, $order_id, $platform) {
+        $order = Order::find($order_id);
+        if ($order) {
+            if ($order->user_id == $user->id) {
+                // add single condition on a cart bases
+                $destination = $order->orderAddresses()->where('type', "shipping")->first();
+                $attributes = json_decode($order->attributes, true);
+                if (array_key_exists("origin", $attributes)) {
+                    $origin = Address::find($attributes['origin']);
+                    if ($origin) {
+                        $className = "App\\Services\\" . $platform;
+                        $gateway = new $className;
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
+                        if ($result['status'] == 'success') {
+                            return $result;
+                        }
+                        return array("status" => "error", "message" => "Shipping provider does not have coverage");
+                    }
+                    return array("status" => "error", "message" => "Order has no origin");
                 }
                 return array("status" => "error", "message" => "Order does not have an origin address");
             }
@@ -846,10 +882,10 @@ class EditOrder {
         $followers = [];
         $payments = $order->payments()->with('user')->get();
         $merchant = $order->merchant;
-        if($merchant){
+        if ($merchant) {
             $admins = $merchant->users;
         } else {
-            $admins = User::whereIn("id",[2,77])->get();
+            $admins = User::whereIn("id", [2, 77])->get();
         }
         $sendEmail = true;
         if ($order->status == "approved") {

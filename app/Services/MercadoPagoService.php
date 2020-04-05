@@ -398,7 +398,7 @@ class MercadoPagoService {
         $source->source = $token;
         $source->has_default = true;
         $source->save();
-    }
+    } 
 
     public function createClient(User $user) {
         $customer = new Customer();
@@ -414,7 +414,7 @@ class MercadoPagoService {
             if (count($customers) > 0) {
                 $customer = $customers[0];
             } else {
-                return $customer;
+                return ["customer" => $customer];
             }
         }
         $source = $user->sources()->where("gateway", "MercadoPago")->first();

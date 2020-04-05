@@ -185,10 +185,11 @@ Route::get('cart/checkout', 'CartApiController@getCheckoutCart');
 Route::post('cart/clear', 'CartApiController@postClearCart');
 Route::get('cart/load', 'CartApiController@loadActiveCart');
 Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
-
+ 
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
 Route::get('orders/active', 'OrderApiController@getOrder');
 Route::post('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@setPlatformShippingCondition');
+Route::get('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@getPlatformShippingPrice');
 Route::post('orders/tax', 'OrderApiController@setTaxesCondition');
 Route::post('orders/coupon', 'OrderApiController@setCouponCondition');
 Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
