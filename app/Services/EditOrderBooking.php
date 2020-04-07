@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Jobs\CreateChatroom;
 use App\Models\Booking;
 use DB;
+
 class EditOrderBooking {
 
     const MODEL_PATH = 'App\\Models\\';
@@ -96,16 +97,18 @@ class EditOrderBooking {
                         $booking->options['payer'] = $order->user_id;
                         $booking->options['status'] = "pending";
                         $booking->options['paid'] = date("Y-m-d H:i:s");
-                        
+
                         $booking->save();
                         $updateData = [
                             "total_paid" => $item->priceSumConditions,
                             "updated_at" => date("Y-m-d H:i:s")
                         ];
-                        Booking::where("id",$id)->update($updateData);
+                        Booking::where("id", $id)->update($updateData);
                     }
-                    if($data["call"]){
-                        dispatch(new CreateChatroom($booking->id)); 
+                    if (array_key_exists("call", $data)) {
+                        if ($data["call"]) {
+                            dispatch(new CreateChatroom($booking->id));
+                        }
                     }
                 }
             }

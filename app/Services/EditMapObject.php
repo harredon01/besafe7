@@ -601,7 +601,7 @@ class EditMapObject {
         $attributes['booking_requires_auth'] = false;
         $attributes['years_experience'] = 1;
         $attributes['max_per_hour'] = 1;
-        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour'];
+        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider'];
         foreach ($fields2 as $value) {
             if (array_key_exists($value, $data)) {
                 if ($data[$value]) {
@@ -624,6 +624,16 @@ class EditMapObject {
         if (!array_key_exists("unit_cost", $data)) {
             $data['unit_cost'] = 0;
         }
+        if (array_key_exists("virtual_meeting", $attributes)) {
+            if ($attributes["virtual_meeting"]) {
+                if (array_key_exists("virtual_provider", $attributes)) {
+                    if ($attributes["virtual_provider"]=="ZoomMeetings") { 
+//                $zoom = app("ZoomMeetings");
+//                $zoom->createUser($user);
+                    }
+                }
+            }
+        } 
         $data['currency'] = "COP";
         if (array_key_exists('id', $data)) {
             if ($data['id'] && $data['id'] > 0) {
@@ -647,13 +657,7 @@ class EditMapObject {
         } else {
             $data["private"] = 0;
         }
-        if (array_key_exists("virtual_meeting", $data)) {
-            if ($data["virtual_meeting"]) {
-                $zoom = app("ZoomMeetings");
-                $zoom->createUser($user);
-            }
-            $attributes['virtual_meeting'] = $data["virtual_meeting"]; 
-        }
+
 
         $data['status'] = 'active';
         if ($type == self::OBJECT_MERCHANT) {

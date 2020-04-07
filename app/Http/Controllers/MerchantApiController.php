@@ -225,6 +225,8 @@ class MerchantApiController extends Controller {
             'experience2',
             'experience3',
             'booking_requires_auth',
+            'virtual_meeting',
+            'virtual_provider',
             'max_per_hour',
             'years_experience',
             'private'
@@ -264,6 +266,8 @@ class MerchantApiController extends Controller {
             'experience1',
             'experience2',
             'experience3',
+            'virtual_meeting',
+            'virtual_provider',
             'booking_requires_auth',
             'max_per_hour',
             'years_experience',

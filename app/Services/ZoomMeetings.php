@@ -43,25 +43,24 @@ class ZoomMeetings {
         if ($push) {
             return $push;
         } else {
+            $dataSent = [
+                "action" => "create",
+                "user_info" => [
+                    "email" => $user->email,
+                    "type" => 1,
+                    "first_name" => $user->firstName,
+                    "last_name" => $user->lastName,
+                ]
+            ];
+            $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/");
+            dd($results);
+            $push->object_id = $results['id'];
+            $push->save();
             $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
             $user->push()->save($push);
         }
-        $dataSent = [
-            "action" => "create",
-            "user_info" => [
-                "email" => $user->email,
-                "type" => 1,
-                "first_name" => $user->firstName,
-                "last_name" => $user->lastName,
-            ]
-        ];
-        $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/");
-
-        $push->object_id = $results['id'];
-        $push->save();
-        return ["status" => "success", "message" => "user must created"];
     }
- 
+
     public function updateUser(User $user) {
         $push = $user->push()->where('platform', self::PLATFORM)->first();
         if ($push) {

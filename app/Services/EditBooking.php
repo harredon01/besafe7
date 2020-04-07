@@ -24,6 +24,7 @@ class EditBooking {
     const BOOKING_STARTING = 'booking_starting';
     const BOOKING_WAITING = 'booking_waiting';
     const BOOKING_COMPLETED = 'booking_completed';
+    const VIRTUAL_BOOKING = 1;
 
     /**
      * The Guard implementation.
@@ -83,34 +84,51 @@ class EditBooking {
     public function checkBooking($data, $object) {
         $attributes = $object->attributes;
         $maxPerHour = 1;
+        $checkZoom = false;
         if (array_key_exists("max_per_hour", $attributes)) {
             $maxPerHour = $attributes['max_per_hour'];
+        }
+        if (array_key_exists("virtual_provider", $attributes)) {
+            if ($attributes['virtual_provider'] == "ZoomMeetings") {
+                $checkZoom = true;
+            }
         }
         $date = date_create($data['from']);
         date_sub($date, date_interval_create_from_date_string("1 seconds"));
         $date2 = date_create($data['to']);
         date_add($date2, date_interval_create_from_date_string("1 seconds"));
-        $array1 = $object->bookingsStartsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
-        $array2 = $object->bookingsEndsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
-        $array1 = $array1->toArray();
-        $array2 = $array2->toArray();
-        foreach ($array2 as $value) {
-            $found = false;
-            foreach ($array1 as $item) {
-                if ($item['id'] == $value['id']) {
-                    $found = true;
-                    break;
+        if ($checkZoom) {
+            $booking1 = Booking::whereBetween('starts_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
+                            ->whereColumn("price", "total_paid")->count();
+            $booking2 = Booking::whereBetween('ends_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
+                            ->whereColumn("price", "total_paid")->count();
+            if ($booking1 > self::VIRTUAL_BOOKING || $booking2 > self::VIRTUAL_BOOKING) {
+                return false;
+            }
+            return true;
+        } else {
+            $array1 = $object->bookingsStartsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
+            $array2 = $object->bookingsEndsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
+            $array1 = $array1->toArray();
+            $array2 = $array2->toArray();
+            foreach ($array2 as $value) {
+                $found = false;
+                foreach ($array1 as $item) {
+                    if ($item['id'] == $value['id']) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    array_push($array1, $value);
                 }
             }
-            if (!$found) {
-                array_push($array1, $value);
+            $totalHoping = count($array1) + 1;
+            if ($totalHoping > $maxPerHour) {
+                return false;
+            } else {
+                return true;
             }
-        }
-        $totalHoping = count($array1) + 1;
-        if ($totalHoping > $maxPerHour) {
-            return false;
-        } else {
-            return true;
         }
     }
 
@@ -122,38 +140,40 @@ class EditBooking {
     public function addBookingObject(array $data, User $user) {
         $validator = $this->validatorCreateBooking($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $type = $data['type'];
         $class = self::MODEL_PATH . $type;
-        if ($object->status != 'online' && $data['call']) {
-            return response()->json(array("status" => "error", "message" => "call only allowed to online"), 400);
-        }
 
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
+                if ($object->status != 'online' && $data['call']) {
+                    return array("status" => "error", "message" => "call only allowed to online");
+                }
                 $result = $this->checkBookingAvailability($data, $object);
                 if ($result || $data['call']) {
                     $update = [];
                     $update["notes"] = "pending";
                     $update["options"] = [];
                     $cost = 0;
-                    if (array_key_exists("location", $data)) {
-                        $update["options"]["location"] = $data['location'];
-                        if ($data['location'] == "zoom") {
-                            $cost = $object->unit_cost;
-                            $object->unit_cost = $object->unit_cost * 0.5;
-                        }
-                    }
-                    $booking = $object->newBooking($user, $data['from'], $data['to']);
-                    $attributes = $object->attributes;
-                    $requiresAuth = false;
-
                     if (array_key_exists("attributes", $data)) {
                         $update["options"] = $data["attributes"];
                     }
-
+                    $attributes = $object->attributes;
+                    if (array_key_exists("virtual_meeting", $data)) {
+                        if ($data['virtual_meeting']) {
+                            $update["options"]["virtual_meeting"] = true;
+                            if (array_key_exists("virtual_provider", $attributes)) {
+                                $update["options"]["location"] = $attributes["virtual_provider"];
+                            }
+                            $cost = $object->unit_cost;
+                            $object->unit_cost = $object->unit_cost * 0.5;
+                            $object->save();
+                        }
+                    }
+                    $booking = $object->newBooking($user, $data['from'], $data['to']);
+                    $requiresAuth = false;
                     $update["options"]["status"] = "approved";
                     $update["options"]["call"] = $data['call'];
                     if (array_key_exists("booking_requires_authorization", $attributes) && !$data['call']) {
@@ -169,6 +189,12 @@ class EditBooking {
                     unset($update['bookable']);
                     unset($update['client']);
                     Booking::where("id", $booking->id)->update($update);
+                    if (array_key_exists("virtual_meeting", $data)) {
+                        if ($data['virtual_meeting']) {
+                            $object->unit_cost = $cost;
+                            $object->save();
+                        }
+                    }
                     return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
                 }
                 return array("status" => "error", "message" => "Not available");
@@ -185,7 +211,7 @@ class EditBooking {
     public function editBookingObject(array $data, User $user) {
         $validator = $this->validatorCreateBooking($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $type = $data['type'];
         $class = self::MODEL_PATH . $type;
@@ -252,10 +278,10 @@ class EditBooking {
         if ($booking->customer_id == $user->id) {
             $owner = $object->users()->first();
             $payload['bookclient'] = $user->firstName . " " . $user->lastName;
-            $type = self::BOOKING_UPDATED_BOOKABLE_PENDING;
+            $type = self::BOOKING_CREATED_BOOKABLE_PENDING;
         } else {
             $owner = $booking->client;
-            $type = self::BOOKING_CREATED_BOOKABLE_PENDING;
+            $type = self::BOOKING_UPDATED_BOOKABLE_PENDING;
         }
         $followers = [$owner];
 
@@ -281,13 +307,13 @@ class EditBooking {
     public function changeStatusBookingObject(array $data, User $user) {
         $validator = $this->validatorStatusBookings($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $status = $data["status"];
         $booking = Booking::find($data['booking_id']);
         $object = $booking->bookable;
         if ($object) {
-            if ($object->checkAdminAccess($user)) {
+            if ($object->checkAdminAccess($user->id)) {
                 $typeAlert = "";
                 $customer = $booking->customer;
                 $options = $booking->options->toArray();
@@ -326,11 +352,11 @@ class EditBooking {
                 ];
                 $date = date("Y-m-d H:i:s");
                 $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
-                return response()->json(array("status" => "success", "message" => "Booking approved", "booking" => $booking));
+                return array("status" => "success", "message" => "Booking approved", "booking" => $booking);
             }
-            return response()->json(array("status" => "error", "message" => "Access denied"), 400);
+            return array("status" => "error", "message" => "Access denied");
         }
-        return response()->json(array("status" => "error", "message" => "Object not found"));
+        return array("status" => "error", "message" => "Object not found");
     }
 
     public function remindLates() {
@@ -427,7 +453,7 @@ class EditBooking {
                 $sessionId = $session->getSessionId();
                 $booking->options["session_id"] = $sessionId;
                 $payload["sessionId"] = $sessionId;
-                $payload["token"] = $bookableToken; 
+                $payload["token"] = $bookableToken;
             }
             if ($options['location'] == 'zoom') {
                 $zoom = app("ZoomMeetings");
@@ -437,7 +463,7 @@ class EditBooking {
             }
             $payload["location"] = $options['location'];
             array_push($users, $bookableUserContainer);
- 
+
             $followers = [$user];
             $data = [
                 "trigger_id" => $booking->id,
@@ -572,7 +598,7 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                if ($user->id == $object->user_id) {
+                if ($object->checkAdminAccess($user->id)) {
                     $serviceBooking = new Availability();
                     $dateFrom = date_create($data['from']);
                     $dateTo = date_create($data['to']);
@@ -602,7 +628,7 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                if ($user->id == $object->user_id) {
+                if ($object->checkAdminAccess($user->id)) {
                     $availability = Availability::find($data['id']);
                     if ($availability) {
                         if ($availability->bookable_id == $object->id) {
@@ -623,7 +649,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function getObjectsWithBookingUser(User $user) {
-        $query = " select id,name from merchants where user_id = $user->id and id in ( select distinct( bookable_id) from bookable_bookings )";
+        $query = " select id,name from merchants where id in (select merchant_id from merchant_user where user_id = $user->id) and id in ( select distinct( bookable_id) from bookable_bookings )";
         $objects = DB::select($query);
         return array(
             "status" => "success",
@@ -719,7 +745,7 @@ class EditBooking {
                         "message" => "",
                         "data" => $results);
                 } else {
-                    if ($user->id == $object->user_id) {
+                    if ($object->checkAdminAccess($user->id)) {
                         if ($query == "bookable_upcoming") {
                             return array(
                                 "status" => "success",
@@ -739,7 +765,10 @@ class EditBooking {
                             return array(
                                 "status" => "success",
                                 "message" => "",
-                                "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "data" => $object->futureBookings()->where(function($query) {
+                                            $query->whereColumn('price', 'total_paid')
+                                                    ->orWhere('total_paid', -1);
+                                        })->orderBy('starts_at')->with("customer")->get());
                         }
                     }
                 }
