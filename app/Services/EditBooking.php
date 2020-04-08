@@ -280,7 +280,7 @@ class EditBooking {
             $payload['bookclient'] = $user->firstName . " " . $user->lastName;
             $type = self::BOOKING_CREATED_BOOKABLE_PENDING;
         } else {
-            $owner = $booking->client;
+            $owner = $booking->customer;
             $type = self::BOOKING_UPDATED_BOOKABLE_PENDING;
         }
         $followers = [$owner];
@@ -663,7 +663,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function getBooking(User $user, $booking) {
-        $booking = Booking::find($booking);
+        $booking = $user->bookings->where('id',$booking)->first();
         if ($booking) {
             $client = $booking->customer;
             $bookable = $booking->bookable;
