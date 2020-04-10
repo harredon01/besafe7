@@ -644,7 +644,7 @@ class Food {
         if ($dayofweek > 0 && $dayofweek < 5) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         } else if ($dayofweek == 5) {
-            date_add($date, date_interval_create_from_date_string("3 days"));
+            date_add($date, date_interval_create_from_date_string("1 days"));
         } else if ($dayofweek == 6) {
             date_add($date, date_interval_create_from_date_string("2 days"));
         } else if ($dayofweek == 0) {
@@ -739,7 +739,7 @@ class Food {
                     $tempAttrs = $delivery2->details;
                     $delivery2->details = $item->details;
                     $delivery2->save();
-                    $item->details = $tempAttrs;
+                    $item->details = $tempAttrs; 
                 }
             } else {
                 $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";
