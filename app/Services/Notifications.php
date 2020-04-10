@@ -243,8 +243,16 @@ class Notifications {
                         }
                     }
                     $data['user_id'] = $user->id;
-                    $body = $data['body'];
-                    $bodyEs = $data['body_es'];
+                    if(array_key_exists('body', $data)){
+                        $body = $data['body'];
+                    }else {
+                        $body = $data['subject'];
+                    }
+                    if(array_key_exists('body_es', $data)){
+                        $bodyEs = $data['body_es'];
+                    }else {
+                        $bodyEs = $data['subject_es'];
+                    }
                     unset($data['body']);
                     unset($data['body_es']);
                     $notification = new Notification($data);

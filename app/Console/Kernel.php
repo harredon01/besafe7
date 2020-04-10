@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->call('App\Http\Controllers\BookingApiController@remindLates')->everyFiveMinutes();
 //        $schedule->call('App\Http\Controllers\BookingApiController@sendStartReminder')->everyFiveMinutes();
         $schedule->call('App\Http\Controllers\BookingApiController@terminateOpenChatRooms')->everyFiveMinutes();
-        $schedule->call('App\Http\Controllers\BookingApiController@startMeeting')->everyMinute();
+//        $schedule->call('App\Http\Controllers\BookingApiController@startMeeting')->everyMinute();
         //$schedule->call('App\Http\Controllers\RapigoController@getActiveRoutesUpdate')->everyFiveMinutes();
         
 //        $schedule->call('App\Http\Controllers\FoodController@reprogramDeliveries')->hourly();

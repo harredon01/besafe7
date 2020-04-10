@@ -33,6 +33,7 @@ class EditOrder {
     const PAYMENT_APPROVED = 'payment_approved';
     const PAYMENT_STATUS = 'payment_status';
     const ORDER_STATUS = 'order_status';
+    const ORDER_STATUS_MERCHANT = 'order_status_Merchant';
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'Food';
 
@@ -880,13 +881,18 @@ class EditOrder {
      */
     public function OrderStatusUpdate(Order $order) {
         $followers = [];
+        $admins = [];
         $payments = $order->payments()->with('user')->get();
         $merchant = $order->merchant;
         if ($merchant) {
-            $admins = $merchant->users;
+            $admins2 = $merchant->users;
+            foreach ($admins2 as $value) {
+                array_push($admins, $value);
+            }
         } else {
-            $admins = User::whereIn("id", [2, 77])->get();
+            //$admins = User::whereIn("id", [2, 77])->get();
         }
+        
         $sendEmail = true;
         if ($order->status == "approved") {
             $shipping = $order->orderAddresses()->where("type", "shipping")->first();
@@ -924,6 +930,31 @@ class EditOrder {
             ];
             $date = date("Y-m-d H:i:s");
             $this->notifications->sendMassMessage($data, $followers, null, true, $date, $sendEmail);
+        }
+        if ($order->status == "approved") {
+            $followers = $admins;
+            $payload = [
+                "order_id" => $order->id,
+                "payment_id" => $item->id,
+                "payment_total" => $item->total,
+                "payment_status" => $item->status,
+                "order_total" => $order->total,
+                "order_status" => $order->status,
+                "object_name" => $merchant->name,
+                "object_type" => ""
+            ];
+            $data = [
+                "trigger_id" => $order->id,
+                "message" => "",
+                "subject" => "",
+                "object" => self::OBJECT_ORDER,
+                "sign" => true,
+                "payload" => $payload,
+                "type" => self::ORDER_STATUS_MERCHANT,
+                "user_status" => "normal"
+            ];
+            $date = date("Y-m-d H:i:s");
+            $this->notifications->sendMassMessage($data, $followers, null, true, $date, false);
         }
     }
 

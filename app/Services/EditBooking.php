@@ -328,7 +328,9 @@ class EditBooking {
                     $typeAlert = self::BOOKING_BOOKABLE_APPROVED;
                 } elseif ($status == "denied") {
                     $updateData["total_paid"] = -1;
-                    $updateData["options"]["reason"] = $data["reason"];
+                    if(array_key_exists("reason", $data)){
+                        $updateData["options"]["reason"] = $data["reason"];
+                    }
                     $typeAlert = self::BOOKING_BOOKABLE_DENIED;
                 }
                 $options = $updateData["options"];
@@ -501,7 +503,7 @@ class EditBooking {
             $bookable->status = "busy";
             $bookable->save();
             $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'ready', 'total_paid' => $booking->total_paid]);
+            Booking::where("id", $booking->id)->update(['notes' => 'ready', 'total_paid' => $booking->price]);
         }
     }
 
@@ -663,7 +665,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function getBooking(User $user, $booking) {
-        $booking = $user->bookings->where('id',$booking)->first();
+        $booking = Booking::where('id', $booking)->first();
         if ($booking) {
             $client = $booking->customer;
             $bookable = $booking->bookable;
@@ -671,8 +673,10 @@ class EditBooking {
             if ($user->id == $client->id) {
                 $send = true;
             }
-            if ($bookable->checkAdminAccess($user->id)) {
-                $send = true;
+            if (!$send) {
+                if ($bookable->checkAdminAccess($user->id)) {
+                    $send = true;
+                }
             }
             if ($send) {
                 return array(
