@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Http\Request;
 use Stripe\Event as StripeEvent;
-use App\Services\PayU;
+use App\Services\ZoomMeetings;
 use App\Services\Stripe;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +17,7 @@ class WebhookController extends Controller {
      *
      * @var \Illuminate\Contracts\Auth\Guard
      */
-    protected $payU;
+    protected $zoom;
 
     /**
      * The Guard implementation.
@@ -32,8 +32,8 @@ class WebhookController extends Controller {
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct(PayU $payU, Stripe $stripe) {
-        $this->payU = $payU;
+    public function __construct(ZoomMeetings $zoom, Stripe $stripe) {
+        $this->zoom = $zoom;
         $this->stripe = $stripe;
     }
 
@@ -48,9 +48,9 @@ class WebhookController extends Controller {
         $this->stripe->webhook($payload);
     }
 
-    public function handleWebhookPayu(Request $request) {
+    public function handleWebhookZoom(Request $request) {
         $payload = json_decode($request->getContent(), true);
-        $this->payu->webhook($payload);
+        $this->zoom->webhook($payload);
     }
 
     /**

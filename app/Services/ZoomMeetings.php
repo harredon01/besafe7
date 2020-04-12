@@ -53,11 +53,13 @@ class ZoomMeetings {
                 ]
             ];
             $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/");
-            dd($results);
-            $push->object_id = $results['id'];
-            $push->save();
-            $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
+            if ($results['code'] == 1005) {
+                $push = new Push(["platform" => self::PLATFORM, "object_id" => "NrSfO34eR32Y68d6VrhqFw"]);
+            } else {
+                $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
+            }
             $user->push()->save($push);
+            return $push;
         }
     }
 
@@ -97,7 +99,7 @@ class ZoomMeetings {
                 $type = 1;
             }
             $dataSent = [
-                "topic" => "Meeting with: " . $booking->bookable->name,
+                "topic" => $booking->id,
                 "type" => $type,
                 "password" => "test",
                 "agenda" => "",
@@ -116,22 +118,16 @@ class ZoomMeetings {
                 $dataSent["duration"] = $duration;
             }
             $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/" . $push->object_id . "/meetings");
+            return $results;
         }
+        return null;
     }
 
     public function endMeeting($meeting) {
-        $bankListInformation = [
-            "paymentMethod" => "PSE",
-            "paymentCountry" => "CO"
-        ];
         $dataSent = [
-            "language" => "es",
-            "command" => "GET_BANKS_LIST",
-            "merchant" => $merchant,
-            "bankListInformation" => $bankListInformation,
-            "test" => false,
+            "action" => "end",
         ];
-        return $this->sendRequest($dataSent, $this->getTestUrl($meeting) . "meetins/" . $meeting . "/status");
+        return $this->sendPut($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting . "/status");
     }
 
     public function addUserToMeeting(User $user) {
@@ -169,9 +165,9 @@ class ZoomMeetings {
         $auth = env('ZOOM_JWT');
         $headers = array(
             'Content-Type: application/json; charset=utf-8',
-            'Content-Length: ' . strlen($data_string),
-            'Accept: application/json',
-            'Accept-language: es',
+            // 'Content-Length: ' . strlen($data_string),
+            // 'Accept: application/json',
+            //  'Accept-language: es',
             'Authorization: Bearer ' . $auth,
         );
         return $headers;
@@ -191,10 +187,13 @@ class ZoomMeetings {
         return $response;
     }
 
-    public function sendGet($query, array $data) {
+    public function sendGet($query, $data) {
         $data_string = json_encode($data);
-        $curl = curl_init($query);
         $headers = $this->getHeaders($data_string);
+        if ($data) {
+            $query = $query . "?" . http_build_query($data);
+        }
+        $curl = curl_init($query);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers
         );
@@ -257,68 +256,31 @@ class ZoomMeetings {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function webhook(array $data) {
-//        $file = '/home/hoovert/access.log';
-//        // Open the file to get existing content
-//        $current = file_get_contents($file);
-//        //$daarray = json_decode(json_encode($data));
-//        // Append a new person to the file
-//
-//        $current .= json_encode($data);
-//        $current .= PHP_EOL;
-//        $current .= PHP_EOL;4Vj8eK4rloUd272L48hsrarnUA~508029~payment_42_order_43_1543377788~72000.0~COP~4
-//        $current .= PHP_EOL;
-//        $current .= PHP_EOL;
-//        file_put_contents($file, $current);
-        $ApiKey = env('PAYU_KEY');
-        $transactionId = $data['transaction_id'];
-        $merchant_id = $data['merchant_id'];
-        $referenceCode = $data['reference_sale'];
-        $TX_VALUE = $data['value'];
-        $New_value = number_format($TX_VALUE, 1, '.', '');
-        $currency = $data['currency'];
-        $transactionState = $data['state_pol'];
-        $firma_cadena = "$ApiKey~$merchant_id~$referenceCode~$New_value~$currency~$transactionState";
-        //dd($firma_cadena);
-        $firmacreada = sha1($firma_cadena);
-        $firma = $data['sign'];
-        if ($firmacreada == $firma) {
-            $transactionExists = Transaction::where("transaction_id", $transactionId)->where('gateway', 'PayU')->first();
-            if ($transactionExists) {
-                return ["status" => "success", "message" => "transaction already processed", "data" => $data];
-            }
-            $payment = Payment::where("referenceCode", $referenceCode)->first();
-            if ($payment) {
-                $data['user_id'] = $payment->user_id;
-                $data['order_id'] = $payment->order_id;
-                $transaction = $this->saveTransactionConfirmacion($data, $payment);
-                if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment, "Food"));
-                } else {
-                    dispatch(new DenyPayment($payment, "Food"));
-                }
-            } else {
-                if (array_key_exists("reference_recurring_payment", $data)) {
-                    if ($data['state_pol'] == 4) {
-                        $results = explode("_", $data["reference_recurring_payment"]);
-                        $subscriptionL = Subscription::where("source_id", $results[0])->first();
-                        if ($subscriptionL) {
-                            $subscriptionL->ends_at = Date($data['date_next_payment']);
-                            $objectType = "App\\Models\\" . $subscriptionL->type;
-                            $object = new $objectType;
-                            $target = $object->find($subscriptionL->object_id);
-                            if ($target) {
-                                $target->ends_at = $subscriptionL->ends_at;
-                                $target->save();
-                            }
-                            $subscriptionL->save();
-                        }
-                    }
-                }
-            }
+        $file = '/home/hoovert/access.log';
+        // Open the file to get existing content
+        $current = file_get_contents($file);
+        //$daarray = json_decode(json_encode($data));
+        // Append a new person to the file
 
-            return ["status" => "success", "message" => "transaction processed", "data" => $data];
-        } else {
-            return ["status" => "error", "message" => "signature", "data" => $data];
+        $current .= json_encode($data);
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        $current .= PHP_EOL;
+        file_put_contents($file, $current);
+        if ($data['event'] == "meeting.started") {
+            $bookingId = $data['payload']['object']['topic'];
+            $booking = Booking::find($bookingId);
+            Booking::where("id", $booking->id)->update(['notes' => 'started', 'total_paid' => $booking->price]);
+            return ["status" => "success", "message" => "transaction processed"];
+        } else if ($data['event'] == "meeting.ended") {
+            $bookingId = $data['payload']['object']['topic'];
+            $booking = Booking::find($bookingId);
+            $bookable = $booking->bookable;
+            $bookable->status = "online";
+            $bookable->save();
+            Booking::where("id", $booking->id)->update(['notes' => 'ended', 'total_paid' => $booking->price]);
+            return ["status" => "success", "message" => "transaction processed"];
         }
     }
 

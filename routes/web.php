@@ -14,6 +14,18 @@
 Route::get('/', function () {
     return view('lonchis');
 });
+Route::get('/test', function () {
+    return view('lonchis2');
+});
+Route::get('/faq', function () {
+    return view('faq');
+});
+Route::get('/blog', function () {
+    return view('blog');
+});
+Route::get('/blog/{slug?}', function () {
+    return view('blog-detail');
+});
 Route::get('/terms', function () {
     return view('content.terms');
 });
@@ -161,7 +173,7 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
 }); 
-Route::get('/newsletter_paella', function () {
+Route::get('/newsletter_santa', function () {
     return new App\Mail\Newsletter();
 }); 
 Route::get('/newsletter_sancho', function () {
