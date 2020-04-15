@@ -97,7 +97,7 @@
         }
         
         nav.navbar .logo img {
-            max-height: 41px !important;
+            max-height: 55px !important;
         }
     </style>
     <!--[if lt IE 9]><link rel='stylesheet' id='vc_lte_ie9-css'  href='http://fitmeal.like-themes.com/wp-content/plugins/js_composer/assets/css/vc_lte_ie9.min.css' type='text/css' media='screen' /> <![endif]-->
@@ -172,11 +172,11 @@
                 <nav class="navbar" data-spy="affix" data-offset-top="0">
                     <div class="container">
                         <div class="navbar-logo ">
-                            <a class="logo" href="/"><img src="assets/img/icon/logo-lonchis.png" alt="Lonchis"></a>
+                            <a class="logo" href="/"><img src="/fitmeal/images/logotranparenteazul300.82.png" alt="Lonchis"></a>
                         </div>
                         <div id="navbar" class="navbar-collapse collapse" data-mobile-screen-width="1200">
                             <div class="toggle-wrap">
-                                <a class="logo" href="/"><img src="assets/img/icon/logo-lonchis.png" alt="Lonchis"></a>
+                                <a class="logo" href="/"><img src="/fitmeal/images/logotranparenteazul300.82.png" alt="Lonchis"></a>
                                 <button type="button" class="navbar-toggle collapsed"> <span class="close">&times;</span> </button>
                                 <div class="clearfix"></div>
                             </div>
@@ -204,7 +204,7 @@
                                         </li>
                                     </ul-->
                                 </li>
-                                <li id="menu-item-619" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-619"><a href="products"><span>Planes</span></a>
+                                <li id="menu-item-619" style="display:none" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-619"><a href="products"><span>Planes</span></a>
                                     <!--ul class="sub-menu">
                                         <li id="menu-item-623" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-623"><a href="http://fitmeal.like-themes.com/shop/"><span>Shop</span></a></li>
                                         <li id="menu-item-622" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-622"><a href="http://fitmeal.like-themes.com/cart/"><span>Cart</span></a></li>
@@ -220,7 +220,7 @@
                                         <li id="menu-item-620" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-620"><a href="http://fitmeal.like-themes.com/my-account/"><span>My account</span></a></li>
                                     </ul-->
                                 </li>
-                                <li id="menu-item-59" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-59"><a href="blog"><span>Blog</span></a>
+                                <li id="menu-item-59" style="display:none" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-59"><a href="blog"><span>Blog</span></a>
                                     <!--ul class="sub-menu">
                                         <li id="menu-item-3976" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-3976"><a href="#"><span>Blog with Sidebar</span></a>
                                             <ul class="sub-menu">
@@ -273,7 +273,7 @@
                                         </ul>
                                     </div>
                                 </li-->
-                                <li id="menu-item-10317" class="ltx-menu-button menu-item menu-item-type-custom menu-item-object-custom menu-item-10317"><a href="nuestro-menu"><span>Ver Menu</span></a></li>
+                                <li id="menu-item-10317" class="ltx-menu-button menu-item menu-item-type-custom menu-item-object-custom menu-item-10317"><a href="https://app.lonchis.com.co"><span>Ver Menu</span></a></li>
                             </ul>
                             <div class="mobile-controls"></div>
                         </div>
@@ -297,7 +297,7 @@
                             <div id="text-14" class="widget widget_text">
                                 <div class="textwidget">
                                     <p>
-                                        <a class="logo" href="http://fitmeal.like-themes.com/"><img src="http://fitmeal.like-themes.com/wp-content/themes/fitmeal/assets/images/logo-white.png" alt="FitMeal"></a>
+                                        <a class="logo" href="http://fitmeal.like-themes.com/"><img src="/fitmeal/images/logoblancotransparente300.png" alt="FitMeal"></a>
                                         <br /> Toma control sobre tu nutrición con Lonchis. Come saludable, hogareño y práctico. </p>
                                 </div>
                             </div>
@@ -320,10 +320,10 @@
                                 <div class="menu-footer-menu-container">
                                     <ul id="menu-footer-menu" class="menu">
                                         <li id="menu-item-11179" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-11179"><a href="/">Home</a></li>
-                                        <li id="menu-item-11180" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11180"><a href="blog">Blog</a></li>
-                                        <li id="menu-item-11177" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11177"><a href="products">Planes</a></li>
+                                        <li id="menu-item-11180" style="display:none" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11180"><a href="blog">Blog</a></li>
+                                        <li id="menu-item-11177" style="display:none" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11177"><a href="products">Planes</a></li>
                                         <li id="menu-item-11178" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11178"><a href="zones">Cobertura</a></li>
-                                        <li id="menu-item-11181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11181"><a href="menu">Menu</a></li>
+                                        <li id="menu-item-11181" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11181"><a href="https://app.lonchis.com.co">Menu</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -346,22 +346,22 @@
                                 <h3 class="header-widget "><span class="widget-icon"></span>Instagram<span class="last widget-icon"></span></h3>
                                 <ul class="zoom-instagram-widget__items zoom-instagram-widget__items--no-js" data-images-per-row="3" data-image-width="100" data-image-spacing="15" data-image-lazy-loading="">
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/71523965_150235036189417_1697624314342557960_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=ZFI9ROnb8hYAX-A1zxX&oh=08e1333cb38c25d17fc975cdc110a7af&oe=5EB8B30C" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/71523965_150235036189417_1697624314342557960_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=ZFI9ROnb8hYAX-A1zxX&oh=08e1333cb38c25d17fc975cdc110a7af&oe=5EB8B30C');" href="https://www.instagram.com/p/B3YEmIYg5Bw/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/71523965_150235036189417_1697624314342557960_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=ZFI9ROnb8hYAX-A1zxX&oh=08e1333cb38c25d17fc975cdc110a7af&oe=5EB8B30C" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/71523965_150235036189417_1697624314342557960_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=ZFI9ROnb8hYAX-A1zxX&oh=08e1333cb38c25d17fc975cdc110a7af&oe=5EB8B30C');" href="https://www.instagram.com/p/B9SPYfZJl5d/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70939523_136260674345917_4486216497294357438_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=SCVrYSim0HEAX-FZNiJ&oh=95f7816b400460f063fbd1b75c6591e7&oe=5EB8894D" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70939523_136260674345917_4486216497294357438_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=SCVrYSim0HEAX-FZNiJ&oh=95f7816b400460f063fbd1b75c6591e7&oe=5EB8894D');" href="https://www.instagram.com/p/B3YElG4gn_P/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70939523_136260674345917_4486216497294357438_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=SCVrYSim0HEAX-FZNiJ&oh=95f7816b400460f063fbd1b75c6591e7&oe=5EB8894D" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70939523_136260674345917_4486216497294357438_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=101&_nc_ohc=SCVrYSim0HEAX-FZNiJ&oh=95f7816b400460f063fbd1b75c6591e7&oe=5EB8894D');" href="https://www.instagram.com/p/B8ZjnOhp9iN/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/73095499_2988697821141463_1781670075092872348_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=107&_nc_ohc=9UIaikBrMcYAX8_eixC&oh=01eab3198fe2c1851d36bb47ce690d4a&oe=5EB8E626" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/73095499_2988697821141463_1781670075092872348_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=107&_nc_ohc=9UIaikBrMcYAX8_eixC&oh=01eab3198fe2c1851d36bb47ce690d4a&oe=5EB8E626');" href="https://www.instagram.com/p/B3YEkBTgv34/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/73095499_2988697821141463_1781670075092872348_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=107&_nc_ohc=9UIaikBrMcYAX8_eixC&oh=01eab3198fe2c1851d36bb47ce690d4a&oe=5EB8E626" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/73095499_2988697821141463_1781670075092872348_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=107&_nc_ohc=9UIaikBrMcYAX8_eixC&oh=01eab3198fe2c1851d36bb47ce690d4a&oe=5EB8E626');" href="https://www.instagram.com/p/B-YFH-opue8/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70940676_221250178871496_6725541057980006745_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=FX90jW5O6yYAX_icbtf&oh=b32f1989d7494e6704a5f0fd2b5f0121&oe=5EBA3ACB" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70940676_221250178871496_6725541057980006745_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=FX90jW5O6yYAX_icbtf&oh=b32f1989d7494e6704a5f0fd2b5f0121&oe=5EBA3ACB');" href="https://www.instagram.com/p/B3YEivSADyZ/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70940676_221250178871496_6725541057980006745_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=FX90jW5O6yYAX_icbtf&oh=b32f1989d7494e6704a5f0fd2b5f0121&oe=5EBA3ACB" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70940676_221250178871496_6725541057980006745_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=FX90jW5O6yYAX_icbtf&oh=b32f1989d7494e6704a5f0fd2b5f0121&oe=5EBA3ACB');" href="https://www.instagram.com/p/B9ZttKJpkYt/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70151251_2302148403448209_376334770803557213_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Co2Du5-mGUkAX9epJjT&oh=909d38b468e647ef936fad2fc7516bdf&oe=5EBADFFB" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70151251_2302148403448209_376334770803557213_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Co2Du5-mGUkAX9epJjT&oh=909d38b468e647ef936fad2fc7516bdf&oe=5EBADFFB');" href="https://www.instagram.com/p/B3YEhmUAtlT/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70151251_2302148403448209_376334770803557213_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Co2Du5-mGUkAX9epJjT&oh=909d38b468e647ef936fad2fc7516bdf&oe=5EBADFFB" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/70151251_2302148403448209_376334770803557213_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=109&_nc_ohc=Co2Du5-mGUkAX9epJjT&oh=909d38b468e647ef936fad2fc7516bdf&oe=5EBADFFB');" href="https://www.instagram.com/p/BzjOl8iBtz2/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                     <li class="zoom-instagram-widget__item">
-                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/69931860_399936497292648_1584179516394770139_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=GVMkUPyp7t8AX8caHie&oh=e0f891fb8361a2ec9afd084bdd6e8946&oe=5EB94159" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/69931860_399936497292648_1584179516394770139_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=GVMkUPyp7t8AX8caHie&oh=e0f891fb8361a2ec9afd084bdd6e8946&oe=5EB94159');" href="https://www.instagram.com/p/B3YEgACArg1/" target="_blank" rel="noopener" title=""> </a>
+                                        <a class='zoom-instagram-link' data-src="https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/69931860_399936497292648_1584179516394770139_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=GVMkUPyp7t8AX8caHie&oh=e0f891fb8361a2ec9afd084bdd6e8946&oe=5EB94159" style="width:100px;height:100px;background-image: url('https://instagram.fiev11-1.fna.fbcdn.net/v/t51.2885-15/e35/s150x150/69931860_399936497292648_1584179516394770139_n.jpg?_nc_ht=instagram.fiev11-1.fna.fbcdn.net&_nc_cat=100&_nc_ohc=GVMkUPyp7t8AX8caHie&oh=e0f891fb8361a2ec9afd084bdd6e8946&oe=5EB94159');" href="https://www.instagram.com/p/B45P6h8pit0/" target="_blank" rel="noopener" title=""> </a>
                                     </li>
                                 </ul>
                                 <div style="clear:both;"></div>
