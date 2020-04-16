@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
-    <title>Homepage Healthy food &#8211; FitMeal</title>
+    <title>Lonchis comida saludable</title>
     <script type='text/javascript' src='/fitmeal/js/jquery.js'></script>
     <style type="text/css" data-type="vc_shortcodes-custom-css">
         .vc_custom_1570740304421 {
@@ -117,6 +117,17 @@
             }
         </style>
     </noscript>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-139655421-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+
+            gtag('config', 'UA-139655421-1');
+        </script>
 </head>
 
 <body class="page-template page-template-page-templates page-template-full-width page-template-page-templatesfull-width-php page page-id-10921 theme-fitmeal woocommerce-no-js tribe-no-js full-width singular paceloader-enabled no-sidebar wpb-js-composer js-comp-ver-6.0.5 vc_responsive">
