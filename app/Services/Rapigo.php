@@ -85,6 +85,12 @@ class Rapigo {
         $date = date_create($deliveries[0]->delivery);
         $data['fecha_servicio'] = date_format($date, "m/d/Y");
         $data['hora_servicio'] = "08:45";
+//        foreach ($points as $value) {
+//            $result = $this->checkAddress($value['address']);
+//            if(!$result['result']){
+//                dd($value['address']);
+//            }
+//        }
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_PROD') . "api/bogota/request_service/";

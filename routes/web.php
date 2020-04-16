@@ -14,6 +14,18 @@
 Route::get('/', function () {
     return view('lonchis');
 });
+Route::get('/test', function () {
+    return view('lonchis2');
+});
+Route::get('/faq', function () {
+    return view('faq');
+});
+Route::get('/blog', function () {
+    return view('blog');
+});
+Route::get('/blog/{slug?}', function () {
+    return view('blog-detail');
+});
 Route::get('/terms', function () {
     return view('content.terms');
 });
@@ -161,7 +173,7 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
 }); 
-Route::get('/newsletter_paella', function () {
+Route::get('/newsletter_santa', function () {
     return new App\Mail\Newsletter();
 }); 
 Route::get('/newsletter_sancho', function () {
@@ -188,7 +200,7 @@ Route::get('/newsletter_menu', function () {
     $days =$gateway->getDataNewsletter();
     return new App\Mail\NewsletterMenus($days,"Marzo","Marzo");
 });
-Route::get('/newsletter_2', function () {
+Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();
 });
 Route::get('/newsletter_4', function () {
