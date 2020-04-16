@@ -313,3 +313,5 @@ Route::post('runner/route/complete', 'RunnerApiController@postRouteCompleted');
 Route::post('runner/stop/arrived', 'RunnerApiController@postStopArrived');
 Route::post('runner/stop/failed', 'RunnerApiController@postStopFailed');
 Route::post('runner/stop/complete', 'RunnerApiController@postStopCompleted');
+
+Route::post('zoom/webhook', 'ZoomController@webhook');
