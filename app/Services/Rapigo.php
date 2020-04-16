@@ -42,7 +42,7 @@ class Rapigo {
         //dd($points);
         foreach ($points as $value) {
             $result = $this->checkAddress($value['address']);
-            if(!$result['result']){
+            if (!$result['result']) {
                 dd($value['address']);
             }
         }
@@ -74,7 +74,7 @@ class Rapigo {
         $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         //dd($query);
         $response = $this->sendPost($data, $query);
-        $response['status']="success"; 
+        $response['status'] = "success";
         return $response;
     }
 
@@ -85,44 +85,54 @@ class Rapigo {
         $date = date_create($deliveries[0]->delivery);
         $data['fecha_servicio'] = date_format($date, "m/d/Y");
         $data['hora_servicio'] = "08:45";
-//        foreach ($points as $value) {
-//            $result = $this->checkAddress($value['address']);
-//            if(!$result['result']){
-//                dd($value['address']);
-//            }
-//        }
+        foreach ($points as $value) {
+            $result = $this->checkAddress($value['address']);
+            if(!$result['result']){
+                dd($value['address']);
+            }
+        }
 
         $data['points'] = json_encode($points);
         $query = env('RAPIGO_PROD') . "api/bogota/request_service/";
         //dd($data);
+        $stopCodes = null;
         $serviceBookResponse = $this->sendPost($data, $query);
-        if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
-            $stopCodes = $serviceBookResponse['paradas_referencia'];
-            $route->provider_id = $serviceBookResponse['key'];
-            $location = [
-                "runner" => "",
-                "runner_phone" => "",
-                "lat" => 0,
-                "long" => 0
-            ];
-            $serviceBookResponse["location"] = $location;
-            $route->coverage = json_encode($serviceBookResponse);
-            $i = 0;
-            foreach ($stops as $stop) {
-                $totals = $stop->totals;
-                $deliveries = $stop->deliveries;
-                unset($stop->totals);
-                unset($stop->deliveries);
-                $stop->code = $stopCodes[$i]['ref_parada'];
-                $stop->status = "pending";
-                $stop->save();
-                $stop->totals = $totals;
-                $stop->deliveries = $deliveries;
-                $i++;
+        if ($serviceBookResponse) {
+            if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
+                $stopCodes = $serviceBookResponse['paradas_referencia'];
             }
-            $route->status = "built";
-            $route->save();
+        } else {
+            $serviceBookResponse = [];
         }
+
+        if ($stopCodes) {
+            $route->provider_id = $serviceBookResponse['key'];
+        }
+        $location = [
+            "runner" => "",
+            "runner_phone" => "",
+            "lat" => 0,
+            "long" => 0
+        ];
+        $serviceBookResponse["location"] = $location;
+        $route->coverage = json_encode($serviceBookResponse);
+        $i = 0;
+        foreach ($stops as $stop) {
+            $totals = $stop->totals;
+            $deliveries = $stop->deliveries;
+            unset($stop->totals);
+            unset($stop->deliveries);
+            if($stopCodes){
+                $stop->code = $stopCodes[$i]['ref_parada'];
+            }
+            $stop->status = "pending";
+            $stop->save();
+            $stop->totals = $totals;
+            $stop->deliveries = $deliveries;
+            $i++;
+        }
+        $route->status = "built";
+        $route->save();
 
         $route->stops = $stops;
         return $route;
@@ -225,7 +235,7 @@ class Rapigo {
         if ($route) {
             $route->status = "complete";
             $route->save();
-        }else {
+        } else {
             return $data;
         }
     }
@@ -234,7 +244,7 @@ class Rapigo {
         $route = Route::where("provider_id", $data["key"])->with("deliveries")->first();
         if ($route) {
             $route->status = "transit";
-            $route->save(); 
+            $route->save();
             foreach ($route->deliveries as $delivery) {
                 $delivery->status = "transit";
                 $delivery->save();

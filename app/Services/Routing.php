@@ -22,7 +22,7 @@ use Excel;
 class Routing {
 
     const OBJECT_ORDER = 'Order';
-    const CREDIT_PRICE = 14000; 
+    const CREDIT_PRICE = 14000;
     const LUNCH_ROUTE = 16;
     const LUNCH_PROFIT = 1100;
     const ROUTE_HOUR_COST = 11000;
@@ -56,7 +56,7 @@ class Routing {
         $oldRoute->unit_price -= $stop->shipping;
         $oldRoute->save();
         $newRoute = Route::find($route);
-        $newRoute->unit+= $stop->amount;
+        $newRoute->unit += $stop->amount;
         $newRoute->unit_price += $stop->shipping;
         $newRoute->save();
         $stop->route_id = $newRoute->id;
@@ -233,8 +233,12 @@ class Routing {
             } else if ($route->provider == "Basilikum") {
                 $rapigoResponse = $basilikum->getEstimate($queryStops);
             }
-            if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
-                $routeCost = $rapigoResponse['price'];
+            if (array_key_exists("price", $rapigoResponse)) {
+                if ((self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST) > $rapigoResponse['price']) {
+                    $routeCost = $rapigoResponse['price'];
+                }
+            } else {
+                $routeCost =self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             }
             $route->unit_price = $income;
             $route->unit_cost = $routeCost;
