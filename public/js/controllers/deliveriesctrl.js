@@ -15,11 +15,9 @@
 
                 let date = new Date();
                 let day = date.getDay();
-                if (day < 5) {
+                if (day < 6) {
                     date.setDate(date.getDate() + 1);
-                } else if (day == 5) {
-                    date.setDate(date.getDate() + 3);
-                } else if (day == 6) {
+                }  else if (day == 6) {
                     date.setDate(date.getDate() + 2);
                 }
                 $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
@@ -154,23 +152,25 @@
                         $scope.deliveries[item].build = false;
                         $scope.deliveries[item].type_id = attributes.dish.type_id;
                         let article = $scope.getArticle(attributes.dish.type_id);
-                        attributes.tipoAlmuerzo = article.name;
-                        for (item2 in article.attributes.entradas) {
-                            if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
-                                attributes.entrada = article.attributes.entradas[item2].valor;
-                                $scope.deliveries[item].starter_id = attributes.dish.starter_id;
+                        if (article) {
+                            attributes.tipoAlmuerzo = article.name;
+                            for (item2 in article.attributes.entradas) {
+                                if (article.attributes.entradas[item2].codigo == attributes.dish.starter_id) {
+                                    attributes.entrada = article.attributes.entradas[item2].valor;
+                                    $scope.deliveries[item].starter_id = attributes.dish.starter_id;
+                                }
                             }
-                        }
-                        for (item3 in article.attributes.plato) {
-                            if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
-                                attributes.plato = article.attributes.plato[item3].valor;
-                                $scope.deliveries[item].main_id = attributes.dish.main_id;
+                            for (item3 in article.attributes.plato) {
+                                if (article.attributes.plato[item3].codigo == attributes.dish.main_id) {
+                                    attributes.plato = article.attributes.plato[item3].valor;
+                                    $scope.deliveries[item].main_id = attributes.dish.main_id;
+                                }
                             }
+                            delete attributes.dish;
+                            delete attributes.products;
+                            delete attributes.merchant_id;
+                            $scope.deliveries[item].details = attributes;
                         }
-                        delete attributes.dish;
-                        delete attributes.products;
-                        delete attributes.merchant_id;
-                        $scope.deliveries[item].details = attributes;
                         console.log("deliveryDone", $scope.deliveries[item].id);
                     } else {
                         $scope.deliveries[item].type_id = null;
@@ -201,15 +201,15 @@
                 }
                 item.details = attributes;
                 let container = {
-                    "delivery_id":item.id,
-                    "type_id":item.type_id,
-                    "main_id":item.main_id
+                    "delivery_id": item.id,
+                    "type_id": item.type_id,
+                    "main_id": item.main_id
                 };
-                if(item.starter_id){
+                if (item.starter_id) {
                     container.starter_id = item.starter_id;
                 }
                 item.build = false;
-                console.log("Updating dish: ",container);
+                console.log("Updating dish: ", container);
                 Food.updateMissingDish(container);
             }
             $scope.getArticles = function (date) {
