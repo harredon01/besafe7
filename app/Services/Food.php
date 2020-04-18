@@ -376,7 +376,7 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Visita tu correo para enterarte de nuestros menus de esta semana",
+                "subject" => "Visita tu correo para enterarte de nuestros menus de fin de semana",
                 "object" => "Lonchis",
                 "sign" => true, 
                 "payload" => $payload,
@@ -389,8 +389,8 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
-                //Mail::to($user->email)->send(new Newsletter()); 
+                //Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
+                Mail::to($user->email)->send(new Newsletter()); 
             }
         }
     }
