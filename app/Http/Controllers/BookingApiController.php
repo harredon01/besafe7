@@ -39,6 +39,15 @@ class BookingApiController extends Controller
      *
      * @return Response
      */
+    public function getCheckExistingBookingObject(Request $request,$code) {
+        $user = $request->user();
+        return response()->json($this->editBooking->checkExistingBooking($user, $code));
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function postEditBookingObject(Request $request) {
         $user = $request->user();
         $data = $request->all();
@@ -128,6 +137,14 @@ class BookingApiController extends Controller
      */
     public function sendStartReminder() {
         return $this->editBooking->sendStartReminder();
+    }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function deleteOldBookings() {
+        return $this->editBooking->deleteOldBookings();
     }
     /**
      * Store a newly created resource in storage.

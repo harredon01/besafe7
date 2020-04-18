@@ -301,6 +301,7 @@ Route::post('bookings', 'BookingApiController@postAddBookingObject');
 Route::post('bookings/edit', 'BookingApiController@postEditBookingObject');
 Route::post('bookings/now', 'BookingApiController@postImmediateBookingObject');
 Route::post('bookings/status', 'BookingApiController@postChangeStatusBookingObject');
+Route::get('bookings/{code?}/check', 'BookingApiController@getCheckExistingBookingObject');
 Route::post('bookings/schedule', 'BookingApiController@postRescheduleBookingObject');
 Route::post('bookings/connection', 'BookingApiController@postRegisterConnection');
 Route::post('bookings/connection_end', 'BookingApiController@postleaveChatroom');
