@@ -173,7 +173,7 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
 }); 
-Route::get('/newsletter_santa', function () {
+Route::get('/newsletter_sabado', function () {
     return new App\Mail\Newsletter();
 }); 
 Route::get('/newsletter_sancho', function () {

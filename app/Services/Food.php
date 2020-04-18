@@ -376,7 +376,7 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Visita tu correo para enterarte de nuestros menus de esta semana",
+                "subject" => "Visita tu correo para enterarte de nuestros menus de fin de semana",
                 "object" => "Lonchis",
                 "sign" => true, 
                 "payload" => $payload,
@@ -389,8 +389,8 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
-                //Mail::to($user->email)->send(new Newsletter()); 
+                //Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
+                Mail::to($user->email)->send(new Newsletter()); 
             }
         }
     }
@@ -641,9 +641,7 @@ class Food {
 
     public function getNextValidDate($date) {
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek > 0 && $dayofweek < 5) {
-            date_add($date, date_interval_create_from_date_string("1 days"));
-        } else if ($dayofweek == 5) {
+        if ($dayofweek > 0 && $dayofweek < 6) {
             date_add($date, date_interval_create_from_date_string("1 days"));
         } else if ($dayofweek == 6) {
             date_add($date, date_interval_create_from_date_string("2 days"));
