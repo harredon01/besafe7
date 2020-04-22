@@ -912,6 +912,7 @@ class EditOrder {
             array_push($followers, $user);
             $payload = [
                 "order_id" => $order->id,
+                "merchant_id" => $order->merchant_id,
                 "payment_id" => $item->id,
                 "payment_total" => $item->total,
                 "payment_status" => $item->status,
@@ -937,6 +938,7 @@ class EditOrder {
                 "order_id" => $order->id,
                 "payment_id" => $item->id,
                 "payment_total" => $item->total,
+                "merchant_id" => $order->merchant_id,
                 "payment_status" => $item->status,
                 "order_total" => $order->total,
                 "order_status" => $order->status,

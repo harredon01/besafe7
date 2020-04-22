@@ -34,7 +34,8 @@ class BookingSeeder extends Seeder {
 
     public function run() {
 //        $this->editBooking->startMeeting();
-//        $this->editBooking->remindLates();
+        dd($this->editBooking->terminateOpenChatRooms());
+        return;
         $user = User::find(1);
         dd($this->editBooking->checkExistingBooking($user,136));
     }

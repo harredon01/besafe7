@@ -127,7 +127,8 @@ class ZoomMeetings {
         $dataSent = [
             "action" => "end",
         ];
-        return $this->sendPut($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting . "/status");
+        $this->sendPut($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting . "/status");
+        $this->sendDelete($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting );
     }
 
     public function addUserToMeeting(User $user) {
