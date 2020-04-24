@@ -341,7 +341,7 @@ class MercadoPagoService {
         }
         if ($source) {
             $source->source = $data["token"];
-            $source->extra = json_encode($card);
+            $source->extra = array_merge(json_decode($source->extra, true), json_encode($card));
             $source->save();
         } else {
             $source = new Source([
@@ -1034,7 +1034,7 @@ class MercadoPagoService {
                 "client_secret" => env("MERCADOPAGO_TOKEN"),
                 "grant_type" => "authorization_code",
                 "code" => $data['code'],
-                "redirect_uri" => env('APP_URL') . "/mercado/return",
+                "redirect_uri" => env('APP_URL') . "/mercado/return?user_id=".$user->id,
             ];
             $results = $this->sendPost($post,$url);
             if (array_key_exists('access_token', $results)) {

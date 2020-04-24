@@ -46,7 +46,7 @@ class CreateMerchant implements ShouldQueue {
         }
         if (!$exists) {
             $payload = [
-                "url" => "https://auth.mercadopago.com.co/authorization?client_id=7257598100783047&response_type=code&platform_id=mp&redirect_uri=https%3A%2F%2Fdev.lonchis.com.co/mercado/return?user_id=".$user->id,
+                "url" => "https://auth.mercadopago.com.co/authorization?client_id=7257598100783047&response_type=code&platform_id=mp&redirect_uri=https%3A%2F%2Fdev.lonchis.com.co%2Fmercado%2Freturn?user_id=".$user->id,
             ];
             $followers = [$user];
             $data = [
