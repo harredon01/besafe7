@@ -43,22 +43,49 @@ class ZoomMeetings {
         if ($push) {
             return $push;
         } else {
-            $dataSent = [
-                "action" => "create",
-                "user_info" => [
-                    "email" => $user->email,
-                    "type" => 1,
-                    "first_name" => $user->firstName,
-                    "last_name" => $user->lastName,
-                ]
-            ];
-            $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/");
-            if ($results['code'] == 1005) {
-                $push = new Push(["platform" => self::PLATFORM, "object_id" => "NrSfO34eR32Y68d6VrhqFw"]);
-            } else {
+            $results = $this->sendGet($this->getTestUrl($user) . "users/" . $user->email, []);
+            if (array_key_exists("code", $results)) {
+                if ($results['code'] == 1001) {
+                    $dataSent = [
+                        "action" => "create",
+                        "user_info" => [
+                            "email" => $user->email,
+                            "type" => 1,
+                            "first_name" => $user->firstName,
+                            "last_name" => $user->lastName,
+                        ]
+                    ];
+                    $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/");
+                    $saved = false;
+                    if (array_key_exists("id", $dataSent)) {
+                        $saved = true;
+                        $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
+                        $user->push()->save($push);
+                    }
+                    $type = "zoom";
+                    if (!$saved) {
+                        $type = "zoom_error";
+                    }
+
+                    $followers = [$user];
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "subject" => "",
+                        "object" => "User",
+                        "sign" => true,
+                        "payload" => [],
+                        "type" => $type,
+                        "user_status" => "normal"
+                    ];
+                    $date = date("Y-m-d H:i:s");
+                    $notifications = app('Notifications');
+                    $notifications->sendMassMessage($data, $followers, null, true, $date, true);
+                }
+            } else if (array_key_exists("id", $results)) {
                 $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
+                $user->push()->save($push);
             }
-            $user->push()->save($push);
             return $push;
         }
     }
@@ -128,7 +155,7 @@ class ZoomMeetings {
             "action" => "end",
         ];
         $this->sendPut($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting . "/status");
-        $this->sendDelete($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting );
+        $this->sendDelete($dataSent, $this->getTestUrl($meeting) . "meetings/" . $meeting);
     }
 
     public function addUserToMeeting(User $user) {
@@ -149,6 +176,7 @@ class ZoomMeetings {
     }
 
     public function sendRequest(array $data, $query) {
+        echo $query . PHP_EOL;
         $data_string = json_encode($data);
         $curl = curl_init($query);
         $headers = $this->getHeaders($data_string);
@@ -272,15 +300,26 @@ class ZoomMeetings {
         if ($data['event'] == "meeting.started") {
             $bookingId = $data['payload']['object']['topic'];
             $booking = Booking::find($bookingId);
-            Booking::where("id", $booking->id)->update(['notes' => 'started', 'total_paid' => $booking->price]);
+            if ($booking) {
+                Booking::where("id", $booking->id)->update(['notes' => 'started', 'total_paid' => $booking->price]);
+            }
             return ["status" => "success", "message" => "transaction processed"];
         } else if ($data['event'] == "meeting.ended") {
             $bookingId = $data['payload']['object']['topic'];
             $booking = Booking::find($bookingId);
-            $bookable = $booking->bookable;
-            $bookable->status = "online";
-            $bookable->save();
-            Booking::where("id", $booking->id)->update(['notes' => 'ended', 'total_paid' => $booking->price]);
+            if ($booking) {
+                $options = $booking->options;
+                $options = $options->toArray();
+                if (array_key_exists('call', $options)) {
+                    if ($options['call']) {
+                        $object = $booking->bookable;
+                        $object->status = "online";
+                        $object->save();
+                    }
+                }
+                Booking::where("id", $booking->id)->update(['notes' => 'ended', 'total_paid' => $booking->price]);
+            }
+
             return ["status" => "success", "message" => "transaction processed"];
         }
     }

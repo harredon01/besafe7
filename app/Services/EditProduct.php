@@ -784,12 +784,7 @@ class EditProduct {
                     'description' => 'required|max:255',
                     'sku' => 'required|max:255',
                     'description2' => 'required|max:255',
-                    'price' => 'required|max:255',
-                    'sale' => 'required|max:255',
-                    'tax' => 'required|max:255',
-                    'cost' => 'required|max:255',
-                    'min_quantity' => 'required|max:255',
-                    'quantity' => 'required|max:255'
+                    'price' => 'required|max:255'
         ]);
     }
 

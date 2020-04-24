@@ -5,8 +5,10 @@ namespace App\Services;
 use Validator;
 use App\Models\FileM;
 use App\Models\Merchant;
+use App\Models\Category;
 use App\Models\User;
 use App\Jobs\SaveGroupsObject;
+use App\Jobs\CreateMerchant;
 use App\Models\Group;
 use App\Models\Report;
 use App\Models\Favorite;
@@ -89,9 +91,11 @@ class EditMapObject {
     }
 
     public function getCategoriesMerchant($id) {
-        $merchant = Merchant::find($id);
-        $merchant->categories;
-        return ['status' => "success", "data" => $merchant->categories];
+        $categories = Category::where('type', "Product")->where(function($query) {
+                $query->where('merchant_id', $id)
+                      ->orWhereNull('merchant_id');
+            })->get();
+        return ['status' => "success", "data" => $categories];
     }
 
     /**
@@ -624,16 +628,7 @@ class EditMapObject {
         if (!array_key_exists("unit_cost", $data)) {
             $data['unit_cost'] = 0;
         }
-        if (array_key_exists("virtual_meeting", $attributes)) {
-            if ($attributes["virtual_meeting"]) {
-                if (array_key_exists("virtual_provider", $attributes)) {
-                    if ($attributes["virtual_provider"]=="ZoomMeetings") { 
-//                $zoom = app("ZoomMeetings");
-//                $zoom->createUser($user);
-                    }
-                }
-            }
-        } 
+        dispatch(new CreateMerchant($user));
         $data['currency'] = "COP";
         if (array_key_exists('id', $data)) {
             if ($data['id'] && $data['id'] > 0) {

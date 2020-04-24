@@ -1039,8 +1039,8 @@ class MercadoPagoService {
             $results = $this->sendPost($post,$url);
             if (array_key_exists('access_token', $results)) {
                 $source = $user->sources()->where("gateway", "MercadoPago")->first();
-                if ($source) {
-                    $source->extra = json_encode($results);
+                if ($source) { 
+                    $source->extra = array_merge(json_decode($source->extra, true), $results);;
                     $source->save();
                 } else {
                     $source = new Source([
