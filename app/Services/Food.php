@@ -327,11 +327,11 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-04-20 00:00:00";
-        $end_date = "2020-04-24 23:59:59";
+        $start_date = "2020-04-27 00:00:00";
+        $end_date = "2020-05-02 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
-        for ($x = 0; $x < 5; $x++) {
+        for ($x = 0; $x < 6; $x++) {
             $day = [
                 "imagen" => "",
                 "titulo" => "",
@@ -341,6 +341,9 @@ class Food {
                 "vegetariano_d" => "",
                 "light_d" => "",
                 "completo_d" => "",
+                "vegetariano_et" => "",
+                "light_et" => "",
+                "completo_et" => "",
             ];
             array_push($days, $day);
         }
@@ -356,17 +359,23 @@ class Food {
             if (!$days[($dayofweek - 1)][strtolower($article->name) . "_t"]) {
                 $days[($dayofweek - 1)][strtolower($article->name) . "_t"] = $attributes["plato"][0]["valor"];
             }
+            if (count($attributes["entradas"]) > 0) { 
+                if (!$days[($dayofweek - 1)][strtolower($article->name) . "_et"]) {
+                    $days[($dayofweek - 1)][strtolower($article->name) . "_et"] = $attributes["entradas"][0]["valor"];
+                }
+            }
             if (!$days[($dayofweek - 1)][strtolower($article->name) . "_d"]) {
                 $days[($dayofweek - 1)][strtolower($article->name) . "_d"] = $attributes["plato"][0]["descripcion"];
             }
         }
+//        dd($days);
         return $days;
     }
 
     public function sendNewsletter() {
         $days = $this->getDataNewsletter();
 
-        $date = date_create(); 
+        $date = date_create();
         // id > 130 and id < 200 bota 500
         $followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
@@ -378,7 +387,7 @@ class Food {
                 "message" => "",
                 "subject" => "Visita tu correo para enterarte de nuestros menus de fin de semana",
                 "object" => "Lonchis",
-                "sign" => true, 
+                "sign" => true,
                 "payload" => $payload,
                 "type" => 'newsletter_food',
                 "user_status" => "normal"
@@ -390,7 +399,7 @@ class Food {
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
                 //Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
-                Mail::to($user->email)->send(new Newsletter()); 
+                //Mail::to($user->email)->send(new Newsletter());
             }
         }
     }
@@ -672,7 +681,6 @@ class Food {
             "2020-03-23",
             "2020-04-09",
             "2020-04-10",
-            "2020-05-01",
             "2020-05-25",
             "2020-06-15",
             "2020-06-22",
@@ -737,7 +745,7 @@ class Food {
                     $tempAttrs = $delivery2->details;
                     $delivery2->details = $item->details;
                     $delivery2->save();
-                    $item->details = $tempAttrs; 
+                    $item->details = $tempAttrs;
                 }
             } else {
                 $item->delivery = date_format($date, "Y-m-d") . " 12:00:00";

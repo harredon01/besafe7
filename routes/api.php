@@ -151,11 +151,7 @@ Route::get('merchants/search', function (Request $request) {
     $filters = json_decode($filters,true);
     if(is_array($filters)){
         foreach ($filters as $key => $value) {
-            if($key == 'category'){
-                $searchQuery->categories()->where('id',$value);
-            } else {
-                $searchQuery->where($key,$value);
-            }
+            $searchQuery->where($key,$value); 
         }
     }
     return $searchQuery->paginate();
