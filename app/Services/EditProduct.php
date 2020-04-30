@@ -602,6 +602,7 @@ class EditProduct {
                 $variants = $product->productVariants;
                 $product->conditions()->delete();
                 $product->merchants()->detach();
+                $product->categories()->detach();
                 $files = FileM::where("type", self::OBJECT_PRODUCT)->where("trigger_id", $product->id)->get();
                 foreach ($files as $file) {
                     $this->editFile->delete($user, $file->id);
@@ -613,8 +614,11 @@ class EditProduct {
                 }
                 $product->clearCache();
                 $product->delete();
+                return array("status" => "success", "message" => "Product deleted");
             }
+            return array("status" => "error", "message" => "access_denied");
         }
+        return array("status" => "error", "message" => "not_found");
     }
 
     /**
@@ -627,11 +631,18 @@ class EditProduct {
         if ($variant) {
             $write = $this->checkAccessProduct($user, $variant->product_id);
             if ($write['access'] == true) {
+                $prodId = $variant->product_id;
                 $variant->conditions()->delete();
                 $variant->items()->delete();
                 $variant->delete();
+                if(ProductVariant::where('product_id',$prodId)->count()==0){
+                    $this->deleteProduct($user, $prodId);
+                }
+                return array("status" => "success", "message" => "Variant deleted");
             }
+            return array("status" => "error", "message" => "access_denied");
         }
+        return array("status" => "error", "message" => "not_found");
     }
 
     public function createOrUpdateProduct(User $user, array $data) {
@@ -799,15 +810,6 @@ class EditProduct {
                     'sku' => 'required|max:255',
                     'description' => 'required|max:255',
                     'price' => 'required|max:255',
-                    'sale' => 'required|max:255',
-                    'tax' => 'required|max:255',
-                    'cost' => 'required|max:255',
-                    'min_quantity' => 'required|max:255',
-                    'quantity' => 'required|max:255',
-                    'requires_authorization' => 'required|max:255',
-                    'is_shippable' => 'required|max:255',
-                    'is_on_sale' => 'required|max:255',
-                    'is_digital' => 'required|max:255',
         ]);
     }
 

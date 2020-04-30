@@ -386,7 +386,7 @@ class EditOrderFood {
         }
         return $date;
     }
-
+ 
     private function checkIsHoliday($date) {
         $holidays = [
             "2020-01-01",
@@ -396,7 +396,6 @@ class EditOrderFood {
             "2020-03-23",
             "2020-04-09",
             "2020-04-10",
-            "2020-05-01",
             "2020-05-25",
             "2020-06-15",
             "2020-06-22",

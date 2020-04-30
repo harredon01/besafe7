@@ -249,10 +249,10 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="line-height: 1.5; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;">
 <ul>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano {{$days[0]["vegetariano_t"]}}</b>: {{$days[0]["vegetariano_d"]}}</span></li>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Light: <b>{{$days[0]["light_t"]}}</b>: {{$days[0]["light_d"]}} </span></li>
-<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;">Completo: <b>{{$days[0]["completo_t"]}}</b>: {{$days[0]["completo_d"]}}</span></li>
-</ul>
+    <li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[0]["vegetariano_et"])<b>Entrada:</b> {{$days[0]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[0]["vegetariano_t"]}}: {{$days[0]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[0]["light_et"])<b>Entrada:</b> {{$days[0]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[0]["light_t"]}}: {{$days[0]["light_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[0]["completo_et"])<b>Entrada:</b> {{$days[0]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[0]["completo_t"]}}: {{$days[0]["completo_d"]}}</span></li>
+</ul> 
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -287,9 +287,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px;">
 <ul>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Vegetariano {{$days[1]["vegetariano_t"]}}</b>: {{$days[1]["vegetariano_d"]}}</span></li>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Light {{$days[1]["light_t"]}}</b>: {{$days[1]["light_d"]}}</span></li>
-<li style="line-height: 1.2; font-size: 14px; mso-line-height-alt: 17px;"><span style="font-size: 14px;"><b>Completo {{$days[1]["completo_t"]}}</b>: {{$days[1]["completo_d"]}}</span></li>
+    <li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[1]["vegetariano_et"])<b>Entrada:</b> {{$days[1]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[1]["vegetariano_t"]}}: {{$days[1]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[1]["light_et"])<b>Entrada:</b> {{$days[1]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[1]["light_t"]}}: {{$days[1]["light_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[1]["completo_et"])<b>Entrada:</b> {{$days[1]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[1]["completo_t"]}}: {{$days[1]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
@@ -361,9 +361,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Vegetariano {{$days[2]["vegetariano_t"]}}</b>: {{$days[2]["vegetariano_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Light {{$days[2]["light_t"]}}</b>: {{$days[2]["light_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Completo {{$days[2]["completo_t"]}}</b>: {{$days[2]["completo_d"]}}</li>
+    <li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[2]["vegetariano_et"])<b>Entrada:</b> {{$days[2]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[2]["vegetariano_t"]}}: {{$days[2]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[2]["light_et"])<b>Entrada:</b> {{$days[2]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[2]["light_t"]}}: {{$days[2]["light_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[2]["completo_et"])<b>Entrada:</b> {{$days[2]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[2]["completo_t"]}}: {{$days[2]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
@@ -399,9 +399,9 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.2; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 17px;">
 <ul>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Vegetariano {{$days[3]["vegetariano_t"]}}</b>: {{$days[3]["vegetariano_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Light {{$days[3]["light_t"]}}</b>: {{$days[3]["light_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.2; word-break: break-word; mso-line-height-alt: 17px;"><b>Completo {{$days[3]["completo_t"]}}</b>: {{$days[3]["completo_d"]}}</li>
+    <li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[3]["vegetariano_et"])<b>Entrada:</b> {{$days[3]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[3]["vegetariano_t"]}}: {{$days[3]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[3]["light_et"])<b>Entrada:</b> {{$days[3]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[3]["light_t"]}}: {{$days[3]["light_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[3]["completo_et"])<b>Entrada:</b> {{$days[3]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[3]["completo_t"]}}: {{$days[3]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
@@ -508,13 +508,69 @@
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
 <div style="font-size: 14px; line-height: 1.5; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px;">
 <ul>
-    <li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Vegetariano {{$days[4]["vegetariano_t"]}}</b>: {{$days[4]["vegetariano_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Light {{$days[4]["light_t"]}}</b>: {{$days[4]["light_d"]}}</li>
-<li style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: left; mso-line-height-alt: 21px;"><b>Completo {{$days[4]["completo_t"]}}</b>: {{$days[4]["completo_d"]}}</li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[4]["vegetariano_et"])<b>Entrada:</b> {{$days[4]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[4]["vegetariano_t"]}}: {{$days[4]["vegetariano_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[4]["light_et"])<b>Entrada:</b> {{$days[4]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[4]["light_t"]}}: {{$days[4]["light_d"]}}</span></li>
+<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[4]["completo_et"])<b>Entrada:</b> {{$days[4]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[4]["completo_t"]}}: {{$days[4]["completo_d"]}}</span></li>
 </ul>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td></tr></table></td></tr></table><![endif]-->
+</div>
+</div>
+</div>
+    <div style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;">
+<div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 625px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
+<div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
+<!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-image:url('https://gohife.s3.us-east-2.amazonaws.com/public/newsletter/images/bgwhite3.png');background-position:top center;background-repeat:repeat;background-color:#eeeade;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:625px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
+<!--[if (mso)|(IE)]><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 5px; padding-bottom: 20px; font-family: Georgia, 'Times New Roman', serif"><![endif]-->
+<div style="color:#555555;font-family:Georgia, Times, 'Times New Roman', serif;line-height:1.2;padding-top:5px;padding-right:10px;padding-bottom:20px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Georgia, Times, 'Times New Roman', serif; mso-line-height-alt: 14px;">
+<p style="line-height: 1.2; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><em><span style="color: #180a01; font-size: 20px;"><strong>Sábado {{$days[5]["titulo"]}}</strong></span></em></p>
+</div>
+</div>
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 10px; padding-left: 10px; padding-top: 10px; padding-bottom: 25px; font-family: Arial, sans-serif"><![endif]-->
+<div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:25px;padding-left:10px;">
+<div style="line-height: 1.2; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14px;">
+<ul>
+    @if ($days[5]["vegetariano_t"])<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Vegetariano</b> @if ($days[5]["vegetariano_et"])<b>Entrada:</b> {{$days[5]["vegetariano_et"]}} <br/>@endif<b>Plato:</b> {{$days[5]["vegetariano_t"]}}: {{$days[5]["vegetariano_d"]}}</span></li>@endif
+@if ($days[5]["light_t"])<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Light </b> @if ($days[5]["light_et"])<b>Entrada:</b> {{$days[5]["light_et"]}} <br/>@endif<b>Plato:</b> {{$days[5]["light_t"]}}: {{$days[5]["light_d"]}}</span></li>@endif
+@if ($days[5]["completo_t"])<li style="line-height: 1.5; font-size: 14px; mso-line-height-alt: 21px;"><span style="font-size: 14px;"><b>Completo </b> @if ($days[5]["completo_et"])<b>Entrada:</b> {{$days[5]["completo_et"]}} <br/>@endif<b>Plato:</b> {{$days[5]["completo_t"]}}: {{$days[5]["completo_d"]}}</span></li>@endif
+</ul>
+</div>
+</div> 
+<!--[if mso]></td></tr></table><![endif]-->
+<!--[if (!mso)&(!IE)]><!-->
+</div>
+<!--<![endif]-->
+</div>
+</div>
+<!--[if (mso)|(IE)]></td></tr></table><![endif]-->
+<!--[if (mso)|(IE)]></td><td align="center" width="312" style="background-color:transparent;width:312px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 0px; padding-left: 0px; padding-top:25px; padding-bottom:25px;"><![endif]-->
+<div class="col num6" style="max-width: 320px; min-width: 312px; display: table-cell; vertical-align: top; width: 312px;">
+<div style="width:100% !important;">
+<!--[if (!mso)&(!IE)]><!-->
+<div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:25px; padding-bottom:25px; padding-right: 0px; padding-left: 0px;">
+<!--<![endif]-->
+<div align="center" class="img-container center fixedwidth" style="padding-right: 15px;padding-left: 15px;"> 
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 15px;padding-left: 15px;" align="center"><![endif]-->
+<div style="font-size:1px;line-height:15px"> </div><img align="center" alt="Image" border="0" class="center fixedwidth" src="{{$days[5]["imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; border: 0; height: auto; width: 100%; max-width: 312px; display: block;" title="Image" width="312"/>
+<div style="font-size:1px;line-height:15px"> </div>
+<!--[if mso]></td></tr></table><![endif]-->
+</div>
 <!--[if (!mso)&(!IE)]><!-->
 </div>
 <!--<![endif]-->

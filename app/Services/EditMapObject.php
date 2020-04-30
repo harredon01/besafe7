@@ -90,11 +90,13 @@ class EditMapObject {
         return ['status' => "success", "data" => $merchant->paymentMethods];
     }
 
-    public function getCategoriesMerchant($id) {
-        $categories = Category::where('type', "Product")->where(function($query) {
-                $query->where('merchant_id', $id)
-                      ->orWhereNull('merchant_id');
-            })->get();
+    public function getCategoriesMerchant($id,$type) {
+        //DB::enableQueryLog();
+        $categories = Category::where('type', $type)->where(function($query) use ($id) {
+                    $query->where('merchant_id', $id)
+                            ->orWhereNull('merchant_id');
+                })->get();
+        //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
     }
 
@@ -345,7 +347,7 @@ class EditMapObject {
     }
 
     public function getNearbyObjects(array $data) {
-        $radius = 1;
+        $radius = 1000;
         $R = 6371;
         $lat = $data['lat'];
         $long = $data['long'];
@@ -361,7 +363,7 @@ class EditMapObject {
         $additionalFields = "";
         if ($data['type'] == "Merchant") {
             $type = "merchants";
-            $additionalFields = " type, telephone, address, ";
+            $additionalFields = " type, telephone, address,rating,rating_count,unit_cost,attributes, ";
             if ($category) {
                 $joins = " join category_merchant cm on r.id = cm.merchant_id ";
                 $joinsWhere = " AND cm.category_id = :category ";
@@ -400,7 +402,7 @@ class EditMapObject {
                    FROM
                     " . $type . " r " . $joins . "
                     WHERE
-                        status = 'active'
+                        status in ('active','online','busy')
                             AND r.private = 0
                             AND r.type <> ''
                             AND lat BETWEEN :latinf AND :latsup

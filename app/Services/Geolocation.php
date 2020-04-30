@@ -28,7 +28,6 @@ class Geolocation {
 //        foreach ($polygon as $vertex) {
 //            $vertices[] = $this->pointStringToCoordinates($vertex);
 //        }
-
         // Check if the point sits exactly on a vertex
         if ($this->pointOnVertex == true and $this->pointOnVertex($point, $vertices) == true) {
             return "vertex";
@@ -61,7 +60,7 @@ class Geolocation {
             return "outside";
         }
     }
-    
+
     public function pointOnVertex($point, $vertices) {
         foreach ($vertices as $vertex) {
             if ($point == $vertex) {
@@ -75,10 +74,13 @@ class Geolocation {
         return array("x" => $coordinates[0], "y" => $coordinates[1]);
     }
 
-    public function checkMerchantPolygons($latitude,$longitude, $merchant_id,$provider) { 
-        $query = CoveragePolygon::where('merchant_id', $merchant_id);
-        if($provider){
-            $query->where('provider', $provider);
+    public function checkMerchantPolygons($latitude, $longitude, $merchant_id, $provider) {
+        $query = CoveragePolygon::where(function($query) use ($merchant_id) {
+                    $query->where('merchant_id', $merchant_id)
+                            ->orWhereNull('merchant_id');
+                });
+        if ($provider) {
+            $query->where('provider', $provider); 
         }
         $polygons = $query->get();
         $point = array("x" => $latitude, "y" => $longitude);
@@ -89,11 +91,12 @@ class Geolocation {
                 $vertices[] = array("x" => $vertex['lat'], "y" => $vertex['lng']);
             }
             $result = $this->pointInPolygon($point, $vertices, true);
-            
-            if($result != "outside"){
-                return array("status" => "success", "message" => "Address in coverage","polygon" => $item);
+
+            if ($result != "outside") {
+                return array("status" => "success", "message" => "Address in coverage", "polygon" => $item);
             }
         }
-        return array("status" => "error", "message" => "Address not in coverage" );
+        return array("status" => "error", "message" => "Address not in coverage");
     }
+
 }

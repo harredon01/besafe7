@@ -145,8 +145,8 @@ class MerchantApiController extends Controller {
      *
      * @return Response
      */
-    public function getCategoriesMerchant($id) {
-        return response()->json($this->editMapObject->getCategoriesMerchant($id));
+    public function getCategoriesMerchant($id,$type) {
+        return response()->json($this->editMapObject->getCategoriesMerchant($id,$type));
     }
 
     /**

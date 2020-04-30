@@ -122,7 +122,8 @@ class MercadoPagoService {
     }
 
     private function getMerchantToken(Payment $payment) {
-        $paymentM = new Pago();
+        
+        $external = false;
         $user = DB::table('payments')
                 ->join('orders', 'payments.order_id', '=', 'orders.id')
                 ->join('merchant_user', 'orders.merchant_id', '=', 'merchant_user.merchant_id')
@@ -133,11 +134,16 @@ class MercadoPagoService {
                 ->distinct()
                 ->first();
         if ($user) {
-            $attributes = json_decode($user->extra);
+            $attributes = json_decode($user->extra,true);
             if (array_key_exists("access_token", $attributes)) {
-                $paymentM->user_token = $attributes['access_token'];
+                $external = true;
+                SDK::configure(['ACCESS_TOKEN' =>$attributes['access_token']]);
+                $paymentM = new Pago();
                 $paymentM->application_fee = $payment->total / 10;
             }
+        }
+        if(!$external){
+            $paymentM = new Pago();
         }
         return $paymentM;
     }

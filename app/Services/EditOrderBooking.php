@@ -95,7 +95,7 @@ class EditOrderBooking {
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
-                        $booking->options['status'] = "pending";
+                        $booking->options['status'] = "reminded";
                         $booking->options['paid'] = date("Y-m-d H:i:s");
 
                         $booking->save();

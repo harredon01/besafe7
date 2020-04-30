@@ -143,13 +143,19 @@ Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchan
 Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
-Route::get('merchants/{code?}/categories', 'MerchantApiController@getCategoriesMerchant');
+Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
 Route::get('merchants/search', function (Request $request) {
     $searchQuery = App\Models\Merchant::search($request->search);
-    if(is_array($request->filters)){
-        $filters = $request->filters;
+    
+    $filters = $request->filters;
+    $filters = json_decode($filters,true);
+    if(is_array($filters)){
         foreach ($filters as $key => $value) {
-            $searchQuery->where($key,$value);
+            if($key == 'category'){
+                $searchQuery->categories()->where('id',$value);
+            } else {
+                $searchQuery->where($key,$value);
+            }
         }
     }
     return $searchQuery->paginate();

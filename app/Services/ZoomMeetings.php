@@ -13,21 +13,8 @@ class ZoomMeetings {
 
     const PLATFORM = 'ZoomMeetings';
 
-    public function getUsers() {
-        $merchant = $this->populateMerchant($user);
-
-        $bankListInformation = [
-            "paymentMethod" => "PSE",
-            "paymentCountry" => "CO"
-        ];
-        $dataSent = [
-            "language" => "es",
-            "command" => "GET_BANKS_LIST",
-            "merchant" => $merchant,
-            "bankListInformation" => $bankListInformation,
-            "test" => false,
-        ];
-        return $this->sendRequest($dataSent, $this->getTestUrl($user) . "users/");
+    public function getUsers($user) {
+        return $this->sendGet($this->getTestUrl($user) . "users",[]);
     }
 
     public function getUser(User $user) {
