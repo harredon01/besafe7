@@ -11,6 +11,8 @@ use App\Models\Condition;
 use App\Models\Delivery;
 use App\Jobs\PostPurchase;
 use App\Jobs\SendMessage;
+use App\Jobs\CreateChatroom;
+use App\Models\Booking;
 use App\Models\Route;
 use App\Models\Stop;
 use App\Models\OrderCondition;
@@ -175,6 +177,29 @@ class EditOrderFood {
                 if ($data['type'] == "delivery") {
                     //$this->createDelivery($order, $item, $address->id);
                 }
+                if ($data['type'] == "Booking") {
+                    $id = $data['id'];
+                    $booking = Booking::find($id);
+                    if ($booking) {
+                        $booking->options['order_id'] = $order->id;
+                        $booking->options['item_id'] = $item->id;
+                        $booking->options['payer'] = $order->user_id;
+                        $booking->options['status'] = "reminded";
+                        $booking->options['paid'] = date("Y-m-d H:i:s");
+
+                        $booking->save();
+                        $updateData = [
+                            "total_paid" => $item->priceSumConditions,
+                            "updated_at" => date("Y-m-d H:i:s")
+                        ];
+                        Booking::where("id", $id)->update($updateData);
+                    }
+                    if (array_key_exists("call", $data)) {
+                        if ($data["call"]) {
+                            dispatch(new CreateChatroom($booking->id));
+                        }
+                    }
+                }
             }
             if (array_key_exists("model", $data)) {
                 $class = "App\\Models\\" . $data["model"];
@@ -209,7 +234,7 @@ class EditOrderFood {
             if ($user) {
                 $this->createDeliveries($user->id, $item, $address_id);
                 PostPurchase::dispatch($user)
-                ->delay(now()->addMinutes(10));
+                        ->delay(now()->addMinutes(10));
             }
         }
     }
@@ -386,7 +411,7 @@ class EditOrderFood {
         }
         return $date;
     }
- 
+
     private function checkIsHoliday($date) {
         $holidays = [
             "2020-01-01",
