@@ -145,12 +145,9 @@ class EditOrderFood {
     public function approveOrder(Order $order) {
         $data = array();
         $items = $order->items;
-        $geo = app('Geolocation');
         $address = $order->orderAddresses()->where("type", "shipping")->first();
-        $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id, "Basilikum");
-        $polygon = $result['polygon'];
-        $address->polygon_id = $polygon->id;
-        $address->save();
+
+        $doShipping = false;
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
@@ -169,12 +166,14 @@ class EditOrderFood {
                     // add date to object
                 }
                 if ($data['type'] == "meal-plan") {
+                    $doShipping = true;
                     $this->createMealPlan($order, $item, $address->id);
                 }
                 if ($data['type'] == "credit") {
                     $this->createDeposit($order);
                 }
                 if ($data['type'] == "delivery") {
+                    $doShipping = true;
                     //$this->createDelivery($order, $item, $address->id);
                 }
                 if ($data['type'] == "Booking") {
@@ -207,6 +206,14 @@ class EditOrderFood {
             } else {
                 
             }
+        }
+        if ($doShipping) {
+            $geo = app('Geolocation');
+            $address = $order->orderAddresses()->where("type", "shipping")->first();
+            $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id, "Basilikum");
+            $polygon = $result['polygon'];
+            $address->polygon_id = $polygon->id;
+            $address->save();
         }
         $order->status = "approved";
         $order->save();

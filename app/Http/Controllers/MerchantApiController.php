@@ -181,6 +181,17 @@ class MerchantApiController extends Controller {
         $data['id'] = $code;
         return $this->editMapObject->updateObjectStatus($user, $data, self::OBJECT_MERCHANT);
     }
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function updateStatus(Request $request) {
+        $user = $request->user();
+        $data = $request->all();
+        return $this->editMapObject->updateStatus($user, $data);
+    }
 
     /**
      * Show the form for editing the specified resource.

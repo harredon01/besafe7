@@ -193,6 +193,11 @@ class Notifications {
             $data['body'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['body']);
             $data['body_es'] = str_replace("{bookable}", $arrayPayload['bookable'], $data['body_es']);
         }
+        $pos = strpos($data['body'], '{url}');
+        if ($pos) {
+            $data['body'] = str_replace("{url}", $arrayPayload['url'], $data['body']);
+            $data['body_es'] = str_replace("{url}", $arrayPayload['url'], $data['body_es']);
+        }
         return $data;
     }
 

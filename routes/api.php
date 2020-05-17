@@ -85,6 +85,7 @@ Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
 Route::post('deliveries/date', 'DeliveryController@posUpdateDeliveryDate');
+Route::get('deliveries/pending', 'DeliveryController@getPendingDelivery');
 Route::post('deliveries/address', 'DeliveryController@posUpdateDeliveryAddress');
 Route::post('deliveries/cancel/{delivery?}', 'DeliveryController@postCancelDeliverySelection');
 Route::resource('deliveries', 'DeliveryController');
@@ -156,7 +157,8 @@ Route::get('merchants/search', function (Request $request) {
     }
     return $searchQuery->paginate();
 });
-Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
+//Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
+Route::post('merchants/status', 'MerchantApiController@updateStatus');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::resource('merchants', 'MerchantApiController');
 

@@ -29,6 +29,6 @@ class Newsletter extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-codigos')->subject("Lonchis Super menú de Sábado!");
+        return $this->view('emails.food.newsletter-codigos')->subject("Programa tu cena para mamá hasta hoy antes de las 6pm!");
     }
 }

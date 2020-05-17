@@ -134,7 +134,8 @@ class ZoomMeetings {
             $results = $this->sendPost($dataSent, $this->getTestUrl($user) . "users/" . $push->object_id . "/meetings");
             return $results;
         }
-        return null;
+        $this->createUser($user);
+        return $this->createMeeting($user, $booking);
     }
 
     public function endMeeting($meeting) {

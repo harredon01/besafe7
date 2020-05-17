@@ -29,7 +29,7 @@ class ZoomSeeder extends Seeder {
  
     public function run() {
         $user = User::find(2);
-//        $results = $this->booking->createChatroom(145);
+        $results = $this->booking->createChatroom(6);
 //        dd($results);
         $results = $this->zoom->getUserEmail($user);
         dd($results);

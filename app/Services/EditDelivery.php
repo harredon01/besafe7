@@ -30,6 +30,11 @@ class EditDelivery {
         $delivery = Delivery::find($data['delivery_id']);
         if ($delivery) {
             if ($delivery->user_id == $user->id) {
+                if (array_key_exists('date', $data)) {
+                    if ($data['date']) {
+                        $delivery->delivery = $data['date'];
+                    }
+                }
                 $results = $this->checkDeliveryTime($delivery);
                 if ($results['status'] == 'success') {
                     $details = json_decode($delivery->details, true);
@@ -73,6 +78,11 @@ class EditDelivery {
                         $details["dish"] = $dish;
                         $delivery->details = json_encode($details);
                         $delivery->status = "enqueue";
+                        if (array_key_exists('date', $data)) {
+                            if ($data['date']) {
+                                $delivery->delivery = $data['date'];
+                            }
+                        }
                         $delivery->save();
                         $this->checkRecurringPosibility($user, $data['ip_address']);
                         dispatch(new AddDeliveryInfo($delivery));
@@ -240,6 +250,15 @@ class EditDelivery {
             return array("status" => "error", "message" => "Limit passed");
         }
         return array("status" => "success", "message" => "Delivery in limit");
+    }
+
+    public function getPendingDelivery(User $user) {
+        $delivery = $user->deliveries()->whereIn("status",["pending","deposit"])->orderBy("status","desc")->with("address")->first();
+        if ($delivery) {
+            return array("status" => "success", "message" => "","delivery" => $delivery);
+        } else {
+            return array("status" => "error", "message" => "no_delivery_available");
+        }
     }
 
     public function cancelDeliverySelection(User $user, $delivery) {
@@ -536,4 +555,5 @@ class EditDelivery {
         }
         return false;
     }
+
 }

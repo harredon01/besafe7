@@ -90,7 +90,7 @@ class EditMapObject {
         return ['status' => "success", "data" => $merchant->paymentMethods];
     }
 
-    public function getCategoriesMerchant($id,$type) {
+    public function getCategoriesMerchant($id, $type) {
         //DB::enableQueryLog();
         $categories = Category::where('type', $type)->where(function($query) use ($id) {
                     $query->where('merchant_id', $id)
@@ -163,7 +163,8 @@ class EditMapObject {
                                 "merchant" => $object,
                                 "files" => $files,
                                 "ratings" => $ratings,
-                                "availabilities" => $availability
+                                "availabilities" => $availability,
+                                "access" => $object->checkAdminAccess($user->id)
                             ];
                         }
                         return $data;
@@ -175,8 +176,8 @@ class EditMapObject {
             $ratings = Rating::where("type", $type)->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
             if ($type == self::OBJECT_REPORT) {
                 if ($object->private == true && $type == "Report") {
-                    $object->email == "";
-                    $object->telephone == "";
+                    $object->email = "";
+                    $object->telephone = "";
                 }
                 $data = [
                     "report" => $object,
@@ -189,7 +190,8 @@ class EditMapObject {
                     "merchant" => $object,
                     "files" => $files,
                     "ratings" => $ratings,
-                    "availabilities" => $availability
+                    "availabilities" => $availability,
+                    "access" => $object->checkAdminAccess($user->id)
                 ];
             }
         }
@@ -696,6 +698,27 @@ class EditMapObject {
             }
         }
         return null;
+    }
+
+    /**
+     * returns all current shared locations for the user
+     *
+     * @return Location
+     */
+    public function updateStatus(User $user, array $data) {
+        $object = "App\\Models\\" . $data['type'];
+        $checker = $object::find($data['object_id']);
+        if ($checker) {
+            if ($checker->status == "active" || $checker->status == "online" || $checker->status == "busy") {
+                if ($checker->checkAdminAccess($user->id)) {
+                    Cache::forget('Merchant_' . $data['object_id']);
+                    $checker->status = $data['status'];
+                    $checker->save();
+                    return ['status' => 'success', "message" => "status updated"];
+                }
+            }
+        }
+        return ['status' => 'error', "message" => "failed"];
     }
 
     /**

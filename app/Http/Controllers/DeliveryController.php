@@ -106,6 +106,15 @@ class DeliveryController extends Controller {
         ]);
         return response()->json($this->editDelivery->changeDeliveryDate($user, $data));
     }
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getPendingDelivery(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editDelivery->getPendingDelivery($user ));
+    }
 
     /**
      * Show the form for creating a new resource.

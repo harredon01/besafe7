@@ -203,9 +203,17 @@ class EditBooking {
                                 }
                                 $cost = $object->unit_cost;
                                 if ($isCall) {
-                                    $object->unit_cost = $object->unit_cost * 0.35;
+                                    if(array_key_exists('v_costr', $attributes)){
+                                        $object->unit_cost = $attributes['v_costr'];
+                                    } else {
+                                        $object->unit_cost = $object->unit_cost * 0.35;
+                                    }
                                 } else {
-                                    $object->unit_cost = $object->unit_cost * 0.5;
+                                    if(array_key_exists('v_cost', $attributes)){
+                                        $object->unit_cost = $attributes['v_cost'];
+                                    } else {
+                                        $object->unit_cost = $object->unit_cost * 0.5;
+                                    }
                                 }
                                 $object->save();
                                 $returnCost = true;
