@@ -67,7 +67,7 @@ class ZoomMeetings {
                     ];
                     $date = date("Y-m-d H:i:s");
                     $notifications = app('Notifications');
-                    $notifications->sendMassMessage($data, $followers, null, true, $date, true);
+                    //$notifications->sendMassMessage($data, $followers, null, true, $date, true);
                 }
             } else if (array_key_exists("id", $results)) {
                 $push = new Push(["platform" => self::PLATFORM, "object_id" => $results['id']]);
