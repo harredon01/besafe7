@@ -327,8 +327,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-05-11 00:00:00";
-        $end_date = "2020-05-16 23:59:59";
+        $start_date = "2020-05-18 00:00:00";
+        $end_date = "2020-05-23 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {

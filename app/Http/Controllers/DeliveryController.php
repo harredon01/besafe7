@@ -78,6 +78,7 @@ class DeliveryController extends Controller {
     public function postDeliveryOptions(Request $request) {
         $user = $request->user();
         $data = $request->all([
+            'date',
             'type_name',
             'starter_name',
             'main_name',
