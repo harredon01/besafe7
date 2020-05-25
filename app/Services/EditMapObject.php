@@ -186,12 +186,16 @@ class EditMapObject {
                 ];
             } else if ($type == self::OBJECT_MERCHANT) {
                 $availability = Availability::where("bookable_type", self::MODEL_PATH . $type)->where("bookable_id", $object->id)->limit(25)->get();
+                $access = false;
+                if($user){
+                    $access = $object->checkAdminAccess($user->id);
+                }
                 $data = [
                     "merchant" => $object,
                     "files" => $files,
                     "ratings" => $ratings,
                     "availabilities" => $availability,
-                    "access" => $object->checkAdminAccess($user->id)
+                    "access" => $access
                 ];
             }
         }
