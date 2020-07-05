@@ -173,8 +173,14 @@ Route::get('/email_payment_cash', function () {
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
 }); 
-Route::get('/newsletter_madres', function () {
+Route::get('/newsletter_padres', function () {
     return new App\Mail\Newsletter();
+}); 
+Route::get('/newsletter_padres2', function () {
+    return new App\Mail\Newsletter3();
+}); 
+Route::get('/newsletter_padre2', function () {
+    return new App\Mail\Newsletter3();
 }); 
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
@@ -198,7 +204,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
     $days =$gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days,"Mayo","Mayo");
+    return new App\Mail\NewsletterMenus($days,"Junio","Julio");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();

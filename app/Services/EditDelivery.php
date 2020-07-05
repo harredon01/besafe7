@@ -32,7 +32,9 @@ class EditDelivery {
             if ($delivery->user_id == $user->id) {
                 if (array_key_exists('date', $data)) {
                     if ($data['date']) {
-                        $delivery->delivery = $data['date'];
+                        $strdta = str_replace("T", " ", $data['date']);
+                        $strdta = str_replace(".000Z", "", $strdta);
+                        $delivery->delivery = $strdta;
                     }
                 }
                 $results = $this->checkDeliveryTime($delivery);
@@ -240,7 +242,7 @@ class EditDelivery {
         } else {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
-        //return array("status" => "success", "message" => "Delivery in limit"); 
+        //return array("status" => "success", "message" => "Delivery in limit");
         $date = date_create();
         $now = date_format($date, "Y-m-d H:i:s");
         $datetimestampDelivery = strtotime($delivery->delivery);
@@ -253,9 +255,9 @@ class EditDelivery {
     }
 
     public function getPendingDelivery(User $user) {
-        $delivery = $user->deliveries()->whereIn("status",["pending","deposit"])->orderBy("status","desc")->with("address")->first();
+        $delivery = $user->deliveries()->whereIn("status", ["pending", "deposit"])->orderBy("status", "desc")->with("address")->first();
         if ($delivery) {
-            return array("status" => "success", "message" => "","delivery" => $delivery);
+            return array("status" => "success", "message" => "", "delivery" => $delivery);
         } else {
             return array("status" => "error", "message" => "no_delivery_available");
         }

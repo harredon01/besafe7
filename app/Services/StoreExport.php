@@ -128,11 +128,11 @@ class StoreExport {
             $orders = Order::where('status', self::ORDER_APPORVED_STATUS)
                             ->where('merchant_id', $merchant->id)
                             ->whereBetween('updated_at', [$startDate, $endDate])
-                            ->whereNotIn('user_id', [2, 77, 3, 82, 161])
+                            ->whereNotIn('user_id', [1, 77 ])
                             ->with(['payments.user', 'items', 'orderConditions'])->get();
 
             $merchantResults = $this->exportOrderInvoices($orders, $merchant->name);
-            $meDiscount += $merchantResults[self::DISCOUNT_HOOV];
+            $meDiscount += $merchantResults[self::DISCOUNT_HOOV]; 
             $comissionSub += $merchantResults[self::COMMISION_W_DISCOUNT];
 
             $costSub += $merchantResults[self::COST_W_DISCOUNT];

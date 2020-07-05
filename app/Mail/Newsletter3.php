@@ -30,6 +30,6 @@ class Newsletter3 extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-black-friday')->subject("Empezó Black Lonchis!");
+        return $this->view('emails.food.newsletter-padres')->subject("Celebra el día del padre en casa, con nuestros especiales para papá Lonchis!");
     }
 }
