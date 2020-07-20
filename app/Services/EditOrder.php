@@ -377,13 +377,6 @@ class EditOrder {
             $results['type'] = "credits";
             return $results;
         }
-        if ($results['requiresShipping'] > 0) {
-            $results['status'] = "error";
-            $results['order'] = $order;
-            $results['message'] = "Order requires shipping condition";
-            $results['type'] = "shipping";
-            return $results;
-        }
         if ($results['requiresDelivery'] > 0) {
             $results['status'] = "error";
             $results['order'] = $order;

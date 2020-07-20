@@ -347,7 +347,12 @@ class MercadoPagoService {
         }
         if ($source) {
             $source->source = $data["token"];
-            $source->extra = array_merge(json_decode($source->extra, true), json_encode($card));
+            if($source->extra){
+                $source->extra = array_merge(json_decode($source->extra, true), json_encode($card));
+            } else {
+                $source->extra = json_encode($card);
+            }
+            
             $source->save();
         } else {
             $source = new Source([
