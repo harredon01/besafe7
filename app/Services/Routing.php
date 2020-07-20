@@ -23,7 +23,9 @@ class Routing {
 
     const OBJECT_ORDER = 'Order';
     const CREDIT_PRICE = 14000;
-    const LUNCH_ROUTE = 16;
+    const START_ADDRESS_ID = 17660;
+    const END_ADDRESS_ID = 17663;
+    const LUNCH_ROUTE = 19;
     const LUNCH_PROFIT = 1100;
     const ROUTE_HOUR_COST = 11000;
     const ROUTE_HOURS_EST = 3;
@@ -238,7 +240,7 @@ class Routing {
                     $routeCost = $rapigoResponse['price'];
                 }
             } else {
-                $routeCost =self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
+                $routeCost = self::ROUTE_HOURS_EST * self::ROUTE_HOUR_COST;
             }
             $route->unit_price = $income;
             $route->unit_cost = $routeCost;
@@ -638,21 +640,10 @@ class Routing {
         $route->height = 1;
         $route->unit_price = 0;
         $route->save();
-        $address = OrderAddress::create([
-                    "user_id" => 1,
-                    "name" => "test",
-                    "city_id" => 524,
-                    "region_id" => 11,
-                    "country_id" => 1,
-                    "address" => "Carrera 58 D # 130 A - 43",
-                    "lat" => 4.721717,
-                    "long" => -74.069855,
-                    "phone" => "3202261525"
-        ]);
         $details = ["pickups" => []];
 
         Stop::create([
-            "address_id" => $address->id,
+            "address_id" => self::START_ADDRESS_ID,
             "amount" => 0,
             "shipping" => 0,
             "route_id" => $route->id,
@@ -732,7 +723,7 @@ class Routing {
         return ($a['amount'] < $b['amount']) ? -1 : 1;
     }
 
-    private function addpickupStop(Route $route) {
+    private function addpickupStop(Route $route, $address_id) {
         if ($route->provider == "Basilikum") {
             return;
         }
@@ -744,30 +735,22 @@ class Routing {
             }
         }
         if ($addStop) {
-            $address = OrderAddress::create([
-                        "user_id" => 1,
-                        "name" => "test",
-                        "city_id" => 524,
-                        "region_id" => 11,
-                        "country_id" => 1,
-                        "address" => "Carrera 1 este # 72a-90 Apto 202",
-                        "lat" => 4.653610,
-                        "long" => -74.049822,
-                        "phone" => "3103418432"
-            ]);
-            $details = ["pickups" => []];
-            $firstStop = Stop::create([
-                        "address_id" => $address->id,
-                        "amount" => 0,
-                        "route_id" => $route->id,
-                        "region_name" => "Entregar los envases recogidos",
-                        "stop_order" => 3,
-                        "details" => json_encode($details)
-            ]);
+            $oaddress = OrderAddress::find($address_id);
+            if ($oaddress) {
+                $details = ["pickups" => []];
+                $firstStop = Stop::create([
+                            "address_id" => $oaddress->id,
+                            "amount" => 0,
+                            "route_id" => $route->id,
+                            "region_name" => "Entregar los envases recogidos",
+                            "stop_order" => 3,
+                            "details" => json_encode($details)
+                ]);
+            }
         }
     }
 
-    public function completeRoutes($routes) {
+    public function completeRoutes($routes, $address_id) {
         foreach ($routes as $route) {
             $pickup = "";
             $addReturn = false;
@@ -783,7 +766,7 @@ class Routing {
                 }
             }
             if ($addReturn) {
-                $this->addpickupStop($route);
+                $this->addpickupStop($route, $address_id);
             }
         }
     }
@@ -1097,9 +1080,9 @@ class Routing {
             }
             $results = $this->prepareRouteModel($results, true, $polygon, $shipping);
         }
-        $this->completeRoutes($results);
+        $this->completeRoutes($results, self::END_ADDRESS_ID);
         if ($shipping == "Rapigo") {
-            $this->completeRoutes($results2);
+            $this->completeRoutes($results2, self::END_ADDRESS_ID);
         }
     }
 
@@ -1147,7 +1130,7 @@ class Routing {
             "2020-01-06",
             "2020-03-23",
             "2020-04-09",
-            "2020-04-10", 
+            "2020-04-10",
             "2020-05-25",
             "2020-06-15",
             "2020-06-22",

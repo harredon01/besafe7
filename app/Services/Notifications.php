@@ -74,24 +74,24 @@ class Notifications {
             $data['type'] = "program_reminder";
         }
         $arrayPayload = $data['payload'];
-        if ($userSending) {
-            if ($translationEsp) {
-                $data['subject_es'] = str_replace("{user}", $userSending->name, $translationEsp->value);
-                $data['body_es'] = str_replace("{user}", $userSending->name, $translationEsp->body);
-            }
-            if ($translation) {
-                $data['subject'] = str_replace("{user}", $userSending->name, $translation->value);
-                $data['body'] = str_replace("{user}", $userSending->name, $translation->body);
-            }
+        if ($translation) {
+            $data['subject'] = $translation->value;
+            $data['body'] = $translation->body;
         } else {
-            if ($translation) {
-                $data['subject'] = $translation->value;
-                $data['body'] = $translation->body;
-            }
-            if ($translationEsp) {
-                $data['subject_es'] = $translationEsp->value;
-                $data['body_es'] = $translationEsp->body;
-            }
+            $data['body'] = $data['subject'];
+        }
+        if ($translationEsp) {
+            $data['subject_es'] = $translationEsp->value;
+            $data['body_es'] = $translationEsp->body;
+        } else {
+            $data['subject_es'] = $data['subject'];
+            $data['body_es'] = $data['subject'];
+        }
+        if ($userSending) {
+            $data['subject'] = str_replace("{user}", $userSending->name, $data['subject']);
+            $data['subject_es'] = str_replace("{user}", $userSending->name, $data['subject_es']);
+            $data['body'] = str_replace("{user}", $userSending->name, $data['body']);
+            $data['body_es'] = str_replace("{user}", $userSending->name, $data['body_es']);
         }
         $pos = strpos("e" . $data['type'], 'Report');
         if ($pos) {
@@ -173,12 +173,12 @@ class Notifications {
             $data['body_es'] = str_replace("{route}", $arrayPayload['route'], $data['body_es']);
         }
         $pos = strpos($data['subject'], '{date}');
-        if ($pos) { 
+        if ($pos) {
             $data['subject'] = str_replace("{date}", $arrayPayload['date'], $data['subject']);
             $data['subject_es'] = str_replace("{date}", $arrayPayload['date'], $data['subject_es']);
             $data['body'] = str_replace("{date}", $arrayPayload['date'], $data['body']);
             $data['body_es'] = str_replace("{date}", $arrayPayload['date'], $data['body_es']);
-        } 
+        }
         $pos = strpos($data['subject'], '{bookclient}');
         if ($pos) {
             $data['subject'] = str_replace("{bookclient}", $arrayPayload['bookclient'], $data['subject']);
@@ -248,14 +248,14 @@ class Notifications {
                         }
                     }
                     $data['user_id'] = $user->id;
-                    if(array_key_exists('body', $data)){
+                    if (array_key_exists('body', $data)) {
                         $body = $data['body'];
-                    }else {
+                    } else {
                         $body = $data['subject'];
                     }
-                    if(array_key_exists('body_es', $data)){
+                    if (array_key_exists('body_es', $data)) {
                         $bodyEs = $data['body_es'];
-                    }else {
+                    } else {
                         $bodyEs = $data['subject_es'];
                     }
                     unset($data['body']);
@@ -398,7 +398,7 @@ class Notifications {
                 'app_id' => env('ONESIGNAL_APP_ID_FOOD'),
                 'include_player_ids' => $userPush,
                 'data' => $msg,
-                'contents' => $content 
+                'contents' => $content
             );
             $auth = 'Authorization: Basic ' . env('ONESIGNAL_REST_KEY_FOOD');
 

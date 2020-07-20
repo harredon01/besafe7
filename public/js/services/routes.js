@@ -129,12 +129,12 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
-            var addReturnStop = function (route_id) {
+            var addReturnStop = function (route_id,address_id) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
                         url: "/api/routes/"+route_id+"/return",
-                        data: {}, // pass in data as strings
+                        data: {address_id:address_id}, // pass in data as strings
                     })
                             .success(function (data) {
                                 def.resolve(data);

@@ -15,7 +15,19 @@ html {
 body {
   margin: 0;
 }
-
+.preloader {
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   z-index: 9999;
+   background-image: url('../images/default.gif');
+   background-repeat: no-repeat; 
+   display:none;
+   background-color: #FFF;
+   background-position: center;
+}
 article,
 aside,
 details,

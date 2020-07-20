@@ -52,6 +52,15 @@ class EditDelivery {
                         if ($validator->fails()) {
                             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
                         }
+//                        $components = ['type_id', 'starter_id', 'drink_id', 'main_id', 'dessert_id'];
+//                        $dish = [];
+//                        foreach ($components as $field) {
+//                            if (array_key_exists($field, $data)) {
+//                                if ($data[$field]) {
+//                                    $dish[$field] = $data[$field];
+//                                }
+//                            }
+//                        }
                         $starter = "";
                         if (array_key_exists('starter_id', $data)) {
                             if ($data['starter_id']) {
@@ -86,7 +95,6 @@ class EditDelivery {
                             }
                         }
                         $delivery->save();
-                        $this->checkRecurringPosibility($user, $data['ip_address']);
                         dispatch(new AddDeliveryInfo($delivery));
                     }
                     $date = date_create($delivery->delivery);

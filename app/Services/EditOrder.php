@@ -395,6 +395,20 @@ class EditOrder {
         if (!$address) {
             return array("status" => "error", "message" => "Order does not have Shipping Address");
         }
+        if ($results['requiresShipping'] == 0) {
+            $order->orderConditions()->where('type', "shipping")->delete();
+            Cart::session($user->id)->removeConditionsByType("shipping");
+        } else {
+            $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
+            if (!$shippingCondition) {
+                Cart::session($user->id)->removeConditionsByType("shipping");
+                $results['status'] = "error";
+                $results['order'] = $order;
+                $results['message'] = "Order requires shipping condition";
+                $results['type'] = "shipping";
+                return $results;
+            }
+        }
 
         return $results;
     }
@@ -552,17 +566,6 @@ class EditOrder {
             }
             array_push($checkBuyers, $user->id);
             $requiredBuyers -= count($checkBuyers);
-        }
-        if ($requiresShipping == 0) {
-            $order->orderConditions()->where('type', "shipping")->delete();
-            Cart::session($user->id)->removeConditionsByType("shipping");
-        } else {
-            $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
-            if ($shippingCondition) {
-                $requiresShipping = 0;
-            } else {
-                Cart::session($user->id)->removeConditionsByType("shipping");
-            }
         }
         return array(
             "split" => $splitTotal,
@@ -892,7 +895,7 @@ class EditOrder {
         } else {
             //$admins = User::whereIn("id", [2, 77])->get();
         }
-        
+
         $sendEmail = true;
         if ($order->status == "approved") {
             $shipping = $order->orderAddresses()->where("type", "shipping")->first();

@@ -185,10 +185,11 @@ class RouteController extends Controller {
      * @param  \App\Models\Route  $route
      * @return \Illuminate\Http\Response
      */
-    public function addReturnStop($routeId) {
+    public function addReturnStop(Request $request,$routeId) {
         $route = Route::find($routeId);
         if ($route) {
-            $this->routing->completeRoutes([$route]);
+            $data = $request->only("address_id");
+            $this->routing->completeRoutes([$route],$data["address_id"]);
             return response()->json([
                         'status' => "success",
                         'message' => "Stop added to new route"

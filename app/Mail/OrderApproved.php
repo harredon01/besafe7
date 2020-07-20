@@ -68,7 +68,7 @@ class OrderApproved extends Mailable {
         foreach ($order->items as $item) {
             $attributes = json_decode($item->attributes, true);
             if (array_key_exists("is_credit", $attributes)) {
-                $totalDeposit+= ($item->quantity * $item->cost);
+                $totalDeposit += ($item->quantity * $item->cost);
             } else {
                 $totalCost += ($item->quantity * $item->cost);
                 $totalTax += ($item->quantity * $item->tax);
@@ -78,9 +78,15 @@ class OrderApproved extends Mailable {
         if ($totalDiscount > 0) {
             $productDiscount = $totalDiscount / 1.08;
             $taxDiscount = $totalDiscount - $productDiscount;
+            if ($taxDiscount < 0) {
+                $taxDiscount = 0;
+            }
         }
         $order->payment = $payment;
         $order->tax = $totalTax - $taxDiscount;
+        if ($order->tax < 0) {
+            $order->tax = 0;
+        }
         $order->totalCost = $totalCost - $productDiscount;
         $order->totalPlatform = $totalPlatform;
         $order->totalDeposit = $totalDeposit;

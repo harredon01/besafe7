@@ -47,15 +47,15 @@
                             Id
                         </td>
                         <td>
-                            Amount
+                            #
                         </td>
-                        <td>
+                        <td  style="display:none">
                             Envio
                         </td>
-                        <td>
+                        <td style="display:none">
                             Acciones
                         </td>
-                        <td>
+                        <td style="display:none">
                             Acciones
                         </td>
                         <td>
@@ -63,19 +63,19 @@
                         </td>
                     </tr>
                     <tr ng-repeat="stop in route.stops" data-route="@{{ stop.route_id}}" data-stop="@{{ stop.id}}">
-                        <td>
+                        <td class="handle">
                             @{{ stop.id}}
                         </td>
                         <td>
                             -@{{ stop.amount}}
                         </td>
-                        <td>
+                        <td style="display:none">
                             @{{ stop.shipping}}
                         </td>
                         <td><input style="display:none" type="tel" name="Route" ng-model="stop.route_id"/>
                             <button style="display:none" ng-click="updateRouteStop(stop)">Actualizar</button><br style="display:none"/>-@{{ stop.address.address}}
                         </td>
-                        <td><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
+                        <td style="display:none"><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
                         <td><button ng-click="deleteStop(stop.id)">Borrar parada</button></td>
                     </tr>
                 </tbody>
@@ -88,8 +88,10 @@
                     <td>
                         <a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
                     </td>
-                    <td>
-                        <a href="javascript:;" ng-click="addReturnStop(route.id)" class="editar">addReturnStop</a>
+                    <td><select ng-model="route.address_id" name="address_id">
+                    <option ng-repeat="stop in returns" value="@{{stop.address_id}}">@{{stop.name}}</option>
+                </select>
+                        <a href="javascript:;" ng-click="addReturnStop(route.id,route.address_id)" class="editar">addReturnStop</a>
                     </td>
                     <td>
                         <a href="javascript:;" ng-click="deleteRoute(route.id)" class="editar">deleteRoute</a>
@@ -100,7 +102,7 @@
             <div style="display:none">
                 <br/><a href="javascript:;" ng-click="buildRoute(route)" class="editar">Construir</a>
                 <br/><br/><a href="javascript:;" ng-click="showRoute(route)" class="editar">Show Route</a>
-                <br/><br/><a href="javascript:;" ng-click="addReturnStop(route.id)" class="editar">addReturnStop</a>
+                <br/><br/><a href="javascript:;" ng-click="addReturnStop(route.id,route.address_id)" class="editar">addReturnStop</a>
                 <br/><br/><a href="javascript:;" ng-click="deleteRoute(route.id)" class="editar">deleteRoute</a>
             </div>
         </div>

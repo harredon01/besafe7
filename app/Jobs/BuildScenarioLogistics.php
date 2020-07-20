@@ -35,9 +35,6 @@ class BuildScenarioLogistics implements ShouldQueue
      */
     public function handle(Routing $routing)
     {
-        if(!$this->user){
-            $this->user = User::find(2);
-        }
         $routing->buildScenarioLogistics($this->data); 
     }
     
@@ -50,12 +47,12 @@ class BuildScenarioLogistics implements ShouldQueue
     public function failed(Exception $exception)
     {
         $payload = ["scenario"=> $this->scenario." completo"  ];
-        if(!$this->user){
-            $this->user = User::find(2);
-        }
-        $followers = [$this->user];
+
+        $user = User::find(2);
+
+        $followers = [$user];
         $data = [
-            "trigger_id" => $this->user->id,
+            "trigger_id" => $user->id,
             "message" => "",
             "subject" => "",
             "object" => "Lonchis",

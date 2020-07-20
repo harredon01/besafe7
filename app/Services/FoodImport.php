@@ -119,7 +119,7 @@ class FoodImport {
         $this->importDishes(storage_path('imports') . '/TemplateAlmuerzo.xlsx');
     }
 
-    private function importDish($entradas, $principales, $postres, $activeRow) {
+    private function importDish($entradas, $principales, $postres, $activeRow,$message) {
         $dishes = [
             "entradas" => $entradas,
             "plato" => $principales,
@@ -137,6 +137,7 @@ class FoodImport {
         $article = Article::create([
                     "type" => "lunch",
                     "name" => $activeRow[1],
+                    "pagetitle" => $message,
                     "description" => "Almuerzo " . $activeRow[1],
                     "start_date" => $saveDate,
                     "attributes" => json_encode($dishes)
@@ -176,6 +177,7 @@ class FoodImport {
         $entradas = [];
         $principales = [];
         $postres = [];
+        $message = null;
         foreach ($reader as $row) {
             
             if ($row[0]) {
@@ -186,10 +188,11 @@ class FoodImport {
                 }
                 if ($row[1] != $activeLunch) {
                     $activeLunch = $row[1];
-                    $this->importDish($entradas, $principales, $postres, $activeRow);
+                    $this->importDish($entradas, $principales, $postres, $activeRow,$message);
                     $entradas = [];
                     $principales = [];
                     $postres = [];
+                    $message = null;
                 }
                 $imagen ="";
                 if($row[7]){
@@ -242,6 +245,9 @@ class FoodImport {
                     "p_otro" => "",
                     "pesos" => $pesos
                 ];
+                if($row[13]){
+                    $plato['message']=$row[13];
+                }
                 if ($row[2] == "Entrada") {
                     array_push($entradas, $plato);
                 } else if ($row[2] == "Principal") {
@@ -252,7 +258,7 @@ class FoodImport {
                 $activeRow = $row;
             }
         }
-        $this->importDish($entradas, $principales, $postres, $activeRow);
+        $this->importDish($entradas, $principales, $postres, $activeRow,$message);
     }
 
     public function importTranslations($path) {

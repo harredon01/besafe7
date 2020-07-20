@@ -17,14 +17,47 @@
                 let day = date.getDay();
                 if (day < 6) {
                     date.setDate(date.getDate() + 1);
-                }  else if (day == 6) {
+                } else if (day == 6) {
                     date.setDate(date.getDate() + 2);
                 }
                 $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
-                $scope.getArticles(new Date());
-
+                $scope.getArticles();
+                $scope.buildDatePicker();
 
             });
+            $scope.buildDatePicker = function () {
+                var dateFormat = "yy-mm-dd",
+                        from = $("#from")
+                        .datepicker({
+                            defaultDate: "+1d",
+                            changeMonth: true,
+                            numberOfMonths: 2,
+                            dateFormat: dateFormat
+                        })
+                        .on("change", function () {
+                            console.log("date1", $scope.activeDate);
+                            let date = $scope.getDate(this);
+                            $scope.activeDate = date.getFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
+                            console.log("date", $scope.activeDate);
+                        });
+
+            }
+            $scope.getDate = function (element) {
+                console.log("Get date", element.value);
+                var date;
+                try {
+                    date = $.datepicker.parseDate("yy-mm-dd", element.value);
+                } catch (error) {
+                    date = null;
+                }
+
+                return date;
+            }
+            $scope.updateDels = function () {
+                $scope.page =0;
+                $scope.deliveries = [];
+                $scope.getArticles();
+            }
             $scope.activateMap = function () {
                 $scope.mapActive = true;
                 console.log("Creating map data")
@@ -58,7 +91,7 @@
             $scope.getDeliveries = function () {
                 console.log("Status", $scope.status);
                 $scope.page++;
-                let url = "includes=user,address&limit=50&order_by=address_id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery<" + $scope.activeDate + " 23:59:59";
+                let url = "includes=user,address&limit=50&order_by=address_id,asc&page=" + $scope.page + "&status=" + $scope.status + "&delivery=" + $scope.activeDate + " 12:00:00";
                 Food.getDeliveries(url).then(function (data) {
                     let deliveriesCont = data.data;
                     if (data.page == data.last_page) {
@@ -212,7 +245,7 @@
                 console.log("Updating dish: ", container);
                 Food.updateMissingDish(container);
             }
-            $scope.getArticles = function (date) {
+            $scope.getArticles = function () {
                 Food.getArticlesByDate($scope.activeDate).then(function (data) {
                     $scope.listArticles = data.data;
                     for (let item in $scope.listArticles) {

@@ -37,6 +37,7 @@
                         });
             }
             $scope.getDate = function (element) {
+                console.log("Get date",element.value);
                 var date;
                 try {
                     date = $.datepicker.parseDate("yy-mm-dd", element.value);

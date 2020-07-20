@@ -4,6 +4,7 @@
             $scope.data = {};
             $scope.routes;
             $scope.page = 0;
+            $scope.returns = [{name: "casa", address_id: 17663}, {name: "basilikum", address_id: 17660}];
             $scope.loadMore = true;
             $scope.scenario = 'simple';
             $scope.status = 'pending';
@@ -100,6 +101,7 @@
                     var el = document.getElementById('route-' + route.id + '-table');
                     var sortable = new Sortable(el, {
                         group: "routes",
+                        handle: '.handle',
                         dataIdAttr: route.id,
                         onAdd: function (/**Event*/evt) {
                             console.log("On add", evt);
@@ -138,7 +140,7 @@
                     console.log("Setting sortable");
                 }, 1000);
 
-
+                route.address_id = 17663;
                 return route;
             }
             $scope.updateRouteLocation = function (route, stop, index, old) {
@@ -169,16 +171,17 @@
                         }
                     }
                 }
-                
+
                 console.log("displacedStops", displacedStops);
-                if(!movingStop){
+                if (!movingStop) {
                     movingStop = {};
                     movingStop.route_id = route;
                     movingStop.id = stop;
                 }
                 console.log("Moving stop", movingStop);
+                $('.preloader').fadeIn('slow');
                 $scope.updateRouteStop(movingStop);
-                
+
                 setTimeout(function () {
                     let counter = 1;
                     if (displacedStops.length > 0) {
@@ -186,12 +189,10 @@
                             $scope.updateSpeed(displacedStops[item], counter);
                             counter++;
                             console.log("displacing stop", displacedStops[item]);
-                            if (counter == displacedStops.length) {
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 300 * (counter + 1));
-                            }
                         }
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300 * (counter + 1));
                     } else {
                         setTimeout(function () {
                             window.location.reload();
@@ -285,7 +286,7 @@
             }
             $scope.updateRouteStop = function (stop) {
                 Routes.updateRouteStop(stop.id, stop.route_id).then(function (data) {
-                    
+
                 },
                         function (data) {
 
@@ -309,7 +310,7 @@
             }
             $scope.deleteStop = function (stop_id) {
                 Routes.deleteStop(stop_id).then(function (data) {
-
+                    window.location.reload();
                 },
                         function (data) {
 
@@ -323,8 +324,8 @@
 
                         });
             }
-            $scope.addReturnStop = function (route) {
-                Routes.addReturnStop(route).then(function (data) {
+            $scope.addReturnStop = function (route, address_id) {
+                Routes.addReturnStop(route, address_id).then(function (data) {
                     window.location.reload();
                 },
                         function (data) {
@@ -348,6 +349,7 @@
             }
             $scope.regenerateScenarios = function () {
                 Food.regenerateScenarios().then(function (data) {
+                    window.location.reload();
                 },
                         function (data) {
 
@@ -378,6 +380,7 @@
             $scope.buildScenarioLogistics = function () {
                 let data = $scope.getInputs();
                 Food.buildScenarioLogistics(data).then(function (data) {
+                    window.location.reload();
                 },
                         function (data) {
 

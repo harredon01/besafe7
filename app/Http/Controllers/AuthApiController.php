@@ -160,13 +160,40 @@ class AuthApiController extends Controller {
      */
     public function checkSocialToken(Request $request) {
         $data = $request->all();
-        $user = Socialite::driver($data['driver'])->userFromToken($data['token']);
+        $user = null;
+        if ($data['driver'] == 'apple') {
+            //dd(base_path() . '/AuthKey_.pem');
+            $result = $this->sendPost($data['token']);
+            return response()->json(['status' => "error", "message" => $result]);
+            dd($result);
+            if ($result['expires_in'] > 0) {
+                $user = $data['extra'];
+            } else {
+                return response()->json(['status' => "error", "message" => "token validation failed"]);
+            }
+        } else {
+            $user = Socialite::driver($data['driver'])->userFromToken($data['token']);
+        }
+
         $user = json_decode(json_encode($user), true);
         $authUser = User::where("email", $user['email'])->first();
         if (!$authUser) {
             $str = rand();
             $result = md5($str);
-            if ($data['driver'] == 'google') {
+            if ($data['driver'] == 'apple') {
+                $authUser = User::create([
+                            'firstName' => $user['firstName'],
+                            'lastName' => $user['lastName'],
+                            'name' => $user['name'],
+                            'email' => $user['email'],
+                            'cellphone' => '11',
+                            'language' => 'es',
+                            'area_code' => '11',
+                            'password' => bcrypt($result),
+                            'emailNotifications' => 1,
+                            'optinMarketing' => 1
+                ]);
+            } else if ($data['driver'] == 'google') {
                 $authUser = User::create([
                             'firstName' => $user['user']['given_name'],
                             'lastName' => $user['user']['family_name'],
@@ -198,6 +225,131 @@ class AuthApiController extends Controller {
         }
         $token = $authUser->createToken($data['driver'])->accessToken;
         return response()->json(['status' => "success", "token" => $token]);
+    }
+
+    public static function fromDER(string $der, int $partLength)
+    {
+        $hex = unpack('H*', $der)[1];
+        if ('30' !== mb_substr($hex, 0, 2, '8bit')) { // SEQUENCE
+            throw new \RuntimeException();
+        }
+        if ('81' === mb_substr($hex, 2, 2, '8bit')) { // LENGTH > 128
+            $hex = mb_substr($hex, 6, null, '8bit');
+        } else {
+            $hex = mb_substr($hex, 4, null, '8bit');
+        }
+        if ('02' !== mb_substr($hex, 0, 2, '8bit')) { // INTEGER
+            throw new \RuntimeException();
+        }
+        $Rl = hexdec(mb_substr($hex, 2, 2, '8bit'));
+        $R = self::retrievePositiveInteger(mb_substr($hex, 4, $Rl * 2, '8bit'));
+        $R = str_pad($R, $partLength, '0', STR_PAD_LEFT);
+        $hex = mb_substr($hex, 4 + $Rl * 2, null, '8bit');
+        if ('02' !== mb_substr($hex, 0, 2, '8bit')) { // INTEGER
+            throw new \RuntimeException();
+        }
+        $Sl = hexdec(mb_substr($hex, 2, 2, '8bit'));
+        $S = self::retrievePositiveInteger(mb_substr($hex, 4, $Sl * 2, '8bit'));
+        $S = str_pad($S, $partLength, '0', STR_PAD_LEFT);
+        return pack('H*', $R.$S);
+    }
+    /**
+     * @param string $data
+     *
+     * @return string
+     */
+    private static function preparePositiveInteger(string $data)
+    {
+        if (mb_substr($data, 0, 2, '8bit') > '7f') {
+            return '00'.$data;
+        }
+        while ('00' === mb_substr($data, 0, 2, '8bit') && mb_substr($data, 2, 2, '8bit') <= '7f') {
+            $data = mb_substr($data, 2, null, '8bit');
+        }
+        return $data;
+    }
+    /**
+     * @param string $data
+     *
+     * @return string
+     */
+    private static function retrievePositiveInteger(string $data)
+    {
+        while ('00' === mb_substr($data, 0, 2, '8bit') && mb_substr($data, 2, 2, '8bit') > '7f') {
+            $data = mb_substr($data, 2, null, '8bit');
+        }
+        return $data;
+    }
+
+    function encode($data) {
+        $encoded = strtr(base64_encode($data), '+/', '-_');
+        return rtrim($encoded, '=');
+    }
+
+    private function generateJWT() {
+        $kid = env('APPLE_KEY_ID'); // identifier for private key
+        $iss = env('APPLE_TEAM_ID'); // team identifier
+        $sub = env('APPLE_CLIENT_ID');
+        $header = [
+            'alg' => 'ES256',
+            'kid' => $kid
+        ];
+        $body = [
+            'iss' => $iss,
+            'iat' => time(),
+            'exp' => time() + 3600,
+            'aud' => 'https://appleid.apple.com',
+            'sub' => $sub
+        ];
+
+        $privKey = openssl_pkey_get_private(file_get_contents(base_path() . '/Authkey.pem'));
+        if (!$privKey) {
+            return false;
+        }
+
+        $payload = $this->encode(json_encode($header)) . '.' . $this->encode(json_encode($body));
+
+        $signature = '';
+        $success = openssl_sign($payload, $signature, $privKey, OPENSSL_ALGO_SHA256);
+        if (!$success)
+            return false;
+
+        $raw_signature = $this->fromDER($signature, 64);
+
+        return $payload . '.' . $this->encode($raw_signature);
+    }
+
+    private function sendPost($token) {
+        $jwt = $this->generateJWT();
+        //url-ify the data for the POST
+        $data = [
+            "client_id" => env('APPLE_CLIENT_ID'),
+            "client_secret" => $jwt,
+            "code" => $token,
+            "grant_type" => "authorization_code",
+            "redirect_uri" => env('APPLE_REDIRECT_URI')
+        ];
+        $headers = array(
+            'Accept: application/json',
+            'User-Agent: curl'
+        );
+        $fields_string = "";
+        foreach ($data as $key => $value) {
+            $fields_string .= $key . '=' . $value . '&';
+        }
+        $fields_string = rtrim($fields_string, '&');
+        //return [$data,$fields_string];
+        
+        $curl = curl_init('https://appleid.apple.com/auth/token');
+        //dd($data);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode($response, true);
+        return [$response,$fields_string];
     }
 
     /**

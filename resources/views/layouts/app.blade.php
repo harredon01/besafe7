@@ -81,6 +81,7 @@ echo json_encode([
   
     </head>
     <body>
+        <div class="preloader">Cargando</div>
         <div id="app">
             <nav class="navbar navbar-default navbar-static-top">
                 <div class="container">

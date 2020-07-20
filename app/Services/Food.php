@@ -23,7 +23,7 @@ use App\Mail\PurchaseOrder;
 use App\Mail\Register;
 use App\Mail\NewsletterMenus;
 use App\Jobs\SendMessage;
-use App\Mail\Newsletter;
+use App\Mail\Newsletter4;
 use App\Services\Rapigo;
 use DB;
 use Excel;
@@ -281,21 +281,33 @@ class Food {
             return $dayConfig;
         }
     }
+    
+    private function getSubject($tomorrow){
+        $articles = Article::where("start_date",$tomorrow . " 00:00:00")->get();
+    }
 
     public function sendReminder() {
         $date = date_create();
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 5) {
-            return true;
-        }
-        $type = "program_reminder";
+        $type = "program_reminder2";
         $date = $this->getNextValidDate($date);
-        $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
-        if ($dayofweek == 1) {
-            //$type = "program_reminder2";
-        }
         $tomorrow = date_format($date, "Y-m-d");
-        $deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
+        $articles = Article::where('start_date',$tomorrow . " 00:00:00")->get();
+        $remindMessage = null;
+        foreach ($articles as $art) {
+            if($art->pagetitle){
+                $remindMessage = $art->pagetitle;
+            }
+        }
+        //$deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
+        $thedata = ["tom1"=>$tomorrow . " 00:00:00","tom2"=>$tomorrow . " 23:59:59"];
+        $deliveries = DB::select(""
+                        . "SELECT * FROM food.deliveries WHERE status = 'pending' AND user_id NOT IN "
+            . " (SELECT DISTINCT user_id FROM food.deliveries WHERE status = 'enqueue' AND delivery BETWEEN :tom1 AND :tom2) GROUP BY user_id;"
+                        . "", $thedata);
+        if(!$remindMessage){
+            $remindMessage = "¿Ya sabes que vas a almorzar mañana?";
+        }
         if (count($deliveries) > 0) {
             $followers = [];
             $platFormService = app('Notifications');
@@ -308,11 +320,15 @@ class Food {
                     "page" => "DeliveryProgramPage",
                     "page_payload" => $delivery
                 ];
-                $followers = [$deliveryObj->user];
+                
+                $dauser = [
+                    "id"=> $deliveryObj->user_id
+                ];
+                $followers = [json_decode(json_encode($dauser))];
                 $data = [
                     "trigger_id" => -1,
                     "message" => "",
-                    "subject" => "Ya escogiste tu almuerzo de mañana?",
+                    "subject" => $remindMessage,
                     "object" => "Lonchis",
                     "sign" => true,
                     "payload" => $payload,
@@ -327,8 +343,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-07-06 00:00:00";
-        $end_date = "2020-07-10 23:59:59";
+        $start_date = "2020-07-13 00:00:00";
+        $end_date = "2020-07-18 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -377,7 +393,9 @@ class Food {
 
         $date = date_create();
         // id > 130 and id < 200 bota 500
-        $followers = DB::select("select id,email from users where optinMarketing = 1");
+        $followers = DB::select('select user_id as id from deliveries where delivery ="2020-07-17 12:00:00" and status in ("scheduled","completed")');
+        //dd($followers);
+        //$followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -385,12 +403,12 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Visita tu correo para enterarte de nuestros menus de fin de semana",
+                "subject" => "Debido a que no encontramos papaya fresca, dulce y jugosa en el mercado de la mañana,  a todos nuestros clientes que pidieron fruta de de entrada, les enviaremos un mix con las frutas mas frescas recién picada. Pedimos disculpa por cualquier inconveniente",
                 "object" => "Lonchis",
                 "sign" => true,
                 "payload" => $payload,
-                "type" => 'newsletter_food',
-                "user_status" => "normal"
+                "type" => 'program_reminder2',
+                "user_status" => "normal" 
             ];
             $date = date_create();
             $date = date_format($date, "Y-m-d");
@@ -398,8 +416,8 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) { 
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Julio","Julio"));
-                //Mail::to($user->email)->send(new Newsletter());
+                //Mail::to($user->email)->send(new NewsletterMenus($days,"Julio","Julio"));
+                //Mail::to($user->email)->send(new Newsletter4());
             }
         }
     }

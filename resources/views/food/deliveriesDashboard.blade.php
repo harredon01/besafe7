@@ -14,7 +14,8 @@
                         <option value="Rapigo">Rapigo</option>
                         <option value="Basilikum">Basilikum</option>
                     </select><br/>
-
+                    <input type="text" id="from" ng-model="from" name="from">
+                    <br/><a href="javascript:;" ng-click="updateDels()">Actualizar</a><br/><br/><br/>
                     <a href="javascript:;" ng-click="sendReminder()">Enviar Recordatorio</a><br/><br/>
                     <a href="javascript:;" ng-click="sendNewsletter()">Enviar Newsletter</a><br/><br/>
                     <!--a href="javascript:;" ng-click="regenerateDeliveries()">Regenerate Deliveries</a><br/><br/-->

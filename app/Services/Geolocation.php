@@ -78,7 +78,7 @@ class Geolocation {
         $query = CoveragePolygon::where(function($query) use ($merchant_id) {
                     $query->where('merchant_id', $merchant_id)
                             ->orWhereNull('merchant_id');
-                });
+                })->orderBy("provider","desc");
         if ($provider) {
             $query->where('provider', $provider); 
         }

@@ -105,9 +105,6 @@ class FoodApiController extends Controller {
             return response()->json(array("status" => "success", "message" => "Debug mode doing nothing"));
         }
         $date = date_create();
-        if ($this->food->checkIsHoliday($date)) {
-            return true;
-        }
         $dayofweek = date('w', strtotime(date_format($date, "Y-m-d H:i:s")));
         if ($dayofweek > 5) {
             return response()->json(array("status" => "success", "message" => "Reminder Sent"));
@@ -272,7 +269,7 @@ class FoodApiController extends Controller {
      */
     public function regenerateScenarios(Request $request) {
         dispatch(new RegenerateScenarios());
-        $this->routing->regenerateScenarios();
+        //$this->routing->regenerateScenarios();
         return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
     }
 
