@@ -15,7 +15,7 @@ class Kernel extends HttpKernel
      */
     protected $middleware = [
         \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
-        \Barryvdh\Cors\HandleCors::class,
+        \Fruitcake\Cors\HandleCors::class,
     ];
 
     /**
@@ -55,7 +55,6 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'admin' => \App\Http\Middleware\CheckIfAdmin::class,
         'user.admin.request' => \App\Http\Middleware\CheckAdminRequest::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'cors' => \Barryvdh\Cors\HandleCors::class
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class
     ];
 }

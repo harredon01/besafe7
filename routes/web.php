@@ -35,7 +35,7 @@ Route::get('/icons', function () {
 Route::get('/zones', function () {
     return view('content.zonespublic');
 });
-Auth::routes();
+//Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 Route::get('user/editProfile', 'UserController@getEditProfile');

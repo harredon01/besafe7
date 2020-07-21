@@ -19,9 +19,14 @@ class BackupDatabase extends Command {
         parent::__construct();
         $date = date_create();
         $this->backupName = date_format($date, "Y-m-d") . "-food.sql";
-        $this->process = new Process(sprintf(
-                        'mysqldump -u%s -p%s %s > %s', config('database.connections.mysql.username'), config('database.connections.mysql.password'), config('database.connections.mysql.database'), storage_path('app/backups/' . $this->backupName)
-        ));
+        $file = storage_path('app/backups/' . $this->backupName);
+        $this->process = new Process([
+            'mysqldump',
+            '--user=' . config('database.connections.mysql.username'),
+            '--password=' . config('database.connections.mysql.password'),
+            config('database.connections.mysql.database'),
+            '--result-file=' . $file
+        ]);
     }
 
     public function handle() {
@@ -32,14 +37,14 @@ class BackupDatabase extends Command {
             // executes after the command finishes
             if ($this->process->isSuccessful()) {
                 $this->info('Backup successful.');
-                $contents =  new File(storage_path('app/backups/' . $this->backupName));
-                $path = Storage::putFileAs('backups',$contents,$this->backupName, 'private');
+                $contents = new File(storage_path('app/backups/' . $this->backupName));
+                $path = Storage::putFileAs('backups', $contents, $this->backupName, 'private');
                 //Storage::delete('backups/' . $this->backupName);
             }
             //
-            $this->info('The backup has been proceed successfully.');
+            $this->info('The backup has been stored successfully.');
         } catch (ProcessFailedException $exception) {
-            $this->error('The backup process has been failed.' . $exception->getMessage());
+            $this->error('The backup process has failed.' . $exception->getMessage());
         }
     }
 

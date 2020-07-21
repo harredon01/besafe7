@@ -168,7 +168,6 @@ return [
 	Darryldecode\Cart\CartServiceProvider::class,
 	Unlu\Laravel\Api\ApiQueryBuilderServiceProvider::class,
 	Laravel\Passport\PassportServiceProvider::class,
-        Barryvdh\Cors\ServiceProvider::class,
         Laravel\Scout\ScoutServiceProvider::class,
         Laravel\Cashier\CashierServiceProvider::class,
         Dusterio\AwsWorker\Integrations\LaravelServiceProvider::class,
