@@ -214,15 +214,19 @@ class EditMessages {
     public function sendChat(array $data, User $user, bool $notif) {
         if ($data['type'] == self::USER_MESSAGE_TYPE) {
             $followers = $user->getRecipientsMessage($data['to_id']);
+            $sendEmail = false;
             if (count($followers) > 0) {
                 
             } else {
                 $followers = [];
+                if($data['to_id']==77){
+                    $sendEmail = true;
+                }
                 $recipient = User::find($data['to_id']);
                 array_push($followers, $recipient);
             }
             unset($data['to_id']);
-            $this->notifications->sendMassMessage($data, $followers, $user, $notif, null, false);
+            $this->notifications->sendMassMessage($data, $followers, $user, $notif, null, $sendEmail);
         } elseif ($data['type'] == self::GROUP_MESSAGE_TYPE) {
             $group = Group::find(intval($data['to_id']));
             if ($group) {

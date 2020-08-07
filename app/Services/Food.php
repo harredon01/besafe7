@@ -294,17 +294,26 @@ class Food {
         $tomorrow = date_format($date, "Y-m-d");
         $articles = Article::where('start_date',$tomorrow . " 00:00:00")->get();
         $remindMessage = null;
+        $sendToAll = false;
         foreach ($articles as $art) {
             if($art->pagetitle){
                 $remindMessage = $art->pagetitle;
             }
+            if($art->metadescription){
+                $sendToAll = true;
+            }
         }
         //$deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
         $thedata = ["tom1"=>$tomorrow . " 00:00:00","tom2"=>$tomorrow . " 23:59:59"];
-        $deliveries = DB::select(""
+        $deliveries = null;
+        if($sendToAll){
+            $deliveries = DB::select("SELECT id as user_id FROM users where optinMarketing = 1;");
+        } else {
+            $deliveries = DB::select(""
                         . "SELECT * FROM food.deliveries WHERE status = 'pending' AND user_id NOT IN "
             . " (SELECT DISTINCT user_id FROM food.deliveries WHERE status = 'enqueue' AND delivery BETWEEN :tom1 AND :tom2) GROUP BY user_id;"
                         . "", $thedata);
+        }
         if(!$remindMessage){
             $remindMessage = "¿Ya sabes que vas a almorzar mañana?";
         }
@@ -335,7 +344,12 @@ class Food {
                     "type" => $type,
                     "user_status" => "normal"
                 ];
-                $date = date_create($deliveryObj->delivery);
+                if($sendToAll){
+                    $date = date_create($tomorrow . " 00:00:00");
+                } else {
+                    $date = date_create($deliveryObj->delivery);
+                }
+                
                 $date = date_format($date, "Y-m-d");
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             }
@@ -343,13 +357,16 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-07-13 00:00:00";
-        $end_date = "2020-07-18 23:59:59";
+        $start_date = "2020-08-03 00:00:00";
+        $end_date = "2020-08-08 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
             $day = [
                 "imagen" => "",
+                "completo_imagen" => "",
+                "light_imagen" => "",
+                "vegetariano_imagen" => "",
                 "titulo" => "",
                 "vegetariano_t" => "",
                 "light_t" => "",
@@ -360,6 +377,10 @@ class Food {
                 "vegetariano_et" => "",
                 "light_et" => "",
                 "completo_et" => "",
+                "et1" => "",
+                "et2" => "",
+                "ed1" => "",
+                "ed2" => "",
             ];
             array_push($days, $day);
         }
@@ -372,6 +393,9 @@ class Food {
             if (!$days[($dayofweek - 1)]["imagen"]) {
                 $days[($dayofweek - 1)]["imagen"] = $attributes["plato"][0]["imagen"];
             }
+            if (!$days[($dayofweek - 1)][strtolower($article->name) ."_imagen"]) {
+                $days[($dayofweek - 1)][strtolower($article->name) ."_imagen"] = $attributes["plato"][0]["imagen"];
+            }
             if (!$days[($dayofweek - 1)][strtolower($article->name) . "_t"]) {
                 $days[($dayofweek - 1)][strtolower($article->name) . "_t"] = $attributes["plato"][0]["valor"];
             }
@@ -379,12 +403,18 @@ class Food {
                 if (!$days[($dayofweek - 1)][strtolower($article->name) . "_et"]) {
                     $days[($dayofweek - 1)][strtolower($article->name) . "_et"] = $attributes["entradas"][0]["valor"];
                 }
+                if (count($attributes["entradas"]) > 1) { 
+                    $days[($dayofweek - 1)]["et1"] = $attributes["entradas"][0]["valor"];
+                    $days[($dayofweek - 1)]["et2"] = $attributes["entradas"][1]["valor"];
+                    $days[($dayofweek - 1)]["ed1"] = $attributes["entradas"][0]["descripcion"];
+                    $days[($dayofweek - 1)]["ed2"] = $attributes["entradas"][1]["descripcion"];
+                }
             }
             if (!$days[($dayofweek - 1)][strtolower($article->name) . "_d"]) {
                 $days[($dayofweek - 1)][strtolower($article->name) . "_d"] = $attributes["plato"][0]["descripcion"];
             }
         }
-//        dd($days);
+        //dd($days);
         return $days;
     }
 
@@ -393,9 +423,9 @@ class Food {
 
         $date = date_create();
         // id > 130 and id < 200 bota 500
-        $followers = DB::select('select user_id as id from deliveries where delivery ="2020-07-17 12:00:00" and status in ("scheduled","completed")');
+        //$followers = DB::select('select user_id as id from deliveries where delivery ="2020-07-17 12:00:00" and status in ("scheduled","completed")');
         //dd($followers);
-        //$followers = DB::select("select id,email from users where optinMarketing = 1");
+        $followers = DB::select("select id,email from users where optinMarketing = 1");
         if (count($followers) > 0) {
             $payload = [
             ];
@@ -403,11 +433,11 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Debido a que no encontramos papaya fresca, dulce y jugosa en el mercado de la mañana,  a todos nuestros clientes que pidieron fruta de de entrada, les enviaremos un mix con las frutas mas frescas recién picada. Pedimos disculpa por cualquier inconveniente",
+                "subject" => "Visita tu correo para enterarte de nuestros menus de la semana",
                 "object" => "Lonchis",
                 "sign" => true,
                 "payload" => $payload,
-                "type" => 'program_reminder2',
+                "type" => 'newsletter_food',
                 "user_status" => "normal" 
             ];
             $date = date_create();
@@ -416,7 +446,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) { 
-                //Mail::to($user->email)->send(new NewsletterMenus($days,"Julio","Julio"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Agosto"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
@@ -553,7 +583,7 @@ class Food {
                 if ($preorganize) {
                     $totalCounter++;
                     if ($delivery->address == $initialAddress) {
-                        if (($delivery->provider == "Rapigo" && $deliveryCounter < 15) || ($delivery->provider == "Basilikum" && $deliveryCounter < 80)) {
+                        if (($delivery->provider == "Rapigo" && $deliveryCounter < 15) || ($delivery->provider == "Basilikum" && $deliveryCounter < 18)) {
                             $deliveryCounter++;
                             $deliveryShipping += $delivery->shipping;
                             array_push($packages, $delivery);

@@ -6,9 +6,9 @@
             $scope.page = 0;
             $scope.returns = [{name: "casa", address_id: 17663}, {name: "basilikum", address_id: 17660}];
             $scope.loadMore = true;
-            $scope.scenario = 'simple';
+            $scope.scenario = 'preorganize';
             $scope.status = 'pending';
-            $scope.provider = 'Rapigo';
+            $scope.provider = 'Basilikum';
             $scope.regionVisible = false;
             $scope.editAddress = false;
             $scope.mapActive = false;

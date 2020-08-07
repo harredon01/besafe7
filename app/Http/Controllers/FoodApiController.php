@@ -268,8 +268,8 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function regenerateScenarios(Request $request) {
-        dispatch(new RegenerateScenarios());
-        //$this->routing->regenerateScenarios();
+        //dispatch(new RegenerateScenarios());
+        $this->routing->regenerateScenarios();
         return response()->json(array("status" => "success", "message" => "Scenarios Scheduled for regeneration"));
     }
 

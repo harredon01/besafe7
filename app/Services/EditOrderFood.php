@@ -210,7 +210,7 @@ class EditOrderFood {
         if ($doShipping) {
             $geo = app('Geolocation');
             $address = $order->orderAddresses()->where("type", "shipping")->first();
-            $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id, "Rapigo");
+            $result = $geo->checkMerchantPolygons($address->lat, $address->long, $order->merchant_id, "Basilikum");
             $polygon = $result['polygon'];
             $address->polygon_id = $polygon->id;
             $address->save();
@@ -255,7 +255,7 @@ class EditOrderFood {
         $details["products"] = $products;
         $delivery->shipping = $order->shipping;
         $delivery->merchant_id = $item->merchant_id;
-        $delivery->provider = "Rapigo";
+        $delivery->provider = "Basilikum";
         $delivery->address_id = $address_id;
         $delivery->status = "pending";
         $delivery->details = json_encode($details);
@@ -343,7 +343,7 @@ class EditOrderFood {
             $delivery->merchant_id = $item->merchant_id;
             $delivery->address_id = $address_id;
             $delivery->status = "pending";
-            $delivery->provider = "Rapigo";
+            $delivery->provider = "Basilikum";
             if ($returnDelivery) {
                 $details["deliver"] = "envase";
                 $details["pickup"] = "envase";
@@ -387,7 +387,7 @@ class EditOrderFood {
                 $delivery->shipping = 2500;
                 $delivery->address_id = $address_id;
                 $delivery->status = "deposit";
-                $delivery->provider = "Rapigo";
+                $delivery->provider = "Basilikum";
                 $delivery->save();
             }
         }

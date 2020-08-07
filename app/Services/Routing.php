@@ -724,9 +724,6 @@ class Routing {
     }
 
     private function addpickupStop(Route $route, $address_id) {
-        if ($route->provider == "Basilikum") {
-            return;
-        }
         $addStop = true;
         foreach ($route->stops as $stop) {
             $address = $stop->address;
