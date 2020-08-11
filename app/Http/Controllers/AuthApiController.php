@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Push;
 use App\Services\EditAlerts;
 use App\Services\Security;
 use App\Jobs\PostRegistration;
@@ -161,22 +162,23 @@ class AuthApiController extends Controller {
     public function checkSocialToken(Request $request) {
         $data = $request->all();
         $user = null;
+        $authUser = null;
         if ($data['driver'] == 'apple') {
             //dd(base_path() . '/AuthKey_.pem');
             $result = $this->sendPost($data['token']);
             return response()->json(['status' => "error", "message" => $result]);
-            dd($result);
-            if ($result['expires_in'] > 0) {
+            if ($result['expires_in'] > 0 || $result['expires_in']) {
                 $user = $data['extra'];
+                $push = Push::where('object_id',$data['token'])->where('platform','apple')->with("User")->first();
+                $authUser = $push->user;
             } else {
                 return response()->json(['status' => "error", "message" => "token validation failed"]);
             }
         } else {
             $user = Socialite::driver($data['driver'])->userFromToken($data['token']);
+            $user = json_decode(json_encode($user), true);
+            $authUser = User::where("email", $user['email'])->first();
         }
-
-        $user = json_decode(json_encode($user), true);
-        $authUser = User::where("email", $user['email'])->first();
         if (!$authUser) {
             $str = rand();
             $result = md5($str);
@@ -192,6 +194,10 @@ class AuthApiController extends Controller {
                             'password' => bcrypt($result),
                             'emailNotifications' => 1,
                             'optinMarketing' => 1
+                ]);
+                Push::create([
+                    'user_id'=>$authUser->id,
+                    'platform' => "apple"
                 ]);
             } else if ($data['driver'] == 'google') {
                 $authUser = User::create([
@@ -227,8 +233,7 @@ class AuthApiController extends Controller {
         return response()->json(['status' => "success", "token" => $token]);
     }
 
-    public static function fromDER(string $der, int $partLength)
-    {
+    public static function fromDER(string $der, int $partLength) {
         $hex = unpack('H*', $der)[1];
         if ('30' !== mb_substr($hex, 0, 2, '8bit')) { // SEQUENCE
             throw new \RuntimeException();
@@ -251,30 +256,30 @@ class AuthApiController extends Controller {
         $Sl = hexdec(mb_substr($hex, 2, 2, '8bit'));
         $S = self::retrievePositiveInteger(mb_substr($hex, 4, $Sl * 2, '8bit'));
         $S = str_pad($S, $partLength, '0', STR_PAD_LEFT);
-        return pack('H*', $R.$S);
+        return pack('H*', $R . $S);
     }
+
     /**
      * @param string $data
      *
      * @return string
      */
-    private static function preparePositiveInteger(string $data)
-    {
+    private static function preparePositiveInteger(string $data) {
         if (mb_substr($data, 0, 2, '8bit') > '7f') {
-            return '00'.$data;
+            return '00' . $data;
         }
         while ('00' === mb_substr($data, 0, 2, '8bit') && mb_substr($data, 2, 2, '8bit') <= '7f') {
             $data = mb_substr($data, 2, null, '8bit');
         }
         return $data;
     }
+
     /**
      * @param string $data
      *
      * @return string
      */
-    private static function retrievePositiveInteger(string $data)
-    {
+    private static function retrievePositiveInteger(string $data) {
         while ('00' === mb_substr($data, 0, 2, '8bit') && mb_substr($data, 2, 2, '8bit') > '7f') {
             $data = mb_substr($data, 2, null, '8bit');
         }
@@ -339,7 +344,7 @@ class AuthApiController extends Controller {
         }
         $fields_string = rtrim($fields_string, '&');
         //return [$data,$fields_string];
-        
+
         $curl = curl_init('https://appleid.apple.com/auth/token');
         //dd($data);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -349,7 +354,7 @@ class AuthApiController extends Controller {
         $response = curl_exec($curl);
         curl_close($curl);
         $response = json_decode($response, true);
-        return [$response,$fields_string];
+        return [$response, $fields_string];
     }
 
     /**

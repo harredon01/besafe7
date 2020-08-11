@@ -922,7 +922,7 @@
 </div>
 </div>
 </div>
-<div style="background-color:transparent;">
+<div style="background-color:transparent;display:none">
 <div class="block-grid mixed-two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">
 <!--[if (mso)|(IE)]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;"><tr><td align="center"><table cellpadding="0" cellspacing="0" border="0" style="width:600px"><tr class="layout-full-width" style="background-color:transparent"><![endif]-->
