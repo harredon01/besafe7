@@ -166,11 +166,26 @@ class AuthApiController extends Controller {
         if ($data['driver'] == 'apple') {
             //dd(base_path() . '/AuthKey_.pem');
             $result = $this->sendPost($data['token']);
-            return response()->json(['status' => "error", "message" => $result]);
-            if ($result['expires_in'] > 0 || $result['expires_in']) {
+            //return response()->json(['status' => "error", "message" => $result]);
+            $urlparams = [];
+            parse_str($result[1],$urlparams);
+            $result = $result[0];
+            //$urlparams se puede verificar el id y el secret;
+            $processResult = false;
+            if (array_key_exists('expires_in', $result)) {
+                $processResult = true;
+            }
+            if (array_key_exists('error', $result)) {
+                if ($result['error'] == 'invalid_grant') {
+                    $processResult = true;
+                }
+            }
+            if ($processResult) {
                 $user = $data['extra'];
-                $push = Push::where('object_id',$data['token'])->where('platform','apple')->with("User")->first();
-                $authUser = $push->user;
+                $push = Push::where('object_id', $user['id'])->where('platform', 'apple')->with("User")->first();
+                if ($push) {
+                    $authUser = $push->user;
+                }
             } else {
                 return response()->json(['status' => "error", "message" => "token validation failed"]);
             }
@@ -180,25 +195,42 @@ class AuthApiController extends Controller {
             $authUser = User::where("email", $user['email'])->first();
         }
         if (!$authUser) {
+            $postRegistration = true;
             $str = rand();
             $result = md5($str);
             if ($data['driver'] == 'apple') {
-                $authUser = User::create([
-                            'firstName' => $user['firstName'],
-                            'lastName' => $user['lastName'],
-                            'name' => $user['name'],
-                            'email' => $user['email'],
-                            'cellphone' => '11',
-                            'language' => 'es',
-                            'area_code' => '11',
-                            'password' => bcrypt($result),
-                            'emailNotifications' => 1,
-                            'optinMarketing' => 1
-                ]);
-                Push::create([
-                    'user_id'=>$authUser->id,
-                    'platform' => "apple"
-                ]);
+                if ($user['email']) {
+                    $authUser = User::where("email", $user['email'])->first();
+                    if ($authUser) {
+                        $postRegistration = false;
+                        Push::create([
+                            'user_id' => $authUser->id,
+                            'platform' => "apple",
+                            'object_id' => $user['id']
+                        ]);
+                    }
+                } else {
+                    return response()->json(['status' => "error", "message" => "forget-apple"]);
+                }
+                if (!$authUser) {
+                    $authUser = User::create([
+                                'firstName' => $user['firstName'],
+                                'lastName' => $user['lastName'],
+                                'name' => $user['name'],
+                                'email' => $user['email'],
+                                'cellphone' => '11',
+                                'language' => 'es',
+                                'area_code' => '11',
+                                'password' => bcrypt($result),
+                                'emailNotifications' => 1,
+                                'optinMarketing' => 1
+                    ]);
+                    Push::create([
+                        'user_id' => $authUser->id,
+                        'platform' => "apple",
+                        'object_id' => $user['id']
+                    ]);
+                }
             } else if ($data['driver'] == 'google') {
                 $authUser = User::create([
                             'firstName' => $user['user']['given_name'],
@@ -227,7 +259,9 @@ class AuthApiController extends Controller {
                             'optinMarketing' => 1
                 ]);
             }
-            dispatch(new PostRegistration($authUser));
+            if ($postRegistration) {
+                dispatch(new PostRegistration($authUser));
+            }
         }
         $token = $authUser->createToken($data['driver'])->accessToken;
         return response()->json(['status' => "success", "token" => $token]);
