@@ -8,4 +8,8 @@ class Availability extends BookableAvailability {
 
     protected $table = 'bookable_availabilities';
     
+    public function available() {
+        return $this->morphTo();
+    }
+    
 }

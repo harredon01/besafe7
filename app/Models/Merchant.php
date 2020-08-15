@@ -45,6 +45,9 @@ class Merchant extends Model {
     public function products() {
         return $this->belongsToMany('App\Models\Product')->withTimestamps();
     }
+    public function availabilities() {
+        return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','merchant_id');
+    }
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');
     }

@@ -28,6 +28,7 @@ use MercadoPago\Customer;
 use MercadoPago\Card;
 use MercadoPago\Payment as Pago;
 use DB;
+
 class MercadoPagoService {
 
     /**
@@ -122,7 +123,7 @@ class MercadoPagoService {
     }
 
     private function getMerchantToken(Payment $payment) {
-        
+
         $external = false;
         $user = DB::table('payments')
                 ->join('orders', 'payments.order_id', '=', 'orders.id')
@@ -134,15 +135,15 @@ class MercadoPagoService {
                 ->distinct()
                 ->first();
         if ($user) {
-            $attributes = json_decode($user->extra,true);
+            $attributes = json_decode($user->extra, true);
             if (array_key_exists("access_token", $attributes)) {
                 $external = true;
-                SDK::configure(['ACCESS_TOKEN' =>$attributes['access_token']]);
+                SDK::configure(['ACCESS_TOKEN' => $attributes['access_token']]);
                 $paymentM = new Pago();
                 $paymentM->application_fee = $payment->total / 10;
             }
         }
-        if(!$external){
+        if (!$external) {
             $paymentM = new Pago();
         }
         return $paymentM;
@@ -347,12 +348,12 @@ class MercadoPagoService {
         }
         if ($source) {
             $source->source = $data["token"];
-            if($source->extra){
-                $source->extra = array_merge(json_decode($source->extra, true), json_encode($card));
+            if ($source->extra) {
+                $source->extra = json_encode(array_merge(json_decode($source->extra, true), json_decode(json_encode($card),true)));
             } else {
                 $source->extra = json_encode($card);
             }
-            
+
             $source->save();
         } else {
             $source = new Source([
@@ -409,7 +410,7 @@ class MercadoPagoService {
         $source->source = $token;
         $source->has_default = true;
         $source->save();
-    } 
+    }
 
     public function createClient(User $user) {
         $customer = new Customer();
@@ -452,12 +453,15 @@ class MercadoPagoService {
             "email" => $user->email
         );
         $customers = Customer::search($filters);
-        $results = $customers->results;
-        if (count($results) > 0) {
-            $source->client_id = $results[0]->id;
-            $source->save();
-            return $results[0];
+        if ($customers->total > 0) {
+            $results = $customers->results;
+            if (count($results) > 0) {
+                $source->client_id = $results[0]->id;
+                $source->save();
+                return $results[0];
+            }
         }
+
         return null;
     }
 
@@ -1023,12 +1027,12 @@ class MercadoPagoService {
      * @return \Illuminate\Contracts\Validation\Validator
      */
     public function returnMerc(array $data) {
-        if ((array_key_exists('AUTHORIZATION_CODE', $data)||array_key_exists('code', $data) ) && array_key_exists('user_id', $data)) {
+        if ((array_key_exists('AUTHORIZATION_CODE', $data) || array_key_exists('code', $data) ) && array_key_exists('user_id', $data)) {
             $code = "";
-            if(array_key_exists('AUTHORIZATION_CODE', $data)){
+            if (array_key_exists('AUTHORIZATION_CODE', $data)) {
                 $code = $data['AUTHORIZATION_CODE'];
             }
-            if(array_key_exists('code', $data)){
+            if (array_key_exists('code', $data)) {
                 $code = $data['code'];
             }
             $data['code'] = $code;
@@ -1045,13 +1049,14 @@ class MercadoPagoService {
                 "client_secret" => env("MERCADOPAGO_TOKEN"),
                 "grant_type" => "authorization_code",
                 "code" => $data['code'],
-                "redirect_uri" => env('APP_URL') . "/mercado/return?user_id=".$user->id,
+                "redirect_uri" => env('APP_URL') . "/mercado/return?user_id=" . $user->id,
             ];
-            $results = $this->sendPost($post,$url);
+            $results = $this->sendPost($post, $url);
             if (array_key_exists('access_token', $results)) {
                 $source = $user->sources()->where("gateway", "MercadoPago")->first();
-                if ($source) { 
-                    $source->extra = array_merge(json_decode($source->extra, true), $results);;
+                if ($source) {
+                    $source->extra = array_merge(json_decode($source->extra, true), $results);
+                    ;
                     $source->save();
                 } else {
                     $source = new Source([

@@ -47,8 +47,7 @@ class EditBooking {
     private function checkAvailable(array $data) {
         $from = $data['from'];
         $to = $data['to'];
-        $dayofweek = date('l', strtotime($from));
-
+        $dayofweek = date('l', (strtotime($from)-date('Z', strtotime($from))));
         $dayName = strtolower($dayofweek);
         $availabilities = Availability::where("range", $dayName)->where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $data['object_id'])->get();
         if (count($availabilities) > 0) {
@@ -72,7 +71,6 @@ class EditBooking {
             return ['status' => "error", "message" => "booking_not_in_range"];
         }
         return ['status' => "success", "message" => "booking_allowed"];
-        ;
     }
 
     public function checkExistingBooking(User $user, $booking_id) {
@@ -201,7 +199,7 @@ class EditBooking {
                                 if (array_key_exists("virtual_provider", $attributes)) {
                                     $update["options"]["location"] = $attributes["virtual_provider"];
                                 }
-                                $cost = $object->unit_cost;
+                                /*$cost = $object->unit_cost;
                                 if ($isCall) {
                                     if(array_key_exists('v_costr', $attributes)){
                                         $object->unit_cost = $attributes['v_costr'];
@@ -216,7 +214,7 @@ class EditBooking {
                                     }
                                 }
                                 $object->save();
-                                $returnCost = true;
+                                $returnCost = true;*/
                             }
                         }
 
@@ -240,10 +238,10 @@ class EditBooking {
                         unset($update['client']);
                         Booking::where("id", $booking->id)->update($update);
                         //$booking->touch();
-                        if ($returnCost) {
-                            $object->unit_cost = $cost;
-                            $object->save();
-                        }
+//                        if ($returnCost) {
+//                            $object->unit_cost = $cost;
+//                            $object->save();
+//                        }
                         return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
                     }
                     return $result;

@@ -326,7 +326,9 @@ class CleanSearch {
         $mystring = $request->getRequestUri();
         $data = $request->all("includes");
         if ($data['includes']) {
-            return null;
+            if ($data['includes']!="availabilities") {
+                return null;
+            }
         }
         $data = $request->all("columns");
         if ($data['columns']) {
