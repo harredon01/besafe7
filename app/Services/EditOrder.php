@@ -409,7 +409,7 @@ class EditOrder {
     public function checkUsersCredits($usersArray, $platform) {
         $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
                         $query->where('platform', strtolower($platform));
-                    }])->get();
+                    }])->get(); 
 //        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
 //                        $query->where('platform', strtolower($platform));
 //                    }, 'deliveries' => function ($query) {

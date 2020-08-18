@@ -178,6 +178,7 @@
 </div>
 </div>
 </div>
+ @if ($days[0]["titulo"])   
 <div style="background-color:#ffffff;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #ffffff;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#ffffff;">
@@ -277,6 +278,8 @@
 </div>
 </div>
 </div>
+ @endif 
+ @if ($days[1]["titulo"])   
 <div style="background-color:#005c5e;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #005c5e;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#005c5e;">
@@ -376,6 +379,8 @@
 </div>
 </div>
 </div>
+  @endif 
+   @if ($days[2]["titulo"])   
 <div style="background-color:#ffffff;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #ffffff;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#ffffff;">
@@ -475,6 +480,8 @@
 </div>
 </div>
 </div>
+    @endif 
+   @if ($days[3]["titulo"])   
 <div style="background-color:#005c5e;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #005c5e;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#005c5e;">
@@ -574,6 +581,8 @@
 </div>
 </div>
 </div>
+    @endif 
+   @if ($days[4]["titulo"])   
 <div style="background-color:#ffffff;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #ffffff;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#ffffff;">
@@ -673,6 +682,8 @@
 </div>
 </div>
 </div>
+    @endif 
+   @if ($days[5]["titulo"])   
 <div style="background-color:#005c5e;">
 <div class="block-grid two-up" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #005c5e;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:#005c5e;">
@@ -772,6 +783,7 @@
 </div>
 </div>
 </div>
+  @endif 
 <div style="background-color:transparent;display:none">
 <div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 600px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: transparent;">
 <div style="border-collapse: collapse;display: table;width: 100%;background-color:transparent;">

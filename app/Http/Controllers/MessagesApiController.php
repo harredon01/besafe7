@@ -11,7 +11,7 @@ use App\Querybuilders\NotificationQueryBuilder;
 use App\Querybuilders\MessageQueryBuilder;
 use App\Models\Notification;
 use App\Models\Message;
-
+use DB;
 class MessagesApiController extends Controller {
 
     /**
