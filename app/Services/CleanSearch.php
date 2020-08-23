@@ -78,7 +78,7 @@ class CleanSearch {
             if ($data['user_id']) {
                 return null;
             }
-            $data = $request->all(["type","trigger_id"]);
+            $data = $request->all(["type", "trigger_id"]);
             if ($data['type']) {
                 if ($data['type'] == "Merchant") {
                     $members = DB::select('select merchant_id as id from merchant_user where user_id  = ? and merchant_id = ? ', [$user->id, $data['trigger_id']]);
@@ -326,7 +326,7 @@ class CleanSearch {
         $mystring = $request->getRequestUri();
         $data = $request->all("includes");
         if ($data['includes']) {
-            if ($data['includes']!="availabilities") {
+            if ($data['includes'] != "availabilities") {
                 return null;
             }
         }
@@ -431,12 +431,72 @@ class CleanSearch {
         return $request2;
     }
 
+    public function handleObjectExternal($request, $type) {
+        $mystring = $request->getRequestUri();
+        $data = $request->all("includes");
+        if ($data['includes']) {
+            if ($data['includes'] != "availabilities") {
+                return null;
+            }
+        }
+        $data = $request->all("columns");
+        if ($data['columns']) {
+            return null;
+        }
+        $data = $request->all("appends");
+        if ($data['appends']) {
+            return null;
+        }
+        $findme = '?';
+        $finalString = "";
+        $pos = strpos($mystring, $findme);
+        if ($pos === false) {
+            $finalString = $mystring . "?order_by=$type.id,desc&private=0&status[]=active&status[]=online&status[]=busy";
+        } else {
+            $check = explode("?", $mystring);
+            if (count($check) != 2) {
+                return null;
+            }
+            $data = $request->all(
+                    "user_id", "group_id", "group_status", 'shared_id', "favorite_id", "shared", "favorite", "private", "order_by","status"
+            );
+            if ($data['shared_id']) {
+                return null;
+            }
+            if ($data['favorite_id']) {
+                return null;
+            }
+            if ($data['user_id']) {
+                return null;
+            }
+            if ($data['private']) {
+                return null;
+            }
+            if ($data['status']) {
+                return null;
+            }
+            $finalString = $mystring . "&private=0&status[]=active&status[]=online&status[]=busy";
+            if (!$data['order_by']) {
+                $finalString = $finalString . "&order_by=$type.id,desc";
+            }
+        }
+        $request2 = Request::create($finalString, 'GET');
+        return $request2;
+    }
+
     public function handleReport($request) {
         return $this->handleObject($request, "reports");
     }
 
     public function handleMerchant($request) {
         return $this->handleObject($request, "merchants");
+    }
+    public function handleReportExternal($request) {
+        return $this->handleObjectExternal($request, "reports");
+    }
+
+    public function handleMerchantExternal($request) {
+        return $this->handleObjectExternal($request, "merchants");
     }
 
 }

@@ -39,9 +39,6 @@ class CreateReportsTable extends Migration {
             $table->integer('country_id')->unsigned()->nullable();
             $table->foreign('country_id')->references('id')
                     ->on('countries');
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')
-                    ->on('users');
             $table->double('minimum', 15, 2)->nullable();
             $table->dateTime('report_time')->nullable();
             $table->string('status')->nullable();

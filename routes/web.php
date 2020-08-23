@@ -84,6 +84,10 @@ Route::get('billing/payments', 'BillingController@getPayments');
 Route::get('merchant/register', 'MerchantController@getRegisterMerchant');
 Route::get('merchant/{code?}', 'MerchantController@getMerchantOrders');
 Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
+Route::get('merchants/import', 'MerchantApiController@importMerchant');
+Route::get('merchants/export', 'MerchantApiController@exportMerchant');
+Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
+Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchant');
 
 Route::get('admin/store/products', 'ProductImportController@getProducts');
 Route::get('admin/store/variants', 'ProductImportController@getVariants');

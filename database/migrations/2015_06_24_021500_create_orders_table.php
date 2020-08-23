@@ -34,7 +34,7 @@ class CreateOrdersTable extends Migration {
                         $table->boolean('is_shippable');
                         $table->boolean('is_digital');
                         $table->boolean('is_editable')->nullable();
-                        $table->boolean('is_editable')->nullable();
+                        $table->boolean('is_recurring')->nullable();
                         $table->string('recurring_type')->nullable();
                         $table->string('recurring_value')->nullable();
                         $table->boolean('requires_authorization');
@@ -44,6 +44,7 @@ class CreateOrdersTable extends Migration {
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
+                        $table->string('client_id')->nullable();
                         $table->integer('supplier_id')->unsigned()->nullable();
                         $table->index('supplier_id');
                         $table->text('extras')->nullable();
