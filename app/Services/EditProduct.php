@@ -155,9 +155,9 @@ class EditProduct {
                 $data['merchant_products'] = $variants;
                 $data['products_variants'] = DB::table('products')
                                 ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                                ->leftJoin('categorizable', 'products.id', '=', 'categorizable.categorizable_id')
-                                ->leftJoin('categories', 'categories.id', '=', 'categorizable.category_id')
-                                ->where('categorizable.categorizable_type','App\Models\Product')
+                                ->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
+                                ->leftJoin('categories', 'categories.id', '=', 'categorizables.category_id')
+                                ->where('categorizables.categorizable_type','App\Models\Product')
                                 ->whereIn('products.id', $products)
                                 ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail', 'categories.id as category_id', 'categories.name as category_name', 'categories.description as category_description')
                                 ->orderBy('categories.level', 'asc')
@@ -523,7 +523,7 @@ class EditProduct {
         }
         $data = [
             "access" => $access,
-            "owner_id" => $merchant->user_id
+            "owner_id" => 2
         ];
         return $data;
     }
