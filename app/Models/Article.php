@@ -24,4 +24,13 @@ class Article extends Model
     public function file() {
         return $this->belongsTo('App\Models\FileM');
     }
+    public function categories() { 
+        return $this->morphToMany('App\Models\Category', 'categorizable')->withTimestamps();
+    }
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable','type','trigger_id','categorizable_id');
+    }
+    public function files2() {
+        return $this->morphMany('App\Models\FileM', 'fileable','type','trigger_id','id');
+    }
 }

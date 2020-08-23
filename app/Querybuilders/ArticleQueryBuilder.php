@@ -4,7 +4,7 @@ namespace App\Querybuilders;
 
 use Unlu\Laravel\Api\QueryBuilder;
 
-class MerchantQueryBuilder extends QueryBuilder {
+class ArticleQueryBuilder extends QueryBuilder {
 
     public function filterBySharedId($query, $id) {
         return $query->join('userables', 'merchants.id', '=', 'userables.object_id')
@@ -19,13 +19,13 @@ class MerchantQueryBuilder extends QueryBuilder {
 
     public function filterByCategoryId($query, $id) {
         if (strpos($id, ',') !== false) {
-            return $query->join('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+            return $query->join('categorizables', 'articles.id', '=', 'categorizables.categorizable_id')
                             ->whereIn('categorizables.category_id', explode(",", $id))
-                            ->where('categorizables.categorizable_type', 'App\Models\Merchant');
+                            ->where('categorizables.categorizable_type', 'App\Models\Article');
         } else {
-            return $query->join('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+            return $query->join('categorizables', 'articles.id', '=', 'categorizables.categorizable_id')
                             ->where('categorizables.category_id', '=', $id)
-                            ->where('categorizables.categorizable_type', 'App\Models\Merchant')->select('merchants.id as ids');
+                            ->where('categorizables.categorizable_type', 'App\Models\Article');
         }
     }
 
@@ -37,10 +37,6 @@ class MerchantQueryBuilder extends QueryBuilder {
     public function filterByFavoritesId($query, $id) {
         return $query->join('favorites', 'merchants.id', '=', 'favorites.object_id')
                         ->where('favorites.favorite_type', '=', "Merchant");
-    }
-
-    public function filterByGroupStatus($query, $id) {
-        return $query->where('group_merchant.status', '=', $id);
     }
 
 }

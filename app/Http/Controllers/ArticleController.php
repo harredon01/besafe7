@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
-use Unlu\Laravel\Api\QueryBuilder;
+use App\Querybuilders\ArticleQueryBuilder;
 use Illuminate\Http\Request;
 //use DB;
 class ArticleController extends Controller {
@@ -26,7 +26,9 @@ class ArticleController extends Controller {
         //$request2 = $this->cleanSearch->handleOrder($request);
         if (true) {
             //DB::enableQueryLog();
-            $queryBuilder = new QueryBuilder(new Article, $request);
+            $mystring = $request->getRequestUri();
+            //dd($mystring);
+            $queryBuilder = new ArticleQueryBuilder(new Article, $request);
             $result = $queryBuilder->build()->paginate();
             //dd(DB::getQueryLog());
             return response()->json([
