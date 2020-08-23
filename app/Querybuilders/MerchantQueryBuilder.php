@@ -16,12 +16,13 @@ class MerchantQueryBuilder extends QueryBuilder {
                         ->where('group_merchant.group_id', '=', $id);
     }
     public function filterByCategoryId($query, $id) {
-        return $query->join('category_merchant', 'merchants.id', '=', 'category_merchant.merchant_id')
-                        ->where('category_merchant.category_id', '=', $id);
+        return $query->join('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+                        ->where('categorizables.category_id', '=', $id)
+                        ->where('categorizables.categorizable_type', 'App\Models\Merchant')->select('merchants.id as ids');
     }
     public function filterByOwnerId($query, $id) {
         return $query->join('merchant_user', 'merchants.id', '=', 'merchant_user.merchant_id')
-                        ->where('merchant_user.user_id', '=', $id); 
+                        ->where('merchant_user.user_id', '=', $id);
     }
 
     public function filterByFavoritesId($query, $id) {

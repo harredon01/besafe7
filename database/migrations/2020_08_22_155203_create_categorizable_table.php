@@ -12,7 +12,7 @@ class CreateCategorizableTable extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create('categorizable', function (Blueprint $table) {
+        Schema::create('categorizables', function (Blueprint $table) {
             $table->id();
             $table->integer('category_id')->unsigned();
             $table->foreign('category_id')->references('id')
@@ -28,7 +28,7 @@ class CreateCategorizableTable extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists('categorizable');
+        Schema::dropIfExists('categorizables');
     }
 
 }

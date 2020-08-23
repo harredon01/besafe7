@@ -46,7 +46,7 @@ class Merchant extends Model {
         return $this->belongsToMany('App\Models\Product')->withTimestamps();
     }
     public function availabilities() {
-        return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','merchant_id');
+        return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','categorizable_id');
     }
     public function availabilities2() {
         return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','id');
@@ -78,8 +78,8 @@ class Merchant extends Model {
     public function items() {
         return $this->hasMany('App\Models\Item');
     }
-    public function categories() {
-        return $this->belongsToMany('App\Models\Category')->withTimestamps();
+    public function categories() { 
+        return $this->morphToMany('App\Models\Category', 'categorizable')->withTimestamps();
     }
     public function paymentMethods() {
         return $this->belongsToMany('App\Models\PaymentMethod', 'merchant_payment_methods', 'merchant_id', 'payment_method_id')->withTimestamps();

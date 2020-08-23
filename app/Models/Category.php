@@ -22,8 +22,8 @@ class Category extends Model {
     public function parentCategory() {
         return $this->belongsTo('App\Models\Category', 'foreign_key', 'parent_id');
     }
-    public function merchant() {
-        return $this->belongsToMany('App\Models\Merchant')->withTimestamps();
+    public function merchants() {
+        return $this->morphedByMany('App\Models\Merchant', 'categorizable')->withTimestamps();
     }
     public function products() {
         return $this->belongsToMany('App\Models\Product')->withTimestamps();
