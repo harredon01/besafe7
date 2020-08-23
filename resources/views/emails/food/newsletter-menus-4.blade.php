@@ -763,8 +763,8 @@
 <p style="line-height: 1.5; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: NaNpx; margin: 0;"><span style="color: #ffffff;"><u><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Plato fuerte:</span></strong></u></span></p>
 <ul style="list-style-type: square;">
 <li style="line-height: 1.5; font-size: 13px; mso-line-height-alt: 20px; mso-ansi-font-size: 14px;"><span style="font-size: 13px; color: #ffffff; mso-ansi-font-size: 14px;"><strong>Completo:</strong> {{$days[5]["completo_d"]}}</span></li>
-<li style="font-size: 14px; line-height: 1.5; text-align: left; word-break: break-word; mso-line-height-alt: 21px;"><span style="color: #ffffff;"><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Light:</span></strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">{{$days[5]["completo_d"]}}</span></span></li>
-<li style="font-size: 14px; line-height: 1.5; text-align: left; word-break: break-word; mso-line-height-alt: 21px;"><span style="color: #ffffff;"><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Vegetariano:</span></strong></span><span style="font-size: 13px; mso-ansi-font-size: 14px;"><span style="color: #ffffff;">{{$days[5]["completo_d"]}}</span> </span></li>
+<li style="font-size: 14px; line-height: 1.5; text-align: left; word-break: break-word; mso-line-height-alt: 21px;"><span style="color: #ffffff;"><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Light:</span></strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">{{$days[5]["light_d"]}}</span></span></li>
+<li style="font-size: 14px; line-height: 1.5; text-align: left; word-break: break-word; mso-line-height-alt: 21px;"><span style="color: #ffffff;"><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Vegetariano:</span></strong></span><span style="font-size: 13px; mso-ansi-font-size: 14px;"><span style="color: #ffffff;">{{$days[5]["vegetariano_d"]}}</span> </span></li>
 </ul>
 </div>
 </div>
