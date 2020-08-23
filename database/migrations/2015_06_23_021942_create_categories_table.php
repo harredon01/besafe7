@@ -21,9 +21,6 @@ class CreateCategoriesTable extends Migration {
                         $table->string('description');
                         $table->integer('parent_id')->unsigned()->nullable();
                         $table->index('parent_id');
-                        $table->integer('merchant_id')->unsigned()->nullable();
-                        $table->foreign('merchant_id')->references('id')
-                                ->on('merchants');
 			$table->timestamps();
 		});
 	}

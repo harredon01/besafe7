@@ -47,7 +47,7 @@ class EditBooking {
     private function checkAvailable(array $data) {
         $from = $data['from'];
         $to = $data['to'];
-        $dayofweek = date('l', (strtotime($from)-date('Z', strtotime($from))));
+        $dayofweek = date('l', (strtotime($from) - date('Z', strtotime($from))));
         $dayName = strtolower($dayofweek);
         $availabilities = Availability::where("range", $dayName)->where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $data['object_id'])->get();
         if (count($availabilities) > 0) {
@@ -126,8 +126,8 @@ class EditBooking {
 
             $booking2 = Booking::whereBetween('ends_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
                             ->whereColumn("price", "total_paid")->count();
-            $booking3 = Booking::where('starts_at','<=',date_format($date, "Y-m-d H:i:s"))->where('ends_at','>=',date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->count();
-            if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING|| $booking3 >= self::VIRTUAL_BOOKING) {
+            $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->count();
+            if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING || $booking3 >= self::VIRTUAL_BOOKING) {
                 return ['status' => "error", "message" => "zoom_limit"];
             }
             return ['status' => "success", "message" => "zoom_ok"];
@@ -199,22 +199,22 @@ class EditBooking {
                                 if (array_key_exists("virtual_provider", $attributes)) {
                                     $update["options"]["location"] = $attributes["virtual_provider"];
                                 }
-                                /*$cost = $object->unit_cost;
-                                if ($isCall) {
-                                    if(array_key_exists('v_costr', $attributes)){
-                                        $object->unit_cost = $attributes['v_costr'];
-                                    } else {
-                                        $object->unit_cost = $object->unit_cost * 0.35;
-                                    }
-                                } else {
-                                    if(array_key_exists('v_cost', $attributes)){
-                                        $object->unit_cost = $attributes['v_cost'];
-                                    } else {
-                                        $object->unit_cost = $object->unit_cost * 0.5;
-                                    }
-                                }
-                                $object->save();
-                                $returnCost = true;*/
+                                /* $cost = $object->unit_cost;
+                                  if ($isCall) {
+                                  if(array_key_exists('v_costr', $attributes)){
+                                  $object->unit_cost = $attributes['v_costr'];
+                                  } else {
+                                  $object->unit_cost = $object->unit_cost * 0.35;
+                                  }
+                                  } else {
+                                  if(array_key_exists('v_cost', $attributes)){
+                                  $object->unit_cost = $attributes['v_cost'];
+                                  } else {
+                                  $object->unit_cost = $object->unit_cost * 0.5;
+                                  }
+                                  }
+                                  $object->save();
+                                  $returnCost = true; */
                             }
                         }
 
@@ -230,6 +230,14 @@ class EditBooking {
                                     $this->handleAuthorizationRequest($user, $booking, $object);
                                     $requiresAuth = true;
                                     $update["options"]["status"] = "pending";
+                                }
+                            }
+                        }
+                        if (array_key_exists("is_admin", $data)) {
+                            if($data['is_admin']){
+                                if($object->checkAdminAccess($user->id)){
+                                    $update["total_paid"] = $update["price"];
+                                    $booking->total_paid = $booking->price;
                                 }
                             }
                         }
@@ -687,7 +695,7 @@ class EditBooking {
             }
         }
         if (array_key_exists('call', $options)) {
-            if($options['call']){
+            if ($options['call']) {
                 $object = $booking->bookable;
                 $object->status = "online";
                 $object->save();
@@ -728,13 +736,32 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 if ($object->checkAdminAccess($user->id)) {
-                    $serviceBooking = new Availability();
-                    $dateFrom = date_create($data['from']);
-                    $dateTo = date_create($data['to']);
-                    $serviceBooking->make(['range' => $data['range'], 'from' => date_format($dateFrom, "h:i a"), 'to' => date_format($dateTo, "h:i a"), 'is_bookable' => true])
-                            ->bookable()->associate($object)
-                            ->save();
-                    return array("status" => "success", "message" => "Availability created", "availability" => $serviceBooking);
+                    if (!array_key_exists("id", $data)) {
+                        $data['id']=null;
+                    }
+                    if ($data['id']) {
+                        $data['from'] = date_format(date_create($data['from']), "h:i a");
+                        $data['to'] = date_format(date_create($data['to']), "h:i a");
+                        $id = $data["id"];
+                        $data["bookable_type"] = "App\\Models\\".$data['type'];
+                        $data["bookable_id"] = $data['object_id'];
+                        $data['updated_at']=date("Y-m-d H:i:s");
+                        unset($data["id"]);
+                        unset($data["object_id"]);
+                        unset($data["type"]);
+                        Availability::where("id", $id)->update($data);
+                        $serviceBooking = Availability::find($id);
+                        return array("status" => "success", "message" => "Availability updated", "availability" => $serviceBooking);
+                    } else {
+                        $serviceBooking = new Availability();
+                        $dateFrom = date_create($data['from']);
+                        $dateTo = date_create($data['to']);
+                        $serviceBooking->make(['range' => $data['range'], 'from' => date_format($dateFrom, "h:i a"), 'to' => date_format($dateTo, "h:i a"), 'is_bookable' => true])
+                                ->bookable()->associate($object)
+                                ->save();
+                        $serviceBooking = Availability::find(DB::getPdo()->lastInsertId());
+                        return array("status" => "success", "message" => "Availability created", "availability" => $serviceBooking);
+                    }
                 }
                 return array("status" => "error", "message" => "access_denied");
             }
@@ -960,7 +987,7 @@ class EditBooking {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                return array("status" => "success", "message" => "", "data" => $object->availabilities);
+                return array("status" => "success", "message" => "", "data" => $object->availabilities2);
             }
         }
         return array("status" => "error", "message" => "not_found");

@@ -58,7 +58,7 @@ class MerchantApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        $request2 = $this->cleanSearch->handleMerchant($request);
+        $request2 = $this->cleanSearch->handleMerchantExternal($request);
         if ($request2) {
             $queryBuilder = new MerchantQueryBuilder(new Merchant, $request2);
             $result = $queryBuilder->build()->paginate();
@@ -75,32 +75,23 @@ class MerchantApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 403);
     }
-
-    public function importMerchant(Request $request) {
-        $user = $request->user();
-        $filename = "merchant test.xlsx";
-        return response()->json($this->merchantImport->importNewMerchant($user, $filename));
-    }
-
-    public function exportMerchant(Request $request) {
-        $user = $request->user();
-        $filename = "merchant test.xlsx";
-        $merchantid = "5";
-        return response()->json($this->merchantImport->exportMerchant($user, $filename, $merchantid));
-    }
-
-    public function exportMerchantOrders(Request $request) {
-        $user = $request->user();
-        $filename = "merchant test.xlsx";
-        $merchantid = "5";
-        return response()->json($this->merchantImport->exportMerchantOrders($user, $filename, $merchantid));
-    }
-
-    public function importUpdateMerchant(Request $request) {
-        $user = $request->user();
-        $filename = "Filename13.xlsx";
-        $merchantid = "5";
-        return response()->json($this->merchantImport->importUpdateMerchant($user, $filename, $merchantid));
+    public function indexPrivate(Request $request) {
+        $request2 = $this->cleanSearch->handleMerchant($request);
+        if ($request2) {
+            $queryBuilder = new MerchantQueryBuilder(new Merchant, $request2);
+            $result = $queryBuilder->build()->paginate();
+            return response()->json([
+                        'data' => $result->items(),
+                        "total" => $result->total(),
+                        "per_page" => $result->perPage(),
+                        "page" => $result->currentPage(),
+                        "last_page" => $result->lastPage(),
+            ]);
+        }
+        return response()->json([
+                    'status' => "error",
+                    'message' => "illegal parameter"
+                        ], 403);
     }
 
     /**
@@ -129,7 +120,26 @@ class MerchantApiController extends Controller {
         }
         $data = $request->all();
         $data['type']="Merchant";
-        return response()->json($this->editMapObject->getNearbyObjects($data));
+        $results = $this->editMapObject->getNearbyObjects($data);
+        $merchants = $results['data'];
+        if (array_key_exists('includes', $data)) {
+            if ($data['includes']) {
+                $relatedObjects = explode(',', $data['includes']);
+                $merchantIds = array_column($merchants, 'id');
+                $object = "";
+                $idColumn = "";
+                foreach ($relatedObjects as $item) {
+                    if ($item == 'availabilities') {
+                        $object = "bookable_availabilities";
+                        $idColumn = "bookable_id";
+                    }
+                    $relationships = $this->editMapObject->getRelation($merchantIds, $object, $idColumn);
+                    $merchants = $this->editMapObject->organizeRelation($merchants, $relationships, $item, $idColumn);
+                }
+            }
+        }
+        $results['data'] = $merchants;
+        return response()->json($results);
     }
 
     /**

@@ -135,12 +135,9 @@ Route::delete('reports/group/{groupId?}/{objectId?}', 'ReportApiController@remov
 Route::resource('reports', 'ReportApiController');
 
 
-Route::get('merchants/import', 'MerchantApiController@importMerchant');
 Route::post('merchants/share', 'ShareApiController@postAddFollower');
-Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
-Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
-Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchant');
+Route::get('private/merchants', 'MerchantApiController@indexPrivate');
 Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');

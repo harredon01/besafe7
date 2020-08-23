@@ -187,7 +187,7 @@ class EditMapObject {
             } else if ($type == self::OBJECT_MERCHANT) {
                 $availability = Availability::where("bookable_type", self::MODEL_PATH . $type)->where("bookable_id", $object->id)->limit(25)->get();
                 $access = false;
-                if($user){
+                if ($user) {
                     $access = $object->checkAdminAccess($user->id);
                 }
                 $data = [
@@ -347,9 +347,39 @@ class EditMapObject {
     public function getNearby(array $data) {
         $data['type'] = "Merchant";
         $merchants = $this->getNearbyObjects($data);
+        
         $data['type'] = "Report";
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
+    }
+
+    public function getRelation(array $parentIds, $object, $idColumn) {
+//DB::enableQueryLog();
+        $results = DB::table($object)
+                ->whereIn($idColumn, $parentIds)
+                ->orderBy($idColumn)
+                ->get();
+       // dd(DB::getQueryLog());
+        return $results->toArray();
+    }
+
+    public function organizeRelation(array $objects, array $relations,$resource, $idColumn) {
+        foreach ($relations as $rel) {
+            //$rel = json_decode(json_encode((array) $rel), true);
+            
+            foreach ($objects as &$item) {
+                //dd($item);
+                if($item->id==$rel->$idColumn){
+                    if(property_exists($item, $resource)){
+                        array_push($item->$resource, $rel);
+                    } else {
+                        $item->$resource=[$rel];
+                    }
+                }
+            }
+            
+        }
+        return $objects;
     }
 
     public function getNearbyObjects(array $data) {

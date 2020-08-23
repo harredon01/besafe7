@@ -48,6 +48,9 @@ class Merchant extends Model {
     public function availabilities() {
         return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','merchant_id');
     }
+    public function availabilities2() {
+        return $this->morphMany('App\Models\Availability', 'available','bookable_type','bookable_id','id');
+    }
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');
     }
