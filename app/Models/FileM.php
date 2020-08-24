@@ -22,4 +22,7 @@ class FileM extends Model {
     public function article() {
 	return $this->hasMany('App\Models\Article');
     }	
+    public function fileable() {
+        return $this->morphTo();
+    }
 }
