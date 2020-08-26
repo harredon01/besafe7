@@ -280,7 +280,8 @@ class EditBooking {
                 if ($booking) {
                     $result = $this->checkTime($data['from'], $object);
                     if ($result['status'] == 'success') {
-                        if ($object->checkAdminAccess($user->id) || $booking->customer_id == $user->id) {
+                        $admin = $object->checkAdminAccess($user->id);
+                        if ($admin || $booking->customer_id == $user->id) {
                             if ($booking->notes == 'pending') {
                                 $result = $this->checkBookingAvailability($data, $object);
                                 if ($result['status'] == 'success') {
@@ -301,12 +302,16 @@ class EditBooking {
                                         foreach ($reqAttrs as $key => $value) {
                                             $attributes[$key] = $reqAttrs[$key];
                                         }
-                                        $booking->total_paid = 0;
+                                        if($admin && $booking->total_paid <= 0 ){
+                                            $booking->total_paid = 0;
+                                        }
                                         if ($booking->customer_id == $user->id) {
                                             $attributes2 = $object->attributes;
                                             if (array_key_exists("booking_requires_authorization", $attributes2)) {
                                                 if ($attributes2["booking_requires_authorization"]) {
-                                                    $booking->total_paid = -1;
+                                                    if($booking->total_paid <= 0 ){
+                                                        $booking->total_paid = -1;
+                                                    }
                                                 }
                                             }
                                         }
@@ -314,8 +319,8 @@ class EditBooking {
                                         $booking->updated_at = date("Y-m-d H:i:s");
                                         $update = $booking->toArray();
                                         $update["options"] = json_encode($attributes);
-                                        Booking::where("id", $booking->id)->update($update);
                                         $booking->touch();
+                                        Booking::where("id", $booking->id)->update($update);
                                         $this->handleAuthorizationRequest($user, $booking, $object);
                                         return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
                                     }
@@ -520,204 +525,6 @@ class EditBooking {
             return array("status" => "success", "message" => "connection_registered", "booking" => $booking);
         }
         return array("status" => "error", "message" => "not_found");
-    }
-
-    public function createChatroom($bookingId) {
-        $booking = Booking::find($bookingId);
-        if ($booking) {
-            $bookable = $booking->bookable;
-            $options = $booking->options;
-            $options = $options->toArray();
-            $users = [];
-            $payload = ["booking_id" => $booking->id, "booking" => $booking];
-            $user = $bookable->users()->first();
-            $bookableUserContainer = ["id" => $user->id];
-            $meeting = null;
-            if (array_key_exists('virtual_meeting', $options)) {
-                if ($options['virtual_meeting']) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $openTok = app("OpenTok");
-                        $session = $openTok->createSession();
-                        $bookableToken = $session->generateToken();
-                        //$bookableToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
-                        $bookableUserContainer = ["id" => $user->id, "token" => $bookableToken];
-                        $sessionId = $session->getSessionId();
-                        $booking->options["session_id"] = $sessionId;
-                        $payload["sessionId"] = $sessionId;
-                        $payload["token"] = $bookableToken;
-                    } else if ($options['virtual_provider'] == 'zoom') {
-                        $zoom = app("ZoomMeetings");
-                        $meeting = $zoom->createMeeting($user, $booking);
-                        if (array_key_exists('id', $meeting)) {
-                            echo "Meeting id: " . $meeting['id'] . PHP_EOL;
-                            $booking->options["session_id"] = $meeting['id'];
-                            $payload["url"] = $meeting['start_url'];
-                        } else {
-                            return ["status" => "error", "message" => "Meeting not created", "object" => $meeting];
-                        }
-                    }
-                }
-            }
-            array_push($users, $bookableUserContainer);
-
-            $followers = [$user];
-            $data = [
-                "trigger_id" => $booking->id,
-                "message" => "",
-                "subject" => "",
-                "object" => self::OBJECT_BOOKING,
-                "sign" => true,
-                "payload" => $payload,
-                "type" => self::BOOKING_STARTING,
-                "user_status" => "normal"
-            ];
-            $date = date("Y-m-d H:i:s");
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            $client = $booking->customer;
-            $bookableClientContainer = ["id" => $client->id];
-            $followers = [$client];
-            if (array_key_exists('virtual_meeting', $options)) {
-                if ($options['virtual_meeting']) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $clientToken = $session->generateToken();
-//                      $clientToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
-                        $bookableClientContainer = ["id" => $client->id, "token" => $clientToken];
-                        $payload["sessionId"] = $sessionId;
-                        $payload["token"] = $clientToken;
-                    }
-                    if ($options['virtual_provider'] == 'zoom') {
-                        unset($payload['url']);
-                        $bookableClientContainer = ["id" => $client->id];
-                        $payload['url'] = $meeting['join_url'];
-                    }
-                }
-            }
-            $data['payload'] = $payload;
-
-            array_push($users, $bookableClientContainer);
-            $booking->options["users"] = $users;
-            //dd($booking);
-            $booking->save();
-            $bookable->status = "busy";
-            $bookable->save();
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'ready', 'total_paid' => $booking->price]);
-            //$booking->touch();
-            return $booking;
-        }
-    }
-
-    public function terminateOpenChatRooms() {
-        $query = $this->buildQuery("paid", null, "ready", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-        $query = $this->buildQuery("paid", null, "waiting", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-        $query = $this->buildQuery("paid", null, "started", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-    }
-
-    public function leaveChatroom(User $user, array $data) {
-        $booking = Booking::find($data['booking_id']);
-        $activecount = 0;
-        if ($booking) {
-            $users = $booking->options["users"];
-            foreach ($users as &$userM) {
-                if ($userM['id'] == $user->id) {
-                    if ($booking->options["location"] == 'opentok') {
-                        $userM["connection_id"] = null;
-                    }
-                }
-                if ($userM["connection_id"]) {
-                    $activecount++;
-                }
-            }
-            $booking->options["users"] = $users;
-            $booking->save();
-            if ($booking->notes == 'started' && $activecount == 0) {
-                Booking::where("id", $booking->id)->update(['notes' => 'completed', 'total_paid' => $booking->total_paid]);
-                //$booking->touch();
-            }
-            $bookable = $booking->bookable;
-            if ($bookable->checkAdminAccess($user->id)) {
-                $bookable->status = "online";
-                $bookable->save();
-            }
-            return ["status" => "success", "message" => "left_meeting"];
-        }
-        return ["status" => "error", "message" => "not_found"];
-    }
-
-    public function endChatroom(Booking $booking) {
-        $options = $booking->options;
-        $options = $options->toArray();
-        $followers = [];
-        $meetingProvider = null;
-        if (array_key_exists('virtual_meeting', $options)) {
-            if ($options['virtual_meeting']) {
-                if (array_key_exists('virtual_provider', $options)) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $meetingProvider = app("OpenTok");
-                    }
-                    if ($options['virtual_provider'] == 'zoom') {
-                        $meetingProvider = app("ZoomMeetings");
-                    }
-                }
-            }
-        }
-        //$options = $booking->options;
-        if (array_key_exists("users", $options)) {
-            foreach ($options["users"] as $user) {
-                if ($meetingProvider) {
-                    if ($options["virtual_provider"] == 'opentok') {
-                        if (array_key_exists("connection_id", $user)) {
-                            $meetingProvider->forceDisconnect($options["session_id"], $user["connection_id"]);
-                        }
-                    }
-                }
-                array_push($followers, (object) $user);
-            }
-        }
-
-        if ($meetingProvider) {
-            if ($options["virtual_provider"] == 'zoom') {
-                if (array_key_exists("session_id", $options)) {
-                    $meetingProvider->endMeeting($options["session_id"]);
-                }
-            }
-        }
-        if (array_key_exists('call', $options)) {
-            if ($options['call']) {
-                $object = $booking->bookable;
-                $object->status = "online";
-                $object->save();
-            }
-        }
-        $payload = [
-            "booking_id" => $booking->id,
-        ];
-        $data = [
-            "trigger_id" => $booking->id,
-            "message" => "",
-            "subject" => "",
-            "object" => self::OBJECT_BOOKING,
-            "sign" => true,
-            "payload" => $payload,
-            "type" => self::BOOKING_COMPLETED,
-            "user_status" => "normal"
-        ];
-        $date = date("Y-m-d H:i:s");
-        $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-        Booking::where("id", $booking->id)->update(['notes' => 'completed', 'total_paid' => $booking->total_paid]);
-        //$booking->touch();
     }
 
     /**
@@ -938,40 +745,6 @@ class EditBooking {
         return array("status" => "error", "message" => "not_found");
     }
 
-    public function buildQuery($paidStatus, $authStatus, $bookingStatus, $date, $op, $interval, $units) {
-        $query = null;
-//        DB::enableQueryLog();
-        if ($paidStatus == "paid") {
-            $query = Booking::whereColumn('price', 'total_paid');
-        } else {
-            if ($authStatus == "approved") {
-                $query = Booking::where('total_paid', 0);
-            } elseif ($authStatus == "unapproved") {
-                $query = Booking::where('total_paid', -1);
-            } else {
-                $query = Booking::where(function($query2) {
-                            $query2->where('total_paid', 0)
-                                    ->orWhere('total_paid', -1);
-                        });
-            }
-        }
-        if ($query) {
-            if ($bookingStatus) {
-                $query->where('notes', $bookingStatus);
-            }
-            if ($interval) {
-                $now = Carbon::now();
-                $now->add($units, $interval);
-                $query->where($date, $op, $now);
-            }
-//            $query->orderBy("id","desc")->limit(3);
-//            $results = $query->get()->toArray();
-//            dd($results);
-//            dd(DB::getQueryLog());
-            return $query;
-        }
-    }
-
     /**
      * Show the application registration form.
      *
@@ -991,77 +764,6 @@ class EditBooking {
             }
         }
         return array("status" => "error", "message" => "not_found");
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteBookingObject(array $data, User $user) {
-        Favorite::where('user_id', $user->id)
-                ->where('favorite_type', $data['type'])
-                ->where('object_id', $data['object_id'])->delete();
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteOldBookings() {
-        $query = $this->buildQuery("unpaid", "both", null, 'starts_at', "<", -10, 'minute');
-        $query->delete();
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function sendStartReminder() {
-        $query = $this->buildQuery("paid", null, "pending", 'starts_at', "<", 20, 'minute');
-//        dd($query->with("bookable")->get()->toArray());
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $payload = [
-                "booking_id" => $booking->id,
-                "booking_date" => $booking->starts_at
-            ];
-            $data = [
-                "trigger_id" => $booking->id,
-                "message" => "",
-                "subject" => "",
-                "object" => "Booking",
-                "sign" => true,
-                "payload" => $payload,
-                "type" => "booking_soon",
-                "user_status" => "active"
-            ];
-            $object = $booking->bookable;
-            $admins = $object->users()->first();
-            $followers = [];
-            array_push($followers, $admins);
-            $user = json_decode(json_encode(["id" => $booking->customer_id]), false);
-            array_push($followers, $user);
-            $date = date("Y-m-d H:i:s");
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'reminded', 'total_paid' => $booking->price]);
-            //$booking->touch();
-        }
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function startMeeting() {
-        $query = $this->buildQuery("paid", null, "reminded", 'starts_at', "<", 2, 'minute');
-        $bookings = $query->get();
-        foreach ($bookings as $booking) {
-            $this->createChatroom($booking->id);
-        }
     }
 
     public function deleteBooking(User $user, $id) {
