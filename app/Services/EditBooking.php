@@ -328,9 +328,7 @@ class EditBooking {
             $attributes2 = $object->attributes;
             if (array_key_exists("booking_requires_authorization", $attributes2)) {
                 if ($attributes2["booking_requires_authorization"]) {
-                    if ($booking->notes == self::IN_COMFIRMATION) {
-                        $booking->notes = self::IN_COMFIRMATION;
-                    }
+                    $booking->notes = self::IN_COMFIRMATION;
                 }
             }
         }
