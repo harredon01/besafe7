@@ -25,6 +25,8 @@ class EditBooking {
     const BOOKING_STARTING = 'booking_starting';
     const BOOKING_WAITING = 'booking_waiting';
     const BOOKING_COMPLETED = 'booking_completed';
+    const IN_COMFIRMATION = 'in_confirmation';
+    const PENDING = 'pending';
     const VIRTUAL_BOOKING = 1;
 
     /**
@@ -122,18 +124,21 @@ class EditBooking {
         date_add($date2, date_interval_create_from_date_string("1 seconds"));
         if ($checkZoom) {
             $booking1 = Booking::whereBetween('starts_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
-                            ->whereColumn("price", "total_paid")->count();
+                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
 
             $booking2 = Booking::whereBetween('ends_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
-                            ->whereColumn("price", "total_paid")->count();
-            $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->count();
+                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
+            $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))
+                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
             if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING || $booking3 >= self::VIRTUAL_BOOKING) {
                 return ['status' => "error", "message" => "zoom_limit"];
             }
             return ['status' => "success", "message" => "zoom_ok"];
         } else {
-            $array1 = $object->bookingsStartsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
-            $array2 = $object->bookingsEndsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))->whereColumn("price", "total_paid")->get();
+            $array1 = $object->bookingsStartsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))
+                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->get();
+            $array2 = $object->bookingsEndsBetween(date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s"))
+                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->get();
             $array1 = $array1->toArray();
             $array2 = $array2->toArray();
             foreach ($array2 as $value) {
@@ -180,77 +185,7 @@ class EditBooking {
                 if ($result['status'] == 'success' || $data['call']) {
                     $result = $this->checkBookingAvailability($data, $object);
                     if ($result['status'] == 'success' || $data['call']) {
-                        $update = [];
-                        $update["notes"] = "pending";
-                        $update["options"] = [];
-                        $cost = 0;
-                        $isCall = false;
-                        $returnCost = false;
-                        if (array_key_exists("attributes", $data)) {
-                            $update["options"] = $data["attributes"];
-                        }
-                        $attributes = $object->attributes;
-                        if ($data['call']) {
-                            $isCall = true;
-                        }
-                        if (array_key_exists("virtual_meeting", $data)) {
-                            if ($data['virtual_meeting']) {
-                                $update["options"]["virtual_meeting"] = true;
-                                if (array_key_exists("virtual_provider", $attributes)) {
-                                    $update["options"]["location"] = $attributes["virtual_provider"];
-                                }
-                                /* $cost = $object->unit_cost;
-                                  if ($isCall) {
-                                  if(array_key_exists('v_costr', $attributes)){
-                                  $object->unit_cost = $attributes['v_costr'];
-                                  } else {
-                                  $object->unit_cost = $object->unit_cost * 0.35;
-                                  }
-                                  } else {
-                                  if(array_key_exists('v_cost', $attributes)){
-                                  $object->unit_cost = $attributes['v_cost'];
-                                  } else {
-                                  $object->unit_cost = $object->unit_cost * 0.5;
-                                  }
-                                  }
-                                  $object->save();
-                                  $returnCost = true; */
-                            }
-                        }
-
-                        $booking = $object->newBooking($user, $data['from'], $data['to']);
-                        $requiresAuth = false;
-                        $update["options"]["status"] = "approved";
-                        $update["options"]["call"] = $data['call'];
-                        if (!$isCall) {
-                            if (array_key_exists("booking_requires_authorization", $attributes)) {
-                                if ($attributes["booking_requires_authorization"]) {
-                                    $update["total_paid"] = -1;
-                                    $booking->total_paid = -1;
-                                    $this->handleAuthorizationRequest($user, $booking, $object);
-                                    $requiresAuth = true;
-                                    $update["options"]["status"] = "pending";
-                                }
-                            }
-                        }
-                        if (array_key_exists("is_admin", $data)) {
-                            if($data['is_admin']){
-                                if($object->checkAdminAccess($user->id)){
-                                    $update["total_paid"] = $update["price"];
-                                    $booking->total_paid = $booking->price;
-                                }
-                            }
-                        }
-                        $update["options"] = json_encode($update["options"]);
-                        unset($update['bookable']);
-                        unset($update['client']);
-                        Booking::where("id", $booking->id)->update($update);
-                        //$booking->touch();
-//                        if ($returnCost) {
-//                            $object->unit_cost = $cost;
-//                            $object->save();
-//                        }
-                        return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
+                        return $this->createBooking($object, $user, $data);
                     }
                     return $result;
                 }
@@ -258,6 +193,79 @@ class EditBooking {
             }
         }
         return array("status" => "error", "message" => "not_found");
+    }
+
+    public function createBooking($object, $user, $data) {
+        $update = [];
+        $update["notes"] = "pending";
+        $update["options"] = [];
+        $cost = 0;
+        $isCall = false;
+        $returnCost = false;
+        if (array_key_exists("attributes", $data)) {
+            $update["options"] = $data["attributes"];
+        }
+        $attributes = $object->attributes;
+        if ($data['call']) {
+            $isCall = true;
+        }
+        if (array_key_exists("virtual_meeting", $data)) {
+            if ($data['virtual_meeting']) {
+                $update["options"]["virtual_meeting"] = true;
+                if (array_key_exists("virtual_provider", $attributes)) {
+                    $update["options"]["location"] = $attributes["virtual_provider"];
+                }
+            }
+        }
+
+        $requiresAuth = false;
+        $update["options"]["status"] = "approved";
+        $update["options"]["call"] = $data['call'];
+        if (!$isCall) {
+            if (array_key_exists("booking_requires_authorization", $attributes)) {
+                if ($attributes["booking_requires_authorization"]) {
+                    $update["notes"] = "in_confirmation";
+                    $requiresAuth = true;
+                    $update["options"]["status"] = "pending";
+                }
+            }
+        }
+        $update["starts_at"] = $data['from'];
+        $update["ends_at"] = $data['to'];
+        $booking = new Booking;
+        $booking = $booking->make($update)
+                ->customer()->associate($user)
+                ->bookable()->associate($object)
+                ->save();
+        $booking = Booking::where('id', DB::getPdo()->lastInsertId())->with('bookable')->first();
+        if ($requiresAuth) {
+            $this->handleAuthorizationRequest($user, $booking, $object);
+        }
+        if (array_key_exists("is_admin", $data)) {
+            if ($data['is_admin']) {
+                if ($object->checkAdminAccess($user->id)) {
+                    $update["total_paid"] = $update["price"];
+                    $booking->total_paid = $booking->price;
+                    unset($update['bookable']);
+                    unset($update['client']);
+                    Booking::where("id", $booking->id)->update($update);
+                }
+            }
+        }
+        return array("status" => "success", "message" => "Booking created", "booking" => $booking, "requires_auth" => $requiresAuth);
+    }
+
+    public function createBookingFromItem($object_id, $item) {
+        $user = $item->user;
+        $type = $data['type'];
+        $class = self::MODEL_PATH . $type;
+
+        if (class_exists($class)) {
+            $object = $class::find($data['object_id']);
+            if ($object) {
+                
+            }
+        }
     }
 
     /**
@@ -280,46 +288,12 @@ class EditBooking {
                 if ($booking) {
                     $result = $this->checkTime($data['from'], $object);
                     if ($result['status'] == 'success') {
-                        if ($object->checkAdminAccess($user->id) || $booking->customer_id == $user->id) {
-                            if ($booking->notes == 'pending') {
+                        $admin = $object->checkAdminAccess($user->id);
+                        if ($admin || $booking->customer_id == $user->id) {
+                            if ($booking->notes == self::PENDING || $booking->notes == self::IN_COMFIRMATION) {
                                 $result = $this->checkBookingAvailability($data, $object);
                                 if ($result['status'] == 'success') {
-                                    if (strpos($data['from'], '.') !== false) {
-                                        $a = explode(".", $data['from']);
-                                        $data['from'] = str_replace("T", " ", $a[0]);
-                                    }
-                                    if (strpos($data['to'], '.') !== false) {
-                                        $a = explode(".", $data['to']);
-                                        $data['to'] = str_replace("T", " ", $a[0]);
-                                    }
-                                    $result = $this->checkTime($data['from'], $object);
-                                    if ($result['status'] == 'success') {
-                                        $booking->starts_at = $data['from'];
-                                        $booking->ends_at = $data['to'];
-                                        $attributes = $booking->options;
-                                        $reqAttrs = $data['attributes'];
-                                        foreach ($reqAttrs as $key => $value) {
-                                            $attributes[$key] = $reqAttrs[$key];
-                                        }
-                                        $booking->total_paid = 0;
-                                        if ($booking->customer_id == $user->id) {
-                                            $attributes2 = $object->attributes;
-                                            if (array_key_exists("booking_requires_authorization", $attributes2)) {
-                                                if ($attributes2["booking_requires_authorization"]) {
-                                                    $booking->total_paid = -1;
-                                                }
-                                            }
-                                        }
-                                        $booking->options = $attributes;
-                                        $booking->updated_at = date("Y-m-d H:i:s");
-                                        $update = $booking->toArray();
-                                        $update["options"] = json_encode($attributes);
-                                        Booking::where("id", $booking->id)->update($update);
-                                        $booking->touch();
-                                        $this->handleAuthorizationRequest($user, $booking, $object);
-                                        return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
-                                    }
-                                    return array("status" => "error", "message" => "too_soon");
+                                    return $this->editBooking($booking, $object, $user, $data, $admin);
                                 }
                                 return $result;
                             }
@@ -327,12 +301,50 @@ class EditBooking {
                         }
                         return $result;
                     }
-                    return array("status" => "error", "message" => "access_denied");
+                    return array("status" => "error", "message" => "too_soon");
                 }
                 return array("status" => "error", "message" => "not_found");
             }
         }
         return array("status" => "error", "message" => "not_found");
+    }
+
+    private function editBooking($booking, $object, $user, $data, $admin) {
+        $dateFrom = date_create($data['from']);
+        date_add($dateFrom, date_interval_create_from_date_string(date('Z') . " seconds"));
+        $dateTo = date_create($data['to']);
+        date_add($dateTo, date_interval_create_from_date_string(date('Z') . " seconds"));
+        $booking->starts_at = $dateFrom;
+        $booking->ends_at = $dateTo;
+        $attributes = $booking->options;
+        $reqAttrs = $data['attributes'];
+        foreach ($reqAttrs as $key => $value) {
+            $attributes[$key] = $reqAttrs[$key];
+        }
+        if ($admin && $booking->notes == self::IN_COMFIRMATION) {
+            $booking->notes = self::PENDING;
+        }
+        if ($booking->customer_id == $user->id) {
+            $attributes2 = $object->attributes;
+            if (array_key_exists("booking_requires_authorization", $attributes2)) {
+                if ($attributes2["booking_requires_authorization"]) {
+                    $booking->notes = self::IN_COMFIRMATION;
+                }
+            }
+        }
+        $booking->options = $attributes;
+        $booking->updated_at = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));;
+        $update = $booking->toArray();
+        $update["options"] = json_encode($attributes);
+        $booking->touch();
+        //dd($update);
+        $booking->total_paid = $update['total_paid'];
+        $booking->starts_at = $data['from'];
+        $booking->ends_at = $data['to'];
+        unset($update['created_at']);
+        Booking::where("id", $booking->id)->update($update);
+        //$this->handleAuthorizationRequest($user, $booking, $object);
+        return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
     }
 
     private function handleAuthorizationRequest($user, $booking, $object) {
@@ -376,11 +388,11 @@ class EditBooking {
         $starts = date_format($date2, "Y-m-d H:i:s");
         $datetimestampDelivery = strtotime($starts);
         $dateTimestampNow = strtotime($now);
-        $diff = ($datetimestampDelivery - $dateTimestampNow ) / 60;
-        if ($diff < 14) {
+        $diff = ($datetimestampDelivery - $dateTimestampNow ) / 60 / 60;
+        if ($diff < 1) {
             return array("status" => "error", "message" => "too_soon", "limit" => $diff, "diff" => ($diff < 14));
         }
-        return array("status" => "success", "message" => "Delivery in limit");
+        return array("status" => "success", "message" => "Booking in limit");
     }
 
     /**
@@ -414,10 +426,10 @@ class EditBooking {
                     "reason" => ""
                 ];
                 if ($status == "approved") {
-                    $updateData["total_paid"] = 0;
+                    $updateData["notes"] = self::PENDING;
                     $typeAlert = self::BOOKING_BOOKABLE_APPROVED;
                 } elseif ($status == "denied") {
-                    $updateData["total_paid"] = -1;
+                    $updateData["notes"] = self::IN_COMFIRMATION;
                     if (array_key_exists("reason", $data)) {
                         $updateData["options"]["reason"] = $data["reason"];
                         $payload['reason'] = $data["reason"];
@@ -448,278 +460,6 @@ class EditBooking {
         return array("status" => "error", "message" => "not_found");
     }
 
-    public function remindLates() {
-        $bookings = Booking::where('notes', 'waiting')->get();
-        foreach ($bookings as $booking) {
-            $options = $booking->options;
-            $options = $options->toArray();
-            $payloads = [];
-            $pending = false;
-            $found = false;
-            for ($x = 0; $x < count($options["users"]); $x++) {
-                $theUser = $options["users"][$x];
-                if (!array_key_exists("connection_id", $theUser)) {
-                    $payload = [
-                        "booking_id" => $booking->id,
-                        "booking" => $booking
-                    ];
-                    if (array_key_exists("session_id", $options)) {
-                        $payload['sessionId'] = $options['session_id'];
-                    }
-                    if (array_key_exists("token", $theUser)) {
-                        $payload['token'] = $theUser['token'];
-                    }
-                    $followers = [(object) $theUser];
-                    $data = [
-                        "trigger_id" => $booking->id,
-                        "message" => "",
-                        "subject" => "",
-                        "object" => self::OBJECT_BOOKING,
-                        "sign" => true,
-                        "payload" => $payload,
-                        "type" => self::BOOKING_WAITING,
-                        "user_status" => "normal"
-                    ];
-                    $date = date("Y-m-d H:i:s");
-                    $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-                }
-            }
-        }
-    }
-
-    public function registerConnection(User $user, array $data) {
-        $booking = Booking::find($data["booking_id"]);
-        if ($booking) {
-            $options = $booking->options;
-            $options = $options->toArray();
-            $pending = false;
-            $found = false;
-            for ($x = 0; $x < count($options["users"]); $x++) {
-                $theUser = $options["users"][$x];
-                if ($theUser["id"] == $user->id) {
-                    $found = true;
-                    $theUser["connection_id"] = $data["connection_id"];
-                    $options["users"][$x] = $theUser;
-                }
-                if (!array_key_exists("connection_id", $theUser)) {
-                    $pending = true;
-                }
-            }
-            $update = [];
-            $update['total_paid'] = $booking->total_paid;
-            $booking->options = $options;
-            $booking->save();
-            if ($pending) {
-                $update["notes"] = "waiting";
-            } else {
-                $update["notes"] = "started";
-                // si quisiera mover el start date seria aca
-            }
-            Booking::where("id", $booking->id)->update($update);
-            $bookable = $booking->bookable;
-            return array("status" => "success", "message" => "connection_registered", "booking" => $booking);
-        }
-        return array("status" => "error", "message" => "not_found");
-    }
-
-    public function createChatroom($bookingId) {
-        $booking = Booking::find($bookingId);
-        if ($booking) {
-            $bookable = $booking->bookable;
-            $options = $booking->options;
-            $options = $options->toArray();
-            $users = [];
-            $payload = ["booking_id" => $booking->id, "booking" => $booking];
-            $user = $bookable->users()->first();
-            $bookableUserContainer = ["id" => $user->id];
-            $meeting = null;
-            if (array_key_exists('virtual_meeting', $options)) {
-                if ($options['virtual_meeting']) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $openTok = app("OpenTok");
-                        $session = $openTok->createSession();
-                        $bookableToken = $session->generateToken();
-                        //$bookableToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
-                        $bookableUserContainer = ["id" => $user->id, "token" => $bookableToken];
-                        $sessionId = $session->getSessionId();
-                        $booking->options["session_id"] = $sessionId;
-                        $payload["sessionId"] = $sessionId;
-                        $payload["token"] = $bookableToken;
-                    } else if ($options['virtual_provider'] == 'zoom') {
-                        $zoom = app("ZoomMeetings");
-                        $meeting = $zoom->createMeeting($user, $booking);
-                        if (array_key_exists('id', $meeting)) {
-                            echo "Meeting id: " . $meeting['id'] . PHP_EOL;
-                            $booking->options["session_id"] = $meeting['id'];
-                            $payload["url"] = $meeting['start_url'];
-                        } else {
-                            return ["status" => "error", "message" => "Meeting not created", "object" => $meeting];
-                        }
-                    }
-                }
-            }
-            array_push($users, $bookableUserContainer);
-
-            $followers = [$user];
-            $data = [
-                "trigger_id" => $booking->id,
-                "message" => "",
-                "subject" => "",
-                "object" => self::OBJECT_BOOKING,
-                "sign" => true,
-                "payload" => $payload,
-                "type" => self::BOOKING_STARTING,
-                "user_status" => "normal"
-            ];
-            $date = date("Y-m-d H:i:s");
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            $client = $booking->customer;
-            $bookableClientContainer = ["id" => $client->id];
-            $followers = [$client];
-            if (array_key_exists('virtual_meeting', $options)) {
-                if ($options['virtual_meeting']) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $clientToken = $session->generateToken();
-//                      $clientToken = $session->generateToken(array('expireTime' => time()+(intval($booking->formula["total_units"]) * 60 * 60)));
-                        $bookableClientContainer = ["id" => $client->id, "token" => $clientToken];
-                        $payload["sessionId"] = $sessionId;
-                        $payload["token"] = $clientToken;
-                    }
-                    if ($options['virtual_provider'] == 'zoom') {
-                        unset($payload['url']);
-                        $bookableClientContainer = ["id" => $client->id];
-                        $payload['url'] = $meeting['join_url'];
-                    }
-                }
-            }
-            $data['payload'] = $payload;
-
-            array_push($users, $bookableClientContainer);
-            $booking->options["users"] = $users;
-            //dd($booking);
-            $booking->save();
-            $bookable->status = "busy";
-            $bookable->save();
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'ready', 'total_paid' => $booking->price]);
-            //$booking->touch();
-            return $booking;
-        }
-    }
-
-    public function terminateOpenChatRooms() {
-        $query = $this->buildQuery("paid", null, "ready", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-        $query = $this->buildQuery("paid", null, "waiting", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-        $query = $this->buildQuery("paid", null, "started", 'ends_at', "<", 2, 'minute');
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $this->endChatroom($booking);
-        }
-    }
-
-    public function leaveChatroom(User $user, array $data) {
-        $booking = Booking::find($data['booking_id']);
-        $activecount = 0;
-        if ($booking) {
-            $users = $booking->options["users"];
-            foreach ($users as &$userM) {
-                if ($userM['id'] == $user->id) {
-                    if ($booking->options["location"] == 'opentok') {
-                        $userM["connection_id"] = null;
-                    }
-                }
-                if ($userM["connection_id"]) {
-                    $activecount++;
-                }
-            }
-            $booking->options["users"] = $users;
-            $booking->save();
-            if ($booking->notes == 'started' && $activecount == 0) {
-                Booking::where("id", $booking->id)->update(['notes' => 'completed', 'total_paid' => $booking->total_paid]);
-                //$booking->touch();
-            }
-            $bookable = $booking->bookable;
-            if ($bookable->checkAdminAccess($user->id)) {
-                $bookable->status = "online";
-                $bookable->save();
-            }
-            return ["status" => "success", "message" => "left_meeting"];
-        }
-        return ["status" => "error", "message" => "not_found"];
-    }
-
-    public function endChatroom(Booking $booking) {
-        $options = $booking->options;
-        $options = $options->toArray();
-        $followers = [];
-        $meetingProvider = null;
-        if (array_key_exists('virtual_meeting', $options)) {
-            if ($options['virtual_meeting']) {
-                if (array_key_exists('virtual_provider', $options)) {
-                    if ($options['virtual_provider'] == 'opentok') {
-                        $meetingProvider = app("OpenTok");
-                    }
-                    if ($options['virtual_provider'] == 'zoom') {
-                        $meetingProvider = app("ZoomMeetings");
-                    }
-                }
-            }
-        }
-        //$options = $booking->options;
-        if (array_key_exists("users", $options)) {
-            foreach ($options["users"] as $user) {
-                if ($meetingProvider) {
-                    if ($options["virtual_provider"] == 'opentok') {
-                        if (array_key_exists("connection_id", $user)) {
-                            $meetingProvider->forceDisconnect($options["session_id"], $user["connection_id"]);
-                        }
-                    }
-                }
-                array_push($followers, (object) $user);
-            }
-        }
-
-        if ($meetingProvider) {
-            if ($options["virtual_provider"] == 'zoom') {
-                if (array_key_exists("session_id", $options)) {
-                    $meetingProvider->endMeeting($options["session_id"]);
-                }
-            }
-        }
-        if (array_key_exists('call', $options)) {
-            if ($options['call']) {
-                $object = $booking->bookable;
-                $object->status = "online";
-                $object->save();
-            }
-        }
-        $payload = [
-            "booking_id" => $booking->id,
-        ];
-        $data = [
-            "trigger_id" => $booking->id,
-            "message" => "",
-            "subject" => "",
-            "object" => self::OBJECT_BOOKING,
-            "sign" => true,
-            "payload" => $payload,
-            "type" => self::BOOKING_COMPLETED,
-            "user_status" => "normal"
-        ];
-        $date = date("Y-m-d H:i:s");
-        $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-        Booking::where("id", $booking->id)->update(['notes' => 'completed', 'total_paid' => $booking->total_paid]);
-        //$booking->touch();
-    }
-
     /**
      * Show the application registration form.
      *
@@ -737,15 +477,15 @@ class EditBooking {
             if ($object) {
                 if ($object->checkAdminAccess($user->id)) {
                     if (!array_key_exists("id", $data)) {
-                        $data['id']=null;
+                        $data['id'] = null;
                     }
                     if ($data['id']) {
                         $data['from'] = date_format(date_create($data['from']), "h:i a");
                         $data['to'] = date_format(date_create($data['to']), "h:i a");
                         $id = $data["id"];
-                        $data["bookable_type"] = "App\\Models\\".$data['type'];
+                        $data["bookable_type"] = "App\\Models\\" . $data['type'];
                         $data["bookable_id"] = $data['object_id'];
-                        $data['updated_at']=date("Y-m-d H:i:s");
+                        $data['updated_at'] = date("Y-m-d H:i:s");
                         unset($data["id"]);
                         unset($data["object_id"]);
                         unset($data["type"]);
@@ -866,33 +606,50 @@ class EditBooking {
             return array(
                 "status" => "success",
                 "message" => "",
-                "data" => $user->futureBookings()->where('total_paid', 0)->with("bookable")->orderBy('starts_at')->get());
+                "data" => $user->futureBookings()
+                        ->where('total_paid', 0)
+                        ->with("bookable")
+                        ->orderBy('starts_at')->get());
         } else if ($query == "customer_unapproved") {
             return array(
                 "status" => "success",
                 "message" => "",
-                "data" => $user->bookings()->where('total_paid', -1)->with("bookable")->orderBy('starts_at')->get());
+                "data" => $user->bookings()
+                        ->where('notes', self::IN_COMFIRMATION)
+                        ->with("bookable")
+                        ->orderBy('starts_at')->get());
         } else if ($query == "customer_past") {
             return array(
                 "status" => "success",
                 "message" => "",
-                "data" => $user->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
+                "data" => $user->pastBookings()
+                        ->whereColumn('price', 'total_paid')
+                        ->orderBy('starts_at')
+                        ->with("bookable")->get());
         } else if ($query == "customer_upcoming") {
             return array(
                 "status" => "success",
                 "message" => "",
-                "data" => $user->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("bookable")->get());
+                "data" => $user->futureBookings()
+                        ->where('notes', self::PENDING)
+                        ->whereColumn('price', 'total_paid')
+                        ->orderBy('starts_at')->with("bookable")->get());
         } else if ($query == "customer_all") {
             return array(
                 "status" => "success",
                 "message" => "",
-                "data" => $user->futureBookings()->with("bookable")->orderBy('starts_at')->get());
+                "data" => $user->futureBookings()
+                        ->with("bookable")
+                        ->orderBy('starts_at')->get());
         }
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
                 if ($query == "day") {
-                    $results = $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")->orderBy('starts_at')->whereColumn('price', 'total_paid')->get();
+                    $results = $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")
+                                    ->orderBy('starts_at')
+                                    ->where('notes', self::PENDING)
+                                    ->whereColumn('price', 'total_paid')->get();
                     foreach ($results as $value) {
                         unset($value->price);
                         unset($value->total_paid);
@@ -910,25 +667,36 @@ class EditBooking {
                             return array(
                                 "status" => "success",
                                 "message" => "",
-                                "data" => $object->futureBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "data" => $object->futureBookings()
+                                        ->whereColumn('price', 'total_paid')
+                                        ->where('notes', self::PENDING)
+                                        ->orderBy('starts_at')
+                                        ->with("customer")->get());
                         } else if ($query == "bookable_past") {
                             return array(
                                 "status" => "success",
                                 "message" => "",
-                                "data" => $object->pastBookings()->whereColumn('price', 'total_paid')->orderBy('starts_at')->with("customer")->get());
+                                "data" => $object->pastBookings()
+                                        ->whereColumn('price', 'total_paid')
+                                        ->orderBy('starts_at')
+                                        ->with("customer")->get());
                         } else if ($query == "bookable_unapproved") {
                             return array(
                                 "status" => "success",
                                 "message" => "",
-                                "data" => $object->futureBookings()->where('total_paid', -1)->orderBy('starts_at')->with("customer")->get());
+                                "data" => $object->futureBookings()
+                                        ->where('notes', self::IN_COMFIRMATION)
+                                        ->orderBy('starts_at')
+                                        ->with("customer")->get());
                         } else if ($query == "bookable_all") {
                             return array(
                                 "status" => "success",
                                 "message" => "",
                                 "data" => $object->futureBookings()->where(function($query) {
-                                            $query->whereColumn('price', 'total_paid')
-                                                    ->orWhere('total_paid', -1);
-                                        })->orderBy('starts_at')->with("customer")->get());
+                                                    $query->whereColumn('price', 'total_paid')
+                                                    ->orWhere('notes', self::IN_COMFIRMATION);
+                                                })->orderBy('starts_at')
+                                        ->with("customer")->get());
                         }
                     }
                 }
@@ -936,40 +704,6 @@ class EditBooking {
             }
         }
         return array("status" => "error", "message" => "not_found");
-    }
-
-    public function buildQuery($paidStatus, $authStatus, $bookingStatus, $date, $op, $interval, $units) {
-        $query = null;
-//        DB::enableQueryLog();
-        if ($paidStatus == "paid") {
-            $query = Booking::whereColumn('price', 'total_paid');
-        } else {
-            if ($authStatus == "approved") {
-                $query = Booking::where('total_paid', 0);
-            } elseif ($authStatus == "unapproved") {
-                $query = Booking::where('total_paid', -1);
-            } else {
-                $query = Booking::where(function($query2) {
-                            $query2->where('total_paid', 0)
-                                    ->orWhere('total_paid', -1);
-                        });
-            }
-        }
-        if ($query) {
-            if ($bookingStatus) {
-                $query->where('notes', $bookingStatus);
-            }
-            if ($interval) {
-                $now = Carbon::now();
-                $now->add($units, $interval);
-                $query->where($date, $op, $now);
-            }
-//            $query->orderBy("id","desc")->limit(3);
-//            $results = $query->get()->toArray();
-//            dd($results);
-//            dd(DB::getQueryLog());
-            return $query;
-        }
     }
 
     /**
@@ -991,77 +725,6 @@ class EditBooking {
             }
         }
         return array("status" => "error", "message" => "not_found");
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteBookingObject(array $data, User $user) {
-        Favorite::where('user_id', $user->id)
-                ->where('favorite_type', $data['type'])
-                ->where('object_id', $data['object_id'])->delete();
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteOldBookings() {
-        $query = $this->buildQuery("unpaid", "both", null, 'starts_at', "<", -10, 'minute');
-        $query->delete();
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function sendStartReminder() {
-        $query = $this->buildQuery("paid", null, "pending", 'starts_at', "<", 20, 'minute');
-//        dd($query->with("bookable")->get()->toArray());
-        $bookings = $query->with("bookable")->get();
-        foreach ($bookings as $booking) {
-            $payload = [
-                "booking_id" => $booking->id,
-                "booking_date" => $booking->starts_at
-            ];
-            $data = [
-                "trigger_id" => $booking->id,
-                "message" => "",
-                "subject" => "",
-                "object" => "Booking",
-                "sign" => true,
-                "payload" => $payload,
-                "type" => "booking_soon",
-                "user_status" => "active"
-            ];
-            $object = $booking->bookable;
-            $admins = $object->users()->first();
-            $followers = [];
-            array_push($followers, $admins);
-            $user = json_decode(json_encode(["id" => $booking->customer_id]), false);
-            array_push($followers, $user);
-            $date = date("Y-m-d H:i:s");
-            $this->notifications->sendMassMessage($data, $followers, null, true, $date, true);
-            Booking::where("id", $booking->id)->update(['notes' => 'reminded', 'total_paid' => $booking->price]);
-            //$booking->touch();
-        }
-    }
-
-    /**
-     * Show the application registration form.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function startMeeting() {
-        $query = $this->buildQuery("paid", null, "reminded", 'starts_at', "<", 2, 'minute');
-        $bookings = $query->get();
-        foreach ($bookings as $booking) {
-            $this->createChatroom($booking->id);
-        }
     }
 
     public function deleteBooking(User $user, $id) {

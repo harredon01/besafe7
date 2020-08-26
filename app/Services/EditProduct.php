@@ -122,7 +122,7 @@ class EditProduct {
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
                                     ->whereIn('files.trigger_id', $products)
-                                    ->where('files.type', "Product")
+                                    ->where('files.type', "App\Models\Product")
                                     ->select('products.*', 'files.*')
                                     ->get();
                             return $data;
@@ -165,7 +165,7 @@ class EditProduct {
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
                         ->whereIn('files.trigger_id', $products)
-                        ->where('files.type', "Product")
+                        ->where('files.type', "App\Models\Product")
                         ->select('products.*', 'files.*')
                         ->get();
                 return $data;
