@@ -139,6 +139,7 @@ Route::post('merchants/share', 'ShareApiController@postAddFollower');
 Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
 Route::get('private/merchants', 'MerchantApiController@indexPrivate');
 Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
+Route::get('merchants/detail', 'MerchantApiController@getObject');
 Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
 Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
 Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
@@ -157,6 +158,7 @@ Route::get('merchants/search', function (Request $request) {
 //Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
 Route::post('merchants/status', 'MerchantApiController@updateStatus');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
+Route::get('merchants/products', 'ProductApiController@getProductsMerchant');
 Route::resource('merchants', 'MerchantApiController');
 
 Route::get('imagesapi', 'FileApiController@getFiles');
@@ -165,7 +167,7 @@ Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 
 Route::get('products/group/{group?}/{page?}', 'ProductApiController@getProductsGroup');
 Route::get('products/merchant/private/{merchant?}/{page?}', 'ProductApiController@getProductsPrivateMerchant');
-Route::get('products/merchant/{merchant?}/{page?}', 'ProductApiController@getProductsMerchant');
+Route::get('products/merchant/{merchant?}/{page?}', 'ProductApiController@getProductsMerchantOld');
 
 Route::resource('products', 'ProductApiController');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');

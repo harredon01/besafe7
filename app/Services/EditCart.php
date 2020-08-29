@@ -13,6 +13,8 @@ use Cart;
 
 class EditCart {
 
+    const MODEL_PATH = 'App\\Models\\';
+
     /**
      * The Auth implementation.
      *
@@ -165,12 +167,12 @@ class EditCart {
             $order->total = 0;
             $order->save();
         }
-        if(isset($user->email)){
+        if (isset($user->email)) {
             Item::where('user_id', $user->id)->where('order_id', null)->delete();
         } else {
             Item::where('ref2', $user->id)->where('order_id', null)->delete();
         }
-        
+
         Cart::clearCartConditions();
     }
 
@@ -521,6 +523,10 @@ class EditCart {
                             $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
                             $item->save();
                             $item->attributes = $losAttributes;
+                            if ($losAttributes['type'] == "Booking") {
+                                $objClass = self::MODEL_PATH . $losAttributes['type'];
+                                $objClass::where("id", $losAttributes['id'])->update(['price' => $item->priceSumConditions]);
+                            }
 
                             return array("status" => "success", "message" => "item added to cart successfully", "cart" => $this->getCart($user), "item" => $item);
                         } else {

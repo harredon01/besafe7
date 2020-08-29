@@ -147,9 +147,14 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function getProductsMerchant($merchant,$page, Request $request) {
-        $user = $request->user();
-        return response()->json($this->editProduct->getProductsMerchant($user, $merchant,$page));
+    public function getProductsMerchantOld($merchant,$page, Request $request) {
+        $data = $request->all();
+        $data['page'] = $page;
+        $data['merchant_id'] = $merchant;
+        return response()->json($this->editProduct->getProductsMerchant($data));
+    }
+    public function getProductsMerchant( Request $request) {
+        return response()->json($this->editProduct->getProductsMerchant($request->all()));
     }
     /**
      * Display the specified resource.

@@ -235,6 +235,75 @@ class EditMapObject {
         }
     }
 
+    public function getObject($data) {
+        $object = null;
+        if (array_key_exists('object_id', $data) && array_key_exists('type', $data)) {
+            if ($data['object_id'] && $data['type']) {
+                $target = "App\\Models\\" . $data['type'];
+                $object = $target::where('id', $data['object_id'])->where('private', false)->first();
+            }
+        }
+        if (!$object) {
+            return ['status' => "error", "message" => $data['type'] . ' not found'];
+        }
+        $includes_files = false;
+        $includes_ratings = false;
+        $includes_availabilities = false;
+        if (array_key_exists("includes", $data)) {
+            if ($data['includes']) {
+                $includes = $data['includes'];
+                $includes = explode(',', $includes);
+                foreach ($includes as $value) {
+                    if ($value == 'ratings') {
+                        $includes_ratings = true;
+                    } else if ($value == 'files') {
+                        $includes_files = true;
+                    } else if ($value == 'availabilities') {
+                        $includes_availabilities = true;
+                    }
+                }
+            }
+        }
+        $files = [];
+        if ($includes_files) {
+            $files = FileM::where("type", self::MODEL_PATH . $data['type'])->where("trigger_id", $object->id)->get();
+        }
+        $ratings = [];
+        if ($includes_ratings) {
+            $ratings = Rating::where("type", $data['type'])->where("object_id", $object->id)->orderBy('id', 'desc')->limit(20)->get();
+        }
+        $availabilities = [];
+        if ($includes_availabilities) {
+            $availabilities = Availability::where("bookable_type", self::MODEL_PATH . $data['type'])->where("bookable_id", $object->id)->limit(25)->get();
+        }
+        if ($data['type'] == self::OBJECT_REPORT) {
+            $object->email = "";
+            $object->telephone = "";
+            $data = [
+                "report" => $object,
+                "files" => $files,
+                "ratings" => $ratings
+            ];
+        } else if ($data['type'] == self::OBJECT_MERCHANT) {
+            $data = [
+                "merchant" => $object,
+                "files" => $files,
+                "ratings" => $ratings,
+                "availabilities" => $availabilities,
+                "access" => false
+            ];
+        }
+        if (array_key_exists('favorite_id', $data)) {
+            if ($data['favorite_id']) {
+                $favor = Favorite::where('user_id', $data['favorite_id'])->where("favorite_type", $data['type'])->where("object_id", $object->id)->first();
+                if ($favor) {
+                    $data['favorite'] = true;
+                }
+            }
+        }
+        return $data;
+    }
+
     public function sendCartItem(User $user, array $data) {
         $validator = $this->validatorMerchantCartItem($data);
         if ($validator->fails()) {
@@ -347,7 +416,7 @@ class EditMapObject {
     public function getNearby(array $data) {
         $data['type'] = "Merchant";
         $merchants = $this->getNearbyObjects($data);
-        
+
         $data['type'] = "Report";
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
@@ -359,25 +428,24 @@ class EditMapObject {
                 ->whereIn($idColumn, $parentIds)
                 ->orderBy($idColumn)
                 ->get();
-       // dd(DB::getQueryLog());
+        // dd(DB::getQueryLog());
         return $results->toArray();
     }
 
-    public function organizeRelation(array $objects, array $relations,$resource, $idColumn) {
+    public function organizeRelation(array $objects, array $relations, $resource, $idColumn) {
         foreach ($relations as $rel) {
             //$rel = json_decode(json_encode((array) $rel), true);
-            
+
             foreach ($objects as &$item) {
                 //dd($item);
-                if($item->id==$rel->$idColumn){
-                    if(property_exists($item, $resource)){
+                if ($item->id == $rel->$idColumn) {
+                    if (property_exists($item, $resource)) {
                         array_push($item->$resource, $rel);
                     } else {
-                        $item->$resource=[$rel];
+                        $item->$resource = [$rel];
                     }
                 }
             }
-            
         }
         return $objects;
     }

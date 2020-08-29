@@ -97,11 +97,12 @@ class EditOrderBooking {
                         $booking->options['payer'] = $order->user_id;
                         $booking->options['status'] = "reminded";
                         $booking->options['paid'] = date("Y-m-d H:i:s");
-
-                        $booking->save();
+                        $options = $booking->options;
+                        $booking->touch();
                         $updateData = [
+                            "options" => json_encode($options),
                             "total_paid" => $item->priceSumConditions,
-                            "updated_at" => date("Y-m-d H:i:s")
+                            "updated_at" => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))
                         ];
                         Booking::where("id", $id)->update($updateData);
                     }
