@@ -52,6 +52,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
+        'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'admin' => \App\Http\Middleware\CheckIfAdmin::class,
         'user.admin.request' => \App\Http\Middleware\CheckAdminRequest::class,

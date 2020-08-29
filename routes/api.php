@@ -3,15 +3,15 @@
 use Illuminate\Http\Request;
 
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+  |--------------------------------------------------------------------------
+  | API Routes
+  |--------------------------------------------------------------------------
+  |
+  | Here is where you can register API routes for your application. These
+  | routes are loaded by the RouteServiceProvider within a group which
+  | is assigned the "api" middleware group. Enjoy building your API!
+  |
+ */
 
 Route::resource('addresses', 'AddressApiController');
 Route::resource('coverage', 'CoveragePolygonController');
@@ -99,7 +99,7 @@ Route::post('groups/code/refresh/{id?}', 'GroupController@regenerateGroupCode');
 Route::get('groups/code/{code?}', 'GroupController@getGroupByCode');
 Route::post('groups/code/{code?}', 'GroupController@joinGroupByCode');
 Route::post('groups/admin_users', 'GroupController@getAdminGroupUsers');
-Route::post('groups/status', 'GroupController@changeStatusGroup'); 
+Route::post('groups/status', 'GroupController@changeStatusGroup');
 Route::post('groups/invite', 'GroupController@inviteUsers');
 Route::resource('groups', 'GroupController');
 
@@ -122,11 +122,11 @@ Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
 Route::get('reports/search', function (Request $request) {
     $searchQuery = App\Models\Report::search($request->search);
-    if(is_array($request->filters)){
+    if (is_array($request->filters)) {
         $filters = $request->filters;
         foreach ($filters as $key => $value) {
-            
-            $searchQuery->where($key,$value);
+
+            $searchQuery->where($key, $value);
         }
     }
     return $searchQuery->paginate();
@@ -136,30 +136,35 @@ Route::resource('reports', 'ReportApiController');
 
 
 Route::post('merchants/share', 'ShareApiController@postAddFollower');
-Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
-Route::get('private/merchants', 'MerchantApiController@indexPrivate');
-Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
-Route::get('merchants/detail', 'MerchantApiController@getObject');
-Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
-Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
-Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
-Route::get('merchants/search', function (Request $request) {
-    $searchQuery = App\Models\Merchant::search($request->search);
-    
-    $filters = $request->filters;
-    $filters = json_decode($filters,true);
-    if(is_array($filters)){
-        foreach ($filters as $key => $value) {
-            $searchQuery->where($key,$value); 
-        }
-    }
-    return $searchQuery->paginate();
-});
-//Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
 Route::post('merchants/status', 'MerchantApiController@updateStatus');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
-Route::get('merchants/products', 'ProductApiController@getProductsMerchant');
-Route::resource('merchants', 'MerchantApiController');
+Route::get('private/merchants', 'MerchantApiController@indexPrivate');
+Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
+    Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
+    Route::get('merchants/products', 'ProductApiController@getProductsMerchant');
+    Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
+    Route::get('merchants/detail', 'MerchantApiController@getObject');
+    Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
+    Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
+    Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
+    Route::get('merchants/search', function (Request $request) {
+        $searchQuery = App\Models\Merchant::search($request->search);
+
+        $filters = $request->filters;
+        $filters = json_decode($filters, true);
+        if (is_array($filters)) {
+            foreach ($filters as $key => $value) {
+                $searchQuery->where($key, $value);
+            }
+        }
+        return $searchQuery->paginate();
+    });
+//Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
+
+
+    Route::resource('merchants', 'MerchantApiController');
+});
+
 
 Route::get('imagesapi', 'FileApiController@getFiles');
 Route::post('imagesapi', 'FileApiController@postFile');
@@ -174,7 +179,7 @@ Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
 Route::post('products/variant', 'ProductVariantApiController@store');
 Route::post('products/share', 'ShareApiController@postAddFollower');
 Route::patch('products/variant/{variant?}', 'ProductVariantApiController@update');
-Route::post('products/variant/{variant?}', 'ProductVariantApiController@update'); 
+Route::post('products/variant/{variant?}', 'ProductVariantApiController@update');
 Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
 Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
 
@@ -188,7 +193,7 @@ Route::get('cart/checkout', 'CartApiController@getCheckoutCart');
 Route::post('cart/clear', 'CartApiController@postClearCart');
 Route::get('cart/load', 'CartApiController@loadActiveCart');
 Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
- 
+
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
 Route::get('orders/active', 'OrderApiController@getOrder');
 Route::post('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@setPlatformShippingCondition');
@@ -203,16 +208,16 @@ Route::post('orders/check/{order?}', 'OrderApiController@checkOrder');
 Route::post('orders/recurring/{order?}', 'OrderApiController@setOrderRecurringType');
 Route::get('orders/deny/{code?}', 'OrderApiController@denyOrder');
 Route::resource('orders', 'OrderApiController');
-Route::get('payments', 'BillingApiController@getPaymentsAdmin'); 
-Route::post('payments/{payment?}/approve', 'FoodApiController@approvePayment'); 
+Route::get('payments', 'BillingApiController@getPaymentsAdmin');
+Route::post('payments/{payment?}/approve', 'FoodApiController@approvePayment');
 
 Route::get('items', 'ItemApiController@index');
-Route::post('items/fulfillment', 'ItemApiController@fulfillItem'); 
+Route::post('items/fulfillment', 'ItemApiController@fulfillItem');
 
-Route::get('admin/store/products', 'ProductImportApiController@getProducts'); 
-Route::get('admin/store/variants', 'ProductImportApiController@getVariants'); 
-Route::get('admin/store/merchants', 'ProductImportApiController@getMerchants'); 
-Route::get('admin/store/categories', 'ProductImportApiController@getCategories'); 
+Route::get('admin/store/products', 'ProductImportApiController@getProducts');
+Route::get('admin/store/variants', 'ProductImportApiController@getVariants');
+Route::get('admin/store/merchants', 'ProductImportApiController@getMerchants');
+Route::get('admin/store/categories', 'ProductImportApiController@getCategories');
 
 Route::get('food/menu', 'FoodApiController@getMenu');
 Route::get('food/zones', 'FoodApiController@getZones');

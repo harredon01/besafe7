@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Medical;
+use App\Models\Certificate;
+use App\Models\Signature;
+use App\Models\Document;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TwoFactorAuthMail;
 use Carbon\Carbon;

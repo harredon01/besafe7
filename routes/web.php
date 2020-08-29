@@ -10,9 +10,10 @@
   | to using a Closure or controller method. Build something great!
   |
  */
-
-Route::get('/', function () {
-    return view('lonchis2');
+Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
+    Route::get('/', function () {
+        return view('lonchis2');
+    });
 });
 Route::get('/test', function () {
     return view('lonchis');
@@ -176,16 +177,16 @@ Route::get('/email_payment_cash', function () {
     $url = "http://www.google.com";
     $pdf = "http://www.google.com";
     return new App\Mail\EmailPaymentCash($payment, $user, $url, $pdf);
-}); 
+});
 Route::get('/newsletter_descuento', function () {
     return new App\Mail\Newsletter4();
-}); 
+});
 Route::get('/newsletter_padres2', function () {
     return new App\Mail\Newsletter3();
-}); 
+});
 Route::get('/newsletter_padre2', function () {
     return new App\Mail\Newsletter3();
-}); 
+});
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
 });
@@ -207,8 +208,8 @@ Route::get('/newsletter_catering', function () {
 Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
-    $days =$gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days,"Agosto","Agosto");
+    $days = $gateway->getDataNewsletter();
+    return new App\Mail\NewsletterMenus($days, "Agosto", "Agosto");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();
