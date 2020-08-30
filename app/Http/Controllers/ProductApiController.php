@@ -151,6 +151,7 @@ class ProductApiController extends Controller {
         $data = $request->all();
         $data['page'] = $page;
         $data['merchant_id'] = $merchant;
+        $data['includes'] = 'categories,files,merchant';
         return response()->json($this->editProduct->getProductsMerchant($data));
     }
     public function getProductsMerchant( Request $request) {
