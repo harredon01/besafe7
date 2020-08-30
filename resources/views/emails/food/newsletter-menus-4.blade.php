@@ -252,19 +252,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/>
+<div style="font-size:1px;line-height:5px"> </div> @if ($days[0]["completo_imagen"])   <img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/> @endif 
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[0]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/> @endif 
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[0]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[0]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 300px; display: block;" title="Alternate text" width="300"/> @endif 
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -292,19 +292,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[1]["completo_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[1]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[1]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[1]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -454,19 +454,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[2]["completo_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[2]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[2]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[2]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -494,19 +494,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[3]["completo_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[3]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[3]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[3]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -656,19 +656,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[4]["completo_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[4]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[4]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[4]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
@@ -696,19 +696,19 @@
 <!--<![endif]-->
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[5]["completo_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["completo_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[5]["light_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["light_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <div align="center" class="img-container center autowidth" style="padding-right: 5px;padding-left: 5px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 5px;padding-left: 5px;" align="center"><![endif]-->
-<div style="font-size:1px;line-height:5px"> </div><img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>
+<div style="font-size:1px;line-height:5px"> </div>@if ($days[5]["vegetariano_imagen"])<img align="center" alt="Alternate text" border="0" class="center autowidth" src="{{$days[5]["vegetariano_imagen"]}}" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 290px; display: block;" title="Alternate text" width="290"/>@endif
 <div style="font-size:1px;line-height:5px"> </div>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
