@@ -1,11 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\EditDelivery;
-use App\Services\PayU;
-use App\Services\Food;
+use App\Services\Security;
 use App\Services\EditAlerts;
-use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
 use App\Models\Order;
@@ -33,14 +30,14 @@ class DeliveriesSeeder extends Seeder {
      * The edit profile implementation.
      *
      */
-    protected $food;
+    protected $security;
  
-    public function __construct(Food $food, Rapigo $editOrderfood, PayU $payu, EditAlerts $editAlerts) {
-        $this->food = $food;
+    public function __construct(Security $security) {
+        $this->security = $security;
     }
 
     public function run() {
-        $this->food->reprogramDeliveries();
+        $this->security->generateCertificate(); 
 //        $data = [
 //            "address" => "Calle 73 # 0 - 24",
 //            "complete" => false, 
@@ -51,7 +48,7 @@ class DeliveriesSeeder extends Seeder {
 //        
 //        //dispatch(new ApprovePayment($payment, "Food"));
 //        foreach ($deliveries as $delivery) {
-//            $this->food->addInfoToDelivery($delivery);
+//            $this->security->addInfoToDelivery($delivery);
 //        }
         
         
@@ -67,12 +64,12 @@ class DeliveriesSeeder extends Seeder {
 //                        "type" => self::ORDER_PAYMENT,
 //                        "user_status" => "test"
 //                    ];
-//        $this->food->sendMassMessage($data, $users, $user, true, null,"food");
-//        $this->food->runCompleteSimulation();
-//        $this->food->importDishes();
+//        $this->security->sendMassMessage($data, $users, $user, true, null,"security");
+//        $this->security->runCompleteSimulation();
+//        $this->security->importDishes();
 //        $this->deleteOldData();
-//        $this->food->generateRandomDeliveries(4.670129, -74.051013);
-//        $this->food->prepareRoutingSimulation(4.670129, -74.051013);
+//        $this->security->generateRandomDeliveries(4.670129, -74.051013);
+//        $this->security->prepareRoutingSimulation(4.670129, -74.051013);
     }
 
     public function deleteOldData() {

@@ -70,6 +70,15 @@ class User extends Authenticatable {
     public function addresses() {
         return $this->hasMany('App\Models\Address');
     }
+    public function certificates() {
+        return $this->hasMany('App\Models\Certificate');
+    }
+    public function signatures() {
+        return $this->hasMany('App\Models\Signature');
+    }
+    public function documents() {
+        return $this->hasMany('App\Models\Document');
+    }
     public function payments() {
         return $this->hasMany('App\Models\Payment');
     }

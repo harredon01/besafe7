@@ -105,7 +105,7 @@ class Security {
         }
         $user = User::where("email", $data["email"])->first();
         if ($user->two_factor_expiry > \Carbon\Carbon::now() && $data['token'] == $user->two_factor_token) {
-            
+
 
             $this->updatePassword($user, $data);
             $http = new \GuzzleHttp\Client;
@@ -125,6 +125,92 @@ class Security {
         return ['status' => 'error', 'message' => 'verification failed'];
     }
 
+    public function generateCertificate(User $user) {
+        $config = array(
+            "digest_alg" => "sha512",
+            "private_key_bits" => 1024,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
+        $today = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
+
+
+// Create the private and public key
+        $res = openssl_pkey_new($config);
+
+// Extract the private key from $res to $privKey
+        $privKey = null;
+        openssl_pkey_export($res, $privKey);
+        echo "Private key: " . $privKey . PHP_EOL;
+        $pubKey = openssl_pkey_get_details($res);
+        $pubKey = $pubKey["key"];
+        echo "Public key: " . $pubKey . PHP_EOL;
+        $oldCert = $user->certificates()->where('is_active', true)->first();
+        if ($oldCert) {
+            $oldCert->is_active = false;
+            $oldCert->expiration = $today;
+            $oldCert->save();
+        }
+
+        $certificate = Certificate::create([
+                    'user_id' => $user->id,
+                    'public_key' => $pubKey,
+                    'is_active' => true]);
+        return array("status" => "success", "message" => "Cert created", "private_key" => $privKey, "certificate" => $certificate);
+    }
+
+    public function sign(User $user, Document $data, $privKey) {
+        $signature = "";
+        $save = false;
+        if(!$data->is_signed){
+            $data->is_signed = true;
+            $save = true;
+            $data->signature_date = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
+        }
+        
+        openssl_sign($data, $signature, $privKey, OPENSSL_ALGO_SHA256);
+        $cert = $user->certificates()->where('is_active', true)->first();
+        if ($cert) {
+            $r = openssl_verify($data, $signature, $cert->public_key, "sha256WithRSAEncryption");
+            if ($r) {
+                $signatureObj = new Signature([
+                    'user_id' => $user->id,
+                    'signature' => $signature]);
+                $data->signatures()->save($signatureObj);
+                if($save){
+                    $data->save();
+                }
+                return array("status" => "success", "message" => "Signature created", "signature" => $signatureObj);
+            }
+            return array("status" => "error", "message" => "Private key does not match current certificate");
+        }
+        return array("status" => "error", "message" => "No certificate");
+    }
+
+    public function validate(Document $doc) {
+        $signatures = $doc->signatures;
+        $valid_signatures = [];
+        $invalid_signatures = [];
+        foreach ($signatures as $sign) {
+            $signer = $sign->user;
+            $certificate = $signer->certificates()->where('is_active',true)->first();
+            $valid = false;
+            if($certificate){
+                $r = openssl_verify($doc, $sign->signature, $certificate->public_key, "sha256WithRSAEncryption");
+                if($r){
+                    $valid = true;
+                }
+            }
+            if($valid){
+                array_push($valid_signatures,$sign);
+            } else {
+                array_push($invalid_signatures,$sign);
+            }
+            
+        }
+        return ['status'=>"success","message"=>"signature validations completed","valid_signatures"=>$valid_signatures,"invalid_signatures"=>$invalid_signatures];
+        
+    }
+
     /**
      * Get a validator for an incoming edit profile request.
      *
@@ -136,6 +222,7 @@ class Security {
                     'password' => 'required|confirmed|min:6',
         ]);
     }
+
     /**
      * Get a validator for an incoming edit profile request.
      *
