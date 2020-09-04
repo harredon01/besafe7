@@ -91,11 +91,11 @@ class EditMapObject {
     }
 
     public function getCategoriesMerchant($id, $type) {
+        $categories = DB::select(" "
+                        . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
+                . " from categorizable where categorizable_type='App//Models//Product') and name like '%:name%' limit 15"
+                        . "", ['name'=>$type]);
         //DB::enableQueryLog();
-        $categories = Category::where('type', $type)->where(function($query) use ($id) {
-                    $query->where('merchant_id', $id)
-                            ->orWhereNull('merchant_id');
-                })->get();
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
     }
@@ -722,20 +722,22 @@ class EditMapObject {
         }
 
         $data['attributes'] = $attributes;
-        if (!array_key_exists("unit", $data)) {
-            $data['unit'] = "hour";
-        }
+        if ($type == self::OBJECT_MERCHANT) {
+            if (!array_key_exists("unit", $data)) {
+                $data['unit'] = "hour";
+            }
 //        if (!array_key_exists("status", $data)) {
 //            $data['status'] = "pending";
 //        }
-        if (!array_key_exists("base_cost", $data)) {
-            $data['base_cost'] = 0;
+            if (!array_key_exists("base_cost", $data)) {
+                $data['base_cost'] = 0;
+            }
+            if (!array_key_exists("unit_cost", $data)) {
+                $data['unit_cost'] = 0;
+            }
+            dispatch(new CreateMerchant($user));
+            $data['currency'] = "COP";
         }
-        if (!array_key_exists("unit_cost", $data)) {
-            $data['unit_cost'] = 0;
-        }
-        dispatch(new CreateMerchant($user));
-        $data['currency'] = "COP";
         if (array_key_exists('id', $data)) {
             if ($data['id'] && $data['id'] > 0) {
                 foreach ($data as $key => $value) {
@@ -792,6 +794,7 @@ class EditMapObject {
                     //$this->saveToGroups($user, $data, $type,$object);
                     dispatch(new SaveGroupsObject($user, $data, $type, $object));
                 }
+                $data['updated_at'] = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
                 $object::where('id', $data['id'])->whereIn('status', ['active', 'online', 'inactive', 'pending'])->update($data);
                 $result = $this->getObjectUser($user, $data['id'], $type);
                 if ($result) {

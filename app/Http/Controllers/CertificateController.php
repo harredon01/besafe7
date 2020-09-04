@@ -2,18 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Security;
 use App\Certificate;
 use Illuminate\Http\Request;
 
-class CertificateController extends Controller
-{
+class CertificateController extends Controller {
+
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $security;
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct(Security $security) {
+        $this->security = $security;
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index(Request $request) {
+        $user = $request->user();
+        $cert = $user->certificates()->where('is_active',true)->get();
+        return response()->json(['status'=>"success","certificate"=>$cert]);
         //
     }
 
@@ -22,9 +41,8 @@ class CertificateController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        //
+    public function create(Request $request) {
+        
     }
 
     /**
@@ -33,9 +51,9 @@ class CertificateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        //
+    public function store(Request $request) {
+        $user = $request->user();
+        return response()->json($this->security->generateCertificate($user));
     }
 
     /**
@@ -44,8 +62,7 @@ class CertificateController extends Controller
      * @param  \App\Certificate  $certificate
      * @return \Illuminate\Http\Response
      */
-    public function show(Certificate $certificate)
-    {
+    public function show(Certificate $certificate) {
         //
     }
 
@@ -55,8 +72,7 @@ class CertificateController extends Controller
      * @param  \App\Certificate  $certificate
      * @return \Illuminate\Http\Response
      */
-    public function edit(Certificate $certificate)
-    {
+    public function edit(Certificate $certificate) {
         //
     }
 
@@ -67,8 +83,7 @@ class CertificateController extends Controller
      * @param  \App\Certificate  $certificate
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Certificate $certificate)
-    {
+    public function update(Request $request, Certificate $certificate) {
         //
     }
 
@@ -78,8 +93,8 @@ class CertificateController extends Controller
      * @param  \App\Certificate  $certificate
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Certificate $certificate)
-    {
+    public function destroy(Certificate $certificate) {
         //
     }
+
 }

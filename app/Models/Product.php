@@ -78,7 +78,7 @@ class Product extends Model {
     public function clearCache() {
         $access = false;
         $merchants = DB::select('SELECT 
-                                            DISTINCT(m.id) as merchant_id,m.user_id
+                                            DISTINCT(m.id) as merchant_id
                                         FROM
                                             merchants m
                                         WHERE
@@ -94,7 +94,7 @@ class Product extends Model {
             Cache::forget('products_merchant_' . $value->merchant_id . "_3");
         }
         $groups = DB::select('SELECT 
-                                            DISTINCT(g.id) as group_id,m.user_id
+                                            DISTINCT(g.id) as group_id
                                         FROM
                                             groups g
                                                 JOIN

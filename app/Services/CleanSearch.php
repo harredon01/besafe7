@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
 use App\Models\Merchant;
-
+use Illuminate\Support\Str;
 class CleanSearch {
 
     public function handle(User $user, Request $request) {
@@ -29,6 +29,43 @@ class CleanSearch {
             }
         }
 
+        return $request2;
+    }
+
+    public function handleDocument(User $user, Request $request) {
+        $mystring = $request->getRequestUri();
+        $findme = '?';
+        $pos = strpos($mystring, $findme);
+        if ($pos === false) {
+            $request2 = Request::create($mystring . "?user_id=" . $user->id, 'GET');
+        } else {
+            $check = explode("?", $mystring);
+            if (count($check) != 2) {
+                return null;
+            }
+            $auth = $request->all("author_id");
+            if ($auth['author_id']) {
+                if ($auth['author_id'] != -1) {
+                    return null;
+                }
+            }
+            $data = $request->all("user_id");
+            if (!$data['user_id']) {
+                if ($auth['author_id']) {
+                    if(Str::contains($mystring, '&author_id=-1')){
+                        $mystring = str_replace("&author_id=-1","",$mystring);
+                    }
+                    if(Str::contains($mystring, 'author_id=-1')){
+                        $mystring = str_replace("author_id=-1","",$mystring);
+                    }
+                    $request2 = Request::create($mystring . "&author_id=" . $user->id, 'GET');
+                } else {
+                    $request2 = Request::create($mystring . "&user_id=" . $user->id, 'GET');
+                }
+            } else {
+                return null;
+            }
+        }
         return $request2;
     }
 
@@ -458,7 +495,7 @@ class CleanSearch {
                 return null;
             }
             $data = $request->all(
-                    "user_id", "group_id", "group_status", 'shared_id', "favorite_id", "shared", "favorite", "private", "order_by","status"
+                    "user_id", "group_id", "group_status", 'shared_id', "favorite_id", "shared", "favorite", "private", "order_by", "status"
             );
             if ($data['shared_id']) {
                 return null;
@@ -491,6 +528,7 @@ class CleanSearch {
     public function handleMerchant($request) {
         return $this->handleObject($request, "merchants");
     }
+
     public function handleReportExternal($request) {
         return $this->handleObjectExternal($request, "reports");
     }

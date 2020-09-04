@@ -91,6 +91,11 @@ Route::post('deliveries/cancel/{delivery?}', 'DeliveryController@postCancelDeliv
 Route::resource('deliveries', 'DeliveryController');
 Route::resource('articles', 'ArticleController');
 
+Route::post('documents/{document}/sign ', 'DocumentController@signDocument');
+Route::post('documents/{document}/verify_signature ', 'DocumentController@verifySignatures');
+Route::resource('documents', 'DocumentController');
+Route::resource('certificates', 'CertificateController');
+
 Route::resource('routes', 'RouteController');
 
 Route::get('groups/leave/{code?}', 'GroupController@leaveGroup');
@@ -139,6 +144,8 @@ Route::post('merchants/share', 'ShareApiController@postAddFollower');
 Route::post('merchants/status', 'MerchantApiController@updateStatus');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::get('private/merchants', 'MerchantApiController@indexPrivate');
+Route::get('private/merchants/detail', 'MerchantApiController@getObject');
+Route::get('private/merchants/products', 'ProductApiController@getProductsMerchant');
 Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
     Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
     Route::get('merchants/products', 'ProductApiController@getProductsMerchant');
@@ -299,7 +306,7 @@ Route::post('routes/stop/{stop?}', 'RouteController@sendStopToNewRoute');
 
 Route::post('favorites', 'FavoriteController@postAddFavoriteObject');
 Route::post('favorites/delete', 'FavoriteController@postDeleteFavoriteObject');
-Route::get('categories/{type?}', 'CategoriesApiController@getCategoriesType');
+Route::get('categories', 'CategoriesApiController@getCategoriesType');
 Route::get('bookings', 'BookingApiController@getBookingsObject');
 Route::get('bookings/user', 'BookingApiController@getObjectsWithBookingUser');
 Route::get('bookings/{code?}', 'BookingApiController@getBooking');

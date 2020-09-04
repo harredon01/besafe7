@@ -174,6 +174,8 @@ class Security {
             if ($r) {
                 $signatureObj = new Signature([
                     'user_id' => $user->id,
+                    'name' => $user->name,
+                    'identification'=>$user->docType.": ".$user->docNum,
                     'signature' => $signature]);
                 $data->signatures()->save($signatureObj);
                 if($save){
@@ -185,6 +187,7 @@ class Security {
         }
         return array("status" => "error", "message" => "No certificate");
     }
+    
 
     public function validate(Document $doc) {
         $signatures = $doc->signatures;

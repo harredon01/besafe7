@@ -123,33 +123,32 @@ class EditProduct {
                 $merchant_id = $data['merchant_id'];
             }
         }
-        if($merchant_id){
+        if ($merchant_id) {
             $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                     ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                        ->where('merchant_product.merchant_id', $data['merchant_id'])
-                        ->where('merchants.private', false);
+                    ->where('merchant_product.merchant_id', $data['merchant_id'])
+                    ->where('merchants.private', false);
         }
         if (array_key_exists("category_id", $data)) {
             if ($data['category_id']) {
-                $categories = explode(",",$data['category_id']);
+                $categories = explode(",", $data['category_id']);
                 $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
-                    ->whereIn('categorizables.category_id', $categories);
+                        ->whereIn('categorizables.category_id', $categories);
             }
         }
         $query->distinct();
         $count_query = $query;
-        if($includes_merchant){
-            if($merchant_id){
-                $query->addSelect('merchants.id as merchant_id','merchants.name as merchant_name', 'merchants.description as merchant_description',
-                'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
+        if ($includes_merchant) {
+            if ($merchant_id) {
+                $query->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
+                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
             } else {
                 $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                         ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
                         ->where('merchants.private', false)
-                        ->addSelect('merchants.id as merchant_id','merchants.name as merchant_name', 'merchants.description as merchant_description',
-                'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
+                        ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
+                                'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
             }
-            
         }
 //        DB::enableQueryLog();
 //        
@@ -185,7 +184,7 @@ class EditProduct {
 //        DB::enableQueryLog();
         $variants = $query->get();
 //        dd(DB::getQueryLog());
-        
+
         $products = [];
         foreach ($variants as $value) {
             if (in_array($value->id, $products)) {
@@ -245,7 +244,7 @@ class EditProduct {
         $data = [];
         $merchant = Merchant::find($merchant_id);
         if ($merchant) {
-            if ($merchant->user_id == $user->id) {
+            if ($merchant->checkAdminAccess($user->id)) {
                 $data = [];
                 $take = self::OBJECT_PAGESIZE;
                 $skip = ($page - 1 ) * ($take);
@@ -576,7 +575,7 @@ class EditProduct {
                     if (sizeof($groups) > 0) {
                         $access = true;
                     }
-                    if ($user->id == $merchant->user_id) {
+                    if ( $merchant->checkAdminAccess($user->id)) {
                         $access = true;
                     }
                 }
@@ -718,8 +717,9 @@ class EditProduct {
                             return !is_null($val);
                         });
                 $data = (array) $data;
-                Product::where('id', $productid)->update($data);
                 $product = Product::find($productid);
+                $product->fill($data);
+                $product->save();
                 $product->clearCache();
                 $product->productVariants;
                 if ($product) {
@@ -746,8 +746,7 @@ class EditProduct {
             if ($categoryName) {
                 $category = Category::create([
                             "name" => $data['category_name'],
-                            "merchant_id" => $merchantid,
-                            "type" => "Product"
+                            "type" => "App\Models\Product"
                 ]);
                 $catFound = true;
             }
@@ -775,7 +774,7 @@ class EditProduct {
             $merchant = Merchant::find($merchantid);
             $category->products()->save($product);
             if ($merchant) {
-                if ($merchant->user_id == $user->id) {
+                if ($merchant->checkAdminAccess($user->id)) {
                     $merchant->products()->save($product);
                 }
             }
@@ -797,10 +796,10 @@ class EditProduct {
                             return !is_null($val);
                         });
                 $data = (array) $data;
-                ProductVariant::where('id', $variantid)
-                        ->where('product_id', $productid)
-                        ->update($data);
                 $variant = ProductVariant::find($variantid);
+                $variant->fill($data);
+                $variant->save();
+
                 if ($variant) {
                     return array("status" => "success", "message" => "variant updated", "variant" => $variant);
                 }
@@ -829,12 +828,10 @@ class EditProduct {
             foreach ($merchants as $value) {
                 $merchant = Merchant::find($value);
                 if ($merchant) {
-                    if ($merchant->user_id) {
-                        if ($operation == 'add') {
-                            $merchant->products()->save($product);
-                        } else if ($operation == 'remove') {
-                            $merchant->products()->detach($product);
-                        }
+                    if ($operation == 'add') {
+                        $merchant->products()->save($product);
+                    } else if ($operation == 'remove') {
+                        $merchant->products()->detach($product);
                     }
                 }
             }

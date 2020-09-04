@@ -485,7 +485,7 @@ class EditBooking {
                         $id = $data["id"];
                         $data["bookable_type"] = "App\\Models\\" . $data['type'];
                         $data["bookable_id"] = $data['object_id'];
-                        $data['updated_at'] = date("Y-m-d H:i:s");
+                        $data['updated_at'] = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
                         unset($data["id"]);
                         unset($data["object_id"]);
                         unset($data["type"]);

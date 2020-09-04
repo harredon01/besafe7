@@ -209,31 +209,7 @@ class EditUserData {
                 }
             }
         }
-        if ($data['firstName']) {
-            $user->firstName = $data['firstName'];
-        }
-        $user->optinMarketing = $data['optinMarketing'];
-        if ($data['lastName']) {
-            $user->lastName = $data['lastName'];
-        }
-        if ($data['docType']) {
-            $user->docType = $data['docType'];
-        }
-        if ($data['docNum']) {
-            $user->docNum = $data['docNum'];
-        }
-        if ($data['email']) {
-            $user->email = $data['email'];
-        }
-        if ($data['cellphone']) {
-            $user->cellphone = $data['cellphone'];
-        }
-        if ($data['area_code']) {
-            $user->area_code = $data['area_code'];
-        }
-        if ($data['gender']) {
-            $user->gender = $data['gender'];
-        }
+        $user->fill($data);
         $user->name = $user->firstName . " " . $user->lastName;
         $user->save();
         return array("status" => "success", "message" => "User Profile Updated", "user" => $user);
@@ -334,10 +310,14 @@ class EditUserData {
                 unset($data['address_id']);
                 $city = City::find($data['city_id']);
                 $data['city'] = $city->name;
-                Address::where('user_id', $user->id)
-                        ->where('id', $addressid)->update($data);
                 $address = Address::find($addressid);
                 if ($address) {
+                    if ($address->user_id == $user->id) {
+                        $address->fill($data);
+                        $address->save();
+                    } else {
+                        return array("status" => "error", "message" => "access_denied");
+                    }
                     $region = Region::find($address->region_id);
                     $country = Country::find($address->country_id);
                     if ($city) {

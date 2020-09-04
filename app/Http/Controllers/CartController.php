@@ -8,8 +8,8 @@ use App\Services\EditDocument;
 use App\Services\Security;
 use App\Services\CleanSearch;
 use Unlu\Laravel\Api\QueryBuilder;
-use DB;
-class DocumentController extends Controller {
+
+class CartController extends Controller {
 
     /**
      * The Guard implementation.
@@ -44,7 +44,7 @@ class DocumentController extends Controller {
         $this->security = $security;
         $this->editDocument = $editDocument;
         $this->cleanSearch = $cleanSearch;
-        $this->middleware('auth:api')->except(['verifySignatures']);
+        $this->middleware('auth:api');
     }
 
     /**
@@ -56,10 +56,8 @@ class DocumentController extends Controller {
         $user = $request->user();
         $request2 = $this->cleanSearch->handleDocument($user, $request);
         if ($request2) {
-            //DB::enableQueryLog();
             $queryBuilder = new QueryBuilder(new Document, $request2);
             $result = $queryBuilder->build()->paginate();
-            //dd(DB::getQueryLog());
             return response()->json([
                         'data' => $result->items(),
                         "total" => $result->total(),
@@ -103,10 +101,6 @@ class DocumentController extends Controller {
     public function show(Document $document, Request $request) {
         $user = $request->user();
         if ($document->author_id == $user->id || $document->user_id == $user->id) {
-            $document->signatures;
-            $document->user;
-            $document->author;
-            $document->files;
             return response()->json(['status' => "success", "message" => "", "document" => $document]);
         } else {
             return response()->json(['status' => "error", "message" => "forbidden"]);
@@ -133,14 +127,14 @@ class DocumentController extends Controller {
     public function update(Request $request, Document $document) {
         $user = $request->user();
         if ($document->is_signed) {
-            return response()->json(["status" => "error", "message" => "forbidden"]);
+            return ["status" => "error", "message" => "forbidden"];
         } else {
             if ($document->author_id == $user->id) {
-                $document->fill($request->all());
+                $document->fill($data);
                 $document->save();
-                return response()->json(["status" => "success", "message" => "document edited", "document" => $document]);
+                return ["status" => "success", "message" => "document edited", "document" => $document];
             } else {
-                return response()->json(["status" => "error", "message" => "forbidden"]);
+                return ["status" => "error", "message" => "forbidden"];
             }
         }
     }
@@ -151,38 +145,18 @@ class DocumentController extends Controller {
      * @param  \App\Document  $document
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Document $document,Request $request) {
+    public function destroy(Document $document) {
         $user = $request->user();
         if ($document->is_signed) {
-            return response()->json(["status" => "error", "message" => "forbidden"]);
+            return ["status" => "error", "message" => "forbidden"];
         } else {
             if ($document->author_id == $user->id || $document->user_id == $user->id) {
                 $document->delete();
-                return response()->json(["status" => "success", "message" => "document deleted", "document" => $document]);
+                return ["status" => "success", "message" => "document deleted", "document" => $document];
             } else {
-                return response()->json(["status" => "error", "message" => "forbidden"]);
+                return ["status" => "error", "message" => "forbidden"];
             }
         }
-    }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Document  $document
-     * @return \Illuminate\Http\Response
-     */
-    public function signDocument(Document $document,Request $request) {
-        $user = $request->user();
-        $data = $request->all(['private_key']);
-        return response()->json($this->security->sign($user, $document, $data['private_key']));
-    }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Document  $document
-     * @return \Illuminate\Http\Response
-     */
-    public function verifySignatures(Document $document) {
-        return response()->json($this->security->validate($document));
     }
 
 }

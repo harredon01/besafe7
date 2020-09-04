@@ -28,9 +28,8 @@ class CategoriesApiController extends Controller {
      *
      * @return Response
      */
-    public function getCategoriesType($type) {
-        $categories = $this->editCategories->getCategories($type);
-        return response()->json(compact('categories'));
+    public function getCategoriesType(Request $request) {
+        return response()->json($this->editCategories->getCategories($request->all()));
     }
 
 }

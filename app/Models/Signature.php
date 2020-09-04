@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +18,6 @@ class Signature extends Model
      *
      * @var array
      */
-    protected $fillable = ['user_id','signature','auto_validate','signable_id','signable_type'];
     //
     public function user() {
         return $this->hasOne('App\Models\User');
