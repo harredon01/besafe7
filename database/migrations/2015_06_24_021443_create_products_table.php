@@ -19,6 +19,8 @@ class CreateProductsTable extends Migration {
                         $table->text('description');
                         $table->string('availability');
                         $table->string('hash');
+                        $table->double('high', 15, 2); 
+                        $table->double('low', 15, 2);
                         $table->integer('object_id')->unsigned()->nullable();
                         $table->index('object_id');
                         $table->string('type')->nullable();
