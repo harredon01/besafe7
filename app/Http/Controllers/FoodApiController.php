@@ -24,6 +24,7 @@ use App\Models\Route;
 use App\Models\Delivery;
 use App\Models\Translation;
 use App\Models\CoveragePolygon;
+use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
 use Artisan;
 
 class FoodApiController extends Controller {
@@ -136,6 +137,7 @@ class FoodApiController extends Controller {
         ];
         return ["status" => 'success', "results" => $data];
     }
+
     public function getTips() {
         $data = [
             ["Profesionales en la cocina, expertos en nutrición."],
@@ -366,17 +368,47 @@ class FoodApiController extends Controller {
 
     public function createZoneItem(Request $request) {
         $data = $request->all();
-        $item = CoveragePolygon::create($data);
+        $cpolygon = new CoveragePolygon();
+        $cpolygon->fill($data);
+        $coordPoints = json_decode($cpolygon->coverage, true);
+        $totalPoints = [];
+        foreach ($coordPoints as $coordPoint) {
+            $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
+            array_push($totalPoints, $pointArray);
+        }
+        $result = [
+            "type" => "MultiPolygon",
+            "coordinates" => [[$totalPoints]]
+        ];
+        $mp = MultiPolygon::fromJson(json_encode($result));
+        $cpolygon->geometry = $mp;
+        $cpolygon->save();
         return response()->json([
                     'status' => "success",
                     "message" => "item created",
-                    "item" => $item
+                    "item" => $cpolygon
         ]);
     }
 
     public function updateZoneItem(Request $request, $item) {
         $data = $request->all();
-        CoveragePolygon::where("id", $item)->update($data);
+        $cpolygon = CoveragePolygon::find($item);
+        if ($cpolygon) {
+            $cpolygon->fill($data);
+            $coordPoints = json_decode($cpolygon->coverage, true);
+            $totalPoints = [];
+            foreach ($coordPoints as $coordPoint) {
+                $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
+                array_push($totalPoints, $pointArray);
+            }
+            $result = [
+                "type" => "MultiPolygon",
+                "coordinates" => [[$totalPoints]]
+            ];
+            $mp = MultiPolygon::fromJson(json_encode($result));
+            $cpolygon->geometry = $mp;
+            $cpolygon->save();
+        }
         return response()->json([
                     'status' => "success",
                     "message" => "item updated",

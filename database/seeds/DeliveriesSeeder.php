@@ -31,13 +31,16 @@ class DeliveriesSeeder extends Seeder {
      *
      */
     protected $security;
- 
+
     public function __construct(Security $security) {
         $this->security = $security;
     }
 
     public function run() {
-        $this->security->generateCertificate(); 
+        $geolocation = app('Geolocation');
+        $result = $geolocation->checkMerchantPolygons(4.6559523, -74.050506, 1299, "Rapigo");
+        dd($result);
+        $this->security->generateCertificate();
 //        $data = [
 //            "address" => "Calle 73 # 0 - 24",
 //            "complete" => false, 
@@ -50,8 +53,6 @@ class DeliveriesSeeder extends Seeder {
 //        foreach ($deliveries as $delivery) {
 //            $this->security->addInfoToDelivery($delivery);
 //        }
-        
-        
 //        $user = User::find(1);
 //        $user2 = User::find(2);
 //        $users = [$user2];
