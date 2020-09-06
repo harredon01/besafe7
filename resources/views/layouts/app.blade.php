@@ -4,10 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <!-- CSRF Token -->
-        <meta name="csrf-token" content="{{ csrf_token()}}">
-
+ 
         <title>{{ config('app.name', 'Laravel')}}</title>
 
         <!-- Styles -->
@@ -67,13 +64,6 @@
         <script src="{{ asset('/js/services/product-import.js')}}"></script>
         <script src="{{ asset('/js/services/food.js')}}"></script>
 
-        <script>
-            window.Laravel = <?php
-echo json_encode([
-    'csrfToken' => csrf_token(),
-]);
-?>;
-        </script>
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>

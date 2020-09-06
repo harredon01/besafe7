@@ -12,10 +12,10 @@ app.config(function ($interpolateProvider) {
     $interpolateProvider.startSymbol('{{');
     $interpolateProvider.endSymbol('}}');
 }).run(function ($http) {
-    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    $http.defaults.headers.common['X-CSRF-TOKEN'] = Laravel.csrfToken;
+//    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+//    $http.defaults.headers.common['X-XSRF-TOKEN'] = Laravel.csrfToken;
     $http.defaults.headers.common['Accept'] = "application/json";
-    
+
 
 
 }); 
