@@ -124,9 +124,10 @@ class EditProduct {
             }
         }
         if ($merchant_id) {
+            $merchants = explode(",", $merchant_id);
             $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                     ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                    ->where('merchant_product.merchant_id', $data['merchant_id'])
+                    ->whereIn('merchant_product.merchant_id', $merchants)
                     ->where('merchants.private', false);
         }
         if (array_key_exists("category_id", $data)) {
