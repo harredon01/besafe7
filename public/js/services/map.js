@@ -151,13 +151,18 @@ angular.module('besafe')
                 bermudaTriangle.setMap(damap);
                 bermudaTriangle.getPaths().forEach(function (path, index) {
                     google.maps.event.addListener(path, 'insert_at', function () {
-                        console.log('insert_at', zone.id);
+                        console.log('zzinsert_at', zone.id);
+                        $rootScope.$broadcast("zone-updated",zone);
+                        zone.isActive = true;
                     });
                     google.maps.event.addListener(path, 'remove_at', function () {
-                        console.log('insert_at', zone.id);
+                        console.log('zzinsert_at', zone.id);
+                        $rootScope.$broadcast("zone-updated",zone);
+                        zone.isActive = true;
                     });
                     google.maps.event.addListener(path, 'set_at', function () {
-                        console.log('insert_at', zone.id);
+                        console.log('zzinsert_at', zone.id);
+                        $rootScope.$broadcast("zone-updated",zone);
                     });
                 });
 

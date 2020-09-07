@@ -33,6 +33,7 @@ class MerchantApiController extends Controller {
      *
      */
     protected $cleanSearch;
+
     /**
      * The edit profile implementation.
      *
@@ -49,7 +50,7 @@ class MerchantApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api')->except(['index','show','getObject']);
+        $this->middleware('auth:api')->except(['index', 'show', 'getObject']);
     }
 
     /**
@@ -75,6 +76,7 @@ class MerchantApiController extends Controller {
                     'message' => "illegal parameter"
                         ], 403);
     }
+
     public function indexPrivate(Request $request) {
         $request2 = $this->cleanSearch->handleMerchant($request);
         if ($request2) {
@@ -105,7 +107,7 @@ class MerchantApiController extends Controller {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
-        return response()->json($this->editMapObject->getNearby( $request->all()));
+        return response()->json($this->editMapObject->getNearby($request->all()));
     }
 
     /**
@@ -119,7 +121,7 @@ class MerchantApiController extends Controller {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         $data = $request->all();
-        $data['type']="Merchant";
+        $data['type'] = "Merchant";
         $results = $this->editMapObject->getNearbyObjects($data);
         $merchants = $results['data'];
         if (array_key_exists('includes', $data)) {
@@ -147,16 +149,56 @@ class MerchantApiController extends Controller {
      *
      * @return Response
      */
-    public function getPaymentMethodsMerchant($id) {
-        return response()->json($this->editMapObject->getPaymentMethodsMerchant($id));
+    public function getCoverageMerchants(Request $request) {
+        $validator = $this->editMapObject->validatorLat($request->all());
+        if ($validator->fails()) {
+            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+        }
+        $data = $request->all();
+
+        $lat = $data['lat'];
+        $long = $data['long'];
+        $category = false;
+        if (array_key_exists("category", $data)) {
+            if ($data["category"]) {
+                $category = true;
+            }
+        }
+
+        $thedata = [
+            'point' => 'POINT(' . $long . ' ' . $lat . ')',
+        ];
+        $additionalQuery = '';
+        if ($category) {
+            $thedata["category"] = $data["category"];
+            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category)) ';
+        }
+        $merchants = DB::select(" "
+                        . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
+                ." where private = 0 AND status in ('online','active','busy') AND "
+                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
+                        . $additionalQuery
+                        . "", $thedata);
+        $merchants = $this->editMapObject->buildIncludes($merchants, $data);
+        return array("data" => $merchants);
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return Response
      */
-    public function getCategoriesMerchant($id,$type) {
-        return response()->json($this->editMapObject->getCategoriesMerchant($id,$type));
+    public function getPaymentMethodsMerchant($id) {
+        return response()->json($this->editMapObject->getPaymentMethodsMerchant($id));
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getCategoriesMerchant($id, $type) {
+        return response()->json($this->editMapObject->getCategoriesMerchant($id, $type));
     }
 
     /**
@@ -174,40 +216,41 @@ class MerchantApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function show(Request $request,$id ) {
+    public function show(Request $request, $id) {
         $data = $request->all();
         $data['type'] = "Merchant";
         $data['object_id'] = $id;
-        if(!array_key_exists('includes', $data)){
+        if (!array_key_exists('includes', $data)) {
             $data['includes'] = "ratings,files,availabilities";
         }
         return $this->editMapObject->getObject($data);
     }
-    
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function getObject(Request $request ) {
+    public function getObject(Request $request) {
         $data = $request->all();
-        $data['type']="Merchant";
+        $data['type'] = "Merchant";
         return $this->editMapObject->getObject($data);
     }
-    
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function updateObjectStatus(Request $request,$code) {
+    public function updateObjectStatus(Request $request, $code) {
         $user = $request->user();
-        $data = $request->only(['status',"group_id"]);
+        $data = $request->only(['status', "group_id"]);
         $data['id'] = $code;
         return $this->editMapObject->updateObjectStatus($user, $data, self::OBJECT_MERCHANT);
     }
+
     /**
      * Display the specified resource.
      *
@@ -314,15 +357,16 @@ class MerchantApiController extends Controller {
         $data['id'] = $id;
         return response()->json($this->editMapObject->saveOrCreateObject($user, $data, self::OBJECT_MERCHANT));
     }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function removeObjectGroup($group,$object, Request $request) {
+    public function removeObjectGroup($group, $object, Request $request) {
         $user = $request->user();
-        return response()->json($this->editMapObject->deleteObjectFromGroup($user, $group,$object, self::OBJECT_REPORT));
+        return response()->json($this->editMapObject->deleteObjectFromGroup($user, $group, $object, self::OBJECT_REPORT));
     }
 
     /**
@@ -331,7 +375,7 @@ class MerchantApiController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id,Request $request) {
+    public function destroy($id, Request $request) {
         $user = $request->user();
         return response()->json($this->editMapObject->deleteObject($user, $id, self::OBJECT_MERCHANT));
     }
@@ -340,4 +384,5 @@ class MerchantApiController extends Controller {
         $user = $request->user();
         return response()->json($this->shareObject->getObjectHash($user, $merchantId, self::OBJECT_MERCHANT));
     }
+
 }

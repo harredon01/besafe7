@@ -1,23 +1,44 @@
 ﻿angular.module('besafe')
 
-        .controller('ZonesCtrl', function ($scope, $rootScope, Food, MapService) {
+        .controller('ZonesCtrl', function ($scope, $rootScope, Zones, MapService, Merchants) {
             $scope.data = {};
             $scope.items = [];
-            $scope.merchants = [{"name": "Plan de almuerzos", "value": 1299}, {"name": "Para preparar en casa", "value": 1300}, {"name": "Catering", "value": 1301}];
+            $scope.merchants = [{"name": "Plan de almuerzos", "value": 1299, "id": 1299}, {"name": "Para preparar en casa", "value": 1300, "id": 1300}, {"name": "Catering", "value": 1301, "id": 1301}];
             $scope.providers = [{"name": "Basilikum", "value": "Basilikum"}, {"name": "Rapigo", "value": "Rapigo"}];
             $scope.activeMerchant = 1299 + "";
-            $scope.activeProvider = "Rapigo";
+            $scope.activeMerchantObject = {"name": "Plan de almuerzos", "value": 1299, "id": 1299};
+            $scope.activeProvider = "Basilikum";
+            $scope.searchTerms = "";
+            $scope.changeMerchant = false;
+            $scope.createNewMerchant = false;
             $scope.loadMore = true,
                     $scope.page = 0;
             angular.element(document).ready(function () {
                 $scope.getItems();
                 MapService.createMap(4.685419, -74.064161);
             });
+            $rootScope.$on("zone-updated", function (evt, data) {
+                for (item in $scope.items) {
+                    if($scope.items[item].id == data.id){
+                        $scope.items[item].isActive = true;
+                        $scope.$digest();
+                    }
+                }
+            });
 
             $scope.buildItemData = function (item) {
                 item.isActive = false;
                 //item.attributes = JSON.parse(item.attributes);
                 return item;
+            }
+            $scope.changeActiveMerchant = function () {
+                $scope.changeMerchant = true;
+            }
+            $scope.createItemStart = function () {
+                $scope.createNewMerchant = true;
+            }
+            $scope.cancelChangeMerchant = function () {
+                $scope.changeMerchant = false;
             }
             $scope.activateMap = function () {
                 $scope.mapActive = true;
@@ -58,8 +79,11 @@
             }
             $scope.createItem = function () {
                 $scope.clearMap();
-                let coverage = [{"lat": 4.661880, "lng": -74.056724},
-                    {"lat": 4.656747, "lng": -74.060458}, {"lat": 4.656277, "lng": -74.052304}];
+                let centerMap = $rootScope.map.getCenter();
+                let center = {"lat":centerMap.lat(),"lng":centerMap.lng()};
+                console.log("Center Map",center.lat);
+                let coverage = [{"lat": center.lat+0.006, "lng": center.lng},
+                    {"lat": center.lat-0.006, "lng": center.lng-0.006}, {"lat": center.lat-0.006, "lng": center.lng+0.006},{"lat": center.lat+0.006, "lng": center.lng}];
                 let item = {
                     "city_id": 524,
                     "region_id": 11,
@@ -71,9 +95,10 @@
                     "lat": 4.649824,
                     "long": -74.058881
                 };
-                Food.createZoneItem(item).then(function (data) {
+                Zones.createZoneItem(item).then(function (data) {
                     let color = MapService.getColor();
                     let item = data.item;
+                    item.isActive = false;
                     item.polygon = MapService.createPolygon(item, color);
                     $scope.items.push(item);
                 },
@@ -85,7 +110,7 @@
             $scope.getItems = function () {
                 $scope.page++;
                 let url = "order_by=id,desc&page=" + $scope.page + "&merchant_id=" + $scope.activeMerchant + "&provider=" + $scope.activeProvider;
-                Food.getZones(url).then(function (data) {
+                Zones.getZones(url).then(function (data) {
                     if (data.page == data.last_page) {
                         $scope.loadMore = false;
                     }
@@ -100,6 +125,25 @@
                         function (data) {
 
                         });
+            }
+            $scope.getMerchants = function () {
+                $scope.page++;
+                Merchants.searchMerchants($scope.searchTerms).then(function (data) {
+                    console.log("Items", data.data);
+                    $scope.merchants = data.data;
+                },
+                        function (data) {
+
+                        });
+            }
+            $scope.selectMerchant = function (item) {
+                $scope.activeMerchantObject = item;
+                $scope.clearMap();
+                $scope.page = 0;
+                $scope.items = [];
+                $scope.activeMerchant = item.id + "";
+                $scope.changeMerchant = false;
+                $scope.getItems();
             }
             $scope.updateItem = function (data) {
                 var item = data;
@@ -124,8 +168,9 @@
                 item.coverage = JSON.stringify(results);
                 console.log("Zone", item);
                 console.log("Points", results);
-                Food.updateZoneItem(item).then(function (data) {
+                Zones.updateZoneItem(item).then(function (data) {
                     item.polygon = polygon;
+                    item.isActive = false;
                     console.log("updateZoneItem", data);
                 },
                         function (data) {
@@ -134,7 +179,7 @@
             }
             $scope.deleteItem = function (item) {
                 console.log("Zone", item);
-                Food.deleteZoneItem(item).then(function (data) {
+                Zones.deleteZoneItem(item).then(function (data) {
                     for (item in $scope.items) {
                         console.log("Creating map data item")
                         $scope.items[item].polygon.setMap(null);

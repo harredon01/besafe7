@@ -517,6 +517,25 @@ class EditMapObject {
                         . "", $thedata);
         return array("data" => $reports);
     }
+    function buildIncludes($merchants,$data){
+        if (array_key_exists('includes', $data)) {
+            if ($data['includes']) {
+                $relatedObjects = explode(',', $data['includes']);
+                $merchantIds = array_column($merchants, 'id');
+                $object = "";
+                $idColumn = "";
+                foreach ($relatedObjects as $item) {
+                    if ($item == 'availabilities') {
+                        $object = "bookable_availabilities";
+                        $idColumn = "bookable_id";
+                    }
+                    $relationships = $this->getRelation($merchantIds, $object, $idColumn);
+                    $merchants = $this->organizeRelation($merchants, $relationships, $item, $idColumn);
+                }
+            }
+        }
+        return $merchants;
+    }
 
     function findLonBoundary($lat, $lon, $lat1, $lat2) {
 
