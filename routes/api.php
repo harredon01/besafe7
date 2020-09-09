@@ -142,6 +142,7 @@ Route::resource('reports', 'ReportApiController');
 
 Route::post('merchants/share', 'ShareApiController@postAddFollower');
 Route::post('merchants/status', 'MerchantApiController@updateStatus');
+Route::post('merchants/coverage', 'MerchantApiController@checkCoverageMerchants');
 Route::delete('merchants/group/{groupId?}/{objectId?}', 'MerchantApiController@removeObjectGroup');
 Route::get('private/merchants', 'MerchantApiController@indexPrivate');
 Route::get('private/merchants/detail', 'MerchantApiController@getObject');

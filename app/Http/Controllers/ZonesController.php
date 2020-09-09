@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Unlu\Laravel\Api\QueryBuilder;
 use App\Models\CoveragePolygon;
+use App\Models\Merchant;
 use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
 use Excel;
 
@@ -20,7 +21,6 @@ class ZonesController extends Controller {
       | controller as you wish. It is just here to get your app started!
       |
      */
-
 
     /**
      * Create a new controller instance.
@@ -54,6 +54,18 @@ class ZonesController extends Controller {
         $data = $request->all();
         $cpolygon = new CoveragePolygon();
         $cpolygon->fill($data);
+        $merchant = Merchant::find($data['merchant_id']);
+        if ($merchant) {
+            if ($merchant->lat) {
+                $cpolygon->lat = $merchant->lat;
+                $cpolygon->long = $merchant->long;
+            }
+        } else {
+            return response()->json([
+                        'status' => "success",
+                        "message" => "Merchant not found",
+            ]);
+        }
         $coordPoints = json_decode($cpolygon->coverage, true);
         $totalPoints = [];
         foreach ($coordPoints as $coordPoint) {

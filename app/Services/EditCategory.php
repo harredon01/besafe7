@@ -23,7 +23,7 @@ class EditCategory {
             $categories = DB::select(" "
                         . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
                 . " from categorizables where categorizable_type=:type) and name like :name limit 15"
-                        . "", ['name'=>$data['name']."%",'type'=>$data['type']]);
+                        . "", ['name'=>"%".$data['name']."%",'type'=>$data['type']]);
         } else {
             $categories = DB::select(" "
                         . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
