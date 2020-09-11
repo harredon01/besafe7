@@ -762,6 +762,12 @@ class EditProduct {
             ];
             unset($data['name']);
             unset($data['description']);
+            if(array_key_exists('category_id', $data)){
+                unset($data['category_id']);
+            }
+            if(array_key_exists('category_name', $data)){
+                unset($data['category_name']);
+            }
             $data['description'] = $data['description2'];
             unset($data['description2']);
             $data = (object) array_filter((array) $data, function ($val) {

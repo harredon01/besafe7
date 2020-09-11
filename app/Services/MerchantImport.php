@@ -10,7 +10,7 @@ use App\Models\Country;
 use App\Models\Region;
 use App\Models\City;
 use App\Models\Group;
-use App\Models\Plan;
+use App\Models\Article;
 use App\Jobs\PostLocation;
 use App\Jobs\InviteUsers;
 use App\Models\Block;
@@ -617,10 +617,12 @@ class MerchantImport {
                         unset($sheet['categories']);
                         unset($sheet['id']);
                         $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
-                        $categories = Category::whereIn('id', $categoriesData)->get();
-                        $merchant = $results['object'];
-                        foreach ($categories as $item) {
-                            $item->merchants()->save($merchant);
+                        if ($categoriesData) {
+                            $categories = Category::whereIn('id', $categoriesData)->get();
+                            $merchant = $results['object'];
+                            foreach ($categories as $item) {
+                                $item->merchants()->save($merchant);
+                            }
                         }
                     }
                 }
@@ -638,7 +640,32 @@ class MerchantImport {
                     $sheet[$headers[$key]] = $value;
                 }
                 if ($sheet['id'] && $sheet['id'] != 'id') {
-                    Category::create($sheet);
+                    Category::firstOrCreate($sheet);
+                }
+            }
+        }
+    }
+
+    public function importArticlesExcel($filename) {
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    $categoriesData = explode(",", $sheet['categories']);
+                    unset($sheet['categories']);
+                    $article = new Article($sheet);
+                    $article->save();
+                    if ($categoriesData) {
+                        $categories = Category::whereIn('id', $categoriesData)->get();
+                        foreach ($categories as $item) {
+                            $item->articles()->save($article);
+                        }
+                    }
                 }
             }
         }
@@ -715,14 +742,17 @@ class MerchantImport {
                     $owner = User::find($sheet['user_id']);
                     if ($owner) {
                         unset($sheet['user_id']);
-//                    $categoriesData = explode(",", $sheet['categories']);
-//                    unset($sheet['categories']);
+                        $sheet['id']="";
+                        $categoriesData = explode(",", $sheet['categories']);
+                        unset($sheet['categories']);
                         $results = $this->editProduct->createOrUpdateProduct($owner, $sheet);
-//                    $categories = Category::whereIn('id', $categoriesData)->get();
-//                    $product = $results['product'];
-//                    foreach ($categories as $item) {
-//                        $item->products()->save($product);
-//                    }
+                        if ($categoriesData) {
+                            $categories = Category::whereIn('id', $categoriesData)->get();
+                            $product = $results['product'];
+                            foreach ($categories as $item) {
+                                $item->products()->save($product);
+                            }
+                        }
                     }
                 }
             }
@@ -742,6 +772,7 @@ class MerchantImport {
                     $owner = User::find($sheet['user_id']);
                     if ($owner) {
                         unset($sheet['user_id']);
+                        $sheet['id']="";
                         $attributes = $sheet['attributes'];
                         unset($sheet['attributes']);
                         $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);

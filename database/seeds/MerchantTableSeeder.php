@@ -263,6 +263,10 @@ class MerchantTableSeeder extends Seeder {
         $this->command->info('availabilities seeded!');
         $this->createMerchantBookings();
         $this->command->info('Bookings created!');
+        $this->merchantImport->importArticlesExcel("articles.xlsx");
+        $this->command->info('articles seeded!');
+        $this->merchantImport->importMerchantsRatingsExcel("ratings.xlsx");
+        $this->command->info('ratings seeded!');
     }
 
     public function createMerchants() {
