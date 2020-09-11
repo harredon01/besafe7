@@ -105,7 +105,7 @@ class MerchantTableSeeder extends Seeder {
 
     public function addBooking($data, $booker, $owner, $merchant) {
         $result1 = $this->editBooking->addBookingObject($data, $booker);
-        $result1 = $result1->original;
+        //$result1 = $result1->original;
         if ($result1['status'] == "success") {
             $booking = $result1['booking'];
             $status = [

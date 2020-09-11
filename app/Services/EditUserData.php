@@ -66,15 +66,15 @@ class EditUserData {
         $pass = $data['password'];
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
-        $data['salt'] = str_random(40);
         $data['emailNotifications'] = 1;
+        unset($data['password_confirmation']);
         $user = User::create($data);
         $http = new \GuzzleHttp\Client;
         $response = $http->post(env('APP_URL') . '/oauth/token', [
             'form_params' => [
                 'grant_type' => 'password',
-                'client_id' => '1',
-                'client_secret' => 'nuoLagU2jqmzWqN6zHMEo82vNhiFpbsBsqcs2DPt',
+                'client_id' => env('APP_CLIENT_ID'),
+                'client_secret' => env('APP_CLIENT_SECRET'),
                 'username' => $data['email'],
                 'password' => $pass,
                 'scope' => '*',

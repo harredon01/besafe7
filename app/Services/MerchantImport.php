@@ -35,7 +35,7 @@ use App\Services\EditProduct;
 use App\Services\EditBooking;
 use App\Services\EditRating;
 use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
-use DB;
+use App\Imports\ArrayImport;
 
 class MerchantImport {
 
@@ -76,7 +76,6 @@ class MerchantImport {
             'chunk'
         ];
     }
-
 
     public function exportMerchant(User $user, $filename, $merchantid) {
         $found = false;
@@ -255,24 +254,21 @@ class MerchantImport {
     }
 
     public function importCountries($filename) {
-
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+        //dd(storage_path('imports') . '/' . $filename);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
-                if ($row['id']) {
-                    $code;
-                    if ($row['facebook_id'] == "NULL") {
-                        $code = null;
-                    } else {
-                        $code = $sheet['facebook_id'];
-                    }
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
+                if ($row['id'] && $row['id'] != 'id') {
                     $country = Country::updateOrCreate(['id' => $row['id']], [
                                 'id' => $row['id'],
                                 'name' => $row['name'],
                                 'area_code' => $row['area_code'],
-                                'code' => $row['code'],
-                                'facebook_id' => $code
+                                'code' => $row['code']
                     ]);
                 }
             }
@@ -336,10 +332,14 @@ class MerchantImport {
 
     public function importCountriesAreas($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            foreach ($sheet as $row) {
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
                 $country = Country::where('name', 'like', '%' . $row['name'] . '%')->first();
                 if ($country) {
                     $country->area_code = $row['area_code'];
@@ -351,91 +351,109 @@ class MerchantImport {
 
     public function importRegions($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            if ($sheet['id']) {
-                $code;
-                if ($sheet['facebook_id'] == "NULL") {
-                    $code = null;
-                } else {
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    //dd($sheet);
+                    $code;
+                    if ($sheet['facebook_id'] == "NULL") {
+                        $code = null;
+                    } else {
 
-                    $code = $sheet['facebook_id'];
+                        $code = $sheet['facebook_id'];
+                    }
+                    $code2;
+                    if ($sheet['facebook_country_id'] == "NULL") {
+                        $code2 = null;
+                    } else {
+                        $code2 = $sheet['facebook_country_id'];
+                    }
+                    $region = Region::updateOrCreate([
+                                'id' => $sheet['id']], [
+                                'id' => $sheet['id'],
+                                'name' => $sheet['name'],
+                                'country_id' => $sheet['country_id'],
+                                'code' => $sheet['code'],
+                                'facebook_id' => $code,
+                                'facebook_country_id' => $code2
+                    ]);
                 }
-                $code2;
-                if ($sheet['facebook_country_id'] == "NULL") {
-                    $code2 = null;
-                } else {
-                    $code2 = $sheet['facebook_country_id'];
-                }
-                $region = Region::updateOrCreate([
-                            'id' => $sheet['id']], [
-                            'id' => $sheet['id'],
-                            'name' => $sheet['name'],
-                            'country_id' => $sheet['country_id'],
-                            'code' => $sheet['code'],
-                            'facebook_id' => $code,
-                            'facebook_country_id' => $code2
-                ]);
             }
         }
     }
 
     public function importCities($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            if ($sheet['id']) {
-                $code;
-                if ($sheet['facebook_id'] == "NULL") {
-                    $code = null;
-                } else {
-                    $code = $sheet['facebook_id'];
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
                 }
-                $code2;
-                if ($sheet['facebook_country_id'] == "NULL") {
-                    $code2 = null;
-                } else {
-                    $code2 = $sheet['facebook_country_id'];
-                }
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    $code;
+                    if ($sheet['facebook_id'] == "NULL") {
+                        $code = null;
+                    } else {
+                        $code = $sheet['facebook_id'];
+                    }
+                    $code2;
+                    if ($sheet['facebook_country_id'] == "NULL") {
+                        $code2 = null;
+                    } else {
+                        $code2 = $sheet['facebook_country_id'];
+                    }
 //                if( $sheet['name'] =="BELMIRA"){
 //                    dd($sheet);
 //                }
-                $city = City::updateOrCreate([
-                            'id' => $sheet['id']], [
-                            'id' => $sheet['id'],
-                            'name' => $sheet['name'],
-                            'code' => $sheet['code'],
-                            'facebook_id' => $code,
-                            'country_id' => $sheet['country_id'],
-                            'facebook_country_id' => $code2,
-                            'region_id' => $sheet['region_id'],
-                            'lat' => $sheet['lat'],
-                            'long' => $sheet['long'],
-                ]);
+                    $city = City::updateOrCreate([
+                                'id' => $sheet['id']], [
+                                'id' => $sheet['id'],
+                                'name' => $sheet['name'],
+                                'code' => $sheet['code'],
+                                'facebook_id' => $code,
+                                'country_id' => $sheet['country_id'],
+                                'facebook_country_id' => $code2,
+                                'region_id' => $sheet['region_id'],
+                                'lat' => $sheet['lat'],
+                                'long' => $sheet['long'],
+                    ]);
+                }
             }
         }
     }
 
     public function importTranslations($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            unset($sheet['']);
-            if ($sheet['code']) {
-                if (!$sheet['body']) {
-                    $sheet['body'] = "";
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
                 }
-                $translation = Translation::updateOrCreate([
-                            'code' => $sheet['code'],
-                            'language' => $sheet['language'],
-                            'value' => $sheet['value'],
-                            'body' => $sheet['body']
-                ]);
-            } else {
-                break;
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    if (!$sheet['body']) {
+                        $sheet['body'] = "";
+                    }
+                    $translation = Translation::updateOrCreate([
+                                'code' => $sheet['code'],
+                                'language' => $sheet['language'],
+                                'value' => $sheet['value'],
+                                'body' => $sheet['body']
+                    ]);
+                } else {
+                    break;
+                }
             }
         }
     }
@@ -550,143 +568,245 @@ class MerchantImport {
 
     public function importUsers($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            $this->editUserData->create($sheet);
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
+                if ($row['email'] && $row['email'] != 'email') {
+                    $this->editUserData->create($row);
+                }
+            }
         }
     }
 
     public function importUpdateUsers($filename) {
-
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            $user = User::find($sheet['id']);
-            $this->editUserData->update($user, $sheet);
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
+                if ($row['id'] && $row['id'] != 'id') {
+                    $user = User::find($row['id']);
+                    $this->editUserData->update($user, $row);
+                }
+            }
         }
     }
 
     public function importMerchantsExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['owner_id']);
-            unset($sheet['owner_id']);
-            $categoriesData = explode(",", $sheet['categories']);
-            unset($sheet['categories']);
-            $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
-            $categories = Category::whereIn('id', $categoriesData)->get();
-            $merchant = $results['object'];
-            foreach ($categories as $item) {
-                $item->merchants()->save($merchant);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                    $owner = User::find($sheet['user_id']);
+                    if ($owner) {
+                        unset($sheet['user_id']);
+                        $categoriesData = explode(",", $sheet['categories']);
+                        unset($sheet['categories']);
+                        unset($sheet['id']);
+                        $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
+                        $categories = Category::whereIn('id', $categoriesData)->get();
+                        $merchant = $results['object'];
+                        foreach ($categories as $item) {
+                            $item->merchants()->save($merchant);
+                        }
+                    }
+                }
             }
         }
     }
 
     public function importCategoriesExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            Category::create($sheet);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    Category::create($sheet);
+                }
+            }
         }
     }
 
     public function importMerchantsAvailabilitiesExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['owner_id']);
-            unset($sheet['owner_id']);
-            $this->editBooking->addAvailabilityObject($sheet, $owner);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                    $owner = User::find($sheet['owner_id']);
+                    if ($owner) {
+                        unset($sheet['owner_id']);
+                        $this->editBooking->addAvailabilityObject($sheet, $owner);
+                    }
+                }
+            }
         }
     }
 
     public function importMerchantsBookingsExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['owner_id']);
-            unset($sheet['owner_id']);
-            $this->editBooking->addBookingObject($sheet, $owner);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                    $owner = User::find($sheet['owner_id']);
+                    unset($sheet['owner_id']);
+                    $this->editBooking->addBookingObject($sheet, $owner);
+                }
+            }
         }
     }
 
     public function importMerchantsRatingsExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['owner_id']);
-            unset($sheet['owner_id']);
-            $this->editRating->addRatingObject($sheet, $owner);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                    $owner = User::find($sheet['owner_id']);
+                    unset($sheet['owner_id']);
+                    $this->editRating->addRatingObject($sheet, $owner);
+                }
+            }
         }
     }
 
     public function importProductsExcel($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['user_id']);
-            unset($sheet['user_id']);
-            $categoriesData = explode(",", $sheet['categories']);
-            unset($sheet['categories']);
-            $results = $this->editProduct->createOrUpdateProduct($owner, $sheet);
-            $categories = Category::whereIn('id', $categoriesData)->get();
-            $product = $results['product'];
-            foreach ($categories as $item) {
-                $item->products()->save($product);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+
+                    $owner = User::find($sheet['user_id']);
+                    if ($owner) {
+                        unset($sheet['user_id']);
+//                    $categoriesData = explode(",", $sheet['categories']);
+//                    unset($sheet['categories']);
+                        $results = $this->editProduct->createOrUpdateProduct($owner, $sheet);
+//                    $categories = Category::whereIn('id', $categoriesData)->get();
+//                    $product = $results['product'];
+//                    foreach ($categories as $item) {
+//                        $item->products()->save($product);
+//                    }
+                    }
+                }
             }
         }
     }
 
     public function importProductVariantsExcel($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $owner = User::find($sheet['user_id']);
-            unset($sheet['user_id']);
-            $attributes = $sheet['attributes'];
-            unset($sheet['attributes']);
-            $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
-            if ($attributes) {
-                $variant = $results['variant'];
-                $variant->attributes = $attributes;
-                $variant->save();
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                    $owner = User::find($sheet['user_id']);
+                    if ($owner) {
+                        unset($sheet['user_id']);
+                        $attributes = $sheet['attributes'];
+                        unset($sheet['attributes']);
+                        $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
+                        if ($attributes) {
+                            $variant = $results['variant'];
+                            $variant->attributes = $attributes;
+                            $variant->save();
+                        }
+                    }
+                }
             }
         }
     }
-    
+
     public function importPolygons($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            $cpolygon = new CoveragePolygon;
-            $cpolygon->fill($sheet);
-            $coordPoints = json_decode($cpolygon->coverage, true);
-            $totalPoints = [];
-            foreach ($coordPoints as $coordPoint) {
-                $pointArray = [ $coordPoint['lng'],$coordPoint['lat']];
-                array_push($totalPoints, $pointArray);
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['merchant_id'] && $sheet['merchant_id'] != 'merchant_id') {
+                    $cpolygon = new CoveragePolygon;
+                    $cpolygon->fill($sheet);
+                    $coordPoints = json_decode($cpolygon->coverage, true);
+                    if (is_array($coordPoints)) {
+                        $totalPoints = [];
+                        foreach ($coordPoints as $coordPoint) {
+                            $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
+                            array_push($totalPoints, $pointArray);
+                        }
+                        $result = [
+                            "type" => "MultiPolygon",
+                            "coordinates" =>
+                            [[$totalPoints]]
+                        ];
+                        $mp = MultiPolygon::fromJson(json_encode($result));
+                        $cpolygon->geometry = $mp;
+                        $cpolygon->save();
+                    }
+                }
             }
-            $result = [
-                "type" => "MultiPolygon",
-                "coordinates" => 
-                    [[$totalPoints]]
-                
-            ];
-            $mp = MultiPolygon::fromJson(json_encode($result));
-            $cpolygon->geometry = $mp;
-            $cpolygon->save();
         }
     }
-    public function importTranslations($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+
+    public function importTranslationsExcel($filename) {
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            $cpolygon = new Translation;
-            $cpolygon->fill($sheet);
-            $cpolygon->save();
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
+                if ($row['id'] && $row['id'] != 'id') {
+                    $cpolygon = new Translation;
+                    if (!$row['body']) {
+                        $row['body'] = '';
+                    }
+                    $cpolygon->fill($row);
+                    $cpolygon->save();
+                }
+            }
         }
     }
 
@@ -716,12 +836,21 @@ class MerchantImport {
 
     public function importAddresses($filename) {
 
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            $user = User::find($sheet['user_id']);
-            if ($user) {
-                $this->editUserData->createOrUpdateAddress($user, $sheet);
+            $headers = $sheet[0];
+            foreach ($sheet as $item) {
+                $row = null;
+                foreach ($item as $key => $value) {
+                    $row[$headers[$key]] = $value;
+                }
+                if ($row['user_id'] && $row['user_id'] != 'user_id') {
+                    $user = User::find($row['user_id']);
+                    if ($user) {
+                        unset($row['user_id']);
+                        $this->editUserData->createOrUpdateAddress($user, $row);
+                    }
+                }
             }
         }
     }

@@ -31,7 +31,7 @@ class BookingApiController extends Controller
     public function postAddBookingObject(Request $request) {
         $user = $request->user();
         $data = $request->all();
-        $data['call'] = false;
+        
         return response()->json($this->editBooking->addBookingObject($data, $user));
     }
     /**

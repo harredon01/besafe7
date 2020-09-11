@@ -10,6 +10,7 @@ use App\Services\MerchantImport;
 use App\Services\EditGroup;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
+use App\Services\Security;
 use App\Services\ShareObject;
 
 class UserTableSeeder extends Seeder {
@@ -48,15 +49,22 @@ class UserTableSeeder extends Seeder {
      *
      */
     protected $merchantImport;
+    
+    /**
+     * The edit alerts implementation.
+     *
+     */
+    protected $security;
 
 
-    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport) {
+    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport, Security $security) {
         $this->editGroup = $editGroup;
         $this->editLocation = $editLocation;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
         $this->shareObject = $shareObject;
         $this->merchantImport = $merchantImport;
+        $this->security = $security;
     }
 
     /**
@@ -66,13 +74,11 @@ class UserTableSeeder extends Seeder {
      */
     public function run() {
 
-        $this->merchantImport->importTranslations("translations.xlsx");
-        $this->command->info('Translations seeded');
-        $this->merchantImport->importTranslations("categories.xlsx");
+        $this->merchantImport->importTranslationsExcel("translations.xlsx");
         $this->command->info('Translations seeded');
         $this->merchantImport->importUsers("users.xlsx");
         $this->command->info('users seeded!');
-        $this->merchantImport->importAddresses("address.xlsx");
+        $this->merchantImport->importAddresses("addresses.xlsx");
         $this->command->info('Addresses seeded!');
 //        $this->merchantImport->importContacts("contacts.xlsx");
 //        $this->command->info('Contacts seeded!');
@@ -155,7 +161,7 @@ class UserTableSeeder extends Seeder {
             'other' => "anemic",
         );
         foreach ($users as $user) {
-            $this->editUserData->UpdateMedical($user, $data);
+            $this->security->updateMedical($user, $data);
         }
     }
 
@@ -166,7 +172,7 @@ class UserTableSeeder extends Seeder {
             'red' => 4321,
         );
         foreach ($users as $user) {
-            $this->editUserData->updateCodes($user, $data);
+            $this->security->updateCodes($user, $data);
         }
     }
 

@@ -1,6 +1,6 @@
 -- MySQL dump 10.17  Distrib 10.3.24-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: localhost    Database: dev
+-- Host: localhost    Database: pets
 -- ------------------------------------------------------
 -- Server version	10.3.24-MariaDB-1:10.3.24+maria~stretch-log
 
@@ -51,7 +51,7 @@ CREATE TABLE `addresses` (
   CONSTRAINT `addresses_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`),
   CONSTRAINT `addresses_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`),
   CONSTRAINT `addresses_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=435 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,7 +65,7 @@ CREATE TABLE `articles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8_unicode_ci DEFAULT NULL,
-  `type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `type` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `body` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `pagetitle` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -80,7 +80,7 @@ CREATE TABLE `articles` (
   PRIMARY KEY (`id`),
   KEY `articles_file_id_foreign` (`file_id`),
   CONSTRAINT `articles_file_id_foreign` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=634 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,7 +100,7 @@ CREATE TABLE `attribute_options` (
   PRIMARY KEY (`id`),
   KEY `attribute_options_attribute_id_foreign` (`attribute_id`),
   CONSTRAINT `attribute_options_attribute_id_foreign` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -124,7 +124,7 @@ CREATE TABLE `attributes` (
   KEY `attributes_product_variant_id_foreign` (`product_variant_id`),
   CONSTRAINT `attributes_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `attributes_product_variant_id_foreign` FOREIGN KEY (`product_variant_id`) REFERENCES `product_variant` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +167,7 @@ CREATE TABLE `bookable_availabilities` (
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `bookable_availabilities_bookable_type_bookable_id_index` (`bookable_type`,`bookable_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -200,7 +200,7 @@ CREATE TABLE `bookable_bookings` (
   PRIMARY KEY (`id`),
   KEY `bookable_bookings_bookable_type_bookable_id_index` (`bookable_type`,`bookable_id`),
   KEY `bookable_bookings_customer_type_customer_id_index` (`customer_type`,`customer_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -340,7 +340,7 @@ CREATE TABLE `cart_conditions` (
   CONSTRAINT `cart_conditions_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`),
   CONSTRAINT `cart_conditions_product_variant_id_foreign` FOREIGN KEY (`product_variant_id`) REFERENCES `product_variant` (`id`),
   CONSTRAINT `cart_conditions_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=363 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -378,7 +378,7 @@ CREATE TABLE `categories` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `categories_parent_id_index` (`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -396,10 +396,10 @@ CREATE TABLE `categorizables` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `categorizable_category_id_foreign` (`category_id`),
-  KEY `categorizable_categorizable_type_categorizable_id_index` (`categorizable_type`,`categorizable_id`),
-  CONSTRAINT `categorizable_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  KEY `categorizables_category_id_foreign` (`category_id`),
+  KEY `categorizables_categorizable_type_categorizable_id_index` (`categorizable_type`,`categorizable_id`),
+  CONSTRAINT `categorizables_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -420,7 +420,7 @@ CREATE TABLE `category_merchant` (
   KEY `category_merchant_category_id_foreign` (`category_id`),
   CONSTRAINT `category_merchant_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
   CONSTRAINT `category_merchant_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -441,7 +441,7 @@ CREATE TABLE `category_product` (
   KEY `category_product_category_id_foreign` (`category_id`),
   CONSTRAINT `category_product_category_id_foreign` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE,
   CONSTRAINT `category_product_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=906 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -495,7 +495,7 @@ CREATE TABLE `cities` (
   KEY `cities_country_id_foreign` (`country_id`),
   CONSTRAINT `cities_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE CASCADE,
   CONSTRAINT `cities_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1121 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -539,7 +539,7 @@ CREATE TABLE `countries` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `countries_facebook_id_unique` (`facebook_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -559,7 +559,7 @@ CREATE TABLE `coverage_polygons` (
   `city_id` int(10) unsigned DEFAULT NULL,
   `merchant_id` int(10) unsigned DEFAULT NULL,
   `address_id` int(10) unsigned DEFAULT NULL,
-  `provider` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `geometry` multipolygon DEFAULT NULL,
@@ -574,7 +574,7 @@ CREATE TABLE `coverage_polygons` (
   CONSTRAINT `coverage_polygons_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`),
   CONSTRAINT `coverage_polygons_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`),
   CONSTRAINT `coverage_polygons_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -595,10 +595,9 @@ CREATE TABLE `deliveries` (
   `observation` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `group_id` int(10) unsigned DEFAULT NULL,
-  `user_id` int(10) unsigned DEFAULT NULL,
-  `client_id` varchar(55) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_id` int(10) unsigned NOT NULL,
   `address_id` int(10) unsigned NOT NULL,
-  `merchant_id` int(10) unsigned DEFAULT NULL,
+  `merchant_id` int(10) unsigned NOT NULL,
   `delivery` datetime NOT NULL,
   `details` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -606,11 +605,11 @@ CREATE TABLE `deliveries` (
   PRIMARY KEY (`id`),
   KEY `deliveries_group_id_foreign` (`group_id`),
   KEY `deliveries_user_id_foreign` (`user_id`),
-  KEY `deliveries_merchant_id_foreign_idx` (`merchant_id`),
+  KEY `deliveries_merchant_id_foreign` (`merchant_id`),
   CONSTRAINT `deliveries_group_id_foreign` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`),
-  CONSTRAINT `deliveries_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `deliveries_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`),
   CONSTRAINT `deliveries_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12571 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -631,7 +630,7 @@ CREATE TABLE `delivery_route` (
   KEY `delivery_route_route_id_foreign` (`route_id`),
   CONSTRAINT `delivery_route_delivery_id_foreign` FOREIGN KEY (`delivery_id`) REFERENCES `deliveries` (`id`),
   CONSTRAINT `delivery_route_route_id_foreign` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18038 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -652,7 +651,7 @@ CREATE TABLE `delivery_stop` (
   KEY `delivery_stop_stop_id_foreign` (`stop_id`),
   CONSTRAINT `delivery_stop_delivery_id_foreign` FOREIGN KEY (`delivery_id`) REFERENCES `deliveries` (`id`),
   CONSTRAINT `delivery_stop_stop_id_foreign` FOREIGN KEY (`stop_id`) REFERENCES `stops` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18043 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -680,7 +679,7 @@ CREATE TABLE `documents` (
   KEY `documents_author_id_foreign` (`author_id`),
   CONSTRAINT `documents_author_id_foreign` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
   CONSTRAINT `documents_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -698,7 +697,7 @@ CREATE TABLE `failed_jobs` (
   `exception` longtext COLLATE utf8_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -742,7 +741,7 @@ CREATE TABLE `files` (
   KEY `files_user_id_foreign` (`user_id`),
   KEY `files_trigger_id_index` (`trigger_id`),
   CONSTRAINT `files_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -851,7 +850,6 @@ CREATE TABLE `groups` (
   `plan` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `avatar` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `ends_at` timestamp NULL DEFAULT NULL,
   `level` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `is_public` tinyint(1) NOT NULL DEFAULT 0,
   `max_users` int(10) unsigned DEFAULT NULL,
@@ -859,8 +857,9 @@ CREATE TABLE `groups` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `rating` double DEFAULT NULL,
   `rating_count` int(10) unsigned DEFAULT NULL,
+  `ends_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1006,7 +1005,7 @@ CREATE TABLE `items` (
   CONSTRAINT `items_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `items_product_variant_id_foreign` FOREIGN KEY (`product_variant_id`) REFERENCES `product_variant` (`id`),
   CONSTRAINT `items_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2394 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1026,7 +1025,7 @@ CREATE TABLE `jobs` (
   `available_at` int(10) unsigned NOT NULL,
   `created_at` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3835 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1143,7 +1142,7 @@ CREATE TABLE `merchant_product` (
   KEY `merchant_product_product_id_foreign` (`product_id`),
   CONSTRAINT `merchant_product_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`),
   CONSTRAINT `merchant_product_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1009 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1164,7 +1163,7 @@ CREATE TABLE `merchant_user` (
   KEY `merchant_user_user_id_foreign` (`user_id`),
   CONSTRAINT `merchant_user_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `merchant_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1183,7 +1182,7 @@ CREATE TABLE `merchants` (
   `telephone` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `hash` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `address` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `address` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `attributes` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `icon` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -1197,12 +1196,12 @@ CREATE TABLE `merchants` (
   `minimum` double(15,2) DEFAULT NULL,
   `delivery_time` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `delivery_price` double(15,2) DEFAULT NULL,
-  `price` decimal(10,0) DEFAULT NULL,
-  `unit_cost` decimal(10,0) DEFAULT NULL,
-  `base_cost` decimal(10,0) DEFAULT NULL,
-  `unit` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `currency` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
-  `slug` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `price` decimal(8,2) DEFAULT NULL,
+  `unit_cost` decimal(8,2) DEFAULT NULL,
+  `base_cost` decimal(8,2) DEFAULT NULL,
+  `unit` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `currency` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `slug` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `plan` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1222,7 +1221,7 @@ CREATE TABLE `merchants` (
   CONSTRAINT `merchants_city_id_foreign` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`),
   CONSTRAINT `merchants_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`),
   CONSTRAINT `merchants_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1322 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1249,7 +1248,7 @@ CREATE TABLE `messages` (
   KEY `messages_messageable_id_index` (`messageable_id`),
   KEY `messages_target_id_index` (`target_id`),
   CONSTRAINT `messages_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1661 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1264,7 +1263,7 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1437 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=87 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1293,7 +1292,7 @@ CREATE TABLE `notifications` (
   KEY `notifications_trigger_id_index` (`trigger_id`),
   KEY `notifications_user_id_foreign` (`user_id`),
   CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20174 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1305,8 +1304,8 @@ DROP TABLE IF EXISTS `oauth_access_tokens`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `oauth_access_tokens` (
   `id` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `client_id` int(11) NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `client_id` bigint(20) unsigned NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `scopes` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `revoked` tinyint(1) NOT NULL,
@@ -1314,8 +1313,7 @@ CREATE TABLE `oauth_access_tokens` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `expires_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `oauth_access_tokens_user_id_index` (`user_id`),
-  KEY `oauth_access_tokens_client_id_index` (`client_id`)
+  KEY `oauth_access_tokens_user_id_index` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1328,12 +1326,13 @@ DROP TABLE IF EXISTS `oauth_auth_codes`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `oauth_auth_codes` (
   `id` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `client_id` int(11) NOT NULL,
+  `user_id` bigint(20) unsigned NOT NULL,
+  `client_id` bigint(20) unsigned NOT NULL,
   `scopes` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `revoked` tinyint(1) NOT NULL,
   `expires_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `oauth_auth_codes_user_id_index` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1345,10 +1344,11 @@ DROP TABLE IF EXISTS `oauth_clients`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `oauth_clients` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `secret` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `secret` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `redirect` text COLLATE utf8_unicode_ci NOT NULL,
   `personal_access_client` tinyint(1) NOT NULL,
   `password_client` tinyint(1) NOT NULL,
@@ -1357,7 +1357,7 @@ CREATE TABLE `oauth_clients` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `oauth_clients_user_id_index` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1368,13 +1368,12 @@ DROP TABLE IF EXISTS `oauth_personal_access_clients`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `oauth_personal_access_clients` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `client_id` int(11) NOT NULL,
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `client_id` bigint(20) unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `oauth_personal_access_clients_client_id_index` (`client_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1456,7 +1455,7 @@ CREATE TABLE `order_addresses` (
   CONSTRAINT `order_addresses_polygon_id_foreign` FOREIGN KEY (`polygon_id`) REFERENCES `coverage_polygons` (`id`),
   CONSTRAINT `order_addresses_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`),
   CONSTRAINT `order_addresses_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10020 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1474,8 +1473,8 @@ CREATE TABLE `order_conditions` (
   `value` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `coupon` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `total` double NOT NULL,
-  `order_id` int(10) unsigned DEFAULT NULL,
   `condition_id` int(10) unsigned DEFAULT NULL,
+  `order_id` int(10) unsigned DEFAULT NULL,
   `order` int(10) unsigned NOT NULL DEFAULT 0,
   `attributes` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1483,7 +1482,7 @@ CREATE TABLE `order_conditions` (
   PRIMARY KEY (`id`),
   KEY `order_conditions_order_id_foreign` (`order_id`),
   CONSTRAINT `order_conditions_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2982 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1519,7 +1518,7 @@ CREATE TABLE `orders` (
   `requires_authorization` tinyint(1) NOT NULL,
   `payment_method_id` int(10) unsigned DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
-  `client_id` varchar(55) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `client_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `supplier_id` int(10) unsigned DEFAULT NULL,
   `extras` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `merchant_id` int(10) unsigned DEFAULT NULL,
@@ -1534,7 +1533,7 @@ CREATE TABLE `orders` (
   CONSTRAINT `orders_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`),
   CONSTRAINT `orders_payment_method_id_foreign` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_methods` (`id`),
   CONSTRAINT `orders_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=777 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1566,7 +1565,7 @@ CREATE TABLE `payment_methods` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1587,7 +1586,7 @@ CREATE TABLE `payment_transaction` (
   KEY `payment_transaction_transaction_id_foreign` (`transaction_id`),
   CONSTRAINT `payment_transaction_payment_id_foreign` FOREIGN KEY (`payment_id`) REFERENCES `payments` (`id`),
   CONSTRAINT `payment_transaction_transaction_id_foreign` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=656 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1602,7 +1601,6 @@ CREATE TABLE `payments` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
-  `client_id` varchar(55) COLLATE utf8_unicode_ci DEFAULT NULL,
   `order_id` int(10) unsigned DEFAULT NULL,
   `address_id` int(10) unsigned DEFAULT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -1610,7 +1608,7 @@ CREATE TABLE `payments` (
   `transactionId` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `responseCode` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `attributes` text COLLATE utf8_unicode_ci NOT NULL,
-  `subtotal` double(15,2) NOT NULL DEFAULT 0.00,
+  `subtotal` double(15,2) NOT NULL,
   `total` double(15,2) NOT NULL,
   `tax` double(15,2) NOT NULL,
   `transaction_cost` double(15,2) NOT NULL,
@@ -1621,7 +1619,7 @@ CREATE TABLE `payments` (
   CONSTRAINT `payments_address_id_foreign` FOREIGN KEY (`address_id`) REFERENCES `order_addresses` (`id`),
   CONSTRAINT `payments_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
   CONSTRAINT `payments_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1046 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1644,7 +1642,7 @@ CREATE TABLE `plans` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1670,9 +1668,9 @@ CREATE TABLE `product_variant` (
   `sale` double(15,2) NOT NULL,
   `tax` double(15,2) NOT NULL,
   `cost` double(15,2) NOT NULL,
+  `weight` double(15,2) NOT NULL DEFAULT 1.00,
   `quantity` int(11) NOT NULL,
   `min_quantity` int(11) NOT NULL DEFAULT 1,
-  `weight` double(15,2) NOT NULL DEFAULT 1.00,
   `attributes` text COLLATE utf8_unicode_ci NOT NULL,
   `merchant_id` int(10) unsigned DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1682,7 +1680,7 @@ CREATE TABLE `product_variant` (
   KEY `product_variant_merchant_id_foreign` (`merchant_id`),
   CONSTRAINT `product_variant_merchant_id_foreign` FOREIGN KEY (`merchant_id`) REFERENCES `merchants` (`id`),
   CONSTRAINT `product_variant_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=415 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1745,7 +1743,7 @@ CREATE TABLE `products` (
   KEY `products_object_id_index` (`object_id`),
   KEY `products_user_id_foreign` (`user_id`),
   CONSTRAINT `products_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=215 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1767,7 +1765,7 @@ CREATE TABLE `push` (
   PRIMARY KEY (`id`),
   KEY `push_user_id_foreign` (`user_id`),
   CONSTRAINT `push_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=867 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1792,7 +1790,7 @@ CREATE TABLE `ratings` (
   KEY `ratings_object_id_index` (`object_id`),
   KEY `ratings_user_id_foreign` (`user_id`),
   CONSTRAINT `ratings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=176 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1817,7 +1815,7 @@ CREATE TABLE `regions` (
   KEY `regions_code_index` (`code`),
   KEY `regions_country_id_foreign` (`country_id`),
   CONSTRAINT `regions_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1865,7 +1863,7 @@ CREATE TABLE `reports` (
   CONSTRAINT `reports_city_id_foreign` FOREIGN KEY (`city_id`) REFERENCES `cities` (`id`),
   CONSTRAINT `reports_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`),
   CONSTRAINT `reports_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1889,7 +1887,7 @@ CREATE TABLE `routes` (
   `unit` int(11) NOT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `provider` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `provider_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `provider_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `coverage` text COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -1899,7 +1897,7 @@ CREATE TABLE `routes` (
   KEY `routes_user_id_foreign` (`user_id`),
   CONSTRAINT `routes_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `routes_vehicle_id_foreign` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5550 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1967,7 +1965,7 @@ CREATE TABLE `sources` (
   PRIMARY KEY (`id`),
   KEY `sources_user_id_foreign` (`user_id`),
   CONSTRAINT `sources_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2006,7 +2004,7 @@ CREATE TABLE `stops` (
   CONSTRAINT `stops_country_id_foreign` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`),
   CONSTRAINT `stops_region_id_foreign` FOREIGN KEY (`region_id`) REFERENCES `regions` (`id`),
   CONSTRAINT `stops_route_id_foreign` FOREIGN KEY (`route_id`) REFERENCES `routes` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34116 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2134,7 +2132,7 @@ CREATE TABLE `transactions` (
   KEY `transactions_user_id_foreign` (`user_id`),
   CONSTRAINT `transactions_order_id_foreign` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
   CONSTRAINT `transactions_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=656 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2153,7 +2151,7 @@ CREATE TABLE `translations` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1229 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2211,10 +2209,18 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `firstName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `lastName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `cellphone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `area_code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `gender` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `docType` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `docNum` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `emailNotifications` tinyint(1) NOT NULL DEFAULT 0,
   `pushNotifications` tinyint(1) NOT NULL DEFAULT 0,
-  `optinMarketing` tinyint(1) DEFAULT 0,
+  `optinMarketing` tinyint(1) NOT NULL DEFAULT 0,
   `green` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `red` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `is_alerting` tinyint(1) NOT NULL DEFAULT 0,
@@ -2222,26 +2228,18 @@ CREATE TABLE `users` (
   `write_report` tinyint(1) NOT NULL DEFAULT 0,
   `alert_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `notify_location` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `lastName` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `cellphone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `area_code` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `plan` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `hash` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `trip` int(10) unsigned DEFAULT NULL,
-  `gender` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `language` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `avatar` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `code` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `platform` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `docType` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `docNum` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `two_factor_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `two_factor_expiry` timestamp NULL DEFAULT NULL,
   `username` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `two_factor_expiry` timestamp NULL DEFAULT NULL,
-  `two_factor_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `remember_token` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -2258,7 +2256,7 @@ CREATE TABLE `users` (
   KEY `users_area_code_index` (`area_code`),
   KEY `users_trip_index` (`trip`),
   KEY `users_stripe_id_index` (`stripe_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=976 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -2272,6 +2270,13 @@ CREATE TABLE `vehicles` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `category_id` int(10) unsigned NOT NULL,
   `user_id` int(10) unsigned DEFAULT NULL,
+  `axis` int(11) NOT NULL,
+  `plates` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `make` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `model` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `color` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `year` int(11) NOT NULL,
   `cargo_width` double NOT NULL,
   `cargo_length` double NOT NULL,
   `cargo_height` double NOT NULL,
@@ -2296,4 +2301,4 @@ CREATE TABLE `vehicles` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-09-09 12:20:26
+-- Dump completed on 2020-09-10 15:34:10
