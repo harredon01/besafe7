@@ -114,12 +114,12 @@ Route::get('food/routes', 'FoodController@getRoutes');
 Route::get('food/largest_addresses', 'FoodController@getLargestAddresses');
 Route::get('food/menu', 'FoodImportController@getMenu');
 Route::get('food/deliveries', 'FoodImportController@getDeliveries');
-Route::get('food/zones', 'FoodImportController@getZones');
+Route::get('admin/zones', 'FoodImportController@getZones');
 Route::get('food/messages', 'FoodImportController@getMessages');
 Route::get('food/content', 'FoodImportController@getContent');
 Route::post('food/menu', 'FoodImportController@postMenu');
 Route::post('food/content', 'FoodImportController@postContent');
-Route::post('food/zones', 'FoodImportController@postZones');
+Route::post('admin/zones', 'ZonesController@postZones');
 Route::post('food/messages', 'FoodImportController@postMessages');
 
 Route::get('/purchase', function () {
@@ -209,7 +209,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Agosto", "Septiembre");
+    return new App\Mail\NewsletterMenus($days, "Septiembre", "Septiembre");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();

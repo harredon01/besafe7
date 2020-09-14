@@ -105,6 +105,10 @@ class Food {
             }
         }
     }
+    
+    public function updateDeliveries(){
+        Delivery::where('status','scheduled')->update(["status"=>"completed"]); 
+    }
 
     public function inviteUser(User $user) {
         $platFormService = app('Notifications');
@@ -357,8 +361,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-08-31 00:00:00";
-        $end_date = "2020-09-05 23:59:59";
+        $start_date = "2020-09-14 00:00:00";
+        $end_date = "2020-09-18 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -446,7 +450,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) { 
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Septiembre"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Septiembre","Septiembre"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
