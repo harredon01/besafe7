@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder {
         $this->call(MerchantTableSeeder::class);
         $this->command->info('Merchants seeded!');
         
-        $this->call(FoodMerchantSeeder::class);
-        $this->command->info('Food seeded!'); 
+//        $this->call(FoodMerchantSeeder::class);
+//        $this->command->info('Food seeded!'); 
 
         /* $this->call('MerchantTableSeeder');
           $this->command->info('Merchant table seeded!'); */

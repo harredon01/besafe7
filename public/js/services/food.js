@@ -60,7 +60,7 @@ angular.module('besafe')
                 /**/
             }
             var getZones = function (where) {
-                let url = '/api/food/zones' ;
+                let url = '/api/admin/zones' ;
                 if(where){
                     url = url+'?'+where;
                 }
@@ -351,7 +351,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'PATCH',
-                        url: '/api/food/zones/'+item.id,
+                        url: '/api/admin/zones/'+item.id,
                         data: item, // pass in data as strings
                     })
                             .success(function (data) {
@@ -367,7 +367,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/api/food/zones',
+                        url: '/api/admin/zones',
                         data: item, // pass in data as strings
                     })
                             .success(function (data) {
@@ -430,7 +430,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'DELETE',
-                        url: '/api/food/zones/'+item.id
+                        url: '/api/admin/zones/'+item.id
                     })
                             .success(function (data) {
                                 def.resolve(data);

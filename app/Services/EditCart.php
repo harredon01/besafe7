@@ -22,28 +22,32 @@ class EditCart {
     protected $auth;
 
     public function getCart($user) {
-        $items = Cart::session($user->id)->getContent();
-        $data = array();
-        $result = array();
-        foreach ($items as $item) {
-            $dataitem = [];
-            $dataitem['id'] = $item->id;
-            $dataitem['name'] = $item->name;
-            $dataitem['price'] = $item->price;
-            $dataitem['quantity'] = $item->quantity;
-            $dataitem['attributes'] = $item->attributes;
-            $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
-            $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
-            $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
-            // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
-            // so you can do things like below:
-            array_push($data, $dataitem);
+        if ($user->id) {
+            $items = Cart::session($user->id)->getContent();
+            $data = array();
+            $result = array();
+            foreach ($items as $item) {
+                $dataitem = [];
+                $dataitem['id'] = $item->id;
+                $dataitem['name'] = $item->name;
+                $dataitem['price'] = $item->price;
+                $dataitem['quantity'] = $item->quantity;
+                $dataitem['attributes'] = $item->attributes;
+                $dataitem['priceSum'] = $item->getPriceSum(); // the subtotal without conditions applied
+                $dataitem['priceWithConditions'] = $item->getPriceWithConditions(); // the single price with conditions applied
+                $dataitem['priceSumWithConditions'] = $item->getPriceSumWithConditions(); // the subtotal with conditions applied
+                // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection
+                // so you can do things like below:
+                array_push($data, $dataitem);
+            }
+            $result["subtotal"] = Cart::session($user->id)->getSubTotal();
+            $result["total"] = Cart::session($user->id)->getTotal();
+            $result['items'] = $data;
+            $result['totalItems'] = count($data);
+            return $result;
+        } else {
+            return ['subtotal'=>0,'total'=>0,'items'=>[],'totalItems'=>0];
         }
-        $result["subtotal"] = Cart::session($user->id)->getSubTotal();
-        $result["total"] = Cart::session($user->id)->getTotal();
-        $result['items'] = $data;
-        $result['totalItems'] = count($data);
-        return $result;
     }
 
     public function getCheckoutCart(User $user) {

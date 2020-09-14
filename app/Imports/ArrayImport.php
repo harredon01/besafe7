@@ -2,9 +2,9 @@
 
 namespace App\Imports;
 
-use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
-class ArrayImport implements ToModel
+class ArrayImport implements WithCalculatedFormulas
 {
     /**
     * @param array $row

@@ -23,8 +23,6 @@ use App\Mail\RouteChoose;
 use App\Models\Route;
 use App\Models\Delivery;
 use App\Models\Translation;
-use App\Models\CoveragePolygon;
-use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
 use Artisan;
 
 class FoodApiController extends Controller {
@@ -358,63 +356,6 @@ class FoodApiController extends Controller {
         ]);
     }
 
-    public function deleteZoneItem(Request $request, $item) {
-        CoveragePolygon::where("id", $item)->delete();
-        return response()->json([
-                    'status' => "success",
-                    "message" => "item deleted",
-        ]);
-    }
-
-    public function createZoneItem(Request $request) {
-        $data = $request->all();
-        $cpolygon = new CoveragePolygon();
-        $cpolygon->fill($data);
-        $coordPoints = json_decode($cpolygon->coverage, true);
-        $totalPoints = [];
-        foreach ($coordPoints as $coordPoint) {
-            $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
-            array_push($totalPoints, $pointArray);
-        }
-        $result = [
-            "type" => "MultiPolygon",
-            "coordinates" => [[$totalPoints]]
-        ];
-        $mp = MultiPolygon::fromJson(json_encode($result));
-        $cpolygon->geometry = $mp;
-        $cpolygon->save();
-        return response()->json([
-                    'status' => "success",
-                    "message" => "item created",
-                    "item" => $cpolygon
-        ]);
-    }
-
-    public function updateZoneItem(Request $request, $item) {
-        $data = $request->all();
-        $cpolygon = CoveragePolygon::find($item);
-        if ($cpolygon) {
-            $cpolygon->fill($data);
-            $coordPoints = json_decode($cpolygon->coverage, true);
-            $totalPoints = [];
-            foreach ($coordPoints as $coordPoint) {
-                $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
-                array_push($totalPoints, $pointArray);
-            }
-            $result = [
-                "type" => "MultiPolygon",
-                "coordinates" => [[$totalPoints]]
-            ];
-            $mp = MultiPolygon::fromJson(json_encode($result));
-            $cpolygon->geometry = $mp;
-            $cpolygon->save();
-        }
-        return response()->json([
-                    'status' => "success",
-                    "message" => "item updated",
-        ]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -439,23 +380,6 @@ class FoodApiController extends Controller {
      */
     public function getDeliveries(Request $request) {
         $queryBuilder = new QueryBuilder(new Delivery, $request);
-        $result = $queryBuilder->build()->paginate();
-        return response()->json([
-                    'data' => $result->items(),
-                    "total" => $result->total(),
-                    "per_page" => $result->perPage(),
-                    "page" => $result->currentPage(),
-                    "last_page" => $result->lastPage(),
-        ]);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return Response
-     */
-    public function getZones(Request $request) {
-        $queryBuilder = new QueryBuilder(new CoveragePolygon, $request);
         $result = $queryBuilder->build()->paginate();
         return response()->json([
                     'data' => $result->items(),

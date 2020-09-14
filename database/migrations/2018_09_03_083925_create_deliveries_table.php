@@ -26,11 +26,11 @@ class CreateDeliveriesTable extends Migration
             $table->integer('group_id')->unsigned()->nullable();
             $table->foreign('group_id')->references('id')
                     ->on('groups');
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')->unsigned()->nullable();
             $table->foreign('user_id')->references('id')
                     ->on('users');
             $table->integer('address_id')->unsigned();
-            $table->integer('merchant_id')->unsigned();
+            $table->integer('merchant_id')->unsigned()->nullable();
             $table->foreign('merchant_id')->references('id')
                     ->on('merchants');
 	    $table->dateTime('delivery');

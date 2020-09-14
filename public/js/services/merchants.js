@@ -22,6 +22,27 @@ angular.module('besafe')
                 return def.promise;
 
             }
+
+            var searchMerchants = function (where) {
+                let url = "/api/merchants/search";
+                if (where) {
+                    url = url + "?search=" + where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
             
             var saveMerchant = function (data) {
                 var def = $q.defer();
@@ -71,6 +92,7 @@ angular.module('besafe')
             return {
                 getMerchants: getMerchants,
                 saveMerchant: saveMerchant,
+                searchMerchants: searchMerchants,
                 deleteMerchant: deleteMerchant
             };
         })

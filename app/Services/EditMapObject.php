@@ -517,6 +517,25 @@ class EditMapObject {
                         . "", $thedata);
         return array("data" => $reports);
     }
+    function buildIncludes($merchants,$data){
+        if (array_key_exists('includes', $data)) {
+            if ($data['includes']) {
+                $relatedObjects = explode(',', $data['includes']);
+                $merchantIds = array_column($merchants, 'id');
+                $object = "";
+                $idColumn = "";
+                foreach ($relatedObjects as $item) {
+                    if ($item == 'availabilities') {
+                        $object = "bookable_availabilities";
+                        $idColumn = "bookable_id";
+                    }
+                    $relationships = $this->getRelation($merchantIds, $object, $idColumn);
+                    $merchants = $this->organizeRelation($merchants, $relationships, $item, $idColumn);
+                }
+            }
+        }
+        return $merchants;
+    }
 
     function findLonBoundary($lat, $lon, $lat1, $lat2) {
 
@@ -698,9 +717,9 @@ class EditMapObject {
                 if (array_key_exists($value . $x, $data)) {
                     if ($data[$value . $x]) {
                         $container = ["name" => $data[$value . $x]];
-                        unset($data[$value . $x]);
                         array_push($services, $container);
                     }
+                    unset($data[$value . $x]);
                 }
             }
             if (count($services) > 0) {
@@ -716,8 +735,8 @@ class EditMapObject {
             if (array_key_exists($value, $data)) {
                 if ($data[$value]) {
                     $attributes[$value] = $data[$value];
-                    unset($data[$value]);
                 }
+                unset($data[$value]);
             }
         }
 
@@ -865,7 +884,6 @@ class EditMapObject {
      * @return Location
      */
     public function createObject(User $user, array $data, $type) {
-        $data["user_id"] = $user->id;
         $object = "App\\Models\\" . $type;
 
 

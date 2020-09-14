@@ -10,6 +10,7 @@ use App\Services\MerchantImport;
 use App\Services\EditGroup;
 use App\Services\EditLocation;
 use App\Services\EditAlerts;
+use App\Services\Security;
 use App\Services\ShareObject;
 
 class UserTableSeeder extends Seeder {
@@ -48,15 +49,22 @@ class UserTableSeeder extends Seeder {
      *
      */
     protected $merchantImport;
+    
+    /**
+     * The edit alerts implementation.
+     *
+     */
+    protected $security;
 
 
-    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport) {
+    public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport, Security $security) {
         $this->editGroup = $editGroup;
         $this->editLocation = $editLocation;
         $this->editUserData = $editUserData;
         $this->editAlerts = $editAlerts;
         $this->shareObject = $shareObject;
         $this->merchantImport = $merchantImport;
+        $this->security = $security;
     }
 
     /**
@@ -66,121 +74,14 @@ class UserTableSeeder extends Seeder {
      */
     public function run() {
 
-        /*$data = array(
-            'firstName' => "Hoovert",
-            'name' => "Hoovert Arredondo",
-            'lastName' => "Arredondo",
-            'docType' => "Cedula",
-            'cellphone' => "3105507245",
-            'area_code' => "57",
-            'docNum' => "1020716535",
-            'email' => "harredon007@hotmail.com",
-            'password' => bcrypt("123456"),
-        );
-        
-        $user = User::create($data);
-
-        $data = array(
-            'firstName' => "Rodrigo",
-            'lastName' => "Arias",
-            'type' => 'billing',
-            'phone' => "3105507245",
-            'postal' => "57",
-            'address' => "Carrera 1 este # 74 - 14",
-            'city_id' => "524",
-            'region_id' => "11",
-            'country_id' => "1",
-            'lat' => 4.654419,
-            'long' => -74.049405,
-        );
-        $this->editUserData->createOrUpdateAddress($user, $data);
-        $salt2 = str_random(40);
-        $data = array(
-            'firstName' => "Hoovert2",
-            'name' => "Hoovert2 Arredondo2",
-            'lastName' => "Arredondo2",
-            'docType' => "Cedula",
-            'cellphone' => "3105507245",
-            'area_code' => "57",
-            'docNum' => "1020716536",
-            'email' => "harredon01@gmail.com",
-            'password' => bcrypt("123456"),
-        );
-        $user = User::create($data);
-        $data = array(
-            'firstName' => "Hoov",
-            'lastName' => "Arre",
-            'type' => 'billing',
-            'phone' => "3105507245",
-            'postal' => "57",
-            'address' => "Calle 73 # o - 39 este Apto 502",
-            'lat' => 4.652879,
-            'long' => -74.050242,
-            'city_id' => "524",
-            'region_id' => "11",
-            'country_id' => "1",
-        );
-        $this->editUserData->createOrUpdateAddress($user, $data);
-        $data = array(
-            'firstName' => "Camila",
-            'name' => "Camila Sandoval",
-            'lastName' => "Sandoval",
-            'docType' => "Cedula",
-            'docNum' => "1020766426",
-            'cellphone' => "3103418432",
-            'area_code' => "57",
-            'email' => "cami_sandoval_@hotmail.com",
-            'password' => bcrypt("123456"),
-        );
-        $user = User::create($data);
-        $data = array(
-            'firstName' => "Seb",
-            'lastName' => "Jara",
-            'type' => 'billing',
-            'address' => "Cra 5 # 72-14",
-            'phone' => "3105507245",
-            'postal' => "57",
-            'lat' => 4.654462,
-            'long' => -74.053375,
-            'city_id' => "524",
-            'region_id' => "11",
-            'country_id' => "1",
-        );
-        $this->editUserData->createOrUpdateAddress($user, $data);
-        $data = array(
-            'firstName' => "Juan Camilo",
-            'name' => "Juan Camilo Rondon",
-            'lastName' => "Rondon",
-            'docType' => "Cedula",
-            'cellphone' => "3157833052",
-            'area_code' => "57",
-            'docNum' => "80874422",
-            'email' => "rondoncardenas@gmail.com",
-            'password' => bcrypt("123456"),
-        );
-        $user = User::create($data);
-        $data = array(
-            'firstName' => "Cami",
-            'lastName' => "Sand",
-            'type' => 'billing',
-            'address' => "Cra 7 # 64-44",
-            'phone' => "3105507245",
-            'postal' => "57",
-            'lat' => 4.648751,
-            'long' => -74.059104,
-            'city_id' => "524",
-            'region_id' => "11",
-            'country_id' => "1",
-        );
-        $this->editUserData->createOrUpdateAddress($user, $data);*/
-        $this->merchantImport->importTranslations("translations.xlsx");
+        $this->merchantImport->importTranslationsExcel("translations.xlsx");
         $this->command->info('Translations seeded');
         $this->merchantImport->importUsers("users.xlsx");
         $this->command->info('users seeded!');
-        $this->merchantImport->importAddresses("address.xlsx");
+        $this->merchantImport->importAddresses("addresses.xlsx");
         $this->command->info('Addresses seeded!');
-        $this->merchantImport->importContacts("contacts.xlsx");
-        $this->command->info('Contacts seeded!');
+//        $this->merchantImport->importContacts("contacts.xlsx");
+//        $this->command->info('Contacts seeded!');
         $this->updateMedical();
         $this->updateCodes();
 //        $this->createMessages();
@@ -260,7 +161,7 @@ class UserTableSeeder extends Seeder {
             'other' => "anemic",
         );
         foreach ($users as $user) {
-            $this->editUserData->UpdateMedical($user, $data);
+            $this->security->updateMedical($user, $data);
         }
     }
 
@@ -271,7 +172,7 @@ class UserTableSeeder extends Seeder {
             'red' => 4321,
         );
         foreach ($users as $user) {
-            $this->editUserData->updateCodes($user, $data);
+            $this->security->updateCodes($user, $data);
         }
     }
 

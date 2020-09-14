@@ -28,6 +28,9 @@ class Category extends Model {
     public function products() {
         return $this->morphedByMany('App\Models\Product', 'categorizable')->withTimestamps();
     }
+    public function articles() {
+        return $this->morphedByMany('App\Models\Article', 'categorizable')->withTimestamps();
+    }
     public function cargos() {
         return $this->hasMany('App\Models\Cargo');
     }

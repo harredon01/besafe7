@@ -124,9 +124,10 @@ class EditProduct {
             }
         }
         if ($merchant_id) {
+            $merchants = explode(",", $merchant_id);
             $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
                     ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                    ->where('merchant_product.merchant_id', $data['merchant_id'])
+                    ->whereIn('merchant_product.merchant_id', $merchants)
                     ->where('merchants.private', false);
         }
         if (array_key_exists("category_id", $data)) {
@@ -761,6 +762,12 @@ class EditProduct {
             ];
             unset($data['name']);
             unset($data['description']);
+            if(array_key_exists('category_id', $data)){
+                unset($data['category_id']);
+            }
+            if(array_key_exists('category_name', $data)){
+                unset($data['category_name']);
+            }
             $data['description'] = $data['description2'];
             unset($data['description2']);
             $data = (object) array_filter((array) $data, function ($val) {

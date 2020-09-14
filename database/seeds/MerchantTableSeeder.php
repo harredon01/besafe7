@@ -60,63 +60,8 @@ class MerchantTableSeeder extends Seeder {
 //        $this->cleanPhones();
         //$this->createConditions();
 //        $this->createProducts();
-        $this->createExcel();
+        $this->createMerchantsExcel();
         //$this->createMerchants();
-    }
-
-    public function createProducts() {
-        for ($x = 0; $x <= 4; $x++) {
-            $category1 = Category::create([
-                        'name' => "Cat" . $x,
-                        'level' => "1",
-                        'description' => "Cat desc " . $x,
-            ]);
-            for ($y = 0; $y <= 4; $y++) {
-                $product1 = new Product([
-                    'name' => "plan " . $x . "-" . $y,
-                    'description' => " plan de seguridad " . $x . "-" . $y,
-                    'hash' => "plan-de-seguridad-" . $x . "-" . $y,
-                    'isActive' => true,
-                ]);
-                $category1->products()->save($product1);
-                $product1->save();
-                if ($y % 2 == 0) {
-                    $itemCondition = new Condition(array(
-                        'name' => "Product percent discount " . $y,
-                        'type' => 'sale',
-                        'target' => 'item',
-                        'value' => '-' . ($y + 1) . "%",
-                        'isActive' => true
-                    ));
-                    $product1->conditions()->save($itemCondition);
-                }
-                for ($z = 0; $z <= 4; $z++) {
-                    $attributes = ["size" => "tamano-" . $z, "color" => "color-" . $z];
-                    $productVariant1 = new ProductVariant([
-                        'isActive' => true,
-                        'sku' => "sku-" . $x . "-" . $y . "-" . $z,
-                        'ref2' => "ref-" . $x . "-" . $y . "-" . $z,
-                        'sale' => 800 * ($z + 1) * ($y + 1),
-                        'price' => 1000 * ($z + 1) * ($y + 1),
-                        'quantity' => 1 * ($z + 1) * ($y + 1),
-                        'attributes' => json_encode($attributes)
-                    ]);
-                    $product1->productVariants()->save($productVariant1);
-                    $productVariant1->save();
-                    if ($z % 2 == 0) {
-                        $amount = ($y + 1) * ($z + 1);
-                        $itemCondition = new Condition(array(
-                            'name' => "Product variant percent discount " . $y . "-" . $z,
-                            'type' => 'sale',
-                            'target' => 'item',
-                            'value' => '-' . $amount . "%",
-                            'isActive' => true
-                        ));
-                        $productVariant1->conditions()->save($itemCondition);
-                    }
-                }
-            }
-        }
     }
 
     public function createOrders() {
@@ -160,7 +105,7 @@ class MerchantTableSeeder extends Seeder {
 
     public function addBooking($data, $booker, $owner, $merchant) {
         $result1 = $this->editBooking->addBookingObject($data, $booker);
-        $result1 = $result1->original;
+        //$result1 = $result1->original;
         if ($result1['status'] == "success") {
             $booking = $result1['booking'];
             $status = [
@@ -168,7 +113,7 @@ class MerchantTableSeeder extends Seeder {
                 "booking_id" => $booking->id
             ];
             echo "Paid" . $booking->total_paid . PHP_EOL;
-            if ($booking->total_paid == -1) {
+            if ($booking->notes == 'in_confirmation') {
                 $this->editBooking->changeStatusBookingObject($status, $owner);
             }
             $shouldPay = mt_rand(0, 1);
@@ -248,68 +193,24 @@ class MerchantTableSeeder extends Seeder {
           )); */
     }
 
-    public function createMerchant($category, $num, $categoryProds) {
-        $userId = mt_rand(1, 3);
+    public function createMerchantBookings() {
+        $userId = mt_rand(1, 2);
         $bookerId = 1;
-        if ($userId == 1||$userId == 3) {
+        $merchant_id = 0;
+        if ($userId == 1) {
             $bookerId = 2;
+            $merchant_id = mt_rand(1, 3);
         } else {
             $bookerId = 1;
+            $merchant_id = mt_rand(4, 6);
         }
+        $merchant = Merchant::find($merchant_id);
         $booker = User::find($bookerId);
         $owner = User::find($userId);
-        $merchant = Merchant::create(array(
-                    'name' => "Dr " . $category->name . " " . $num,
-                    'type' => 'medical',
-                    'email' => 'hoov@hoov.com',
-                    'telephone' => '3152562356',
-                    'url' => "http://hoovert.com",
-                    'address' => "cra 1 # 45-56",
-                    'description' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " . $num,
-                    'icon' => 'https://s3.us-east-2.amazonaws.com/gohife/public/product/catering-eventos.jpg',
-                    'lat' => 4.656060000,
-                    'long' => -74.045932000,
-                    'price' => 40000,
-                    'country_id' => 1,
-                    'region_id' => 11,
-                    'city_id' => 524,
-                    'unit_cost' => 30000,
-                    'base_cost' => 5000,
-                    'unit' => "hour",
-                    'user_id' => $owner->id,
-                    'currency' => "COP",
-                    'status' => "active",
-                    'attributes' => [
-                        "experience" => [["name" => "St judes hospital", "years" => "1.5"]],
-                        "service" => [["name" => "Servicio de " . $category->name . "1", "icon" => "1.5"], ["name" => "Servicio de " . $category->name . "2", "icon" => "1.5"], ["name" => "Servicio de " . $category->name . "3", "icon" => "1.5"]],
-                        "booking_requires_authorization" => mt_rand(0, 1),
-                        "max_per_hour" => 2,
-                        "years_experience" => mt_rand(1, 5)
-                    ]
-        ));
-        $merchant->users()->save($owner);
-        CoveragePolygon::create(array(
-            'coverage' => '[{"lat":4.723382111533708,"lng":-74.04241729687499},{"lat":4.729223885835614,"lng":-74.06611658606096},{"lat":4.7049518372167185,"lng":-74.08981691503908},{"lat":4.668639281672278,"lng":-74.11485624947431},{"lat":4.641907363562615,"lng":-74.07912789819335},{"lat":4.636631621857092,"lng":-74.05114528732781},{"lat":4.646754460045917,"lng":-74.04994175097659},{"lat":4.671210887736071,"lng":-74.04257490395742},{"lat":4.685316127393699,"lng":-74.03228927563475},{"lat":4.699259639444434,"lng":-74.0269677729492},{"lat":4.711406520789634,"lng":-74.0269677729492},{"lat":4.723382111533708,"lng":-74.04241729687499},{"lat":4.723382111533708,"lng":-74.04241729687499},{"lat":4.723382111533708,"lng":-74.04241729687499}]',
-            'lat' => 4.721717000,
-            'long' => -74.069855000,
-            'country_id' => 1,
-            'region_id' => 11,
-            'city_id' => 524,
-            'merchant_id' => $merchant->id,
-            'address_id' => 14,
-            'provider' => 'Basilikum',
-        ));
-        $merchant->categories()->save($category);
-        $this->addAvailability('monday', $merchant, $owner);
-        $this->addAvailability('tuesday', $merchant, $owner);
-        $this->addAvailability('wednesday', $merchant, $owner);
-        $this->addAvailability('thursday', $merchant, $owner);
-        $this->addAvailability('friday', $merchant, $owner);
 
         $date = date_create();
         date_add($date, date_interval_create_from_date_string("1 days"));
         $booker2 = User::find(3);
-        $booker3 = User::find(6);
         $attributes = [
             "pet" => "cat",
             "weight" => "200lb"
@@ -323,7 +224,6 @@ class MerchantTableSeeder extends Seeder {
         ];
         $this->addBooking($data, $booker, $owner, $merchant);
         $this->addBooking($data, $booker2, $owner, $merchant);
-        $this->addBooking($data, $booker3, $owner, $merchant);
 
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
@@ -335,7 +235,6 @@ class MerchantTableSeeder extends Seeder {
         ];
         $this->addBooking($data, $booker, $owner, $merchant);
         $this->addBooking($data, $booker2, $owner, $merchant);
-        $this->addBooking($data, $booker3, $owner, $merchant);
         date_add($date, date_interval_create_from_date_string("1 days"));
         $data = [
             "type" => "Merchant",
@@ -346,106 +245,28 @@ class MerchantTableSeeder extends Seeder {
         ];
         $this->addBooking($data, $booker, $owner, $merchant);
         $this->addBooking($data, $booker2, $owner, $merchant);
-        $this->addBooking($data, $booker3, $owner, $merchant);
-        for ($i = 1; $i < 4; $i++) {
-            $product = Product::create([
-                        'name' => "Product " . $i,
-                        'description' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. " . $i,
-                        'isActive' => true,
-                        'hash' => "",
-            ]);
-            for ($j = 1; $j < 4; $j++) {
-                $productVariant = ProductVariant::updateOrCreate([
-                            'product_id' => $product->id,
-                            'merchant_id' => $merchant->id,
-                            'description' => "Item " . $i . "-" . $j,
-                            'sku' => "prod" . $i . "-" . $j,
-                            'ref2' => "prod2" . $i . "-" . $j,
-                            'isActive' => true,
-                            'price' => 10 * $i * $j,
-                            'sale' => 9 * $i * $j,
-                            'tax' => $i * $j,
-                            'cost' => 8 * $i * $j,
-                            'quantity' => 10,
-                            'min_quantity' => 1,
-                            'is_digital' => true,
-                            'is_shippable' => true,
-                                //'attributes' => $sheet['attributes'],
-                ]);
-            }
-            $merchant->products()->save($product);
-            $categoryProds->products()->save($product);
-        }
-        for ($i = 1; $i < 4; $i++) {
-            $user = User::whereNotIn("id", [$owner->id])->first();
-            $data = [
-                "type" => "Merchant",
-                "object_id" => $merchant->id,
-                "rating" => $i + 2,
-                "comment" => "Comment " . $i
-            ];
-            $this->editRating->addRatingObject($data, $user);
-        }
     }
 
-    public function addAvailability($day, $merchant, $owner) {
-        $data = [
-            "type" => "Merchant",
-            "object_id" => $merchant->id,
-            "range" => $day,
-            "from" => '08:00 am',
-            "to" => '12:30 pm'
-        ];
-        $this->editBooking->addAvailabilityObject($data, $owner);
-        $data = [
-            "type" => "Merchant",
-            "object_id" => $merchant->id,
-            "range" => $day,
-            "from" => '02:00 pm',
-            "to" => '06:00 pm'
-        ];
-        $this->editBooking->addAvailabilityObject($data, $owner);
-    }
+    public function createMerchantsExcel() {
+        //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
 
-    public function createExcel() {
+        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
+        $this->command->info('merchants seeded!');
 
-//        $merchant = Merchant::find(1302);
-//        DB::enableQueryLog();
-//        $array1 = $merchant->bookingsStartsBetween('2019-10-13 07:59:59', '2019-10-13 09:00:00')->get();
-//        dd($array1->toArray());
-        $dentists = Category::create(array(
-                    'name' => "Dentists",
-                    'type' => 'merchants',
-                    'level' => '1',
-                    'description' => 'tend to peoples teeth',
-        ));
-        $store = Category::create(array(
-                    'name' => "Nuestra Tienda",
-                    'type' => 'products',
-                    'level' => '1',
-                    'description' => 'tend to peoples teeth',
-        ));
-        $this->createMerchant($dentists, 1, $store);
-        $this->createMerchant($dentists, 2, $store);
-        $this->createMerchant($dentists, 3, $store);
-        $dermatologist = Category::create(array(
-                    'name' => "Dermatologists",
-                    'type' => 'merchants',
-                    'level' => '1',
-                    'description' => 'tend to peoples skin',
-        ));
-        $this->createMerchant($dermatologist, 1, $store);
-        $this->createMerchant($dermatologist, 2, $store);
-        $this->createMerchant($dermatologist, 3, $store);
-        $oftalmologists = Category::create(array(
-                    'name' => "Oftalmologists",
-                    'type' => 'merchants',
-                    'level' => '1',
-                    'description' => 'tend to peoples eyes',
-        ));
-        $this->createMerchant($oftalmologists, 1, $store);
-        $this->createMerchant($oftalmologists, 2, $store);
-        $this->createMerchant($oftalmologists, 3, $store);
+        $this->merchantImport->importPolygons("polygons.xlsx");
+        $this->command->info('polygons seeded!');
+        $this->merchantImport->importProductsExcel("products.xlsx");
+        $this->command->info('products seeded!');
+        $this->merchantImport->importProductVariantsExcel("variants.xlsx");
+        $this->command->info('variants seeded!');
+        $this->merchantImport->importMerchantsAvailabilitiesExcel("availabilities.xlsx");
+        $this->command->info('availabilities seeded!');
+        $this->createMerchantBookings();
+        $this->command->info('Bookings created!');
+        $this->merchantImport->importArticlesExcel("articles.xlsx");
+        $this->command->info('articles seeded!');
+        $this->merchantImport->importMerchantsRatingsExcel("ratings.xlsx");
+        $this->command->info('ratings seeded!');
     }
 
     public function createMerchants() {

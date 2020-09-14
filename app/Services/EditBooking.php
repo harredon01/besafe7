@@ -168,6 +168,7 @@ class EditBooking {
      * @return \Illuminate\Http\Response
      */
     public function addBookingObject(array $data, User $user) {
+        $data['call'] = false;
         $validator = $this->validatorCreateBooking($data);
         if ($validator->fails()) {
             return array("status" => "error", "message" => $validator->getMessageBag());

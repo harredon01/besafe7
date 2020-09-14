@@ -63,6 +63,7 @@
         <script src="{{ asset('/js/services/orders.js')}}"></script>
         <script src="{{ asset('/js/services/product-import.js')}}"></script>
         <script src="{{ asset('/js/services/food.js')}}"></script>
+        <script src="{{ asset('/js/services/zones.js')}}"></script>
 
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   <link rel="stylesheet" href="/resources/demos/style.css">
@@ -142,7 +143,7 @@
                                     </a>
                                     <ul class="dropdown-menu" role="menu">
                                         <li><a href="{{ url('food/menu')}}">Menu</a></li>
-                                        <li><a href="{{ url('food/zones')}}">Zonas</a></li>
+                                        <li><a href="{{ url('admin/zones')}}">Zonas</a></li>
                                         <li><a href="{{ url('food/messages')}}">Mensajes</a></li>
                                         <li><a href="{{ url('food/routes')}}">Rutas</a></li>
                                         <li><a href="{{ url('food/deliveries')}}">Entregas</a></li>

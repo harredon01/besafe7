@@ -17,7 +17,7 @@ class CreateArticlesTable extends Migration
             $table->increments('id');
             $table->string('name')->nullable();
             $table->text('description')->nullable();
-            $table->text('type')->nullable();
+            $table->string('type')->nullable(); 
             $table->text('body')->nullable();
             $table->string('status')->nullable();
             $table->string('pagetitle')->nullable();
