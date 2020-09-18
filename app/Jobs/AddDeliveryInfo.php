@@ -14,16 +14,18 @@ class AddDeliveryInfo implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $delivery;
+    
+    protected $delivery_details;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Delivery $delivery )
+    public function __construct(Delivery $delivery,$details )
     {
         $this->delivery = $delivery;
-
+        $this->delivery_details = $details;
     }
 
     /**
@@ -33,6 +35,6 @@ class AddDeliveryInfo implements ShouldQueue
      */
     public function handle(EditDelivery $editDelivery)
     {
-        $editDelivery->addInfoToDelivery($this->delivery); 
+        $editDelivery->addInfoToDelivery($this->delivery, $this->delivery_details); 
     }
 }
