@@ -95,7 +95,7 @@ class EditDelivery {
                             }
                         }
                         $delivery->save();
-                        dispatch(new AddDeliveryInfo($delivery));
+                        dispatch(new AddDeliveryInfo($delivery,$details));
                     }
                     $date = date_create($delivery->delivery);
                     $pending = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
@@ -365,10 +365,12 @@ class EditDelivery {
         }
     }
 
-    public function addInfoToDelivery(Delivery $delivery) {
+    public function addInfoToDelivery(Delivery $delivery,$delDetails) {
         $details = json_decode($delivery->details, true);
-        if (!array_key_exists("dish", $details)) {
+        if (array_key_exists("dish", $details)) {
             return;
+        } else {
+            $details = $delDetails;
         }
         $dish = $details["dish"];
         $article = Article::find($dish["type_id"]);

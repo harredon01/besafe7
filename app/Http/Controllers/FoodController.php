@@ -215,6 +215,16 @@ class FoodController extends Controller {
 
         return view('food.routesDashboard')->with('user', $user);
     }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function updateDeliveries() { 
+        $this->food->updateDeliveries();
+        return ['status'=>'success'];
+    }
      
     /**
      * Show the application dashboard to the user.

@@ -164,7 +164,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 0px; padding-bottom: 30px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#ff8e54;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:1.2;padding-top:0px;padding-right:20px;padding-bottom:30px;padding-left:20px;">
 <div style="line-height: 1.2; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #ff8e54; mso-line-height-alt: 14px;">
-<p style="font-size: 16px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px;">Del {{$days[0]["titulo"]}} al {{$days[5]["titulo"]}} de {{$month1}} </span></p>
+<p style="font-size: 16px; line-height: 1.2; text-align: center; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 19px; margin: 0;"><span style="font-size: 16px;">Del {{$days[0]["titulo"]}} al {{$days[4]["titulo"]}} de {{$month1}} </span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -525,7 +525,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 20px; padding-left: 20px; padding-top: 30px; padding-bottom: 0px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#ffffff;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:1.2;padding-top:30px;padding-right:20px;padding-bottom:0px;padding-left:20px;">
 <div style="line-height: 1.2; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #ffffff; mso-line-height-alt: 14px;">
-<p style="font-size: 14px; line-height: 1.2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 17px; margin: 0;"><strong><span style="font-size: 24px;"><span style="font-size: 24px;">Jueves {{$days[5]["titulo"]}}</span></span></strong></p>
+<p style="font-size: 14px; line-height: 1.2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 17px; margin: 0;"><strong><span style="font-size: 24px;"><span style="font-size: 24px;">Jueves {{$days[3]["titulo"]}}</span></span></strong></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->

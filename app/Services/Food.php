@@ -357,8 +357,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-08-31 00:00:00";
-        $end_date = "2020-09-05 23:59:59";
+        $start_date = "2020-09-21 00:00:00";
+        $end_date = "2020-09-26 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('id', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -444,9 +444,9 @@ class Food {
             $date = date_format($date, "Y-m-d");
 
             $platFormService = app('Notifications');
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+            //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) { 
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Septiembre"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Septiembre","Septiembre"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
@@ -550,6 +550,9 @@ class Food {
 
     public function generateHash($id, $created_at) {
         return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
+    }
+    public function updateDeliveries() {
+        Delivery::where('status','scheduled')->update(['status'=>'completed']);
     }
 
     public function checkHash($id, $created_at, $hash) {
