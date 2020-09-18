@@ -16,7 +16,7 @@ use App\Jobs\InviteUsers;
 use App\Models\Block;
 use App\Jobs\AddFollower;
 use App\Jobs\AddContact;
-use App\Models\Attribute;
+use App\Models\FileM;
 use App\Models\AttributeOption;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -615,13 +615,70 @@ class MerchantImport {
                         unset($sheet['user_id']);
                         $categoriesData = explode(",", $sheet['categories']);
                         unset($sheet['categories']);
+                        $image = $sheet['icon'];
+                        unset($sheet['icon']);
                         unset($sheet['id']);
                         $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
+                        $merchant = $results['object'];
                         if ($categoriesData) {
                             $categories = Category::whereIn('id', $categoriesData)->get();
-                            $merchant = $results['object'];
+
                             foreach ($categories as $item) {
                                 $item->merchants()->save($merchant);
+                            }
+                        }
+                        if ($image) {
+                            $merchant->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
+                        } else {
+                            $merchant->icon = 'https://picsum.photos/900/350';
+                        }
+                        $merchant->save();
+                    }
+                }
+            }
+        }
+    }
+
+    public function importReportsExcel($filename) {
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $headers = $row[0];
+            foreach ($row as $item) {
+                $sheet = null;
+                foreach ($item as $key => $value) {
+                    $sheet[$headers[$key]] = $value;
+                }
+                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                    $owner = User::find($sheet['user_id']);
+                    if ($owner) {
+                        unset($sheet['user_id']);
+                        $categoriesData = explode(",", $sheet['categories']);
+                        unset($sheet['categories']);
+                        $image = $sheet['icon'];
+                        if (array_key_exists('merchant_id', $sheet)) {
+                            $merchant_id = $sheet['merchant_id'];
+                            unset($sheet['merchant_id']);
+                        }
+                        unset($sheet['icon']);
+                        unset($sheet['id']);
+                        $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Report");
+                        $report = $results['object'];
+                        if ($categoriesData) {
+                            $categories = Category::whereIn('id', $categoriesData)->get();
+                            foreach ($categories as $item) {
+                                $item->reports()->save($report);
+                            }
+                        }
+                        if ($image) {
+                            $report->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-report/' . $image;
+                        } else {
+                            $report->icon = 'https://picsum.photos/900/350';
+                        }
+                        $report->save();
+                        if ($merchant_id) {
+                            $merchant = Merchant::find($merchant_id);
+                            if ($merchant) {
+                                $merchant->reports()->save($report);
                             }
                         }
                     }
@@ -640,6 +697,11 @@ class MerchantImport {
                     $sheet[$headers[$key]] = $value;
                 }
                 if ($sheet['id'] && $sheet['id'] != 'id') {
+                    if($sheet['icon']){
+                        $sheet['icon']='https://s3.us-east-2.amazonaws.com/gohife/public/pets-categories/' . $sheet['icon'];
+                    } else {
+                        $sheet['icon']='https://picsum.photos/900/300';
+                    }
                     Category::firstOrCreate($sheet);
                 }
             }
@@ -659,6 +721,12 @@ class MerchantImport {
                     $categoriesData = explode(",", $sheet['categories']);
                     unset($sheet['categories']);
                     $article = new Article($sheet);
+                    $image = $sheet['icon'];
+                    if ($image) {
+                        $article->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-banners/' . $image;
+                    } else {
+                        $article->icon = 'https://picsum.photos/900/350';
+                    }
                     $article->save();
                     if ($categoriesData) {
                         $categories = Category::whereIn('id', $categoriesData)->get();
@@ -742,17 +810,38 @@ class MerchantImport {
                     $owner = User::find($sheet['user_id']);
                     if ($owner) {
                         unset($sheet['user_id']);
-                        $sheet['id']="";
+                        $sheet['id'] = "";
+                        $image = $sheet['imagen'];
+                        $ext = $sheet['ext'];
+                        unset($sheet['imagen']);
+                        unset($sheet['ext']);
                         $categoriesData = explode(",", $sheet['categories']);
                         unset($sheet['categories']);
                         $results = $this->editProduct->createOrUpdateProduct($owner, $sheet);
+                        if ($results['status'] == 'error') {
+                            dd($results);
+                        }
+                        $product = $results['product'];
                         if ($categoriesData) {
                             $categories = Category::whereIn('id', $categoriesData)->get();
-                            $product = $results['product'];
+
                             foreach ($categories as $item) {
                                 $item->products()->save($product);
                             }
                         }
+                        if ($image) {
+                            $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $image;
+                        } else {
+                            $image = 'https://picsum.photos/600/350';
+                            $ext = 'jpg';
+                        }
+                        FileM::create([
+                            'user_id' => 2,
+                            'trigger_id' => $product->id,
+                            'file' => $image,
+                            'extension' => $ext,
+                            'type' => 'App\Models\Product'
+                        ]);
                     }
                 }
             }
@@ -768,18 +857,22 @@ class MerchantImport {
                 foreach ($item as $key => $value) {
                     $sheet[$headers[$key]] = $value;
                 }
-                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
-                    $owner = User::find($sheet['user_id']);
-                    if ($owner) {
-                        unset($sheet['user_id']);
-                        $sheet['id']="";
-                        $attributes = $sheet['attributes'];
-                        unset($sheet['attributes']);
-                        $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
-                        if ($attributes) {
-                            $variant = $results['variant'];
-                            $variant->attributes = $attributes;
-                            $variant->save();
+                if (array_key_exists('user_id', $sheet)) {
+                    if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                        $owner = User::find($sheet['user_id']);
+                        if ($owner) {
+                            unset($sheet['user_id']);
+                            $sheet['id'] = "";
+                            $attributes = $sheet['attributes'];
+                            unset($sheet['attributes']);
+                            $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
+                            if ($results['status'] == 'success') {
+                                if ($attributes) {
+                                    $variant = $results['variant'];
+                                    $variant->attributes = $attributes;
+                                    $variant->save();
+                                }
+                            }
                         }
                     }
                 }

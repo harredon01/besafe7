@@ -488,7 +488,12 @@ class CleanSearch {
         $finalString = "";
         $pos = strpos($mystring, $findme);
         if ($pos === false) {
-            $finalString = $mystring . "?order_by=$type.id,desc&private=0&status[]=active&status[]=online&status[]=busy";
+            if($type == "merchants"){
+                $finalString = $mystring . "?order_by=$type.id,desc&private=0&status[]=active&status[]=online&status[]=busy";
+            } else {
+                $finalString = $mystring . "?order_by=$type.id,desc&status=active";
+            }
+            
         } else {
             $check = explode("?", $mystring);
             if (count($check) != 2) {
@@ -512,7 +517,12 @@ class CleanSearch {
             if ($data['status']) {
                 return null;
             }
-            $finalString = $mystring . "&private=0&status[]=active&status[]=online&status[]=busy";
+            if($type == "merchants"){
+                $finalString = $mystring . "&private=0&status[]=active&status[]=online&status[]=busy";
+            } else {
+                $finalString = $mystring . "&status=active";
+            }
+            
             if (!$data['order_by']) {
                 $finalString = $finalString . "&order_by=$type.id,desc";
             }

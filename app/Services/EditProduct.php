@@ -576,7 +576,7 @@ class EditProduct {
                     if (sizeof($groups) > 0) {
                         $access = true;
                     }
-                    if ( $merchant->checkAdminAccess($user->id)) {
+                    if ($merchant->checkAdminAccess($user->id)) {
                         $access = true;
                     }
                 }
@@ -707,6 +707,9 @@ class EditProduct {
     }
 
     public function createOrUpdateProduct(User $user, array $data) {
+        if ($data['description']) {
+            $data['description'] = substr($data['description'], 0, 254);
+        }
         if ($data["id"]) {
             $result = $this->checkAccessProduct($user, $data["id"]);
             $product = null;
@@ -732,7 +735,7 @@ class EditProduct {
         } else {
             $validator = $this->validatorProduct($data);
             if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                return array("status" => "error", "message" => $validator->getMessageBag());
             }
             $categoryId = $data['category_id'];
             $merchantid = $data['merchant_id'];
@@ -743,16 +746,19 @@ class EditProduct {
                     $catFound = true;
                 }
             }
-            $categoryName = $data['category_name'];
-            if ($categoryName) {
-                $category = Category::create([
-                            "name" => $data['category_name'],
-                            "type" => "App\Models\Product"
-                ]);
-                $catFound = true;
-            }
             if (!$catFound) {
-                return response()->json(array("status" => "error", "message" => "Missing category"), 400);
+                $categoryName = $data['category_name'];
+                if ($categoryName) {
+                    $category = Category::create([
+                                "name" => $data['category_name'],
+                                "type" => "App\Models\Product"
+                    ]);
+                    $catFound = true;
+                }
+            }
+
+            if (!$catFound) {
+                return array("status" => "error", "message" => "Missing category");
             }
             $productData = [
                 "name" => $data['name'],
@@ -762,10 +768,10 @@ class EditProduct {
             ];
             unset($data['name']);
             unset($data['description']);
-            if(array_key_exists('category_id', $data)){
+            if (array_key_exists('category_id', $data)) {
                 unset($data['category_id']);
             }
-            if(array_key_exists('category_name', $data)){
+            if (array_key_exists('category_name', $data)) {
                 unset($data['category_name']);
             }
             $data['description'] = $data['description2'];
@@ -813,7 +819,7 @@ class EditProduct {
             } else {
                 $validator = $this->validatorVariant($data);
                 if ($validator->fails()) {
-                    return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                    return array("status" => "error", "message" => $validator->getMessageBag());
                 }
                 $data = (object) array_filter((array) $data, function ($val) {
                             return !is_null($val);

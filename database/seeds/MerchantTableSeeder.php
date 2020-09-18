@@ -252,6 +252,8 @@ class MerchantTableSeeder extends Seeder {
 
         $this->merchantImport->importMerchantsExcel("merchants.xlsx");
         $this->command->info('merchants seeded!');
+        $this->merchantImport->importReportsExcel("adopcion.xlsx");
+        $this->command->info('merchants seeded!');
 
         $this->merchantImport->importPolygons("polygons.xlsx");
         $this->command->info('polygons seeded!');

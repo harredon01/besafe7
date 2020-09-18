@@ -19,6 +19,7 @@ class CreateOrderAddressesTable extends Migration
             $table->string('phone')->nullable();
             $table->double('lat', 16, 13)->nullable();
             $table->double('long', 16, 13)->nullable();
+            $table->point('position')->nullable();
             $table->index('lat');
             $table->index('long');
             $table->integer('city_id')->unsigned()->nullable();

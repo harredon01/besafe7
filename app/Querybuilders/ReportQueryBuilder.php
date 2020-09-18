@@ -17,6 +17,18 @@ class ReportQueryBuilder extends QueryBuilder {
                         ->where('favorites.favorite_type', '=', "Report");
     }
     
+    public function filterByCategoryId($query, $id) {
+        if (strpos($id, ',') !== false) {
+            return $query->join('categorizables', 'reports.id', '=', 'categorizables.categorizable_id')
+                            ->whereIn('categorizables.category_id', explode(",", $id))
+                            ->where('categorizables.categorizable_type', 'App\Models\Report');
+        } else {
+            return $query->join('categorizables', 'reports.id', '=', 'categorizables.categorizable_id')
+                            ->where('categorizables.category_id', '=', $id)
+                            ->where('categorizables.categorizable_type', 'App\Models\Report')->select('reports.id as ids');
+        }
+    }
+    
     public function filterByGroupId($query, $id) {
         return $query->join('group_report', 'reports.id', '=', 'group_report.report_id')
                         ->where('group_report.group_id', '=', $id);

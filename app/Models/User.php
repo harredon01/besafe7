@@ -86,7 +86,7 @@ class User extends Authenticatable {
         return $this->hasMany('App\Models\Push');
     }
     public function reports() {
-        return $this->hasMany('App\Models\Report');
+        return $this->morphToMany('App\Models\Report', 'reportable')->withTimestamps();
     }
 
     public function locations() {

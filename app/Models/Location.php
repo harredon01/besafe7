@@ -1,8 +1,15 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 class Location extends Model {
+    
+    use SpatialTrait;
+    
+    protected $spatialFields = [
+        'position'
+    ];
 
     /**
      * The database table used by the model.
@@ -21,6 +28,13 @@ class Location extends Model {
 
     public function user() {
         return $this->belongsTo('App\Models\User');
+    }
+    protected static function booted() {
+        static::saving(function ($location) {
+            if($location->lat){
+                $location->position = new Point($location->lat, $location->long); // (lat, lng)
+            }
+        });
     }
 
 }

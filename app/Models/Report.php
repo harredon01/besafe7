@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Cache;
 use DB;
 use Carbon\Carbon; 
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
+use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class Report extends Model {
 
     use Searchable;
+    use SpatialTrait;
 
     /**
      * The database table used by the model.
@@ -18,14 +21,21 @@ class Report extends Model {
      * @var string
      */
     protected $table = 'reports';
+    
+    protected $spatialFields = [
+        'position'
+    ];
+    protected $casts = [
+        'attributes' => 'array',
+    ];
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description',
-        'icon', 'lat', 'long', 'minimum', 'status', 'user_id', "private", "anonymous", "object", 'report_time', 'ends_at','plan','rating','rating_count'];
+    protected $fillable = ['city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description','attributes',
+        'icon', 'lat', 'long', 'minimum', 'status', "private", "anonymous", "object", 'report_time', 'ends_at','plan','rating','rating_count'];
     protected $hidden = ['user_id'];
     protected $dates = [
         'created_at',
@@ -44,8 +54,11 @@ class Report extends Model {
     public function city() {
         return $this->hasOne('App\Models\City');
     }
-    public function user() {
-        return $this->hasOne('App\Models\User');
+    public function users() {
+        return $this->morphedByMany('App\Models\User', 'reportable')->withTimestamps();
+    }
+    public function merchants() {
+        return $this->morphedByMany('App\Models\Merchant', 'reportable')->withTimestamps();
     }
 
     public function region() {
@@ -82,8 +95,25 @@ class Report extends Model {
         }
         return false;
     }
+    public function checkAdminAccess($user_id) {
+        $test = DB::table('reportables')
+                        ->where('reportable_id', $user_id)
+                        ->where('reportable_type', "App\\Models\\User")
+                        ->where("report_id", $this->id)->first();
+        if ($test) {
+            return true;
+        }
+        return false;
+    }
     public function postAddImg() {
         return null;
+    }
+    protected static function booted() {
+        static::saving(function ($report) {
+            if($report->lat){
+                $report->position = new Point($report->lat, $report->long); // (lat, lng)
+            }
+        });
     }
 
 }

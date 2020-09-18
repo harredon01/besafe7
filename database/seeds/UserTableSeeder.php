@@ -4,7 +4,6 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Jobs\AddContact;
 use App\Models\Group;
-
 use App\Services\EditUserData;
 use App\Services\MerchantImport;
 use App\Services\EditGroup;
@@ -38,24 +37,24 @@ class UserTableSeeder extends Seeder {
      *
      */
     protected $editAlerts;
+
     /**
      * The edit alerts implementation.
      *
      */
     protected $shareObject;
-    
+
     /**
      * The edit alerts implementation.
      *
      */
     protected $merchantImport;
-    
+
     /**
      * The edit alerts implementation.
      *
      */
     protected $security;
-
 
     public function __construct(EditUserData $editUserData, EditGroup $editGroup, EditLocation $editLocation, EditAlerts $editAlerts, ShareObject $shareObject, MerchantImport $merchantImport, Security $security) {
         $this->editGroup = $editGroup;
@@ -73,6 +72,18 @@ class UserTableSeeder extends Seeder {
      * @return void
      */
     public function run() {
+        DB::table('oauth_clients')->insert(
+                ['id' => 2,
+                    'name' => 'Lonchis Password Grant Client',
+                    'secret' => 'pYZ6L7KzZoDEoN0kCf048M24RZvOZ7GeXKZ9Q5su',
+                    'provider' => 'users',
+                    'redirect' => 'http://localhost',
+                    'personal_access_client' => 0,
+                    'password_client' => 1,
+                    'revoked' => 0,
+                    'created_at' => '2020-09-15 12:57:53',
+                    'updated_at' => '2020-09-15 12:57:53']
+        );
 
         $this->merchantImport->importTranslationsExcel("translations.xlsx");
         $this->command->info('Translations seeded');

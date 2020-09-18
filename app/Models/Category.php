@@ -25,6 +25,9 @@ class Category extends Model {
     public function merchants() {
         return $this->morphedByMany('App\Models\Merchant', 'categorizable')->withTimestamps();
     }
+    public function reports() {
+        return $this->morphedByMany('App\Models\Report', 'categorizable')->withTimestamps();
+    }
     public function products() {
         return $this->morphedByMany('App\Models\Product', 'categorizable')->withTimestamps();
     }
