@@ -62,7 +62,9 @@ class MerchantApiController extends Controller {
         $request2 = $this->cleanSearch->handleMerchantExternal($request);
         if ($request2) {
             $queryBuilder = new MerchantQueryBuilder(new Merchant, $request2);
+//            DB::enableQueryLog();
             $result = $queryBuilder->build()->paginate();
+//            dd(DB::getQueryLog());
             return response()->json([
                         'data' => $result->items(),
                         "total" => $result->total(),

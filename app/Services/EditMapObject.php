@@ -469,15 +469,15 @@ class EditMapObject {
             $type = "merchants";
             $additionalFields = " type, telephone, address,rating,rating_count,unit_cost,attributes, ";
             if ($category) {
-                $joins = " join category_merchant cm on r.id = cm.merchant_id ";
-                $joinsWhere = " AND cm.category_id = :category ";
+                $joins = " join categorizables cm on r.id = cm.categorizable_id ";
+                $joinsWhere = " AND cm.category_id in (:category) AND cm.categorizable_type=='App\Models\Merchant' ";
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
             if ($category) {
-                $joins = " join category_report cr on r.id = cm.report_id ";
-                $joinsWhere = " AND cr.category_id = :category ";
+                $joins = " join categorizables cr on r.id = cr.categorizable_id ";
+                $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type=='App\Models\Report' ";
             }
         }
 
