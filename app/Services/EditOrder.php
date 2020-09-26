@@ -609,6 +609,19 @@ class EditOrder {
         } else {
             $orderAddresses = $data['address'];
         }
+        $getMerchant = false;
+        if(!array_key_exists('merchant_id', $data)){
+            $getMerchant = true;
+        } else {
+            if(!$data['merchant_id']){
+                $getMerchant = true;
+            }
+        }
+        if($getMerchant){
+            $item = Item::where('user_id',$user->id)->whereNull('order_id')->first();
+            $attributes = json_decode($item->attributes, true);
+            $data['merchant_id'] = $attributes['merchant_id'];
+        }
         $result = $this->geolocation->checkMerchantPolygons($orderAddresses['lat'], $orderAddresses['long'], $data['merchant_id'], null);
         if ($result["status"] == "success") {
             $orderAddresses['order_id'] = $order->id;
