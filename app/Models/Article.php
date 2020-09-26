@@ -19,7 +19,7 @@ class Article extends Model
      *
      * @var array
      */
-    protected $fillable = ['name','description','type','body','status','options','attributes','pagetitle','metadescription','slug','start_date','end_date','file_id'];
+    protected $fillable = ['name','description','type','body','status','options','attributes','pagetitle','metadescription','slug','start_date','end_date','file_id','icon'];
 
     public function file() {
         return $this->belongsTo('App\Models\FileM');

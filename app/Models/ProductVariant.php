@@ -58,4 +58,25 @@ class ProductVariant extends Model {
         }
         return $this->price;
     }
+    protected static function booted() {
+        static::saved(function ($variant) {
+            $product = $variant->product;
+            $saveProduct = false;
+            if($variant->price > $product->high){
+                $product->high = $variant->price;
+                $saveProduct = true;
+            }
+            if($variant->price < $product->low){
+                $product->low = $variant->price;
+                $saveProduct = true;
+            }
+            if($product->low < 1){
+                $product->low = $variant->price;
+                $saveProduct = true;
+            }
+            if($saveProduct){
+                $product->save();
+            }
+        });
+    }
 }

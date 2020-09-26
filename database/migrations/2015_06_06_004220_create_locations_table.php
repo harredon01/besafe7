@@ -19,6 +19,7 @@ class CreateLocationsTable extends Migration {
                         $table->double('long', 12, 9);
                         $table->index('lat');
                         $table->index('long');
+                        $table->point('position')->nullable();
                         $table->string('name');
                         $table->string('status');
                         $table->string('uuid')->nullable();

@@ -25,9 +25,11 @@ class CreateReportsTable extends Migration {
             $table->string('telephone')->nullable();
             $table->string('address');
             $table->text('description')->nullable();
+            $table->text('attributes')->nullable();
             $table->string('icon')->nullable();
-            $table->double('lat', 12, 9);
-            $table->double('long', 12, 9);
+            $table->double('lat', 12, 9)->nullable();
+            $table->double('long', 12, 9)->nullable();
+            $table->point('position')->nullable();
             $table->index('lat');
             $table->index('long');
             $table->integer('city_id')->unsigned()->nullable();

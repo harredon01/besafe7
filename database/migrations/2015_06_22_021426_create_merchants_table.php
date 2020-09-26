@@ -28,6 +28,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('icon')->nullable();
             $table->double('lat', 12, 9)->nullable();
             $table->double('long', 12, 9)->nullable();
+            $table->point('position')->nullable();
             $table->index('lat');
             $table->index('long');
             $table->boolean('submitted')->default(0);

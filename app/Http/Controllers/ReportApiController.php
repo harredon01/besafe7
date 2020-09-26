@@ -49,7 +49,7 @@ class ReportApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except(['index', 'show', 'getObject']);;
     }
 
     /**
@@ -58,10 +58,12 @@ class ReportApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        $request2 = $this->cleanSearch->handleReport($request);
+        $request2 = $this->cleanSearch->handleReportExternal($request);
         if ($request2) {
             $queryBuilder = new ReportQueryBuilder(new Report, $request2);
+            //DB::enableQueryLog();
             $result = $queryBuilder->build()->paginate();
+            //dd(DB::getQueryLog());
             return response()->json([
                         'data' => $result->items(),
                         "total" => $result->total(),
@@ -120,8 +122,25 @@ class ReportApiController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id, Request $request) {
-        $user = $request->user();
-        return response()->json($this->editMapObject->getObjectUser($user, $id, self::OBJECT_REPORT));
+        $data = $request->all();
+        $data['type'] = "Report";
+        $data['object_id'] = $id;
+        if (!array_key_exists('includes', $data)) {
+            $data['includes'] = "ratings,files";
+        }
+        return $this->editMapObject->getObject($data);
+    }
+    
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getObject(Request $request) {
+        $data = $request->all();
+        $data['type'] = "Report";
+        return $this->editMapObject->getObject($data);
     }
 
     /**

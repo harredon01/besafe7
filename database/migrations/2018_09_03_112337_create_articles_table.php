@@ -19,6 +19,7 @@ class CreateArticlesTable extends Migration
             $table->text('description')->nullable();
             $table->string('type')->nullable(); 
             $table->text('body')->nullable();
+            $table->string('icon')->nullable();
             $table->string('status')->nullable();
             $table->string('pagetitle')->nullable();
             $table->string('metadescription')->nullable();

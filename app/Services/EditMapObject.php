@@ -93,8 +93,8 @@ class EditMapObject {
     public function getCategoriesMerchant($id, $type) {
         $categories = DB::select(" "
                         . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
-                . " from categorizable where categorizable_type='App//Models//Product') and name like '%:name%' limit 15"
-                        . "", ['name'=>$type]);
+                        . " from categorizable where categorizable_type='App//Models//Product') and name like '%:name%' limit 15"
+                        . "", ['name' => $type]);
         //DB::enableQueryLog();
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
@@ -469,15 +469,15 @@ class EditMapObject {
             $type = "merchants";
             $additionalFields = " type, telephone, address,rating,rating_count,unit_cost,attributes, ";
             if ($category) {
-                $joins = " join category_merchant cm on r.id = cm.merchant_id ";
-                $joinsWhere = " AND cm.category_id = :category ";
+                $joins = " join categorizables cm on r.id = cm.categorizable_id ";
+                $joinsWhere = " AND cm.category_id in (:category) AND cm.categorizable_type=='App\Models\Merchant' ";
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
             if ($category) {
-                $joins = " join category_report cr on r.id = cm.report_id ";
-                $joinsWhere = " AND cr.category_id = :category ";
+                $joins = " join categorizables cr on r.id = cr.categorizable_id ";
+                $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type=='App\Models\Report' ";
             }
         }
 
@@ -517,7 +517,8 @@ class EditMapObject {
                         . "", $thedata);
         return array("data" => $reports);
     }
-    function buildIncludes($merchants,$data){
+
+    function buildIncludes($merchants, $data) {
         if (array_key_exists('includes', $data)) {
             if ($data['includes']) {
                 $relatedObjects = explode(',', $data['includes']);
@@ -707,9 +708,6 @@ class EditMapObject {
             }
         }
         $attributes = [];
-        if (!array_key_exists("unit_cost", $data)) {
-            $data["unit_cost"] = 0;
-        }
         $fields = ["service", "experience", "specialty"];
         foreach ($fields as $value) {
             $services = [];
@@ -730,7 +728,7 @@ class EditMapObject {
         $attributes['booking_requires_auth'] = false;
         $attributes['years_experience'] = 1;
         $attributes['max_per_hour'] = 1;
-        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider'];
+        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider', 'type_pet'];
         foreach ($fields2 as $value) {
             if (array_key_exists($value, $data)) {
                 if ($data[$value]) {
@@ -744,6 +742,9 @@ class EditMapObject {
         if ($type == self::OBJECT_MERCHANT) {
             if (!array_key_exists("unit", $data)) {
                 $data['unit'] = "hour";
+            }
+            if (!array_key_exists("unit_cost", $data)) {
+                $data["unit_cost"] = 0;
             }
 //        if (!array_key_exists("status", $data)) {
 //            $data['status'] = "pending";
@@ -888,7 +889,12 @@ class EditMapObject {
 
 
         $result = $object::create($data);
-        $user->merchants()->save($result);
+        if ($type == "Merchant") {
+            $user->merchants()->save($result);
+        } else if ($type == "Report") {
+            $user->reports()->save($result);
+        }
+
         if (array_key_exists("groups", $data)) {
             //$this->saveToGroups($user, $data, $type, $result);
             dispatch(new SaveGroupsObject($user, $data, $type, $result));
@@ -943,10 +949,7 @@ class EditMapObject {
      */
     public function validatorReport(array $data) {
         return Validator::make($data, [
-                    'name' => 'required|max:255',
-                    'type' => 'required|max:255',
-                    'report_time' => 'required|max:255',
-                    'address' => 'required|max:255',
+                    'name' => 'required|max:255'
         ]);
     }
 

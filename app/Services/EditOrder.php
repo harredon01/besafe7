@@ -409,7 +409,7 @@ class EditOrder {
     public function checkUsersCredits($usersArray, $platform) {
         $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
                         $query->where('platform', strtolower($platform));
-                    }])->get(); 
+                    }])->get();
 //        $users = User::whereIn("id", $usersArray)->with(['push' => function ($query) use ($platform) {
 //                        $query->where('platform', strtolower($platform));
 //                    }, 'deliveries' => function ($query) {
@@ -599,43 +599,43 @@ class EditOrder {
      */
     public function setShippingAddress(User $user, $data) {
         $address = $data['address_id'];
+        $orderAddresses = null;
+        $order = $this->getOrder($user);
         $theAddress = Address::find(intval($address));
         if ($theAddress) {
-            if ($theAddress->user_id == $user->id) {
-                $order = $this->getOrder($user);
-                $result = $this->geolocation->checkMerchantPolygons($theAddress->lat, $theAddress->long, $data['merchant_id'], null);
-                if ($result["status"] == "success") {
-                    $orderAddresses = $theAddress->toarray();
-                    unset($orderAddresses['id']);
-                    unset($orderAddresses['is_default']);
-                    $orderAddresses['order_id'] = $order->id;
-                    $orderAddresses['type'] = "shipping";
-                    Payment::where("order_id", $order->id)->update(['address_id' => null]);
-                    $order->orderAddresses()->where('type', "shipping")->delete();
-                    $attributes = json_decode($order->attributes, true);
-                    $polygon = $result['polygon'];
-                    $attributes['polygon'] = $polygon->id;
-                    $attributes['origin'] = $polygon->address_id;
-                    $order->attributes = json_encode($attributes);
-                    $order->merchant_id = $data['merchant_id'];
-                    $order->save();
-                    OrderAddress::insert($orderAddresses);
-                    Cart::session($user->id)->removeConditionsByType("shipping");
-                    $order->orderConditions()->where('type', "shipping")->delete();
-                    if ($user->cellphone == '11') {
-                        if ($orderAddresses['country_id'] == '1') {
-                            $user->area_code = 57;
-                        }
-                        $user->cellphone = $orderAddresses['phone'];
-                        $user->save();
-                    }
-                    return array("status" => "success", "message" => "Address added to order", "order" => $order);
-                }
-                return $result;
-            }
-            return array("status" => "error", "message" => "Address does not belong to user");
+            $orderAddresses = $theAddress->toarray();
+            unset($orderAddresses['id']);
+            unset($orderAddresses['is_default']);
+        } else {
+            $orderAddresses = $data['address'];
         }
-        return array("status" => "error", "message" => "Address does not exist");
+        $result = $this->geolocation->checkMerchantPolygons($orderAddresses['lat'], $orderAddresses['lat'], $data['merchant_id'], null);
+        if ($result["status"] == "success") {
+            $orderAddresses['order_id'] = $order->id;
+            $orderAddresses['type'] = "shipping";
+            $orderAddresses['user_id'] = $user->id;
+            Payment::where("order_id", $order->id)->update(['address_id' => null]);
+            $order->orderAddresses()->where('type', "shipping")->delete();
+            $attributes = json_decode($order->attributes, true);
+            $polygon = $result['polygon'];
+            $attributes['polygon'] = $polygon->id;
+            $attributes['origin'] = $polygon->address_id;
+            $order->attributes = json_encode($attributes);
+            $order->merchant_id = $data['merchant_id'];
+            $order->save();
+            OrderAddress::insert($orderAddresses);
+            Cart::session($user->id)->removeConditionsByType("shipping");
+            $order->orderConditions()->where('type', "shipping")->delete();
+            if ($user->cellphone == '11') {
+                if ($orderAddresses['country_id'] == '1') {
+                    $user->area_code = 57;
+                }
+                $user->cellphone = $orderAddresses['phone'];
+                $user->save();
+            }
+            return array("status" => "success", "message" => "Address added to order", "order" => $order);
+        }
+        return $result;
     }
 
     /**
