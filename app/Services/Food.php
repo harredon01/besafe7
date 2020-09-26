@@ -467,7 +467,7 @@ class Food {
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
             $phone = $delUser->cellphone;
-            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
+            $arrayDel = [$stop->id, $address->address . " " . $address->notes,$address->name,$address->phone, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
             $descr = $delUser->firstName . " " . $delUser->lastName . " ";
             $details = json_decode($stopDel->details, true);
             if (array_key_exists("deliver", $details)) {

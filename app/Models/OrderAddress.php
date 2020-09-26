@@ -26,7 +26,7 @@ class OrderAddress extends Model
      *
      * @var array
      */
-    protected $fillable = ['id','firstName', 'lastName', 'address', 'city_id', 'country_id', 'region_id','lat','long','type','order_id',
+    protected $fillable = ['id','name', 'city', 'address', 'city_id', 'country_id', 'region_id','lat','long','type','order_id','user_id',
         'postal','phone','polygon_id','notes'];
 
     public function user() {

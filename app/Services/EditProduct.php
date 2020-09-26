@@ -125,10 +125,7 @@ class EditProduct {
         }
         if ($merchant_id) {
             $merchants = explode(",", $merchant_id);
-            $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                    ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                    ->whereIn('merchant_product.merchant_id', $merchants)
-                    ->where('merchants.private', false);
+            $query->whereIn('merchant_product.merchant_id', $merchants);
         }
         if (array_key_exists("category_id", $data)) {
             if ($data['category_id']) {
@@ -138,19 +135,24 @@ class EditProduct {
             }
         }
         $query->distinct();
-        $count_query = $query;
-        if ($includes_merchant) {
-            if ($merchant_id) {
-                $query->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
+
+        $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
+                ->where('merchants.private', false)
+                ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
                         'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
-            } else {
-                $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                        ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                        ->where('merchants.private', false)
-                        ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
-                                'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
+        
+        if (array_key_exists("lat", $data)) {
+            if ($data['lat']) {
+                $query->whereIn('merchants.id', function($query) use ($data) {
+                    $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                    $query->select('merchant_id')
+                            ->from('coverage_polygons')
+                            ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                });
             }
         }
+        $count_query = $query;
 //        DB::enableQueryLog();
 //        
         $results['products_total'] = $count_query->count('products.id');
@@ -182,9 +184,9 @@ class EditProduct {
             }
             $query->skip($skip);
         }
-//        DB::enableQueryLog();
+        DB::enableQueryLog();
         $variants = $query->get();
-//        dd(DB::getQueryLog());
+//        dd($variants);
 
         $products = [];
         foreach ($variants as $value) {

@@ -470,14 +470,14 @@ class EditMapObject {
             $additionalFields = " type, telephone, address,rating,rating_count,unit_cost,attributes, ";
             if ($category) {
                 $joins = " join categorizables cm on r.id = cm.categorizable_id ";
-                $joinsWhere = " AND cm.category_id in (:category) AND cm.categorizable_type=='App\Models\Merchant' ";
+                $joinsWhere = " AND cm.category_id in (:category) AND cm.categorizable_type = 'App\\\Models\\\Merchant' ";
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
             $additionalFields = " type, telephone, address, report_time, ";
             if ($category) {
                 $joins = " join categorizables cr on r.id = cr.categorizable_id ";
-                $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type=='App\Models\Report' ";
+                $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type = 'App\\\Models\\\Report' ";
             }
         }
 
@@ -508,7 +508,6 @@ class EditMapObject {
                     WHERE
                         status in ('active','online','busy')
                             AND r.private = 0
-                            AND r.type <> ''
                             AND lat BETWEEN :latinf AND :latsup
                             AND `long` BETWEEN :longinf AND :longsup
                             " . $joinsWhere . "

@@ -627,6 +627,8 @@ class MerchantImport {
                                 $item->merchants()->save($merchant);
                             }
                         }
+                        $merchant->lat = rand(4527681,4774930)/1000000;
+                        $merchant->long = rand(-74185612,-74035612)/1000000;
                         if ($image) {
                             $merchant->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
                         } else {
@@ -674,6 +676,8 @@ class MerchantImport {
                         } else {
                             $report->icon = 'https://picsum.photos/900/350';
                         }
+                        $report->lat = rand(4527681,4774930)/1000000;
+                        $report->long = rand(-74185612,-74035612)/1000000;
                         $report->save();
                         if ($merchant_id) {
                             $merchant = Merchant::find($merchant_id);

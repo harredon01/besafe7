@@ -9,14 +9,17 @@ class Geolocation {
 
     public function checkMerchantPolygons($latitude, $longitude, $merchant_id, $provider) {
         $point = new Point($latitude,$longitude);
+        $polygon = null;
         $query = CoveragePolygon::contains('geometry', $point)->where(function($query) use ($merchant_id) {
                     $query->where('merchant_id', $merchant_id)
                             ->orWhereNull('merchant_id');
                 })->orderBy("provider","desc");
         if ($provider) {
             $query->where('provider', $provider); 
+            $polygon = $query->first();
+        } else {
+            $polygon = $query->get();
         }
-        $polygon = $query->first();
         if($polygon){
             return array("status" => "success", "message" => "Address in coverage", "polygon" => $polygon);
         } else {
