@@ -616,6 +616,10 @@ class MerchantImport {
                         $categoriesData = explode(",", $sheet['categories']);
                         unset($sheet['categories']);
                         $image = $sheet['icon'];
+                        //dd($sheet['id']);
+                        if($sheet['name']=='Doctor Wilson Quevedo'){
+                            //dd($sheet);
+                        }
                         unset($sheet['icon']);
                         unset($sheet['id']);
                         $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
@@ -830,7 +834,7 @@ class MerchantImport {
                             $categories = Category::whereIn('id', $categoriesData)->get();
 
                             foreach ($categories as $item) {
-                                $item->products()->save($product);
+                                $product->categories()->save($item);
                             }
                         }
                         if ($image) {

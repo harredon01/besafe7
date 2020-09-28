@@ -36,7 +36,7 @@ class Product extends Model {
         return $this->belongsToMany('App\Models\Merchant')->withTimestamps();
     }
     public function categories() {
-        return $this->belongsToMany('App\Models\Category')->withTimestamps();
+        return $this->morphToMany('App\Models\Category', 'categorizable')->withTimestamps();
     }
 
     public function groups() {
