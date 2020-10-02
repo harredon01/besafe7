@@ -249,26 +249,27 @@ class MerchantTableSeeder extends Seeder {
 
     public function createMerchantsExcel() {
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-
-        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
-        $this->command->info('merchants seeded!');
-        $this->merchantImport->importReportsExcel("adopcion.xlsx");
-        $this->command->info('merchants seeded!');
-
-        $this->merchantImport->importPolygons("polygons.xlsx");
-        $this->command->info('polygons seeded!');
-        $this->merchantImport->importProductsExcel("products.xlsx");
-        $this->command->info('products seeded!');
-        $this->merchantImport->importProductVariantsExcel("variants.xlsx");
-        $this->command->info('variants seeded!');
-        $this->merchantImport->importMerchantsAvailabilitiesExcel("availabilities.xlsx");
-        $this->command->info('availabilities seeded!');
+        $this->merchantImport->importGlobalExcel("Global.xlsx");
+//        return true;
+//        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
+//        $this->command->info('merchants seeded!');
+//        $this->merchantImport->importReportsExcel("reports.xlsx");
+//        $this->command->info('merchants seeded!');
+//
+//        $this->merchantImport->importPolygons("polygons.xlsx");
+//        $this->command->info('polygons seeded!');
+//        $this->merchantImport->importProductsExcel("products.xlsx");
+//        $this->command->info('products seeded!');
+//        $this->merchantImport->importProductVariantsExcel("variants.xlsx");
+//        $this->command->info('variants seeded!');
+//        $this->merchantImport->importMerchantsAvailabilitiesExcel("availabilities.xlsx");
+//        $this->command->info('availabilities seeded!');
         $this->createMerchantBookings();
         $this->command->info('Bookings created!');
         $this->merchantImport->importArticlesExcel("articles.xlsx");
         $this->command->info('articles seeded!');
-        $this->merchantImport->importMerchantsRatingsExcel("ratings.xlsx");
-        $this->command->info('ratings seeded!');
+//        $this->merchantImport->importMerchantsRatingsExcel("ratings.xlsx");
+//        $this->command->info('ratings seeded!');
     }
 
     public function createMerchants() {

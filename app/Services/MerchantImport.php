@@ -36,6 +36,7 @@ use App\Services\EditBooking;
 use App\Services\EditRating;
 use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
 use App\Imports\ArrayImport;
+use App\Imports\ArrayMultipleSheetImport;
 
 class MerchantImport {
 
@@ -570,15 +571,20 @@ class MerchantImport {
 
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $sheet) {
-            $headers = $sheet[0];
-            foreach ($sheet as $item) {
-                $row = null;
-                foreach ($item as $key => $value) {
-                    $row[$headers[$key]] = $value;
-                }
-                if ($row['email'] && $row['email'] != 'email') {
-                    $this->editUserData->create($row);
-                }
+            $this->importUsersInternal($sheet);
+        }
+    }
+
+    public function importUsersInternal(array $sheet) {
+
+        $headers = $sheet[0];
+        foreach ($sheet as $item) {
+            $row = null;
+            foreach ($item as $key => $value) {
+                $row[$headers[$key]] = $value;
+            }
+            if ($row['email'] && $row['email'] != 'email') {
+                $this->editUserData->create($row);
             }
         }
     }
@@ -599,47 +605,72 @@ class MerchantImport {
             }
         }
     }
+    public function importGlobalExcel($filename) {
+        $reader = Excel::toArray(new ArrayMultipleSheetImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $key => $value) {
+            if($key == 'merchants'){
+                $this->importMerchantsExcelInternal($value);
+            } else if($key == 'categories'){
+                $this->importCategoriesExcelInternal($value);
+            } else if($key == 'reports'){
+                $this->importReportsExcelInternal($value);
+            }else if($key == 'products'){
+                $this->importProductsExcelInternal($value);
+            }else if($key == 'variants'){
+                $this->importProductVariantsExcelInternal($value);
+            }else if($key == 'availabilities'){
+                $this->importMerchantsAvailabilitiesExcelInternal($value);
+            }else if($key == 'ratings'){
+                $this->importMerchantsRatingsExcelInternal($value);
+            }else if($key == 'polygons'){
+                $this->importPolygonsInternal($value);
+            }
+        } 
+    }
 
     public function importMerchantsExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
-                    $owner = User::find($sheet['user_id']);
-                    if ($owner) {
-                        unset($sheet['user_id']);
-                        $categoriesData = explode(",", $sheet['categories']);
-                        unset($sheet['categories']);
-                        $image = $sheet['icon'];
-                        //dd($sheet['id']);
-                        if($sheet['name']=='Doctor Wilson Quevedo'){
-                            //dd($sheet);
-                        }
-                        unset($sheet['icon']);
-                        unset($sheet['id']);
-                        $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
-                        $merchant = $results['object'];
-                        if ($categoriesData) {
-                            $categories = Category::whereIn('id', $categoriesData)->get();
+            $this->importMerchantsExcelInternal($row);
+        }
+    }
 
-                            foreach ($categories as $item) {
-                                $item->merchants()->save($merchant);
-                            }
+    public function importMerchantsExcelInternal(array $row) {
+        
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            
+            if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                $owner = User::find($sheet['user_id']);
+                if ($owner) {
+                    unset($sheet['user_id']);
+                    $categoriesData = explode(",", $sheet['categories']);
+                    unset($sheet['categories']);
+                    $image = $sheet['icon'];
+                    //dd($sheet['id']);
+                    unset($sheet['icon']);
+                    unset($sheet['id']);
+                    $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
+                    $merchant = $results['object'];
+                    if ($categoriesData) {
+                        $categories = Category::whereIn('id', $categoriesData)->get();
+
+                        foreach ($categories as $item) {
+                            $item->merchants()->save($merchant);
                         }
-                        $merchant->lat = rand(4527681,4774930)/1000000;
-                        $merchant->long = rand(-74185612,-74035612)/1000000;
-                        if ($image) {
-                            $merchant->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
-                        } else {
-                            $merchant->icon = 'https://picsum.photos/900/350';
-                        }
-                        $merchant->save();
                     }
+                    $merchant->lat = rand(4527681, 4774930) / 1000000;
+                    $merchant->long = rand(-74185612, -74035612) / 1000000;
+                    if ($image) {
+                        $merchant->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
+                    } else {
+                        $merchant->icon = 'https://picsum.photos/900/350';
+                    }
+                    $merchant->save();
                 }
             }
         }
@@ -648,46 +679,50 @@ class MerchantImport {
     public function importReportsExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
-                    $owner = User::find($sheet['user_id']);
-                    if ($owner) {
-                        unset($sheet['user_id']);
-                        $categoriesData = explode(",", $sheet['categories']);
-                        unset($sheet['categories']);
-                        $image = $sheet['icon'];
-                        if (array_key_exists('merchant_id', $sheet)) {
-                            $merchant_id = $sheet['merchant_id'];
-                            unset($sheet['merchant_id']);
+            $this->importReportsExcelInternal($row);
+        }
+    }
+
+    public function importReportsExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
+                $owner = User::find($sheet['user_id']);
+                if ($owner) {
+                    unset($sheet['user_id']);
+                    $categoriesData = explode(",", $sheet['categories']);
+                    unset($sheet['categories']);
+                    $image = $sheet['icon'];
+                    if (array_key_exists('merchant_id', $sheet)) {
+                        $merchant_id = $sheet['merchant_id'];
+                        unset($sheet['merchant_id']);
+                    }
+                    unset($sheet['icon']);
+                    unset($sheet['id']);
+                    $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Report");
+                    $report = $results['object'];
+                    if ($categoriesData) {
+                        $categories = Category::whereIn('id', $categoriesData)->get();
+                        foreach ($categories as $item) {
+                            $item->reports()->save($report);
                         }
-                        unset($sheet['icon']);
-                        unset($sheet['id']);
-                        $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Report");
-                        $report = $results['object'];
-                        if ($categoriesData) {
-                            $categories = Category::whereIn('id', $categoriesData)->get();
-                            foreach ($categories as $item) {
-                                $item->reports()->save($report);
-                            }
-                        }
-                        if ($image) {
-                            $report->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-report/' . $image;
-                        } else {
-                            $report->icon = 'https://picsum.photos/900/350';
-                        }
-                        $report->lat = rand(4527681,4774930)/1000000;
-                        $report->long = rand(-74185612,-74035612)/1000000;
-                        $report->save();
-                        if ($merchant_id) {
-                            $merchant = Merchant::find($merchant_id);
-                            if ($merchant) {
-                                $merchant->reports()->save($report);
-                            }
+                    }
+                    if ($image) {
+                        $report->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-report/' . $image;
+                    } else {
+                        $report->icon = 'https://picsum.photos/900/350';
+                    }
+                    $report->lat = rand(4527681, 4774930) / 1000000;
+                    $report->long = rand(-74185612, -74035612) / 1000000;
+                    $report->save();
+                    if ($merchant_id) {
+                        $merchant = Merchant::find($merchant_id);
+                        if ($merchant) {
+                            $merchant->reports()->save($report);
                         }
                     }
                 }
@@ -698,20 +733,24 @@ class MerchantImport {
     public function importCategoriesExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
+            $this->importCategoriesExcelInternal($row);
+        }
+    }
+
+    public function importCategoriesExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['id'] && $sheet['id'] != 'id') {
+                if ($sheet['icon']) {
+                    $sheet['icon'] = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-categories/' . $sheet['icon'];
+                } else {
+                    $sheet['icon'] = 'https://picsum.photos/900/300';
                 }
-                if ($sheet['id'] && $sheet['id'] != 'id') {
-                    if($sheet['icon']){
-                        $sheet['icon']='https://s3.us-east-2.amazonaws.com/gohife/public/pets-categories/' . $sheet['icon'];
-                    } else {
-                        $sheet['icon']='https://picsum.photos/900/300';
-                    }
-                    Category::firstOrCreate($sheet);
-                }
+                Category::firstOrCreate($sheet);
             }
         }
     }
@@ -719,28 +758,32 @@ class MerchantImport {
     public function importArticlesExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
+            $this->importArticlesExcelInternal($row);
+        }
+    }
+
+    public function importArticlesExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['id'] && $sheet['id'] != 'id') {
+                $categoriesData = explode(",", $sheet['categories']);
+                unset($sheet['categories']);
+                $article = new Article($sheet);
+                $image = $sheet['icon'];
+                if ($image) {
+                    $article->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-banners/' . $image;
+                } else {
+                    $article->icon = 'https://picsum.photos/900/350';
                 }
-                if ($sheet['id'] && $sheet['id'] != 'id') {
-                    $categoriesData = explode(",", $sheet['categories']);
-                    unset($sheet['categories']);
-                    $article = new Article($sheet);
-                    $image = $sheet['icon'];
-                    if ($image) {
-                        $article->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-banners/' . $image;
-                    } else {
-                        $article->icon = 'https://picsum.photos/900/350';
-                    }
-                    $article->save();
-                    if ($categoriesData) {
-                        $categories = Category::whereIn('id', $categoriesData)->get();
-                        foreach ($categories as $item) {
-                            $item->articles()->save($article);
-                        }
+                $article->save();
+                if ($categoriesData) {
+                    $categories = Category::whereIn('id', $categoriesData)->get();
+                    foreach ($categories as $item) {
+                        $item->articles()->save($article);
                     }
                 }
             }
@@ -750,18 +793,22 @@ class MerchantImport {
     public function importMerchantsAvailabilitiesExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
-                    $owner = User::find($sheet['owner_id']);
-                    if ($owner) {
-                        unset($sheet['owner_id']);
-                        $this->editBooking->addAvailabilityObject($sheet, $owner);
-                    }
+            $this->importMerchantsAvailabilitiesExcelInternal($row);
+        }
+    }
+
+    public function importMerchantsAvailabilitiesExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                $owner = User::find($sheet['owner_id']);
+                if ($owner) {
+                    unset($sheet['owner_id']);
+                    $this->editBooking->addAvailabilityObject($sheet, $owner);
                 }
             }
         }
@@ -770,17 +817,21 @@ class MerchantImport {
     public function importMerchantsBookingsExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
-                    $owner = User::find($sheet['owner_id']);
-                    unset($sheet['owner_id']);
-                    $this->editBooking->addBookingObject($sheet, $owner);
-                }
+            $this->importMerchantsBookingsExcelInternal($row);
+        }
+    }
+
+    public function importMerchantsBookingsExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                $owner = User::find($sheet['owner_id']);
+                unset($sheet['owner_id']);
+                $this->editBooking->addBookingObject($sheet, $owner);
             }
         }
     }
@@ -803,7 +854,79 @@ class MerchantImport {
         }
     }
 
+    public function importMerchantsRatingsExcelInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['owner_id'] && $sheet['owner_id'] != 'owner_id') {
+                $owner = User::find($sheet['owner_id']);
+                unset($sheet['owner_id']);
+                $this->editRating->addRatingObject($sheet, $owner);
+            }
+        }
+    }
+
     public function importProductsExcel($filename) {
+        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
+        foreach ($reader as $row) {
+            $this->importProductsExcelInternal($row);
+        }
+    }
+
+    public function importProductsExcelInternal(array $row) {
+
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                if ($headers[$key]) {
+                    $sheet[$headers[$key]] = $value;
+                }
+            }
+            if ($sheet['id'] && $sheet['id'] != 'id') {
+                $image = $sheet['imagen'];
+                $merchant = Merchant::find($sheet['merchant_id']);
+                $ext = $sheet['ext'];
+                unset($sheet['merchant_id']);
+                unset($sheet['imagen']);
+                unset($sheet['ext']);
+                $categoriesData = explode(",", $sheet['categories']);
+                unset($sheet['categories']);
+                $product = new Product();
+                //dd($sheet);
+                $product->fill($sheet);
+                $product->isActive = true;
+                $product->hash = "asd";
+
+                $product->save();
+                $product->merchants()->save($merchant);
+                if ($categoriesData) {
+                    $categories = Category::whereIn('id', $categoriesData)->get();
+                    foreach ($categories as $item) {
+                        $product->categories()->save($item);
+                    }
+                }
+                if ($image) {
+                    $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $image;
+                } else {
+                    $image = 'https://picsum.photos/600/350';
+                    $ext = 'jpg';
+                }
+                FileM::create([
+                    'user_id' => 2,
+                    'trigger_id' => $product->id,
+                    'file' => $image,
+                    'extension' => $ext,
+                    'type' => 'App\Models\Product'
+                ]);
+            }
+        }
+    }
+
+    public function importProductsExcel2($filename) {
 
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
@@ -859,27 +982,38 @@ class MerchantImport {
     public function importProductVariantsExcel($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if (array_key_exists('user_id', $sheet)) {
-                    if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
-                        $owner = User::find($sheet['user_id']);
-                        if ($owner) {
-                            unset($sheet['user_id']);
+            $this->importProductVariantsExcelInternal($row);
+        }
+    }
+
+    public function importProductVariantsExcelInternal($row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if (array_key_exists('id', $sheet)) {
+                if ($sheet['id'] && $sheet['id'] != 'id') {
+                    $product = Product::find($sheet['product_id']);
+                    if (!$product) {
+                        
+                    }
+                    $merchant = $product->merchants()->first();
+                    $owner = $merchant->users()->first();
+                    if ($owner) {
+                        $variant = ProductVariant::find($sheet['id']);
+                        if (!$variant) {
                             $sheet['id'] = "";
-                            $attributes = $sheet['attributes'];
-                            unset($sheet['attributes']);
-                            $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
-                            if ($results['status'] == 'success') {
-                                if ($attributes) {
-                                    $variant = $results['variant'];
-                                    $variant->attributes = $attributes;
-                                    $variant->save();
-                                }
+                        }
+                        $attributes = $sheet['attributes'];
+                        unset($sheet['attributes']);
+                        $results = $this->editProduct->createOrUpdateVariant($owner, $sheet);
+                        if ($results['status'] == 'success') {
+                            if ($attributes) {
+                                $variant = $results['variant'];
+                                $variant->attributes = $attributes;
+                                $variant->save();
                             }
                         }
                     }
@@ -891,31 +1025,35 @@ class MerchantImport {
     public function importPolygons($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['merchant_id'] && $sheet['merchant_id'] != 'merchant_id') {
-                    $cpolygon = new CoveragePolygon;
-                    $cpolygon->fill($sheet);
-                    $coordPoints = json_decode($cpolygon->coverage, true);
-                    if (is_array($coordPoints)) {
-                        $totalPoints = [];
-                        foreach ($coordPoints as $coordPoint) {
-                            $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
-                            array_push($totalPoints, $pointArray);
-                        }
-                        $result = [
-                            "type" => "MultiPolygon",
-                            "coordinates" =>
-                            [[$totalPoints]]
-                        ];
-                        $mp = MultiPolygon::fromJson(json_encode($result));
-                        $cpolygon->geometry = $mp;
-                        $cpolygon->save();
+            $this->importPolygonsInternal($row);
+        }
+    }
+
+    public function importPolygonsInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['merchant_id'] && $sheet['merchant_id'] != 'merchant_id') {
+                $cpolygon = new CoveragePolygon;
+                $cpolygon->fill($sheet);
+                $coordPoints = json_decode($cpolygon->coverage, true);
+                if (is_array($coordPoints)) {
+                    $totalPoints = [];
+                    foreach ($coordPoints as $coordPoint) {
+                        $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
+                        array_push($totalPoints, $pointArray);
                     }
+                    $result = [
+                        "type" => "MultiPolygon",
+                        "coordinates" =>
+                        [[$totalPoints]]
+                    ];
+                    $mp = MultiPolygon::fromJson(json_encode($result));
+                    $cpolygon->geometry = $mp;
+                    $cpolygon->save();
                 }
             }
         }
