@@ -15,11 +15,14 @@ class EditCategory {
         
         //DB::enableQueryLog();
         //dd(DB::getQueryLog());
+        if(array_key_exists("level", $data)){
+            $categories = Category::where('level',1)->get();
+            return ['status' => "success", "data" => $categories];
+        }
         if(!array_key_exists("type", $data)){
             return ['status' => "error", "message" => "needs type"];
         }
         if(array_key_exists("name", $data)){
-            
             $categories = DB::select(" "
                         . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
                 . " from categorizables where categorizable_type=:type) and name like :name limit 15"

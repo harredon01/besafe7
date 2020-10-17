@@ -131,7 +131,8 @@ class EditProduct {
             if ($data['category_id']) {
                 $categories = explode(",", $data['category_id']);
                 $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
-                        ->whereIn('categorizables.category_id', $categories);
+                        ->whereIn('categorizables.category_id', $categories)
+                        ->where('categorizables.categorizable_type', "App\\Models\\Product");
             }
         }
         $query->distinct();
@@ -753,7 +754,7 @@ class EditProduct {
                 if ($categoryName) {
                     $category = Category::create([
                                 "name" => $data['category_name'],
-                                "type" => "App\Models\Product"
+                                "type" => "App\\Models\\Product"
                     ]);
                     $catFound = true;
                 }
