@@ -357,8 +357,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-09-21 00:00:00";
-        $end_date = "2020-09-26 23:59:59";
+        $start_date = "2020-10-19 00:00:00";
+        $end_date = "2020-10-24 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -446,7 +446,7 @@ class Food {
             $platFormService = app('Notifications');
             //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) { 
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Septiembre","Septiembre"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Octubre","Octubre"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }

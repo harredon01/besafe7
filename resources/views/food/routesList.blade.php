@@ -75,8 +75,8 @@
                         <td><input style="display:none" type="tel" name="Route" ng-model="stop.route_id"/>
                             <button style="display:none" ng-click="updateRouteStop(stop)">Actualizar</button><br style="display:none"/>-@{{ stop.address.address}}
                         </td>
-                        <td style="display:none"><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
-                        <td><button ng-click="deleteStop(stop.id)">Borrar parada</button></td>
+                        <td ng-if="stop.amount>0"><button ng-click="sendStopToNewRoute(stop.id)">Nueva Ruta</button></td>
+                        <td ng-if="stop.amount==0"><button ng-click="deleteStop(stop.id)">Borrar parada</button></td>
                     </tr>
                 </tbody>
             </table>

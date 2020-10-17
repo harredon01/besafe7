@@ -35,6 +35,9 @@ class EditRating {
                         $isReport = true;
                     }
                 }
+                if (!array_key_exists('comment', $data)) {
+                    $data['comment']="";
+                }
                 Rating::where('type', $type)->where('object_id', $data['object_id'])->where('user_id', $user->id)->delete();
                 $result = Rating::create([
                             'user_id' => $user->id,
@@ -117,7 +120,6 @@ class EditRating {
     public function validatorRating() {
         return [
             'type' => 'required|max:255',
-            'comment' => 'required',
             'object_id' => 'required|integer|min:1',
             'rating' => 'required|integer|min:0|max:5'
         ];

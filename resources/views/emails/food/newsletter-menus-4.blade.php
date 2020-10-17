@@ -732,6 +732,7 @@
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 5px; padding-left: 5px; padding-top: 40px; padding-bottom: 5px; font-family: Arial, sans-serif"><![endif]-->
+@if ($days[5]["et1"])   
 <div style="color:#ffffff;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:40px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
 <div style="line-height: 1.5; font-size: 12px; color: #ffffff; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;">
 <p style="line-height: 1.5; word-break: break-word; mso-line-height-alt: NaNpx; margin: 0;"><span style="color: #ffffff;"><u><strong><span style="font-size: 13px; mso-ansi-font-size: 14px;">Entradas:</span></strong></u></span></p>
@@ -741,6 +742,7 @@
 </ul>
 </div>
 </div>
+@endif
 <!--[if mso]></td></tr></table><![endif]-->
 <table border="0" cellpadding="0" cellspacing="0" class="divider" role="presentation" style="table-layout: fixed; vertical-align: top; border-spacing: 0; border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; min-width: 100%; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%;" valign="top" width="100%">
 <tbody>
