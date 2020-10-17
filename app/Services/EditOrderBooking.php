@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Payment;
 use App\Models\User;
 use App\Jobs\CreateChatroom;
+use App\Jobs\CreateGoogleEvent;
 use App\Models\Booking;
 use DB;
 
@@ -95,7 +96,7 @@ class EditOrderBooking {
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
-                        $booking->options['status'] = "reminded";
+                        $booking->options['status'] = "pending";
                         $booking->options['paid'] = date("Y-m-d H:i:s");
                         $options = $booking->options;
                         $booking->touch();
@@ -105,10 +106,11 @@ class EditOrderBooking {
                             "updated_at" => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))
                         ];
                         Booking::where("id", $id)->update($updateData);
-                    }
-                    if (array_key_exists("call", $data)) {
-                        if ($data["call"]) {
-                            dispatch(new CreateChatroom($booking->id));
+                        dispatch(new CreateGoogleEvent($booking->id));
+                        if (array_key_exists("call", $data)) {
+                            if ($data["call"]) {
+                                dispatch(new CreateChatroom($booking->id));
+                            }
                         }
                     }
                 }

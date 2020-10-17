@@ -12,6 +12,7 @@ use App\Services\EditOrder;
 use App\Services\EditRating;
 use App\Services\EditBooking;
 use App\Services\MerchantImport;
+use App\Services\MiPaquete;
 use App\Models\CoveragePolygon;
 use App\Models\PaymentMethod;
 use App\Models\Booking;
@@ -40,6 +41,12 @@ class MerchantTableSeeder extends Seeder {
      *
      */
     protected $editBooking;
+    
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $miPaquete;
 
     /**
      * The edit profile implementation.
@@ -47,11 +54,12 @@ class MerchantTableSeeder extends Seeder {
      */
     protected $merchantImport;
 
-    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport, EditRating $editRating, EditBooking $editBooking) {
+    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport, EditRating $editRating, EditBooking $editBooking, MiPaquete $miPaquete) {
         $this->editOrder = $editOrder;
         $this->merchantImport = $merchantImport;
         $this->editRating = $editRating;
         $this->editBooking = $editBooking;
+        $this->miPaquete = $miPaquete;
         /* $this->middleware('location.group', ['only' => 'postGroupLocation']);
           $this->middleware('location.group', ['only' => 'getGroupLocation']); */
     }
@@ -123,22 +131,22 @@ class MerchantTableSeeder extends Seeder {
                     "updated_at" => date("Y-m-d hh:m:s")
                 ];
                 Booking::where("id", $booking->id)->update($updateData);
-                $itemData = [
-                    "name" => "Reserva para " . $merchant->name,
-                    "price" => $booking->price,
-                    "priceSum" => $booking->price,
-                    "priceConditions" => $booking->price,
-                    "priceSumConditions" => $booking->price,
-                    "quantity" => $booking->quantity,
-                    "paid_status" => "paid",
-                    "fulfillment" => "unfulfilled",
-                    "requires_authorization" => 0,
-                    "user_id" => $booker->id,
-                    "merchant_id" => $merchant->id,
-                    "created_at" => date("Y-m-d H:i:s"),
-                    "updated_at" => date("Y-m-d H:i:s")
-                ];
-                Item::create($itemData);
+//                $itemData = [
+//                    "name" => "Reserva para " . $merchant->name,
+//                    "price" => $booking->price,
+//                    "priceSum" => $booking->price,
+//                    "priceConditions" => $booking->price,
+//                    "priceSumConditions" => $booking->price,
+//                    "quantity" => $booking->quantity,
+//                    "paid_status" => "paid",
+//                    "fulfillment" => "unfulfilled",
+//                    "requires_authorization" => 0,
+//                    "user_id" => $booker->id,
+//                    "merchant_id" => $merchant->id,
+//                    "created_at" => date("Y-m-d H:i:s"),
+//                    "updated_at" => date("Y-m-d H:i:s")
+//                ];
+//                Item::create($itemData);
             }
         }
     }
@@ -213,7 +221,8 @@ class MerchantTableSeeder extends Seeder {
         $booker2 = User::find(3);
         $attributes = [
             "pet" => "cat",
-            "weight" => "200lb"
+            "weight" => "200lb",
+            "location" => "zoom"
         ];
         $data = [
             "type" => "Merchant",
@@ -248,6 +257,8 @@ class MerchantTableSeeder extends Seeder {
     }
 
     public function createMerchantsExcel() {
+        $this->miPaquete->authenticate("https://ecommerce.mipaquete.com/api/auth");
+        $this->miPaquete->getCitiesAndRegions();
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
         $this->merchantImport->importGlobalExcel("Global.xlsx");
 //        return true;
@@ -264,6 +275,7 @@ class MerchantTableSeeder extends Seeder {
 //        $this->command->info('variants seeded!');
 //        $this->merchantImport->importMerchantsAvailabilitiesExcel("availabilities.xlsx");
 //        $this->command->info('availabilities seeded!');
+        $this->createMerchantBookings();
         $this->createMerchantBookings();
         $this->command->info('Bookings created!');
         $this->merchantImport->importArticlesExcel("articles.xlsx");

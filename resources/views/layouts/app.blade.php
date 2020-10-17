@@ -33,6 +33,7 @@
         <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/routesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/exportsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>

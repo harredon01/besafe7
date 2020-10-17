@@ -6,6 +6,7 @@ use Validator;
 use App\Models\Order;
 use App\Models\OrderCondition;
 use App\Models\Plan;
+use App\Models\Item;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\User;
@@ -393,7 +394,7 @@ class EditBilling {
     public function completePaidOrder($paymentId, $platform) {
         $payment = Payment::find($paymentId);
         if ($payment->total == $payment->transaction_cost) {
-            dispatch(new ApprovePayment($payment, $platform));
+            dispatch(new ApprovePayment($payment, $platform,6));
             return array("status" => "success", "message" => "Order Approved");
         }
         return array("status" => "error", "message" => "Payment must be paid");
@@ -407,7 +408,7 @@ class EditBilling {
                 if ($payment->status == 'payment_in_bank') {
                     return array("status" => "error", "message" => "Payment must be in bank");
                 }
-                $this->changeOrderStatus($payment->order_id);
+                $this->changeOrderStatus($payment->order_id, "payment_created");
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
@@ -427,7 +428,7 @@ class EditBilling {
                             $change = true;
                         }
                     }
-                    if($change){
+                    if ($change) {
                         $user->save();
                     }
                 }
@@ -450,7 +451,7 @@ class EditBilling {
                   $order->save();
                   $this->changeOrderStatus($order->id);
                   } */
-                $this->changeOrderStatus($payment->order_id);
+                $this->changeOrderStatus($payment->order_id, "payment_in_bank");
                 $payment->total = $payment->total - $payment->transaction_cost;
                 $payment->transaction_cost = 0;
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
@@ -508,13 +509,22 @@ class EditBilling {
         return array("status" => "error", "message" => "Invalid payment");
     }
 
-    private function changeOrderStatus($order_id) {
+    private function changeOrderStatus($order_id, $status) {
         $order = Order::find($order_id);
         if ($order) {
             if ($order->status == "pending") {
-                $order->status = "payment_created";
+                $order->status = $status;
+                if ($status == "payment_in_bank") {
+                    $order->execution_status = "pending";
+                }
                 $order->save();
                 $this->editCart->clearCartSession($order->user_id);
+                if ($status == "payment_in_bank") {
+                    Item::where('order_id', $order_id)->update([
+                        "paid_status" => $status,
+                        "updated_at" => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))
+                    ]);
+                }
             }
         }
     }
@@ -526,7 +536,7 @@ class EditBilling {
                 if ($payment->status == 'payment_in_bank') {
                     return array("status" => "error", "message" => "Payment must be in bank");
                 }
-                $this->changeOrderStatus($payment->order_id);
+                $this->changeOrderStatus($payment->order_id, "payment_created");
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
@@ -544,7 +554,7 @@ class EditBilling {
                             $change = true;
                         }
                     }
-                    if($change){
+                    if ($change) {
                         $user->save();
                     }
                 }
@@ -563,7 +573,7 @@ class EditBilling {
                 if ($payment->status == 'payment_in_bank') {
                     return array("status" => "error", "message" => "Payment must be in bank");
                 }
-                $this->changeOrderStatus($payment->order_id);
+                $this->changeOrderStatus($payment->order_id, "payment_created");
                 $className = "App\\Services\\" . $source;
                 $gateway = new $className; //// <--- this thing will be autoloaded
                 $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();

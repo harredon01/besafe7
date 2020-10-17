@@ -493,6 +493,19 @@ function getNearbyMerchants(lat, long, radius) {
         }
     });
 }
+function getMerchantsPrivate() {
+    $.ajax({
+        url: "private/merchants",
+        type: "POST",
+        headers: {
+            "Authorization": "Bearer " + token
+        },
+        dataType: "json",
+        data: {
+            name: name
+        }
+    });
+}
 function searchMerchants(name) {
     $.ajax({
         url: "merchants/search",

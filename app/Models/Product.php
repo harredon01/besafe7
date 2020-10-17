@@ -58,6 +58,9 @@ class Product extends Model {
     public function productVariants() {
         return $this->hasMany('App\Models\ProductVariant');
     }
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable','type','trigger_id','id');
+    }
 
     public function attributes() {
         return $this->belongsToMany('App\Models\Attribute', 'product_variant_attribute_option', 'product_id', 'attribute_id')->withTimestamps();

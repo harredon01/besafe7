@@ -349,7 +349,7 @@ class MercadoPagoService {
         if ($source) {
             $source->source = $data["token"];
             if ($source->extra) {
-                $source->extra = json_encode(array_merge(json_decode($source->extra, true), json_decode(json_encode($card),true)));
+                $source->extra = json_encode(array_merge(json_decode($source->extra, true), json_decode(json_encode($card), true)));
             } else {
                 $source->extra = json_encode($card);
             }
@@ -794,7 +794,15 @@ class MercadoPagoService {
             $payment->transactions()->save($transaction);
             $message = $this->getMessage($response);
             if ($response->status == "approved") {
-                dispatch(new ApprovePayment($payment, $platform));
+                if ($response->payment_type_id == "") {
+                    dispatch(new ApprovePayment($payment, $platform, 1));
+                } else if ($response->payment_type_id == "") {
+                    dispatch(new ApprovePayment($payment, $platform, 2));
+                } else if ($response->payment_type_id == "") {
+                    dispatch(new ApprovePayment($payment, $platform, 3));
+                } else {
+                    dispatch(new ApprovePayment($payment, $platform, 1));
+                }
             } else if ($response->status == "in_process") {
                 dispatch(new PendingPayment($payment, $platform));
             } else if ($response->status == "rejected" && (
@@ -870,7 +878,15 @@ class MercadoPagoService {
                         $transactionResponse['gateway'] = 'MercadoPago';
                         $this->saveTransactionQuery($transactionResponse, $payment);
                         if ($paymentD->status == "approved") {
-                            dispatch(new ApprovePayment($payment, "Food"));
+                            if ($paymentD->payment_type_id == "") {
+                                dispatch(new ApprovePayment($payment, "Food", 1));
+                            } else if ($paymentD->payment_type_id == "") {
+                                dispatch(new ApprovePayment($payment, "Food", 2));
+                            } else if ($paymentD->payment_type_id == "") {
+                                dispatch(new ApprovePayment($payment, "Food", 3));
+                            } else {
+                                dispatch(new ApprovePayment($payment, "Food", 1));
+                            }
                         }
                         if ($paymentD->status == "rejected") {
                             dispatch(new DenyPayment($payment, "Food"));
@@ -925,7 +941,15 @@ class MercadoPagoService {
                             $insert["extras"] = json_encode($data);
                             $transaction = $this->saveTransactionConfirmacion($data, $payment);
                             if ($paymentM->status == "approved") {
-                                dispatch(new ApprovePayment($payment, "Food"));
+                                if ($paymentM->payment_type_id == "") {
+                                    dispatch(new ApprovePayment($payment, "Food", 1));
+                                } else if ($paymentM->payment_type_id == "") {
+                                    dispatch(new ApprovePayment($payment, "Food", 2));
+                                } else if ($paymentM->payment_type_id == "") {
+                                    dispatch(new ApprovePayment($payment, "Food", 3));
+                                } else {
+                                    dispatch(new ApprovePayment($payment, "Food", 1));
+                                }
                             } else if ($paymentM->status == "rejected") {
                                 dispatch(new DenyPayment($payment, "Food"));
                             }

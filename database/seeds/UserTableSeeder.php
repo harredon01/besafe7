@@ -84,6 +84,33 @@ class UserTableSeeder extends Seeder {
                     'created_at' => '2020-09-15 12:57:53',
                     'updated_at' => '2020-09-15 12:57:53']
         );
+        DB::table('payment_methods')->insert([
+            ['id' => 1,
+                'name' => 'Credit',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 2,
+                'name' => 'Debit',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 3,
+                'name' => 'Cash Options',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 4,
+                'name' => 'Cash Delivery',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 5,
+                'name' => 'Bank',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 6,
+                'name' => 'Coupon',
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+                ]
+        );
 
         $this->merchantImport->importTranslationsExcel("translations.xlsx");
         $this->command->info('Translations seeded');
@@ -94,6 +121,33 @@ class UserTableSeeder extends Seeder {
 //        $this->merchantImport->importContacts("contacts.xlsx");
 //        $this->command->info('Contacts seeded!');
         $this->updateMedical();
+        DB::table('push')->insert([
+            ['id' => 1,
+                'user_id' => 2,
+                'push' => "1",
+                'platform' => "Zoom",
+                "object_id" => "1",
+                'credits' => 0,
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 2,
+                'user_id' => 2,
+                'push' => "1",
+                'platform' => "MiPaquete",
+                "object_id" => "1",
+                'credits' => 0,
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 3,
+                'user_id' => 2,
+                'push' => "1",
+                'platform' => "MiPaqueteTest",
+                "object_id" => "1",
+                'credits' => 0,
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53']
+                ]
+        );
         $this->updateCodes();
 //        $this->createMessages();
 //        $this->addFollowersUsers();

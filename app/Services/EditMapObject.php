@@ -727,7 +727,7 @@ class EditMapObject {
         $attributes['booking_requires_auth'] = false;
         $attributes['years_experience'] = 1;
         $attributes['max_per_hour'] = 1;
-        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider', 'type_pet'];
+        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider', 'type_pet','google_calendar'];
         foreach ($fields2 as $value) {
             if (array_key_exists($value, $data)) {
                 if ($data[$value]) {

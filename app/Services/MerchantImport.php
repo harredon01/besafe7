@@ -78,130 +78,6 @@ class MerchantImport {
         ];
     }
 
-    public function exportMerchant(User $user, $filename, $merchantid) {
-        $found = false;
-        $merchant1;
-        foreach ($user->merchants as $merchant) {
-            if ($merchant->id == $merchantid) {
-                $found = true;
-                $merchant1 = $merchant;
-            }
-        }
-        $rand = rand(1, 100);
-
-        Excel::create('Filename' . $rand, function($excel) use($merchant1) {
-
-            $excel->setTitle('Our new awesome title');
-
-            // Chain the setters
-            $excel->setCreator('Maatwebsite')
-                    ->setCompany('Maatwebsite');
-
-            // Call them separately
-            $excel->setDescription('A demonstration to change the file properties');
-            $excel->sheet('merchants', function($sheet) use($merchant1) {
-                $data = array(
-                    $merchant1->toArray()
-                );
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-            $excel->sheet('office_hours', function($sheet) use($merchant1) {
-                $data = array();
-                foreach ($merchant1->hours as $hour) {
-                    if ($hour->day == 1) {
-                        $hour->day = "domingo";
-                    }
-                    if ($hour->day == 2) {
-                        $hour->day = "lunes";
-                    }
-                    if ($hour->day == 3) {
-                        $hour->day = "martes";
-                    }
-                    if ($hour->day == 4) {
-                        $hour->day = "miercoles";
-                    }
-                    if ($hour->day == 5) {
-                        $hour->day = "jueves";
-                    }
-                    if ($hour->day == 6) {
-                        $hour->day = "viernes";
-                    }
-                    if ($hour->day == 7) {
-                        $hour->day = "sabado";
-                    }
-                    array_push($data, $hour->toArray());
-                }
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-            $excel->sheet('categories', function($sheet) use($merchant1) {
-                $data = array();
-                $counter = 1;
-                foreach ($merchant1->categories as $category) {
-                    array_push($data, $category->toArray());
-                    $counter++;
-                }
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-            $excel->sheet('products', function($sheet) use($merchant1) {
-                $data = array();
-                $counter = 1;
-                foreach ($merchant1->products as $product) {
-                    array_push($data, $product->toArray());
-                }
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-            $excel->sheet('payment_method', function($sheet) use($merchant1) {
-                $data = array();
-                $counter = 1;
-                foreach (PaymentMethod::all() as $method) {
-                    $esta = "0";
-                    foreach ($merchant1->paymentMethods as $pmethod) {
-                        if ($pmethod->id == $method->id) {
-                            $esta = "1";
-                        }
-                    }
-                    array_push($data, array(
-                        "id" => $method->id,
-                        "name" => $method->name,
-                        "active" => $esta
-                    ));
-                }
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-        })->store('xlsx');
-    }
-
-    public function exportMerchantOrders(User $user, $filename, $merchantid) {
-        $found = false;
-        $merchant1;
-        foreach ($user->merchants as $merchant) {
-            if ($merchant->id == $merchantid) {
-                $found = true;
-                $merchant1 = $merchant;
-            }
-        }
-        $rand = rand(1, 100);
-        Excel::create('Filename' . $rand, function($excel) use($merchant1) {
-
-            $excel->setTitle('Our new awesome title');
-
-            // Chain the setters
-            $excel->setCreator('Maatwebsite')
-                    ->setCompany('Maatwebsite');
-
-            // Call them separately
-            $excel->setDescription('A demonstration to change the file properties');
-            $excel->sheet('office_hours', function($sheet) use($merchant1) {
-                $data = array();
-                foreach ($merchant1->orders as $order) {
-
-                    array_push($data, $order->toArray());
-                }
-                $sheet->fromArray($data, null, 'A1', true);
-            });
-        })->store('xlsx');
-    }
-
     public function exportMerchantJson($filename) {
         $string = file_get_contents($filename);
         $thepolice = json_decode($string, true);
@@ -432,33 +308,6 @@ class MerchantImport {
         }
     }
 
-    public function importTranslations($filename) {
-
-        $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
-        foreach ($reader as $row) {
-            $headers = $row[0];
-            foreach ($row as $item) {
-                $sheet = null;
-                foreach ($item as $key => $value) {
-                    $sheet[$headers[$key]] = $value;
-                }
-                if ($sheet['id'] && $sheet['id'] != 'id') {
-                    if (!$sheet['body']) {
-                        $sheet['body'] = "";
-                    }
-                    $translation = Translation::updateOrCreate([
-                                'code' => $sheet['code'],
-                                'language' => $sheet['language'],
-                                'value' => $sheet['value'],
-                                'body' => $sheet['body']
-                    ]);
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
     public function importCities2($filename) {
 
         $excel = Excel::load(storage_path('imports') . '/' . $filename);
@@ -503,70 +352,6 @@ class MerchantImport {
         }
     }
 
-    public function importProducts($filename) {
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            if ($sheet['id']) {
-                $code;
-                if ($sheet['merchant_id'] == "NULL") {
-                    $code = null;
-                } else {
-                    $code = $sheet['merchant_id'];
-                }
-                $product = Product::updateOrCreate(['id' => $sheet['id']], [
-                            'id' => $sheet['id'],
-                            'name' => $sheet['name'],
-                            'description' => $sheet['description'],
-                            'isActive' => $sheet['isactive'],
-                            'hash' => $sheet['slug'],
-                ]);
-            }
-        }
-    }
-
-    public function importProductVariants($filename) {
-
-        $excel = Excel::load(storage_path('imports') . '/' . $filename);
-        $reader = $excel->toArray();
-        foreach ($reader as $sheet) {
-            if ($sheet['id']) {
-                $productVariant = ProductVariant::updateOrCreate(['id' => $sheet['id']], [
-                            'id' => $sheet['id'],
-                            'product_id' => $sheet['product_id'],
-                            'sku' => $sheet['sku'],
-                            'ref2' => $sheet['ref2'],
-                            'isActive' => $sheet['isactive'],
-                            'price' => $sheet['price'],
-                            'sale' => $sheet['sale'],
-                            'quantity' => $sheet['quantity'],
-                            'is_digital' => $sheet['is_digital'],
-                            'is_shippable' => $sheet['is_shippable'],
-                                //'attributes' => $sheet['attributes'],
-                ]);
-            }
-        }
-    }
-
-    /*
-     * [
-      'firstName',
-      'lastName',
-      'docNum',
-      'docType',
-      'area_code',
-      'cellphone',
-      'email',
-      'optinMarketing',
-      'password',
-      'password_confirmation',
-      'language',
-      'city_id',
-      'region_id',
-      'country_id',
-      ]
-     */
-
     public function importUsers($filename) {
 
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
@@ -605,27 +390,28 @@ class MerchantImport {
             }
         }
     }
+
     public function importGlobalExcel($filename) {
         $reader = Excel::toArray(new ArrayMultipleSheetImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $key => $value) {
-            if($key == 'merchants'){
+            if ($key == 'merchants') {
                 $this->importMerchantsExcelInternal($value);
-            } else if($key == 'categories'){
+            } else if ($key == 'categories') {
                 $this->importCategoriesExcelInternal($value);
-            } else if($key == 'reports'){
+            } else if ($key == 'reports') {
                 $this->importReportsExcelInternal($value);
-            }else if($key == 'products'){
+            } else if ($key == 'products') {
                 $this->importProductsExcelInternal($value);
-            }else if($key == 'variants'){
+            } else if ($key == 'variants') {
                 $this->importProductVariantsExcelInternal($value);
-            }else if($key == 'availabilities'){
+            } else if ($key == 'availabilities') {
                 $this->importMerchantsAvailabilitiesExcelInternal($value);
-            }else if($key == 'ratings'){
+            } else if ($key == 'ratings') {
                 $this->importMerchantsRatingsExcelInternal($value);
-            }else if($key == 'polygons'){
+            } else if ($key == 'polygons') {
                 $this->importPolygonsInternal($value);
             }
-        } 
+        }
     }
 
     public function importMerchantsExcel($filename) {
@@ -636,14 +422,14 @@ class MerchantImport {
     }
 
     public function importMerchantsExcelInternal(array $row) {
-        
+
         $headers = $row[0];
         foreach ($row as $item) {
             $sheet = null;
             foreach ($item as $key => $value) {
                 $sheet[$headers[$key]] = $value;
             }
-            
+
             if ($sheet['user_id'] && $sheet['user_id'] != 'user_id') {
                 $owner = User::find($sheet['user_id']);
                 if ($owner) {
@@ -887,26 +673,38 @@ class MerchantImport {
                 }
             }
             if ($sheet['id'] && $sheet['id'] != 'id') {
+                $product = Product::find($sheet['id']);
+                if ($product) {
+                    
+                } else {
+                    $product = new Product();
+                }
                 $image = $sheet['imagen'];
-                $merchant = Merchant::find($sheet['merchant_id']);
+                $merchantsData = explode(",", $sheet['merchant_id']);
                 $ext = $sheet['ext'];
                 unset($sheet['merchant_id']);
                 unset($sheet['imagen']);
                 unset($sheet['ext']);
                 $categoriesData = explode(",", $sheet['categories']);
                 unset($sheet['categories']);
-                $product = new Product();
+
                 //dd($sheet);
                 $product->fill($sheet);
                 $product->isActive = true;
                 $product->hash = "asd";
 
                 $product->save();
-                $product->merchants()->save($merchant);
+
                 if ($categoriesData) {
                     $categories = Category::whereIn('id', $categoriesData)->get();
                     foreach ($categories as $item) {
                         $product->categories()->save($item);
+                    }
+                }
+                if ($merchantsData) {
+                    $merchants = Merchant::whereIn('id', $merchantsData)->get();
+                    foreach ($merchants as $item) {
+                        $product->merchants()->save($item);
                     }
                 }
                 if ($image) {
@@ -915,16 +713,21 @@ class MerchantImport {
                     $image = 'https://picsum.photos/600/350';
                     $ext = 'jpg';
                 }
-                FileM::create([
-                    'user_id' => 2,
-                    'trigger_id' => $product->id,
-                    'file' => $image,
-                    'extension' => $ext,
-                    'type' => 'App\Models\Product'
-                ]);
+                $file = FileM::where("trigger_id", $product->id)->where("file", $image)->where("extension", $ext)->first();
+                if (!$file) {
+                    FileM::create([
+                        'user_id' => 2,
+                        'trigger_id' => $product->id,
+                        'file' => $image,
+                        'extension' => $ext,
+                        'type' => 'App\Models\Product'
+                    ]);
+                }
             }
         }
     }
+
+    
 
     public function importProductsExcel2($filename) {
 
@@ -1015,12 +818,16 @@ class MerchantImport {
                                 $variant->attributes = $attributes;
                                 $variant->save();
                             }
+                        } else {
+                            dd($results);
                         }
                     }
                 }
             }
         }
     }
+
+    
 
     public function importPolygons($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);
@@ -1249,7 +1056,7 @@ class MerchantImport {
                 $group = Group::find($sheet['group_id']);
                 $group->updated_at = date("Y-m-d H:i:s");
                 $group->save();
-                //$this->editGroup->inviteUsers($user, $sheet, false);
+//$this->editGroup->inviteUsers($user, $sheet, false);
                 dispatch(new InviteUsers($user, $sheet, false, $group));
             }
         }
@@ -1268,7 +1075,7 @@ class MerchantImport {
                 $sheet['follower'] = $sheet['group_id'];
                 unset($sheet['group_id']);
                 $this->editAlerts->addFollower($sheet, $user);
-                //dispatch(new AddFollower($user, $sheet));
+//dispatch(new AddFollower($user, $sheet));
             }
         }
     }
@@ -1282,7 +1089,7 @@ class MerchantImport {
             if ($user) {
                 unset($sheet['user_id']);
                 $this->editMessages->postMessage($user, $sheet);
-                //dispatch(new PostMessage($user, $sheet));
+//dispatch(new PostMessage($user, $sheet));
             }
         }
     }

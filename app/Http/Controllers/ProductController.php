@@ -7,7 +7,7 @@ use App\Models\Product;
 use App\Services\EditProduct;
 use App\Models\Merchant;
 use Illuminate\Pagination\LengthAwarePaginator;
-
+use Illuminate\Http\Request;
 class ProductController extends Controller {
 
     /**
@@ -16,7 +16,7 @@ class ProductController extends Controller {
      */
     protected $editProduct;
 
-    public function __construct(EditProduct $editProduct ) {
+    public function __construct(EditProduct $editProduct) {
         $this->editProduct = $editProduct;
     }
 
@@ -36,15 +36,21 @@ class ProductController extends Controller {
      *
      * @return Response
      */
-    public function getProducts() {
-        $products = Product::with('productVariants')->paginate(8);
-        return view('products.products', ['products' => $products]);
+    public function getProducts(Request $request, $category) {
+        $data = $request->all();
+        $data['category_id'] = $category;
+        $data['includes'] = "categories,files";
+        $results = $this->editProduct->getProductsMerchant($data);
+        
+        $visualResults = $this->editProduct->buildProducts($results);
+        return view('products.productsMerchant',["categories"=>$visualResults]);
     }
-    public function getProductsMerchant($slug,$page) {
-        $merchant = Merchant::where("url",$slug)->first();
-        $products =$this->editProduct->getProductsMerchant(null, $merchant->id, $page);
+
+    public function getProductsMerchant($slug, $page) {
+        $merchant = Merchant::where("url", $slug)->first();
+        $products = $this->editProduct->getProductsMerchant(null, $merchant->id, $page);
         $productsCategory = $this->editProduct->buildProducts($products, $merchant->id);
-        return view('products.productsMerchant', ['categories' => $productsCategory,"merchant"=>$merchant->id]);
+        return view('products.productsMerchant', ['categories' => $productsCategory, "merchant" => $merchant->id]);
     }
 
 }

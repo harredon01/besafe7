@@ -142,7 +142,7 @@ class EditProduct {
                 ->where('merchants.private', false)
                 ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
                         'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
-        
+
         if (array_key_exists("lat", $data)) {
             if ($data['lat']) {
                 $query->whereIn('merchants.id', function($query) use ($data) {
@@ -185,7 +185,6 @@ class EditProduct {
             }
             $query->skip($skip);
         }
-        DB::enableQueryLog();
         $variants = $query->get();
 //        dd($variants);
 
@@ -201,7 +200,8 @@ class EditProduct {
         $variants_query = DB::table('products')
                 ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                 ->whereIn('products.id', $products)
-                ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
+                ->where('product_variant.isActive', true)
+                ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
                 ->orderBy('products.id', 'asc');
 
         if ($includes_categories) {
@@ -273,7 +273,7 @@ class EditProduct {
                 $data['products_variants'] = DB::table('products')
                         ->leftJoin('product_variant', 'products.id', '=', 'product_variant.product_id')
                         ->whereIn('products.id', $products)
-                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
+                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -330,7 +330,7 @@ class EditProduct {
                             $data['products_variants'] = DB::table('products')
                                     ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                                     ->whereIn('products.id', $products)
-                                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
+                                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
                                     ->get();
                             $data['products_files'] = DB::table('products')
                                     ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -365,7 +365,7 @@ class EditProduct {
                 $data['products_variants'] = DB::table('products')
                         ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
                         ->whereIn('products.id', $products)
-                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.availability as prod_avail')
+                        ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
                         ->get();
                 $data['products_files'] = DB::table('products')
                         ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
@@ -413,7 +413,7 @@ class EditProduct {
         return $variant;
     }
 
-    private function buildProduct($container, $merchant, $merchant_id) {
+    private function buildProduct($container, $merchant) {
         $product = [
             "id" => $container->product_id,
             "name" => $container->prod_name,
@@ -424,7 +424,9 @@ class EditProduct {
             "merchant_description_more" => false,
             "inCart" => false,
             "item_id" => null,
-            "imgs" => []
+            "imgs" => [],
+            "variant_ids" => [],
+            "variants" => []
         ];
         if ($merchant) {
             $product['merchant_name'] = $merchant->merchant_name;
@@ -432,98 +434,91 @@ class EditProduct {
             $product['src'] = $merchant->merchant_icon;
             $product['merchant_type'] = $merchant->merchant_type;
         }
-        if ($merchant_id == 1299) {
-            $product['amount'] = 11;
-        } else {
-            $product['amount'] = $container->min_quantity;
-        }
+        $product['amount'] = $container->min_quantity;
         return $product;
     }
 
-    public function buildProducts(array $items, $merchant_id) {
+    public function getProductData($variant, array $categories, $merchant) {
+        foreach ($categories as $cat) {
+            foreach ($cat['products'] as $product) {
+                if ($product['id'] == $variant->product_id) {
+                    return $product;
+                }
+            }
+        }
+        return $this->buildProduct($variant, $merchant);
+    }
+
+    public function getCategory($variant, array $categories) {
+        foreach ($categories as &$cat) {
+            if ($cat['id'] == $variant->category_id) {
+                return ["cat" => $cat, "cats" => $categories];
+            }
+        }
+
+        return ["cat" => $category, "cats" => $categories];
+    }
+
+    public function buildProducts(array $items) {
         $results = [];
+        $processedVariants = [];
         if (array_key_exists('products_variants', $items)) {
             if (count($items['products_variants']) > 0) {
                 $resultsVariant = [];
                 $resultsCategory = [];
-                $activeProduct = $this->buildProduct($items['products_variants'][0], $items['merchant_products'][0], $merchant_id);
-                if (array_key_exists('category_id', $items['products_variants'][0])) {
-                    $cat = $items['products_variants'][0];
-                    $activeCategory = [
-                        "name" => $cat->category_name,
-                        "id" => $cat->category_id,
-                        "description" => $cat->category_description,
-                        "products" => [],
-                        "more" => false,
-                    ];
-                } else {
-                    $activeCategory = [
-                        "name" => null,
-                        "id" => null,
-                        "description" => null,
-                        "products" => [],
-                        "more" => false,
-                    ];
-                }
-
                 for ($i = 0; $i < count($items['products_variants']); $i++) {
-                    if ($items['products_variants'][$i]->product_id != $activeProduct['id']) {
-                        $activeProduct['variants'] = $resultsVariant;
-                        if ($activeCategory['id']) {
-                            if ($items['products_variants'][$i - 1]->category_id == $activeCategory['id']) {
-                                array_push($activeCategory['products'], $activeProduct);
-                            } else {
-                                array_push($resultsCategory, $activeCategory);
-                                $activeCategory = [
-                                    "name" => $items['products_variants'][$i - 1]->category_name,
-                                    "id" => $items['products_variants'][$i - 1]->category_id,
-                                    "description" => $items['products_variants'][$i - 1]->category_description,
-                                    "products" => [],
-                                    "more" => false,
-                                ];
-                                array_push($activeCategory['products'], $activeProduct);
-                            }
-                        }
-                        array_push($results, $activeProduct);
-                        $activeProduct = $this->buildProduct($items['products_variants'][$i], $items['merchant_products'][0], $merchant_id);
-                        $resultsVariant = [];
+                    $category = null;
+                    $product = null;
+                    if (in_array($items['products_variants'][$i]->id, $resultsVariant)) {
+                        continue;
+                    } else {
+                        array_push($resultsVariant, $items['products_variants'][$i]->id);
                     }
-                    $variant = $this->buildVariant($items['products_variants'][$i]);
-                    array_push($resultsVariant, $variant);
-                    if (($i + 1) >= count($items['products_variants'])) {
-                        $activeProduct['variants'] = $resultsVariant;
-                        if ($activeCategory['id']) {
-                            if ($items['products_variants'][$i]->category_id == $activeCategory['id']) {
-                                array_push($activeCategory['products'], $activeProduct);
-                                array_push($resultsCategory, $activeCategory);
-                            } else {
-                                array_push($resultsCategory, $activeCategory);
-                                $activeCategory = [
-                                    "name" => $items['products_variants'][$i]->category_name,
-                                    "id" => $items['products_variants'][$i]->category_id,
-                                    "description" => $items['products_variants'][$i]->category_description,
-                                    "products" => [],
-                                    "more" => false,
-                                ];
-                                array_push($activeCategory['products'], $activeProduct);
-                                array_push($resultsCategory, $activeCategory);
-                            }
+                    for ($j = 0; $j < count($resultsCategory); $j++) {
+                        if ($resultsCategory[$j]['id'] == $items['products_variants'][$i]->category_id) {
+                            $category = $j;
                         }
-                        array_push($results, $activeProduct);
-                    }
-                }
-                for ($j = 0; $j < count($items['products_files']); $j++) {
-                    for ($k = 0; $k < count($resultsCategory); $k++) {
-                        $prods = $resultsCategory[$k]['products'];
-                        for ($i = 0; $i < count($resultsCategory[$k]['products']); $i++) {
-                            if ($items['products_files'][$j]->trigger_id == $resultsCategory[$k]['products'][$i]['id']) {
-                                $imgInfo = [
-                                    "file" => $items['products_files'][$j]->file
-                                ];
-
-                                array_push($resultsCategory[$k]['products'][$i]['imgs'], $imgInfo);
+                        for ($k = 0; $k < count($resultsCategory[$j]['products']); $k++) {
+                            if ($resultsCategory[$j]['products'][$k]['id'] == $items['products_variants'][$i]->product_id) {
+                                $product = $k;
                                 break;
                             }
+                        }
+                        if (!is_null($category) && !is_null($product)) {
+                            break;
+                        }
+                    }
+                    if (is_null($category)) {
+                        $category = count($resultsCategory);
+                        array_push($resultsCategory, [
+                            "name" => $items['products_variants'][$i]->category_name,
+                            "id" => $items['products_variants'][$i]->category_id,
+                            "description" => $items['products_variants'][$i]->category_description,
+                            "products" => [],
+                            "product_ids" => [],
+                            "more" => false,
+                            "new" => true
+                        ]);
+                    }
+                    if (is_null($product)) {
+                        $container = $this->buildProduct($items['products_variants'][$i], $items['merchant_products'][0]);
+                        $product = count($resultsCategory[$category]['products']);
+                        array_push($resultsCategory[$category]['product_ids'], $container['id']);
+                        array_push($resultsCategory[$category]['products'], $container);
+                    }
+                    $variant = $this->buildVariant($items['products_variants'][$i]);
+
+                    if (!in_array($variant['id'], $resultsCategory[$category]['products'][$product]['variant_ids'])) {
+                        array_push($resultsCategory[$category]['products'][$product]['variant_ids'], $variant['id']);
+                        array_push($resultsCategory[$category]['products'][$product]['variants'], $variant);
+                    }
+                    for ($j = 0; $j < count($items['products_files']); $j++) {
+                        if ($items['products_files'][$j]->trigger_id == $resultsCategory[$category]['products'][$product]['id']) {
+                            $imgInfo = [
+                                "file" => $items['products_files'][$j]->file
+                            ];
+                            array_push($resultsCategory[$category]['products'][$product]['imgs'], $imgInfo);
+                            break;
                         }
                     }
                 }
@@ -601,6 +596,10 @@ class EditProduct {
         $access = false;
         $owner = false;
         $data = [];
+        if($user->id < 4){
+            $access = true;
+            $owner = true;
+        }
         $damerchant = DB::select('SELECT 
                                             DISTINCT(m.id),mu.user_id
                                         FROM
@@ -613,6 +612,73 @@ class EditProduct {
                                                 )
 
                 ;', [$user->id, $product_id]);
+        if (sizeof($damerchant) > 0) {
+            $access = true;
+            $owner = true;
+        }
+        $data = [
+            "access" => $access,
+            "owner" => $owner
+        ];
+        return $data;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function checkAccessAdminMerchant(User $user, $merchant_id) {
+        $access = false;
+        $owner = false;
+        if($user->id < 4){
+            $access = true;
+            $owner = true;
+        }
+        $data = [];
+        $damerchant = DB::select('SELECT 
+                                            DISTINCT(m.id),mu.user_id
+                                        FROM
+                                            merchants m join merchant_user mu on m.id = mu.merchant_id
+                                        WHERE
+                                                m.status <> "suspended"
+                                                AND mu.user_id = ?
+                                                AND m.id = ?
+
+                ;', [$user->id, $merchant_id]);
+        if (sizeof($damerchant) > 0) {
+            $access = true;
+            $owner = true;
+        }
+        $data = [
+            "access" => $access,
+            "owner" => $owner
+        ];
+        return $data;
+    }
+
+    public function checkAccessVariant(User $user, $variant_id) {
+        $access = false;
+        $owner = false;
+        if($user->id < 4){
+            $access = true;
+            $owner = true;
+        }
+        $data = [];
+        DB::enableQueryLog();
+        $damerchant = DB::select('SELECT 
+                                            DISTINCT(m.id),mu.user_id
+                                        FROM
+                                            merchants m join merchant_user mu on m.id = mu.merchant_id
+                                        WHERE
+                                                m.status <> "suspended"
+                                                AND mu.user_id = ?
+                                                AND m.id IN ( 
+                                                SELECT merchant_id from merchant_product WHERE product_id = 
+                                                ( select product_id from product_variant where id = ? ) 
+                                                )
+
+                ;', [$user->id, $variant_id]);
         if (sizeof($damerchant) > 0) {
             $access = true;
             $owner = true;
@@ -800,11 +866,11 @@ class EditProduct {
     }
 
     public function createOrUpdateVariant(User $user, array $data) {
-        $result = $this->checkAccessProduct($user, $data['product_id']);
-        if ($result['access'] == true) {
-            if ($data["id"]) {
+
+        if ($data["id"]) {
+            $result = $this->checkAccessVariant($user, $data["id"]);
+            if ($result['access'] == true) {
                 $variantid = $data['id'];
-                $productid = $data['product_id'];
                 unset($data['id']);
                 unset($data['merchant_id']);
                 unset($data['product_id']);
@@ -819,7 +885,10 @@ class EditProduct {
                 if ($variant) {
                     return array("status" => "success", "message" => "variant updated", "variant" => $variant);
                 }
-            } else {
+            }
+        } else {
+            $result = $this->checkAccessProduct($user, $data["product_id"]);
+            if ($result['access'] == true) {
                 $validator = $this->validatorVariant($data);
                 if ($validator->fails()) {
                     return array("status" => "error", "message" => $validator->getMessageBag());
@@ -828,6 +897,7 @@ class EditProduct {
                             return !is_null($val);
                         });
                 $data = (array) $data;
+                $data['isActive'] = true;
                 $variant = ProductVariant::create($data);
                 return array("status" => "success", "message" => "variant created", "variant" => $variant);
             }

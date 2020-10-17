@@ -26,7 +26,7 @@ use App\Models\Transaction;
 class PayU {
 
     private function populatePaymentContent(Payment $payment, $platform) {
-        if ($payment->user_id == 2 || $payment->user_id == 77) {
+        if ($payment->user_id == 2 || $payment->user_id == 1 || $payment->user_id == 3 || $payment->user_id == 77) {
             $accountId = env('PAYU_TEST_ACCOUNT', "512321");
             $apiKey = env('PAYU_TEST_KEY');
             $merchantId = env('PAYU_TEST_MERCHANT', "508029");
@@ -105,7 +105,7 @@ class PayU {
         $apiLogin = env('PAYU_LOGIN');
         $apiKey = env('PAYU_KEY');
         if ($user) {
-            if ($user->id == 2 || $user->id == 77) {
+            if ($user->id == 2 || $user->id == 1 || $user->id == 3 || $user->id == 77) {
                 $apiLogin = env('PAYU_TEST_LOGIN');
                 $apiKey = env('PAYU_TEST_KEY');
             }
@@ -139,6 +139,14 @@ class PayU {
             "billingAddress" => $payerAddress
         ];
         return $payer;
+    }
+    
+    private function checkUserId(User $user,array $data) {
+        if(!$user->docNum){
+            $user->docNum = $data['payer_id'];
+            $user->save();
+        }
+        return $user;
     }
 
     private function populatePayerSimple(array $data) {
@@ -259,7 +267,7 @@ class PayU {
     }
 
     private function getTestVar(User $user) {
-        if ($user->id == 2 || $user->id == 77) {
+        if ($user->id == 2 || $user->id == 1 || $user->id == 3 || $user->id == 77) {
             return "true";
         } else {
             return false;
@@ -268,7 +276,7 @@ class PayU {
 
     private function getTestUrl($user) {
         if ($user) {
-            if ($user->id == 2 || $user->id == 77) {
+            if ($user->id == 2 || $user->id == 1 || $user->id == 3 || $user->id == 77) {
                 return "https://sandbox.api.payulatam.com";
             }
         }
@@ -360,6 +368,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
+        $user = $this->checkUserId($user,$data);
         $buyer = $this->populateBuyer($user, $data);
 
 
@@ -414,6 +423,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
+        $user = $this->checkUserId($user,$data);
         $buyer = $this->populateBuyer($user, $data);
 
         $payer = $this->populatePayer($data);
@@ -1143,6 +1153,7 @@ class PayU {
             "merchant" => $merchant,
             "creditCardToken" => $creditCardToken,
         ];
+        $user = $this->checkUserId($user,$data);
         $payer = $this->populatePayer($data);
         $payer['method'] = $data['cc_branch'];
         //dd($dataSent);
@@ -1240,6 +1251,7 @@ class PayU {
         if ($validator->fails()) {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
+        $user = $this->checkUserId($user,$data);
         $buyer = $this->populateBuyer($user, $data);
 
         $payer = $this->populatePayer($data);
@@ -1393,7 +1405,7 @@ class PayU {
                 $transaction = Transaction::create($transactionContainer);
                 $payment->transactions()->save($transaction);
                 if ($transactionResponse['state'] == 'APPROVED') {
-                    dispatch(new ApprovePayment($payment, $platform));
+                    dispatch(new ApprovePayment($payment, "Food", 1));
                 } else if ($transactionResponse['state'] == 'PENDING') {
                     dispatch(new PendingPayment($payment, $platform));
                 } else {
@@ -1578,7 +1590,7 @@ class PayU {
                             $transactionResponse['gateway'] = 'PayU';
                             $transaction = $this->saveTransactionQuery($transactionResponse, $payment);
                             if ($transactionResponse['state'] == 'APPROVED') {
-                                dispatch(new ApprovePayment($payment, "Food"));
+                                dispatch(new ApprovePayment($payment, "Food",1));
                             }
                             if ($transactionResponse['state'] == 'DECLINED' || $transactionResponse['state'] == 'ERROR' || $transactionResponse['state'] == 'EXPIRED') {
                                 dispatch(new DenyPayment($payment, "Food"));
@@ -1645,7 +1657,7 @@ class PayU {
                 $data['order_id'] = $payment->order_id;
                 $transaction = $this->saveTransactionConfirmacion($data, $payment);
                 if ($data['state_pol'] == 4) {
-                    dispatch(new ApprovePayment($payment, "Food"));
+                    dispatch(new ApprovePayment($payment, "Food",1));
                 } else {
                     dispatch(new DenyPayment($payment, "Food"));
                 }
@@ -1827,7 +1839,7 @@ class PayU {
                 $data['transaction'] = $transaction;
                 if ($data['transactionState'] == 4) {
                     $estadoTx = "Transaction approved";
-                    dispatch(new ApprovePayment($payment, "Food"));
+                    dispatch(new ApprovePayment($payment, "Food",1));
                 } else if ($data['transactionState'] == 6) {
                     $estadoTx = "Transaction rejected";
                     dispatch(new DenyPayment($payment, "Food"));

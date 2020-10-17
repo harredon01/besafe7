@@ -39,7 +39,7 @@
                                     <p>
                                         {{ $productVariant['price']}}
                                     </p>
-                                    <a href="javascript:;" ng-click="addCartItem({{ $productVariant['id']}},{{ $merchant}},1,this)" class="editar">agregar</a>
+                                    <a href="javascript:;" ng-click="addCartItem({{ $productVariant['id']}},1,this)" class="editar">agregar</a>
                                 </div>
 
                                 @endforeach

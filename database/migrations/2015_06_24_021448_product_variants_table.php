@@ -35,9 +35,6 @@ class ProductVariantsTable extends Migration {
                         $table->integer('quantity');
                         $table->integer('min_quantity')->default(1);
                         $table->text('attributes'); 
-                        $table->integer('merchant_id')->unsigned()->nullable();
-                        $table->foreign('merchant_id')->references('id')
-                                ->on('merchants');
 			$table->timestamps();
 		});
 	}
