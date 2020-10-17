@@ -53,7 +53,7 @@ class Rapigo {
         return $response;
     }
 
-    public function getOrderShippingPrice(array $origin, array $destination) {
+    public function getOrderShippingPrice(array $origin, array $destination, array $extras) {
         //dd($points);
         $points = [];
         $querystop = [
@@ -71,7 +71,18 @@ class Rapigo {
         ];
         array_push($points, $querystop);
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        $urlFound = false;
+        if (array_key_exists('user_id', $extras)) {
+            if ($extras['user_id']) {
+                if ($extras['user_id'] < 4) {
+                    $urlFound = true;
+                    $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+                }
+            }
+        }
+        if(!$urlFound){
+            $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        }
         //dd($query);
         $response = $this->sendPost($data, $query);
         $response['status'] = "success";
@@ -87,7 +98,7 @@ class Rapigo {
         $data['hora_servicio'] = "08:45";
         foreach ($points as $value) {
             $result = $this->checkAddress($value['address']);
-            if(!$result['result']){
+            if (!$result['result']) {
                 dd($value['address']);
             }
         }
@@ -122,7 +133,7 @@ class Rapigo {
             $deliveries = $stop->deliveries;
             unset($stop->totals);
             unset($stop->deliveries);
-            if($stopCodes){
+            if ($stopCodes) {
                 $stop->code = $stopCodes[$i]['ref_parada'];
             }
             $stop->status = "pending";
@@ -136,6 +147,61 @@ class Rapigo {
 
         $route->stops = $stops;
         return $route;
+    }
+
+    public function sendOrder($origin, $destination, $extras) {
+        $data['type'] = 'stop';
+        $date = $extras["request_date"];
+        $data['fecha_servicio'] = date_format($date, "m/d/Y");
+        $data['hora_servicio'] = date_format($date, "h:i");
+        $points = [];
+        array_push($points, [
+            "address" => $origin['address'] . " " . $origin['notes'],
+            "description" => $extras['description_pickup'],
+            "type" => "point",
+            "phone" => $origin['phone']
+        ]);
+        array_push($points, [
+            "address" => $destination['address'] . " " . $destination['notes'],
+            "description" => $extras['description_delivery'],
+            "type" => "point",
+            "phone" => $destination['phone']
+        ]);
+        foreach ($points as $value) {
+            $result = $this->checkAddress($value['address']);
+            if (!$result['result']) {
+                dd($value['address']);
+            }
+        }
+
+        $data['points'] = json_encode($points);
+        $urlFound = false;
+        if (array_key_exists('user_id', $extras)) {
+            if ($extras['user_id']) {
+                if ($extras['user_id'] < 4) {
+                    $urlFound = true;
+                    $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+                }
+            }
+        }
+        if(!$urlFound){
+            $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        }
+        //dd($data);
+        $stopCodes = null;
+        $serviceBookResponse = $this->sendPost($data, $query);
+        if ($serviceBookResponse) {
+            if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
+                $stopCodes = $serviceBookResponse['paradas_referencia'];
+            }
+        } else {
+            $serviceBookResponse = [];
+        }
+
+        if ($stopCodes) {
+            return ["status" => "success", "shipping_id" => $serviceBookResponse['key']];
+        }
+        return ["status" => "error"];
     }
 
     public function checkAddress($address) {

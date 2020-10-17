@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Models\Availability;
 use App\Models\Booking;
 use App\Models\Favorite;
+use App\Jobs\CreateGoogleEvent;
 use App\Models\User;
 use Validator;
 use DB;
 use Carbon\Carbon;
+use Spatie\GoogleCalendar\Event;
 
 class EditBooking {
 
@@ -75,6 +77,154 @@ class EditBooking {
         return ['status' => "success", "message" => "booking_allowed"];
     }
 
+    public function addOrUpdateGoogleEvent($booking_id) {
+        $booking = Booking::find($booking_id);
+        if ($booking) {
+            //create a new event
+            $eventExists = false;
+            if ($booking->options['google_event_id']) {
+                try {
+                    $event = Event::find($booking->options['google_event_id']);
+                } catch (\Exception $ex) {
+                    $event = null;
+                }
+
+                if ($event) {
+                    $event->startDateTime = $booking->starts_at;
+                    $event->endDateTime = $booking->ends_at;
+                    $event->save();
+                    $eventExists = true;
+                }
+            }
+            if ($booking->options['google_personal_event_id']) {
+                try {
+                    $event = Event::find($booking->options['google_personal_event_id']);
+                } catch (\Exception $ex) {
+                    $event = null;
+                }
+
+                if ($event) {
+                    $event->startDateTime = $booking->starts_at;
+                    $event->endDateTime = $booking->ends_at;
+                    $event->save();
+                    $eventExists = true;
+                }
+            }
+            if (!$eventExists) {
+                $client = $booking->customer;
+                $bookable = $booking->bookable;
+                $attributes = $bookable->attributes;
+                if (array_key_exists('google_calendar', $attributes)) {
+                    if ($attributes['google_calendar']) {
+                        $event2 = $this->createGoogleEvent($booking, $bookable, $client, $attributes['google_calendar']);
+                        if ($event2) {
+                            $booking->options['google_personal_event_id'] = $event2->id;
+                        }
+                    }
+                }
+                $event = $this->createGoogleEvent($booking, $bookable, $client, null);
+                $booking->options['google_event_id'] = $event->id;
+                $options = $booking->options;
+                $booking->touch();
+                $updateData = [
+                    "options" => json_encode($options),
+                    "total_paid" => $booking->total_paid,
+                    "updated_at" => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))
+                ];
+                Booking::where("id", $booking->id)->update($updateData);
+            }
+        }
+    }
+
+    private function createGoogleEvent($booking, $bookable, $client, $calendar) {
+        $event = null;
+        $attendees = [
+            ['email' => $client->email, 'displayName' => $client->name],
+            ['email' => $bookable->email, 'displayName' => $bookable->name],
+//                ['email' => 'harredon01@gmail.com', 'displayName' => "Hoovert"],
+//                ['email' => 'camilasaca82@gmail.com', 'displayName' => 'Camila'],
+        ];
+        if ($calendar) {
+            if ($calendar == $bookable->email) {
+                return null;
+            }
+            $name = "PetWorld Reserva con: " . $bookable->name;
+            $data = [
+                "name" => $name,
+                "startDateTime" => $booking->starts_at,
+                "endDateTime" => $booking->ends_at,
+                "sendUpdates" => "all"
+            ];
+            if ($booking->options['location']) {
+                $data['location'] = $booking->options['location'];
+            }
+
+            $data['attendees'] = $attendees;
+            $event = Event::create($data, $calendar);
+        } else {
+            $event = new Event;
+            $event->sendUpdates = "all";
+            $event->name = "PetWorld Reserva con: " . $bookable->name;
+            if ($booking->options['location']) {
+                $event->location = $booking->options['location'];
+            }
+            $event->startDateTime = $booking->starts_at;
+            $event->endDateTime = $booking->ends_at;
+
+            foreach ($attendees as $value) {
+                $event->addAttendee($value);
+            }
+            $calendarEvent = $event->save();
+            return $calendarEvent;
+        }
+        return $event;
+    }
+
+    public function checkGoogleBookings($data) {
+        $date = new Carbon($data['from']);
+        $date2 = new Carbon($data['to']);
+        $events = Event::get($date, $date2, [], 'camilasaca82@gmail.com');
+        foreach ($events as $event) {
+            dd($event);
+        }
+    }
+
+    public function getGoogleBookingsDay($data, $object) {
+        $attributes = $object->attributes;
+        $events = [];
+        if (array_key_exists("google_calendar", $attributes)) {
+            $google_calendar = $attributes['google_calendar'];
+            if ($google_calendar) {
+                $date = new Carbon($data['from'] . " 00:00:00");
+                $date2 = new Carbon($data['from'] . " 23:59:59");
+                $results = Event::get($date, $date2, [], $google_calendar);
+                foreach ($results as $event) {
+                    array_push($events, [
+                        'id' => -1,
+                        'name' => $event->name,
+                        "starts_at" => $event->startDateTime,
+                        "ends_at" => $event->endDateTime,
+                    ]);
+                }
+            }
+        }
+        $datea = new Carbon($data['from'] . " 00:00:00");
+        $datea2 = new Carbon($data['from'] . " 23:59:59");
+        $results2 = Event::get($datea, $datea2)->toArray();
+        foreach ($results2 as $event) {
+            array_push($events, [
+                'id' => -1,
+                'name' => $event->name,
+                "starts_at" => $event->startDateTime,
+                "ends_at" => $event->endDateTime,
+            ]);
+        }
+        return array(
+            "status" => "success",
+            "message" => "",
+            "data" => $events);
+    }
+
     public function checkExistingBooking(User $user, $booking_id) {
         $booking = Booking::where('id', $booking_id)->with("bookable")->first();
         if ($booking) {
@@ -118,19 +268,46 @@ class EditBooking {
                 }
             }
         }
+        if (false) {
+            return $this->checkBookingGoogle($data, $object, $maxPerHour, $checkZoom);
+        } else {
+            return $this->checkBookingLocal($data, $object, $maxPerHour, $checkZoom);
+        }
+    }
+
+    public function checkBookingLocal($data, $object, $maxPerHour, $checkZoom) {
+        $attributes = $object->attributes;
+        if (array_key_exists("google_calendar", $attributes)) {
+            $google_calendar = $attributes['google_calendar'];
+            if ($google_calendar) {
+                $dateT = new Carbon($data['from']);
+                $date2T = new Carbon($data['to']);
+                $events = Event::get($dateT, $date2T, [], $google_calendar);
+                if (count($events) > 0) {
+                    return ['status' => "error", "message" => "merchant_limit"];
+                }
+            }
+        }
         $date = date_create($data['from']);
         date_sub($date, date_interval_create_from_date_string("1 seconds"));
         $date2 = date_create($data['to']);
         date_add($date2, date_interval_create_from_date_string("1 seconds"));
         if ($checkZoom) {
-            $booking1 = Booking::whereBetween('starts_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
-                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
+            /* $booking1 = Booking::whereBetween('starts_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
+              ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
 
-            $booking2 = Booking::whereBetween('ends_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
-                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
-            $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))
-                            ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
-            if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING || $booking3 >= self::VIRTUAL_BOOKING) {
+              $booking2 = Booking::whereBetween('ends_at', [date_format($date, "Y-m-d H:i:s"), date_format($date2, "Y-m-d H:i:s")])
+              ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count();
+              $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))
+              ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count(); */
+            $booking1 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))
+                    ->where('ens_at', '>', date_format($date, "Y-m-d H:i:s"))
+                    ->whereColumn("price", "total_paid")->count();
+
+            $booking2 = Booking::where('starts_at', '>', date_format($date, "Y-m-d H:i:s"))
+                    ->where('starts_at', '<', date_format($date2, "Y-m-d H:i:s"))
+                    ->whereColumn("price", "total_paid")->count();
+            if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING) {
                 return ['status' => "error", "message" => "zoom_limit"];
             }
             return ['status' => "success", "message" => "zoom_ok"];
@@ -159,6 +336,49 @@ class EditBooking {
             } else {
                 return ['status' => "success", "message" => "merchant_ok"];
             }
+        }
+    }
+
+    public function checkBookingGoogle($data, $object, $maxPerHour, $checkZoom) {
+        $attributes = $object->attributes;
+        if (array_key_exists("google_calendar", $attributes)) {
+            $google_calendar = $attributes['google_calendar'];
+            if ($google_calendar) {
+                $date = new Carbon($data['from']);
+                $date2 = new Carbon($data['to']);
+                $events = Event::get($date, $date2, [], $google_calendar);
+                if (count($events) > 0) {
+                    return ['status' => "error", "message" => "merchant_limit"];
+                }
+            }
+        }
+        $date = new Carbon($data['from']);
+        $date2 = new Carbon($data['to']);
+        $events = Event::get($date, $date2);
+        if ($checkZoom) {
+            $zoomEvents = 0;
+            foreach ($events as $event) {
+                if ($event->location == "zoom") {
+                    $zoomEvents++;
+                }
+            }
+            if ($zoomEvents >= self::VIRTUAL_BOOKING) {
+                return ['status' => "error", "message" => "zoom_limit"];
+            }
+            return ['status' => "success", "message" => "zoom_ok"];
+        } else {
+            $eventSlots = 0;
+            foreach ($events as $event) {
+                foreach ($event->attendees as $atendee) {
+                    if ($atendee->email == $object->email) {
+                        $eventSlots++;
+                    }
+                }
+            }
+            if ($eventSlots >= $maxPerHour) {
+                return ['status' => "error", "message" => "merchant_limit"];
+            }
+            return ['status' => "success", "message" => "merchant_ok"];
         }
     }
 
@@ -334,7 +554,8 @@ class EditBooking {
             }
         }
         $booking->options = $attributes;
-        $booking->updated_at = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));;
+        $booking->updated_at = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
+        ;
         $update = $booking->toArray();
         $update["options"] = json_encode($attributes);
         $booking->touch();
@@ -344,6 +565,9 @@ class EditBooking {
         $booking->ends_at = $data['to'];
         unset($update['created_at']);
         Booking::where("id", $booking->id)->update($update);
+        if ($booking->price == $booking->total_paid) {
+            dispatch(new CreateGoogleEvent($booking->id));
+        }
         //$this->handleAuthorizationRequest($user, $booking, $object);
         return array("status" => "success", "message" => "Booking update request sent", "booking" => $booking);
     }
@@ -471,8 +695,12 @@ class EditBooking {
         if ($validator->fails()) {
             return array("status" => "error", "message" => $validator->getMessageBag());
         }
-        $type = $data['type'];
-        $class = self::MODEL_PATH . $type;
+        $class = '';
+        if (strpos($data['type'], "Models") !== false) {
+            $class = $data['type'];
+        } else {
+            $class = self::MODEL_PATH . $data['type'];
+        }
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
@@ -484,7 +712,12 @@ class EditBooking {
                         $data['from'] = date_format(date_create($data['from']), "h:i a");
                         $data['to'] = date_format(date_create($data['to']), "h:i a");
                         $id = $data["id"];
-                        $data["bookable_type"] = "App\\Models\\" . $data['type'];
+                        if (strpos($data['type'], "Models") !== false) {
+                            $data["bookable_type"] = $data['type'];
+                        } else {
+                            $data["bookable_type"] = self::MODEL_PATH . $data['type'];
+                        }
+
                         $data["bookable_id"] = $data['object_id'];
                         $data['updated_at'] = date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"));
                         unset($data["id"]);
@@ -647,6 +880,7 @@ class EditBooking {
             $object = $class::find($data['object_id']);
             if ($object) {
                 if ($query == "day") {
+                    return $this->getGoogleBookingsDay($data, $object);
                     $results = $object->bookingsStartsBetween($data['from'] . " 00:00:00", $data['from'] . " 23:59:59")
                                     ->orderBy('starts_at')
                                     ->where('notes', self::PENDING)

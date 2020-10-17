@@ -12,8 +12,9 @@ use App\Models\Delivery;
 use App\Jobs\PostPurchase;
 use App\Jobs\SendMessage;
 use App\Jobs\CreateChatroom;
+use App\Jobs\CreateGoogleEvent;
 use App\Models\Booking;
-use App\Models\Route;
+use App\Models\ProductVariant;
 use App\Models\Stop;
 use App\Models\OrderCondition;
 use Darryldecode\Cart\CartCondition;
@@ -148,10 +149,13 @@ class EditOrderFood {
         $address = $order->orderAddresses()->where("type", "shipping")->first();
 
         $doShipping = false;
+        $variants = [];
         foreach ($items as $item) {
             $data = json_decode($item->attributes, true);
             $item->attributes = $data;
-
+            if($item->product_variant_id){
+                array_push($variants,["id"=>$item->product_variant_id,"quantity"=>$item->quantity]);
+            }
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "subscription") {
                     $object = $data['object'];
@@ -183,19 +187,21 @@ class EditOrderFood {
                         $booking->options['order_id'] = $order->id;
                         $booking->options['item_id'] = $item->id;
                         $booking->options['payer'] = $order->user_id;
-                        $booking->options['status'] = "reminded";
+                        $booking->options['status'] = "pending";
                         $booking->options['paid'] = date("Y-m-d H:i:s");
-
-                        $booking->save();
+                        $options = $booking->options;
+                        $booking->touch();
                         $updateData = [
+                            "options" => json_encode($options),
                             "total_paid" => $item->priceSumConditions,
-                            "updated_at" => date("Y-m-d H:i:s")
+                            "updated_at" => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))
                         ];
                         Booking::where("id", $id)->update($updateData);
-                    }
-                    if (array_key_exists("call", $data)) {
-                        if ($data["call"]) {
-                            dispatch(new CreateChatroom($booking->id));
+                        dispatch(new CreateGoogleEvent($booking->id));
+                        if (array_key_exists("call", $data)) {
+                            if ($data["call"]) {
+                                dispatch(new CreateChatroom($booking->id));
+                            }
                         }
                     }
                 }
@@ -217,7 +223,23 @@ class EditOrderFood {
         }
         $order->status = "approved";
         $order->save();
+        $this->updateVariantInventory($variants);
         return array("status" => "success", "message" => "Order approved, subtasks completed", "order" => $order);
+    }
+    
+    private function updateVariantInventory($items){
+        $variants = ProductVariant::whereIn("id",array_column($items, 'id'))->get();
+        foreach ($variants as $var) {
+            if(!$var->is_digital){
+                foreach ($items as $value) {
+                    if($var->id == $value['id']){
+                        $var->quantity -= $value['quantity'];
+                        $var->save(); 
+                    }
+                }
+                
+            }
+        }
     }
 
     public function createMealPlan(Order $order, Item $item, $address_id) {

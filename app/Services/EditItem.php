@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Item;
+use App\Models\CoveragePolygon;
+use App\Models\Order;
 use App\Models\User;
 use Validator;
 use DB;
@@ -41,36 +43,65 @@ class EditItem {
         }
         $status = $data["status"];
         $totalWeight = 0;
+        $extras = [];
         $originAddress = [];
         $destinyAddress = [];
-        $items = Item::whereIn("id", $data['items']);
+        $order = Order::where("id", $data['order_id'])->with(['items', 'user', 'merchant', 'orderAddresses', 'orderConditions'])->first();
+        $items = $order->items;
         if (count($items) > 0) {
-            $merchant = $items[0]->merchant;
-            $order = $items[0]->order;
+            $merchant = $order->merchant;
+            $itemsDesc = "Orden: " . $order->id . ", Items: ";
             if ($merchant) {
                 if ($merchant->checkAdminAccess($user->id)) {
                     foreach ($items as $item) {
+                        $itemsDesc += $item->name . ": " . $item->quantity . ", ";
                         $attributes = json_decode($item->attributes, true);
-                        $totalWeight += $attributes['weight'];
+                        if (array_key_exists('weight', $attributes)) {
+                            if ($attributes['weight']) {
+                                $totalWeight += $attributes['weight'];
+                            }
+                        }
+
                         $item->fulfillment = $data['status'];
                         $item->save();
                     }
+                    if ($totalWeight) {
+                        $extras['weight'] = $totalWeight;
+                    }
+                    $extras['description_pickup'] = $itemsDesc;
+                    $extras['description_delivery'] = $itemsDesc;
                 }
             }
             $shippingAddress = $order->orderAddresses()->where('type', 'shipping')->first();
             if ($data["status"] == "fullfill" && $shippingAddress) {
-                $originCountry = Country::find($merchant->country_id);
-                $originRegion = Region::find($merchant->region_id);
-                $originCity = Region::find($merchant->city_id);
 
-                $destinyCountry = Country::find($shippingAddress->country_id);
-                $destinyRegion = Region::find($shippingAddress->region_id);
-                $destinyCity = Region::find($shippingAddress->city_id);
+                $extras["request_date"] = date_create();
+                $extras['declared_value'] = $order->total;
+                if ($order->payment_method_id == 5) {
+                    $extras['special_service'] = 2;
+                    $extras['value_collection'] = $order->total;
+                } else {
+                    $extras['special_service'] = 1;
+                }
+                $attributesM = json_decode($merchant->attributes, true);
+                $extras['merchant_id'] = $attributesM['merchant_id'];
+                $extras['merchant_email'] = $merchant->email;
+                $extras['client_email'] = $order->user->email;
+                $extras['user_id'] = $order->user->id;
                 $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
                 $attributes = json_encode($shippingCondition->attributes, true);
+                $polygon = CoveragePolygon::where("merchant_id", $merchant->id)->where('provider', $attributes["platform"])->with("address")->first();
+                $origin = $polygon->address;
                 $className = "App\\Services\\" . $attributes["platform"];
                 $gateway = new $className;
-                $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray());
+                $result = $gateway->sendOrder($origin->toArray(), $shippingAddress->toArray(), $extras);
+                if ($result['status'] == 'success') {
+                    $attributesO = json_decode($origin->attributes, true);
+                    $attributesO['shipping_provider_id'] = $result['shipping_id'];
+                    $attributesO['shipping_provider'] = $attributes['platform'];
+                    $order->attributes = json_encode($attributesO);
+                    $order->save();
+                }
             }
             $payload = [
                 "order_id" => $order->id,
@@ -89,10 +120,10 @@ class EditItem {
             $client = $order->user;
             $followers = [$client];
             $date = date("Y-m-d H:i:s");
-            $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
+            //$this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
             return response()->json(array("status" => "success", "message" => "Status updated"));
         }
-        return response()->json(array("status" => "error", "message" => "Object not found"));        
+        return response()->json(array("status" => "error", "message" => "Object not found"));
     }
 
     /**

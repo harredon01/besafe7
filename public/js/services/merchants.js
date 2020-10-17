@@ -22,6 +22,65 @@ angular.module('besafe')
                 return def.promise;
 
             }
+            var getMerchantsPrivate = function (where) {
+                let url = "/api/merchants";
+                if (where) {
+                    url = url + "?" + where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+            }
+            var getStoreExport = function (data) {
+                let url = '/api/admin/merchant/orders' ;
+                var def = $q.defer();
+                $http({
+                    method: 'POST',
+                    url: url,
+                    data:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getStoreExport");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var getStoreContent = function (data) {
+                let url = '/api/admin/merchant/content' ;
+                var def = $q.defer();
+                $http({
+                    method: 'POST',
+                    url: url,
+                    data:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getStoreExport");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
 
             var searchMerchants = function (where) {
                 let url = "/api/merchants/search";
@@ -43,13 +102,13 @@ angular.module('besafe')
                 return def.promise;
 
             }
-            
+
             var saveMerchant = function (data) {
                 var def = $q.defer();
                 var url = "/api/merchants";
                 var method = "POST";
-                if(data.id){
-                    var url = "/api/merchants/"+data.id;
+                if (data.id) {
+                    var url = "/api/merchants/" + data.id;
                     var method = "PATCH";
                 }
                 $http({
@@ -91,7 +150,10 @@ angular.module('besafe')
 
             return {
                 getMerchants: getMerchants,
+                getMerchantsPrivate: getMerchantsPrivate,
                 saveMerchant: saveMerchant,
+                getStoreContent:getStoreContent,
+                getStoreExport:getStoreExport,
                 searchMerchants: searchMerchants,
                 deleteMerchant: deleteMerchant
             };

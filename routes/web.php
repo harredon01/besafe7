@@ -48,7 +48,7 @@ Route::delete('user/addresses/{code?}', 'UserController@deleteAddress');
 Route::post('user/billingAddress/{code?}', 'UserController@postSetAsBillingAddress');
 Route::post('user/editAddress', 'UserController@postEditAddress');
 
-Route::get('products', 'ProductController@getproducts');
+Route::get('products/{category?}', 'ProductController@getproducts');
 Route::get('products/{code?}', 'ProductController@getproduct');
 Route::get('products/{merchant?}/{page?}', 'ProductController@getproductsMerchant');
 
@@ -98,6 +98,9 @@ Route::post('admin/store/products', 'ProductImportController@postProducts');
 Route::post('admin/store/variants', 'ProductImportController@postVariants');
 Route::post('admin/store/merchants', 'ProductImportController@postMerchants');
 Route::post('admin/store/categories', 'ProductImportController@postCategories');
+Route::get('admin/store/global', 'StoreExportController@getImport');
+Route::post('admin/store/global', 'StoreExportController@postImport');
+Route::get('admin/store/export', 'StoreExportController@getExport');
 
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
@@ -209,7 +212,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Septiembre", "Septiembre");
+    return new App\Mail\NewsletterMenus($days, "Octubre", "Octubre");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();

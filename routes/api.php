@@ -232,6 +232,8 @@ Route::get('admin/zones', 'ZonesController@getZones');
 Route::delete('admin/zones/{item?}', 'ZonesController@deleteZoneItem');
 Route::patch('admin/zones/{item?}', 'ZonesController@updateZoneItem');
 Route::post('admin/zones', 'ZonesController@createZoneItem');
+Route::post('admin/merchant/content', 'StoreExportApiController@postMerchantExport');
+Route::post('admin/merchant/orders', 'StoreExportApiController@postStoreOrdersExport');
 Route::get('food/menu', 'FoodApiController@getMenu');
 Route::get('food/indicators', 'FoodApiController@getActiveIndicators');
 Route::get('food/tips', 'FoodApiController@getTips');

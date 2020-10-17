@@ -202,7 +202,7 @@ class FoodApiController extends Controller {
      */
     public function approvePayment($id) {
         $payment = \App\Models\Payment::find($id);
-        dispatch(new \App\Jobs\ApprovePayment($payment, "Food"));
+        dispatch(new \App\Jobs\ApprovePayment($payment, "Food",5));
         return response()->json(array("status" => "success", "message" => "Payment scheduled"));
     }
 

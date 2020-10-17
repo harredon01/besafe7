@@ -17,13 +17,9 @@ class CreateProductsTable extends Migration {
 			$table->increments('id');
                         $table->string('name');
                         $table->text('description');
-                        $table->string('availability');
                         $table->string('hash');
                         $table->double('high', 15, 2); 
                         $table->double('low', 15, 2);
-                        $table->integer('object_id')->unsigned()->nullable();
-                        $table->index('object_id');
-                        $table->string('type')->nullable();
                         $table->boolean('isActive');
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')

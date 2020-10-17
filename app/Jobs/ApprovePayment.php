@@ -16,15 +16,17 @@ class ApprovePayment implements ShouldQueue
     protected $payment;
     
     protected $platform;
+    protected $paymentMenthod;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Payment $payment,$platform )
+    public function __construct(Payment $payment,$platform ,$paymentMethod)
     {
         $this->payment = $payment;
+        $this->paymentMenthod = $paymentMethod;
         $this->platform = $platform;
     }
 
@@ -35,6 +37,6 @@ class ApprovePayment implements ShouldQueue
      */
     public function handle(EditOrder $editOrder)
     {
-        $editOrder->approvePayment($this->payment,$this->platform); 
+        $editOrder->approvePayment($this->payment,$this->platform, $this->paymentMenthod); 
     }
 }

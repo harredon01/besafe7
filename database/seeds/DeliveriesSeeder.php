@@ -1,16 +1,18 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use App\Services\Security;
-use App\Services\EditAlerts;
+use App\Services\MiPaquete;
+use App\Services\StoreExport;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
 use App\Models\Order;
+use App\Models\Booking;
 use App\Models\User;
 use App\Models\Delivery;
 use App\Models\Route;
 use App\Models\OrderAddress;
-
+use App\Models\Address;
+use App\Jobs\CreateGoogleEvent;
 class DeliveriesSeeder extends Seeder {
 
     /**
@@ -32,15 +34,21 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $security;
 
-    public function __construct(Security $security) {
+    public function __construct(MiPaquete $security) {
         $this->security = $security;
     }
 
     public function run() {
-        $geolocation = app('Geolocation');
-        $result = $geolocation->checkMerchantPolygons(4.6559523, -74.050506, 1299, "Rapigo");
-        dd($result);
-        $this->security->generateCertificate();
+        //dispatch(new CreateGoogleEvent(8));
+        $user = User::find(1);
+        $this->security->authenticate();
+        return;
+//        $this->security->getCitiesAndRegions();
+//        return null;
+        $this->security->checkGoogleBookings(['from'=>"2020-10-08 08:00:00",'to'=>"2020-10-08 09:00:00"]);
+//        $address1 = Address::find(1);
+//        $address2 = Address::find(2);
+//        dd($this->security->getOrderShippingPrice($address1->toArray(),$address2->toArray()));
 //        $data = [
 //            "address" => "Calle 73 # 0 - 24",
 //            "complete" => false, 
