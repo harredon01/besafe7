@@ -12,32 +12,33 @@
  */
 Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
     Route::get('/', function () {
-        return view('lonchis2');
+        return view(config("app.views").'.welcome');
     });
 });
 Route::get('/test', function () {
-    return view('lonchis');
+    return view(config("app.views").'.lonchis');
 });
 Route::get('/faq', function () {
-    return view('faq');
+    return view(config("app.views").'.faq');
 });
 Route::get('/blog', function () {
-    return view('blog');
+    return view(config("app.views").'.blog');
 });
 Route::get('/blog/{slug?}', function () {
-    return view('blog-detail');
+    return view(config("app.views").'.blog-detail');
 });
 Route::get('/terms', function () {
-    return view('content.terms');
+    return view(config("app.views").'.content.terms');
 });
 Route::get('/icons', function () {
-    return view('content.icons');
+    return view(config("app.views").'.content.icons');
 });
 Route::get('/zones', function () {
-    return view('content.zonespublic');
+    return view(config("app.views").'.content.zonespublic');
 });
 Auth::routes();
-
+Route::get('landing/{type?}', 'LeadController@getLanding');
+Route::post('landing', 'LeadController@postLanding');
 Route::get('/home', 'HomeController@index');
 Route::get('user/editProfile', 'UserController@getEditProfile');
 Route::post('user/editProfile', 'UserController@postEditProfile');
@@ -48,9 +49,9 @@ Route::delete('user/addresses/{code?}', 'UserController@deleteAddress');
 Route::post('user/billingAddress/{code?}', 'UserController@postSetAsBillingAddress');
 Route::post('user/editAddress', 'UserController@postEditAddress');
 
-Route::get('products/{category?}', 'ProductController@getproducts');
-Route::get('products/{code?}', 'ProductController@getproduct');
-Route::get('products/{merchant?}/{page?}', 'ProductController@getproductsMerchant');
+Route::get('a/products/{category?}/{page?}', 'ProductController@getproducts');
+Route::get('a/product-detail/{code?}', 'ProductController@getproduct');
+Route::get('a/merchant/{merchant?}/products', 'ProductController@getproductsMerchant');
 
 Route::get('plans', 'BillingController@getPlans');
 Route::get('sources', 'BillingController@getSources');
@@ -83,8 +84,8 @@ Route::get('billing/orders', 'BillingController@getOrders');
 Route::get('billing/payments', 'BillingController@getPayments');
 
 Route::get('merchant/register', 'MerchantController@getRegisterMerchant');
-Route::get('merchant/{code?}', 'MerchantController@getMerchantOrders');
 Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
+Route::get('a/merchants/{category?}', 'MerchantController@index');
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
@@ -101,7 +102,7 @@ Route::post('admin/store/categories', 'ProductImportController@postCategories');
 Route::get('admin/store/global', 'StoreExportController@getImport');
 Route::post('admin/store/global', 'StoreExportController@postImport');
 Route::get('admin/store/export', 'StoreExportController@getExport');
-
+Route::get('location', 'MapExternalController@location');
 Route::get('map/{code?}', 'MapExternalController@index');
 Route::get('safereportsext/{code?}', 'MapExternalController@report');
 Route::get('food/build_route_id/{id?}/{hash?}', 'FoodController@buildScenarioRouteId');

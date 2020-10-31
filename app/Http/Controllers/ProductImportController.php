@@ -36,7 +36,7 @@ class ProductImportController extends Controller {
      * @return Response
      */
     public function getProducts() {
-        return view('admin.store.products');
+        return view(config("app.views").'.admin.store.products');
     }
 
     /**
@@ -54,7 +54,7 @@ class ProductImportController extends Controller {
             }
         }
 
-        return view('admin.store.products')->with('user', $user);
+        return view(config("app.views").'.admin.store.products')->with('user', $user);
     }
     
     /**
@@ -63,7 +63,7 @@ class ProductImportController extends Controller {
      * @return Response
      */
     public function getVariants() {
-        return view('admin.store.variants');
+        return view(config("app.views").'.admin.store.variants');
     }
 
     /**
@@ -81,7 +81,7 @@ class ProductImportController extends Controller {
             }
         }
 
-        return view('admin.store.variants')->with('user', $user);
+        return view(config("app.views").'.admin.store.variants')->with('user', $user);
     }
     
     /**
@@ -90,7 +90,7 @@ class ProductImportController extends Controller {
      * @return Response
      */
     public function getMerchants() {
-        return view('admin.store.merchants');
+        return view(config("app.views").'.admin.store.merchants');
     }
 
     /**
@@ -108,7 +108,7 @@ class ProductImportController extends Controller {
             }
         }
 
-        return view('admin.store.merchants')->with('user', $user);
+        return view(config("app.views").'.admin.store.merchants')->with('user', $user);
     }
     
     /**
@@ -117,7 +117,7 @@ class ProductImportController extends Controller {
      * @return Response
      */
     public function getCategories() {
-        return view('admin.store.categories');
+        return view(config("app.views").'.admin.store.categories');
     }
 
     /**
@@ -135,6 +135,6 @@ class ProductImportController extends Controller {
             }
         }
 
-        return view('admin.store.categories')->with('user', $user);
+        return view(config("app.views").'.admin.store.categories')->with('user', $user);
     }
 }

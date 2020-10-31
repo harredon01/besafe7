@@ -522,6 +522,18 @@ class MerchantImport {
             $this->importCategoriesExcelInternal($row);
         }
     }
+    public function slug_url($text) {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return 'n-a';
+        }
+        return $text;
+    }
 
     public function importCategoriesExcelInternal(array $row) {
         $headers = $row[0];
@@ -536,6 +548,8 @@ class MerchantImport {
                 } else {
                     $sheet['icon'] = 'https://picsum.photos/900/300';
                 }
+                $sheet['url'] = $this->slug_url($sheet['name'] );
+                $sheet['isActive'] = true;
                 Category::firstOrCreate($sheet);
             }
         }

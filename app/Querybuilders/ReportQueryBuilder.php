@@ -37,6 +37,11 @@ class ReportQueryBuilder extends QueryBuilder {
     public function filterByGroupStatus($query, $id) {
         return $query->where('group_report.status', '=', $id);
     }
+    public function filterByOwnerId($query, $id) {
+        return $query->join('reportables', 'reports.id', '=', 'reportables.report_id')
+                        ->where('reportables.reportable_type', 'App\Models\User')
+                        ->where('reportables.reportable_id', $id);
+    }
 }
 
 /* 

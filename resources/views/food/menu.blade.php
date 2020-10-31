@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(config("app.views").'layouts.app')
 
 @section('content')
 <div class="container" ng-controller="MenuCtrl" ng-init='config={content:"lunch"}'>

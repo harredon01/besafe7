@@ -29,6 +29,6 @@ class Newsletter extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-generico2')->subject("Celebra el día del padre en casa, con nuestros especiales para papá Lonchis!");
+        return $this->view(config("app.views").'.emails.food.newsletter-generico2')->subject("Celebra el día del padre en casa, con nuestros especiales para papá Lonchis!");
     }
 }

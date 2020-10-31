@@ -353,20 +353,20 @@ class PayU {
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorPayment($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
 
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $validator = $this->validatorPayer($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $validator = $this->validatorCC($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $user = $this->checkUserId($user,$data);
         $buyer = $this->populateBuyer($user, $data);

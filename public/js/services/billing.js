@@ -1,76 +1,73 @@
 angular.module('besafe')
         
-        .service('Billing', function ($q, $http) {
+        .service('Billing',['$q', '$http', function ($q, $http) {
 
-            var createSubscriptionExisting = function (data,platform) {
+            var payCreditCard = function (data,platform) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/subscriptions/'+platform,
+                        url: 'api/billing/pay_cc/'+platform,
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to get nearby");
+                            def.reject("Failed to payCreditCard");
                         });
 
                 return def.promise;
                 /**/
 
             }
-            var createSubscription = function (data,platform) {
+            var payInBank = function (data) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/subscriptions/'+platform,
+                        url: 'api/billing/pay_in_bank/Local',
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to get nearby");
+                            def.reject("Failed to payInBank");
                         });
 
                 return def.promise;
                 /**/
 
             }
-            var editSubscription = function (data,subscription,platform) {
+            var completePaidOrder = function (data) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/subscriptions/'+platform+"/"+subscription,
+                        url: 'api/billing/complete_paid/Food',
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to get nearby");
+                            def.reject("Failed to completePaidOrder");
                         });
 
                 return def.promise;
                 /**/
 
             }
-            var getSubscriptions = function () {
+            var retryPayment = function (payment) {
                 var def = $q.defer();
                 $http({
-                        method: 'GET',
-                        url: 'api/subscriptions',
+                        method: 'POST',
+                        url: 'api/billing/retry/'+payment,
                         
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to get sources");
+                            def.reject("Failed to retryPayment");
                         });
 
                 return def.promise;
@@ -78,29 +75,58 @@ angular.module('besafe')
 
             }
             
-            var getSubscriptionsTypeObject = function (type,object) {
+            var addTransactionCosts = function (payment) {
                 var def = $q.defer();
                 
                 $http({
-                        method: 'GET',
-                        url: 'api/subscriptions/object/'+type+"/"+object,
+                        method: 'POST',
+                        url: 'api/billing/add_transaction_costs/'+payment,
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to getSubscriptionsTypeObject");
+                            def.reject("Failed to addTransactionCosts");
                         });
                 return def.promise;
             }
-            
-            var getPlans = function (where) {
-                var url ="";
-                if(where){
-                    url = 'api/plans?' +where;
-                } else {
-                    url = 'api/plans';
-                }
+
+            var payDebit = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: 'api/billing/pay_debit/'+platform,
+                        data: data, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to payDebit");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var payCash = function (data,platform) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: 'api/billing/pay_cash/'+platform,
+                        data: data, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to payCash");
+                        });
+                return def.promise;
+                /**/
+            }
+            var getBanks = function (where) {
+                var url ="api/payu/banks";
                 var def = $q.defer();
                 $http({
                         method: 'GET',
@@ -110,132 +136,18 @@ angular.module('besafe')
                                 def.resolve(data);
                             })
                         .error(function () {
-                            def.reject("Failed to get plans");
+                            def.reject("Failed to getBanks");
                         });
                 return def.promise;
-            }
-            
-            var deleteSubscription = function (subscription,platform) {
-                var def = $q.defer();
-                $http({
-                        method: 'Delete',
-                        url: 'api/subscriptions/'+platform+"/"+subscription,
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
-            var createSource = function (data,platform) {
-                var def = $q.defer();
-                $http({
-                        method: 'POST',
-                        url: 'api/sources/'+platform,
-                        data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
-            var getSources = function (platform) {
-                var def = $q.defer();
-                $http({
-                        method: 'GET',
-                        url: 'api/sources/'+platform,
-                        
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get sources");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
-            var deleteSource = function (source,platform) {
-                var def = $q.defer();
-                $http({
-                        method: 'Delete',
-                        url: 'api/sources/'+platform+"/"+source,
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
-            var setAsDefault = function (data,platform) {
-                var def = $q.defer();
-                $http({
-                        method: 'POST',
-                        url: 'api/sources/'+platform+"/default",
-                        data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
-            }
-            var makeCharge = function (data) {
-                var def = $q.defer();
-                $http({
-                        method: 'POST',
-                        url: '/pay/pay_cash',
-                        data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-
-                return def.promise;
-                /**/
-
             }
             return {
-                deleteSource: deleteSource,
-                getSources:getSources,
-                createSource: createSource,
-                setAsDefault:setAsDefault,
-                getPlans:getPlans,
-                makeCharge: makeCharge,
-                deleteSubscription:deleteSubscription,
-                getSubscriptions:getSubscriptions,
-                editSubscription:editSubscription,
-                createSubscription:createSubscription,
-                createSubscriptionExisting:createSubscriptionExisting,
-                getSubscriptionsTypeObject:getSubscriptionsTypeObject
+                payCreditCard: payCreditCard,
+                payInBank:payInBank,
+                completePaidOrder: completePaidOrder,
+                retryPayment:retryPayment,
+                addTransactionCosts:addTransactionCosts,
+                payDebit: payDebit,
+                payCash:payCash,
+                getBanks:getBanks
             };
-        })
+        }])

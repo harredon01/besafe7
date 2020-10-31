@@ -3,8 +3,12 @@
 namespace App\Services;
 use App\Models\Category;
 use DB;
+use Cache;
 class EditCategory {
 
+    /**
+     * Categorias con parent 0 y hasta 2 niveles se devuelven para los hijos
+     */
 
     /**
      * Store a newly created resource in storage.
@@ -35,6 +39,17 @@ class EditCategory {
         }
         
         return ['status' => "success", "data" => $categories];
+    }
+    public function getCategoriesMenu() {
+        if (false) {
+            $results = Cache::remember('products_merchant_' . $data['merchant_id'] . "_" . $data['page'], 100, function ()use ($data) {
+                        return $this->productsQuery($data);
+                    });
+        } else {
+            return Category::where('level',1)->with("children.children")->get()->toArray();
+        }
+
+        return [];
     }
 
 }

@@ -1,6 +1,6 @@
 angular.module('besafe')
         
-        .service('Addresses', function ($q, $http) {
+        .service('Addresses',['$q', '$http', function ($q, $http) {
 
             var getAddresses = function () {
                 var def = $q.defer();
@@ -26,7 +26,6 @@ angular.module('besafe')
                         method: 'POST',
                         url: '/api/addresses',
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -64,4 +63,4 @@ angular.module('besafe')
                 saveAddress:saveAddress,
                 deleteAddress:deleteAddress
             };
-        })
+        }])

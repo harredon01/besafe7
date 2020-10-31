@@ -1,0 +1,47 @@
+<div class="col-lg-2 col-6 offset-6 offset-md-0 col-md-3 order-3" ng-controller="CartCtrl">
+    <div class="cart-widget-wrapper slide-down-wrapper">
+        <div class="cart-widget slide-down--btn">
+            <div class="cart-icon">
+                <i class="ion-bag"></i>
+                <span class="cart-count-badge">
+                    @{{items.length}}
+                </span>
+            </div>
+            <div class="cart-text">
+                <span class="d-block">Your cart</span>
+                <strong><span class="amount"><span class="currencySymbol"></span>@{{subtotal | currency}}</span></strong>
+            </div>
+        </div>
+        <div class="slide-down--item ">
+            <div class="cart-widget-box">
+                <ul class="cart-items">
+                    <li class="single-cart" ng-repeat="item in items">
+                        <a href="#" class="cart-product">
+                            <div class="cart-product-img">
+                                <img src="image/product/cart-product.jpg" alt="Selected Products">
+                            </div>
+                            <div class="product-details">
+                                <h4 class="product-details--title">@{{item.name}}</h4>
+                                <span class="product-details--price">@{{item.quantity}} x @{{item.priceWithConditions | currency}}</span> 
+                            </div>
+                            <span class="cart-cross" ng-click="deleteCartItem(item.id)">x</span>
+                        </a>
+                    </li>
+                    <li class="single-cart">
+                        <div class="cart-product__subtotal">
+                            <span class="subtotal--title">Subtotal</span>
+                            <span class="subtotal--price">@{{subtotal | currency}}</span>
+                        </div>
+                    </li>
+                    <li class="single-cart">
+                        <div class="cart-buttons">
+                            <!--a href="cart.html" class="btn btn-outlined">View Cart</a-->
+                            <a href="/checkout" class="btn btn-outlined">Check Out</a>
+                        </div>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+</div>

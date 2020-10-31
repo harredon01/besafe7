@@ -6,7 +6,9 @@ use Illuminate\Support\ServiceProvider;
 use App\Services\Notifications;
 use App\Services\ZoomMeetings;
 use App\Services\Geolocation;
+use App\Models\Category;
 use OpenTok\OpenTok;
+use Illuminate\Support\Facades\View;
 class AppServiceProvider extends ServiceProvider {
 
     /**
@@ -15,7 +17,9 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        //
+        View::composer(config("app.views").'.layouts.app', function ($view) {
+            $view->with('categories', Category::where('level',0)->with("children.children")->get());
+        });
     }
 
     /**

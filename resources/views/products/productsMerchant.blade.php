@@ -4,7 +4,42 @@
 <div class="container-fluid" ng-controller="ProductsCtrl">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
+            <a href="javascript:;" ng-click="changeStore()" class="editar">Cambiar tienda</a>
+            <div class="panel panel-default" ng-repeat="category in categories">
+                <div class="panel-heading">@{{category.name}}
+
+                </div>
+                <div class="panel-body">
+                    <div >
+                        <ul>
+                            <li ng-repeat="product in category.products">
+                                <h3>
+                                    @{{ product.name}}
+                                </h3>
+                                <div class='gallery'>
+                                    <img ng-repeat="img in product.imgs" ng-src="@{{img.file}}" style="width: 250px"/>
+                                </div>
+
+                                <p ng-bind-html="product.description">
+
+                                </p>
+                                <p>
+
+                                </p>
+                                <div class="product" ng-repeat="productVariant in product.variants">
+                                    <p>
+                                        @{{ productVariant.price }}
+                                    </p>
+                                    <a href="javascript:;" ng-click="addCartItem(productVariant,[])" class="editar">agregar</a>
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+            </div>
+        </div>
+            <div class="panel panel-default" id="dissapear">
+                
                 @foreach ($categories as $category)
                 <div class="panel-heading">{{ $category['name']}}
 
@@ -22,7 +57,7 @@
                                 <div class='gallery'>
                                     @foreach ($product['imgs'] as $img)
 
-                                    <img src="{{ $img['file']}}" style="width: 100%"/>
+                                    <img src="{{ $img['file']}}" style="width: 250px"/>
 
 
                                     @endforeach
@@ -39,7 +74,7 @@
                                     <p>
                                         {{ $productVariant['price']}}
                                     </p>
-                                    <a href="javascript:;" ng-click="addCartItem({{ $productVariant['id']}},1,this)" class="editar">agregar</a>
+                                    <a href="javascript:;" ng-click="addCartItem({{ $productVariant['id']}},1,1)" class="editar">agregar</a>
                                 </div>
 
                                 @endforeach
@@ -54,6 +89,10 @@
                 </div>
                 @endforeach
             </div>
+            
+            <script>
+                var viewData = '@json($categories)';
+            </script>
         </div>
     </div>
 </div>

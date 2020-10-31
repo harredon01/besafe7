@@ -61,6 +61,6 @@ class EmailPaymentCash extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.email-payment-cash-email');
+        return $this->markdown(config("app.views").'.emails.email-payment-cash-email');
     }
 }

@@ -5,31 +5,17 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Hola {{$user->firstName}}, aca puedes editar tus direcciones. Debes tener una de tipo billing para completar una orden
+                <div class="panel-heading">Hola {{$user->firstName}}, aca puedes editar tus direcciones.
 
                 </div>
                 <div class="panel-body">
-                    @if (count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error}}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
-                    <div class="replace-address">
+                    <a href="javascript:;" ng-click="newAddress()">New address</a>
+                    <div class="replace-address" ng-hide="editAddress">
                         @include('user.addressList')
                     </div>
-
-
-                    <div >
-                       
+                    <div ng-show="editAddress">
                         @include('user.editAddressForm')
-                    
                     </div>
-
                 </div>
             </div>
         </div>

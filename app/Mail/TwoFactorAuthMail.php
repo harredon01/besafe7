@@ -44,6 +44,6 @@ class TwoFactorAuthMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.two-factor-email');
+        return $this->markdown(config("app.views").'.emails.two-factor-email');
     }
 }

@@ -11,7 +11,56 @@ let mix = require('laravel-mix');
  |
  */
 
-mix.js('src/app.js', 'dist/').sass('src/app.scss', 'dist/');
+mix.js([
+    '_app.js',
+    'constants.js',
+    'controllers/userctrl.js',
+    'controllers/mapctrl.js',
+    'controllers/productctrl.js',
+    'controllers/cartctrl.js',
+    'controllers/checkoutctrl.js',
+    'controllers/accessctrl.js',
+    'controllers/sourcesctrl.js',
+    'controllers/addressctrl.js',
+    'controllers/routesctrl.js',
+    'controllers/ordersctrl.js',
+    'controllers/exportsctrl.js',
+    'controllers/paymentsctrl.js',
+    'controllers/groupsctrl.js',
+    'controllers/menuctrl.js',
+    'controllers/merchantsctrl.js',
+    'controllers/deliveriesctrl.js',
+    'controllers/admin/store/admin-store-productsctrl.js',
+    'controllers/admin/store/admin-store-variantsctrl.js',
+    'controllers/admin/store/admin-store-merchantsctrl.js',
+    'controllers/admin/store/admin-store-categoriesctrl.js',
+    'controllers/foodaddressesctrl.js',
+    'controllers/foodmessagesctrl.js',
+    'controllers/zonesctrl.js',
+    'services/map.js',
+    'services/merchants.js',
+    'services/categories.js',
+    'services/cart.js',
+    'services/modals.js',
+    'services/mapDash.js',
+    'services/users.js',
+    'services/location.js',
+    'services/products.js',
+    'services/checkout.js',
+    'services/payu.js',
+    'services/billing.js',
+    'services/passport.js',
+    'services/groups.js',
+    'services/address.js',
+    'services/routes.js',
+    'services/payments.js',
+    'services/orders.js',
+    'services/product-import.js',
+    'services/food.js',
+    'services/zones.js',
+    
+    
+    ], 'public/js/');
 
 // Full API
 // mix.js(src, output);

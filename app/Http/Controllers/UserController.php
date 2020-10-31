@@ -38,7 +38,7 @@ class UserController extends Controller {
      * @return Response
      */
     public function index() {
-        return view('user.editProfile');
+        return view(config("app.views").'.user.editProfile');
     }
     /**
      * Show the application dashboard to the user.
@@ -47,7 +47,7 @@ class UserController extends Controller {
      */
     public function access() {
         $user = $this->auth->user();
-        return view('user.editAccess')->with('user', $user);
+        return view(config("app.views").'.user.editAccess')->with('user', $user);
     }
 
 }

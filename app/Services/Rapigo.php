@@ -56,6 +56,9 @@ class Rapigo {
     public function getOrderShippingPrice(array $origin, array $destination, array $extras) {
         //dd($points);
         $points = [];
+        if($origin['city_id'] != $destination['city_id']){
+            return ['status'=>'error','message'=>"solo para la misma ciudad"];
+        }
         $querystop = [
             "address" => $origin['address'],
             "description" => "Origen",
@@ -83,8 +86,9 @@ class Rapigo {
         if(!$urlFound){
             $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
         }
-        //dd($query);
+        //dd($data);
         $response = $this->sendPost($data, $query);
+        //dd($response);
         $response['status'] = "success";
         return $response;
     }

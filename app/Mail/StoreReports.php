@@ -37,6 +37,6 @@ class StoreReports extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.sales-report')->attachFromStorageDisk('local', $this->attachment);
+        return $this->markdown(config("app.views").'.emails.food.sales-report')->attachFromStorageDisk('local', $this->attachment);
     }
 }

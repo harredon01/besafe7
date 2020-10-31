@@ -139,7 +139,7 @@ class MercadoPagoController extends Controller {
 
     public function returnMerc(Request $request) {
         $data = $this->mercadoPago->returnMerc($request->all());
-        return view('billing.MercadoPago.return', $data);
+        return view(config("app.views").'.billing.MercadoPago.return', $data);
     }
 
 }

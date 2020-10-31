@@ -5,65 +5,57 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Hola {{$user->firstName}}, selecciona tu direccion de correspondencia
-
+                <div class="panel-heading">Resumen de tu orden
                 </div>
                 <div class="panel-body">
-                    @if (count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error}}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
-                    <div class="replace-checkout-cart" ng-controller="CheckoutCartCtrl" ng-hide="isDigital">
+                    <div class="replace-checkout-cart" ng-controller="CheckoutCartCtrl">
                         @include('products.checkoutCart')
-                    </div>
-                    <div class="address" ng-controller="CheckoutShippingCtrl" ng-show="visible">
-                        <div class="replace-address">
-                            @include('user.checkoutAddressList')
-                            <a href="javascript:;" ng-click="showAddressForm()">Nueva direccion</a>
+                        <div class="form-group">
+                            <div class="col-md-6 col-md-offset-4">
+                                Ingresa un cupon
+                                <div>
+                                    <input type="text" ng-model="coupon" style="float:left;width:70%" class="form-control" name="coupon" required>
+                                    <button ng-click="setCoupon()" style="float:left" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
                         </div>
-
-
-
+                        <button ng-click="prepareOrder()" style="float:left" ng-show="isDigital" class="btn btn-primary">Pagar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default" ng-controller="CheckoutShippingCtrl" ng-show="visible">
+                <div class="panel-heading">Direccion de envío
+                </div>
+                <div class="panel-body">
+                    <div class="address" >
+                        <div class="replace-address">
+                            <div ng-show="!shippingAddressSet && !addAddress">
+                                @include('user.checkoutAddressList')
+                            </div>
+                            <a href="javascript:;" ng-show="!shippingAddressSet" ng-click="showAddressForm()">Nueva direccion</a>
+                        </div>
                         <div ng-show="addAddress">
                             @include('user.editAddressForm')
                             <a href="javascript:;" ng-click="hideAddressForm()">Cerrar</a>
                         </div>
                         <div class="replace-address" ng-show="shippingAddressSet">
-
+                            <p>@{{addressSet.address}}, @{{addressSet.city}} </p>
                             @include('products.ShippingMethodsList')
                         </div>
-
+                        <button ng-click="prepareOrder()" style="float:left" ng-show="shippingConditionSet" class="btn btn-primary">Pagar</button>
                     </div>
-                    <div class="payment-gateways" ng-show="shippingCondition || isDigital" ng-controller="CheckoutGatewaysCtrl">
+                </div>
+            </div>
+
+            <div class="panel panel-default" ng-show="paymentActive" ng-controller="CheckoutBillingCtrl" id="payment-methods">
+                <div class="panel-heading">Pago
+                </div>
+                <div class="panel-body">
+                    <div class="payment-methods">
                         <div class="replace-address">
-                            @include('products.checkoutPaymentGateways')
-                        </div>
-
-                    </div>
-                    <div class="payu" style="display: none">
-                        <div class="payment-methods" ng-show="shippingCondition || isDigital" ng-controller="CheckoutBillingCtrl">
-                            <div class="replace-address">
-                                @include('products.checkoutPaymentMethods')
-                            </div>
-
+                            @include('products.checkoutPaymentMethods')
                         </div>
                     </div>
-
-
-                    <div class="stripe" style="display: none">
-                        <div class="replace-address">
-                            @include('products.checkoutStripePaymentMethods')
-                        </div>
-
-                    </div>
-
-
                 </div>
             </div>
         </div>

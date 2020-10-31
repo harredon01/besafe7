@@ -15,12 +15,12 @@ class ArrayMultipleSheetImport implements WithMultipleSheets, SkipsUnknownSheets
     public function sheets(): array
     {
         return [
+            'categories' => new ArrayImport(),
             'merchants' => new ArrayImport(),
             'reports' => new ArrayImport(),
             'products' => new ArrayImport(),
             'variants' => new ArrayImport(),
             'availabilities' => new ArrayImport(),
-            'categories' => new ArrayImport(),
             'ratings' => new ArrayImport(),
             'polygons' => new ArrayImport(),
             'quick' => new ArrayImport(),

@@ -1,6 +1,6 @@
 angular.module('besafe')
         
-        .service('Users', function ($q, $http) {
+        .service('Users',['$q', '$http', function ($q, $http) {
 
             var setAsBillingAddress = function (address_id) {
                 var def = $q.defer();
@@ -41,8 +41,7 @@ angular.module('besafe')
                 $http({
                         method: 'POST',
                         url: '/api/addresses',
-                        data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
+                        data: data, // pass in data as strings  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -137,4 +136,4 @@ angular.module('besafe')
                 getContacts:getContacts,
                 getUser:getUser
             };
-        })
+        }])

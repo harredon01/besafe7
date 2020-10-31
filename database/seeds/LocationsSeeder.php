@@ -87,7 +87,6 @@ class LocationsSeeder extends Seeder {
         $this->merchantImport->importCitiesBlocks("GeoLite2-City-Blocks-IPv4.xlsx");
         $this->merchantImport->importCitiesData("cities.xlsx");*/
         $this->merchantImport->importCities("cities.xlsx");
-        $this->merchantImport->importCategoriesExcel("categories.xlsx");
     }
 
 }

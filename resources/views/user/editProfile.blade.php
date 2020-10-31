@@ -1,11 +1,11 @@
-@extends('layouts.app')
+@extends(config("app.views").'layouts.app')
 
 @section('content')
 <div class="container-fluid" ng-controller="UserProfileCtrl">
 	<div class="row">
 		<div class="col-md-8 col-md-offset-2">
 			<div class="panel panel-default">
-				<div class="panel-heading">Hello {{$user->firstName}}, here you can edit your profile information
+				<div class="panel-heading">Hola {{$user->firstName}}, aca puedes editar tus datos
                                 
                                 </div>
 				<div class="panel-body">
@@ -24,14 +24,14 @@
 						<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">First Name</label>
+							<label class="col-md-4 control-label">Nombres</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="firstName" value="{{$user->firstName}}">
 							</div>
 						</div>
                                                 
                                                 <div class="form-group">
-							<label class="col-md-4 control-label">Last Name</label>
+							<label class="col-md-4 control-label">Apellidos</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="lastName" value="{{ $user->lastName }}">
 							</div>
@@ -43,32 +43,26 @@
 							</div>
 						</div>
                                                 <div class="form-group">
-							<label class="col-md-4 control-label">Cellphone</label>
+							<label class="col-md-4 control-label">Celular</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="cellphone" value="{{ $user->cellphone }}">
 							</div>
 						</div>
                                                 <div class="form-group">
-							<label class="col-md-4 control-label">Area Code</label>
-							<div class="col-md-6">
-								<input type="text" class="form-control" name="area_code" value="{{ $user->area_code }}">
-							</div>
-						</div>
-                                                <div class="form-group">
-							<label class="col-md-4 control-label">Gender</label>
+							<label class="col-md-4 control-label">Genero</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="gender" value="{{ $user->gender }}">
 							</div>
 						</div>
                                                 <div class="form-group">
-							<label class="col-md-4 control-label">Doc Type</label>
+							<label class="col-md-4 control-label">Tipo de identificacion</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="docType" value="{{ $user->docType }}">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label class="col-md-4 control-label">Doc Number</label>
+							<label class="col-md-4 control-label"># identificacion</label>
 							<div class="col-md-6">
 								<input type="text" class="form-control" name="docNum" value="{{ $user->docNum }}">
 							</div>

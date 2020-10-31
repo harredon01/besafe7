@@ -274,7 +274,7 @@ class StoreExport {
         });
     }
 
-    public function exportProducts(User $user,$merchant_id) {
+    public function exportProducts(User $user, $merchant_id) {
         $pages = [
             ["name" => "products", "rows" => []],
             ["name" => "variants", "rows" => []],
@@ -293,7 +293,7 @@ class StoreExport {
             $query->select('product_id')
                     ->from('merchant_product')
                     ->where('merchant_id', $merchant_id);
-        })->with(['productVariants', 'merchants', 'files','categories'])->chunk(100, function ($products) use(&$pages, $count, &$processed, &$variantsHead, &$filesHead, &$user) {
+        })->with(['productVariants', 'merchants', 'files', 'categories'])->chunk(100, function ($products) use(&$pages, $count, &$processed, &$variantsHead, &$filesHead, &$user) {
             foreach ($products as $product) {
                 $variants = $product->productVariants;
                 if (count($variants) > 0) {
@@ -306,7 +306,7 @@ class StoreExport {
                 $merchantId = substr($merchantId, 0, -1);
                 $product->merchant_id = $merchantId;
                 $categories = "";
-                
+
                 foreach ($product->categories as $p) {
                     $categories .= $p->id . ",";
                 }
@@ -339,13 +339,13 @@ class StoreExport {
                     array_unshift($pages[0]['rows'], array_keys($product->toArray()));
                     array_unshift($pages[1]['rows'], $variantsHead);
                     array_unshift($pages[2]['rows'], $filesHead);
-                    $this->writeFile($pages, "Productos-Descarga-Completass" . time(), true,$user);
+                    $this->writeFile($pages, "Productos-Descarga-Completass" . time(), true, $user);
                 }
             }
         });
     }
 
-    public function exportProductsFast(User $user,$merchant_id) {
+    public function exportProductsFast(User $user, $merchant_id) {
         $pages = [
             ["name" => "quick", "rows" => []],
         ];
@@ -383,7 +383,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], $tableHeader);
-                    $this->writeFile($pages, "Productos-Descarga-rapida-" . time(), true,$user);
+                    $this->writeFile($pages, "Productos-Descarga-rapida-" . time(), true, $user);
                 }
             }
         });
@@ -404,34 +404,34 @@ class StoreExport {
             $query->select('merchant_id')
                     ->from('merchant_user')
                     ->where('user_id', $user->id);
-        })->with("categories")->chunk(100, function ($merchants) use(&$pages, $count, &$processed,&$tablehead) {
+        })->with("categories")->chunk(100, function ($merchants) use(&$pages, $count, &$processed, &$tablehead) {
             foreach ($merchants as $merchant) {
                 unset($merchant->merchant_id);
                 $attributes = $merchant->attributes;
                 $categories = "";
-                
+
                 foreach ($merchant->categories as $p) {
                     $categories .= $p->id . ",";
                 }
                 unset($merchant->categories);
-                $categories = substr($categories, 0, -1);               
+                $categories = substr($categories, 0, -1);
                 $data = $merchant->toArray();
                 $data['categories'] = $categories;
-                $data['experience1']="";
-                $data['experience2']="";
-                $data['experience3']="";
-                $data['experience4']="";
-                $data['experience5']="";
-                $data['specialty1']="";
-                $data['specialty2']="";
-                $data['specialty3']="";
-                $data['specialty4']="";
-                $data['specialty5']="";
-                $data['service1']="";
-                $data['service2']="";
-                $data['service3']="";
-                $data['service4']="";
-                $data['service5']="";
+                $data['experience1'] = "";
+                $data['experience2'] = "";
+                $data['experience3'] = "";
+                $data['experience4'] = "";
+                $data['experience5'] = "";
+                $data['specialty1'] = "";
+                $data['specialty2'] = "";
+                $data['specialty3'] = "";
+                $data['specialty4'] = "";
+                $data['specialty5'] = "";
+                $data['service1'] = "";
+                $data['service2'] = "";
+                $data['service3'] = "";
+                $data['service4'] = "";
+                $data['service5'] = "";
                 unset($data['attributes']);
                 unset($data['created_at']);
                 unset($data['updated_at']);
@@ -451,27 +451,27 @@ class StoreExport {
                         $data[$key] = $value;
                     }
                 }
-                if(count(array_keys($data))>count($tablehead)){
+                if (count(array_keys($data)) > count($tablehead)) {
                     $tablehead = array_keys($data);
                 }
                 array_push($pages[0]['rows'], $data);
                 $processed++;
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
-                    array_unshift($pages[0]['rows'],$tablehead);
+                    array_unshift($pages[0]['rows'], $tablehead);
                     $this->writeFile($pages, "Listado-Negocios-Descarga-Completa" . time(), true);
                 }
             }
         });
     }
 
-    public function exportAvailabilitiesFast(User $user,$merchant_id) {
+    public function exportAvailabilitiesFast(User $user, $merchant_id) {
         $pages = [
             ["name" => "availabilities", "rows" => []],
         ];
         $processed = 0;
         $count = Availability::where('bookable_id', $merchant_id)->where('bookable_type', "App\\Models\\Merchant")->count();
-        Availability::where('bookable_id', $merchant_id)->where('bookable_type', "App\\Models\\Merchant")->chunk(100, function ($availabilities) use(&$pages, $count, &$processed,&$user) {
+        Availability::where('bookable_id', $merchant_id)->where('bookable_type', "App\\Models\\Merchant")->chunk(100, function ($availabilities) use(&$pages, $count, &$processed, &$user) {
             foreach ($availabilities as $availability) {
                 array_push($pages[0]['rows'], $availability);
                 $processed++;
@@ -487,7 +487,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], array_keys($availability->toArray()));
-                    $this->writeFile($pages, "Disponibilidad-" . time(), true,$user);
+                    $this->writeFile($pages, "Disponibilidad-" . time(), true, $user);
                 }
             }
         });
@@ -521,7 +521,7 @@ class StoreExport {
         }
     }
 
-    public function writeFile($data, $title, $sendMail,$user) {
+    public function writeFile($data, $title, $sendMail, $user) {
         //dd($data);
         $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
         $path = 'exports/' . $title . ".xls";
@@ -1124,6 +1124,7 @@ class StoreExport {
                 }
                 $merchant->lat = rand(4527681, 4774930) / 1000000;
                 $merchant->long = rand(-74185612, -74035612) / 1000000;
+                $merchant->slug = $this->slug_url($merchant->name);
                 if ($image) {
                     if (strpos($image, "https://") !== false) {
                         
@@ -1137,6 +1138,19 @@ class StoreExport {
                 $merchant->save();
             }
         }
+    }
+
+    public function slug_url($text) {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return 'n-a';
+        }
+        return $text;
     }
 
     public function importReportsExcelInternal(User $user, array $row) {
@@ -1238,10 +1252,24 @@ class StoreExport {
                 if (!$category) {
                     $category = new Category;
                 }
-                $category->fill($category);
+                $sheet['url'] = $this->slug_url($sheet['name'] );
+                $sheet['isActive'] = true;
+                $category->fill($sheet);
                 $category->save();
             }
         }
+    }
+    public function slug_url($text) {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return 'n-a';
+        }
+        return $text;
     }
 
     public function importArticlesExcelInternal(User $user, array $row) {
@@ -1366,7 +1394,7 @@ class StoreExport {
             }
             if ($sheet['sku'] && $sheet['sku'] != 'sku') {
                 $variant = ProductVariant::find($sheet['id']);
-                if(!$variant){
+                if (!$variant) {
                     unset($sheet['id']);
                 }
                 $attributes = $sheet['attributes'];

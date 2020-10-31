@@ -200,16 +200,17 @@ class MerchantApiController extends Controller {
         $additionalQuery = '';
         if ($category) {
             $thedata["category"] = $data["category"];
-            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category)) ';
+            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category) and categorizable_type = "App\\\Models\\\Merchant") ';
         }
-        //DB::enableQueryLog();
+//        DB::enableQueryLog();
         $merchants = DB::select(" "
                         . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
                 ." where private = 0 AND status in ('online','active','busy') AND "
                 . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
                         . $additionalQuery
                         . " LIMIT ".$offset.", :limit", $thedata);
-        //dd(DB::getQueryLog());
+//        dd($merchants);
+//        dd(DB::getQueryLog());
         $merchants = $this->editMapObject->buildIncludes($merchants, $data);
         return array("data" => $merchants);
     }

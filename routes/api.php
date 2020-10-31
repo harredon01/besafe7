@@ -124,6 +124,7 @@ Route::post('reports/share', 'ShareApiController@postAddFollower');
 Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
 Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
+Route::get('reports/detail', 'ReportApiController@getObject');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
 Route::get('reports/search', function (Request $request) {
     $searchQuery = App\Models\Report::search($request->search);

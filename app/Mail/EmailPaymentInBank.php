@@ -47,6 +47,6 @@ class EmailPaymentInBank extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.email-payment-bank');
+        return $this->markdown(config("app.views").'.emails.email-payment-bank');
     }
 }

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(config("app.views").'layouts.app')
 
 @section('content')
 <script type="text/javascript">

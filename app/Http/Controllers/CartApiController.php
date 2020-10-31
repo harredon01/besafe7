@@ -190,7 +190,7 @@ class CartApiController extends Controller {
      */
     public function getCheckout() {
         $user = $this->auth->user();
-        return view('products.checkout')
+        return view(config("app.views").'.products.checkout')
                         ->with('user', $user);
     }
 

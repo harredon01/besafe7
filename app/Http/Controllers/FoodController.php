@@ -41,25 +41,6 @@ class FoodController extends Controller {
         $this->middleware('admin', ['except' => ['buildScenarioRouteId', 'buildScenarioPositive','buildCompleteScenario','getScenarioStructure','cancelUserCredit','cancelDelivery']]);
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function index() {
-        return view('user.editProfile');
-    }
-
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function access() {
-        $user = $this->auth->user();
-        return view('user.editAccess')->with('user', $user);
-    }
-
 
     /**
      * Show the application dashboard to the user.
@@ -69,7 +50,7 @@ class FoodController extends Controller {
     public function getPolygons() {
         $user = $this->auth->user();
         $polygons = CoveragePolygon::where('lat', "<>", 0)->where('long', "<>", 0)->get();
-        return view('food.polygons')->with('polygons', $polygons);
+        return view(config("app.views").'.food.polygons')->with('polygons', $polygons);
     }
 
     /**
@@ -90,9 +71,9 @@ class FoodController extends Controller {
             $user = User::find(2);
             dispatch(new \App\Jobs\GetScenarioStructure($user,$data));
             //$this->food->getTotalEstimatedShipping($data);
-            return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
-            return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "La validacion no fue exitosa");
         }
     }
     
@@ -106,9 +87,9 @@ class FoodController extends Controller {
         $check = $this->routing->checkScenario($users, $hash);
         if (true) {
             $this->food->suspendDelivery($users[0],"cancel");
-            return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
-            return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "La validacion no fue exitosa");
         }
     }
     /**
@@ -121,9 +102,9 @@ class FoodController extends Controller {
         $check = $this->routing->checkScenario($users, $hash);
         if (true) {
             $this->food->suspendDelivery($users[0],"trade");
-            return view('food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "El detalle de las rutas fue enviado a tu correo. Tambien puedes verlo en la pagina");
         } else {
-            return view('food.buildScheduled')->with('message', "La validacion no fue exitosa");
+            return view(config("app.views").'.food.buildScheduled')->with('message', "La validacion no fue exitosa");
         }
     }
 
@@ -139,7 +120,7 @@ class FoodController extends Controller {
         if ($checkResult) {
             $this->routing->buildScenarioTransit($routes);
         }*/
-        return view('food.buildScheduled')->with('message', "Ruta enviada a rapigo. Si la autenticacion pasa sera construida");
+        return view(config("app.views").'.food.buildScheduled')->with('message', "Ruta enviada a rapigo. Si la autenticacion pasa sera construida");
     }
 
     /**
@@ -155,7 +136,7 @@ class FoodController extends Controller {
             $routes = Route::whereColumn('unit_price', '>', 'unit_cost')->where("status", "pending")->where("provider", $provider)->where("type", $scenario)->with(['deliveries.user'])->orderBy('id')->get();
             $this->routing->buildScenarioTransit($routes);
         }*/
-        return view('food.buildScheduled')->with('message', "Escenario enviado a rapigo. Si la autenticacion pasa sera construido");
+        return view(config("app.views").'.food.buildScheduled')->with('message', "Escenario enviado a rapigo. Si la autenticacion pasa sera construido");
     }
 
     /**
@@ -170,7 +151,7 @@ class FoodController extends Controller {
         if ($checkResult) {
             $this->routing->buildScenarioTransit($routes);
         }*/
-        return view('food.buildScheduled')->with('message', "Escenario positivo enviado a rapigo. Si la autenticacion pasa sera construido");
+        return view(config("app.views").'.food.buildScheduled')->with('message', "Escenario positivo enviado a rapigo. Si la autenticacion pasa sera construido");
     }
 
     /**
@@ -180,7 +161,7 @@ class FoodController extends Controller {
      */
     public function removeCreditUser($user, $hash) {
         $results = $this->food->removeCreditUser($user, $hash);
-        return view('food.buildScheduled')->with('data', $results);
+        return view(config("app.views").'.food.buildScheduled')->with('data', $results);
     }
 
 
@@ -213,7 +194,7 @@ class FoodController extends Controller {
     public function getRoutes() {
         $user = $this->auth->user();
 
-        return view('food.routesDashboard')->with('user', $user);
+        return view(config("app.views").'.food.routesDashboard')->with('user', $user);
     }
     
     /**
@@ -234,6 +215,6 @@ class FoodController extends Controller {
     public function getLargestAddresses() {
         $user = $this->auth->user();
 
-        return view('food.addressesDashboard')->with('user', $user);
+        return view(config("app.views").'.food.addressesDashboard')->with('user', $user);
     }
 }

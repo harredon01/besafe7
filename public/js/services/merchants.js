@@ -1,6 +1,6 @@
 angular.module('besafe')
 
-        .service('Merchants', function ($q, $http) {
+        .service('Merchants',['$q', '$http', function ($q, $http) {
 
             var getMerchants = function (where) {
                 let url = "/api/merchants";
@@ -11,6 +11,24 @@ angular.module('besafe')
                 $http({
                     method: 'get',
                     url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
+            var getMerchantsCoverage = function (data) {
+                let url = "/api/private/merchants/coverage";
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url,
+                    params:data
                 })
                         .success(function (data) {
                             // console.log(data);
@@ -150,6 +168,7 @@ angular.module('besafe')
 
             return {
                 getMerchants: getMerchants,
+                getMerchantsCoverage: getMerchantsCoverage,
                 getMerchantsPrivate: getMerchantsPrivate,
                 saveMerchant: saveMerchant,
                 getStoreContent:getStoreContent,
@@ -157,4 +176,4 @@ angular.module('besafe')
                 searchMerchants: searchMerchants,
                 deleteMerchant: deleteMerchant
             };
-        })
+        }])

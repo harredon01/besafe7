@@ -36,7 +36,6 @@ class Report extends Model {
      */
     protected $fillable = ['city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description','attributes',
         'icon', 'lat', 'long', 'minimum', 'status', "private", "anonymous", "object", 'report_time', 'ends_at','plan','rating','rating_count'];
-    protected $hidden = ['user_id'];
     protected $dates = [
         'created_at',
         'updated_at',

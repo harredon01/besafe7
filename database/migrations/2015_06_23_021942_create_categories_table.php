@@ -22,6 +22,9 @@ class CreateCategoriesTable extends Migration {
                         $table->string('description')->nullable();
                         $table->integer('parent_id')->unsigned()->nullable();
                         $table->index('parent_id');
+                        $table->boolean('isActive');
+                        $table->string('url');
+                        $table->index('url');
 			$table->timestamps();
 		});
 	}

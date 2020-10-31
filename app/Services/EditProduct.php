@@ -98,6 +98,7 @@ class EditProduct {
         $includes_files = false;
         $includes_categories = false;
         $includes_merchant = false;
+        $searches_categories = false;
         if (array_key_exists("includes", $data)) {
             if ($data['includes']) {
                 $includes = $data['includes'];
@@ -113,9 +114,20 @@ class EditProduct {
                 }
             }
         }
+        $isAdmin = false;
+        if (array_key_exists("isAdmin", $data)) {
+            if ($data['isAdmin']) {
+                $isAdmin = true;
+            }
+        }
+        $query = null;
+        if ($isAdmin) {
+            $query = DB::table('products');
+        } else {
+            $query = DB::table('products')
+                    ->where('products.isActive', true);
+        }
 
-        $query = DB::table('products')
-                ->where('products.isActive', true);
         $query->select('products.*');
         $merchant_id = null;
         if (array_key_exists("merchant_id", $data)) {
@@ -129,11 +141,15 @@ class EditProduct {
         }
         if (array_key_exists("category_id", $data)) {
             if ($data['category_id']) {
+                $searches_categories = true;
                 $categories = explode(",", $data['category_id']);
                 $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
                         ->whereIn('categorizables.category_id', $categories)
                         ->where('categorizables.categorizable_type', "App\\Models\\Product");
             }
+        }
+        if(!$merchant_id && !$searches_categories){
+            $query->limit(25);
         }
         $query->distinct();
 
@@ -141,7 +157,7 @@ class EditProduct {
                 ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
                 ->where('merchants.private', false)
                 ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
-                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
+                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon', 'merchants.attributes as merchant_attributes');
 
         if (array_key_exists("lat", $data)) {
             if ($data['lat']) {
@@ -197,12 +213,21 @@ class EditProduct {
             }
         }
         $results['merchant_products'] = $variants;
-        $variants_query = DB::table('products')
-                ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                ->whereIn('products.id', $products)
-                ->where('product_variant.isActive', true)
-                ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
-                ->orderBy('products.id', 'asc');
+        $variants_query = null;
+        if ($isAdmin) {
+            $variants_query = DB::table('products')
+                    ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                    ->whereIn('products.id', $products)
+                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.isActive', 'products.slug', 'products.rating')
+                    ->orderBy('products.id', 'asc');
+        } else {
+            $variants_query = DB::table('products')
+                    ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                    ->whereIn('products.id', $products)
+                    ->where('product_variant.isActive', true)
+                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.slug', 'products.rating')
+                    ->orderBy('products.id', 'asc');
+        }
 
         if ($includes_categories) {
             $variants_query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
@@ -399,6 +424,9 @@ class EditProduct {
             "description" => $container->description,
             "price" => $container->price,
             "min_quantity" => $container->min_quantity,
+            "is_shippable" => $container->is_shippable,
+            "is_on_sale" => $container->is_on_sale,
+            "sale" => $container->sale,
         ];
         if ($container->attributes) {
             $variant["attributes"] = json_decode($container->attributes, true);
@@ -421,6 +449,8 @@ class EditProduct {
             "description_more" => false,
             "more" => false,
             "type" => $container->type,
+            "slug" => $container->slug,
+            "rating" => $container->rating,
             "merchant_description_more" => false,
             "inCart" => false,
             "item_id" => null,
@@ -475,7 +505,7 @@ class EditProduct {
                         array_push($resultsVariant, $items['products_variants'][$i]->id);
                     }
                     for ($j = 0; $j < count($resultsCategory); $j++) {
-                        if ($resultsCategory[$j]['id'] == $items['products_variants'][$i]->category_id) {
+                        if (is_null($category) || $resultsCategory[$j]['id'] == $items['products_variants'][$i]->category_id) {
                             $category = $j;
                         }
                         for ($k = 0; $k < count($resultsCategory[$j]['products']); $k++) {
@@ -489,11 +519,12 @@ class EditProduct {
                         }
                     }
                     if (is_null($category)) {
+                        
                         $category = count($resultsCategory);
                         array_push($resultsCategory, [
-                            "name" => $items['products_variants'][$i]->category_name,
-                            "id" => $items['products_variants'][$i]->category_id,
-                            "description" => $items['products_variants'][$i]->category_description,
+                            "name" => "Tienda",
+                            "id" => 1,
+                            "description" => "",
                             "products" => [],
                             "product_ids" => [],
                             "more" => false,
@@ -596,7 +627,7 @@ class EditProduct {
         $access = false;
         $owner = false;
         $data = [];
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }
@@ -631,7 +662,7 @@ class EditProduct {
     public function checkAccessAdminMerchant(User $user, $merchant_id) {
         $access = false;
         $owner = false;
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }
@@ -660,7 +691,7 @@ class EditProduct {
     public function checkAccessVariant(User $user, $variant_id) {
         $access = false;
         $owner = false;
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }

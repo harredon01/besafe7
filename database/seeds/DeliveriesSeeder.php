@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\MiPaquete;
-use App\Services\StoreExport;
+use App\Services\EditCategory;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
 use App\Models\Order;
@@ -34,14 +34,13 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $security;
 
-    public function __construct(MiPaquete $security) {
+    public function __construct(EditCategory $security) {
         $this->security = $security;
     }
 
     public function run() {
         //dispatch(new CreateGoogleEvent(8));
-        $user = User::find(1);
-        $this->security->authenticate();
+        dd($this->security->getCategoriesMenu());
         return;
 //        $this->security->getCitiesAndRegions();
 //        return null;

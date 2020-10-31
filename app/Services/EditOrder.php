@@ -465,7 +465,7 @@ class EditOrder {
                 if (array_key_exists("requires_credits", $attributes)) {
                     if ($attributes['requires_credits']) {
                         if (!$creditItem) {
-                            $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $value->merchant_id)->first();
+                            $creditItem = ProductVariant::where("type", "deposit")->first();
                         }
                         if ($attributes['type'] == "meal-plan") {
                             $requiredDeposit += ($creditItem->price * $attributes['credits']);
@@ -620,7 +620,10 @@ class EditOrder {
             }
         }
         if ($getMerchant) {
-            $item = Item::where('user_id', $user->id)->whereNull('order_id')->first();
+            $item = Item::where('user_id', $user->id)->where(function($query) use ($order) {
+                    $query->where('order_id', $order->id)
+                            ->orWhereNull('order_id');
+                })->first();
             $attributes = json_decode($item->attributes, true);
             $data['merchant_id'] = $attributes['merchant_id'];
         }

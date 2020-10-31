@@ -135,7 +135,7 @@ class ZonesController extends Controller {
      * @return Response
      */
     public function getZonesView() {
-        return view('food.zones');
+        return view(config("app.views").'.food.zones');
     }
 
     /**
@@ -144,7 +144,7 @@ class ZonesController extends Controller {
      * @return Response
      */
     public function getZonesPublicView() {
-        return view('content.zonespublic');
+        return view(config("app.views").'.content.zonespublic');
     }
 
     /**
@@ -158,7 +158,7 @@ class ZonesController extends Controller {
             $path = $request->uploadfile->path();
             $this->importPolygons($path);
         }
-        return view('food.zones')->with('user', $user);
+        return view(config("app.views").'.food.zones')->with('user', $user);
     }
 
     private function importPolygons($path) {
