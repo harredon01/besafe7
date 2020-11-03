@@ -109,7 +109,7 @@
                         </ul>
                     </div>
                     <div class="content">
-                        <h3 class="font-weight-500"><a href="product-details.html">@{{ merchant.name}}</a></h3>
+                        <h3 class="font-weight-500"><a href="/a/products/@{{category.url'}}?merchant_id=@{{ merchant.categorizable_id}}">@{{ merchant.name}}</a></h3>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
                             <span>@{{ merchant.unit_cost | currency }}</span>
                         </div>
@@ -129,7 +129,7 @@
                                 <p>@{{ merchant.description}}</p>
                             </article>
                             <div class="btn-block d-flex">
-                                <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                <a href="/a/products/@{{category.url'}}?merchant_id=@{{ merchant.categorizable_id}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                                 <div class="btn-options">
                                     <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
                                 </div>

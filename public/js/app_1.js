@@ -15,24 +15,13 @@ app.config(function () {
 //    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //    $http.defaults.headers.common['X-XSRF-TOKEN'] = Laravel.csrfToken;
         console.log("Searching for user");
-        let user = $cookies.get("user_obj");
-        if (user && user.length > 0) {
-            $rootScope.user = JSON.parse(user);
-            console.log("user found");
-        } else {
-            console.log("user not found");
-            Users.getUser().then(function (data) {
+        Users.getUser().then(function (data) {
+                console.log("user loaded",data);
                 $rootScope.user = data.user;
-                let date = new Date();
-                var newDateObj = new Date();
-                newDateObj.setTime(date.getTime() + (30 * 60 * 1000));
-                $cookies.put("user_obj", JSON.stringify($rootScope.user), {path: "/", expires: newDateObj});
-                console.log("user loaded");
             },
                     function (data) {
 
                     });
-        }
         let shipping = $cookies.get("shippingAddress");
         if (shipping && shipping.length > 0) {
             $rootScope.shippingAddress = JSON.parse(shipping);

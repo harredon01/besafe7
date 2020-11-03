@@ -162,7 +162,8 @@
                                         </div>
                                         <ul class="header-links">
                                             <li><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
-                                            <li><a href="login-register.html"><i class="fas fa-user"></i> Register or Sign in</a></li>
+                                            <li ng-hide="user"><a href="/login"><i class="fas fa-user"></i> Ingresa</a></li>
+                                            <li ng-show="user"><a href="{{ url('user/editProfile')}}"><i class="fas fa-user"></i> Hola @{{user.firstName}}  </a></li>
                                         </ul>
                                     </div>
                                 </div>
@@ -233,6 +234,12 @@
                                                     </li>
                                                     <li>
                                                         <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                {{ csrf_field()}}
+                                            </form>
                                                     </li>
                                                 </ul>
                                             </li>
@@ -320,6 +327,12 @@
                                                     </li>
                                                     <li>
                                                         <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                {{ csrf_field()}}
+                                            </form>
                                                     </li>
                                                 </ul>
                                             </li>

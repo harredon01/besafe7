@@ -89,10 +89,13 @@ angular.module('besafe')
                     });
                 };
 
-                var addCartItem = function (product_variant, extras) {
-                    console.log("Check variant: ", product_variant);
-                    let results = checkProduct(product_variant);
-                    product_variant.merchant_id = $rootScope.merchant_id;
+                var addCartItem = function (container, extras) {
+                    console.log("Check variant: ", container);
+                    let results = checkProduct(container);
+                    container.merchant_id = $rootScope.merchant_id;
+                    if(!container.item_id){
+                        container.item_id = null;
+                    }
                     console.log("Check variant result: ", results);
                     var def = $q.defer();
                     if (!results) {
@@ -102,9 +105,10 @@ angular.module('besafe')
                             method: "post",
                             url: "/api/cart/add",
                             data: {
-                                product_variant_id: product_variant.id,
-                                merchant_id: product_variant.merchant_id,
-                                quantity: product_variant.quantity,
+                                product_variant_id: container.id,
+                                merchant_id: container.merchant_id,
+                                quantity: container.quantity,
+                                item_id:container.item_id,
                                 extras: extras
                             }
                         })
