@@ -216,7 +216,7 @@
                                         </li>
                                     </ul-->
                                 </li>
-                                <li id="menu-item-619" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-619"><a href="/a/terms"><span>Terminos y condiciones</span></a>
+                                <li id="menu-item-619" style="display:none" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-619"><a href="products"><span>Planes</span></a>
                                     <!--ul class="sub-menu">
                                         <li id="menu-item-623" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-623"><a href="http://fitmeal.like-themes.com/shop/"><span>Shop</span></a></li>
                                         <li id="menu-item-622" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-622"><a href="http://fitmeal.like-themes.com/cart/"><span>Cart</span></a></li>
@@ -224,7 +224,7 @@
                                         <li id="menu-item-620" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-620"><a href="http://fitmeal.like-themes.com/my-account/"><span>My account</span></a></li>
                                     </ul-->
                                 </li>
-                                <li id="menu-item-620" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-620"><a href="/a/faq"><span>Preguntas Frecuentes</span></a>
+                                <li id="menu-item-620" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-620"><a href="faq"><span>Preguntas Frecuentes</span></a>
                                     <!--ul class="sub-menu">
                                         <li id="menu-item-623" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-623"><a href="http://fitmeal.like-themes.com/shop/"><span>Shop</span></a></li>
                                         <li id="menu-item-622" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-622"><a href="http://fitmeal.like-themes.com/cart/"><span>Cart</span></a></li>
