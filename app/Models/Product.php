@@ -58,6 +58,9 @@ class Product extends Model {
     public function productVariants() {
         return $this->hasMany('App\Models\ProductVariant');
     }
+    public function ratings() {
+        return $this->morphMany('App\Models\Rating', 'rateable','type','object_id','id');
+    }
     public function files() {
         return $this->morphMany('App\Models\FileM', 'fileable','type','trigger_id','id');
     }

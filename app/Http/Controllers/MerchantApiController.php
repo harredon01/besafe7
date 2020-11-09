@@ -171,48 +171,13 @@ class MerchantApiController extends Controller {
         }
         $data = $request->all();
 
-        $lat = $data['lat'];
-        $long = $data['long'];
-        $category = false;
-        $per_page = 25;
-        $page = 1;
-        if (array_key_exists("category", $data)) {
-            if ($data["category"]) {
-                $category = true;
-            }
-        }
-        if (array_key_exists("page", $data)) {
-            if ($data["page"]) {
-                $page = $data["page"];
-            }
-        }
-        if (array_key_exists("per_page", $data)) {
-            if ($data["per_page"]) {
-                $per_page = $data["per_page"];
-            }
-        }
-        $offset = ($page-1)*$per_page;
-
-        $thedata = [
-            'point' => 'POINT(' . $long . ' ' . $lat . ')',
-            'limit' => $per_page
-        ];
-        $additionalQuery = '';
-        if ($category) {
-            $thedata["category"] = $data["category"];
-            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category) and categorizable_type = "App\\\Models\\\Merchant") ';
-        }
-//        DB::enableQueryLog();
-        $merchants = DB::select(" "
-                        . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
-                ." where private = 0 AND status in ('online','active','busy') AND "
-                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
-                        . $additionalQuery
-                        . " LIMIT ".$offset.", :limit", $thedata);
+        $results = $this->editMapObject->buildCoverageQuery( $data);
+        $merchants = $results['data'];
 //        dd($merchants);
 //        dd(DB::getQueryLog());
         $merchants = $this->editMapObject->buildIncludes($merchants, $data);
-        return array("data" => $merchants);
+        $results['data'] = $merchants;
+        return $results;
     }
 
     /**
@@ -231,6 +196,15 @@ class MerchantApiController extends Controller {
      */
     public function getCategoriesMerchant($id, $type) {
         return response()->json($this->editMapObject->getCategoriesMerchant($id, $type));
+    }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function getActiveCategoriesMerchant($id) {
+        return response()->json($this->editMapObject->getActiveCategoriesMerchant($id));
     }
 
     /**

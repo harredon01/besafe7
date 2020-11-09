@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
   | is assigned the "api" middleware group. Enjoy building your API!
   |
  */
-
+Route::post('leads', 'LeadController@postLanding');
 Route::resource('addresses', 'AddressApiController');
 Route::resource('coverage', 'CoveragePolygonController');
 Route::post('subscriptions/{source?}', 'SubscriptionApiController@store');
@@ -158,6 +158,7 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function (
     Route::get('merchants/nearby_all', 'MerchantApiController@getNearby');
     Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
     Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
+    Route::get('merchants/{id?}/active_categories', 'MerchantApiController@getActiveCategoriesMerchant');
     Route::get('merchants/search', function (Request $request) {
         $searchQuery = App\Models\Merchant::search($request->search);
 

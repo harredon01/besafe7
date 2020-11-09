@@ -2,9 +2,11 @@
 
 <div>
     <div>
-        <a href="javascript:;" ng-click="showMethod('CC')">Tarjeta de Credito</a><br/>
-        <a href="javascript:;" ng-click="showMethod('PSE')">Tarjeta de Debito</a><br/>
-        <a href="javascript:;" ng-click="showMethod('BALOTO')">Efectivo</a><br/>
+        <button ng-click="showMethod('CC')" class="btn btn-primary">Tarjeta de Credito</button>
+        <button ng-click="showMethod('PSE')" class="btn btn-primary">Tarjeta de Debito</button>
+        <button ng-click="showMethod('BALOTO')" class="btn btn-primary">Efectivo</button>
+        <br/>
+        <br/>
     </div>
     <div>
         <div class="credito" ng-show="credito">
@@ -25,7 +27,7 @@
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Franquisia</label>
                     <div class="col-md-6">
-                        <select ng-model="data2.cc_branch" name="cc_branch" required>
+                        <select ng-model="data2.cc_branch" name="cc_branch"  class="form-control nice-select"  required>
                             <option value="VISA">Visa</option>
                             <option value="MASTERCARD">Master Card</option>
                             <option value="AMEX">Amex</option>
@@ -97,18 +99,19 @@
                             <span ng-show="submitted2 && myForm2.payer_id.$error.required">Porfavor ingresa la cédula del propietario de la tarjeta</span></span> 
                     </div>
                 </div>
+                <br/>
                 <div class="payer_address" ng-hide="(myForm2.payer_id.$invalid)||
                             (myForm2.payer_name.$invalid)||(myForm2.payer_email.$invalid)||
                             (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)">
                     <div class="form-group">
                         <label class="col-md-4 control-label">Direccion del pagador</label>
                         <div class="col-md-6">
-                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'payer')" name="gender" value="male">
-                            <label for="male">Igual a Direccion de envío</label><br>
-                            <input type="radio" id="female" name="gender" ng-click="fetchAddressForUse('other', 'payer')" value="female">
-                            <label for="female">Usar direccion guardada</label><br>
-                            <input type="radio" id="other" name="gender" value="other">
-                            <label for="other">Nueva</label>
+                            <label for="male">Igual a Direccion de envío</label>
+                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'payer')" style="width:20%" name="gender" value="male">
+                            <label for="female">Usar direccion guardada</label>
+                            <input type="radio" id="female" name="gender" ng-click="fetchAddressForUse('other', 'payer')" style="width:20%" value="female">
+                            <label for="other">Nueva Direccion</label>
+                            <input type="radio" id="other" name="gender" style="width:20%" value="other">
                         </div>
                     </div>
                     <div class="form-group">
@@ -161,19 +164,19 @@
                         </div>
                     </div>
                 </div>
-
+                <br/>
                 <div class="buyer_address" ng-hide="(myForm2.payer_id.$invalid)||
                             (myForm2.payer_name.$invalid)||(myForm2.payer_email.$invalid)||
-                            (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)">
+                            (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)" style="margin-top: 20px">
                     <div class="form-group">
                         <label class="col-md-4 control-label">Direccion del comprador</label>
                         <div class="col-md-6">
-                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'buyer')" name="gender2" value="male">
-                            <label for="male">Igual a Direccion de envío</label><br>
-                            <input type="radio" id="female" name="gender2" ng-click="fetchAddressForUse('other', 'buyer')" value="female">
-                            <label for="female">Usar direccion guardada</label><br>
-                            <input type="radio" id="other" name="gender2" value="other">
-                            <label for="other">Nueva</label>
+                            <label for="male">Igual a Direccion de envío</label>
+                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'buyer')" style="width:20%" name="gender2" value="male">
+                            <label for="female">Usar direccion guardada</label>
+                            <input type="radio" id="female" style="width:20%" name="gender2" ng-click="fetchAddressForUse('other', 'buyer')" value="female">
+                            <label for="other">Nueva Direccion</label>
+                            <input type="radio" id="other" style="width:20%" name="gender2" value="other">
                         </div>
                     </div>
                     <div class="form-group">
@@ -230,8 +233,8 @@
 
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button ng-click="clean2()" class="btn btn-primary">Clean</button>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                        <button ng-click="clean2()" class="btn btn-primary">Limpiar</button>
                         <a ng-click="fill()" href="javascript:;">Fill</a>
 
                     </div>
@@ -269,12 +272,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-md-4 control-label">Usar mis datos</label>
+                    <label class="col-md-4 control-label">Selecciona una opcion de efectivo</label>
                     <div class="col-md-6">
-                        <select ng-model="data4.payment_method" name="payment_method" required>
+                        <select class="form-control nice-select" ng-model="data4.payment_method" name="payment_method" required>
                             <option value="BALOTO">BALOTO</option>
                             <option value="EFECTY">EFECTY</option>
-                            <option value="OTHERS_CASH">OTHERS_CASH</option>
+                            <option value="OTHERS_CASH">OTROS</option>
                         </select>
                         <span style="color:red" ng-show="(myForm4.payment_method.$dirty && myForm4.payment_method.$invalid) || submitted4 && myForm4.payment_method.$invalid">
                             <span ng-show="submitted4 && myForm4.payment_method.$error.required">Porfavor selecciona un metodo de pago</span></span> 
@@ -306,8 +309,8 @@
 
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button ng-click="clean()" class="btn btn-primary">Clean</button>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                        <button ng-click="clean()" class="btn btn-primary">Limpiar</button>
                         <a ng-click="fill3()" href="javascript:;">Fill</a>
                     </div>
                 </div>
@@ -320,7 +323,7 @@
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Banco</label>
                     <div class="col-md-6">
-                        <select ng-model="data3.financial_institution_code" name="financial_institution_code" required>
+                        <select ng-model="data3.financial_institution_code" class="form-control nice-select" name="financial_institution_code" required>
                             <option ng-repeat="bank in banks" value="@{{bank.pseCode}}">@{{bank.description}}</option>
                         </select>
                         <span style="color:red" ng-show="(myForm3.financial_institution_code.$dirty && myForm3.financial_institution_code.$invalid) || submitted3 && myForm3.financial_institution_code.$invalid">
@@ -336,7 +339,7 @@
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Tipo de cliente</label>
                     <div class="col-md-6">
-                        <select ng-model="data3.user_type" name="user_type" required>
+                        <select ng-model="data3.user_type"  class="form-control nice-select"  name="user_type" required>
                             <option value="N">Persona Natural</option>
                             <option value="J">Persona Juridica</option>
                         </select>
@@ -347,7 +350,7 @@
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Tipo de documento</label>
                     <div class="col-md-6">
-                        <select ng-model="data3.doc_type" name="doc_type" required>
+                        <select ng-model="data3.doc_type"  class="form-control nice-select"  name="doc_type" required>
                             <option value="CC">Cédula de ciudadanía</option>
                             <option value="CE">Cédula de extranjería</option>
                             <option value="NIT">En caso de ser una empresa NIT</option>
@@ -401,8 +404,8 @@
 
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button ng-click="clean()" class="btn btn-primary">Clean</button>
+                        <button type="submit" class="btn btn-primary">Enviar</button>
+                        <button ng-click="clean()" class="btn btn-primary">Limpiar</button>
                         <a ng-click="fill2()" href="javascript:;">Fill</a>
                     </div>
                 </div>

@@ -25,4 +25,5 @@ class HomeController extends Controller
     {
         return view(config("app.views").'.home');
     }
+    
 }

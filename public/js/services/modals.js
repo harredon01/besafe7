@@ -3,7 +3,7 @@ angular.module('besafe')
 
                 var getAddressesPopup = function () {
                     return {
-                        controller: ['$scope', '$mdDialog', 'Addresses','$rootScope', function ($scope, $mdDialog, Addresses,$rootScope) {
+                        controller: ['$scope', '$mdDialog', 'Addresses', '$rootScope', function ($scope, $mdDialog, Addresses, $rootScope) {
                                 $scope.addresses = [];
 
                                 $scope.getAddresses = function () {
@@ -99,8 +99,79 @@ angular.module('besafe')
                         clickOutsideToClose: true,
                     }
                 }
-                var showToast = function (message) {
-                    $mdToast.showSimple(message);
+                var getLocationExtPrompt = function () {
+                    return {
+                        controller: ['$scope', '$mdDialog', function ($scope, $mdDialog) {
+                                $scope.answer = function (answer) {
+                                    $mdDialog.hide(answer);
+                                };
+                                $scope.cancel = function () {
+                                    $mdDialog.cancel();
+                                };
+                                $scope.hide = function () {
+                                    $mdDialog.hide();
+                                };
+                            }],
+                        templateUrl: '/templates/locationExtPrompt.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                    }
+                }
+                var showToast = function (message, parent) {
+                    if (message == "CLEAR_CART") {
+                        message = "Debes vaciar tu carro para esa compra";
+                    }
+                    var pinTo = getToastPosition();
+                    var toast = $mdToast.simple()
+                            .textContent(message)
+                            .position(pinTo)
+                            .hideDelay(3000)
+                    if (parent) {
+                        toast = $mdToast.simple()
+                                .textContent(message)
+                                .position(pinTo)
+                                .parent(parent)
+                                .hideDelay(3000)
+                    }
+                    
+                    $mdToast.show(toast);
+                }
+                var last = {
+                    bottom: false,
+                    top: true,
+                    left: false,
+                    right: true
+                };
+
+                var toastPosition = angular.extend({}, last);
+
+                var getToastPosition = function () {
+                    sanitizePosition();
+
+                    return Object.keys(toastPosition)
+                            .filter(function (pos) {
+                                return toastPosition[pos];
+                            }).join(' ');
+                };
+                function sanitizePosition() {
+                    var current = toastPosition;
+
+                    if (current.bottom && last.top) {
+                        current.top = false;
+                    }
+                    if (current.top && last.bottom) {
+                        current.bottom = false;
+                    }
+                    if (current.right && last.left) {
+                        current.left = false;
+                    }
+                    if (current.left && last.right) {
+                        current.right = false;
+                    }
+
+                    last = angular.extend({}, current);
                 }
                 var showLoader = function () {
                     $mdDialog.show({
@@ -125,6 +196,23 @@ angular.module('besafe')
                             .then(function (answer) {
 
                             });
+                }
+                var turnObjectToUrl = function (params, theUrl) {
+                    if (theUrl.includes("?")) {
+                        theUrl = theUrl.split("?")[0];
+                    }
+                    let first = true;
+                    for (var k in params) {
+                        if (params.hasOwnProperty(k)) {
+                            if (first) {
+                                theUrl += "?" + k + "=" + params[k];
+                                first = false;
+                            } else {
+                                theUrl += "&" + k + "=" + params[k];
+                            }
+                        }
+                    }
+                    return theUrl;
                 }
                 getAllUrlParams = function (url) {
                     // get query string from url (optional) or window
@@ -195,9 +283,11 @@ angular.module('besafe')
                 return {
                     getAddressesPopup: getAddressesPopup,
                     getLocationPrompt: getLocationPrompt,
+                    getLocationExtPrompt: getLocationExtPrompt,
                     getMerchantsPopup: getMerchantsPopup,
                     showToast: showToast,
                     showLoader: showLoader,
+                    turnObjectToUrl: turnObjectToUrl,
                     hideLoader: hideLoader,
                     getAllUrlParams: getAllUrlParams
                 };

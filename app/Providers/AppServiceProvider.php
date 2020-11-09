@@ -9,6 +9,7 @@ use App\Services\Geolocation;
 use App\Models\Category;
 use OpenTok\OpenTok;
 use Illuminate\Support\Facades\View;
+use Cache;
 class AppServiceProvider extends ServiceProvider {
 
     /**
@@ -17,8 +18,15 @@ class AppServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        View::composer(config("app.views").'.layouts.app', function ($view) {
-            $view->with('categories', Category::where('level',0)->with("children.children")->get());
+        View::composer(config("app.views") . '.layouts.app', function ($view) {
+
+            //dd($menu);
+            $menu = Cache::remember('main_menu', 100, function () {
+                        $categories = Category::where('level', 0)->with("children.children")->get();
+                        $menu = view(config("app.views") . '.menu', compact('categories'))->render();
+                        return $menu;
+                    });
+            $view->with('menu', $menu);
         });
     }
 
@@ -30,7 +38,7 @@ class AppServiceProvider extends ServiceProvider {
     public function register() {
         $this->app->alias('bugsnag.logger', \Illuminate\Contracts\Logging\Log::class);
         $this->app->alias('bugsnag.logger', \Psr\Log\LoggerInterface::class);
-        $this->app->singleton('Notifications', function () { 
+        $this->app->singleton('Notifications', function () {
             return new Notifications();
         });
         $this->app->singleton('Geolocation', function () {
@@ -43,4 +51,5 @@ class AppServiceProvider extends ServiceProvider {
             return new ZoomMeetings();
         });
     }
+
 }

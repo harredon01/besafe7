@@ -30,8 +30,15 @@ trait EditProfileUsers {
      * @return \Illuminate\Http\Response
      */
     public function getEditProfile() {
-        $user = $this->auth->user();
-        return view(config("app.views").'.user.editProfile')->with('user', $user);
+        return view(config("app.views").'.user.editProfile');
+    }
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getEditPassword() {
+        return view(config("app.views").'.user.editPassword');
     }
 
     /**

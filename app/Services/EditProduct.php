@@ -92,6 +92,87 @@ class EditProduct {
         return $results;
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function addCategoryToQuery($data, $query) {
+        if ($data['category_id']) {
+            $categories = explode(",", $data['category_id']);
+            $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Product");
+        }
+        return $query;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function baseProductQuery($data, $query) {
+        $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
+                ->where('merchants.private', false)
+                ->select('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
+                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon', 'merchants.attributes as merchant_attributes');
+
+        $query->addSelect('products.*');
+        $merchant_id = null;
+        if (array_key_exists("merchant_id", $data)) {
+            if ($data['merchant_id']) {
+                $merchant_id = $data['merchant_id'];
+            }
+        }
+        if ($merchant_id) {
+            $merchants = explode(",", $merchant_id);
+            $query->whereIn('merchant_product.merchant_id', $merchants);
+        }
+        if (array_key_exists("category_id", $data)) {
+            $searches_categories = true;
+            $query = $this->addCategoryToQuery($data, $query);
+        }
+        if (array_key_exists("lat", $data)) {
+            if ($data['lat']) {
+                $query->whereIn('merchants.id', function($query) use ($data) {
+                    $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                    $query->select('merchant_id')
+                            ->from('coverage_polygons')
+                            ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                });
+            }
+        }
+        return $query;
+    }
+
+    public function getActiveCategoriesMerchant($id) {
+        //DB::enableQueryLog();
+        $categories = DB::select(" "
+                        . "SELECT 
+    c.*, COUNT(categorizable_id) AS tots
+FROM
+    categorizables ca
+        JOIN
+    categories c ON c.id = ca.category_id
+WHERE
+    categorizable_type = 'App\\\Models\\\Product'
+        AND categorizable_id IN (SELECT 
+            product_id
+        FROM
+            merchant_product mp
+                JOIN
+            products p ON mp.product_id = p.id
+        WHERE
+            merchant_id = :merchant_id AND p.isActive = TRUE)
+GROUP BY category_id"
+                        . "", ['merchant_id' => $id]);
+        //DB::enableQueryLog();
+        //dd(DB::getQueryLog());
+        return ['status' => "success", "data" => $categories];
+    }
+
     public function productsQuery($data) {
 
         $results = [];
@@ -114,82 +195,55 @@ class EditProduct {
                 }
             }
         }
+        $query = null;
         $isAdmin = false;
         if (array_key_exists("isAdmin", $data)) {
             if ($data['isAdmin']) {
                 $isAdmin = true;
             }
         }
-        $query = null;
         if ($isAdmin) {
             $query = DB::table('products');
         } else {
             $query = DB::table('products')
                     ->where('products.isActive', true);
         }
+        $query = $this->baseProductQuery($data, $query);
 
-        $query->select('products.*');
         $merchant_id = null;
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id']) {
                 $merchant_id = $data['merchant_id'];
             }
         }
-        if ($merchant_id) {
-            $merchants = explode(",", $merchant_id);
-            $query->whereIn('merchant_product.merchant_id', $merchants);
-        }
-        if (array_key_exists("category_id", $data)) {
-            if ($data['category_id']) {
-                $searches_categories = true;
-                $categories = explode(",", $data['category_id']);
-                $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
-                        ->whereIn('categorizables.category_id', $categories)
-                        ->where('categorizables.categorizable_type', "App\\Models\\Product");
-            }
-        }
-        if(!$merchant_id && !$searches_categories){
-            $query->limit(25);
+
+        if (!$merchant_id && !$searches_categories) {
+            $query->limit(self::OBJECT_PAGESIZE);
         }
         $query->distinct();
-
-        $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                ->where('merchants.private', false)
-                ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
-                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon', 'merchants.attributes as merchant_attributes');
-
-        if (array_key_exists("lat", $data)) {
-            if ($data['lat']) {
-                $query->whereIn('merchants.id', function($query) use ($data) {
-                    $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
-                    $query->select('merchant_id')
-                            ->from('coverage_polygons')
-                            ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
-                });
-            }
-        }
         $count_query = $query;
-//        DB::enableQueryLog();
+        //DB::enableQueryLog();
 //        
         $results['products_total'] = $count_query->count('products.id');
 //        dd($results['products_total']);
-//        dd(DB::getQueryLog());
-        $per_page = null;
-        if (array_key_exists("per_page", $data)) {
-            if ($data['per_page']) {
-                $per_page = $data['per_page'];
-            }
-        }
+        //dd(DB::getQueryLog());
         $page = null;
         if (array_key_exists("page", $data)) {
             if ($data['page']) {
                 $page = $data['page'];
             }
         }
+        $per_page = null;
+        if (array_key_exists("per_page", $data)) {
+            if ($data['per_page']) {
+                $per_page = $data['per_page'];
+            }
+        }
+
         if ($per_page) {
             $query->take($per_page);
         } else {
+            $per_page = self::OBJECT_PAGESIZE;
             $query->take(self::OBJECT_PAGESIZE);
         }
         if ($page) {
@@ -200,19 +254,21 @@ class EditProduct {
                 $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
             }
             $query->skip($skip);
+        } else {
+            $page = 1;
         }
-        $variants = $query->get();
+        $prodResults = $query->get();
 //        dd($variants);
 
         $products = [];
-        foreach ($variants as $value) {
+        foreach ($prodResults as $value) {
             if (in_array($value->id, $products)) {
                 
             } else {
                 array_push($products, $value->id);
             }
         }
-        $results['merchant_products'] = $variants;
+        $results['merchant_products'] = $prodResults;
         $variants_query = null;
         if ($isAdmin) {
             $variants_query = DB::table('products')
@@ -260,7 +316,10 @@ class EditProduct {
         } else {
             $results['products_files'] = [];
         }
-
+        $results['page'] = $page;
+        $results['last_page'] = ceil($results['products_total'] / $per_page);
+        $results['per_page'] = $per_page;
+        $results['total'] = $results['products_total'];
         return $results;
     }
 
@@ -519,7 +578,7 @@ class EditProduct {
                         }
                     }
                     if (is_null($category)) {
-                        
+
                         $category = count($resultsCategory);
                         array_push($resultsCategory, [
                             "name" => "Tienda",

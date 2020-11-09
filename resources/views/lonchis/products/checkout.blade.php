@@ -1,64 +1,61 @@
 @extends(config("app.views").'.layouts.app')
 
 @section('content')
-<div class="container-fluid" >
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">Resumen de tu orden
-                </div>
-                <div class="panel-body">
-                    <div class="replace-checkout-cart" ng-controller="CheckoutCartCtrl">
-                        @include(config("app.views").'.products.checkoutCart')
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                Ingresa un cupon
-                                <div>
-                                    <input type="text" ng-model="coupon" style="float:left;width:70%" class="form-control" name="coupon" required>
-                                    <button ng-click="setCoupon()" style="float:left" class="btn btn-primary">Save</button>
-                                </div>
+
+
+<main id="content" class="page-section sp-inner-page checkout-area-padding space-db--20">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+
+                <!-- Checkout Form s-->
+                <div class="checkout-form">
+                    <div class="row row-40" >
+
+                        <div class="col-lg-7 mb--20" ng-controller="CheckoutShippingCtrl" ng-show="visible && !paymentActive">
+                            <!-- Shipping Address -->
+                            <div class="checkout-quick-box" ng-show="shippingAddressSet">
+                                <p><i class="far fa-sticky-note"></i> <a href="javascript:;" ng-click="changeAddress()">
+                                        Cambiar dirección</a></p>
                             </div>
-                        </div>
-                        <button ng-click="prepareOrder()" style="float:left" ng-show="isDigital" class="btn btn-primary">Pagar</button>
-                    </div>
-                </div>
-            </div>
-            <div class="panel panel-default" ng-controller="CheckoutShippingCtrl" ng-show="visible">
-                <div class="panel-heading">Direccion de envío
-                </div>
-                <div class="panel-body">
-                    <div class="address" >
-                        <div class="replace-address">
                             <div ng-show="!shippingAddressSet && !addAddress">
                                 @include(config("app.views").'.user.checkoutAddressList')
                             </div>
-                            <a href="javascript:;" ng-show="!shippingAddressSet" ng-click="showAddressForm()">Nueva direccion</a>
-                        </div>
-                        <div ng-show="addAddress">
-                            @include(config("app.views").'.user.editAddressForm')
-                            <a href="javascript:;" ng-click="hideAddressForm()">Cerrar</a>
-                        </div>
-                        <div class="replace-address" ng-show="shippingAddressSet">
-                            <p>@{{addressSet.address}}, @{{addressSet.city}} </p>
-                            @include(config("app.views").'.products.ShippingMethodsList')
-                        </div>
-                        <button ng-click="prepareOrder()" style="float:left" ng-show="shippingConditionSet" class="btn btn-primary">Pagar</button>
-                    </div>
-                </div>
-            </div>
+                            <span ng-show="!shippingAddressSet" style="color:#56a700;float:right">
+                                <a href="javascript:;" ng-click="showAddressForm()">Nueva direccion</a>
+                            </span>
+                            @include(config("app.views").'.user.editAddressFormCheckout')
+                            <div class="checkout-quick-box" ng-show="shippingConditionSet">
+                                <p><i class="far fa-sticky-note"></i> <a href="javascript:;" ng-click="changeShipping()">
+                                        Cambiar Metodo de envio</a></p>
+                            </div>
 
-            <div class="panel panel-default" ng-show="paymentActive" ng-controller="CheckoutBillingCtrl" id="payment-methods">
-                <div class="panel-heading">Pago
-                </div>
-                <div class="panel-body">
-                    <div class="payment-methods">
-                        <div class="replace-address">
+
+
+                            <!-- Shipping Methods -->
+                            <div ng-show="shippingAddressSet && !shippingConditionSet" style="color:black;font-weight: bold">
+                                <h4 class="checkout-title">Selecciona un método de envío</h4>
+                                <p>@{{addressSet.address}}, @{{addressSet.city}} </p>
+                                @include(config("app.views").'.products.ShippingMethodsList')
+                            </div>
+                            <h4 ng-show="shippingConditionSet" class="checkout-title">Listo! Puedes ir a pagar</h4>
+                        </div>
+                        <div class="col-lg-7 mb--20" ng-controller="CheckoutBillingCtrl" ng-show="paymentActive">
+                            <h4 class="checkout-title">Selecciona un método de pago</h4>
                             @include(config("app.views").'.products.checkoutPaymentMethods')
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="row" ng-controller="CheckoutCartCtrl">
+
+                                <!-- Cart Total -->
+                                @include(config("app.views").'.products.checkoutCart')
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
 @endsection

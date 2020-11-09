@@ -15,13 +15,13 @@
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-   
+
                                 @if ($errors->has('email'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('email') }}</strong>
+                                </span>
                                 @endif
-</div>
+                            </div>
                         </div>
 
                         <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
@@ -31,9 +31,9 @@
                                 <input id="password" type="password" class="form-control" name="password" required>
 
                                 @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
+                                <span class="help-block">
+                                    <strong>{{ $errors->first('password') }}</strong>
+                                </span>
                                 @endif
                             </div>
                         </div>
@@ -58,8 +58,17 @@
                                     Forgot Your Password?
                                 </a>
                             </div>
+
                         </div>
                     </form>
+                    <div class="col-md-8 col-md-offset-4">
+                        <button class="btn btn-primary" onclick="window.location.href='/login/facebook';" >
+                            Login Facebook
+                        </button>
+                        <button class="btn btn-danger" onclick="window.location.href='/login/google';" >
+                            Login Google
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

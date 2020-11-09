@@ -1,4 +1,4 @@
-@extends('layouts.zeeapp')
+@extends(config("app.views").'.layouts.app')
 
 @section('content')
 <!-- blog post area start -->

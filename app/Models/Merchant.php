@@ -63,6 +63,14 @@ class Merchant extends Model {
     public function availabilities2() {
         return $this->morphMany('App\Models\Availability', 'available', 'bookable_type', 'bookable_id', 'id');
     }
+    
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable', 'type', 'trigger_id', 'id');
+    }
+    
+    public function ratings() {
+        return $this->morphMany('App\Models\Rating', 'rateable', 'type', 'object_id', 'id');
+    }
 
     public function hours() {
         return $this->hasMany('App\Models\OfficeHour');
@@ -107,7 +115,7 @@ class Merchant extends Model {
         return $this->morphToMany('App\Models\Report', 'reportable')->withTimestamps();
     }
 
-    public function paymentMethods() {
+    public function paymentMethods() { 
         return $this->belongsToMany('App\Models\PaymentMethod', 'merchant_payment_methods', 'merchant_id', 'payment_method_id')->withTimestamps();
     }
 

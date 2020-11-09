@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Services\EditUserData;
 use App\Services\CleanSearch;
+use App\Services\EditCart;
 use App\Querybuilders\ContactQueryBuilder;
 use App\Models\User;
 use App\Models\Address;
@@ -40,16 +41,23 @@ class UserApiController extends Controller {
      *
      */
     protected $cleanSearch;
+    
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $editCart;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Guard $auth, EditUserData $editUserData, CleanSearch $cleanSearch) {
+    public function __construct(Guard $auth, EditUserData $editUserData, CleanSearch $cleanSearch, EditCart $editCart) {
         $this->cleanSearch = $cleanSearch;
         $this->editUserData = $editUserData;
         $this->auth = $auth;
+        $this->editCart = $editCart;
         $this->middleware('auth:api')->except('create');
     }
 
@@ -161,7 +169,8 @@ class UserApiController extends Controller {
             $data['push'] = $user->push()->where("platform", "Food")->first();
             $data['count'] = $count;
             $data['green'] = $green;
-            dispatch(new MigrateCart($user, $request->header('x-device-id')));
+            $this->editCart->migrateCart($user, $request->header('x-device-id'));
+            //dispatch(new MigrateCart($user, $request->header('x-device-id')));
             //$data['followers'] = count($users2);
             // the token is valid and we have found the user via the sub claim
         }

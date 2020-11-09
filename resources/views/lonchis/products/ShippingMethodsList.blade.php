@@ -1,7 +1,5 @@
-<h3>Selecciona un metodo de envio</h3>
 <table >
     <tr>
-
         <th class="col-md-3">
             Nombre
         </th>

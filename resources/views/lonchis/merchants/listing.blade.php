@@ -1,7 +1,7 @@
 @extends(config("app.views").'.layouts.app')
 
 @section('content')
-<main class="section-padding shop-page-section">
+<main class="section-padding shop-page-section"  ng-controller="MerchantsCtrl">
     <div class="container">
         <div class="shop-toolbar mb--30">
             <div class="row align-items-center">
@@ -40,7 +40,7 @@
                             </div>
                             <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
                                 <span>
-                                    Showing 1–20 of 52 results
+                                    Showing @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + merchants.length}} of @{{total}} results
                                 </span>
                             </div>
                         </div>
@@ -49,11 +49,16 @@
 
             </div>
         </div>
-        <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
+        <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="dissapear">
             @foreach ($merchants['data'] as $merchant)
             <div class="col-lg-3 col-sm-6">
                 <div class="pm-product product-type-list  ">
+                    @if(isset($merchant['categorizable_id']))
                     <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="image" tabindex="0">
+                    @else
+                    <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="image" tabindex="0">
+                    @endif
+                    
                         <img src="{{ $merchant['icon']}}" alt="{{ $merchant['name']}}">
                     </a>
                     <div class="hover-conents">
@@ -62,14 +67,29 @@
                         </ul>
                     </div>
                     <div class="content">
-                        <h3 class="font-weight-500"><a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" >{{ $merchant['name']}}</a></h3>
+                        <h3 class="font-weight-500">
+                            @if(isset($merchant['categorizable_id']))
+                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" >{{ $merchant['name']}}</a>
+                            @else
+                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" >{{ $merchant['name']}}</a>
+                            @endif
+                        </h3>
                         @if ($merchant['unit_cost'] > 0)
                         <div class="price text-red">
                             <span>${{$merchant['unit_cost']}}</span>
                         </div>
                         @endif
+                        @if(isset($merchant['Distance']))
+                        <div class="price text-red">
+                            <span>Distancia: ${{$merchant['Distance']}}</span>
+                        </div>
+                        @endif
                         <div class="btn-block grid-btn">
+                            @if(isset($merchant['categorizable_id']))
                             <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                            @else
+                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                            @endif
                         </div>
                         <div class="card-list-content ">
                             <div class="rating-widget mt--20">
@@ -88,7 +108,11 @@
                                 <p>{{ $merchant['description']}}</p>
                             </article>
                             <div class="btn-block d-flex">
+                                @if(isset($merchant['categorizable_id']))
                                 <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                @else
+                                <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                @endif
                                 <div class="btn-options">
                                     <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
                                 </div>
@@ -98,9 +122,11 @@
                 </div>
             </div>
             @endforeach
+        </div>
+        <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
             <div class="col-lg-3 col-sm-6" ng-repeat="merchant in merchants">
                 <div class="pm-product product-type-list  ">
-                    <a href="product-details.html" class="image" tabindex="0">
+                    <a href="javascript:;" ng-click="openItem(merchant)" class="image" tabindex="0">
                         <img ng-src="@{{merchant.icon}}">
                     </a>
                     <div class="hover-conents">
@@ -109,12 +135,12 @@
                         </ul>
                     </div>
                     <div class="content">
-                        <h3 class="font-weight-500"><a href="/a/products/@{{category.url'}}?merchant_id=@{{ merchant.categorizable_id}}">@{{ merchant.name}}</a></h3>
+                        <h3 class="font-weight-500" ng-show="merchant.categorizable_id"><a href="/a/products/@{{category.url}}?merchant_id=">@{{ merchant.name}}</a></h3>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
                             <span>@{{ merchant.unit_cost | currency }}</span>
                         </div>
                         <div class="btn-block grid-btn">
-                            <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                            <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                         </div>
                         <div class="card-list-content ">
                             <div class="rating-widget mt--20">
@@ -129,7 +155,8 @@
                                 <p>@{{ merchant.description}}</p>
                             </article>
                             <div class="btn-block d-flex">
-                                <a href="/a/products/@{{category.url'}}?merchant_id=@{{ merchant.categorizable_id}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                
                                 <div class="btn-options">
                                     <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
                                 </div>
@@ -139,21 +166,9 @@
                 </div>
             </div>
         </div>
-        <div class="mt--30">
-            <div class="pagination-widget">
-                <div class="site-pagination">
-                    <a href="#" class="single-pagination">|&lt;</a>
-                    <a href="#" class="single-pagination">&lt;</a>
-                    <a href="#" class="single-pagination active">1</a>
-                    <a href="#" class="single-pagination">2</a>
-                    <a href="#" class="single-pagination">&gt;</a>
-                    <a href="#" class="single-pagination">&gt;|</a>
-                </div>
-            </div>
-
-        </div>
+        @include(config("app.views").'.pagination')
         <script>
-            var viewData = '@json($merchants)';
+                    var viewData = '@json($merchants)';
         </script>
     </div>
 </main>

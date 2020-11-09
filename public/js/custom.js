@@ -96,7 +96,7 @@ jQuery(document).ready(function () {
         /*--
             - Carousel
         ------------------------*/
-
+        function timoSlickSlider() {
         var $html = $('html');
         var $body = $('body');
         var $uptimoSlickSlider = $('.petmark-slick-slider');
@@ -175,6 +175,9 @@ jQuery(document).ready(function () {
             });
 
         });
+        }
+        setTimeout(function(){ timoSlickSlider(); }, 500);
+        
         /*----------  Dropdown Slide Down Effect  ----------*/
 
         $(".slide-down--btn").on('click', function (e) {
@@ -344,7 +347,8 @@ jQuery(document).ready(function () {
 
 
         /*----------   NIce Select  ----------*/
-        $('.nice-select').niceSelect()
+        $('.nice-select').niceSelect('update');
+        //$('.nice-select').niceSelect()
 
         /*----------   Sticky Sidebar  ----------*/
         $('#sidebar').stickySidebar({

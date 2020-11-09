@@ -26,6 +26,7 @@ elixir(mix => {
     'controllers/checkoutctrl.js',
     'controllers/accessctrl.js',
     'controllers/sourcesctrl.js',
+    'controllers/sitemapctrl.js',
     'controllers/addressctrl.js',
     'controllers/routesctrl.js',
     'controllers/ordersctrl.js',
@@ -34,6 +35,8 @@ elixir(mix => {
     'controllers/groupsctrl.js',
     'controllers/menuctrl.js',
     'controllers/merchantsctrl.js',
+    'controllers/reportsctrl.js',
+    'controllers/leadsctrl.js',
     'controllers/deliveriesctrl.js',
     'controllers/admin/store/admin-store-productsctrl.js',
     'controllers/admin/store/admin-store-variantsctrl.js',
@@ -63,6 +66,7 @@ elixir(mix => {
     'services/product-import.js',
     'services/food.js',
     'services/zones.js',
+    'services/leads.js',
     
     ], 'public/js/');
     mix.sass(["scss/main.scss",

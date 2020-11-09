@@ -20,8 +20,8 @@ class CreateMerchantsTable extends Migration {
             $table->index('type');
             $table->string('email')->nullable();
             $table->string('telephone')->nullable();
-            $table->string('hash')->nullable();
-            $table->string('url')->nullable();
+            $table->string('slug')->nullable();
+            $table->index('slug');
             $table->string('address')->nullable();
             $table->text('description')->nullable();
             $table->text('attributes')->nullable();
@@ -50,7 +50,6 @@ class CreateMerchantsTable extends Migration {
             $table->decimal('base_cost')->nullable();
             $table->string('unit')->nullable();
             $table->string('currency')->nullable();
-            $table->string('slug')->nullable();
             $table->string('status')->nullable();
             $table->string('plan')->nullable();
             $table->timestamps();

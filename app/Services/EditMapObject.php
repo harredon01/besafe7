@@ -99,6 +99,31 @@ class EditMapObject {
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
     }
+    public function getActiveCategoriesMerchant($id) {
+        //DB::enableQueryLog();
+        $categories = DB::select(" "
+                        . "SELECT 
+    c.*, COUNT(categorizable_id) AS tots
+FROM
+    categorizables ca
+        JOIN
+    categories c ON c.id = ca.category_id
+WHERE
+    categorizable_type = 'App\\\Models\\\Product'
+        AND categorizable_id IN (SELECT 
+            product_id
+        FROM
+            merchant_product mp
+                JOIN
+            products p ON mp.product_id = p.id
+        WHERE
+            merchant_id = :merchant_id AND p.isActive = TRUE)
+GROUP BY category_id"
+                        . "", ['merchant_id' => $id]);
+        //DB::enableQueryLog();
+        //dd(DB::getQueryLog());
+        return ['status' => "success", "data" => $categories];
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -421,6 +446,58 @@ class EditMapObject {
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function buildCoverageQuery(array $data) {
+        $lat = $data['lat'];
+        $long = $data['long'];
+        $category = false;
+        $per_page = 25;
+        $page = 1;
+        if (array_key_exists("category", $data)) {
+            if ($data["category"]) {
+                $category = true;
+            }
+        }
+        if (array_key_exists("page", $data)) {
+            if ($data["page"]) {
+                $page = $data["page"];
+            }
+        }
+        if (array_key_exists("per_page", $data)) {
+            if ($data["per_page"]) {
+                $per_page = $data["per_page"];
+            }
+        }
+        $offset = ($page-1)*$per_page;
+
+        $thedata = [
+            'point' => 'POINT(' . $long . ' ' . $lat . ')',
+            'limit' => $per_page
+        ];
+        $additionalQuery = '';
+        if ($category) {
+            $thedata["category"] = $data["category"];
+            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category) and categorizable_type = "App\\\Models\\\Merchant") ';
+        }
+//        DB::enableQueryLog();
+        $merchants = DB::select(" "
+                        . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
+                ." where private = 0 AND status in ('online','active','busy') AND "
+                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
+                        . $additionalQuery
+                        . " LIMIT ".$offset.", :limit", $thedata);
+        unset($thedata['limit']);
+        $merchantsCount = DB::select(" "
+                        . "SELECT COUNT(merchants.id) as total FROM merchants "
+                ." where private = 0 AND status in ('online','active','busy') AND "
+                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
+                        . $additionalQuery, $thedata);
+        return array("data" => $merchants,"page"=>$page,"per_page"=>$per_page,"total"=>$merchantsCount[0]->total);
+    }
 
     public function getRelation(array $parentIds, $object, $idColumn) {
 //DB::enableQueryLog();
@@ -474,7 +551,7 @@ class EditMapObject {
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
-            $additionalFields = " type, telephone, address, report_time, ";
+            $additionalFields = " type, telephone, address, report_time,attributes,rating,rating_count, ";
             if ($category) {
                 $joins = " join categorizables cr on r.id = cr.categorizable_id ";
                 $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type = 'App\\\Models\\\Report' ";

@@ -3,10 +3,7 @@
                 $scope.subtotal = 0;
                 $scope.total = 0
                 angular.element(document).ready(function () {
-                    if (window.location.href == 'https://lonchis.com.co/auth/login' || window.location.href == 'http://www.lonchis.com.co/auth/login') {
-                    } else {
-                        $scope.getCart();
-                    }
+                    setTimeout(function(){ $scope.getCart(); }, 300);
                 });
                 $scope.clean = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -21,6 +18,7 @@
                     });
                 }
                 $rootScope.$on('updateHeadCart', function () {
+                    console.log("Get cart");
                     $scope.getCart();
                 });
                 $rootScope.$on('loadHeadCart', function (event, args) {

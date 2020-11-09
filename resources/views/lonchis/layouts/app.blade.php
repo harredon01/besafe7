@@ -29,6 +29,7 @@
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
+        <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
         <!--script src="/js/all.js"></script-->
         <script src="{{ asset('/js/app_1.js')}}"></script>
         <script src="{{ asset('/js/constants.js')}}"></script>
@@ -40,6 +41,7 @@
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/sitemapctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/routesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
@@ -48,6 +50,8 @@
         <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/merchantsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/reportsctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/leadsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/deliveriesctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
@@ -75,6 +79,7 @@
         <script src="{{ asset('/js/services/product-import.js')}}"></script>
         <script src="{{ asset('/js/services/food.js')}}"></script>
         <script src="{{ asset('/js/services/zones.js')}}"></script>
+        <script src="{{ asset('/js/services/leads.js')}}"></script>
 
     </head>
     <body>
@@ -86,26 +91,14 @@
                         <div class="container">
                             <div class="row align-items-center">
                                 <div class="col-sm-6 text-center text-sm-left">
-                                    <p class="font-weight-300">Welcome to Acacia Pet Food</p>
+                                    <p class="font-weight-300">Bienvenido a Petworld</p>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="header-top-nav right-nav">
-                                        <div class="nav-item slide-down-wrapper">
-                                            <span>Language:</span><a class="slide-down--btn" href="#" role="button">
-                                                English<i class="ion-ios-arrow-down"></i>
+                                        <div class="nav-item slide-down-wrapper" ng-show="shippingAddress">
+                                            <span></span><a class="slide-down--btn" href="javascript:;" ng-click="changeShippingHeader()" role="button">
+                                                @{{shippingAddress.address}}<i class="ion-ios-arrow-down"></i>
                                             </a>
-                                            <ul class="dropdown-list slide-down--item">
-                                                <li><a href="#">En</a></li>
-                                                <li><a href="#">En</a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="nav-item slide-down-wrapper">
-                                            <span>Currency:</span><a class="slide-down--btn" href="#" role="button">
-                                                USD<i class="ion-ios-arrow-down"></i>
-                                            </a>
-                                            <ul class="dropdown-list slide-down--item">
-                                                <li><a href="#">EUR</a></li>
-                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -176,42 +169,7 @@
                         <div class="header-bottom-inner">
                             <div class="row no-gutters">
                                 <!-- Category Nav -->
-                                <div class="col-lg-3 col-md-8">
-                                    <!-- Category Nav Start -->
-                                    <div class="category-nav-wrapper bg-blue">
-                                        <div class="category-nav">
-                                            <h2 class="category-nav__title primary-bg" id="js-cat-nav-title"><i class="fa fa-bars"></i>
-                                                <span>All Categories</span></h2>
-
-                                            <ul class="category-nav__menu" id="js-cat-nav">
-                                                @foreach ($categories as $category)
-                                                @if (count($category['children']) > 0)
-                                                <li class="category-nav__menu__item has-children">
-                                                    <a href="/a/merchants/{{ $category['url']}}">{{ $category['name']}}</a>
-                                                    <div class="category-nav__submenu">
-                                                        <div class="category-nav__submenu--inner">
-                                                            <ul>
-                                                                @foreach ($category['children'] as $child)
-                                                                <li><a href="/a/merchants/{{ $child['url']}}">{{ $child['name']}}</a></li>
-                                                                @endforeach
-                                                            </ul>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                </li>
-                                                @else
-                                                <li class="category-nav__menu__item">
-                                                    <a href="/a/merchants/{{ $category['url']}}">{{ $category['name']}}</a>                                                  
-                                                </li>
-                                                @endif
-                                                @endforeach
-                                                
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <!-- Category Nav End -->
-                                    <div class="category-mobile-menu"></div>
-                                </div>
+                                {!!$menu!!}
                                 <!-- Main Menu -->
                                 <div class="col-lg-7 d-none d-lg-block">
                                     <nav class="main-navigation">
@@ -236,15 +194,29 @@
                                                         <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
-                                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
-                                                {{ csrf_field()}}
-                                            </form>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                        <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                            {{ csrf_field()}}
+                                                        </form>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li class="mainmenu__item ">
-                                                <a href="portfolio.html" class="mainmenu__link">Acerca de </a>
+                                            <li class="mainmenu__item menu-item-has-children">
+                                                <a href="javascript" class="mainmenu__link">Acerca de</a>
+                                                <ul class="sub-menu">
+                                                    <li>
+                                                        <a href="/a/about-us">Nosotros</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/faq">Preguntas Frecuentes</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/bla">Contactanos</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/terms">Terminos y condiciones</a>
+                                                    </li>
+                                                </ul>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children ">
                                                 <a href="blog.html" class="mainmenu__link">Blog</a>
@@ -329,15 +301,29 @@
                                                         <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
-                                                            <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
-                                                {{ csrf_field()}}
-                                            </form>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                        <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
+                                                            {{ csrf_field()}}
+                                                        </form>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li class="mainmenu__item ">
-                                                <a href="portfolio.html" class="mainmenu__link">Acerca De</a>
+                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
+                                                <a href="javascript" class="mainmenu__link">Acerca de</a>
+                                                <ul class="sub-menu">
+                                                    <li>
+                                                        <a href="/a/about-us">Nosotros</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/faq">Preguntas Frecuentes</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/bla">Contactanos</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/terms">Terminos y condiciones</a>
+                                                    </li>
+                                                </ul>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children sticky-has-child ">
                                                 <a href="blog.html" class="mainmenu__link">Blog</a>
@@ -388,7 +374,7 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-6">
                             <div class="single-footer contact-block">
-                                <h3 class="footer-title">Contact</h3>
+                                <h3 class="footer-title">Contacto</h3>
                                 <div class="single-footer-content">
                                     <p class="text-italic">We are a team of designers and developers that create high quality Wordpress, Magento, Prestashop, Opencart.</p>
                                     <p class="font-weight-500 text-white"><span class="d-block">Contact info:</span>
@@ -403,34 +389,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-2 col-sm-6">
+                        <div class="col-lg-4 col-sm-6">
                             <div class="single-footer contact-block">
-                                <h3 class="footer-title">Information</h3>
+                                <h3 class="footer-title">Informacion</h3>
                                 <div class="single-footer-content">
                                     <ul class="footer-list">
-                                        <li><a href="#">About Us</a></li>
-                                        <li><a href="#">Contact Us</a></li>
-                                        <li><a href="#">My orders</a></li>
+                                        <li><a href="/a/about-us">Acerca de </a></li>
+                                        <li><a href="/a/contact-us/bla">Contactanos</a></li>
                                         <li><a href="#">Returns & Exchanges</a></li>
                                         <li><a href="#">Shipping & Delivery</a></li>
-                                        <li><a href="#">Privacy Policy</a></li>
-                                        <li><a href="#">About Us</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="single-footer contact-block">
-                                <h3 class="footer-title">CUSTOMER CARE</h3>
-                                <div class="single-footer-content">
-                                    <ul class="footer-list">
-                                        <li><a href="#">Contact us</a></li>
-                                        <li><a href="#">Returns</a></li>
-                                        <li><a href="#">Order History</a></li>
-                                        <li><a href="#">Site Map</a></li>
-                                        <li><a href="#">Testimonials</a></li>
-                                        <li><a href="#">My Account</a></li>
-                                        <li><a href="#">Notification</a></li>
+                                        <li><a href="/a/terms">Terminos y condiciones</a></li>
+                                        <li><a href="/a/icons">Iconos</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -453,7 +422,7 @@
                         </div>
                     </div>
                     <div class="footer-block-2 text-center">
-                        <ul class="footer-list list-inline justify-content-center">
+                        <!--ul class="footer-list list-inline justify-content-center">
                             <li><a href="">Online Shopping</a></li>
 
                             <li><a href="">Promotions</a></li>
@@ -498,7 +467,7 @@
                             <li><a href="">Manufacturers</a></li>
 
                             <li><a href="">Our Stores</a></li>
-                        </ul>
+                        </ul-->
                         <div class="payment-block pt-3">
                             <img src="image/icon-logo/payment-icons.png" alt="">
                         </div>

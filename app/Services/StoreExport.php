@@ -521,7 +521,7 @@ class StoreExport {
         }
     }
 
-    public function writeFile($data, $title, $sendMail, $user) {
+    public function writeFile($data, $title, $sendMail) {
         //dd($data);
         $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
         $path = 'exports/' . $title . ".xls";
@@ -542,8 +542,8 @@ class StoreExport {
 //                });
         $path = 'exports/' . $title . ".xls";
         if ($sendMail) {
-            //$users = User::whereIn('id', [1])->get();
-            Mail::to($user)->send(new StoreReports($path));
+            $users = User::whereIn('id', [1,77,2])->get();
+            Mail::to($users)->send(new StoreReports($path));
         } else {
             return $path;
         }
@@ -1140,19 +1140,6 @@ class StoreExport {
         }
     }
 
-    public function slug_url($text) {
-        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-        $text = preg_replace('~[^-\w]+~', '', $text);
-        $text = trim($text, '-');
-        $text = preg_replace('~-+~', '-', $text);
-        $text = strtolower($text);
-        if (empty($text)) {
-            return 'n-a';
-        }
-        return $text;
-    }
-
     public function importReportsExcelInternal(User $user, array $row) {
         $headers = $row[0];
         foreach ($row as $item) {
@@ -1203,6 +1190,7 @@ class StoreExport {
                 }
                 $report->lat = rand(4527681, 4774930) / 1000000;
                 $report->long = rand(-74185612, -74035612) / 1000000;
+                $report->slug = $this->slug_url($report->name);
                 $report->save();
             }
         }
@@ -1361,7 +1349,7 @@ class StoreExport {
                     $categoriesData = explode(",", $sheet['categories']);
                     unset($sheet['categories']);
                     $product->fill($sheet);
-                    $product->hash = "asd";
+                    $product->slug = $this->slug_url($product->name);
                     $product->save();
 
                     if ($categoriesData) {

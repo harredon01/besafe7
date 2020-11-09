@@ -18,19 +18,19 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function (
 Route::get('/test', function () {
     return view(config("app.views").'.lonchis');
 });
-Route::get('/faq', function () {
+Route::get('/a/faq', function () {
     return view(config("app.views").'.faq');
 });
-Route::get('/blog', function () {
-    return view(config("app.views").'.blog');
+Route::get('/a/about-us', function () {
+    return view(config("app.views").'.about-us');
 });
-Route::get('/blog/{slug?}', function () {
-    return view(config("app.views").'.blog-detail');
-});
-Route::get('/terms', function () {
+Route::get('/a/blog',  'WelcomeController@getBlogList');
+Route::get('/a/contact-us/{type?}',  'LeadController@getLanding');
+Route::get('/a/blog/{slug?}','WelcomeController@getBlogDetail');
+Route::get('/a/terms', function () {
     return view(config("app.views").'.content.terms');
 });
-Route::get('/icons', function () {
+Route::get('/a/icons', function () {
     return view(config("app.views").'.content.icons');
 });
 Route::get('/zones', function () {
@@ -41,16 +41,23 @@ Route::get('landing/{type?}', 'LeadController@getLanding');
 Route::post('landing', 'LeadController@postLanding');
 Route::get('/home', 'HomeController@index');
 Route::get('user/editProfile', 'UserController@getEditProfile');
-Route::post('user/editProfile', 'UserController@postEditProfile');
+Route::get('user/editPassword', 'UserController@getEditPassword');
 Route::get('user/editAddress', 'UserController@getEditAddress');
 Route::get('user/editAccess', 'UserController@access');
 Route::get('user/addresses', 'UserController@getAddresses');
+Route::get('user/payments', 'BillingController@getPayments');
+Route::get('user/payments/{id?}', 'BillingController@getPaymentDetail');
+Route::get('login/facebook', 'SocialiteController@redirectToFacebook');
+Route::get('login/facebook/callback', 'SocialiteController@handleFacebookCallback');
+Route::get('login/google', 'SocialiteController@redirectToGoogle');
+Route::get('login/google/callback', 'SocialiteController@handleGoogleCallback');
 Route::delete('user/addresses/{code?}', 'UserController@deleteAddress');
 Route::post('user/billingAddress/{code?}', 'UserController@postSetAsBillingAddress');
 Route::post('user/editAddress', 'UserController@postEditAddress');
 
 Route::get('a/products/{category?}/{page?}', 'ProductController@getproducts');
 Route::get('a/product-detail/{code?}', 'ProductController@getproduct');
+Route::get('a/merchant/{merchant?}', 'MerchantController@getMerchantDetail');
 Route::get('a/merchant/{merchant?}/products', 'ProductController@getproductsMerchant');
 
 Route::get('plans', 'BillingController@getPlans');
@@ -81,15 +88,21 @@ Route::get('payu/return', 'PayuController@returnPayU');
 Route::get('mercado/return', 'MercadoPagoController@returnMerc');
 Route::get('payu/cron', 'PayuController@cronPayU');
 Route::get('billing/orders', 'BillingController@getOrders');
-Route::get('billing/payments', 'BillingController@getPayments');
+Route::get('billing/payments', 'BillingController@getPaymentsAdmin');
 
 Route::get('merchant/register', 'MerchantController@getRegisterMerchant');
 Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 Route::get('a/merchants/{category?}', 'MerchantController@index');
+Route::get('a/merchants/{category?}/nearby', 'MerchantController@getNearbyMerchants');
+Route::get('a/merchants/{category?}/coverage', 'MerchantController@getCoverageMerchants');
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
 Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchant');
+
+Route::get('a/reports/{category?}', 'ReportController@index');
+Route::get('a/reports/{category?}/nearby', 'ReportController@getNearbyReports');
+Route::get('a/report/{slug?}', 'ReportController@getReportDetail');
 
 Route::get('admin/store/products', 'ProductImportController@getProducts');
 Route::get('admin/store/variants', 'ProductImportController@getVariants');

@@ -22,8 +22,64 @@ angular.module('besafe')
                 return def.promise;
 
             }
+            var getReports = function (where) {
+                let url = "/api/reports";
+                if (where) {
+                    url = url + "?" + where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
             var getMerchantsCoverage = function (data) {
                 let url = "/api/private/merchants/coverage";
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url,
+                    params:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
+            var getMerchantsNearby = function (data) {
+                let url = "/api/private/merchants/nearby";
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url,
+                    params:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
+            var getReportsNearby = function (data) {
+                let url = "/api/private/reports/nearby";
                 var def = $q.defer();
                 $http({
                     method: 'get',
@@ -168,6 +224,9 @@ angular.module('besafe')
 
             return {
                 getMerchants: getMerchants,
+                getMerchantsNearby:getMerchantsNearby,
+                getReportsNearby:getReportsNearby,
+                getReports:getReports,
                 getMerchantsCoverage: getMerchantsCoverage,
                 getMerchantsPrivate: getMerchantsPrivate,
                 saveMerchant: saveMerchant,

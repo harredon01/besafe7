@@ -67,9 +67,16 @@ class Report extends Model {
     public function country() {
         return $this->hasOne('App\Models\Country');
     }
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable', 'type', 'trigger_id', 'id');
+    }
+    
+    public function ratings() {
+        return $this->morphMany('App\Models\Rating', 'rateable', 'type', 'object_id', 'id');
+    }
 
     public function categories() {
-        return $this->belongsToMany('App\Models\Category')->withTimestamps();
+        return $this->morphToMany('App\Models\Category', 'categorizable')->withTimestamps();
     }
 
     public function groups() {

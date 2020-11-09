@@ -42,7 +42,6 @@ angular.module('besafe')
                         method: 'POST',
                         url: '/api/addresses',
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -54,20 +53,37 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            }
+            } 
             var saveUser = function (data) {
                 var def = $q.defer();
                 $http({
                         method: 'POST',
                         url: '/api/user',
                         data: data, // pass in data as strings
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
                             })
                         .error(function () {
                             def.reject("Failed to create user");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
+            var updatePassword = function (data) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/user/change_password',
+                        data: data, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to updatePassword");
                         });
 
                 return def.promise;
@@ -132,6 +148,7 @@ angular.module('besafe')
                 setAsBillingAddress: setAsBillingAddress,
                 getAddresses:getAddresses,
                 saveAddress:saveAddress,
+                updatePassword:updatePassword,
                 deleteAddress:deleteAddress,
                 saveUser:saveUser,
                 getContacts:getContacts,

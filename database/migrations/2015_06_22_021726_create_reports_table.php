@@ -21,7 +21,8 @@ class CreateReportsTable extends Migration {
             $table->boolean('private')->nullable();
             $table->boolean('anonymous')->nullable();
             $table->string('email')->nullable();
-            $table->string('hash')->nullable();
+            $table->string('slug')->nullable();
+            $table->index('slug');
             $table->string('telephone')->nullable();
             $table->string('address');
             $table->text('description')->nullable();

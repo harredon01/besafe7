@@ -110,9 +110,9 @@
                     }
                 }
                 $scope.setCoupon = function () {
-                    Modals.showLoader();
                     //setTimeout(function(){ Modals.hideLoader(); }, 2000);
                     if ($scope.coupon && $scope.coupon.length > 0) {
+                        Modals.showLoader();
                         Orders.setCoupon($scope.coupon).then(function (resp) {
                             Modals.hideLoader();
                             if (resp) {
@@ -153,7 +153,7 @@
                 $scope.visible = false;
                 $rootScope.shippingAddressSet = true;
                 $rootScope.shippingCondition = true;
-                $scope.shippingConditionSet = false;
+                $rootScope.shippingConditionSet = false;
                 $rootScope.billingAddressSet = false;
                 $rootScope.paymentMethodSet = false;
 
@@ -305,7 +305,7 @@
                             for (let i in providers) {
                                 console.log("Providers: ", providers[i]);
                             }
-                            console.log("Setting discounts");
+                            console.log("Setting discounts",$rootScope.shippingAddressSet);
                             Orders.setDiscounts(order.id, "Booking").then(function (data) {
                                 console.log("Discounts set", data);
                                 let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
@@ -351,7 +351,7 @@
                         if (data.status == "success") {
                             $rootScope.$broadcast('updateLoadedCart', data.cart);
                             $rootScope.activeOrder = data.order;
-                            $scope.shippingConditionSet = true;
+                            $rootScope.shippingConditionSet = true;
                             Modals.showToast("Envio agregado exitosamente");
                         }
                     },
@@ -421,6 +421,19 @@
                 $scope.hideAddressForm = function () {
                     $scope.addAddress = false;
                 }
+                $scope.changeAddress = function () {
+                    console.log("Change address")
+                    $rootScope.shippingAddressSet = false;
+                    $scope.addAddress = false;
+                    if($rootScope.addresses && $rootScope.addresses.length > 0 ){
+                        
+                    } else {
+                        $scope.getAddresses();
+                    }
+                }
+                $scope.changeShipping = function () {
+                    $rootScope.shippingConditionSet = false;
+                }
                 $scope.prepareOrder = function () {
                     Modals.showLoader();
                     $scope.showPayment = false;
@@ -486,7 +499,7 @@
                 $scope.data3 = {};
                 $scope.data4 = {};
                 $scope.banks = [];
-                $scope.paymentActive = false;
+                $rootScope.paymentActive = false;
                 $scope.creditCardVisible = false;
                 $scope.creditPayerVisible = false;
                 $scope.creditBuyerVisible = false;
@@ -511,7 +524,7 @@
                     }
                 });
                 $rootScope.$on('activatePayment', function (event, args) {
-                    $scope.paymentActive = true;
+                    $rootScope.paymentActive = true;
                     setTimeout(function () {
                         $location.hash('payment-methods');
                         $anchorScroll();

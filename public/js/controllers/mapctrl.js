@@ -55,7 +55,7 @@ angular.module('besafe')
                             url = locationS + "?lat=" + $rootScope.shippingAddress.lat + "&long=" + $rootScope.shippingAddress.long
                         }
                         console.log("url", url);
-                        url = locationS;
+                        //url = locationS;
                     } else {
                         url = "/?lat=" + $rootScope.shippingAddress.lat + "&long=" + $rootScope.shippingAddress.long
                     }

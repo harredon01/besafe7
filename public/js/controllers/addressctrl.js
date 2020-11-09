@@ -11,23 +11,23 @@
                     var where = "";
                     let checkAddress = $cookies.get("creating_address");
                     if (checkAddress) {
-                        $cookies.remove("creating_address",{path: "/"});
-                        console.log("creat",$cookies.get("creating_address"));
-                        console.log("Loading address from cookie",$rootScope.shippingAddress);
+                        $cookies.remove("creating_address", {path: "/"});
+                        console.log("creat", $cookies.get("creating_address"));
+                        console.log("Loading address from cookie", $rootScope.shippingAddress);
                         $scope.editAddress = true;
                         $scope.data = $rootScope.shippingAddress;
                         $scope.data.address_id = $rootScope.shippingAddress.id;
-                        if($scope.data.name && $scope.data.name.length > 0){
-                            
+                        if ($scope.data.name && $scope.data.name.length > 0) {
+
                         } else {
                             $scope.data.name = $rootScope.user.name;
-                        } 
-                        if($scope.data.phone && $scope.data.phone.length > 0){
-                            
+                        }
+                        if ($scope.data.phone && $scope.data.phone.length > 0) {
+
                         } else {
                             $scope.data.phone = $rootScope.user.cellphone;
                         }
-                        
+
                         $scope.selectPlace($scope.data.country_id, $scope.data.region_id);
                     }
                     LocationService.getCountries(where).then(function (data) {
@@ -41,22 +41,30 @@
                     $scope.submitted = true;
                     if (isvalid) {
                         var existing = false;
-                        $cookies.remove("creating_address",{path: "/"});
-                        $cookies.remove("creating_address",{path: "/"});
-                        $cookies.remove("creating_address",{path: "/"});
+                        $cookies.remove("creating_address", {path: "/"});
+                        $cookies.remove("creating_address", {path: "/"});
+                        $cookies.remove("creating_address", {path: "/"});
                         if ($scope.data.address_id) {
                             existing = true;
                         }
                         Addresses.saveAddress($scope.data).then(function (data) {
-                            if (existing) {
-                                $scope.updateAddress(data.address);
+                            if (data.status == "success") {
+                                Modals.showToast("Actualizacion exitosa", $("#myaccountContent"));
+                                if (existing) {
+                                    $scope.updateAddress(data.address);
+                                } else {
+                                    $scope.addresses.push(data.address);
+                                }
+
+                                $scope.data = {};
+                                $scope.editAddress = false;
+                                //$scope.data = data.user;
                             } else {
-                                $scope.addresses.push(data.address);
+                                Modals.showToast("Hubo un error porfavor comunicate con soporte", $("#myaccountContent"));
                             }
 
-                            $scope.data = {};
                             $scope.submitted = false;
-                            $scope.editAddress = false;
+
                         },
                                 function (data) {
 
@@ -87,12 +95,12 @@
                     });
                 };
                 $scope.deleteAddress = function (address) {
-                    $cookies.remove("shippingAddress",{path: "/"});
+                    $cookies.remove("shippingAddress", {path: "/"});
                     Addresses.deleteAddress(address.id).then(function (data) {
                         for (item in $scope.addresses) {
-                            console.log("a",$scope.addresses[item].id);
-                            console.log("b",address.id);
-                            console.log("c",$scope.addresses[item].id == address.id);
+                            console.log("a", $scope.addresses[item].id);
+                            console.log("b", address.id);
+                            console.log("c", $scope.addresses[item].id == address.id);
                             if ($scope.addresses[item].id == address.id) {
                                 console.log("deleting address", $scope.addresses[item]);
                                 $scope.addresses.splice(item, 1);
@@ -138,12 +146,12 @@
                         }
                     }
                     LocationService.getCitiesRegion($scope.data.region_id).then(function (data) {
-                            $scope.cities = data.data;
-                            $scope.cityVisible = true;
-                            console.log("Setting cities", $scope.cities);
-                        },
-                                function (data) {
-                                });
+                        $scope.cities = data.data;
+                        $scope.cityVisible = true;
+                        console.log("Setting cities", $scope.cities);
+                    },
+                            function (data) {
+                            });
                 }
                 $scope.selectPlace = function (country_id, region_id, city_id) {
                     //$scope.$apply(function () {

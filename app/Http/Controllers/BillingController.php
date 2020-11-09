@@ -79,10 +79,31 @@ class BillingController extends Controller {
      *
      * @return Response
      */
-    public function getPayments() {
+    public function getPaymentsAdmin() {
         $user = $this->auth->user();
 
         return view(config("app.views").'.billing.payments.paymentsDashboard')->with('user',$user );
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPayments() {
+        $user = $this->auth->user();
+
+        return view(config("app.views").'.user.payments');
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPaymentDetail() {
+        $user = $this->auth->user();
+
+        return view(config("app.views").'.user.payment-detail');
     }
 
 }

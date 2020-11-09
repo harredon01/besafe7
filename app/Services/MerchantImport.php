@@ -449,6 +449,7 @@ class MerchantImport {
                             $item->merchants()->save($merchant);
                         }
                     }
+                    $merchant->slug = $this->slug_url($merchant->name);
                     $merchant->lat = rand(4527681, 4774930) / 1000000;
                     $merchant->long = rand(-74185612, -74035612) / 1000000;
                     if ($image) {
@@ -502,6 +503,7 @@ class MerchantImport {
                     } else {
                         $report->icon = 'https://picsum.photos/900/350';
                     }
+                    $report->slug = $this->slug_url($report->name);
                     $report->lat = rand(4527681, 4774930) / 1000000;
                     $report->long = rand(-74185612, -74035612) / 1000000;
                     $report->save();
@@ -705,7 +707,7 @@ class MerchantImport {
                 //dd($sheet);
                 $product->fill($sheet);
                 $product->isActive = true;
-                $product->hash = "asd";
+                $product->slug = $this->slug_url($product->name);
 
                 $product->save();
 

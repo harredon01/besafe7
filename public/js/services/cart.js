@@ -1,10 +1,10 @@
 angular.module('besafe')
         .service('Cart', ['$q', '$http', '$mdDialog', 'Modals', '$cookies', '$rootScope', function ($q, $http, $mdDialog, Modals, $cookies, $rootScope) {
 
-                var showConfirm = function () {
+                var showConfirm = function (url) {
                     $mdDialog.show(Modals.getLocationPrompt()).then(function (answer) {
                         if (answer == "map") {
-                            $cookies.put("locationRefferrer", window.location.href, {path: "/"});
+                            $cookies.put("locationRefferrer", url, {path: "/"});
                             window.location.href = "/location";
                         } else if (answer == 'address') {
                             showAdvanced();
@@ -14,13 +14,17 @@ angular.module('besafe')
 
                     });
                 };
+                var showConfirmExt = function (url) {
+                    $cookies.put("locationRefferrer", url, {path: "/"});
+                    window.location.href = "/location";
+                };
                 var checkProduct = function (variant) {
                     console.log("Check prod", $rootScope.shippingAddress);
                     if (variant.is_shippable) {
                         if ($rootScope.shippingAddress) {
                             return checkMerchant();
                         }
-                        showConfirm();
+                        showConfirm(window.location.href);
                         return false;
                     } else {
                         return checkMerchant();
@@ -196,6 +200,8 @@ angular.module('besafe')
                     getCart: getCart,
                     addCartItem: addCartItem,
                     updateCartItem: updateCartItem,
+                    showConfirm:showConfirm,
+                    showConfirmExt:showConfirmExt,
                     clearCart: clearCart,
                     changeMerchant: changeMerchant
                 };
