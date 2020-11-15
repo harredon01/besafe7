@@ -57,7 +57,7 @@ class ReportController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->auth = $auth;
         $this->cleanSearch = $cleanSearch;
-        $this->middleware('auth')->except(['index', 'getNearbyReports','getReportDetail']);
+        $this->middleware('auth')->except(['index', 'getNearbyReports','getReportDetail','textSearch']);
     }
 
     /**
@@ -135,6 +135,32 @@ class ReportController extends Controller {
         $user = $this->auth->user();
         $merchant = Report::where("slug",$url)->with(["files",'ratings'])->first();
         return view(config("app.views") . '.reports.detail')->with('report', $merchant);
+    }
+    public function textSearch(Request $request) {
+        $data = $request->all();
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $query = Report::search($data['q']);
+
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'reports.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Report");
+        }
+        $countQuery = $query;
+        $pageRes = $this->editMapObject->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $reports = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $reports;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return view(config("app.views") . '.reports.listing', ["reports" => $results]);
     }
 
 }

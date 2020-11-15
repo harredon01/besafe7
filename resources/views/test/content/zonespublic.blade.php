@@ -1,5 +1,4 @@
-@extends('layouts.zeappcontr')
-
+@extends(config("app.views").'.layouts.app')
 @section('content')
 <div class="container" ng-controller="ZonesPubCtrl">
     <div class="row">

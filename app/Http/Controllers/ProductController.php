@@ -9,6 +9,7 @@ use App\Models\Merchant;
 use App\Models\Category;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use DB;
 
 class ProductController extends Controller {
 
@@ -48,12 +49,39 @@ class ProductController extends Controller {
      *
      * @return Response
      */
-    public function getProductSearch(Request $request) {
+    public function textSearch(Request $request) {
         $data = $request->all();
-        $products = Products::whereIn('id', function($query) use($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $textSearchQuery = Product::search($data['q'])->whereIn('id', function($query) use($data) {
                     $query = $this->editProduct->baseProductQuery($data, $query);
+                    $query->from('products');
                     $query->select('products.id');
-                })->where('isActive', true)->get();
+                })->where('isActive', true);
+        $textSearchCountQuery = $textSearchQuery;
+        $total = $textSearchCountQuery->count();
+        $textSearchQuery->with(["merchants", 'files', 'variants']);
+        $pageRes = $this->editProduct->paginateQueryFromArray($textSearchQuery, $data);
+        $textSearchQuery = $pageRes['query'];
+        $products = $textSearchQuery->get();
+        foreach ($products as $value) {
+            $value->description = nl2br($value->description);
+            $value->description = str_replace(array("\r", "\n"), '', $value->description);
+            foreach ($value->variants as $item) {
+                $item->attributes = json_decode($item->attributes);
+            }
+        }
+        $cat = ["products" => $products, 'id' => -1];
+        $results = [];
+        $results['categories'] = [$cat];
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        $results['category'] = [];
+        $results['side_categories'] = [];
+        return view(config("app.views") . '.products.productsMerchant', ["data" => $results]);
     }
 
     /**
@@ -95,13 +123,30 @@ class ProductController extends Controller {
         return view(config("app.views") . '.products.productsMerchant', ["data" => $returnResults]);
     }
 
-    public function getProductsMerchant($slug) {
-        $merchant = Merchant::where("url", $slug)->first();
+    public function getProductsMerchant(Request $request, $slug) {
+        $merchant = Merchant::where("slug", $slug)->first();
         $data = $request->all();
         $side_categories = $this->editProduct->getActiveCategoriesMerchant($merchant->id);
         $data['includes'] = "files";
+        $data['merchant_id'] = $merchant->id;
         $results = $this->editProduct->getProductsMerchant($data);
         $visualResults = $this->editProduct->buildProducts($results);
+        for ($x = 0; $x < count($visualResults); $x++) {
+            for ($y = 0; $y < count($visualResults[$x]['products']); $y++) {
+                $visualResults[$x]['products'][$y]['description'] = nl2br($visualResults[$x]['products'][$y]['description']);
+                $visualResults[$x]['products'][$y]['description'] = str_replace(array("\r", "\n"), '', $visualResults[$x]['products'][$y]['description']);
+                unset($visualResults[$x]['products'][$y]['merchant_description']);
+//                foreach ($value['variants'] as $variant) {
+//                    if (is_string($variant['attributes'])) {
+//                        $variant['attributes'] = json_decode($variant['attributes']);
+//                        if ($variant['attributes']) {
+//                            dd($variant['attributes']);
+//                        }
+//                    }
+//                }
+                //dd($value);
+            }
+        }
 
         if (!$visualResults) {
             $visualResults = [];
@@ -111,7 +156,7 @@ class ProductController extends Controller {
             "page" => $results['page'],
             "last_page" => $results['last_page'],
             "total" => $results['total'],
-            "category" => $category,
+            "category" => null,
             "side_categories" => $side_categories
         ];
         $results = $this->editProduct->getActiveCategoriesMerchant($merchant->id);

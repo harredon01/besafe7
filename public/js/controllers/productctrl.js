@@ -13,8 +13,12 @@
 
                 angular.element(document).ready(function () {
                     $scope.clean();
-                    let container = JSON.parse(viewData);
-                    console.log("Data", container);
+                    
+                    var res = viewData.replace(/App\\Models\\/g, "");
+                    console.log("viewData", res);
+                    let container = JSON.parse(res);
+                    
+                    console.log("Data", res);
                     $scope.categories = container.categories;
                     $scope.current = container.page;
                     $scope.last = container.last_page;
@@ -29,6 +33,9 @@
                         for (let item in $scope.categories) {
                             for (let k in $scope.categories[item].products) {
                                 $scope.local_total++;
+                                if(!$scope.categories[item].products[k].src && $scope.categories[item].products[k].files.length>0){
+                                    $scope.categories[item].products[k].src = $scope.categories[item].products[k].files[0].file;
+                                }
                                 $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
                                 $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
                                 $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;

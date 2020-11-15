@@ -117,34 +117,37 @@
                                     </div>
                                 </div>
                                 <!-- Category With Search -->
-                                <div class="col-lg-5 col-md-7 order-3 order-md-2">
-                                    <form class="category-widget">
-                                        <input type="text" name="search" placeholder="Search products ">
+                                <div class="col-lg-5 col-md-7 order-3 order-md-2" ng-controller="SearchCtrl">
+                                    <form class="category-widget" ng-submit="search()">
+                                        <input type="text" name="search" ng-model="searchText" placeholder="Buscar">
                                         <div class="search-form__group search-form__group--select">
-                                            <select name="category " id="searchCategory" class="search-form__select nice-select">
-                                                <option value="all">All Categories</option>
-                                                <optgroup label="Books, Magazines">
-                                                    <option>Bedroom</option>
-                                                    <option>Kitchen</option>
-                                                    <option>Livingroom</option>
+                                            <select name="category " id="searchCategory" ng-model="category" class="search-form__select nice-select">
+                                                <option value="">Selecciona una categoria</option>
+                                                <optgroup label="Negocios">
+                                                    <option value="merchants|0|coverage">Todos</option>
+                                                    <option value="merchants|24|nearby">Veterinarias</option>
+                                                    <option value="merchants|25|coverage">Tiendas</option>
+                                                    <option value="merchants|27|list">Otros servicios</option>
                                                 </optgroup>
-                                                <optgroup label="Electronics">
-                                                    <option>Fridge</option>
-                                                    <option>Laptops, Desktops</option>
-                                                    <option>Mobiles, Tablets</option>
+                                                <optgroup label="Productos">
+                                                    <option value="products|0|coverage">Todos</option>
+                                                    <option value="products|7|coverage">Perros</option>
+                                                    <option value="products|8|coverage">Gatos</option>
+                                                    <option value="products|5|coverage">Farmacia</option>
                                                 </optgroup>
-                                                <optgroup label="Furniture">
-                                                    <option>Accessories</option>
-                                                    <option>Men</option>
-                                                    <option>Women</option>
+                                                <optgroup label="Publicaciones">
+                                                    <option value="reports|0|list">Todos</option>
+                                                    <option value="reports|11|list">Adopcion</option>
+                                                    <option value="reports|12|list">Mascotas perdidas</option>
+                                                    <option value="reports|13|list">Compra</option>
                                                 </optgroup>
-                                                <option value="3">Home, Garden</option>
-                                                <option value="3">Kids, Baby</option>
-                                                <option value="3">Sport</option>
                                             </select>
+                                            
                                         </div>
                                         <button class="search-submit"><i class="fas fa-search"></i></button>
                                     </form>
+                                    <span style="color:red" ng-show="showError">
+                                                <span>Porfavor Selecciona una categoría</span></span>
                                 </div>
                                 <!-- Call Login & Track of Order -->
                                 <div class="col-lg-4 col-md-5 col-sm-8 order-2 order-md-3">
@@ -178,7 +181,7 @@
                                             <li class="mainmenu__item">
                                                 <a href="/" class="mainmenu__link">Home</a>
                                             </li>
-                                            <li class="mainmenu__item menu-item-has-children">
+                                            <li class="mainmenu__item menu-item-has-children" id="mi_cuenta">
                                                 <a href="#" class="mainmenu__link">Mi cuenta</a>
                                                 <ul class="sub-menu">
                                                     <li>
@@ -191,7 +194,7 @@
                                                         <a href="{{ url('user/editPassword')}}">Actualizar Contraseña</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
+                                                        <a href="{{ url('user/payments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
                                                         <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar session</a>
@@ -200,6 +203,9 @@
                                                         </form>
                                                     </li>
                                                 </ul>
+                                            </li>
+                                            <li class="mainmenu__item">
+                                                <a href="/a/contact-us/bla">Contactanos</a>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children">
                                                 <a href="javascript" class="mainmenu__link">Acerca de</a>
@@ -211,14 +217,11 @@
                                                         <a href="/a/faq">Preguntas Frecuentes</a>
                                                     </li>
                                                     <li>
-                                                        <a href="/a/contact-us/bla">Contactanos</a>
-                                                    </li>
-                                                    <li>
                                                         <a href="/a/terms">Terminos y condiciones</a>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li class="mainmenu__item menu-item-has-children ">
+                                            <li class="mainmenu__item menu-item-has-children " style="display:none">
                                                 <a href="blog.html" class="mainmenu__link">Blog</a>
                                                 <ul class="sub-menu">
                                                     <li class="menu-item-has-children">
@@ -278,14 +281,14 @@
                                     </a>
                                     <!-- Sticky Logo End -->
                                 </div>
-                                <div class="col-lg-9">
+                                <div class="col-lg-9"> 
                                     <!-- Sticky Mainmenu Start -->
                                     <nav class="sticky-navigation">
                                         <ul class="mainmenu sticky-menu">
                                             <li class="mainmenu__item ">
                                                 <a href="/" class="mainmenu__link">Home</a>
                                             </li>
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
+                                            <li class="mainmenu__item menu-item-has-children sticky-has-child" id="mi_cuenta2">
                                                 <a href="index.html" class="mainmenu__link">Mi cuenta</a>
                                                 <ul class="sub-menu">
                                                     <li>
@@ -298,7 +301,7 @@
                                                         <a href="{{ url('user/editPassword')}}">Editar Contraseña</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('user/myPayments')}}">Mis Pagos</a>
+                                                        <a href="{{ url('user/payments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
                                                         <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
@@ -307,6 +310,9 @@
                                                         </form>
                                                     </li>
                                                 </ul>
+                                            </li>
+                                            <li class="mainmenu__item ">
+                                                <a href="/a/contact-us/bla" class="mainmenu__link">Contactanos</a>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children sticky-has-child ">
                                                 <a href="javascript" class="mainmenu__link">Acerca de</a>
@@ -318,14 +324,11 @@
                                                         <a href="/a/faq">Preguntas Frecuentes</a>
                                                     </li>
                                                     <li>
-                                                        <a href="/a/contact-us/bla">Contactanos</a>
-                                                    </li>
-                                                    <li>
                                                         <a href="/a/terms">Terminos y condiciones</a>
                                                     </li>
                                                 </ul>
                                             </li>
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
+                                            <li class="mainmenu__item menu-item-has-children sticky-has-child " style="display:none">
                                                 <a href="blog.html" class="mainmenu__link">Blog</a>
                                                 <ul class="sub-menu">
                                                     <li class="menu-item-has-children">

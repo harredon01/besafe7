@@ -53,72 +53,89 @@
             @foreach ($merchants['data'] as $merchant)
             <div class="col-lg-3 col-sm-6">
                 <div class="pm-product product-type-list  ">
+                    @if(isset($merchants['category']))
                     @if(isset($merchant['categorizable_id']))
                     <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="image" tabindex="0">
-                    @else
-                    <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="image" tabindex="0">
-                    @endif
-                    
-                        <img src="{{ $merchant['icon']}}" alt="{{ $merchant['name']}}">
-                    </a>
-                    <div class="hover-conents">
-                        <ul class="product-btns">
-                            <li><a href="wishlist.html" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
-                        </ul>
-                    </div>
-                    <div class="content">
-                        <h3 class="font-weight-500">
-                            @if(isset($merchant['categorizable_id']))
-                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" >{{ $merchant['name']}}</a>
-                            @else
-                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" >{{ $merchant['name']}}</a>
+                        @else
+                        <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="image" tabindex="0">
                             @endif
-                        </h3>
-                        @if ($merchant['unit_cost'] > 0)
-                        <div class="price text-red">
-                            <span>${{$merchant['unit_cost']}}</span>
-                        </div>
-                        @endif
-                        @if(isset($merchant['Distance']))
-                        <div class="price text-red">
-                            <span>Distancia: ${{$merchant['Distance']}}</span>
-                        </div>
-                        @endif
-                        <div class="btn-block grid-btn">
-                            @if(isset($merchant['categorizable_id']))
-                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                             @else
-                            <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                            <a href="/a/merchant/{{$merchant['slug']}}/products" class="image" tabindex="0">
                             @endif
+                            <img src="{{ $merchant['icon']}}" alt="{{ $merchant['name']}}">
+                        </a>
+                        <div class="hover-conents">
+                            <ul class="product-btns">
+                                <li><a href="wishlist.html" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
+                            </ul>
                         </div>
-                        <div class="card-list-content ">
-                            <div class="rating-widget mt--20">
-                                @for ($x = 1; $x <= 5; $x++) 
-                                @if ($merchant['rating'] >= $x)
-                                <a href="#" class="single-rating"><i class="fas fa-star"></i></a>
-                                @elseif ($merchant['rating'] < $x && $merchant['rating'] >= ($x-1)&&$x<5)
-                                <a href="#" class="single-rating"><i class="fas fa-star-half-alt"></i></a>
+                        <div class="content">
+                            <h3 class="font-weight-500">
+                                @if(isset($merchants['category']))
+                                @if(isset($merchant['categorizable_id']))
+                                <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" >{{ $merchant['name']}}</a>
                                 @else
-                                <a href="#" class="single-rating"><i class="far fa-star"></i></a>
+                                <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" >{{ $merchant['name']}}</a>
                                 @endif
-                                @endfor
+                                @else
+                                <a href="/a/merchant/{{$merchant['slug']}}/products" >{{ $merchant['name']}}</a>
+                                @endif
+                            </h3>
+                            @if ($merchant['unit_cost'] > 0)
+                            <div class="price text-red">
+                                <span>${{$merchant['unit_cost']}}</span>
                             </div>
-                            <article>
-                                <h3 class="d-none sr-only">Article</h3>
-                                <p>{{ $merchant['description']}}</p>
-                            </article>
-                            <div class="btn-block d-flex">
+                            @endif
+                            @if(isset($merchant['Distance']))
+                            <div class="price text-red">
+                                <span>Distancia: ${{$merchant['Distance']}}</span>
+                            </div>
+                            @endif
+                            <div class="btn-block grid-btn">
+                                @if(isset($merchants['category']))
+
                                 @if(isset($merchant['categorizable_id']))
                                 <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                                 @else
                                 <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                                 @endif
-                                <div class="btn-options">
-                                    <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
+                                @else
+                                <a href="/a/merchant/{{$merchant['slug']}}/products" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                @endif
+                            </div>
+                            <div class="card-list-content ">
+                                <div class="rating-widget mt--20">
+                                    @for ($x = 1; $x <= 5; $x++) 
+                                    @if ($merchant['rating'] >= $x)
+                                    <a href="#" class="single-rating"><i class="fas fa-star"></i></a>
+                                    @elseif ($merchant['rating'] < $x && $merchant['rating'] >= ($x-1)&&$x<5)
+                                    <a href="#" class="single-rating"><i class="fas fa-star-half-alt"></i></a>
+                                    @else
+                                    <a href="#" class="single-rating"><i class="far fa-star"></i></a>
+                                    @endif
+                                    @endfor
+                                </div>
+                                <article>
+                                    <h3 class="d-none sr-only">Article</h3>
+                                    <p>{{ $merchant['description']}}</p>
+                                </article>
+                                <div class="btn-block d-flex">
+                                    @if(isset($merchants['category']))
+
+                                    @if(isset($merchant['categorizable_id']))
+                                    <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['categorizable_id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                    @else
+                                    <a href="/a/products/{{$merchants['category']['url']}}?merchant_id={{ $merchant['id']}}" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                    @endif
+                                    @else
+                                    <a href="/a/merchant/{{$merchant['slug']}}/products" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                    @endif
+                                    <div class="btn-options">
+                                        <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </div>
             </div>
             @endforeach
@@ -135,7 +152,7 @@
                         </ul>
                     </div>
                     <div class="content">
-                        <h3 class="font-weight-500" ng-show="merchant.categorizable_id"><a href="/a/products/@{{category.url}}?merchant_id=">@{{ merchant.name}}</a></h3>
+                        <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
                             <span>@{{ merchant.unit_cost | currency }}</span>
                         </div>
@@ -156,7 +173,7 @@
                             </article>
                             <div class="btn-block d-flex">
                                 <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
-                                
+
                                 <div class="btn-options">
                                     <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
                                 </div>

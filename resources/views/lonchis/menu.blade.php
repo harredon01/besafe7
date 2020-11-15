@@ -3,7 +3,7 @@
     <div class="category-nav-wrapper bg-blue"  ng-controller="SitemapCtrl">
         <div class="category-nav">
             <h2 class="category-nav__title primary-bg" id="js-cat-nav-title"><i class="fa fa-bars"></i>
-                <span>All Categories</span></h2>
+                <span>Nuestras Categorias</span></h2>
 
             <ul class="category-nav__menu" id="js-cat-nav">
                 @foreach ($categories as $category)

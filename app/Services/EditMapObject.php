@@ -34,6 +34,7 @@ class EditMapObject {
     const GROUP_MERCHANT_TABLE = 'group_merchant';
     const GROUP_REPORT_TABLE = 'group_report';
     const CONTACT_BLOCKED = 'contact_blocked';
+    const OBJECT_PAGESIZE = 50;
 
     /**
      * The EditAlert implementation.
@@ -446,6 +447,41 @@ GROUP BY category_id"
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
+    
+    public function paginateQueryFromArray($query,$data){
+        $page = null;
+        if (array_key_exists("page", $data)) {
+            if ($data['page']) {
+                $page = $data['page'];
+            }
+        }
+        $per_page = null;
+        if (array_key_exists("per_page", $data)) {
+            if ($data['per_page']) {
+                $per_page = $data['per_page'];
+            }
+        }
+
+        if ($per_page) {
+            $query->take($per_page);
+        } else {
+            $per_page = self::OBJECT_PAGESIZE;
+            $query->take(self::OBJECT_PAGESIZE);
+        }
+        if ($page) {
+            $skip = null;
+            if ($per_page) {
+                $skip = ($page - 1 ) * ($per_page);
+            } else {
+                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
+            }
+            $query->skip($skip);
+        } else {
+            $page = 1;
+        }
+        return ["query"=>$query,"page"=>$page,"per_page"=>$per_page];
+    }
+    
     /**
      * Store a newly created resource in storage.
      *
@@ -498,7 +534,7 @@ GROUP BY category_id"
                         . $additionalQuery, $thedata);
         return array("data" => $merchants,"page"=>$page,"per_page"=>$per_page,"total"=>$merchantsCount[0]->total);
     }
-
+    
     public function getRelation(array $parentIds, $object, $idColumn) {
 //DB::enableQueryLog();
         $results = DB::table($object)
@@ -557,6 +593,19 @@ GROUP BY category_id"
                 $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type = 'App\\\Models\\\Report' ";
             }
         }
+        $page = 1;
+        if (array_key_exists("page", $data)) {
+            if ($data["page"]) {
+                $page = $data["page"];
+            }
+        }
+        $per_page = 25;
+        if (array_key_exists("per_page", $data)) {
+            if ($data["per_page"]) {
+                $per_page = $data["per_page"];
+            }
+        }
+        $offset = ($page-1)*$per_page;
 
         $maxLat = $lat + rad2deg($radius / $R);
         $minLat = $lat - rad2deg($radius / $R);
@@ -571,12 +620,13 @@ GROUP BY category_id"
             'longinf' => $minLon,
             'longsup' => $maxLon,
             'radius' => $radius,
+            'limit' => $per_page
         ];
         if ($category) {
             $thedata["category"] = $data["category"];
         }
         $reports = DB::select(" "
-                        . "SELECT r.id, name, description, icon, lat,`long`, " . $additionalFields . " 
+                        . "SELECT r.id, name, description, icon, lat,`long`,slug, " . $additionalFields . " 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
@@ -589,9 +639,25 @@ GROUP BY category_id"
                             AND `long` BETWEEN :longinf AND :longsup
                             " . $joinsWhere . "
                     HAVING distance < :radius
-                    order by distance asc limit 20 "
-                        . "", $thedata);
-        return array("data" => $reports);
+                    order by distance asc "
+                 . " LIMIT ".$offset.", :limit", $thedata);
+        unset($thedata['limit']);
+        $reportsCount = DB::select(" "
+                        . "SELECT count(r.id) as total,
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
+                   FROM
+                    " . $type . " r " . $joins . "
+                    WHERE
+                        status in ('active','online','busy')
+                            AND r.private = 0
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
+                            " . $joinsWhere . "
+                    HAVING distance < :radius ", $thedata);
+        unset($thedata['limit']);
+        return array("data" => $reports,"page"=>$page,"per_page"=>$per_page,"total"=>$reportsCount[0]->total);
     }
 
     function buildIncludes($merchants, $data) {
@@ -964,7 +1030,7 @@ GROUP BY category_id"
     public function createObject(User $user, array $data, $type) {
         $object = "App\\Models\\" . $type;
 
-
+        dd($data);
         $result = $object::create($data);
         if ($type == "Merchant") {
             $user->merchants()->save($result);

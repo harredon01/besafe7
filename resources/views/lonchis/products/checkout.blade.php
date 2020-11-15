@@ -12,7 +12,7 @@
                 <div class="checkout-form">
                     <div class="row row-40" >
 
-                        <div class="col-lg-7 mb--20" ng-controller="CheckoutShippingCtrl" ng-show="visible && !paymentActive">
+                        <div class="col-lg-7 mb--20" ng-controller="CheckoutShippingCtrl" ng-show="visible && !paymentActive" id="checkout-shipping">
                             <!-- Shipping Address -->
                             <div class="checkout-quick-box" ng-show="shippingAddressSet">
                                 <p><i class="far fa-sticky-note"></i> <a href="javascript:;" ng-click="changeAddress()">
@@ -46,7 +46,7 @@
                         </div>
 
                         <div class="col-lg-5">
-                            <div class="row" ng-controller="CheckoutCartCtrl">
+                            <div class="row" ng-controller="CheckoutCartCtrl" id="checkout-cart">
 
                                 <!-- Cart Total -->
                                 @include(config("app.views").'.products.checkoutCart')

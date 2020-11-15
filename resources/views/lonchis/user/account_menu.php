@@ -7,7 +7,7 @@
 
         <a href="/user/editPassword" ><i class="fas fa-lock"></i> Actualizar contraseña</a>
 
-        <a href="#payment-method" data-toggle="tab"><i class="fa fa-credit-card"></i> Payment
+        <a href="#payment-method" data-toggle="tab" style="display:none"><i class="fa fa-credit-card"></i> Payment
             Method</a>
 
         <a href="/user/editAddress"><i class="fa fa-map-marker"></i> Direcciones</a>

@@ -57,7 +57,7 @@ class MerchantController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->auth = $auth;
         $this->cleanSearch = $cleanSearch;
-        $this->middleware('auth')->except(['index', 'getNearbyMerchants', 'getCoverageMerchants','getMerchantDetail']);
+        $this->middleware('auth')->except(['index', 'getNearbyMerchants', 'getCoverageMerchants', 'getMerchantDetail', 'textSearch']);
     }
 
     /**
@@ -120,6 +120,45 @@ class MerchantController extends Controller {
         $filename = "Filename13.xlsx";
         $merchantid = "5";
         return response()->json($this->merchantImport->importUpdateMerchant($user, $filename, $merchantid));
+    }
+
+    public function textSearch(Request $request) {
+        $data = $request->all();
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        if (isset($data['lat'])) {
+            $query = Merchant::search($data['q'])->whereIn('merchants.id', function($query) use($data) {
+                        if (isset($data['lat'])) {
+                            $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                            $query->select('merchant_id')
+                                    ->from('coverage_polygons')
+                                    ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                        }
+                        //$query->select('merchants.id');
+                    })->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        } else {
+            $query = Merchant::search($data['q'])->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        }
+
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Merchant");
+        }
+        $countQuery = $query;
+        $pageRes = $this->editMapObject->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $merchants = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $merchants;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
     }
 
     /**
@@ -200,6 +239,7 @@ class MerchantController extends Controller {
         $user = $this->auth->user();
         return view(config("app.views") . '.merchants.merchant')->with('merchant', $this->editMapObject->getMerchantOrders($user, $id));
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -207,13 +247,13 @@ class MerchantController extends Controller {
      */
     public function getMerchantDetail($url) {
         $user = $this->auth->user();
-        $merchant = Merchant::where("slug",$url)->with(["files",'ratings','availabilities','categories'])->first();
+        $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities', 'categories'])->first();
         $results = $this->editMapObject->getActiveCategoriesMerchant($merchant->id);
         $results = $results['data'];
         $results = array_map(function ($value) {
             return (array) $value;
         }, $results);
-        return view(config("app.views") . '.merchants.detail')->with('side_categories',$results)->with("merchant",$merchant);
+        return view(config("app.views") . '.merchants.detail')->with('side_categories', $results)->with("merchant", $merchant);
     }
 
     /**

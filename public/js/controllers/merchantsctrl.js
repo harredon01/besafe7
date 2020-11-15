@@ -67,18 +67,23 @@
                 $scope.openItem = function (merchant) {
                     let url = "";
                     let merchant_id = merchant.id;
-                    if(merchant.categorizable_id){
+                    if (merchant.categorizable_id) {
                         merchant_id = merchant.categorizable_id;
                     }
-                    if($scope.category.type.includes("products")){
-                        url = "/a/products/"+$scope.category.url+"?merchant_id="+merchant_id;
+                    if ($scope.category) {
+                        if ($scope.category.type.includes("products")) {
+                            url = "/a/products/" + $scope.category.url + "?merchant_id=" + merchant_id;
+                        } else {
+                            url = "/a/merchant/" + merchant.slug;
+                        }
                     } else {
-                        url = "/a/merchant/"+merchant.slug;
+                        url = "/a/merchant/" + merchant.slug+"/products";
                     }
-                    window.location.href=url;
+
+                    window.location.href = url;
                 }
             }])
-        .controller('MerchantDetailCtrl', ['$scope', 'Merchants', 'Modals', function ($scope, Merchants, Modals) {
+        .controller('MerchantDetailCtrl', ['$scope', 'Merchants', 'Modals', '$mdDialog', function ($scope, Merchants, Modals, $mdDialog) {
                 $scope.data = {};
                 $scope.user = {};
 
@@ -93,6 +98,25 @@
                     console.log("Data", container);
                     $scope.merchant = container.merchant;
 
-                    document.getElementById("dissapear").remove();
+                    //document.getElementById("dissapear").remove();
                 });
+                $scope.booking = function () {
+                    console.log("Booking");
+
+                    $mdDialog.show(Modals.getAppPopup()).then(function (platform) {
+                        let url = "";
+                        if (platform == "ios") {
+                            url = ""
+                        } else if (platform == 'android') {
+                            url = ""
+                        } else if (platform == 'web') {
+                            url = ""
+                        }
+                        console.log("Url", platform, url)
+                        //window.location.href = url;
+
+                    }, function () {
+
+                    });
+                }
             }])

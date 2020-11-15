@@ -40,6 +40,31 @@ angular.module('besafe')
                         clickOutsideToClose: true,
                     }
                 }
+                var getAppPopup = function () {
+                    return {
+                        controller: ['$scope', '$mdDialog', 'Addresses', '$rootScope', function ($scope, $mdDialog, Addresses, $rootScope) {
+                                $scope.addresses = [];
+
+                                $scope.selectPlatform = function (platform) {
+                                    $mdDialog.hide(platform);
+                                    
+
+                                }
+                                $scope.hide = function () {
+                                    $mdDialog.hide();
+                                };
+
+                                $scope.cancel = function () {
+                                    $mdDialog.cancel();
+                                };
+                            }],
+                        templateUrl: '/templates/mobileApp.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                    }
+                }
                 var getMerchantsPopup = function (category) {
                     return {
                         controller: ['$scope', '$mdDialog', 'Merchants', '$rootScope', function ($scope, $mdDialog, Merchants, $rootScope) {
@@ -135,7 +160,7 @@ angular.module('besafe')
                                 .parent(parent)
                                 .hideDelay(3000)
                     }
-                    
+
                     $mdToast.show(toast);
                 }
                 var last = {
@@ -286,6 +311,7 @@ angular.module('besafe')
                     getLocationExtPrompt: getLocationExtPrompt,
                     getMerchantsPopup: getMerchantsPopup,
                     showToast: showToast,
+                    getAppPopup:getAppPopup,
                     showLoader: showLoader,
                     turnObjectToUrl: turnObjectToUrl,
                     hideLoader: hideLoader,

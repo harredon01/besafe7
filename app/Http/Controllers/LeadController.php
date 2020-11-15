@@ -17,8 +17,8 @@ class LeadController extends Controller {
         $data['key'] = env('GOOGLE_CAPTCHA_PUBLIC');
         if ($type == "bla") {
             return view(config("app.views") . ".leads.leads")->with('data', $data);
-        } else if ($type == "bla") {
-            return view(config("app.views") . ".leads.leads")->with('data', $data);
+        } else if ($type == "report-lead") {
+            return view(config("app.views") . ".leads.report-lead")->with('data', $data);
         } else if ($type == "bla") {
             return view(config("app.views") . ".leads.leads")->with('data', $data);
         } else if ($type == "bla") {

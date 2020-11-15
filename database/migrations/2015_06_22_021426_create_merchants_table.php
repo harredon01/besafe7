@@ -54,6 +54,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('plan')->nullable();
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE merchants ADD FULLTEXT fulltext_index_merchant (name, type, email,description,attributes)');
     }
 
     /**

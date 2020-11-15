@@ -29,14 +29,32 @@
                                     <span class="text-gray">Experiencia : </span>
                                     {{ $merchant['attributes']['years_experience']}} años
                                 </span>
-                                <span class="post-separator">|</span>
+                                
                                 @if($merchant['unit_cost']>0)
+                                <span class="post-separator">|</span>
                                 <span class="post-date">
                                     <i class="far fa-calendar-alt"></i>
-                                    <span class="text-gray">Precio por hora : </span>
+                                    <span class="text-gray">Precio por hora promedio : </span>
                                     {{$merchant['unit_cost']}}
                                 </span>
                                 @endif
+                                <span class="post-separator">|</span>
+                                <span class="post-separator">
+                                    <i class="fas fa-at"></i>
+                                    <span class="text-gray">Correo : </span>
+                                    {{ $merchant['email']}} 
+                                </span>
+                                <span class="post-separator">|</span>
+                                <span class="post-separator">
+                                    <i class="fas fa-address-card"></i>
+                                    <span class="text-gray">Dirección : </span>
+                                    {{ $merchant['address']}} 
+                                </span>
+                                <span class="post-separator">
+                                    <i class="fas fa-phone"></i>
+                                    <span class="text-gray">Teléfono : </span>
+                                    {{ $merchant['telephone']}} 
+                                </span>
                             </div>
                         </header>
                         <article>
@@ -146,7 +164,7 @@
                         </ul>
                     </div>
                     @endif
-
+                    <button class="place-order w-100" ng-click="booking()">Reservar</button>
                     <div class="single-sidebar">
                         <a class="promo-image overflow-image">
                             <img src="image/product/slidebar-promo-product.jpg" alt="">

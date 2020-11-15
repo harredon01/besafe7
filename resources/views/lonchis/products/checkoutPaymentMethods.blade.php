@@ -1,14 +1,14 @@
 
 
 <div>
-    <div>
+    <div id="checkout-payment">
         <button ng-click="showMethod('CC')" class="btn btn-primary">Tarjeta de Credito</button>
         <button ng-click="showMethod('PSE')" class="btn btn-primary">Tarjeta de Debito</button>
         <button ng-click="showMethod('BALOTO')" class="btn btn-primary">Efectivo</button>
         <br/>
         <br/>
     </div>
-    <div>
+    <div ng-hide="showResult">
         <div class="credito" ng-show="credito">
             <form class="form-horizontal" role="form" name="myForm2" ng-submit="payCreditCard(myForm2.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
@@ -246,29 +246,29 @@
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data4.payment_id" name="payment_id" value="">
                 <div >
-                    <img width="50" class="w20" src="assets/logos/payu.png" alt="PayU Latam" border="0" />
+                    <img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" />
                 </div>
                 <div>
                     <p>Otros Medios</p>
                 </div>
 
                 <div class="cash-main-logos" >
-                    <img width="250" ng-click="selectOption('BALOTO')" src="assets/logos/baloto.jpg">
-                    <img width="250" ng-click="selectOption('EFECTY')" src="assets/logos/efecty.png">
+                    <img width="250" ng-click="selectOption('BALOTO')" src="/assets/logos/baloto.jpg">
+                    <img width="250" ng-click="selectOption('EFECTY')" src="/assets/logos/efecty.png">
                 </div>
                 <div class="cash-logos" ng-click="selectOption('OTHERS_CASH')">
-                    <img width="250" src="assets/logos/pagatodo.png">
-                    <img width="250" src="assets/logos/ac75.png">
-                    <img width="250" src="assets/logos/gana.png">
+                    <img width="250" src="/assets/logos/pagatodo.png">
+                    <img width="250" src="/assets/logos/ac75.png">
+                    <img width="250" src="/assets/logos/gana.png">
                 </div>
                 <div  class="cash-logos" ng-click="selectOption('OTHERS_CASH')">
-                    <img width="250" src="assets/logos/ganagana.png">
-                    <img width="250" src="assets/logos/suchance.png">
-                    <img width="250" src="assets/logos/acertemos.png">
+                    <img width="250" src="/assets/logos/ganagana.png">
+                    <img width="250" src="/assets/logos/suchance.png">
+                    <img width="250" src="/assets/logos/acertemos.png">
                 </div>
                 <div class="cash-logos" ng-click="selectOption('OTHERS_CASH')">
-                    <img width="250" src="assets/logos/laperla.png">
-                    <img width="250" src="assets/logos/apuestas-unidas.jpg">
+                    <img width="250" src="/assets/logos/laperla.png">
+                    <img width="250" src="/assets/logos/apuestas-unidas.jpg">
                 </div>
 
                 <div class="form-group">
@@ -411,6 +411,17 @@
                 </div>
             </form>
         </div>
+    </div>
+    <div ng-show="showResult" style="color:black;font-weight: bold">
+        <h4>@{{resultHeader}}</h4>
+        <p>@{{resultBody}}</p><br/>
+        <h4>Transaccion</h4>
+        <p>Forma de pago: @{{transaction.payment_method}}</p>
+        <p>Referencia pago: @{{transaction.reference_sale}}</p>
+        <p>Id transaccion: @{{transaction.transaction_id}}</p>
+        <p>Estado: @{{transaction.transaction_state}}</p>
+        <p>Descripcion: @{{transaction.description}}</p>
+        <a href="/">Terminar</a>
     </div>
 </div>
 

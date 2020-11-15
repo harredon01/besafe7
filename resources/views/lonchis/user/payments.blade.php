@@ -37,7 +37,7 @@
                                                     <td>@{{ payment.updated_at}}</td>
                                                     <td>@{{ payment.status}}</td>
                                                     <td>@{{ payment.total | currency}}</td>
-                                                    <td><a href="javascript" ng-href="/user/payments/@{{payment.id}}" class="btn">View</a></td>
+                                                    <td><a href="javascript" ng-href="/user/payments/@{{payment.id}}" class="btn">Ver</a></td>
                                                 </tr>
                                             </tbody>
                                         </table>

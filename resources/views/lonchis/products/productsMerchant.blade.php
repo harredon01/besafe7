@@ -125,6 +125,7 @@
             </div>
             <div class="col-lg-4 col-xl-3 order-lg-1">
                 <div class="sidebar-widget">
+                    @if(count($data['side_categories'])>0)
                     <div class="single-sidebar">
                         <h2 class="sidebar-title">CATEGORIAS</h2>
                         <ul class="sidebar-filter-list">
@@ -137,13 +138,14 @@
                             @endforeach
                         </ul>
                     </div>
+                    @endif
                     <!--<div class="single-sidebar">
                         <h2 class="sidebar-title">Color</h2>
                         <ul class="sidebar-filter-list">
                             <li><a href="#" data-count="(4)">Gold</a></li>
 
                         </ul>
-                    </div>-->
+                    </div>
                     <div class="single-sidebar">
                         <h2 class="sidebar-title">FILTER BY PRICE</h2>
                         <div class="range-slider pt--10">
@@ -155,7 +157,7 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <!--
                     <div class="single-sidebar">
                         <h2 class="sidebar-title">FILTER BY PRICE</h2>
@@ -286,7 +288,7 @@
                     <div ng-repeat="category in categories">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
                             <div class="pm-product  ">
-                                <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant_id}}" class="image" tabindex="0">
+                                <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchants[0].id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
                                 <div class="hover-conents">
@@ -297,7 +299,7 @@
                                     </ul>
                                 </div>
                                 <div class="content">
-                                    <h3 class="font-weight-500"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant_id}}">@{{product.name}}</a></h3>
+                                    <h3 class="font-weight-500"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchants[0].id}}">@{{product.name}}</a></h3>
 
                                     <div class="price text-red" ng-show="product.activeVariant.is_on_sale">
                                         <span class="old">@{{product.activeVariant.price| currency}}</span>
@@ -357,18 +359,21 @@
             </div>
             <div class="col-lg-4 col-xl-3 order-lg-1">
                 <div class="sidebar-widget">
+                    
+                    @if(count($data['side_categories'])>0)
                     <div class="single-sidebar">
                         <h2 class="sidebar-title">CATEGORIAS</h2>
                         <ul class="sidebar-filter-list">
                             @foreach($data['side_categories'] as $cat)
                             @if(isset($data['merchant_id']))
                             <li><a href="/a/products/{{$cat['url']}}?merchant_id={{$data['merchant_id']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
-                            @else
+                            @else                           
                             <li><a href="/a/products/{{$cat['url']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
                             @endif
                             @endforeach
                         </ul>
                     </div>
+                    @endif
                     <!--<div class="single-sidebar">
                         <h2 class="sidebar-title">Color</h2>
                         <ul class="sidebar-filter-list">

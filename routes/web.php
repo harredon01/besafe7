@@ -33,7 +33,7 @@ Route::get('/a/terms', function () {
 Route::get('/a/icons', function () {
     return view(config("app.views").'.content.icons');
 });
-Route::get('/zones', function () {
+Route::get('/a/zones', function () {
     return view(config("app.views").'.content.zonespublic');
 });
 Auth::routes();
@@ -57,6 +57,7 @@ Route::post('user/editAddress', 'UserController@postEditAddress');
 
 Route::get('a/products/{category?}/{page?}', 'ProductController@getproducts');
 Route::get('a/product-detail/{code?}', 'ProductController@getproduct');
+Route::get('a/product-search', 'ProductController@textSearch');
 Route::get('a/merchant/{merchant?}', 'MerchantController@getMerchantDetail');
 Route::get('a/merchant/{merchant?}/products', 'ProductController@getproductsMerchant');
 
@@ -95,6 +96,7 @@ Route::get('merchantProducts/{code?}', 'UserController@getMerchant');
 Route::get('a/merchants/{category?}', 'MerchantController@index');
 Route::get('a/merchants/{category?}/nearby', 'MerchantController@getNearbyMerchants');
 Route::get('a/merchants/{category?}/coverage', 'MerchantController@getCoverageMerchants');
+Route::get('a/merchant-search', 'MerchantController@textSearch');
 Route::get('merchants/import', 'MerchantApiController@importMerchant');
 Route::get('merchants/export', 'MerchantApiController@exportMerchant');
 Route::get('merchants/export_orders', 'MerchantApiController@exportMerchantOrders');
@@ -103,7 +105,7 @@ Route::get('merchants/import_update', 'MerchantApiController@importUpdateMerchan
 Route::get('a/reports/{category?}', 'ReportController@index');
 Route::get('a/reports/{category?}/nearby', 'ReportController@getNearbyReports');
 Route::get('a/report/{slug?}', 'ReportController@getReportDetail');
-
+Route::get('a/report-search', 'ReportController@textSearch');
 Route::get('admin/store/products', 'ProductImportController@getProducts');
 Route::get('admin/store/variants', 'ProductImportController@getVariants');
 Route::get('admin/store/merchants', 'ProductImportController@getMerchants');

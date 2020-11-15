@@ -96,19 +96,6 @@
 
                             });
                 }
-                $scope.save = function (isvalid) {
-                    $scope.submitted = true;
-                    if (isvalid) {
-                        Users.saveAddress($.param($scope.data)).then(function (data) {
-                            $scope.getAddresses();
-                            $scope.data = {};
-                            $scope.submitted = false;
-                        },
-                                function (data) {
-
-                                });
-                    }
-                }
                 $scope.setCoupon = function () {
                     //setTimeout(function(){ Modals.hideLoader(); }, 2000);
                     if ($scope.coupon && $scope.coupon.length > 0) {
@@ -119,9 +106,9 @@
                                 if (resp.status == "success") {
                                     $scope.getCart(false);
                                     $scope.coupon = "";
-                                    Modals.showToast('Cupon agregado exitosamente');
+                                    Modals.showToast('Cupon agregado exitosamente', $("#checkout-cart"));
                                 } else {
-                                    Modals.showToast('No puedes usar ese cupon');
+                                    Modals.showToast('No puedes usar ese cupon', $("#checkout-cart"));
                                 }
                             }
                         },
@@ -217,11 +204,18 @@
                 $scope.save = function (isvalid) {
                     $scope.submitted = true;
                     if (isvalid) {
+                        Modals.showLoader();
                         Users.saveAddress($scope.data).then(function (data) {
-                            $scope.selectAddress(data.address);
-                            $scope.data = {};
-                            $scope.submitted = false;
-                            $scope.hideAddressForm();
+                            Modals.hideLoader();
+                            if (data.status == "success") {
+                                $scope.selectAddress(data.address);
+                                $scope.data = {};
+                                $scope.submitted = false;
+                                $scope.hideAddressForm();
+                            } else {
+
+                            }
+
                         },
                                 function (data) {
 
@@ -305,7 +299,7 @@
                             for (let i in providers) {
                                 console.log("Providers: ", providers[i]);
                             }
-                            console.log("Setting discounts",$rootScope.shippingAddressSet);
+                            console.log("Setting discounts", $rootScope.shippingAddressSet);
                             Orders.setDiscounts(order.id, "Booking").then(function (data) {
                                 console.log("Discounts set", data);
                                 let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
@@ -314,6 +308,7 @@
                                     Modals.hideLoader();
                                     let order = resp.order;
                                     if (resp.status == "success") {
+                                        Modals.showToast("Direccion guardada", $("#checkout-shipping"));
                                         $rootScope.$broadcast('updateCheckoutCart');
                                     } else {
                                         $scope.handleCheckError(resp, order);
@@ -326,7 +321,7 @@
                                     });
                         } else {
                             Modals.hideLoader();
-                            Modals.showToast("Fuera de cobertura para esta orden");
+                            Modals.showToast("Fuera de cobertura para esta orden", $("#checkout-shipping"));
                         }
 
                     },
@@ -346,17 +341,21 @@
                             });
                 }
                 $scope.setShippingCondition = function (item) {
+                    Modals.showLoader();
                     Orders.setPlatformShippingCondition($rootScope.activeOrder.id, item.platform).then(function (data) {
+                        Modals.hideLoader();
                         console.log("setPlatformShippingPrice Result", data);
                         if (data.status == "success") {
                             $rootScope.$broadcast('updateLoadedCart', data.cart);
                             $rootScope.activeOrder = data.order;
                             $rootScope.shippingConditionSet = true;
-                            Modals.showToast("Envio agregado exitosamente");
+                            Modals.showToast("Envio agregado exitosamente", $("#checkout-shipping"));
+                        } else {
+                            Modals.showToast("Hubo un error con ese metodo de envio", $("#checkout-shipping"));
                         }
                     },
                             function (data) {
-
+                                Modals.showToast("Hubo un error con ese metodo de envio", $("#checkout-shipping"));
                             });
                 }
                 $scope.handleCheckError = function (resp, order) {
@@ -364,7 +363,7 @@
                         let missing = parseInt(resp.required_credits);
                         console.log("Required credits", missing);
                         console.log("creditItem", resp.creditItem);
-                        Modals.showToast("Hemos agregado un item obligatorio");
+                        Modals.showToast("Hemos agregado un item obligatorio", $("#checkout-shipping"));
                         console.log("creditItemMerchant", resp.creditItemMerchant);
                         let container = {
                             order_id: order.id,
@@ -378,7 +377,7 @@
                         //
                     } else if (resp.type == "shipping") {
                         //this.api.toast('CHECKOUT_PREPARE.REQUIRES_SHIPPING');
-                        Modals.showToast("Debes seleccionar proveedor de envio");
+                        Modals.showToast("Debes seleccionar proveedor de envio", $("#checkout-shipping"));
                         if ($scope.shipping.length == 0) {
                             $scope.expectedProviders = 0;
                             let attributes = JSON.parse(order.attributes);
@@ -425,8 +424,8 @@
                     console.log("Change address")
                     $rootScope.shippingAddressSet = false;
                     $scope.addAddress = false;
-                    if($rootScope.addresses && $rootScope.addresses.length > 0 ){
-                        
+                    if ($rootScope.addresses && $rootScope.addresses.length > 0) {
+
                     } else {
                         $scope.getAddresses();
                     }
@@ -456,6 +455,7 @@
                         Modals.hideLoader();
                         if (resp) {
                             if (resp.status == "success") {
+                                Modals.showToast("Pago creado exitosamente", $("#checkout-cart"));
                                 console.log("orderProvider", resp);
                                 $rootScope.activePayment = resp.payment;
                                 $rootScope.activeOrder = resp.order;
@@ -488,7 +488,7 @@
                     }, (err) => {
                         Modals.hideLoader();
                         console.log("getCartError", err);
-                        Modals.showToast("Hubo un error porfavor comunicate mas tarde");
+                        Modals.showToast("Hubo un error porfavor comunicate mas tarde", $("#checkout-cart"));
                     });
                 }
             }])
@@ -498,12 +498,16 @@
                 $scope.data2 = {};
                 $scope.data3 = {};
                 $scope.data4 = {};
+                $scope.transaction = {};
                 $scope.banks = [];
                 $rootScope.paymentActive = false;
                 $scope.creditCardVisible = false;
                 $scope.creditPayerVisible = false;
                 $scope.creditBuyerVisible = false;
                 $scope.credito = false;
+                $scope.showResult = false;
+                $scope.resultHeader = "";
+                $scope.resultBody = "";
                 $scope.cash = false;
                 $scope.debito = false;
                 angular.element(document).ready(function () {
@@ -531,21 +535,6 @@
                     }, 800);
                     // call $anchorScroll()
                 });
-                $scope.save = function (isvalid) {
-                    $scope.submitted = true;
-                    if (isvalid) {
-                        Users.saveAddress($.param($scope.data)).then(function (data) {
-                            $scope.getAddresses();
-                            $scope.selectAddress(data.address.id);
-                            $scope.data = {};
-                            $scope.submitted = false;
-                            $scope.hideAddressForm();
-                        },
-                                function (data) {
-
-                                });
-                    }
-                }
                 $scope.keytab = function (event, maxlength) {
                     console.log("Event", event)
                     var target = event.target || event.srcElement;
@@ -588,13 +577,27 @@
                         $scope.data2.platform = "Booking";
                         $scope.data2.email = true;
                         $scope.data2.payment_id = $rootScope.activePayment.id;
+                        Modals.showLoader();
                         Billing.payCreditCard($scope.data2, "PayU").then(function (data) {
-                            Cart.clearCart().then(function (resp) {
-
-                            },
-                                    function (data) {
-
-                                    });
+                            Modals.hideLoader();
+                            console.log("Response payu", data)
+                            Cart.clearCart();
+                            if (data.message != "error") {
+                                $scope.showResult = true;
+                                $scope.transaction = data.transaction;
+                                if (data.transaction.transaction_state == "APPROVED") {
+                                    $scope.resultHeader = "Pago aprobado";
+                                    $scope.resultBody = "Tu pago ha sido completado, revisa tu correo para recibir tu compra";
+                                } else if (data.transaction.transaction_state == "PENDING") {
+                                    $scope.resultHeader = "Pago pendiente";
+                                    $scope.resultBody = "Tu transaccion esta siendo verificada, cuando complete la verificacion recibiras un correo con el resultado";
+                                } else {
+                                    $scope.resultHeader = "Pago negado";
+                                    $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
+                                }
+                            } else {
+                                Modals.showToast("Hubo un error. Porfavor verifica tus datos", $("#checkout-payment"));
+                            }
                             //$scope.data2 = {};
                         },
                                 function (data) {
@@ -606,7 +609,11 @@
                     $scope.data4.payment_method = option;
                 }
                 $scope.populatePayer = function () {
-                    if ($scope.data2.payer_name.length == 0) {
+                    if ($scope.data2.payer_name) {
+                        if ($scope.data2.payer_name.length == 0) {
+                            $scope.data2.payer_name = $scope.data2.cc_name;
+                        }
+                    } else {
                         $scope.data2.payer_name = $scope.data2.cc_name;
                     }
                 }
@@ -616,6 +623,7 @@
                         $scope.data3.platform = "Booking";
                         $scope.data3.email = true;
                         $scope.data3.payment_id = $rootScope.activePayment.id;
+                        Modals.showLoader();
                         Billing.payDebit($scope.data3, "PayU").then(function (data) {
                             if (data.code == "SUCCESS") {
                                 if (data.transactionResponse.state == "PENDING") {
@@ -624,17 +632,19 @@
                                         window.location.href = data.transactionResponse.extraParameters.BANK_URL;
                                     },
                                             function (data) {
-
+                                                Modals.hideLoader();
                                             });
                                 } else {
-                                    Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ");
+                                    Modals.hideLoader();
+                                    Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ", $("#checkout-payment"));
                                 }
                             } else {
-                                Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ");
+                                Modals.hideLoader();
+                                Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ", $("#checkout-payment"));
                             }
                         },
                                 function (data) {
-
+                                    Modals.hideLoader();
                                 });
                     }
                 }
@@ -651,16 +661,16 @@
                             console.log(JSON.stringify(data));
                             if (data.code == "SUCCESS") {
                                 Cart.clearCart().then(function (resp) {
-                                    if(data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML){
+                                    if (data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML) {
                                         window.location.href = data.transactionResponse.extraParameters.URL_PAYMENT_RECEIPT_HTML;
                                     } else {
-                                        Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ");
+                                        Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ", $("#checkout-payment"));
                                     }
                                 },
                                         function (data) {
                                         });
                             } else {
-                                Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ");
+                                Modals.showToast("Hubo un problema. Porfavor intenta otro medio. ", $("#checkout-payment"));
                             }
                         },
                                 function (data) {

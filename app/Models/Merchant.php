@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Rinvex\Bookings\Traits\Bookable;
-use Laravel\Scout\Searchable;
+use App\Traits\FullTextSearch;
 use Illuminate\Support\Facades\Storage;
 use App\Models\FileM;
 use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
@@ -19,7 +19,7 @@ use DB;
 class Merchant extends Model {
 
     use Bookable;
-    use Searchable;
+    use FullTextSearch;
     use SpatialTrait;
 
     /**
@@ -46,6 +46,13 @@ class Merchant extends Model {
     ];
     protected $casts = [
         'attributes' => 'array',
+    ];
+    protected $searchable = [
+        'name',
+        'type',
+        'email',
+        'description',
+        'attributes'
     ];
 
     public function isActive() {

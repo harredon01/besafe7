@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Laravel\Scout\Searchable;
+use App\Traits\FullTextSearch;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 use DB;
@@ -12,7 +12,7 @@ use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class Report extends Model {
 
-    use Searchable;
+    use FullTextSearch;
     use SpatialTrait;
 
     /**
@@ -27,6 +27,13 @@ class Report extends Model {
     ];
     protected $casts = [
         'attributes' => 'array',
+    ];
+    protected $searchable = [
+        'name',
+        'type',
+        'email',
+        'description',
+        'attributes'
     ];
 
     /**

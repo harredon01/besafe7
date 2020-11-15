@@ -70,7 +70,7 @@
                     });
         }
 
-    }]).controller('PaymentDetailCtrl', ['$scope', 'Payments', function ($scope, Payments) {
+    }]).controller('PaymentDetailCtrl', ['$scope', 'Payments','$rootScope', function ($scope, Payments,$rootScope) {
         $scope.data = {};
         $scope.payment = {};
         angular.element(document).ready(function () {
@@ -81,12 +81,12 @@
             $scope.page++;
             let url = window.location.href;
             let segments = url.split("/");
-            console.log("Payment id", segments[segments.length + 1])
-            let url = "id=" + segments[segments.length + 1] + "&includes=order.items,order.orderConditions";
-            Payments.getPaymentsUser(url).then(function (data) {
+            console.log("Payment id", segments[segments.length - 1])
+            let url2 = "id=" + segments[segments.length - 1] + "&includes=order.items,order.orderConditions,order.orderAddresses";
+            Payments.getPaymentsUser(url2).then(function (data) {
                 if (data.total > 0) {
                     let results = data.data;
-                    $scope.payment = results[0]
+                    $scope.payment = results[0] 
                 }
 
             },
@@ -95,8 +95,8 @@
                     });
         }
 
-        $scope.addTransactionCosts = function (payment) {
-            Payments.addTransactionCosts(payment.id).then(function (data) {
+        $scope.addTransactionCosts = function () {
+            Payments.addTransactionCosts($scope.payment.id).then(function (data) {
                 if (data.status == "success") {
                     console.log("after addTransactionCosts");
                     $scope.payment = data.payment;
@@ -109,11 +109,13 @@
                     });
         }
         
-        $scope.retryPayment = function (payment) {
-            Payments.retryPayment(payment.id).then(function (data) {
+        $scope.retryPayment = function () {
+            Payments.retryPayment($scope.payment.id).then(function (data) {
+                console.log("after addTransactionCosts",data);
                 if (data.status == "success") {
-                    console.log("after addTransactionCosts");
                     
+                    $rootScope.activePayment = data.payment;
+                    $rootScope.paymentActive = true;
                 } else {
                     this.api.toast('PAYMENTS.ERROR_CHANGE');
                 }

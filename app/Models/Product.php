@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Cache;
+use App\Traits\FullTextSearch;
 use Carbon\Carbon;
 use DB;
 
 class Product extends Model {
-
+    use FullTextSearch;
     /**
      * The database table used by the model.
      *
@@ -26,6 +27,10 @@ class Product extends Model {
         'created_at',
         'updated_at',
         'ends_at'
+    ];
+    protected $searchable = [
+        'name',
+        'description',
     ];
 
     public function isActive() {
@@ -56,6 +61,9 @@ class Product extends Model {
     }
 
     public function productVariants() {
+        return $this->hasMany('App\Models\ProductVariant');
+    }
+    public function variants() {
         return $this->hasMany('App\Models\ProductVariant');
     }
     public function ratings() {

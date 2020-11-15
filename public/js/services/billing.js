@@ -6,7 +6,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/pay_cc/'+platform,
+                        url: '/api/billing/pay_cc/'+platform,
                         data: data, // pass in data as strings
                     })
                             .success(function (data) {
@@ -24,7 +24,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/pay_in_bank/Local',
+                        url: '/api/billing/pay_in_bank/Local',
                         data: data, // pass in data as strings
                     })
                             .success(function (data) {
@@ -42,7 +42,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/complete_paid/Food',
+                        url: '/api/billing/complete_paid/Food',
                         data: data, // pass in data as strings
                     })
                             .success(function (data) {
@@ -60,7 +60,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/retry/'+payment,
+                        url: '/api/billing/retry/'+payment,
                         
                     })
                             .success(function (data) {
@@ -80,7 +80,7 @@ angular.module('besafe')
                 
                 $http({
                         method: 'POST',
-                        url: 'api/billing/add_transaction_costs/'+payment,
+                        url: '/api/billing/add_transaction_costs/'+payment,
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -95,7 +95,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/pay_debit/'+platform,
+                        url: '/api/billing/pay_debit/'+platform,
                         data: data, // pass in data as strings
                     })
                             .success(function (data) {
@@ -113,7 +113,7 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: 'api/billing/pay_cash/'+platform,
+                        url: '/api/billing/pay_cash/'+platform,
                         data: data, // pass in data as strings
                     })
                             .success(function (data) {
@@ -126,7 +126,7 @@ angular.module('besafe')
                 /**/
             }
             var getBanks = function (where) {
-                var url ="api/payu/banks";
+                var url ="/api/payu/banks";
                 var def = $q.defer();
                 $http({
                         method: 'GET',

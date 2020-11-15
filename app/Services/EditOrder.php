@@ -745,7 +745,7 @@ class EditOrder {
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), []);
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id'=>$user->id]);
                         if ($result['status'] == 'success') {
                             $insertCondition = array(
                                 'name' => "Servicio de transporte",

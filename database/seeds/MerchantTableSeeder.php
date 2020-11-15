@@ -260,7 +260,7 @@ class MerchantTableSeeder extends Seeder {
         $this->miPaquete->authenticate("https://ecommerce.mipaquete.com/api/auth");
         $this->miPaquete->getCitiesAndRegions();
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importGlobalExcel("Global.xlsx");
+        $this->merchantImport->importGlobalExcel("Global3.xlsx");
 //        return true;
 //        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
 //        $this->command->info('merchants seeded!');

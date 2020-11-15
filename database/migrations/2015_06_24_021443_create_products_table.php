@@ -27,6 +27,7 @@ class CreateProductsTable extends Migration {
                                 ->on('users');
 			$table->timestamps();
 		});
+                DB::statement('ALTER TABLE products ADD FULLTEXT fulltext_index (name, description)');
 	}
 
 	/**

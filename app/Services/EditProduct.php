@@ -172,6 +172,40 @@ GROUP BY category_id"
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
     }
+    
+    public function paginateQueryFromArray($query,$data){
+        $page = null;
+        if (array_key_exists("page", $data)) {
+            if ($data['page']) {
+                $page = $data['page'];
+            }
+        }
+        $per_page = null;
+        if (array_key_exists("per_page", $data)) {
+            if ($data['per_page']) {
+                $per_page = $data['per_page'];
+            }
+        }
+
+        if ($per_page) {
+            $query->take($per_page);
+        } else {
+            $per_page = self::OBJECT_PAGESIZE;
+            $query->take(self::OBJECT_PAGESIZE);
+        }
+        if ($page) {
+            $skip = null;
+            if ($per_page) {
+                $skip = ($page - 1 ) * ($per_page);
+            } else {
+                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
+            }
+            $query->skip($skip);
+        } else {
+            $page = 1;
+        }
+        return ["query"=>$query,"page"=>$page,"per_page"=>$per_page];
+    }
 
     public function productsQuery($data) {
 
@@ -227,37 +261,12 @@ GROUP BY category_id"
         $results['products_total'] = $count_query->count('products.id');
 //        dd($results['products_total']);
         //dd(DB::getQueryLog());
-        $page = null;
-        if (array_key_exists("page", $data)) {
-            if ($data['page']) {
-                $page = $data['page'];
-            }
-        }
-        $per_page = null;
-        if (array_key_exists("per_page", $data)) {
-            if ($data['per_page']) {
-                $per_page = $data['per_page'];
-            }
-        }
-
-        if ($per_page) {
-            $query->take($per_page);
-        } else {
-            $per_page = self::OBJECT_PAGESIZE;
-            $query->take(self::OBJECT_PAGESIZE);
-        }
-        if ($page) {
-            $skip = null;
-            if ($per_page) {
-                $skip = ($page - 1 ) * ($per_page);
-            } else {
-                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
-            }
-            $query->skip($skip);
-        } else {
-            $page = 1;
-        }
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $page = $pageRes['page'];
+        $per_page = $pageRes['per_page'];
+        //DB::enableQueryLog();
         $prodResults = $query->get();
+        //dd(DB::getQueryLog());
 //        dd($variants);
 
         $products = [];

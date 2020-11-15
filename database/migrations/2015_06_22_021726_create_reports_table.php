@@ -48,6 +48,7 @@ class CreateReportsTable extends Migration {
             $table->string('plan')->nullable();
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE reports ADD FULLTEXT fulltext_index_report (name, type, email,description,attributes)');
     }
 
     /**
