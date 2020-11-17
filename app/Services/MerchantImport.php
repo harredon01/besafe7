@@ -392,6 +392,7 @@ class MerchantImport {
     }
 
     public function importGlobalExcel($filename) {
+        echo 'merchants file: '.$filename; 
         $reader = Excel::toArray(new ArrayMultipleSheetImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $key => $value) {
             if ($key == 'merchants') {
@@ -441,6 +442,9 @@ class MerchantImport {
                     unset($sheet['icon']);
                     unset($sheet['id']);
                     $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
+                    if($results['status']=="error"){
+                        dd($results);
+                    }
                     $merchant = $results['object'];
                     if ($categoriesData) {
                         $categories = Category::whereIn('id', $categoriesData)->get();

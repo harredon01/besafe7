@@ -36,9 +36,9 @@
                                     <i class="far fa-calendar-alt"></i>
                                     <span class="text-gray">Precio por hora promedio : </span>
                                     {{$merchant['unit_cost']}}
-                                </span>
+                                </span><br/>
                                 @endif
-                                <span class="post-separator">|</span>
+                                
                                 <span class="post-separator">
                                     <i class="fas fa-at"></i>
                                     <span class="text-gray">Correo : </span>
@@ -49,7 +49,7 @@
                                     <i class="fas fa-address-card"></i>
                                     <span class="text-gray">Dirección : </span>
                                     {{ $merchant['address']}} 
-                                </span>
+                                </span><br/>
                                 <span class="post-separator">
                                     <i class="fas fa-phone"></i>
                                     <span class="text-gray">Teléfono : </span>
@@ -80,7 +80,7 @@
                             <p>{{$item['name']}}</p>
                             @endforeach
                             @endif
-                            @if(isset($merchant['attributes']['service']))
+                            @if(isset($merchant['attributes']['specialty']))
                             <h4>Especialidad</h4>
                             @foreach($merchant['attributes']['specialty'] as $item)
                             <p>{{$item['name']}}</p>

@@ -25,7 +25,7 @@ angular.module('besafe')
                         }, function (position) {
                             $scope.$apply(function () {
                                 console.log("Position", position);
-                                $scope.initMap();
+                                MapService.createLocationMarker(4.654258, -74.062643, true);
                             });
                         });
                     } else {

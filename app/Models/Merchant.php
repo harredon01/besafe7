@@ -37,7 +37,8 @@ class Merchant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description', 'attributes',
+    protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 
+        'address', 'description', 'attributes','facebook','instagram','twitter',
         'icon', 'lat', 'long', 'minimum', 'delivery_time', 'delivery_price', 'status', 'private', 'ends_at', 'plan', 'url', 'rating', 'rating_count', 'unit_cost', 'base_cost', 'unit', 'currency'];
     protected $dates = [
         'created_at',

@@ -51,6 +51,9 @@ class CreateMerchantsTable extends Migration {
             $table->string('unit')->nullable();
             $table->string('currency')->nullable();
             $table->string('status')->nullable();
+            $table->string('facebook')->nullable();
+            $table->string('instagram')->nullable();
+            $table->string('twitter')->nullable();
             $table->string('plan')->nullable();
             $table->timestamps();
         });

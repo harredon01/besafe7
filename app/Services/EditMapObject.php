@@ -929,12 +929,12 @@ GROUP BY category_id"
         if ($type == self::OBJECT_MERCHANT) {
             $validator = $this->validatorMerchant($data);
             if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                return array("status" => "error", "message" => $validator->getMessageBag());
             }
         } else if ($type == self::OBJECT_REPORT) {
             $validator = $this->validatorReport($data);
             if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                return array("status" => "error", "message" => $validator->getMessageBag());
             }
         }
         $object = $this->createObject($user, $data, $type);
@@ -1030,7 +1030,6 @@ GROUP BY category_id"
     public function createObject(User $user, array $data, $type) {
         $object = "App\\Models\\" . $type;
 
-        dd($data);
         $result = $object::create($data);
         if ($type == "Merchant") {
             $user->merchants()->save($result);
