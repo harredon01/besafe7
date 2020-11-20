@@ -43,11 +43,11 @@ class ProductVariant extends Model {
     }
     
     public function getCartImg() {
-        $file = FileM::where("type","Variant")->where("trigger_id", $this->id)->first();
+        $file = FileM::where("type","App\\Models\\Variant")->where("trigger_id", $this->id)->first();
         if($file){
             return $file;
         }
-        $file = FileM::where("type","Product")->where("trigger_id", $this->product_id)->first();
+        $file = FileM::where("type","App\\Models\\Product")->where("trigger_id", $this->product_id)->first();
         if($file){
             return $file;
         }

@@ -17,13 +17,15 @@ class LeadController extends Controller {
         $data['key'] = env('GOOGLE_CAPTCHA_PUBLIC');
         if ($type == "bla") {
             return view(config("app.views") . ".leads.leads")->with('data', $data);
-        } else if ($type == "report-lead") {
-            return view(config("app.views") . ".leads.report-lead")->with('data', $data);
-        } else if ($type == "bla") {
-            return view(config("app.views") . ".leads.leads")->with('data', $data);
-        } else if ($type == "bla") {
-            return view(config("app.views") . ".leads.leads")->with('data', $data);
-        }
+        } else if ($type == "sale") {
+            return view(config("app.views") . ".leads.sale-lead")->with('data', $data);
+        } else if ($type == "vets") {
+            return view(config("app.views") . ".leads.vet-lead")->with('data', $data);
+        } else if ($type == "shops") {
+            return view(config("app.views") . ".leads.shop-lead")->with('data', $data);
+        } else if ($type == "lost") {
+            return view(config("app.views") . ".leads.lost-lead")->with('data', $data);
+        } 
     }
 
     private function validateCaptcha($token, $ip) {

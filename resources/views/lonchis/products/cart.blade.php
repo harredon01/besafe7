@@ -17,8 +17,8 @@
                 <ul class="cart-items">
                     <li class="single-cart" ng-repeat="item in items">
                         <a href="#" class="cart-product">
-                            <div class="cart-product-img">
-                                <img src="image/product/cart-product.jpg" alt="Selected Products">
+                            <div class="cart-product-img" ng-show="item.attributes.image">
+                                <img ng-src="@{{item.attributes.image.file}}" alt="Selected Products">
                             </div>
                             <div class="product-details">
                                 <h4 class="product-details--title">@{{item.name}}</h4>

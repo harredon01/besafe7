@@ -124,40 +124,7 @@ class MerchantController extends Controller {
 
     public function textSearch(Request $request) {
         $data = $request->all();
-        if (!isset($data['q'])) {
-            $data['q'] = "";
-        }
-        if (isset($data['lat'])) {
-            $query = Merchant::search($data['q'])->whereIn('merchants.id', function($query) use($data) {
-                        if (isset($data['lat'])) {
-                            $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
-                            $query->select('merchant_id')
-                                    ->from('coverage_polygons')
-                                    ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
-                        }
-                        //$query->select('merchants.id');
-                    })->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
-        } else {
-            $query = Merchant::search($data['q'])->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
-        }
-
-        if (isset($data['categories'])) {
-            $categories = explode(",", $data['categories']);
-            $query->leftJoin('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
-                    ->whereIn('categorizables.category_id', $categories)
-                    ->where('categorizables.categorizable_type', "App\\Models\\Merchant");
-        }
-        $countQuery = $query;
-        $pageRes = $this->editMapObject->paginateQueryFromArray($query, $data);
-        $query = $pageRes['query'];
-        $merchants = $query->get();
-        $total = $countQuery->count();
-        $results['category'] = null;
-        $results['data'] = $merchants;
-        $results['page'] = $pageRes['page'];
-        $results['last_page'] = ceil($total / $pageRes['per_page']);
-        $results['per_page'] = $pageRes['per_page'];
-        $results['total'] = $total;
+        $results = $this->editMapObject->textSearchMerchant($data);
         return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
     }
 
@@ -206,19 +173,22 @@ class MerchantController extends Controller {
             );
         }
         $category = Category::where('url', $category)->first()->toArray();
-        $data['category'] = $category['id'];
-        $results = $this->editMapObject->buildCoverageQuery($data);
-        $merchants = $results['data'];
+        if ($category) {
+            $data['category'] = $category['id'];
+            $results = $this->editMapObject->buildCoverageQuery($data);
+            $merchants = $results['data'];
 //        dd($merchants);
 //        dd(DB::getQueryLog());
-        $merchants = $this->editMapObject->buildIncludes($merchants, $data);
-        $merchants = array_map(function ($value) {
-            $value->attributes = json_decode($value->attributes);
-            return (array) $value;
-        }, $merchants);
-        $results['data'] = $merchants;
-        $results['category'] = $category;
-        return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
+            $merchants = $this->editMapObject->buildIncludes($merchants, $data);
+            $merchants = array_map(function ($value) {
+                $value->attributes = json_decode($value->attributes);
+                return (array) $value;
+            }, $merchants);
+            $results['data'] = $merchants;
+            $results['category'] = $category;
+            return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
+        }
+        abort(404);
     }
 
     /**
@@ -248,12 +218,15 @@ class MerchantController extends Controller {
     public function getMerchantDetail($url) {
         $user = $this->auth->user();
         $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities', 'categories'])->first();
-        $results = $this->editMapObject->getActiveCategoriesMerchant($merchant->id);
-        $results = $results['data'];
-        $results = array_map(function ($value) {
-            return (array) $value;
-        }, $results);
-        return view(config("app.views") . '.merchants.detail')->with('side_categories', $results)->with("merchant", $merchant);
+        if ($merchant) {
+            $results = $this->editMapObject->getActiveCategoriesMerchant($merchant->id);
+            $results = $results['data'];
+            $results = array_map(function ($value) {
+                return (array) $value;
+            }, $results);
+            return view(config("app.views") . '.merchants.detail')->with('side_categories', $results)->with("merchant", $merchant);
+        }
+        abort(404);
     }
 
     /**

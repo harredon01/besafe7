@@ -60,7 +60,7 @@
                         <!-- Blog Short Description -->
                         <div class="product-short-para">
                             <p>
-                                {{$data["product"]['description']}}
+                                {!! $data["product"]['description'] !!}
                             </p>
                         </div>
                         <div class="status">

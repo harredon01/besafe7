@@ -1,104 +1,318 @@
 angular.module('besafe')
-        .service('Products',['$q', '$http', function ($q, $http) {
+        .service('Products', ['$q', '$http', function ($q, $http) {
 
-            var addCartItem = function (product_variant_id,merchant_id,quantity,extras) {
+                var addCartItem = function (product_variant_id, merchant_id, quantity, extras) {
 
-                var def = $q.defer();
+                    var def = $q.defer();
 
-                $http({
-                    method: "post",
-                    url: "/api/cart/add",
-                    data: {
-                        product_variant_id:product_variant_id,
-                        merchant_id:merchant_id,
-                        quantity:quantity,
-                        extras: extras
+                    $http({
+                        method: "post",
+                        url: "/api/cart/add",
+                        data: {
+                            product_variant_id: product_variant_id,
+                            merchant_id: merchant_id,
+                            quantity: quantity,
+                            extras: extras
+                        }
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+
+                    return def.promise;
+                };
+                var updateCartItem = function (item_id, quantity) {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/cart/update",
+                        data: {
+                            item_id: item_id,
+                            quantity: quantity
+                        }
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+
+                    return def.promise;
+                };
+                var addRating = function (rating) {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/ratings",
+                        data: rating
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to addRating");
+                            });
+
+                    return def.promise;
+                };
+                var getCart = function () {
+                    var def = $q.defer();
+                    $http({
+                        method: "GET",
+                        url: "/api/cart/get"
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+                    return def.promise;
+                };
+                var getCheckoutCart = function () {
+                    var def = $q.defer();
+                    $http({
+                        method: "GET",
+                        url: "/api/cart/checkout"
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+                    return def.promise;
+                };
+                var getProductsMerchant = function (data) {
+                    var def = $q.defer();
+                    $http({
+                        method: "GET",
+                        url: "/api/merchants/products",
+                        params: data
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to getProductsMerchant");
+                            });
+                    return def.promise;
+                };
+                var buildProduct = function (container, merchant) {
+                    let productInfo = {};
+
+                    productInfo.id = container.product_id;
+                    productInfo.name = container.prod_name;
+                    productInfo.description = container.prod_desc;
+                    productInfo.isActive = container.isActive;
+                    productInfo.description_more = false;
+                    productInfo.more = false;
+                    productInfo.type = container.type;
+                    productInfo.merchant_description_more = false;
+                    if (merchant) {
+                        productInfo.merchant_name = merchant.merchant_name;
+                        productInfo.merchant_id = merchant.merchant_id;
+                        productInfo.merchant_description = merchant.merchant_description;
+                        productInfo.merchant_attributes = merchant.merchant_attributes;
+                        productInfo.src = merchant.merchant_icon;
+
+                        productInfo.merchant_type = merchant.merchant_type;
                     }
-                })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
 
-                return def.promise;
-            };
-            var updateCartItem = function (item_id,quantity) {
+                    productInfo.inCart = false;
+                    if (container.is_on_sale) {
 
-                var def = $q.defer();
-
-                $http({
-                    method: "post",
-                    url: "/api/cart/update",
-                    data: {
-                        item_id:item_id,
-                        quantity:quantity
+                        productInfo.onsale = true;
+                        productInfo.subtotal = productInfo.price;
+                        productInfo.exsubtotal = productInfo.exprice;
+                    } else {
+                        productInfo.subtotal = productInfo.price;
+                        productInfo.onsale = false;
                     }
-                })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
+                    productInfo = updateProductVisual(container, productInfo);
+                    productInfo.item_id = null;
+                    productInfo.amount = container.min_quantity;
+                    productInfo.imgs = [];
+                    productInfo.variants = [];
+                    return productInfo;
+                };
+                var createVariant = function (container) {
+                    let variant = {};
+                    //        console.log("Variant", container);
+                    //        console.log("Variant", container.id)
+                    variant.id = container.id;
+                    variant.description = container.description;
+                    if (container.attributes.length > 0) {
+                        variant.attributes = JSON.parse(container.attributes);
+                        if (variant.attributes.buyers) {
+                            variant.unitPrice = variant.price / variant.attributes.buyers;
+                        } else {
+                            variant.unitPrice = variant.price;
+                        }
+                    } else {
+                        variant.attributes = "";
+                    }
+                    if (container.is_on_sale) {
+                        variant.exprice = container.price;
+                        variant.price = container.sale;
+                    } else {
+                        variant.price = container.price;
+                    }
+                    variant.is_on_sale = container.is_on_sale;
+                    variant.min_quantity = container.min_quantity;
+                    return variant;
+                }
+                var getCategory = function (variant, arrayCategories) {
+                    for (let i in arrayCategories) {
+                        if (arrayCategories[i].id == variant['category_id']) {
+                            return arrayCategories[i];
+                        }
+                    }
+                    let activeCategory = {
+                        "name": variant['category_name'],
+                        "id": variant['category_id'],
+                        "description": variant['category_description'],
+                        "products": [],
+                        "more": false
+                    }
+                    arrayCategories.push(activeCategory);
+                    return activeCategory
+                }
+                var getProduct = function (variant, arrayCategories, merchant) {
+                    for (let i in arrayCategories) {
+                        for (let j in arrayCategories[i].products) {
+                            if (arrayCategories[i].products[j].id == variant['product_id']) {
+                                return arrayCategories[i].products[j];
+                            }
+                        }
+                    }
+                    let productInfo = buildProduct(variant, merchant);
+                    return productInfo;
+                }
 
-                return def.promise;
-            };
-            var getCart = function () {
-                var def = $q.defer();
-                $http({
-                    method: "GET",
-                    url: "/api/cart/get"
-                })
-                        .success(function (data) {
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-                return def.promise;
-            };
-            var getCheckoutCart = function () {
-                var def = $q.defer();
-                $http({
-                    method: "GET",
-                    url: "/api/cart/checkout"
-                })
-                        .success(function (data) {
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
-                return def.promise;
-            };
-            
-            var clearCart = function () {
+                var buildProductInformation = function (items) {
+                    if (items['products_variants'].length > 0) {
+                        let resultsCategory = [];
+                        let processedVariants = [];
+                        for (let i = 0; i < items['products_variants'].length; i++) {
+                            if (processedVariants.includes(items['products_variants'][i].id)) {
+                                continue;
+                            } else {
+                                processedVariants.push(items['products_variants'][i].id);
+                            }
 
-                var def = $q.defer();
+                            let category = getCategory(items['products_variants'][i], resultsCategory);
+                            console.log("Category found", category);
+                            let product = getProduct(items['products_variants'][i], resultsCategory, items['merchant_products'][0]);
+                            console.log("product found", product);
+                            if (!containsObject(product, category.products)) {
+                                category.products.push(product);
+                            }
+                            let variant = createVariant(items['products_variants'][i]);
+                            if (variant.price < product.price) {
+                                product = updateProductVisual(variant, product);
+                            }
+                            if (!containsObject(variant, product.variants)) {
+                                product.variants.push(variant);
+                            }
+                        }
+                        for (let j in items['products_files']) {
+                            for (let i = 0; i < resultsCategory.length; i++) {
+                                for (let k in resultsCategory[i].products) {
+                                    let imgInfo = {};
+                                    if (items['products_files'][j].trigger_id == resultsCategory[i].products[k].id) {
+                                        imgInfo.file = items['products_files'][j].file;
+                                        if(resultsCategory[i].products[k].imgs.length == 0){
+                                            resultsCategory[i].products[k].src = imgInfo.file;
+                                        }
+                                        resultsCategory[i].products[k].imgs.push(imgInfo);
+                                        break;
+                                    }
+                                }
 
-                $http({
-                    method: "post",
-                    url: "/api/cart/clear",
-                })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
-                            def.reject("Failed to get nearby");
-                        });
+                            }
+                        }
+                        console.log('resultbuildCat', resultsCategory);
+                        return resultsCategory;
+                    }
+                    return null;
+                }
+                var containsObject = function (obj, list) {
+                    var x;
+                    for (x in list) {
+                        if (list[x].id == obj.id) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
 
-                return def.promise;
-            };
-            return {
-                getCheckoutCart:getCheckoutCart,
-                getCart:getCart,
-                addCartItem: addCartItem,
-                updateCartItem: updateCartItem,
-                clearCart: clearCart
-            };
-        }])
+                var updateProductVisual = function (container, productInfo) {
+                    if (container.is_on_sale) {
+                        productInfo.price = container.price;
+                        productInfo.onsale = true;
+                        productInfo.exprice = container.exprice;
+                    } else {
+                        productInfo.price = container.price;
+                        productInfo.onsale = false;
+                    }
+
+                    productInfo.variant_id = container.id;
+                    if (container.attributes) {
+                        let attributes = container.attributes;
+                        if (attributes.buyers) {
+                            productInfo.unitPrice = productInfo.price / attributes.buyers;
+                            productInfo.unitLunches = attributes.buyers;
+                        } else {
+                            productInfo.unitPrice = productInfo.price;
+                            productInfo.unitLunches = 1;
+                        }
+
+                    } else {
+                        productInfo.unitPrice = productInfo.price;
+                        productInfo.unitLunches = 1;
+                    }
+                    //        console.log("Update Prod Vis3", productInfo);
+                    return productInfo;
+                }
+
+                var clearCart = function () {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/cart/clear",
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+
+                    return def.promise;
+                };
+                return {
+                    getCheckoutCart: getCheckoutCart,
+                    getCart: getCart,
+                    addRating:addRating,
+                    addCartItem: addCartItem,
+                    updateCartItem: updateCartItem,
+                    getProductsMerchant: getProductsMerchant,
+                    clearCart: clearCart,
+                    buildProductInformation: buildProductInformation
+                };
+            }])

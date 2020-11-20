@@ -41,7 +41,7 @@ angular.module('besafe')
                 $http({
                         method: 'POST',
                         url: '/api/addresses',
-                        data: data, // pass in data as strings
+                        data: data, // pass in data as strings  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -53,7 +53,7 @@ angular.module('besafe')
                 return def.promise;
                 /**/
 
-            } 
+            }
             var saveUser = function (data) {
                 var def = $q.defer();
                 $http({
@@ -148,8 +148,8 @@ angular.module('besafe')
                 setAsBillingAddress: setAsBillingAddress,
                 getAddresses:getAddresses,
                 saveAddress:saveAddress,
-                updatePassword:updatePassword,
                 deleteAddress:deleteAddress,
+                updatePassword:updatePassword,
                 saveUser:saveUser,
                 getContacts:getContacts,
                 getUser:getUser

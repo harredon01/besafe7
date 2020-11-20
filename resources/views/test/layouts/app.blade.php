@@ -26,57 +26,9 @@
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
-        <!--script src="/js/all.js"></script-->
-        <script src="{{ asset('/js/app_1.js')}}"></script>
-        <script src="{{ asset('/js/constants.js')}}"></script>
-        <script src="{{ asset('/js/controllers/userctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/mapctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/mapdashctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/cartctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/routesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/exportsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/merchantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/deliveriesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-merchantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-categoriesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/foodaddressesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/foodmessagesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
-        <script src="{{ asset('/js/services/map.js')}}"></script>
-        <script src="{{ asset('/js/services/merchants.js')}}"></script>
-        <script src="{{ asset('/js/services/categories.js')}}"></script>
-        <script src="{{ asset('/js/services/mapDash.js')}}"></script>
-        <script src="{{ asset('/js/services/users.js')}}"></script>
-        <script src="{{ asset('/js/services/location.js')}}"></script>
-        <script src="{{ asset('/js/services/products.js')}}"></script>
-        <script src="{{ asset('/js/services/checkout.js')}}"></script>
-        <script src="{{ asset('/js/services/payu.js')}}"></script>
-        <script src="{{ asset('/js/services/cart.js')}}"></script>
-        <script src="{{ asset('/js/services/modals.js')}}"></script>
-        <script src="{{ asset('/js/services/billing.js')}}"></script>
-        <script src="{{ asset('/js/services/passport.js')}}"></script>
-        <script src="{{ asset('/js/services/groups.js')}}"></script>
-        <script src="{{ asset('/js/services/address.js')}}"></script>
-        <script src="{{ asset('/js/services/routes.js')}}"></script>
-        <script src="{{ asset('/js/services/payments.js')}}"></script>
-        <script src="{{ asset('/js/services/orders.js')}}"></script>
-        <script src="{{ asset('/js/services/product-import.js')}}"></script>
-        <script src="{{ asset('/js/services/food.js')}}"></script>
-        <script src="{{ asset('/js/services/zones.js')}}"></script>
+        <script src="/js/all.js"></script>
 
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
   

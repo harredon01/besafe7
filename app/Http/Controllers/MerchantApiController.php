@@ -50,7 +50,7 @@ class MerchantApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api')->except(['index', 'show', 'getObject']);
+        $this->middleware('auth:api')->except(['index', 'show', 'getObject','textSearch']);
     }
 
     /**
@@ -110,6 +110,15 @@ class MerchantApiController extends Controller {
             return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
         }
         return response()->json($this->editMapObject->getNearby($request->all()));
+    }
+    
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function textSearch(Request $request) {
+        return response()->json($this->editMapObject->textSearchMerchant($request->all()));
     }
 
     /**
@@ -384,11 +393,6 @@ class MerchantApiController extends Controller {
     public function destroy($id, Request $request) {
         $user = $request->user();
         return response()->json($this->editMapObject->deleteObject($user, $id, self::OBJECT_MERCHANT));
-    }
-
-    public function getMerchantHash($merchantId, Request $request) {
-        $user = $request->user();
-        return response()->json($this->shareObject->getObjectHash($user, $merchantId, self::OBJECT_MERCHANT));
     }
 
 }

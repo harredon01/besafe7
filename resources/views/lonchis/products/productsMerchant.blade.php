@@ -147,7 +147,7 @@
                         </ul>
                     </div>
                     <div class="single-sidebar">
-                        <h2 class="sidebar-title">FILTER BY PRICE</h2>
+                        <h2 class="sidebar-title">Filtra por precio</h2>
                         <div class="range-slider pt--10">
                             <div class="pm-range-slider"></div>
                             <div class="slider-price">
@@ -160,7 +160,7 @@
                     </div>-->
                     <!--
                     <div class="single-sidebar">
-                        <h2 class="sidebar-title">FILTER BY PRICE</h2>
+                        <h2 class="sidebar-title">Filtra por precio</h2>
                         <a href="product-details.html" class="sidebar-product pm-product product-type-list">
                             <div class="image"  >
                                 <img src="image/product/home-1/product-7.jpg" alt="">
@@ -284,11 +284,11 @@
 
                     </div>
                 </div>
-                <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
+                <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="prods-cont">
                     <div ng-repeat="category in categories">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
                             <div class="pm-product  ">
-                                <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchants[0].id}}" class="image" tabindex="0">
+                                <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
                                 <div class="hover-conents">
@@ -299,7 +299,7 @@
                                     </ul>
                                 </div>
                                 <div class="content">
-                                    <h3 class="font-weight-500"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchants[0].id}}">@{{product.name}}</a></h3>
+                                    <h3 class="font-weight-500"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}">@{{product.name}}</a></h3>
 
                                     <div class="price text-red" ng-show="product.activeVariant.is_on_sale">
                                         <span class="old">@{{product.activeVariant.price| currency}}</span>
@@ -373,7 +373,7 @@
                             @endforeach
                         </ul>
                     </div>
-                    @endif
+                    @endif 
                     <!--<div class="single-sidebar">
                         <h2 class="sidebar-title">Color</h2>
                         <ul class="sidebar-filter-list">
@@ -382,20 +382,20 @@
                         </ul>
                     </div>-->
                     <div class="single-sidebar">
-                        <h2 class="sidebar-title">FILTER BY PRICE</h2>
+                        <h2 class="sidebar-title">Filtra por precio</h2>
                         <div class="range-slider pt--10">
                             <div class="pm-range-slider"></div>
                             <div class="slider-price">
                                 <p>
-                                    <input type="text" id="amount" readonly>
-                                    <a href="#" class="btn btn--primary">Filter</a>
+                                    <input type="text" id="amount" ng-model="range" readonly>
+                                    <a href="javascript:;" ng-click="filterPrice()" class="btn btn--primary">Filter</a>
                                 </p>
                             </div>
                         </div>
                     </div>
                     <!--
                     <div class="single-sidebar">
-                        <h2 class="sidebar-title">FILTER BY PRICE</h2>
+                        <h2 class="sidebar-title">Filtra por precio</h2>
                         <a href="product-details.html" class="sidebar-product pm-product product-type-list">
                             <div class="image"  >
                                 <img src="image/product/home-1/product-7.jpg" alt="">

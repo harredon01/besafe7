@@ -30,56 +30,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
         <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
-        <!--script src="/js/all.js"></script-->
-        <script src="{{ asset('/js/app_1.js')}}"></script>
-        <script src="{{ asset('/js/constants.js')}}"></script>
-        <script src="{{ asset('/js/controllers/userctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/mapctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/mapdashctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/cartctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/sitemapctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/addressctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/routesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/ordersctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/exportsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/paymentsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/groupsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/menuctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/merchantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/reportsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/leadsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/deliveriesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-productsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-variantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-merchantsctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/admin/store/admin-store-categoriesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/foodaddressesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/foodmessagesctrl.js')}}"></script>
-        <script src="{{ asset('/js/controllers/zonesctrl.js')}}"></script>
-        <script src="{{ asset('/js/services/map.js')}}"></script>
-        <script src="{{ asset('/js/services/merchants.js')}}"></script>
-        <script src="{{ asset('/js/services/categories.js')}}"></script>
-        <script src="{{ asset('/js/services/mapDash.js')}}"></script>
-        <script src="{{ asset('/js/services/users.js')}}"></script>
-        <script src="{{ asset('/js/services/location.js')}}"></script>
-        <script src="{{ asset('/js/services/products.js')}}"></script>
-        <script src="{{ asset('/js/services/cart.js')}}"></script>
-        <script src="{{ asset('/js/services/modals.js')}}"></script>
-        <script src="{{ asset('/js/services/billing.js')}}"></script>
-        <script src="{{ asset('/js/services/passport.js')}}"></script>
-        <script src="{{ asset('/js/services/groups.js')}}"></script>
-        <script src="{{ asset('/js/services/address.js')}}"></script>
-        <script src="{{ asset('/js/services/routes.js')}}"></script>
-        <script src="{{ asset('/js/services/payments.js')}}"></script>
-        <script src="{{ asset('/js/services/orders.js')}}"></script>
-        <script src="{{ asset('/js/services/product-import.js')}}"></script>
-        <script src="{{ asset('/js/services/food.js')}}"></script>
-        <script src="{{ asset('/js/services/zones.js')}}"></script>
-        <script src="{{ asset('/js/services/leads.js')}}"></script>
+        <script src="/js/all.js"></script>
 
     </head>
     <body>
@@ -111,8 +62,8 @@
                                 <!-- Template Logo -->
                                 <div class="col-lg-3 col-md-12 col-sm-4">
                                     <div class="site-brand  text-center text-lg-left">
-                                        <a href="index.html" class="brand-image">
-                                            <img src="image/main-logo.png" alt="">
+                                        <a href="/" class="brand-image">
+                                            <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.png" alt="">
                                         </a>
                                     </div>
                                 </div>
@@ -221,6 +172,23 @@
                                                     </li>
                                                 </ul>
                                             </li>
+                                            <li class="mainmenu__item menu-item-has-children">
+                                                <a href="javascript" class="mainmenu__link">Participa</a>
+                                                <ul class="sub-menu">
+                                                    <li>
+                                                        <a href="/a/contact-us/vets">Veterinarios</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/shops">Tiendas de mascotas</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/lost">Mascotas Perdidas</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/sale">Mascotas a la venta</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
                                             <li class="mainmenu__item menu-item-has-children " style="display:none">
                                                 <a href="blog.html" class="mainmenu__link">Blog</a>
                                                 <ul class="sub-menu">
@@ -276,8 +244,8 @@
                             <div class="row align-items-center">
                                 <div class="col-lg-3">
                                     <!-- Sticky Logo Start -->
-                                    <a class="sticky-logo" href="index.html">
-                                        <img src="image/main-logo.png" alt="logo">
+                                    <a class="sticky-logo" href="/">
+                                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.png" alt="logo">
                                     </a>
                                     <!-- Sticky Logo End -->
                                 </div>
@@ -325,6 +293,23 @@
                                                     </li>
                                                     <li>
                                                         <a href="/a/terms">Terminos y condiciones</a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
+                                                <a href="javascript" class="mainmenu__link">Participa</a>
+                                                <ul class="sub-menu">
+                                                    <li>
+                                                        <a href="/a/contact-us/vets">Veterinarios</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/shops">Tiendas de mascotas</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/lost">Mascotas Perdidas</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="/a/contact-us/sale">Mascotas a la venta</a>
                                                     </li>
                                                 </ul>
                                             </li>

@@ -4,6 +4,7 @@
 <section class="blog-page-section with-sidebar" ng-controller="MerchantDetailCtrl">
     <div class="container">
         <div class="row">
+            @if(isset($merchant['name']))
             <div class="col-lg-8 col-xl-9 left-slide-margin">
                 <div class="blog-post post-details single-block">
 
@@ -262,6 +263,7 @@
                     </div>
                 </div>
             </section>
+            @endif
         </div>
         <script>
                     var viewData = '@json($merchant)';

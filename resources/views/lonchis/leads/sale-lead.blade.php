@@ -1,6 +1,28 @@
 @extends(config("app.views").'.layouts.app')
 <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}"></script>
 @section('content')
+<section>
+        <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
+             "autoplay": true,
+             "autoplaySpeed": 6000,
+             "slidesToShow": 1,
+             "dots": true
+             }'
+             >
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-a-la-venta.png">
+                <div class="container position-relative">
+                    <div class="row">
+                        <div class="col-lg-6" style="background: rgba(255,255,255,.5);">
+                            <h1 class="text-black">¿Tu peludo tuvo cachorros? </h1>
+                            <h4 class="mt--20">Sabemos que te encantaría quedarte con todos,  pero es inevitable tener que ofrecerlos.</h4>
+                        </div>
+                    </div>
+
+                </div>
+                <span class="herobanner-progress"></span>
+            </div>
+        </div>
+    </section>
 <section class="contact-page-section overflow-hidden"  ng-controller="LeadCtrl">
     <div class="row">
         <div class="col-md-6">
@@ -9,19 +31,8 @@
                     <h2>Escribenos</h2>
                 </div>
                 <form class="site-form " id="contact-form" role="form" name="myForm" ng-submit="send(myForm.$valid)" novalidate>
+                    <input type="hidden" name="type" ng-model="data.type" value="pet shops"/>
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>Tipo</label>
-                                <select ng-model="data.type" class="nice-select" name="type" ng-change=""required>
-                                    <option value="Preguntas">Preguntas</option>
-                                    <option value="Quejas">Quejas</option>
-                                    <option value="Trabaja">Trabaja con nosotros</option>
-                                </select>
-                                <span style="color:red" ng-show="(myForm.type.$dirty && myForm.type.$invalid) || submitted && myForm.type.$invalid">
-                                    <span ng-show="submitted && myForm.type.$error.required">Porfavor Selecciona un tipo de comunicacion</span>
-                            </div>
-                        </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Nombre</label>
@@ -75,24 +86,19 @@
         <div class="col-md-6 bg-gray">
             <div class="ct-single-side">
                 <div class="section-title mb--20">
-                    <h2>CONTACT US</h2>
+                    <h2>Escríbenos</h2>
                 </div>
                 <div class="contact-right-description">
                     <article class="ct-article">
-                        <h3 class="d-none sr-only">blog-article</h3>
-                        <p>Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam
-                            littera
-                            gothica, quam nunc putamus parum claram anteposuerit litterarum formas human.</p>
+                        <h3 class="d-none sr-only">Publica las mascotas que tienes a la venta</h3>
+                        <p>Cuando llegue el momento cada cachorro necesitará encontrar una familia que los cuide y los ame tanto como tu. 
+                            En pet World te ayudamos a encontrar personas o familias que buscan cachorros, vendelos con confianza y déjalos en buenas manos. </p>
                     </article>
                     <ul class="contact-list mb--35">
                         <li><i class="fas fa-fax"></i>Address : No 40 Baria Sreet 133/2 NewYork City</li>
                         <li><i class="fas fa-phone"></i>0(1234) 567 890</li>
                         <li><i class="far fa-envelope"></i>Info@roadthemes.com</li>
                     </ul>
-                    <div class="working-hour">
-                        <h3>Working hours</h3>
-                        <p> <strong>Monday – Saturday</strong>: 08AM – 22PM</p>
-                    </div>
                 </div>
             </div>
         </div>

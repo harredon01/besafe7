@@ -392,7 +392,7 @@ class MerchantImport {
     }
 
     public function importGlobalExcel($filename) {
-        echo 'merchants file: '.$filename; 
+        echo 'merchants file: ' . $filename;
         $reader = Excel::toArray(new ArrayMultipleSheetImport, storage_path('imports') . '/' . $filename);
         foreach ($reader as $key => $value) {
             if ($key == 'merchants') {
@@ -442,13 +442,12 @@ class MerchantImport {
                     unset($sheet['icon']);
                     unset($sheet['id']);
                     $results = $this->editMapObject->saveOrCreateObject($owner, $sheet, "Merchant");
-                    if($results['status']=="error"){
+                    if ($results['status'] == "error") {
                         dd($results);
                     }
                     $merchant = $results['object'];
                     if ($categoriesData) {
                         $categories = Category::whereIn('id', $categoriesData)->get();
-
                         foreach ($categories as $item) {
                             $item->merchants()->save($merchant);
                         }
@@ -528,6 +527,7 @@ class MerchantImport {
             $this->importCategoriesExcelInternal($row);
         }
     }
+
     public function slug_url($text) {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
@@ -554,7 +554,7 @@ class MerchantImport {
                 } else {
                     $sheet['icon'] = 'https://picsum.photos/900/300';
                 }
-                $sheet['url'] = $this->slug_url($sheet['name'] );
+                $sheet['url'] = $this->slug_url($sheet['name']);
                 $sheet['isActive'] = true;
                 Category::firstOrCreate($sheet);
             }
@@ -701,10 +701,8 @@ class MerchantImport {
                 }
                 $image = $sheet['imagen'];
                 $merchantsData = explode(",", $sheet['merchant_id']);
-                $ext = $sheet['ext'];
                 unset($sheet['merchant_id']);
                 unset($sheet['imagen']);
-                unset($sheet['ext']);
                 $categoriesData = explode(",", $sheet['categories']);
                 unset($sheet['categories']);
 
@@ -721,33 +719,48 @@ class MerchantImport {
                         $product->categories()->save($item);
                     }
                 }
+                $merchantFolder = "";
                 if ($merchantsData) {
                     $merchants = Merchant::whereIn('id', $merchantsData)->get();
                     foreach ($merchants as $item) {
+                        $merchantFolder = $item->id;
                         $product->merchants()->save($item);
                     }
                 }
                 if ($image) {
-                    $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $image;
+                    $files = explode(",", $image);
+                    foreach ($files as $value) {
+                        $imageData = explode(".", $value);
+                        $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $merchantFolder . '/' . $value;
+                        $ext = $imageData[count($imageData) - 1];
+                        $file = FileM::where("trigger_id", $product->id)->where("file", $image)->where("extension", $ext)->first();
+                        if (!$file) {
+                            FileM::create([
+                                'user_id' => 2,
+                                'trigger_id' => $product->id,
+                                'file' => $image,
+                                'extension' => $ext,
+                                'type' => 'App\Models\Product'
+                            ]);
+                        }
+                    }
                 } else {
                     $image = 'https://picsum.photos/600/350';
                     $ext = 'jpg';
-                }
-                $file = FileM::where("trigger_id", $product->id)->where("file", $image)->where("extension", $ext)->first();
-                if (!$file) {
-                    FileM::create([
-                        'user_id' => 2,
-                        'trigger_id' => $product->id,
-                        'file' => $image,
-                        'extension' => $ext,
-                        'type' => 'App\Models\Product'
-                    ]);
+                    $file = FileM::where("trigger_id", $product->id)->where("file", $image)->where("extension", $ext)->first();
+                    if (!$file) {
+                        FileM::create([
+                            'user_id' => 2,
+                            'trigger_id' => $product->id,
+                            'file' => $image,
+                            'extension' => $ext,
+                            'type' => 'App\Models\Product'
+                        ]);
+                    }
                 }
             }
         }
     }
-
-    
 
     public function importProductsExcel2($filename) {
 
@@ -846,8 +859,6 @@ class MerchantImport {
             }
         }
     }
-
-    
 
     public function importPolygons($filename) {
         $reader = Excel::toArray(new ArrayImport, storage_path('imports') . '/' . $filename);

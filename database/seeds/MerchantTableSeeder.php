@@ -69,6 +69,7 @@ class MerchantTableSeeder extends Seeder {
         //$this->createConditions();
 //        $this->createProducts();
         $this->createMerchantsExcel();
+        DB::table('jobs')->delete();
         //$this->createMerchants();
     }
 

@@ -1,146 +1,122 @@
 ﻿angular.module('besafe')
 
-        .controller('MerchantsCtrl',['$scope', 'LocationService', 'Merchants','Users','Categories', function ($scope, LocationService, Merchants,Users,Categories) {
-            $scope.data = {};
-            $scope.user = {};
-            $scope.page = 0;
-            $scope.merchants=[];
-            $scope.categories=[];
-            $scope.regionVisible = false;
-            $scope.editMerchant = false;
-            $scope.submitted = false;
-            angular.element(document).ready(function () {
-                var where = "";
-                LocationService.getCountries(where).then(function (data) {
-                    $scope.countries = data.data;
-                },
-                        function (data) {
-
-                        });
-                Categories.getCategories("merchants").then(function (data) {
-                    $scope.categories = data.categories;
-                },
-                        function (data) {
-
-                        });
-                Users.getUser().then(function (data) {
-                    console.log("Get User",data);
-                    $scope.user = data.user;
-                    $scope.getMerchants();
-                },
-                        function (data) {
-
-                        });
-            });
-            $scope.save = function (isvalid) {
-                $scope.submitted = true;
-                if (isvalid) {
-                    var existing = false;
-                    if ($scope.data.id) {
-                        existing = true;
-                    }
-                    Merchants.saveMerchant($.param($scope.data)).then(function (data) {
-                        if (existing) {
-                            $scope.updateMerchant(data.merchant);
-                        } else {
-                            $scope.merchantes.push(data.merchant);
-                        }
-
-                        $scope.data = {};
-                        $scope.submitted = false;
-                        $scope.editMerchant = false;
-                    },
-                            function (data) {
-
-                            });
-                }
-            }
-            $scope.getMerchants = function () {
-                $scope.page++;
-                var where = "owner_id="+$scope.user.id+"&page="+$scope.page;
-                Merchants.getMerchants(where).then(function (data) {
-                    $scope.merchants = data.merchants;
-
-                },
-                        function (data) {
-
-                        });
-            }
-            $scope.deleteMerchant = function (merchant_id) {
-                Merchants.deleteMerchant(merchant_id).then(function (data) {
-                    merchant_id = "" + merchant_id;
-                    for (item in $scope.merchants) {
-                        if ($scope.merchants[item].merchant_id == merchant_id) {
-                            console.log("deleting merchant", $scope.merchants[item]);
-                            $scope.merchants.splice(item, 1);
-                        }
-                    }
-                },
-                        function (data) {
-                        });
-            }
-            $scope.clean = function () {
+        .controller('MerchantsCtrl', ['$scope', 'Merchants', 'Modals', function ($scope, Merchants, Modals) {
                 $scope.data = {};
+                $scope.user = {};
+                $scope.current = 1;
+                $scope.last = 1;
+                $scope.total = 1;
+                $scope.per_page = 1;
+                $scope.merchants = [];
+                $scope.categories = [];
                 $scope.regionVisible = false;
-                $scope.cityVisible = false;
-            }
-            $scope.updateMerchant = function (merchant) {
-                for (item in $scope.merchants) {
-                    if ($scope.merchants[item].id == merchant.id) {
-                        $scope.merchants.splice(item, 1);
-                        $scope.merchants.push(merchant);
-                    }
-                }
-            }
-            $scope.selectCountry = function () {
-                for (item in $scope.countries) {
-                    if ($scope.countries[item].id == $scope.data.country_id) {
-                        $scope.data.country = $scope.countries[item].country_iso;
-                    }
-                }
-                LocationService.getRegionsCountry($scope.data.country_id).then(function (data) {
-                    $scope.regions = data.data;
-                    $scope.regionVisible = true;
-                    $scope.cityVisible = false;
+                $scope.editMerchant = false;
+                $scope.submitted = false;
+                $scope.category;
+                angular.element(document).ready(function () {
+                    var res = viewData.replace(/App\\Models\\/g, "");
+//                    res = res.replace(/""{/g, '"\"{');
+//                    res = res.replace(/}""/g, '}\""');
+                    console.log("res", res);
+                    let container = JSON.parse(res);
 
-                },
-                        function (data) {
+                    console.log("Data", container);
+                    $scope.category = container.category;
+                    $scope.merchants = container.data;
+                    $scope.current = container.page;
+                    $scope.per_page = container.per_page;
+                    $scope.last = container.last_page;
+                    $scope.total = container.total;
+                    document.getElementById("dissapear").remove();
+                });
 
-                        });
-            }
-            $scope.selectRegion = function () {
-                for (item in $scope.regions) {
-                    if ($scope.countries[item].id == $scope.data.region_id) {
-                        $scope.data.region = $scope.countries[item].name;
+                $scope.goTo = function (page) {
+                    $scope.current = page;
+                    $scope.merchants = [];
+                    Modals.showLoader();
+                    var where = "category_id=" + $scope.category.id + "&page=" + $scope.current + "&limit=" + 2;
+                    if ($scope.category.type.includes("nearby")) {
+                        Merchants.getMerchantsNearby(where).then(function (data) {
+                            $scope.loadResults(data)
+                        },
+                                function (data) {
+                                });
+                    } else if ($scope.category.type.includes("coverage")) {
+                        Merchants.getMerchantsCoverage(where).then(function (data) {
+                            $scope.loadResults(data)
+                        },
+                                function (data) {
+                                });
+                    } else {
+                        Merchants.getMerchants(where).then(function (data) {
+                            $scope.loadResults(data)
+                        },
+                                function (data) {
+                                });
                     }
                 }
-            }
-            $scope.selectPlace = function (country_id, region_id) {
-                $scope.data.country_id = country_id;
-                for (item in $scope.countries) {
-                    if ($scope.countries[item].id == $scope.data.country_id) {
-                        $scope.data.country = $scope.countries[item].country_iso;
-                    }
-                }
-                LocationService.getRegionsCountry(country_id).then(function (data) {
-                    $scope.regions = data.data;
-                    $scope.regionVisible = true;
-                    $scope.cityVisible = false;
-                    $scope.data.region_id = region_id;
-                    $scope.selectRegion();
-                },
-                        function (data) {
 
-                        });
-            }
-            $scope.editMerchant = function (merchant_id) {
-                $scope.editMerchant = true;
-                for (item in $scope.merchants) {
-                    if ($scope.merchants[item].id == merchant_id) {
-                        $scope.data = $scope.merchants[item];
-                        $scope.selectPlace($scope.data.country_id, $scope.data.region_id);
-                    }
+                $scope.loadResults = function (data) {
+                    $scope.merchants = data.data;
+                    $scope.current = parseInt(data.page);
+                    $scope.per_page = parseInt(data.per_page);
+                    $scope.last = parseInt(data.last_page);
+                    $scope.total = parseInt(data.total);
+                    Modals.hideLoader();
                 }
-            }
+                $scope.openItem = function (merchant) {
+                    let url = "";
+                    let merchant_id = merchant.id;
+                    if (merchant.categorizable_id) {
+                        merchant_id = merchant.categorizable_id;
+                    }
+                    if ($scope.category) {
+                        if ($scope.category.type.includes("products")) {
+                            url = "/a/products/" + $scope.category.url + "?merchant_id=" + merchant_id;
+                        } else {
+                            url = "/a/merchant/" + merchant.slug;
+                        }
+                    } else {
+                        url = "/a/merchant/" + merchant.slug+"/products";
+                    }
 
-        }])
+                    window.location.href = url;
+                }
+            }])
+        .controller('MerchantDetailCtrl', ['$scope', 'Merchants', 'Modals', '$mdDialog', function ($scope, Merchants, Modals, $mdDialog) {
+                $scope.data = {};
+                $scope.user = {};
+
+                $scope.merchant = {};
+                angular.element(document).ready(function () {
+                    var res = viewData.replace(/App\\Models\\/g, "");
+//                    res = res.replace(/""{/g, '"\"{');
+//                    res = res.replace(/}""/g, '}\""');
+                    console.log("res", res);
+                    let container = JSON.parse(res);
+
+                    console.log("Data", container);
+                    $scope.merchant = container.merchant;
+
+                    //document.getElementById("dissapear").remove();
+                });
+                $scope.booking = function () {
+                    console.log("Booking");
+
+                    $mdDialog.show(Modals.getAppPopup()).then(function (platform) {
+                        let url = "";
+                        if (platform == "ios") {
+                            url = ""
+                        } else if (platform == 'android') {
+                            url = ""
+                        } else if (platform == 'web') {
+                            url = ""
+                        }
+                        console.log("Url", platform, url)
+                        //window.location.href = url;
+
+                    }, function () {
+
+                    });
+                }
+            }])

@@ -447,6 +447,69 @@ GROUP BY category_id"
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
+    public function textSearchMerchant($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        if (isset($data['lat'])) {
+            $query = Merchant::search($data['q'])->whereIn('merchants.id', function($query) use($data) {
+                        if (isset($data['lat'])) {
+                            $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                            $query->select('merchant_id')
+                                    ->from('coverage_polygons')
+                                    ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                        }
+                        //$query->select('merchants.id');
+                    })->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        } else {
+            $query = Merchant::search($data['q'])->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        }
+
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Merchant");
+        }
+        $countQuery = $query;
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $merchants = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $merchants;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return $results;
+    }
+    
+    public function textSearchReport($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $query = Report::search($data['q']);
+
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'reports.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Report");
+        }
+        $countQuery = $query;
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $reports = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $reports;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return $results;
+    }
     
     public function paginateQueryFromArray($query,$data){
         $page = null;
@@ -532,7 +595,7 @@ GROUP BY category_id"
                 ." where private = 0 AND status in ('online','active','busy') AND "
                 . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
                         . $additionalQuery, $thedata);
-        return array("data" => $merchants,"page"=>$page,"per_page"=>$per_page,"total"=>$merchantsCount[0]->total);
+        return array("data" => $merchants,"page"=>$page,"per_page"=>$per_page,"total"=>$merchantsCount[0]->total,"last_page"=>ceil($merchantsCount[0]->total/$per_page));
     }
     
     public function getRelation(array $parentIds, $object, $idColumn) {
@@ -657,7 +720,7 @@ GROUP BY category_id"
                             " . $joinsWhere . "
                     HAVING distance < :radius ", $thedata);
         unset($thedata['limit']);
-        return array("data" => $reports,"page"=>$page,"per_page"=>$per_page,"total"=>$reportsCount[0]->total);
+        return array("data" => $reports,"page"=>$page,"per_page"=>$per_page,"total"=>$reportsCount[0]->total,"last_page"=>ceil($reportsCount[0]->total/$per_page));
     }
 
     function buildIncludes($merchants, $data) {

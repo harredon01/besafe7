@@ -123,20 +123,9 @@ Route::post('emergency/stop', 'AlertsApiController@postStopEmergency');
 Route::post('reports/share', 'ShareApiController@postAddFollower');
 Route::post('reports/approve/{code?}', 'ReportApiController@approveReport');
 Route::post('reports/status/{code?}', 'ReportApiController@updateObjectStatus');
-Route::get('reports/hash/{code?}', 'ReportApiController@getReportHash');
 Route::get('reports/detail', 'ReportApiController@getObject');
 Route::get('reports/nearby', 'ReportApiController@getNearbyReports');
-Route::get('reports/search', function (Request $request) {
-    $searchQuery = App\Models\Report::search($request->search);
-    if (is_array($request->filters)) {
-        $filters = $request->filters;
-        foreach ($filters as $key => $value) {
-
-            $searchQuery->where($key, $value);
-        }
-    }
-    return $searchQuery->paginate();
-});
+Route::get('reports/search', 'ReportApiController@textSearch');
 Route::delete('reports/group/{groupId?}/{objectId?}', 'ReportApiController@removeObjectGroup');
 Route::resource('reports', 'ReportApiController');
 
@@ -150,7 +139,6 @@ Route::get('private/merchants/detail', 'MerchantApiController@getObject');
 Route::get('private/merchants/coverage', 'MerchantApiController@getCoverageMerchants');
 Route::get('private/merchants/products', 'ProductApiController@getProductsMerchant');
 Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
-    Route::get('merchants/hash/{code?}', 'MerchantApiController@getMerchantHash');
     Route::get('merchants/products', 'ProductApiController@getProductsMerchant');
     Route::get('merchants/nearby', 'MerchantApiController@getNearbyMerchants');
     Route::get('merchants/coverage', 'MerchantApiController@getCoverageMerchants');
@@ -159,18 +147,7 @@ Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function (
     Route::get('merchants/payment_methods/{code?}', 'MerchantApiController@getPaymentMethodsMerchant');
     Route::get('merchants/{id?}/categories/{type?}', 'MerchantApiController@getCategoriesMerchant');
     Route::get('merchants/{id?}/active_categories', 'MerchantApiController@getActiveCategoriesMerchant');
-    Route::get('merchants/search', function (Request $request) {
-        $searchQuery = App\Models\Merchant::search($request->search);
-
-        $filters = $request->filters;
-        $filters = json_decode($filters, true);
-        if (is_array($filters)) {
-            foreach ($filters as $key => $value) {
-                $searchQuery->where($key, $value);
-            }
-        }
-        return $searchQuery->paginate();
-    });
+    Route::get('merchants/search', 'MerchantApiController@textSearch');
 //Route::post('merchants/status/{code?}', 'MerchantApiController@updateObjectStatus');
 
 
@@ -185,6 +162,7 @@ Route::delete('imagesapi/{code?}', 'FileApiController@delete');
 Route::get('products/group/{group?}/{page?}', 'ProductApiController@getProductsGroup');
 Route::get('products/merchant/private/{merchant?}/{page?}', 'ProductApiController@getProductsPrivateMerchant');
 Route::get('products/merchant/{merchant?}/{page?}', 'ProductApiController@getProductsMerchantOld');
+Route::get('products/search', 'ProductApiController@textSearch');
 
 Route::resource('products', 'ProductApiController');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');

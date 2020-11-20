@@ -247,8 +247,8 @@ jQuery(document).ready(function () {
             $(".pm-range-slider").slider({
                 range: true,
                 min: 0,
-                max: 500,
-                values: [80, 320],
+                max: 300000,
+                values: [20000, 60000],
                 slide: function (event, ui) {
                     $("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
                 }

@@ -106,6 +106,39 @@ class EditProduct {
         }
         return $query;
     }
+    public function textSearch($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $textSearchQuery = Product::search($data['q'])->whereIn('id', function($query) use($data) {
+                    $query = $this->baseProductQuery($data, $query);
+                    $query->from('products');
+                    $query->select('products.id');
+                })->where('isActive', true);
+        $textSearchCountQuery = $textSearchQuery;
+        $total = $textSearchCountQuery->count();
+        $textSearchQuery->with(["merchants", 'files', 'variants']);
+        $pageRes = $this->paginateQueryFromArray($textSearchQuery, $data);
+        $textSearchQuery = $pageRes['query'];
+        $products = $textSearchQuery->get();
+        foreach ($products as $value) {
+            $value->description = nl2br($value->description);
+            $value->description = str_replace(array("\r", "\n"), '', $value->description);
+            foreach ($value->variants as $item) {
+                $item->attributes = json_decode($item->attributes);
+            }
+        }
+        $cat = ["products" => $products, 'id' => -1];
+        $results = [];
+        $results['categories'] = [$cat];
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        $results['category'] = [];
+        $results['side_categories'] = [];
+        return $results;
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -245,6 +278,16 @@ GROUP BY category_id"
         $query = $this->baseProductQuery($data, $query);
 
         $merchant_id = null;
+        if (isset($data['high'])) {
+            if($data['high']){
+                $query->where('high','<=',$data['high']);
+            }
+        }
+        if (isset($data['low'])) {
+            if($data['low']){
+                $query->where('low','>=',$data['low']);
+            }
+        }
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id']) {
                 $merchant_id = $data['merchant_id'];
@@ -527,6 +570,7 @@ GROUP BY category_id"
             "variants" => []
         ];
         if ($merchant) {
+            $product['merchant_id'] = $merchant->merchant_id;
             $product['merchant_name'] = $merchant->merchant_name;
             $product['merchant_description'] = $merchant->merchant_description;
             $product['src'] = $merchant->merchant_icon;

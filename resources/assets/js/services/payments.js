@@ -24,6 +24,28 @@ angular.module('besafe')
                 /**/
 
             }
+            var getPaymentsUser = function (where) {
+                let url = '/api/billing/payments' ;
+                if(where){
+                    url = url+'?'+where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get payments");
+                        });
+
+                return def.promise;
+                /**/
+
+            }
             var approvePayment = function (payment_id) {
                 var def = $q.defer();
                 $http({
@@ -40,10 +62,45 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var retryPayment = function (payment_id) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/billing/retry/'+payment_id,
+                        data: {}, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to retryPayment");
+                        });
+                return def.promise;
+                /**/
+            }
+            var addTransactionCosts = function (payment_id) {
+                var def = $q.defer();
+                $http({
+                        method: 'POST',
+                        url: '/api/billing/add_transaction_costs/'+payment_id,
+                        data: {}, // pass in data as strings
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to addTransactionCosts");
+                        });
+                return def.promise;
+                /**/
+            }
 
 
             return {
                 getPayments:getPayments,
+                getPaymentsUser:getPaymentsUser,
+                retryPayment:retryPayment,
+                addTransactionCosts:addTransactionCosts,
                 approvePayment:approvePayment
             };
         }])

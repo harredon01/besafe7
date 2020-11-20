@@ -24,6 +24,9 @@
                 });
 
                 $scope.goTo = function (type, $event) {
+                    if(type.length==0){
+                        $event.preventDefault()
+                    }
                     if (type.includes("nearby") || type.includes("coverage")) {
                         let url = $event.target.href;
                         if (type.includes("nearby")) {
@@ -125,14 +128,14 @@
 
                 $scope.goTo = function (type, $event) {
                     if (type.includes("nearby") || type.includes("coverage")) {
-                        let url = $event.target.href;
+                        let url = $event.currentTarget.href;
                         if (type.includes("nearby")) {
                             url += "/nearby"
                         } else if (type.includes("coverage")) {
                             url += "/coverage"
                         }
                         console.log("Type", type);
-                        console.log("target", $event.target.href);
+                        console.log("target", $event.currentTarget.href);
                         $event.preventDefault()
 
                         if (!$rootScope.shippingAddress) {
