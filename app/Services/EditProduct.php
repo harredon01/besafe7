@@ -92,12 +92,161 @@ class EditProduct {
         return $results;
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function addCategoryToQuery($data, $query) {
+        if ($data['category_id']) {
+            $categories = explode(",", $data['category_id']);
+            $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Product");
+        }
+        return $query;
+    }
+    public function textSearch($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $textSearchQuery = Product::search($data['q'])->whereIn('id', function($query) use($data) {
+                    $query = $this->baseProductQuery($data, $query);
+                    $query->from('products');
+                    $query->select('products.id');
+                })->where('isActive', true);
+        $textSearchCountQuery = $textSearchQuery;
+        $total = $textSearchCountQuery->count();
+        $textSearchQuery->with(["merchants", 'files', 'variants']);
+        $pageRes = $this->paginateQueryFromArray($textSearchQuery, $data);
+        $textSearchQuery = $pageRes['query'];
+        $products = $textSearchQuery->get();
+        foreach ($products as $value) {
+            $value->description = nl2br($value->description);
+            $value->description = str_replace(array("\r", "\n"), '', $value->description);
+            foreach ($value->variants as $item) {
+                $item->attributes = json_decode($item->attributes);
+            }
+        }
+        $cat = ["products" => $products, 'id' => -1];
+        $results = [];
+        $results['categories'] = [$cat];
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        $results['category'] = [];
+        $results['side_categories'] = [];
+        return $results;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function baseProductQuery($data, $query) {
+        $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
+                ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
+                ->where('merchants.private', false)
+                ->select('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
+                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon', 'merchants.attributes as merchant_attributes');
+
+        $query->addSelect('products.*');
+        $merchant_id = null;
+        if (array_key_exists("merchant_id", $data)) {
+            if ($data['merchant_id']) {
+                $merchant_id = $data['merchant_id'];
+            }
+        }
+        if ($merchant_id) {
+            $merchants = explode(",", $merchant_id);
+            $query->whereIn('merchant_product.merchant_id', $merchants);
+        }
+        if (array_key_exists("category_id", $data)) {
+            $searches_categories = true;
+            $query = $this->addCategoryToQuery($data, $query);
+        }
+        if (array_key_exists("lat", $data)) {
+            if ($data['lat']) {
+                $query->whereIn('merchants.id', function($query) use ($data) {
+                    $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                    $query->select('merchant_id')
+                            ->from('coverage_polygons')
+                            ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                });
+            }
+        }
+        return $query;
+    }
+
+    public function getActiveCategoriesMerchant($id) {
+        //DB::enableQueryLog();
+        $categories = DB::select(" "
+                        . "SELECT 
+    c.*, COUNT(categorizable_id) AS tots
+FROM
+    categorizables ca
+        JOIN
+    categories c ON c.id = ca.category_id
+WHERE
+    categorizable_type = 'App\\\Models\\\Product'
+        AND categorizable_id IN (SELECT 
+            product_id
+        FROM
+            merchant_product mp
+                JOIN
+            products p ON mp.product_id = p.id
+        WHERE
+            merchant_id = :merchant_id AND p.isActive = TRUE)
+GROUP BY category_id"
+                        . "", ['merchant_id' => $id]);
+        //DB::enableQueryLog();
+        //dd(DB::getQueryLog());
+        return ['status' => "success", "data" => $categories];
+    }
+    
+    public function paginateQueryFromArray($query,$data){
+        $page = null;
+        if (array_key_exists("page", $data)) {
+            if ($data['page']) {
+                $page = $data['page'];
+            }
+        }
+        $per_page = null;
+        if (array_key_exists("per_page", $data)) {
+            if ($data['per_page']) {
+                $per_page = $data['per_page'];
+            }
+        }
+
+        if ($per_page) {
+            $query->take($per_page);
+        } else {
+            $per_page = self::OBJECT_PAGESIZE;
+            $query->take(self::OBJECT_PAGESIZE);
+        }
+        if ($page) {
+            $skip = null;
+            if ($per_page) {
+                $skip = ($page - 1 ) * ($per_page);
+            } else {
+                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
+            }
+            $query->skip($skip);
+        } else {
+            $page = 1;
+        }
+        return ["query"=>$query,"page"=>$page,"per_page"=>$per_page];
+    }
+
     public function productsQuery($data) {
 
         $results = [];
         $includes_files = false;
         $includes_categories = false;
         $includes_merchant = false;
+        $searches_categories = false;
         if (array_key_exists("includes", $data)) {
             if ($data['includes']) {
                 $includes = $data['includes'];
@@ -113,96 +262,80 @@ class EditProduct {
                 }
             }
         }
+        $query = null;
+        $isAdmin = false;
+        if (array_key_exists("isAdmin", $data)) {
+            if ($data['isAdmin']) {
+                $isAdmin = true;
+            }
+        }
+        if ($isAdmin) {
+            $query = DB::table('products');
+        } else {
+            $query = DB::table('products')
+                    ->where('products.isActive', true);
+        }
+        $query = $this->baseProductQuery($data, $query);
 
-        $query = DB::table('products')
-                ->where('products.isActive', true);
-        $query->select('products.*');
         $merchant_id = null;
+        if (isset($data['high'])) {
+            if($data['high']){
+                $query->where('high','<=',$data['high']);
+            }
+        }
+        if (isset($data['low'])) {
+            if($data['low']){
+                $query->where('low','>=',$data['low']);
+            }
+        }
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id']) {
                 $merchant_id = $data['merchant_id'];
             }
         }
-        if ($merchant_id) {
-            $merchants = explode(",", $merchant_id);
-            $query->whereIn('merchant_product.merchant_id', $merchants);
-        }
-        if (array_key_exists("category_id", $data)) {
-            if ($data['category_id']) {
-                $categories = explode(",", $data['category_id']);
-                $query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
-                        ->whereIn('categorizables.category_id', $categories)
-                        ->where('categorizables.categorizable_type', "App\\Models\\Product");
-            }
+
+        if (!$merchant_id && !$searches_categories) {
+            $query->limit(self::OBJECT_PAGESIZE);
         }
         $query->distinct();
-
-        $query->join('merchant_product', 'products.id', '=', 'merchant_product.product_id')
-                ->join('merchants', 'merchants.id', '=', 'merchant_product.merchant_id')
-                ->where('merchants.private', false)
-                ->addSelect('merchants.id as merchant_id', 'merchants.name as merchant_name', 'merchants.description as merchant_description',
-                        'merchants.telephone as merchant_telephone', 'merchants.type as merchant_type', 'merchants.icon as merchant_icon');
-
-        if (array_key_exists("lat", $data)) {
-            if ($data['lat']) {
-                $query->whereIn('merchants.id', function($query) use ($data) {
-                    $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
-                    $query->select('merchant_id')
-                            ->from('coverage_polygons')
-                            ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
-                });
-            }
-        }
         $count_query = $query;
-//        DB::enableQueryLog();
+        //DB::enableQueryLog();
 //        
         $results['products_total'] = $count_query->count('products.id');
 //        dd($results['products_total']);
-//        dd(DB::getQueryLog());
-        $per_page = null;
-        if (array_key_exists("per_page", $data)) {
-            if ($data['per_page']) {
-                $per_page = $data['per_page'];
-            }
-        }
-        $page = null;
-        if (array_key_exists("page", $data)) {
-            if ($data['page']) {
-                $page = $data['page'];
-            }
-        }
-        if ($per_page) {
-            $query->take($per_page);
-        } else {
-            $query->take(self::OBJECT_PAGESIZE);
-        }
-        if ($page) {
-            $skip = null;
-            if ($per_page) {
-                $skip = ($page - 1 ) * ($per_page);
-            } else {
-                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
-            }
-            $query->skip($skip);
-        }
-        $variants = $query->get();
+        //dd(DB::getQueryLog());
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $page = $pageRes['page'];
+        $per_page = $pageRes['per_page'];
+        //DB::enableQueryLog();
+        $prodResults = $query->get();
+        //dd(DB::getQueryLog());
 //        dd($variants);
 
         $products = [];
-        foreach ($variants as $value) {
+        foreach ($prodResults as $value) {
             if (in_array($value->id, $products)) {
                 
             } else {
                 array_push($products, $value->id);
             }
         }
-        $results['merchant_products'] = $variants;
-        $variants_query = DB::table('products')
-                ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
-                ->whereIn('products.id', $products)
-                ->where('product_variant.isActive', true)
-                ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc')
-                ->orderBy('products.id', 'asc');
+        $results['merchant_products'] = $prodResults;
+        $variants_query = null;
+        if ($isAdmin) {
+            $variants_query = DB::table('products')
+                    ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                    ->whereIn('products.id', $products)
+                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.isActive', 'products.slug', 'products.rating')
+                    ->orderBy('products.id', 'asc');
+        } else {
+            $variants_query = DB::table('products')
+                    ->join('product_variant', 'products.id', '=', 'product_variant.product_id')
+                    ->whereIn('products.id', $products)
+                    ->where('product_variant.isActive', true)
+                    ->select('product_variant.*', 'products.id as prod_id', 'products.name as prod_name', 'products.description as prod_desc', 'products.slug', 'products.rating')
+                    ->orderBy('products.id', 'asc');
+        }
 
         if ($includes_categories) {
             $variants_query->leftJoin('categorizables', 'products.id', '=', 'categorizables.categorizable_id')
@@ -235,7 +368,10 @@ class EditProduct {
         } else {
             $results['products_files'] = [];
         }
-
+        $results['page'] = $page;
+        $results['last_page'] = ceil($results['products_total'] / $per_page);
+        $results['per_page'] = $per_page;
+        $results['total'] = $results['products_total'];
         return $results;
     }
 
@@ -399,6 +535,9 @@ class EditProduct {
             "description" => $container->description,
             "price" => $container->price,
             "min_quantity" => $container->min_quantity,
+            "is_shippable" => $container->is_shippable,
+            "is_on_sale" => $container->is_on_sale,
+            "sale" => $container->sale,
         ];
         if ($container->attributes) {
             $variant["attributes"] = json_decode($container->attributes, true);
@@ -421,6 +560,8 @@ class EditProduct {
             "description_more" => false,
             "more" => false,
             "type" => $container->type,
+            "slug" => $container->slug,
+            "rating" => $container->rating,
             "merchant_description_more" => false,
             "inCart" => false,
             "item_id" => null,
@@ -429,6 +570,7 @@ class EditProduct {
             "variants" => []
         ];
         if ($merchant) {
+            $product['merchant_id'] = $merchant->merchant_id;
             $product['merchant_name'] = $merchant->merchant_name;
             $product['merchant_description'] = $merchant->merchant_description;
             $product['src'] = $merchant->merchant_icon;
@@ -475,7 +617,7 @@ class EditProduct {
                         array_push($resultsVariant, $items['products_variants'][$i]->id);
                     }
                     for ($j = 0; $j < count($resultsCategory); $j++) {
-                        if ($resultsCategory[$j]['id'] == $items['products_variants'][$i]->category_id) {
+                        if (is_null($category) || $resultsCategory[$j]['id'] == $items['products_variants'][$i]->category_id) {
                             $category = $j;
                         }
                         for ($k = 0; $k < count($resultsCategory[$j]['products']); $k++) {
@@ -489,11 +631,12 @@ class EditProduct {
                         }
                     }
                     if (is_null($category)) {
+
                         $category = count($resultsCategory);
                         array_push($resultsCategory, [
-                            "name" => $items['products_variants'][$i]->category_name,
-                            "id" => $items['products_variants'][$i]->category_id,
-                            "description" => $items['products_variants'][$i]->category_description,
+                            "name" => "Tienda",
+                            "id" => 1,
+                            "description" => "",
                             "products" => [],
                             "product_ids" => [],
                             "more" => false,
@@ -596,7 +739,7 @@ class EditProduct {
         $access = false;
         $owner = false;
         $data = [];
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }
@@ -631,7 +774,7 @@ class EditProduct {
     public function checkAccessAdminMerchant(User $user, $merchant_id) {
         $access = false;
         $owner = false;
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }
@@ -660,7 +803,7 @@ class EditProduct {
     public function checkAccessVariant(User $user, $variant_id) {
         $access = false;
         $owner = false;
-        if($user->id < 4){
+        if ($user->id < 4) {
             $access = true;
             $owner = true;
         }

@@ -1,0 +1,27 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Negocios en cobertura</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    X
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <ul>
+                    <li id="address-{{ merchant.id}}" ng-repeat="merchant in merchants">
+                        <span class="type">{{ merchant.name}}</span>
+                        <br/><span class="postal">{{ merchant.description}}</span>
+                        <br/><span class="name">{{ merchant.Distance}}</span>
+                        <br/><a href="javascript:;" ng-click="selectMerchant(merchant)" class="editar">Visitar</a>
+                    </li>
+
+                </ul>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>

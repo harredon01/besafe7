@@ -43,9 +43,9 @@ class PurchaseOrder extends Mailable
     public function build()
     {
         if($this->path){
-            return $this->markdown('emails.food.purchase-order')->attachFromStorageDisk('local', $this->path);
+            return $this->markdown(config("app.views").'.emails.food.purchase-order')->attachFromStorageDisk('local', $this->path);
         } else {
-            return $this->markdown('emails.food.purchase-order');
+            return $this->markdown(config("app.views").'.emails.food.purchase-order');
         }
         
     }

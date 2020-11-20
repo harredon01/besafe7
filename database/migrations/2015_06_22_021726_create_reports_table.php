@@ -21,7 +21,8 @@ class CreateReportsTable extends Migration {
             $table->boolean('private')->nullable();
             $table->boolean('anonymous')->nullable();
             $table->string('email')->nullable();
-            $table->string('hash')->nullable();
+            $table->string('slug')->nullable();
+            $table->index('slug');
             $table->string('telephone')->nullable();
             $table->string('address');
             $table->text('description')->nullable();
@@ -47,6 +48,7 @@ class CreateReportsTable extends Migration {
             $table->string('plan')->nullable();
             $table->timestamps();
         });
+        DB::statement('ALTER TABLE reports ADD FULLTEXT fulltext_index_report (name, type, email,description,attributes)');
     }
 
     /**

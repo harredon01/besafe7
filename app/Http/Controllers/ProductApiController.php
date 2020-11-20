@@ -129,6 +129,16 @@ class ProductApiController extends Controller {
         $user = $request->user();
         return response()->json($this->shareObject->getObjectHash($user, $productId, self::OBJECT_PRODUCT));
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function textSearch(Request $request) {
+        $data = $request->all();
+        $results = $this->editProduct->textSearch($data);
+        return response()->json($results);
+    }
 
     /**
      * Display the specified resource.

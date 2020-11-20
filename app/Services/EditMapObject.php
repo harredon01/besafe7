@@ -34,6 +34,7 @@ class EditMapObject {
     const GROUP_MERCHANT_TABLE = 'group_merchant';
     const GROUP_REPORT_TABLE = 'group_report';
     const CONTACT_BLOCKED = 'contact_blocked';
+    const OBJECT_PAGESIZE = 50;
 
     /**
      * The EditAlert implementation.
@@ -95,6 +96,31 @@ class EditMapObject {
                         . "SELECT * FROM categories WHERE id IN ( SELECT DISTINCT(category_id)"
                         . " from categorizable where categorizable_type='App//Models//Product') and name like '%:name%' limit 15"
                         . "", ['name' => $type]);
+        //DB::enableQueryLog();
+        //dd(DB::getQueryLog());
+        return ['status' => "success", "data" => $categories];
+    }
+    public function getActiveCategoriesMerchant($id) {
+        //DB::enableQueryLog();
+        $categories = DB::select(" "
+                        . "SELECT 
+    c.*, COUNT(categorizable_id) AS tots
+FROM
+    categorizables ca
+        JOIN
+    categories c ON c.id = ca.category_id
+WHERE
+    categorizable_type = 'App\\\Models\\\Product'
+        AND categorizable_id IN (SELECT 
+            product_id
+        FROM
+            merchant_product mp
+                JOIN
+            products p ON mp.product_id = p.id
+        WHERE
+            merchant_id = :merchant_id AND p.isActive = TRUE)
+GROUP BY category_id"
+                        . "", ['merchant_id' => $id]);
         //DB::enableQueryLog();
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
@@ -421,7 +447,157 @@ class EditMapObject {
         $reports = $this->getNearbyObjects($data);
         return array("merchants" => $merchants['data'], "reports" => $reports['data']);
     }
+    public function textSearchMerchant($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        if (isset($data['lat'])) {
+            $query = Merchant::search($data['q'])->whereIn('merchants.id', function($query) use($data) {
+                        if (isset($data['lat'])) {
+                            $point = 'POINT(' . $data['long'] . ' ' . $data['lat'] . ')';
+                            $query->select('merchant_id')
+                                    ->from('coverage_polygons')
+                                    ->whereRaw('ST_Contains( geometry , ST_GeomFromText(?))', [$point]);
+                        }
+                        //$query->select('merchants.id');
+                    })->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        } else {
+            $query = Merchant::search($data['q'])->where('private', false)->whereIn('status', ['active', 'online', 'busy']);
+        }
 
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'merchants.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Merchant");
+        }
+        $countQuery = $query;
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $merchants = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $merchants;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return $results;
+    }
+    
+    public function textSearchReport($data) {
+        if (!isset($data['q'])) {
+            $data['q'] = "";
+        }
+        $query = Report::search($data['q']);
+
+        if (isset($data['categories'])) {
+            $categories = explode(",", $data['categories']);
+            $query->leftJoin('categorizables', 'reports.id', '=', 'categorizables.categorizable_id')
+                    ->whereIn('categorizables.category_id', $categories)
+                    ->where('categorizables.categorizable_type', "App\\Models\\Report");
+        }
+        $countQuery = $query;
+        $pageRes = $this->paginateQueryFromArray($query, $data);
+        $query = $pageRes['query'];
+        $reports = $query->get();
+        $total = $countQuery->count();
+        $results['category'] = null;
+        $results['data'] = $reports;
+        $results['page'] = $pageRes['page'];
+        $results['last_page'] = ceil($total / $pageRes['per_page']);
+        $results['per_page'] = $pageRes['per_page'];
+        $results['total'] = $total;
+        return $results;
+    }
+    
+    public function paginateQueryFromArray($query,$data){
+        $page = null;
+        if (array_key_exists("page", $data)) {
+            if ($data['page']) {
+                $page = $data['page'];
+            }
+        }
+        $per_page = null;
+        if (array_key_exists("per_page", $data)) {
+            if ($data['per_page']) {
+                $per_page = $data['per_page'];
+            }
+        }
+
+        if ($per_page) {
+            $query->take($per_page);
+        } else {
+            $per_page = self::OBJECT_PAGESIZE;
+            $query->take(self::OBJECT_PAGESIZE);
+        }
+        if ($page) {
+            $skip = null;
+            if ($per_page) {
+                $skip = ($page - 1 ) * ($per_page);
+            } else {
+                $skip = ($page - 1 ) * (self::OBJECT_PAGESIZE);
+            }
+            $query->skip($skip);
+        } else {
+            $page = 1;
+        }
+        return ["query"=>$query,"page"=>$page,"per_page"=>$per_page];
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function buildCoverageQuery(array $data) {
+        $lat = $data['lat'];
+        $long = $data['long'];
+        $category = false;
+        $per_page = 25;
+        $page = 1;
+        if (array_key_exists("category", $data)) {
+            if ($data["category"]) {
+                $category = true;
+            }
+        }
+        if (array_key_exists("page", $data)) {
+            if ($data["page"]) {
+                $page = $data["page"];
+            }
+        }
+        if (array_key_exists("per_page", $data)) {
+            if ($data["per_page"]) {
+                $per_page = $data["per_page"];
+            }
+        }
+        $offset = ($page-1)*$per_page;
+
+        $thedata = [
+            'point' => 'POINT(' . $long . ' ' . $lat . ')',
+            'limit' => $per_page
+        ];
+        $additionalQuery = '';
+        if ($category) {
+            $thedata["category"] = $data["category"];
+            $additionalQuery = ' AND id in (SELECT categorizable_id FROM categorizables where category_id in (:category) and categorizable_type = "App\\\Models\\\Merchant") ';
+        }
+//        DB::enableQueryLog();
+        $merchants = DB::select(" "
+                        . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
+                ." where private = 0 AND status in ('online','active','busy') AND "
+                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
+                        . $additionalQuery
+                        . " LIMIT ".$offset.", :limit", $thedata);
+        unset($thedata['limit']);
+        $merchantsCount = DB::select(" "
+                        . "SELECT COUNT(merchants.id) as total FROM merchants "
+                ." where private = 0 AND status in ('online','active','busy') AND "
+                . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
+                        . $additionalQuery, $thedata);
+        return array("data" => $merchants,"page"=>$page,"per_page"=>$per_page,"total"=>$merchantsCount[0]->total,"last_page"=>ceil($merchantsCount[0]->total/$per_page));
+    }
+    
     public function getRelation(array $parentIds, $object, $idColumn) {
 //DB::enableQueryLog();
         $results = DB::table($object)
@@ -474,12 +650,25 @@ class EditMapObject {
             }
         } else if ($data['type'] == "Report") {
             $type = "reports";
-            $additionalFields = " type, telephone, address, report_time, ";
+            $additionalFields = " type, telephone, address, report_time,attributes,rating,rating_count, ";
             if ($category) {
                 $joins = " join categorizables cr on r.id = cr.categorizable_id ";
                 $joinsWhere = " AND cr.category_id in (:category) AND cr.categorizable_type = 'App\\\Models\\\Report' ";
             }
         }
+        $page = 1;
+        if (array_key_exists("page", $data)) {
+            if ($data["page"]) {
+                $page = $data["page"];
+            }
+        }
+        $per_page = 25;
+        if (array_key_exists("per_page", $data)) {
+            if ($data["per_page"]) {
+                $per_page = $data["per_page"];
+            }
+        }
+        $offset = ($page-1)*$per_page;
 
         $maxLat = $lat + rad2deg($radius / $R);
         $minLat = $lat - rad2deg($radius / $R);
@@ -494,12 +683,13 @@ class EditMapObject {
             'longinf' => $minLon,
             'longsup' => $maxLon,
             'radius' => $radius,
+            'limit' => $per_page
         ];
         if ($category) {
             $thedata["category"] = $data["category"];
         }
         $reports = DB::select(" "
-                        . "SELECT r.id, name, description, icon, lat,`long`, " . $additionalFields . " 
+                        . "SELECT r.id, name, description, icon, lat,`long`,slug, " . $additionalFields . " 
 			( 6371 * acos( cos( radians( :lat ) ) *
 		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
 		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
@@ -512,9 +702,25 @@ class EditMapObject {
                             AND `long` BETWEEN :longinf AND :longsup
                             " . $joinsWhere . "
                     HAVING distance < :radius
-                    order by distance asc limit 20 "
-                        . "", $thedata);
-        return array("data" => $reports);
+                    order by distance asc "
+                 . " LIMIT ".$offset.", :limit", $thedata);
+        unset($thedata['limit']);
+        $reportsCount = DB::select(" "
+                        . "SELECT count(r.id) as total,
+			( 6371 * acos( cos( radians( :lat ) ) *
+		         cos( radians( r.lat ) ) * cos( radians(  `long` ) - radians( :long ) ) +
+		   sin( radians( :lat2 ) ) * sin( radians(  r.lat  ) ) ) ) AS Distance  
+                   FROM
+                    " . $type . " r " . $joins . "
+                    WHERE
+                        status in ('active','online','busy')
+                            AND r.private = 0
+                            AND lat BETWEEN :latinf AND :latsup
+                            AND `long` BETWEEN :longinf AND :longsup
+                            " . $joinsWhere . "
+                    HAVING distance < :radius ", $thedata);
+        unset($thedata['limit']);
+        return array("data" => $reports,"page"=>$page,"per_page"=>$per_page,"total"=>$reportsCount[0]->total,"last_page"=>ceil($reportsCount[0]->total/$per_page));
     }
 
     function buildIncludes($merchants, $data) {
@@ -727,7 +933,8 @@ class EditMapObject {
         $attributes['booking_requires_auth'] = false;
         $attributes['years_experience'] = 1;
         $attributes['max_per_hour'] = 1;
-        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider', 'type_pet','google_calendar'];
+        $fields2 = ['booking_requires_auth', 'years_experience', 'max_per_hour', 'virtual_meeting', 'virtual_provider',
+            'type_pet', 'google_calendar', 'store_active', 'booking_active', 'has_store'];
         foreach ($fields2 as $value) {
             if (array_key_exists($value, $data)) {
                 if ($data[$value]) {
@@ -785,12 +992,12 @@ class EditMapObject {
         if ($type == self::OBJECT_MERCHANT) {
             $validator = $this->validatorMerchant($data);
             if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                return array("status" => "error", "message" => $validator->getMessageBag());
             }
         } else if ($type == self::OBJECT_REPORT) {
             $validator = $this->validatorReport($data);
             if ($validator->fails()) {
-                return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+                return array("status" => "error", "message" => $validator->getMessageBag());
             }
         }
         $object = $this->createObject($user, $data, $type);
@@ -885,7 +1092,6 @@ class EditMapObject {
      */
     public function createObject(User $user, array $data, $type) {
         $object = "App\\Models\\" . $type;
-
 
         $result = $object::create($data);
         if ($type == "Merchant") {

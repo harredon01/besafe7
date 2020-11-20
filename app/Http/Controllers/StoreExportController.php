@@ -41,7 +41,7 @@ class StoreExportController extends Controller {
      * @return Response
      */
     public function getImport() {
-        return view('store.import');
+        return view(config("app.views").'.store.import');
     }
     /**
      * Show the application dashboard to the user.
@@ -49,7 +49,7 @@ class StoreExportController extends Controller {
      * @return Response
      */
     public function getExport() {
-        return view('store.import');
+        return view(config("app.views").'.store.import');
     }
     /**
      * Show the application dashboard to the user.
@@ -63,7 +63,7 @@ class StoreExportController extends Controller {
 //            dispatch(new StoreImport($user,$path,true));
             $this->store->importGlobalExcel($user,request()->file('uploadfile'),false);
         }
-        return view('store.import')->with('user', $user);
+        return view(config("app.views").'.store.import')->with('user', $user);
     }
 
 }

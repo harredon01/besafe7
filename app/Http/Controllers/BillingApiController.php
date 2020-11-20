@@ -43,7 +43,7 @@ class BillingApiController extends Controller {
      */
     public function getSources() {
         $user = $this->auth->user();
-        return view('billing.sources')->with('user', $user);
+        return view(config("app.views").'.billing.sources')->with('user', $user);
     }
 
     /**
@@ -64,7 +64,7 @@ class BillingApiController extends Controller {
      */
     public function getSubscriptions() {
         $user = $this->auth->user();
-        return view('billing.subscriptions')->with('user', $user);
+        return view(config("app.views").'.billing.subscriptions')->with('user', $user);
     }
 
     /**
@@ -76,7 +76,7 @@ class BillingApiController extends Controller {
         $user = $this->auth->user();
         $user->sources;
         $plans = $this->editBilling->getPlans();
-        return view('billing.plans')->with('user', $user)->with('plans', $plans);
+        return view(config("app.views").'.billing.plans')->with('user', $user)->with('plans', $plans);
     }
 
     /**

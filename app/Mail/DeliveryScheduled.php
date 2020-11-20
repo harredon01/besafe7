@@ -35,6 +35,6 @@ class DeliveryScheduled extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.delivery-scheduled');
+        return $this->markdown(config("app.views").'.emails.food.delivery-scheduled');
     }
 }

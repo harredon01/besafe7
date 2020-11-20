@@ -30,6 +30,6 @@ class NewsletterPadre extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-referidos');
+        return $this->view(config("app.views").'.emails.food.newsletter-referidos');
     }
 }

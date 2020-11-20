@@ -17,7 +17,8 @@ class CreateProductsTable extends Migration {
 			$table->increments('id');
                         $table->string('name');
                         $table->text('description');
-                        $table->string('hash');
+                        $table->string('slug');
+                        $table->index('slug');
                         $table->double('high', 15, 2); 
                         $table->double('low', 15, 2);
                         $table->boolean('isActive');
@@ -26,6 +27,7 @@ class CreateProductsTable extends Migration {
                                 ->on('users');
 			$table->timestamps();
 		});
+                DB::statement('ALTER TABLE products ADD FULLTEXT fulltext_index (name, description)');
 	}
 
 	/**

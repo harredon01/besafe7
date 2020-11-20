@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="besafe">
+<html lang="en" ng-app="besafe" ng-strict-di>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,23 +10,30 @@
         <!-- Styles -->
         <link href="/css/app.css" rel="stylesheet">
         <link href="/css/style.css" rel="stylesheet">
-
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
         <!-- Scripts -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
         
         <script src="/js/app.js"></script>
+        
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js"></script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
+        <!--script src="/js/all.js"></script-->
         <script src="{{ asset('/js/app_1.js')}}"></script>
         <script src="{{ asset('/js/constants.js')}}"></script>
         <script src="{{ asset('/js/controllers/userctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/mapctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/mapdashctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/productctrl.js')}}"></script>
+        <script src="{{ asset('/js/controllers/cartctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/checkoutctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/accessctrl.js')}}"></script>
         <script src="{{ asset('/js/controllers/sourcesctrl.js')}}"></script>
@@ -55,6 +62,8 @@
         <script src="{{ asset('/js/services/products.js')}}"></script>
         <script src="{{ asset('/js/services/checkout.js')}}"></script>
         <script src="{{ asset('/js/services/payu.js')}}"></script>
+        <script src="{{ asset('/js/services/cart.js')}}"></script>
+        <script src="{{ asset('/js/services/modals.js')}}"></script>
         <script src="{{ asset('/js/services/billing.js')}}"></script>
         <script src="{{ asset('/js/services/passport.js')}}"></script>
         <script src="{{ asset('/js/services/groups.js')}}"></script>
@@ -73,7 +82,6 @@
   
     </head>
     <body>
-        <div class="preloader">Cargando</div>
         <div id="app">
             <nav class="navbar navbar-default navbar-static-top">
                 <div class="container">

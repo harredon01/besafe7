@@ -167,35 +167,6 @@ class ShareObject {
      *
      * @return Location
      */
-    public function getObjectHash(User $user, $id, $type) {
-        $type = "App\\Models\\" . $type;
-        if (class_exists($type)) {
-            $object = $type::find($id);
-            if ($object) {
-                if ($object->user_id == $user->id || !$object->private) {
-                    if ($object->hash) {
-                        return ['status' => 'success', "hash" => $object->hash];
-                    }
-                    $hashExists = true;
-                    while ($hashExists) {
-                        $hash = str_random(40);
-                        $objects = $type::where("hash", $hash)->first();
-                        if ($objects) {
-                            $hashExists = true;
-                        } else {
-                            $hashExists = false;
-                            $object->hash = $hash;
-                            $object->save();
-                            return ['status' => 'success', "hash" => $hash];
-                        }
-                    }
-                }
-                return ['status' => 'error', "message" => "report does not belong to user"];
-            }
-            return ['status' => 'error', "message" => "report id invalid"];
-        }
-        return ['status' => 'error', "message" => "type not supported"];
-    }
 
     public function notifyObjectFollowers(User $user, array $followers, $object, $type, $triggerName, $date) {
         $daobject = array(

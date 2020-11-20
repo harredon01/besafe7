@@ -36,7 +36,7 @@ class ProofhubResults extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.general-notification')->subject("Reports gestion")
+        return $this->markdown(config("app.views").'.emails.general-notification')->subject("Reports gestion")
         ->attachFromStorageDisk('local', $this->path);
     }
 }

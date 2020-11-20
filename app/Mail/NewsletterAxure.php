@@ -30,6 +30,6 @@ class NewsletterAxure extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-axure')->subject("Los mejores platos del 2 al 6 de septiembre!");
+        return $this->view(config("app.views").'.emails.food.newsletter-axure')->subject("Los mejores platos del 2 al 6 de septiembre!");
     }
 }

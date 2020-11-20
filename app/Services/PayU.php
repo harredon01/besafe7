@@ -268,7 +268,7 @@ class PayU {
 
     private function getTestVar(User $user) {
         if ($user->id == 2 || $user->id == 1 || $user->id == 3 || $user->id == 77) {
-            return "true";
+            return true;
         } else {
             return false;
         }
@@ -353,20 +353,20 @@ class PayU {
     public function payCreditCard(User $user, array $data, Payment $payment, $platform) {
         $validator = $this->validatorPayment($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
 
         $validator = $this->validatorBuyer($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $validator = $this->validatorPayer($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $validator = $this->validatorCC($data);
         if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
+            return array("status" => "error", "message" => $validator->getMessageBag());
         }
         $user = $this->checkUserId($user,$data);
         $buyer = $this->populateBuyer($user, $data);
@@ -1411,7 +1411,7 @@ class PayU {
                 } else {
                     dispatch(new DenyPayment($payment, $platform));
                 }
-                $transaction->ur = $this->getTestUrl($user);
+                $transaction->url = $this->getTestUrl($user);
                 return ["status" => "success", "transaction" => $transaction, "response" => $response, "message" => $transactionResponse['responseCode']];
             }
         }

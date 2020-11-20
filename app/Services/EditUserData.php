@@ -201,9 +201,9 @@ class EditUserData {
                 }
             }
         }
-        if ($data['cellphone'] && $data['area_code']) {
+        if ($data['cellphone']) {
             if ($user->cellphone != $data['cellphone']) {
-                $finduser = User::where('cellphone', '=', $data['cellphone'])->where('area_code', '=', $data['area_code'])->first();
+                $finduser = User::where('cellphone', '=', $data['cellphone'])->first();
                 if ($finduser && $finduser->id != $user->id) {
                     return array("status" => "error", "message" => "Celphone already registered");
                 }

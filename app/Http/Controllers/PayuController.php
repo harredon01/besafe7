@@ -120,7 +120,7 @@ class PayuController extends Controller {
 
     public function returnPayU(Request $request) {
         $data = $this->payU->returnPayu($request->all());
-        return view('billing.PayU.return', $data);
+        return view(config("app.views").'.billing.PayU.return', $data);
     }
 
 }

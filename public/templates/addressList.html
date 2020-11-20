@@ -1,0 +1,29 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Tus direcciones</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    X
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <ul>
+                    <li id="address-{{ address.id}}" ng-repeat="address in addresses">
+                        Direccion: <span class="type">{{ address.address}}</span>
+                        <br/><span class="postal">{{ address.postal}}</span>
+                        <br/><span class="name">{{ address.city}}</span>
+                        <br/><span class="firstName">{{ address.name}}</span>, 
+                        <br/><span class="phone">{{ address.phone}}</span>, 
+                        <br/><a href="javascript:;" ng-click="selectAddress(address)" class="editar">Usar</a>
+                    </li>
+
+                </ul>
+            </div>
+        </md-dialog-content>
+    </form>
+</md-dialog>
