@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use Mail;
-
+use Illuminate\Http\Request;
 class WelcomeController extends Controller {
     /*
       |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ class WelcomeController extends Controller {
      * @return Response
      */
     public function index() {
-        return view('welcome');
+        return view(config("app.views").'.welcome');
     }
 
     /**
@@ -42,6 +42,35 @@ class WelcomeController extends Controller {
             $message->from('noreply@hoovert.com', 'Hoove');
             $message->to('harredon01@gmail.com', 'Hoovert Arredondo')->subject('Exitoo!');
         });
+    }
+    
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getBlogList(Request $request)
+    {
+        return view(config("app.views").'.blog');
+    }
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getBlogDetail(Request $request, $category)
+    {
+        return view(config("app.views").'.blog-detail');
+    }
+    
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getContact(Request $request)
+    {
+        return view(config("app.views").'.leads.leads');
     }
 
 }

@@ -3,16 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\CleanSearch;
 use App\Services\EditMapObject;
-use App\Querybuilders\ReportQueryBuilder;
-use App\Querybuilders\LocationQueryBuilder;
 use App\Models\User;
-use App\Models\Report;
-use App\Models\Userable;
-use App\Models\Location;
 use Illuminate\Http\Response;
-use Illuminate\Http\Request;
 
 class MapExternalController extends Controller {
     /*
@@ -29,11 +22,6 @@ class MapExternalController extends Controller {
     const OBJECT_MERCHANT = 'Merchant';
 
     
-    /**
-     * The edit profile implementation.
-     *
-     */
-    protected $cleanSearch;
     
     /**
      * The edit profile implementation.
@@ -47,10 +35,9 @@ class MapExternalController extends Controller {
      *
      * @return void
      */
-    public function __construct(CleanSearch $cleanSearch, EditMapObject $editMapObject) {
-        $this->cleanSearch = $cleanSearch;
+    public function __construct(EditMapObject $editMapObject) {
         $this->editMapObject = $editMapObject;
-        $this->middleware('guest');
+        //$this->middleware('guest');
     }
 
     /**
@@ -60,7 +47,15 @@ class MapExternalController extends Controller {
      */
     public function index($code = null) {
         $user = User::where('hash',$code)->first();
-        return view('map')->with('following', $user);
+        return view(config("app.views").'.map')->with('following', $user);
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function location() {
+        return view(config("app.views").'.map');
     }
     
     /**
@@ -70,7 +65,7 @@ class MapExternalController extends Controller {
      */
     public function report($code = null) {
         $report = $this->editMapObject->getObjectByHash($code,self::OBJECT_REPORT);
-        return view('report')->with('report', $report['report'])->with('images', $report['files']);
+        return view(config("app.views").'.report')->with('report', $report['report'])->with('images', $report['files']);
     }
     
     /**
@@ -80,7 +75,7 @@ class MapExternalController extends Controller {
      */
     public function merchant($code = null) {
         $object = $this->editMapObject->getObjectByHash($code,self::OBJECT_MERCHANT);
-        return view('merchant')->with('merchant', $object['merchant'])->with('images', $object['files']);
+        return view(config("app.views").'.merchant')->with('merchant', $object['merchant'])->with('images', $object['files']);
     }
 
 }

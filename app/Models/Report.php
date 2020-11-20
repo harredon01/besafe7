@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Laravel\Scout\Searchable;
+use App\Traits\FullTextSearch;
 use Illuminate\Database\Eloquent\Model;
 use Cache;
 use DB;
@@ -12,7 +12,7 @@ use Grimzy\LaravelMysqlSpatial\Types\Point;
 
 class Report extends Model {
 
-    use Searchable;
+    use FullTextSearch;
     use SpatialTrait;
 
     /**
@@ -28,6 +28,13 @@ class Report extends Model {
     protected $casts = [
         'attributes' => 'array',
     ];
+    protected $searchable = [
+        'name',
+        'type',
+        'email',
+        'description',
+        'attributes'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -36,7 +43,6 @@ class Report extends Model {
      */
     protected $fillable = ['city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description','attributes',
         'icon', 'lat', 'long', 'minimum', 'status', "private", "anonymous", "object", 'report_time', 'ends_at','plan','rating','rating_count'];
-    protected $hidden = ['user_id'];
     protected $dates = [
         'created_at',
         'updated_at',
@@ -68,9 +74,16 @@ class Report extends Model {
     public function country() {
         return $this->hasOne('App\Models\Country');
     }
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable', 'type', 'trigger_id', 'id');
+    }
+    
+    public function ratings() {
+        return $this->morphMany('App\Models\Rating', 'rateable', 'type', 'object_id', 'id');
+    }
 
     public function categories() {
-        return $this->belongsToMany('App\Models\Category')->withTimestamps();
+        return $this->morphToMany('App\Models\Category', 'categorizable')->withTimestamps();
     }
 
     public function groups() {

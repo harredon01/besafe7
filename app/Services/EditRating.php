@@ -42,7 +42,7 @@ class EditRating {
                 $result = Rating::create([
                             'user_id' => $user->id,
                             'rating' => $data['rating'],
-                            'type' => $type,
+                            'type' => $class,
                             'object_id' => $object->id,
                             'pseudonim' => $data['pseudonim'],
                             'comment' => $data['comment'],

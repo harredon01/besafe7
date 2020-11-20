@@ -250,7 +250,7 @@ class EditDelivery {
         } else {
             return array("status" => "error", "message" => "No se puede programar esa entrega");
         }
-        //return array("status" => "success", "message" => "Delivery in limit");
+        return array("status" => "success", "message" => "Delivery in limit");
         $date = date_create();
         $now = date_format($date, "Y-m-d H:i:s");
         $datetimestampDelivery = strtotime($delivery->delivery);

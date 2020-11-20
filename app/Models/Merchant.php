@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Rinvex\Bookings\Traits\Bookable;
-use Laravel\Scout\Searchable;
+use App\Traits\FullTextSearch;
 use Illuminate\Support\Facades\Storage;
 use App\Models\FileM;
 use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
@@ -19,7 +19,7 @@ use DB;
 class Merchant extends Model {
 
     use Bookable;
-    use Searchable;
+    use FullTextSearch;
     use SpatialTrait;
 
     /**
@@ -37,7 +37,8 @@ class Merchant extends Model {
      *
      * @var array
      */
-    protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 'address', 'description', 'attributes',
+    protected $fillable = ['merchant_id', 'city_id', 'region_id', 'country_id', 'name', 'type', 'email', 'telephone', 
+        'address', 'description', 'attributes','facebook','instagram','twitter',
         'icon', 'lat', 'long', 'minimum', 'delivery_time', 'delivery_price', 'status', 'private', 'ends_at', 'plan', 'url', 'rating', 'rating_count', 'unit_cost', 'base_cost', 'unit', 'currency'];
     protected $dates = [
         'created_at',
@@ -46,6 +47,13 @@ class Merchant extends Model {
     ];
     protected $casts = [
         'attributes' => 'array',
+    ];
+    protected $searchable = [
+        'name',
+        'type',
+        'email',
+        'description',
+        'attributes'
     ];
 
     public function isActive() {
@@ -62,6 +70,14 @@ class Merchant extends Model {
 
     public function availabilities2() {
         return $this->morphMany('App\Models\Availability', 'available', 'bookable_type', 'bookable_id', 'id');
+    }
+    
+    public function files() {
+        return $this->morphMany('App\Models\FileM', 'fileable', 'type', 'trigger_id', 'id');
+    }
+    
+    public function ratings() {
+        return $this->morphMany('App\Models\Rating', 'rateable', 'type', 'object_id', 'id');
     }
 
     public function hours() {
@@ -107,7 +123,7 @@ class Merchant extends Model {
         return $this->morphToMany('App\Models\Report', 'reportable')->withTimestamps();
     }
 
-    public function paymentMethods() {
+    public function paymentMethods() { 
         return $this->belongsToMany('App\Models\PaymentMethod', 'merchant_payment_methods', 'merchant_id', 'payment_method_id')->withTimestamps();
     }
 

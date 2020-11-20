@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\FileM;
+use DB;
 class ProductVariant extends Model {
 
 	/**
@@ -42,11 +43,11 @@ class ProductVariant extends Model {
     }
     
     public function getCartImg() {
-        $file = FileM::where("type","Variant")->where("trigger_id", $this->id)->first();
+        $file = FileM::where("type","App\\Models\\Variant")->where("trigger_id", $this->id)->first();
         if($file){
             return $file;
         }
-        $file = FileM::where("type","Product")->where("trigger_id", $this->product_id)->first();
+        $file = FileM::where("type","App\\Models\\Product")->where("trigger_id", $this->product_id)->first();
         if($file){
             return $file;
         }
@@ -62,6 +63,11 @@ class ProductVariant extends Model {
         static::saved(function ($variant) {
             $product = $variant->product;
             $saveProduct = false;
+            $actives = DB::table('product_variant')->where('product_id', $product->id)->where('isActive', true)->count();
+            if($actives == 0 ){
+                $product->isActive = false;
+                $saveProduct = true;
+            }
             if($variant->price > $product->high){
                 $product->high = $variant->price;
                 $saveProduct = true;

@@ -49,6 +49,6 @@ class ScenarioSelect extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.scenario-select');
+        return $this->markdown(config("app.views").'.emails.food.scenario-select');
     }
 }

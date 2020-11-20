@@ -49,7 +49,7 @@ class LocationController extends Controller {
         $this->editLocation = $editLocation;
         $this->cleanSearch = $cleanSearch; 
         $this->auth = $auth;
-        $this->middleware('auth:api', ['except' => ['moveHistoricLocations', 'moveOldLocations','getCountries2']]);
+        $this->middleware('auth:api', ['except' => ['moveHistoricLocations', 'moveOldLocations','getCountries2','getCities']]);
     }
 
     /**

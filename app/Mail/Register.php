@@ -31,6 +31,6 @@ class Register extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.food.newsletter-info')->subject("Bienvenido a Lonchis. te enviamos unos datos importantes");
+        return $this->view(config("app.views").'.emails.food.newsletter-info')->subject("Bienvenido a Lonchis. te enviamos unos datos importantes");
     }
 }

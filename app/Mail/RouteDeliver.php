@@ -43,6 +43,6 @@ class RouteDeliver extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.transport-distribution')->attachFromStorageDisk('local', $this->attachment);
+        return $this->markdown(config("app.views").'.emails.food.transport-distribution')->attachFromStorageDisk('local', $this->attachment);
     }
 }

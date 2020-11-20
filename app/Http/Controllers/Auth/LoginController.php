@@ -43,4 +43,4 @@ use AuthenticatesUsers;
         //$this->editCart->loadActiveCart($user);
     }
 
-}
+    }

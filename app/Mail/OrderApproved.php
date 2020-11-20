@@ -103,7 +103,7 @@ class OrderApproved extends Mailable {
      * @return $this
      */
     public function build() {
-        return $this->markdown('emails.orders.approved');
+        return $this->markdown(config("app.views").'.emails.orders.approved');
     }
 
 }

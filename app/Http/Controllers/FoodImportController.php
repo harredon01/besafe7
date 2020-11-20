@@ -39,7 +39,7 @@ class FoodImportController extends Controller {
      * @return Response
      */
     public function getMessages() {
-        return view('food.messages');
+        return view(config("app.views").'.food.messages');
     }
     /**
      * Show the application dashboard to the user.
@@ -47,7 +47,7 @@ class FoodImportController extends Controller {
      * @return Response
      */
     public function getDeliveries() {
-        return view('food.deliveriesDashboard');
+        return view(config("app.views").'.food.deliveriesDashboard');
     }
 
     /**
@@ -65,7 +65,7 @@ class FoodImportController extends Controller {
             }
         }
 
-        return view('food.messages')->with('user', $user);
+        return view(config("app.views").'.food.messages')->with('user', $user);
     }
 
     /**
@@ -75,7 +75,7 @@ class FoodImportController extends Controller {
      */
     public function getMenu() {
         $user = $this->auth->user();
-        return view('food.menu')->with('user', $user);
+        return view(config("app.views").'.food.menu')->with('user', $user);
     }
 
     /**
@@ -89,7 +89,7 @@ class FoodImportController extends Controller {
             //$path = $request->uploadfile->path();
             $this->food->importDishes(request()->file('uploadfile'));
         }
-        return view('food.menu')->with('user', $user);
+        return view(config("app.views").'.food.menu')->with('user', $user);
     }
     /**
      * Show the application dashboard to the user.
@@ -98,7 +98,7 @@ class FoodImportController extends Controller {
      */
     public function getContent() {
         $user = $this->auth->user();
-        return view('food.content')->with('user', $user);
+        return view(config("app.views").'.food.content')->with('user', $user);
     }
 
     /**
@@ -112,7 +112,7 @@ class FoodImportController extends Controller {
             $path = $request->uploadfile->path();
             $this->food->importContent($path);
         }
-        return view('food.content')->with('user', $user);
+        return view(config("app.views").'.food.content')->with('user', $user);
     }
 
     /**
@@ -121,7 +121,7 @@ class FoodImportController extends Controller {
      * @return Response
      */
     public function getZones() {
-        return view('food.zones');
+        return view(config("app.views").'.food.zones');
     }
     /**
      * Show the application dashboard to the user.
@@ -129,7 +129,7 @@ class FoodImportController extends Controller {
      * @return Response
      */
     public function getZonesPublic() {
-        return view('content.zonespublic');
+        return view(config("app.views").'.content.zonespublic');
     }
 
     /**
@@ -143,7 +143,7 @@ class FoodImportController extends Controller {
             $path = $request->uploadfile->path();
             $this->food->importPolygons($path);
         }
-        return view('food.zones')->with('user', $user);
+        return view(config("app.views").'.food.zones')->with('user', $user);
     }
 
 }

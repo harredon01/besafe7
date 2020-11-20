@@ -42,6 +42,6 @@ class StopFailed extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.food.stop-failed');
+        return $this->markdown(config("app.views").'.emails.food.stop-failed');
     }
 }

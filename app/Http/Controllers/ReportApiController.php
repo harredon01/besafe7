@@ -49,7 +49,7 @@ class ReportApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api')->except(['index', 'show', 'getObject']);;
+        $this->middleware('auth:api')->except(['index', 'show', 'getObject','textSearch']);;
     }
 
     /**
@@ -91,6 +91,15 @@ class ReportApiController extends Controller {
         $data = $request->all();
         $data['type']="Report";
         return response()->json($this->editMapObject->getNearbyObjects($data));
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function textSearch(Request $request) {
+        $data = $request->all();
+        return response()->json($this->editMapObject->textSearchReport($data));
     }
 
     /**
@@ -251,11 +260,6 @@ class ReportApiController extends Controller {
     public function approveReport($reportId, Request $request) {
         $user = $request->user();
         return response()->json($this->editMapObject->approveReport($user, $reportId));
-    }
-
-    public function getReportHash($reportId, Request $request) {
-        $user = $request->user();
-        return response()->json($this->shareObject->getObjectHash($user, $reportId, self::OBJECT_REPORT));
     }
 
 }

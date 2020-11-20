@@ -38,7 +38,7 @@ class BillingController extends Controller {
      */
     public function getSources() {
         $user = $this->auth->user();
-        return view('billing.sources')->with('user', $user);
+        return view(config("app.views").'.billing.sources')->with('user', $user);
     }
     
     /**
@@ -48,7 +48,7 @@ class BillingController extends Controller {
      */
     public function getSubscriptions() {
         $user = $this->auth->user();
-        return view('billing.subscriptions')->with('user',$user );
+        return view(config("app.views").'.billing.subscriptions')->with('user',$user );
     }
 
 
@@ -61,7 +61,7 @@ class BillingController extends Controller {
         $user = $this->auth->user();
 	$user->sources;
 	$plans = $this->editBilling->getPlans();
-        return view('billing.plans')->with('user',$user )->with('plans',$plans );
+        return view(config("app.views").'.billing.plans')->with('user',$user )->with('plans',$plans );
     }
     /**
      * Show the application dashboard to the user.
@@ -71,7 +71,18 @@ class BillingController extends Controller {
     public function getOrders() {
         $user = $this->auth->user();
 
-        return view('billing.orders.ordersDashboard')->with('user',$user );
+        return view(config("app.views").'.billing.orders.ordersDashboard')->with('user',$user );
+    }
+    
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPaymentsAdmin() {
+        $user = $this->auth->user();
+
+        return view(config("app.views").'.billing.payments.paymentsDashboard')->with('user',$user );
     }
     
     /**
@@ -82,7 +93,17 @@ class BillingController extends Controller {
     public function getPayments() {
         $user = $this->auth->user();
 
-        return view('billing.payments.paymentsDashboard')->with('user',$user );
+        return view(config("app.views").'.user.payments');
+    }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getPaymentDetail() {
+        $user = $this->auth->user();
+
+        return view(config("app.views").'.user.payment-detail');
     }
 
 }
