@@ -6,6 +6,7 @@ use App\Http\Requests;
 use App\Querybuilders\ProductQueryBuilder;
 use App\Http\Controllers\Controller;
 use App\Services\EditProduct;
+use App\Models\Favorite;
 use App\Services\ShareObject;
 use Illuminate\Http\Request;
 
@@ -129,6 +130,7 @@ class ProductApiController extends Controller {
         $user = $request->user();
         return response()->json($this->shareObject->getObjectHash($user, $productId, self::OBJECT_PRODUCT));
     }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -157,35 +159,78 @@ class ProductApiController extends Controller {
      * @param  int  $id
      * @return Response
      */
-    public function getProductsMerchantOld($merchant,$page, Request $request) {
+    public function getProductsMerchantOld($merchant, $page, Request $request) {
         $data = $request->all();
         $data['page'] = $page;
         $data['merchant_id'] = $merchant;
         $data['includes'] = 'categories,files,merchant';
         return response()->json($this->editProduct->getProductsMerchant($data));
     }
-    public function getProductsMerchant( Request $request) {
+
+    public function getProductsMerchant(Request $request) {
         return response()->json($this->editProduct->getProductsMerchant($request->all()));
     }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function getProductsPrivateMerchant($merchant,$page, Request $request) {
+    public function getProductsPrivateMerchant($merchant, $page, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->getProductsPrivateMerchant($user, $merchant,$page));
+        return response()->json($this->editProduct->getProductsPrivateMerchant($user, $merchant, $page));
     }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return Response
      */
-    public function getProductsGroup($group,$page, Request $request) {
+    public function getProductsGroup($group, $page, Request $request) {
         $user = $request->user();
-        return response()->json($this->editProduct->getProductsGroup($user, $group,$page));
+        return response()->json($this->editProduct->getProductsGroup($user, $group, $page));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function getFavoriteProducts(Request $request) {
+        $user = $request->user();
+        return response()->json($this->editProduct->getFavorites($user, $request->all()));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function checkFavoriteProducts(Request $request) {
+        $user = $request->user();
+        return response()->json($this->checkFavorites($user, $request->all()));
+    }
+
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    private function checkFavorites($user, array $data) {
+        $type = "Product";
+        $class = "App\\Models\\" . $type;
+        if (class_exists($class)) {
+            $results = Favorite::whereIn('favoritable_id', $data['product_ids'])->where([
+                        'user_id' => $user->id,
+                        'favoritable_type' => $class
+                    ])->select('favoritable_id')->get();
+            return ['status' => 'success', 'data' => $results];
+        }
+        return ['status' => 'error', 'message' => 'not_found'];
     }
 
     /**
@@ -229,7 +274,7 @@ class ProductApiController extends Controller {
         $data['id'] = $id;
         return response()->json($this->editProduct->createOrUpdateProduct($user, $data));
     }
-    
+
     /**
      * Update the specified resource in storage.
      *

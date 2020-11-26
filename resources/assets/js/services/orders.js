@@ -191,9 +191,25 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var getOrder = function () {
+                var def = $q.defer();
+                $http({
+                        method: 'GET',
+                        url: '/api/orders/active',
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                        .error(function () {
+                            def.reject("Failed to getOrder");
+                        });
+                return def.promise;
+                /**/
+            }
 
             return {
                 getOrders:getOrders,
+                getOrder:getOrder,
                 checkOrder:checkOrder,
                 approveOrder:approveOrder,
                 setShippingAddress:setShippingAddress,

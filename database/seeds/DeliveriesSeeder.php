@@ -3,6 +3,7 @@
 use Illuminate\Database\Seeder;
 use App\Services\MiPaquete;
 use App\Services\EditCategory;
+use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
 use App\Models\Order;
@@ -13,6 +14,7 @@ use App\Models\Route;
 use App\Models\OrderAddress;
 use App\Models\Address;
 use App\Jobs\CreateGoogleEvent;
+
 class DeliveriesSeeder extends Seeder {
 
     /**
@@ -34,17 +36,30 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $security;
 
-    public function __construct(EditCategory $security) {
+    public function __construct(Rapigo $security) {
         $this->security = $security;
     }
 
     public function run() {
         //dispatch(new CreateGoogleEvent(8));
-        dd($this->security->getCategoriesMenu());
+        $order = Order::find(11);
+        $destination = $order->orderAddresses()->where('type', "shipping")->first();
+        $attributes = json_decode($order->attributes, true);
+        $origin = Address::find($attributes['origin']);
+        if ($origin) {
+
+            $result = $this->security->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id' => 2]);
+            dd($result);
+            if ($result['status'] == 'success') {
+                return $result;
+            }
+            return array("status" => "error", "message" => "Shipping provider does not have coverage");
+        }
+        return array("status" => "error", "message" => "Order not found");
         return;
 //        $this->security->getCitiesAndRegions();
 //        return null;
-        $this->security->checkGoogleBookings(['from'=>"2020-10-08 08:00:00",'to'=>"2020-10-08 09:00:00"]);
+        $this->security->checkGoogleBookings(['from' => "2020-10-08 08:00:00", 'to' => "2020-10-08 09:00:00"]);
 //        $address1 = Address::find(1);
 //        $address2 = Address::find(2);
 //        dd($this->security->getOrderShippingPrice($address1->toArray(),$address2->toArray()));

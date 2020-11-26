@@ -624,6 +624,9 @@ class EditOrder {
                     $query->where('order_id', $order->id)
                             ->orWhereNull('order_id');
                 })->first();
+            if(!$item){
+                return array("status" => "error", "message" => "clear_cart");
+            }
             $attributes = json_decode($item->attributes, true);
             $data['merchant_id'] = $attributes['merchant_id'];
         }

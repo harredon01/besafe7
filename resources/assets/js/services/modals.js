@@ -103,6 +103,33 @@ angular.module('besafe')
                         clickOutsideToClose: true,
                     }
                 }
+                var getQuestionairePopup = function (questions) {
+                    return {
+                        controller: ['$scope', '$mdDialog', 'Merchants', '$rootScope', function ($scope, $mdDialog ) {
+                                $scope.questions = questions;
+
+                                $scope.hide = function () {
+                                    $mdDialog.hide();
+                                };
+
+                                $scope.cancel = function () {
+                                    $mdDialog.cancel();
+                                };
+                                $scope.checkValue = function (item) {
+                                    console.log("Checking: ",item);
+                                };
+
+                                $scope.save = function () {
+                                    $mdDialog.hide($scope.questions);
+                                };
+                            }],
+                        templateUrl: '/templates/questionaire.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                    }
+                }
 
                 var getLocationPrompt = function () {
                     return {
@@ -310,6 +337,7 @@ angular.module('besafe')
                     getLocationPrompt: getLocationPrompt,
                     getLocationExtPrompt: getLocationExtPrompt,
                     getMerchantsPopup: getMerchantsPopup,
+                    getQuestionairePopup:getQuestionairePopup,
                     showToast: showToast,
                     getAppPopup:getAppPopup,
                     showLoader: showLoader,

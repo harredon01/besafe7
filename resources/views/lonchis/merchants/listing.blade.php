@@ -17,7 +17,7 @@
                         <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
                             <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
 
-                                <span>Sort By:</span>
+                                <span style="display: none;">Sort By:</span>
                                 <select id="input-sort" class="form-control nice-select sort-select" style="display: none;">
                                     <option value="" selected="selected">Default Sorting</option>
                                     <option value="">Sort
@@ -131,7 +131,7 @@
                                     <a href="/a/merchant/{{$merchant['slug']}}/products" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                                     @endif
                                     <div class="btn-options">
-                                        <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
+                                        <a href="/a/merchant/{{$merchant['slug']}}">Detalle Negocio</a>
                                     </div>
                                 </div>
                             </div>
@@ -154,13 +154,22 @@
                     <div class="content">
                         <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
-                            <span>@{{ merchant.unit_cost | currency }}</span>
+                            <span>Costo promedio consulta: @{{ merchant.unit_cost | currency }}</span>
+                        </div>
+                        <div class="price" ng-if="merchant.Distance > 0">
+                            <span>Distancia: @{{ merchant.Distance | number }} km</span>
+                        </div>
+                        <div class="price" >
+                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
+                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
+                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
                         </div>
                         <div class="btn-block grid-btn">
                             <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
                         </div>
                         <div class="card-list-content ">
-                            <div class="rating-widget mt--20">
+                    
+                            <div class="rating-widget mt--20" ng-if="merchant.rating">
                                 <a href="#" class="single-rating" ng-repeat="n in [].constructor(5) track by $index">
                                     <i class="fas fa-star" ng-if="$index <= merchant.rating"></i>
                                     <i class="fas fa-star-half-alt" ng-if="$index > merchant.rating && ($index - 1) <= merchant.rating && $index < 5"></i>
@@ -175,7 +184,7 @@
                                 <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
 
                                 <div class="btn-options">
-                                    <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Agregar a Favoritos</a>
+                                    <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" >Detalle Negocio</a>
                                 </div>
                             </div>
                         </div>

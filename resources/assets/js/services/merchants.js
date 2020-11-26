@@ -22,6 +22,26 @@ angular.module('besafe')
                 return def.promise;
 
             }
+            var getMerchantsUser = function (where) {
+                let url = "/api/user/merchants";
+                if (where) {
+                    url = url + "?" + where;
+                }
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to get merchants");
+                        });
+                return def.promise;
+
+            }
             var getReports = function (where) {
                 let url = "/api/reports";
                 if (where) {
@@ -226,6 +246,7 @@ angular.module('besafe')
                 getMerchants: getMerchants,
                 getMerchantsNearby:getMerchantsNearby,
                 getReportsNearby:getReportsNearby,
+                getMerchantsUser:getMerchantsUser,
                 getReports:getReports,
                 getMerchantsCoverage: getMerchantsCoverage,
                 getMerchantsPrivate: getMerchantsPrivate,

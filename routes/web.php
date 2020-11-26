@@ -46,6 +46,7 @@ Route::get('user/editAddress', 'UserController@getEditAddress');
 Route::get('user/editAccess', 'UserController@access');
 Route::get('user/addresses', 'UserController@getAddresses');
 Route::get('user/payments', 'BillingController@getPayments');
+Route::get('user/merchants/orders', 'BillingController@getOrdersMerchant');
 Route::get('user/payments/{id?}', 'BillingController@getPaymentDetail');
 Route::get('login/facebook', 'SocialiteController@redirectToFacebook');
 Route::get('login/facebook/callback', 'SocialiteController@handleFacebookCallback');
@@ -228,7 +229,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Octubre", "Octubre");
+    return new App\Mail\NewsletterMenus($days, "Noviembre", "Noviembre");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();

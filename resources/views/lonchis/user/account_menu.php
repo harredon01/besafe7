@@ -13,6 +13,8 @@
         <a href="/user/editAddress"><i class="fa fa-map-marker"></i> Direcciones</a>
 
         <a href="/user/editProfile"><i class="fa fa-user"></i> Mi cuenta</a>
+        <a href="/user/merchants/orders" ng-if="hasMerchants"><i class="fa fa-user"></i> Mis Ordenes</a>
+        <a href="/admin/store/global" ng-if="hasMerchants"><i class="fa fa-user"></i> Contenido</a>
 
         <a href="/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt"></i> Logout</a>
 

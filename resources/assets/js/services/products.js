@@ -66,6 +66,63 @@ angular.module('besafe')
 
                     return def.promise;
                 };
+                var addFavorite = function (data) {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/favorites",
+                        data: data
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to addRating");
+                            });
+
+                    return def.promise;
+                };
+                var deleteFavorite = function (data) {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/favorites/delete",
+                        data: data
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to addRating");
+                            });
+
+                    return def.promise;
+                };
+                var checkFavorite = function (rating) {
+
+                    var def = $q.defer();
+
+                    $http({
+                        method: "post",
+                        url: "/api/products/favorites",
+                        data: rating
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to addRating");
+                            });
+
+                    return def.promise;
+                };
                 var getCart = function () {
                     var def = $q.defer();
                     $http({
@@ -309,6 +366,9 @@ angular.module('besafe')
                     getCheckoutCart: getCheckoutCart,
                     getCart: getCart,
                     addRating:addRating,
+                    deleteFavorite:deleteFavorite,
+                    checkFavorite:checkFavorite,
+                    addFavorite:addFavorite,
                     addCartItem: addCartItem,
                     updateCartItem: updateCartItem,
                     getProductsMerchant: getProductsMerchant,

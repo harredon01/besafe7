@@ -183,6 +183,9 @@ class EditCart {
     public function migrateCart($user, $device) {
         if ($device) {
             $items = Cart::session($device)->getContent();
+            if((!count($items)>0)){
+                return true;
+            }
             $data = array();
             $result = array();
             foreach ($items as $item) {

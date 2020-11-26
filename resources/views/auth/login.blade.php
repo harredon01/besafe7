@@ -55,13 +55,21 @@
                                 </button>
 
                                 <a class="btn btn-link" href="{{ url('/password/reset') }}">
-                                    Forgot Your Password?
+                                    Olvidaste tu clave?
+                                </a>
+                            </div>
+                            <br/>
+                            <div class="col-md-8 col-md-offset-4">
+
+                                <a class="btn btn-link" href="{{ url('/register') }}">
+                                    Registro tradicional
                                 </a>
                             </div>
 
                         </div>
                     </form>
                     <div class="col-md-8 col-md-offset-4">
+                        O ingresa seguro y olvidate de contraseñas con: <br/>
                         <button class="btn btn-primary" onclick="window.location.href='/login/facebook';" >
                             Login Facebook
                         </button>

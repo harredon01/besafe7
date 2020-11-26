@@ -69,21 +69,24 @@ class MerchantController extends Controller {
         $request2 = $this->cleanSearch->handleMerchantExternal($request);
         if ($request2) {
             $category = Category::where('url', $category)->first();
-            $request2 = Request::create($request2->getRequestUri() . "&category_id=" . $category->id, 'GET');
-            $queryBuilder = new MerchantQueryBuilder(new Merchant, $request2);
+            if ($category) {
+                $request2 = Request::create($request2->getRequestUri() . "&category_id=" . $category->id, 'GET');
+                $queryBuilder = new MerchantQueryBuilder(new Merchant, $request2);
 //            DB::enableQueryLog();
-            $result = $queryBuilder->build()->paginate();
+                $result = $queryBuilder->build()->paginate();
 //            dd(DB::getQueryLog());
-            $merchants = [
-                'data' => $result->items(),
-                "total" => $result->total(),
-                "per_page" => $result->perPage(),
-                "page" => $result->currentPage(),
-                "last_page" => $result->lastPage(),
-                "category" => $category
-            ];
+                $merchants = [
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+                    "category" => $category
+                ];
 //            dd($merchants['data'][0]->toArray());
-            return view(config("app.views") . '.merchants.listing', ["merchants" => $merchants]);
+                return view(config("app.views") . '.merchants.listing', ["merchants" => $merchants]);
+            }
+            abort(404);
         }
         $merchants = [
             'data' => [],
@@ -133,30 +136,31 @@ class MerchantController extends Controller {
      *
      * @return Response
      */
-    public function getNearbyMerchants(Request $request, $category) {
+    public function getNearbyMerchants(Request $request, $categoryS) {
         $data = $request->all();
-        $category = Category::where('url', $category)->first()->toArray();
-        $validator = $this->editMapObject->validatorLat($data);
-        if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
-        }
-        $data['category'] = $category['id'];
-        $data['type'] = "Merchant";
-        $results = $this->editMapObject->getNearbyObjects($data);
-        $merchants = $results['data'];
+        $category = Category::where('url', $categoryS)->first()->toArray();
+        if ($category) {
+            $validator = $this->editMapObject->validatorLat($data);
+            if ($validator->fails()) {
+                return $this->index($request, $categoryS);
+            }
+            $data['category'] = $category['id'];
+            $data['type'] = "Merchant";
+            $results = $this->editMapObject->getNearbyObjects($data);
+            $merchants = $results['data'];
 //        dd($merchants);
 //        dd(DB::getQueryLog());
-        $merchants = $this->editMapObject->buildIncludes($merchants, $data);
-        $merchants = array_map(function ($value) {
-            $value->attributes = json_decode($value->attributes);
-            return (array) $value;
-        }, $merchants);
-        $results['data'] = $merchants;
-        $results['category'] = $category;
+            $merchants = $this->editMapObject->buildIncludes($merchants, $data);
+            $merchants = array_map(function ($value) {
+                $value->attributes = json_decode($value->attributes);
+                return (array) $value;
+            }, $merchants);
+            $results['data'] = $merchants;
+            $results['category'] = $category;
 
-        return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
+            return view(config("app.views") . '.merchants.listing', ["merchants" => $results]);
+        }
+        abort(404);
     }
 
     /**
@@ -168,9 +172,7 @@ class MerchantController extends Controller {
         $data = $request->all();
         $validator = $this->editMapObject->validatorLat($data);
         if ($validator->fails()) {
-            $this->throwValidationException(
-                    $request, $validator
-            );
+            return $this->index($request, $category);
         }
         $category = Category::where('url', $category)->first()->toArray();
         if ($category) {

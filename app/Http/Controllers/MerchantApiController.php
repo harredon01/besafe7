@@ -50,7 +50,7 @@ class MerchantApiController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->cleanSearch = $cleanSearch;
         $this->shareObject = $shareObject;
-        $this->middleware('auth:api')->except(['index', 'show', 'getObject','textSearch']);
+        $this->middleware('auth:api')->except(['index', 'show', 'getObject','textSearch','getNearby','getNearbyMerchants','getCoverageMerchants']);
     }
 
     /**
@@ -77,6 +77,21 @@ class MerchantApiController extends Controller {
                     'status' => "error",
                     'message' => "illegal parameter"
                         ], 403);
+    }
+    
+    /**
+     * Show the application registration form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getUserMerchant(Request $request) {
+        $user = $request->user();
+        $query = " select id,name from merchants where id in (select merchant_id from merchant_user where user_id = $user->id)";
+        $objects = DB::select($query);
+        return array(
+            "status" => "success",
+            "message" => "",
+            "data" => $objects);
     }
 
     public function indexPrivate(Request $request) {

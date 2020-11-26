@@ -1,0 +1,54 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Datos adicionales</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    X
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <div ng-repeat="item in questions">
+                    <label ng-show="item.type == 'text' || item.type == 'num' || item.type == 'textarea'" position="floating">{{item.name}}</label><br ng-show="item.type == 'text' || item.type == 'num' || item.type == 'textarea'"/>
+                    <input ng-show="item.type == 'text'" type="text" ng-model="item.value" name="{{item.name}}"/>
+                    <input ng-show="item.type == 'num'" type="tel" ng-model="item.value" name="{{item.name}}"/>
+                    <textarea ng-show="item.type == 'textarea'" class="mb20" ng-model="item.value" name="{{item.name}}"></textarea>
+                    <div class="ion-text-wrap" ng-show="item.type == 'radio' || item.type == 'multiple' || item.type == 'date'"  >
+                        <div ng-show="item.type == 'radio'" ng-model="item.value" lines="none">
+                            <h4>{{item.name}}</h4>
+                            <div ng-repeat="question in item.values">
+                                <label>{{question.name}}</label>
+                                <input type="radio" ng-change="$parent.checkValue(item)" name="{{item.code}}" slot="start" ng-model="$parent.item.value" value="{{question.value}}"/>
+                            </div>
+                        </div>
+                        <div  ng-show="item.type == 'multiple'" lines="none">
+
+                            <h4>{{item.name}}</h4>
+
+                            <div ng-repeat="question in item.values">
+                                <label>{{question.name}}</label>
+                                <input type="checkbox" name="{{item.code}}" ng-model="question.value"/>
+                            </div>
+                        </div>
+                        <p ng-show="item.type == 'date'">{{item.name}}</p>
+                        <input type="tel" class='left date-input' name="{{item.code}}" style="width:50px" ng-show="item.type == 'date'" placeholder="{{item.values[0].name}}" (keyup)="keytab($event,2)" ng-model="item.values[0].value"/>
+                        <input type="tel" class='left date-input' name="{{item.code}}" style="width:50px" ng-show="item.type == 'date'" placeholder="{{item.values[1].name}}" (keyup)="keytab($event,2)" ng-model="item.values[1].value"/>
+                        <input type="tel" class='left date-input' name="{{item.code}}" style="width:50px" ng-show="item.type == 'date'" placeholder="{{item.values[2].name}}" ng-model="item.values[2].value"/>
+                        <div class="clear" ng-show="item.type == 'date'"></div>
+                    </div>
+
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button ng-click="save()">
+                Enviar
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

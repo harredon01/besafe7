@@ -145,6 +145,22 @@ class UserTableSeeder extends Seeder {
                 "object_id" => "1",
                 'credits' => 0,
                 'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 4,
+                'user_id' => 2,
+                'push' => "1",
+                'platform' => "Rapigo",
+                "object_id" => "1",
+                'credits' => 0,
+                'created_at' => '2020-09-15 12:57:53',
+                'updated_at' => '2020-09-15 12:57:53'],
+            ['id' => 5,
+                'user_id' => 2,
+                'push' => "1",
+                'platform' => "RapigoTest",
+                "object_id" => "1",
+                'credits' => 0,
+                'created_at' => '2020-09-15 12:57:53',
                 'updated_at' => '2020-09-15 12:57:53']
                 ]
         );

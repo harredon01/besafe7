@@ -14,6 +14,14 @@ angular.module('besafe')
 
                     });
                 };
+                var showQuestionaire = function (questions) {
+                    $mdDialog.show(Modals.getQuestionairePopup(questions)).then(function (answer) {
+                        console.log("questions", answer)
+
+                    }, function () {
+
+                    });
+                };
                 var showConfirmExt = function (url) {
                     $cookies.put("locationRefferrer", url, {path: "/"});
                     window.location.href = "/location";
@@ -37,7 +45,7 @@ angular.module('besafe')
                     if (category.includes("?")) {
                         category = category.split("?")[0];
                     }
-                    if(isNaN(category)){
+                    if (isNaN(category)) {
                         return null;
                     }
                     return category;
@@ -67,6 +75,12 @@ angular.module('besafe')
                         console.log("Got nothing");
                     });
                 };
+                var checkVariant = function (variant) {
+                    console.log("Variant", variant);
+                    if (variant.attributes.questions) {
+                        showQuestionaire(variant.attributes.questions)
+                    }
+                };
                 var showMerchants = function (category) {
                     $mdDialog.show(Modals.getMerchantsPopup(category)).then(function (merchant) {
                         console.log("Got merchant", merchant);
@@ -79,57 +93,93 @@ angular.module('besafe')
                         let first = true;
                         for (var k in params) {
                             if (params.hasOwnProperty(k)) {
-                                if(first){
-                                    theUrl = "?"+k+"="+params[k];
+                                if (first) {
+                                    theUrl = "?" + k + "=" + params[k];
                                 } else {
-                                    theUrl = "&"+k+"="+params[k];
+                                    theUrl = "&" + k + "=" + params[k];
                                 }
                             }
                         }
-                        
+
                         window.location.href = theUrl;
                     }, function () {
                         console.log("Got nothing");
                     });
+                };
+                var postToServer = function (postData) {
+                    console.log("Post to server", postData);
+                    var def = $q.defer();
+                    $http({
+                        method: "post",
+                        url: "/api/cart/add",
+                        data: postData
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to get nearby");
+                            });
+                    return def.promise;
                 };
 
                 var addCartItem = function (container, extras) {
                     console.log("Check variant: ", container);
                     let results = checkProduct(container);
                     container.merchant_id = $rootScope.merchant_id;
-                    if(!container.item_id){
+                    if (!container.item_id) {
                         container.item_id = null;
                     }
-                    console.log("Check variant result: ", results);
+                    let actvVariant = container.product.activeVariant;
                     var def = $q.defer();
                     if (!results) {
                         def.resolve({status: "pending_location", message: "msg"});
                     } else {
-                        $http({
-                            method: "post",
-                            url: "/api/cart/add",
-                            data: {
+                        if (actvVariant.attributes.questions) {
+                            $mdDialog.show(Modals.getQuestionairePopup(actvVariant.attributes.questions)).then(function (results) {
+                                let data = [];
+                                for (let i in results) {
+                                    let container = {
+                                        "name": results[i].name,
+                                        "value": results[i].value
+                                    }
+                                    data.push(container);
+                                }
+                                let postData = {
+                                    product_variant_id: container.id,
+                                    merchant_id: container.merchant_id,
+                                    quantity: container.quantity,
+                                    item_id: container.item_id,
+                                    extras: {data: data}
+                                };
+                                postToServer(postData).then(function (data) {
+                                    def.resolve(data);
+                                }, function () {
+                                    def.reject("Failed to get nearby");
+                                });
+                            }, function () {
+                                def.resolve({status: "pending_questions", message: "Debes completar estas preguntas para comprar este producto"});
+                            });
+                        } else {
+                            let postData = {
                                 product_variant_id: container.id,
                                 merchant_id: container.merchant_id,
                                 quantity: container.quantity,
-                                item_id:container.item_id,
+                                item_id: container.item_id,
                                 extras: extras
-                            }
-                        })
-                                .success(function (data) {
-                                    // console.log(data);
-                                    def.resolve(data);
-                                })
-                                .error(function () {
-                                    def.reject("Failed to get nearby");
-                                });
+                            };
+                            postToServer(postData).then(function (data) {
+                                def.resolve(data);
+                            }, function () {
+                                def.reject("Failed to postToServer");
+                            });
+                        }
                     }
                     return def.promise;
                 };
                 var updateCartItem = function (item_id, quantity) {
-
                     var def = $q.defer();
-
                     $http({
                         method: "post",
                         url: "/api/cart/update",
@@ -200,8 +250,8 @@ angular.module('besafe')
                     getCart: getCart,
                     addCartItem: addCartItem,
                     updateCartItem: updateCartItem,
-                    showConfirm:showConfirm,
-                    showConfirmExt:showConfirmExt,
+                    showConfirm: showConfirm,
+                    showConfirmExt: showConfirmExt,
                     clearCart: clearCart,
                     changeMerchant: changeMerchant
                 };

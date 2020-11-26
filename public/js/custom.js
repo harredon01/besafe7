@@ -86,10 +86,10 @@ jQuery(document).ready(function () {
         ***********************/
 
         function categoryMenuExpandInMobile() {
-            /*$('.has-children').on('click', function (e) {
+            $('.has-children').on('click', function (e) {
                 e.preventDefault();
                 $(this).find('.category-nav__submenu').slideToggle('500');
-            });*/
+            });
         }
         categoryMenuExpand();
         categoryMenuExpandInMobile();

@@ -41,6 +41,9 @@ class ProductController extends Controller {
                 $results = $this->editProduct->getProductsMerchant($data);
                 $products = $this->editProduct->buildProducts($results);
             }
+            foreach ($product->productVariants as $value) {
+                $value->attributes = json_decode($value->attributes);
+            }
             $results = ['product' => $product, 'related_products' => $products];
             return view(config("app.views") . '.products.detail', ['data' => $results]);
         }

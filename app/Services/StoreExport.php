@@ -312,10 +312,21 @@ class StoreExport {
                 }
                 $categories = substr($categories, 0, -1);
                 $product->categories = $categories;
+                $files = "";
+
+                foreach ($product->files as $p) {
+                    $resfile = explode("/", $p->file);
+                    $files .= $resfile[count($resfile)-1] . ",";
+                }
+                $files = substr($files, 0, -1);
+                $product->imagen = $files;
                 unset($product->productVariants);
+                unset($product->files);
                 unset($product->merchants);
                 unset($product->user_id);
                 unset($product->high);
+                unset($product->created_at);
+                unset($product->updated_at);
                 unset($product->low);
                 unset($product->rating);
                 unset($product->ends_at);
@@ -325,20 +336,11 @@ class StoreExport {
                     $pages[1]['rows'] = array_merge($pages[1]['rows'], $variants->toArray());
                 }
 
-                $files = $product->files;
-                if (count($files) > 0) {
-                    $filesHead = array_keys($files[0]->toArray());
-                }
-                unset($product->files);
-                if ($files) {
-                    $pages[2]['rows'] = array_merge($pages[2]['rows'], $files->toArray());
-                }
                 $processed++;
-                echo $processed . PHP_EOL;
+                //echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], array_keys($product->toArray()));
                     array_unshift($pages[1]['rows'], $variantsHead);
-                    array_unshift($pages[2]['rows'], $filesHead);
                     $this->writeFile($pages, "Productos-Descarga-Completass" . time(), true, $user);
                 }
             }

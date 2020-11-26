@@ -51,9 +51,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'firstName' => 'required|max:255',
             'lastName' => 'required|max:255',
-            'area_code' => 'required|max:255',
             'cellphone' => 'required|max:255',
-            'area_code' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|min:6|confirmed',
         ]);
@@ -73,7 +71,8 @@ class RegisterController extends Controller
             'name' => $data['firstName']." ".$data['lastName'],
             'email' => $data['email'],
             'cellphone' => $data['cellphone'],
-            'area_code' => $data['area_code'],
+            'optinMarketing' => $data['optinMarketing'],
+            'emailNotifications' => 1,
             'password' => bcrypt($data['password']),
         ]);
     }

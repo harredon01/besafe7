@@ -11,10 +11,10 @@
                     <div class="image-block">
                         <!-- Zoomable IMage -->
                         @if(count($data["product"]["files"])>0)
-                        <img id="zoom_03" src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
+                        <img src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
 
                         <!-- Product Gallery with Slick Slider -->
-                        <div id="product-view-gallery" class="elevate-gallery">
+                        <div>
                             <!-- Slick Single -->
                             @foreach ($data["product"]["files"] as $file)
                             <a href="#" class="gallary-item" data-image="{{$file['file']}}"
@@ -75,11 +75,11 @@
                                 <input type="number" ng-model="product.quantity" class="form-control text-center" value="1">
                             </div>
                             <div class="btn-block">
-                                <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-rounded btn-outlined--primary">Add to cart</a>
+                                <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-rounded btn-outlined--primary">Agregar al carrito</a>
                             </div>
                         </form>
                         <!-- Wishlist And Compare -->
-                        <div class="btn-options">
+                        <div class="btn-options" style="display:none">
                             <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Add to Wishlist</a>
                             <a href="compare.html"><i class="ion-ios-shuffle"></i>Add to Compare</a>
                         </div>
@@ -87,10 +87,10 @@
                         <div class="product-meta mt--30">
                             <p>Categorias: 
                                 @foreach ($data["product"]["categories"] as $cat)
-                                <a href="/a/products/{{$cat['url']}}&merchant_id={{$data["product"]["merchants"][0]['id']}}" class="single-meta">{{$cat['name']}}</a>,
+                                <a href="/a/products/{{$cat['url']}}?merchant_id={{$data["product"]["merchants"][0]['id']}}" class="single-meta">{{$cat['name']}}</a>,
                                 @endforeach
                             </p>
-                            <p>Tags: <a href="#" class="single-meta">Food</a></p>
+                            <p style="display:none">Tags: <a href="#" class="single-meta">Food</a></p>
                         </div>
                         <!-- Share Block 1 
                         <div class="share-block-1">

@@ -10,9 +10,9 @@
                 @if (count($category['children']) > 0)
                 <li class="category-nav__menu__item has-children">
                     @if(!(strpos($category['type'], 'merchant')===false))
-                        <a href="/a/merchants/{{ $category['url']}}" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
+                        <a href="javascript:;" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
                     @else
-                        <a href="/a/reports/{{ $category['url']}}" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
+                        <a href="javascript:;" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
                     @endif
                     <div class="category-nav__submenu">
                         <div class="category-nav__submenu--inner">

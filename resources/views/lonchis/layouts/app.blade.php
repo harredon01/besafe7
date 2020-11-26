@@ -104,11 +104,11 @@
                                 <div class="col-lg-4 col-md-5 col-sm-8 order-2 order-md-3">
                                     <div class="header-widget-2 text-center text-sm-right ">
                                         <div class="call-widget">
-                                            <p>CALL US NOW: <i class="icon ion-ios-telephone"></i><span class="font-weight-mid">+91-012
-                                                    345 678</span></p>
+                                            <p><a href="tel:3103418432">Llamanos: <i class="icon ion-ios-telephone"></i><span class="font-weight-mid">+57-310
+                                                        341 8432</span></a></p>
                                         </div>
                                         <ul class="header-links">
-                                            <li><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
+                                            <li ng-hide="true"><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
                                             <li ng-hide="user"><a href="/login"><i class="fas fa-user"></i> Ingresa</a></li>
                                             <li ng-show="user"><a href="{{ url('user/editProfile')}}"><i class="fas fa-user"></i> Hola @{{user.firstName}}  </a></li>
                                         </ul>
@@ -129,9 +129,6 @@
                                     <nav class="main-navigation">
                                         <!-- Mainmenu Start -->
                                         <ul class="mainmenu">
-                                            <li class="mainmenu__item">
-                                                <a href="/" class="mainmenu__link">Home</a>
-                                            </li>
                                             <li class="mainmenu__item menu-item-has-children" id="mi_cuenta">
                                                 <a href="#" class="mainmenu__link">Mi cuenta</a>
                                                 <ul class="sub-menu">
@@ -173,7 +170,7 @@
                                                 </ul>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children">
-                                                <a href="javascript" class="mainmenu__link">Participa</a>
+                                                <a href="javascript:;" class="mainmenu__link">Participa</a>
                                                 <ul class="sub-menu">
                                                     <li>
                                                         <a href="/a/contact-us/vets">Veterinarios</a>
@@ -253,9 +250,6 @@
                                     <!-- Sticky Mainmenu Start -->
                                     <nav class="sticky-navigation">
                                         <ul class="mainmenu sticky-menu">
-                                            <li class="mainmenu__item ">
-                                                <a href="/" class="mainmenu__link">Home</a>
-                                            </li>
                                             <li class="mainmenu__item menu-item-has-children sticky-has-child" id="mi_cuenta2">
                                                 <a href="index.html" class="mainmenu__link">Mi cuenta</a>
                                                 <ul class="sub-menu">
@@ -297,7 +291,7 @@
                                                 </ul>
                                             </li>
                                             <li class="mainmenu__item menu-item-has-children sticky-has-child ">
-                                                <a href="javascript" class="mainmenu__link">Participa</a>
+                                                <a href="javascript:;" class="mainmenu__link">Participa</a>
                                                 <ul class="sub-menu">
                                                     <li>
                                                         <a href="/a/contact-us/vets">Veterinarios</a>

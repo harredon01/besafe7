@@ -52,7 +52,7 @@
                         <li id="item-@{{ item.id}}" ng-repeat="item in merchants">
                             Id: <span class="type">@{{ item.id}}</span><br/>
                             Name: <span class="type">@{{ item.name}}</span>
-                            <a href="javascript:;" ng-click="selectMerchant(item)" class="editar">Select</a><br/>
+                            <a href="javascript:;" ng-click="selectMerchant(item)" class="btn btn-primary">Select</a><br/>
                         </li>
                     </ul>
                 </div>

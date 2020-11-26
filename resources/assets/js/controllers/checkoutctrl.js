@@ -3,9 +3,10 @@
         .controller('CheckoutCartCtrl', ['$scope', '$rootScope', 'Users', 'Orders', 'Products', 'Modals', function ($scope, $rootScope, Users, Orders, Products, Modals) {
                 $scope.data = {};
                 $scope.coupon = "";
-                $scope.isDigital = false;
+                $rootScope.isDigital = false;
                 angular.element(document).ready(function () {
                     $scope.getCart(true);
+
                 });
                 $scope.cleanJson = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -26,6 +27,15 @@
                         } else {
                             $scope.loadCart(data, init)
                         }
+                    },
+                            function (data) {
+
+                            });
+                }
+                $scope.getOrder = function (init) {
+                    Orders.getOrder().then(function (data) {
+                        $rootScope.isDigital = true;
+                        $rootScope.activeOrder = data.data;
                     },
                             function (data) {
 
@@ -74,7 +84,8 @@
                             if (shippable) {
                                 $rootScope.$broadcast('Shippable');
                             } else {
-                                $scope.isDigital = true;
+
+                                $scope.getOrder()
                                 $rootScope.$broadcast('NotShippable');
                             }
                         }
@@ -571,6 +582,27 @@
                     console.log("Credit branch", branch);
                     $scope.data2.cc_branch = branch;
                 }
+                $scope.transactionResponse = function (data) {
+                    Modals.hideLoader();
+                    console.log("Response payu", data)
+                    Cart.clearCart();
+                    if (data.message != "error") {
+                        $scope.showResult = true;
+                        $scope.transaction = data.transaction;
+                        if (data.transaction.transaction_state == "APPROVED") {
+                            $scope.resultHeader = "Pago aprobado";
+                            $scope.resultBody = "Tu pago ha sido completado, revisa tu correo para recibir tu compra";
+                        } else if (data.transaction.transaction_state == "PENDING") {
+                            $scope.resultHeader = "Pago pendiente";
+                            $scope.resultBody = "Tu transaccion esta siendo verificada, cuando complete la verificacion recibiras un correo con el resultado";
+                        } else {
+                            $scope.resultHeader = "Pago negado";
+                            $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
+                        }
+                    } else {
+                        Modals.showToast("Hubo un error. Porfavor verifica tus datos", $("#checkout-payment"));
+                    }
+                }
                 $scope.payCreditCard = function (isvalid) {
                     $scope.submitted2 = true;
                     if (isvalid) {
@@ -579,31 +611,28 @@
                         $scope.data2.payment_id = $rootScope.activePayment.id;
                         Modals.showLoader();
                         Billing.payCreditCard($scope.data2, "PayU").then(function (data) {
-                            Modals.hideLoader();
-                            console.log("Response payu", data)
-                            Cart.clearCart();
-                            if (data.message != "error") {
-                                $scope.showResult = true;
-                                $scope.transaction = data.transaction;
-                                if (data.transaction.transaction_state == "APPROVED") {
-                                    $scope.resultHeader = "Pago aprobado";
-                                    $scope.resultBody = "Tu pago ha sido completado, revisa tu correo para recibir tu compra";
-                                } else if (data.transaction.transaction_state == "PENDING") {
-                                    $scope.resultHeader = "Pago pendiente";
-                                    $scope.resultBody = "Tu transaccion esta siendo verificada, cuando complete la verificacion recibiras un correo con el resultado";
-                                } else {
-                                    $scope.resultHeader = "Pago negado";
-                                    $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
-                                }
-                            } else {
-                                Modals.showToast("Hubo un error. Porfavor verifica tus datos", $("#checkout-payment"));
-                            }
+                            $scope.transactionResponse(data);
                             //$scope.data2 = {};
                         },
                                 function (data) {
 
                                 });
                     }
+                }
+                $scope.quickPay = function () {
+                    let container = {
+                        quick: true,
+                        payment_id: $rootScope.activePayment.id,
+                        platform: "Booking"
+                    };
+                    Modals.showLoader();
+                    Billing.payCreditCard(container, "PayU").then(function (data) {
+                        $scope.transactionResponse(data);
+                        //$scope.data2 = {};
+                    },
+                            function (data) {
+
+                            });
                 }
                 $scope.selectOption = function (option) {
                     $scope.data4.payment_method = option;

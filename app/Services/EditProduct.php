@@ -106,6 +106,7 @@ class EditProduct {
         }
         return $query;
     }
+
     public function textSearch($data) {
         if (!isset($data['q'])) {
             $data['q'] = "";
@@ -177,6 +178,16 @@ class EditProduct {
                 });
             }
         }
+        if (isset($data['high'])) {
+            if ($data['high']) {
+                $query->where('high', '<=', $data['high']);
+            }
+        }
+        if (isset($data['low'])) {
+            if ($data['low']) {
+                $query->where('low', '>=', $data['low']);
+            }
+        }
         return $query;
     }
 
@@ -205,8 +216,8 @@ GROUP BY category_id"
         //dd(DB::getQueryLog());
         return ['status' => "success", "data" => $categories];
     }
-    
-    public function paginateQueryFromArray($query,$data){
+
+    public function paginateQueryFromArray($query, $data) {
         $page = null;
         if (array_key_exists("page", $data)) {
             if ($data['page']) {
@@ -237,7 +248,48 @@ GROUP BY category_id"
         } else {
             $page = 1;
         }
-        return ["query"=>$query,"page"=>$page,"per_page"=>$per_page];
+        return ["query" => $query, "page" => $page, "per_page" => $per_page];
+    }
+
+    public function getFavorites($user, $data) {
+        $query = DB::table('products')
+                ->where('products.isActive', true);
+        $query = $this->baseProductQuery($data, $query);
+        $query->whereIn('id', function($query)use($user) {
+            $query->select('favoritable_id')->from('favorites')
+                    ->where('user_id',$user->id)
+                    ->where('score','>=',8)
+                    ->where('favoritable_type',"App\\Models\\Product");
+        });
+        $count_query = $query;
+        $res = $this->paginateQueryFromArray($query, $data);
+        $page = $res['page'];
+        $per_page = $res['per_page'];
+        $query = $res['query'];
+        $prodResults = $query->get();
+        $products = [];
+        $results = [];
+        foreach ($prodResults as $value) {
+            if (in_array($value->id, $products)) {
+                
+            } else {
+                array_push($products, $value->id);
+            }
+        }
+        $results['merchant_products'] = $prodResults;
+        $variants_query = $this->buildVariantsQuery($products,$data,false,false);
+        $results['products_variants'] = $variants_query->get();
+        if ($includes_files) {
+            $results['products_files'] = $this->getFilesProducts($products);
+        } else {
+            $results['products_files'] = [];
+        }
+        $results['products_total'] = $count_query->count();
+        $results['page'] = $page;
+        $results['last_page'] = ceil($results['products_total'] / $per_page);
+        $results['per_page'] = $per_page;
+        $results['total'] = $results['products_total'];
+        return $results;
     }
 
     public function productsQuery($data) {
@@ -278,16 +330,7 @@ GROUP BY category_id"
         $query = $this->baseProductQuery($data, $query);
 
         $merchant_id = null;
-        if (isset($data['high'])) {
-            if($data['high']){
-                $query->where('high','<=',$data['high']);
-            }
-        }
-        if (isset($data['low'])) {
-            if($data['low']){
-                $query->where('low','>=',$data['low']);
-            }
-        }
+        
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id']) {
                 $merchant_id = $data['merchant_id'];
@@ -321,6 +364,28 @@ GROUP BY category_id"
             }
         }
         $results['merchant_products'] = $prodResults;
+        $variants_query = $this->buildVariantsQuery($products,$data,$isAdmin,$includes_categories);
+        $results['products_variants'] = $variants_query->get();
+        if ($includes_files) {
+            $results['products_files'] = $this->getFilesProducts($products);
+        } else {
+            $results['products_files'] = [];
+        }
+        $results['page'] = $page;
+        $results['last_page'] = ceil($results['products_total'] / $per_page);
+        $results['per_page'] = $per_page;
+        $results['total'] = $results['products_total'];
+        return $results;
+    }
+    private function getFilesProducts($products){
+        return DB::table('products')
+                    ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
+                    ->whereIn('files.trigger_id', $products)
+                    ->where('files.type', "App\Models\Product")
+                    ->select('products.*', 'files.*')
+                    ->get();
+    }
+    private function buildVariantsQuery($products,$data,$isAdmin,$includes_categories){
         $variants_query = null;
         if ($isAdmin) {
             $variants_query = DB::table('products')
@@ -357,22 +422,7 @@ GROUP BY category_id"
         } else {
             $variants_query->orderBy('products.id', 'asc');
         }
-        $results['products_variants'] = $variants_query->get();
-        if ($includes_files) {
-            $results['products_files'] = DB::table('products')
-                    ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
-                    ->whereIn('files.trigger_id', $products)
-                    ->where('files.type', "App\Models\Product")
-                    ->select('products.*', 'files.*')
-                    ->get();
-        } else {
-            $results['products_files'] = [];
-        }
-        $results['page'] = $page;
-        $results['last_page'] = ceil($results['products_total'] / $per_page);
-        $results['per_page'] = $per_page;
-        $results['total'] = $results['products_total'];
-        return $results;
+        return $variants_query;
     }
 
     /**

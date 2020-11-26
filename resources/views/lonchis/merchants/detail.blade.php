@@ -29,10 +29,9 @@
                                     <i class="fas fa-user"></i>
                                     <span class="text-gray">Experiencia : </span>
                                     {{ $merchant['attributes']['years_experience']}} años
-                                </span>
+                                </span><br/>
                                 
                                 @if($merchant['unit_cost']>0)
-                                <span class="post-separator">|</span>
                                 <span class="post-date">
                                     <i class="far fa-calendar-alt"></i>
                                     <span class="text-gray">Precio por hora promedio : </span>
@@ -40,21 +39,19 @@
                                 </span><br/>
                                 @endif
                                 
-                                <span class="post-separator">
+                                <span class="post-author">
                                     <i class="fas fa-at"></i>
-                                    <span class="text-gray">Correo : </span>
-                                    {{ $merchant['email']}} 
-                                </span>
-                                <span class="post-separator">|</span>
-                                <span class="post-separator">
+                                    <a href="mailto:{{ $merchant['email']}}">{{ $merchant['email']}}</a> 
+                                </span><br/>
+                                <span class="post-author">
                                     <i class="fas fa-address-card"></i>
                                     <span class="text-gray">Dirección : </span>
                                     {{ $merchant['address']}} 
                                 </span><br/>
-                                <span class="post-separator">
+                                <span class="post-author">
                                     <i class="fas fa-phone"></i>
                                     <span class="text-gray">Teléfono : </span>
-                                    {{ $merchant['telephone']}} 
+                                    <a href="tel:{{ $merchant['telephone']}}">{{ $merchant['telephone']}}</a>
                                 </span>
                             </div>
                         </header>
@@ -62,7 +59,7 @@
                             <h3 class="d-none sr-only">Descripcion</h3>
                             <p class="p-0">{{ $merchant['description']}}</p>
 
-                            <blockquote>
+                            <blockquote style="display:none">
                                 <p>Quisque semper nunc vitae erat pellentesque, ac placerat arcu consectetur. In venenatis elit ac
                                     ultrices convallis.
                                     Duis est nisi, tincidunt ac urna sed, cursus blandit lectus. In ullamcorper sit amet ligula ut

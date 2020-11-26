@@ -81,6 +81,7 @@ Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'AuthApiController@changePassword');
 Route::post('user/address/{address?}/{type?}', 'UserApiController@setAddressType');
 Route::post('user/credits/{user?}', 'OrderApiController@checkUserCredits');
+Route::get('user/merchants', 'MerchantApiController@getUserMerchant');
 Route::resource('user', 'UserApiController');
 
 Route::post('deliveries/options', 'DeliveryController@postDeliveryOptions');
@@ -166,6 +167,8 @@ Route::get('products/search', 'ProductApiController@textSearch');
 
 Route::resource('products', 'ProductApiController');
 Route::get('products/hash/{code?}', 'ProductApiController@getProductHash');
+Route::get('products/favorites', 'ProductApiController@getFavoriteProducts');
+Route::post('products/favorites', 'ProductApiController@checkFavoriteProducts');
 Route::post('products/variant', 'ProductVariantApiController@store');
 Route::post('products/share', 'ShareApiController@postAddFollower');
 Route::patch('products/variant/{variant?}', 'ProductVariantApiController@update');

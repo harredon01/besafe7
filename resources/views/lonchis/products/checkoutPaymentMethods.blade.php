@@ -1,12 +1,13 @@
 
 
 <div>
-    <div id="checkout-payment">
+    <div id="checkout-payment" ng-hide="showResult">
         <button ng-click="showMethod('CC')" class="btn btn-primary">Tarjeta de Credito</button>
         <button ng-click="showMethod('PSE')" class="btn btn-primary">Tarjeta de Debito</button>
         <button ng-click="showMethod('BALOTO')" class="btn btn-primary">Efectivo</button>
         <br/>
         <br/>
+        <button ng-click="quickPay()" ng-show="hasSavedCard" class="btn btn-primary">Tarjeta Guardada</button>
     </div>
     <div ng-hide="showResult">
         <div class="credito" ng-show="credito">
@@ -67,6 +68,12 @@
                         <input type="text" ng-model="data2.cc_name" class="form-control" ng-change="populatePayer()" name="cc_name" value="{{ old('cc_name')}}" required>
                         <span style="color:red" ng-show="(myForm2.cc_name.$dirty && myForm2.cc_name.$invalid) || submitted2 && myForm2.cc_name.$invalid">
                             <span ng-show="submitted2 && myForm2.cc_name.$error.required">Porfavor ingresa el nombre que aparece en la tarjeta</span>   </span>                              
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Guardar Tarjeta</label>
+                    <div class="col-md-6">
+                        <input type="checkbox" ng-model="data2.save_card"  name="save_card" value="{{ old('save_card')}}" required>                            
                     </div>
                 </div>
                 <div class="form-group">
@@ -421,7 +428,7 @@
         <p>Id transaccion: @{{transaction.transaction_id}}</p>
         <p>Estado: @{{transaction.transaction_state}}</p>
         <p>Descripcion: @{{transaction.description}}</p>
-        <a href="/">Terminar</a>
+        <a href="/" class="btn btn-primary">Terminar</a>
     </div>
 </div>
 

@@ -19,7 +19,7 @@
                                 <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
                                     <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
 
-                                        <span>Sort By:</span>
+                                        <span style="display: none;">Sort By:</span>
                                         <select id="input-sort" class="form-control nice-select sort-select" style="display: none;">
                                             <option value="" selected="selected">Default Sorting</option>
                                             <option value="">Sort
@@ -42,7 +42,7 @@
                                     </div>
                                     <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
                                         <span>
-                                            Showing @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + local_total}} of @{{total}} results
+                                            Mostrando @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + local_total}} de @{{total}} resultados
                                         </span>
                                     </div>
                                 </div>
@@ -252,7 +252,7 @@
                                 <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
                                     <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
 
-                                        <span>Sort By:</span>
+                                        <span style="display: none;">Sort By:</span>
                                         <select id="input-sort" class="form-control nice-select sort-select" style="display: none;">
                                             <option value="" selected="selected">Default Sorting</option>
                                             <option value="">Sort
@@ -275,7 +275,7 @@
                                     </div>
                                     <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
                                         <span>
-                                            Showing @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + local_total}} of @{{total}} results
+                                            Mostrando @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + local_total}} de @{{total}} resultados
                                         </span>
                                     </div>
                                 </div>
@@ -287,13 +287,14 @@
                 <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="prods-cont">
                     <div ng-repeat="category in categories">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
-                            <div class="pm-product  ">
+                            <div class="pm-product" id="prod-cont-@{{product.id}}">
                                 <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
                                 <div class="hover-conents">
                                     <ul class="product-btns">
-                                        <li><a href="wishlist.html" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
+                                        <li ng-hide="product.isFavorite"><a href="javascript:;" ng-click="addFavorite(product)" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
+                                        <li ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" tabindex="0"><i class="ion-ios-heart" style="color:red"></i></a></li>
                                         <li><a href="compare.html" tabindex="0"><i class="ion-ios-shuffle"></i></a></li>
                                         <li><a href="#" data-toggle="modal" data-target="#quickModal" tabindex="0"><i class="ion-ios-search"></i></a></li>
                                     </ul>

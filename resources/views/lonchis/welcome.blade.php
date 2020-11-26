@@ -34,7 +34,7 @@
                             <h4 class="mt--20">servicios veterinarios A <strong>DOMICILIO</strong></h4>
 
                             <div class="slider-btn mt--30">
-                                <a href="/a/merchants/vets" class="btn btn-outlined--primary btn-rounded">Ver</a>
+                                <a href="/a/merchants/consultas" class="btn btn-outlined--primary btn-rounded">Ver</a>
                             </div>
 
                         </div>
@@ -51,7 +51,7 @@
                             <h4 class="mt--20">Encuentra las familias ideales para<br/>ellos y dejalos en buenas manos.</h4>
 
                             <div class="slider-btn mt--30">
-                                <a href="/a/contact-us/sale-lead" class="btn btn-outlined--primary btn-rounded">Ver</a>
+                                <a href="/a/contact-us/sale" class="btn btn-outlined--primary btn-rounded">Ver</a>
                             </div>
 
                         </div>
@@ -116,7 +116,7 @@
     <section class="pt--50">
         <div class="container">
             <div class="block-title">
-                <h2>NEW PRODUCTS</h2>
+                <h2>Nuevos Productos</h2>
             </div>
             <div class="petmark-slick-slider border normal-two-column-slider"
                  data-slick-setting='{
@@ -257,13 +257,13 @@
             </div>
         </div>
     </section>
-
+    
     <!-- Promotion Block 1 -->
     <section class="pt--50 space-db--30">
         <h2 class="d-none">Promotion Block
         </h2>
         <div class="container">
-            <a class="promo-image overflow-image">
+            <a class="promo-image overflow-image" href="/a/reports/adopcion">
                 <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/adoptame-largo.jpg" alt="">
             </a>
         </div>
@@ -281,7 +281,7 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image  promo-small ">
+                    <a class="promo-image overflow-image  promo-small " href="/a/reports/mascotas-perdidas">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/mascotas-perdidas-mini.jpg" alt="">
                     </a>
                     <a class="promo-image overflow-image  promo-small ">
@@ -289,7 +289,7 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image">
+                    <a class="promo-image overflow-image" href="/a/merchants/consultas">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
                     </a>
                 </div>
@@ -297,5 +297,55 @@
         </div>
     </section>
     <br/><br/><br/>
+    <div class="pt--50 pb--50">
+        <div class="container">
+
+            <div class="petmark-slick-slider brand-slider  border normal-slider grid-border-none" data-slick-setting='{
+                 "autoplay": true,
+                 "autoplaySpeed": 3000,
+                 "slidesToShow": 5,
+                 "arrows": true
+                 }'
+                 data-slick-responsive='[
+                 {"breakpoint":991, "settings": {"slidesToShow": 4} },
+                 {"breakpoint":768, "settings": {"slidesToShow": 3} },
+                 {"breakpoint":480, "settings": {"slidesToShow": 2} },
+                 {"breakpoint":320, "settings": {"slidesToShow": 1} }
+                 ]'>
+
+                <div class="single-slide">
+                    <a href="/a/merchant/amadera-colombia/products" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/amadera-col.jpg" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/la-mascota-que-rie/products" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/la_mascota_que_rie.JPG" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/mini-me-mascotas/products" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/mini-me.jpg" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/veti-vet/products" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/vetivet.JPG" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/feroz/products" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/feroz.png" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/mision-canina-colombia" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/mision_canina.jpg" alt="">
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 @endsection

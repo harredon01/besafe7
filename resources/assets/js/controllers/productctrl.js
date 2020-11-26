@@ -1,6 +1,7 @@
 ﻿angular.module('besafe')
         .controller('ProductsCtrl', ['$scope', 'Cart', '$rootScope', '$sce', 'Products', '$mdDialog', 'Modals', function ($scope, Cart, $rootScope, $sce, Products, $mdDialog, Modals) {
                 $scope.categories = [];
+                $scope.prodIds = [];
                 $scope.hasLocation = false;
                 $scope.hasMerchant = false;
                 $scope.merchantObj = {};
@@ -15,11 +16,11 @@
 
                 angular.element(document).ready(function () {
                     $scope.clean();
-                    
+
                     var res = viewData.replace(/App\\Models\\/g, "");
                     console.log("viewData", res);
                     let container = JSON.parse(res);
-                    
+
                     console.log("Data", res);
                     $scope.categories = container.categories;
                     $scope.current = container.page;
@@ -30,16 +31,20 @@
                     if (container.category) {
                         $scope.category_id = container.category.id;
                     }
-                    
+
                     console.log($scope.categories);
                     $scope.$apply(function () {
                         for (let item in $scope.categories) {
                             for (let k in $scope.categories[item].products) {
+                                $scope.prodIds.push($scope.categories[item].products[k].id);
+                                if (!$rootScope.merchant_id) {
+                                    $rootScope.merchant_id = $scope.categories[0].products[0].merchant_id;
+                                }
                                 $scope.local_total++;
-                                if($scope.categories[item].products[k].files && $scope.categories[item].products[k].files.length>0){
+                                if ($scope.categories[item].products[k].files && $scope.categories[item].products[k].files.length > 0) {
                                     $scope.categories[item].products[k].imgs = $scope.categories[item].products[k].files;
                                 }
-                                if($scope.categories[item].products[k].imgs && $scope.categories[item].products[k].imgs.length>0){
+                                if ($scope.categories[item].products[k].imgs && $scope.categories[item].products[k].imgs.length > 0) {
                                     $scope.categories[item].products[k].src = $scope.categories[item].products[k].imgs[0].file;
                                 }
                                 $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
@@ -47,20 +52,25 @@
                                 $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
                                 $scope.categories[item].products[k].quantity = $scope.categories[item].products[k].variants[0].min_quantity;
                                 $scope.categories[item].products[k].item_id = null;
+                                $scope.categories[item].products[k].isFavorite = false;
                             }
                         }
+
                     });
                     console.log($scope.categories);
                     document.getElementById("dissapear").remove();
                     $scope.params = Modals.getAllUrlParams();
                     $scope.params.includes = "files,merchant";
-                    
+
                     if ($scope.category_id) {
                         $scope.params.category_id = $scope.category_id;
                     }
                 });
                 $rootScope.$on('loadCartVariants', function (event, args) {
                     $scope.updateProductsCart(args, false);
+                    if ($rootScope.user) {
+                        $scope.checkFavorites();
+                    }
                 });
                 $scope.clean = function () {
                     angular.forEach(angular.element(".product-attributes"), function (value, key) {
@@ -76,15 +86,15 @@
                 }
                 $scope.changeStore = function () {
                     Cart.changeMerchant()
-                } 
+                }
                 $scope.filterPrice = function () {
-                    console.log("Filtering",$("#amount").val())
+                    console.log("Filtering", $("#amount").val())
                     let str = $("#amount").val();
                     str = str.replace("$", "");
                     str = str.replace("$", "");
-                    console.log("Filtering",str)
+                    console.log("Filtering", str)
                     var res = str.split("-");
-                    console.log("Filtering",res)
+                    console.log("Filtering", res)
                     $scope.params.high = parseInt(res[1].trim());
                     $scope.params.low = parseInt(res[0].trim());
                     $scope.goTo(1);
@@ -125,6 +135,7 @@
                                 }
                             }
                             $scope.current = parseInt(resp.page);
+                            $scope.prodIds = [];
                             $scope.last = parseInt(resp.last_page);
                             $scope.current = parseInt(resp.page);
                             $scope.per_page = parseInt(resp.per_page);
@@ -133,6 +144,7 @@
                             for (let item in $scope.categories) {
                                 for (let k in $scope.categories[item].products) {
                                     $scope.local_total++;
+                                    $scope.prodIds.push($scope.categories[item].products[k].id);
                                     $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
                                     $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
                                     $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
@@ -159,21 +171,85 @@
                     let container = {
                         id: product.activeVariant.id,
                         quantity: product.quantity,
-                        item_id: product.item_id
+                        item_id: product.item_id,
+                        product: product
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
                         if (data.status == "success") {
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                             product.item_id = data.item.id;
                             product.quantity = data.item.quantity;
                             $rootScope.$broadcast('loadHeadCart', data.cart);
 
                         } else {
-                            Modals.showToast(data.message,$("#prods-cont"));
+                            Modals.showToast(data.message, $("#prod-cont-" + product.id));
                         }
                     },
                             function (data) {
 
+                            });
+                }
+                $scope.checkFavorites = function () {
+                    let container = {
+                        product_ids: $scope.prodIds
+                    }
+                    Products.checkFavorite(container).then(function (data) {
+                        console.log("checkFavorites res", data);
+                        if (data.status == "success") {
+                            let results = data.data;
+                            for (let k in results) {
+                                for (let i in $scope.categories) {
+                                    for (let j in $scope.categories[i].products) {
+                                        if ($scope.categories[i].products[j].id == results[k].favoritable_id) {
+                                            $scope.categories[i].products[j].isFavorite = true;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    },
+                            function (data) {
+
+                            });
+                }
+                $scope.addFavorite = function (product) {
+                    if ($rootScope.user) {
+                        let container = {
+                            object_id: product.id,
+                            type: "Product"
+                        }
+                        Products.addFavorite(container).then(function (data) {
+                            console.log("Add addFavorite", data);
+                            if (data.status == "success") {
+                                product.isFavorite = true;
+                                Modals.showToast("Agregado", $("#prod-cont-" + product.id));
+                            } else {
+                                Modals.showToast(data.message, $("#prod-cont-" + product.id));
+                            }
+                        },
+                                function (data) {
+                                });
+                    } else {
+                        Modals.showToast("Debes estar logueado para guardar productos", $("#prod-cont-" + product.id));
+                    }
+
+                }
+                $scope.deleteFavorite = function (product) {
+                    let container = {
+                        object_id: product.id,
+                        type: "Product"
+                    }
+                    Products.deleteFavorite(container).then(function (data) {
+                        console.log("Add addFavorite", data);
+                        if (data.status == "success") {
+                            Modals.showToast("Agregado", $("#prod-cont-" + product.id));
+                        } else {
+                            Modals.showToast(data.message, $("#prod-cont-" + product.id));
+                        }
+                    },
+                            function (data) {
                             });
                 }
                 $scope.updateProductsCart = function (cart, total) {
@@ -295,7 +371,8 @@
                     let container = {
                         id: product.activeVariant.id,
                         quantity: product.quantity,
-                        item_id: product.item_id
+                        item_id: product.item_id,
+                        product:product
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
@@ -313,27 +390,27 @@
                             });
                 }
                 $scope.addRating = function () {
-                    console.log("Rating",$scope.rating);
-                    if(!$rootScope.user){
+                    console.log("Rating", $scope.rating);
+                    if (!$rootScope.user) {
                         console.log("Debes estar loguedo para comentar");
-                        Modals.showToast("Debes estar loguedo para comentar",$("#toast-container"));
+                        Modals.showToast("Debes estar loguedo para comentar", $("#toast-container"));
                         return;
                     }
-                    if($scope.rating.rating.length>0){
-                        Modals.showToast("Agrega una calificacion",$("#toast-container"));
+                    if ($scope.rating.rating.length > 0) {
+                        Modals.showToast("Agrega una calificacion", $("#toast-container"));
                         return;
                     }
-                    if($scope.rating.comment.length>0){
-                        Modals.showToast("Agrega una observacion a tu calificacion",$("#toast-container"));
+                    if ($scope.rating.comment.length > 0) {
+                        Modals.showToast("Agrega una observacion a tu calificacion", $("#toast-container"));
                         return;
                     }
                     Products.addRating($scope.rating).then(function (data) {
                         console.log("Add cart", data);
                         if (data.status == "success") {
-                            Modals.showToast("Mensaje enviado. Si vuelves a enviar se anula el anterior",$("#toast-container"))
+                            Modals.showToast("Mensaje enviado. Si vuelves a enviar se anula el anterior", $("#toast-container"))
 
                         } else {
-                            Modals.showToast(data.message,$("#toast-container"));
+                            Modals.showToast(data.message, $("#toast-container"));
                         }
                     },
                             function (data) {

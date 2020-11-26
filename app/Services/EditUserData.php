@@ -67,6 +67,9 @@ class EditUserData {
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['emailNotifications'] = 1;
+        if(!isset($data['optinMarketing'])){
+            $data['optinMarketing'] = 1;
+        }
         unset($data['password_confirmation']);
         $user = User::create($data);
         $http = new \GuzzleHttp\Client;

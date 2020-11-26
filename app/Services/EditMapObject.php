@@ -584,7 +584,7 @@ GROUP BY category_id"
         }
 //        DB::enableQueryLog();
         $merchants = DB::select(" "
-                        . "SELECT id, name, description, icon, lat,`long`, type, telephone, address,rating,rating_count,unit_cost,attributes FROM merchants "
+                        . "SELECT id, name, description, icon, lat,`long`, type, telephone,slug,email, address,rating,rating_count,unit_cost,attributes FROM merchants "
                 ." where private = 0 AND status in ('online','active','busy') AND "
                 . " id in (SELECT merchant_id FROM coverage_polygons WHERE ST_Contains(`geometry`, ST_GeomFromText(:point)) ) "
                         . $additionalQuery
@@ -643,7 +643,7 @@ GROUP BY category_id"
         $additionalFields = "";
         if ($data['type'] == "Merchant") {
             $type = "merchants";
-            $additionalFields = " type, telephone, address,rating,rating_count,unit_cost,attributes, ";
+            $additionalFields = " type, telephone, address,email,rating,rating_count,unit_cost,attributes, ";
             if ($category) {
                 $joins = " join categorizables cm on r.id = cm.categorizable_id ";
                 $joinsWhere = " AND cm.category_id in (:category) AND cm.categorizable_type = 'App\\\Models\\\Merchant' ";

@@ -36,7 +36,7 @@ class EditRating {
                     }
                 }
                 if (!array_key_exists('comment', $data)) {
-                    $data['comment']="";
+                    $data['comment'] = "";
                 }
                 Rating::where('type', $type)->where('object_id', $data['object_id'])->where('user_id', $user->id)->delete();
                 $result = Rating::create([
@@ -66,7 +66,7 @@ class EditRating {
                     $object->save();
                 } catch (Exception $ex) {
                     
-                } catch (\Illuminate\Database\QueryException $e){
+                } catch (\Illuminate\Database\QueryException $e) {
                     
                 }
 
@@ -91,13 +91,24 @@ class EditRating {
         if (class_exists($class)) {
             $object = $class::find($data['object_id']);
             if ($object) {
-                Favorite::create([
-                    'user_id' => $user->id,
-                    'favorite_type' => $data['type'],
-                    'object_id' => $object->id,
-                ]);
+                $fav = Favorite::where('user_id', $user->id)->where('favoritable_id', $object->id)->where('favoritable_type', $class)->first();
+                if ($fav) {
+                    $fav->score +=8;
+                    $fav->save();
+                } else {
+                    Favorite::create([
+                        'user_id' => $user->id,
+                        'score' => 8,
+                        'favoritable_type' => $class,
+                        'favoritable_id' => $object->id,
+                    ]);
+                }
+
+                return ['status' => "success", "message" => "favorite added"];
             }
+            return ['status' => "error", "message" => "not_found"];
         }
+        return ['status' => "error", "message" => "not_found"];
     }
 
     /**
@@ -107,8 +118,8 @@ class EditRating {
      */
     public function deleteFavoriteObject(array $data, User $user) {
         Favorite::where('user_id', $user->id)
-                ->where('favorite_type', $data['type'])
-                ->where('object_id', $data['object_id'])->delete();
+                ->where('favoritable_type', $data['type'])
+                ->where('favoritable_id', $data['object_id'])->delete();
     }
 
     /**

@@ -301,7 +301,7 @@ class EditBooking {
               $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))
               ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count(); */
             $booking1 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))
-                    ->where('ens_at', '>', date_format($date, "Y-m-d H:i:s"))
+                    ->where('ends_at', '>', date_format($date, "Y-m-d H:i:s"))
                     ->whereColumn("price", "total_paid")->count();
 
             $booking2 = Booking::where('starts_at', '>', date_format($date, "Y-m-d H:i:s"))

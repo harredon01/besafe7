@@ -73,6 +73,14 @@ class BillingController extends Controller {
 
         return view(config("app.views").'.billing.orders.ordersDashboard')->with('user',$user );
     }
+    /**
+     * Show the application dashboard to the user.
+     *
+     * @return Response
+     */
+    public function getOrdersMerchant() {
+        return view(config("app.views").'.billing.orders.ordersAdminDashboard');
+    }
     
     /**
      * Show the application dashboard to the user.

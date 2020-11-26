@@ -24,6 +24,13 @@ app.config(function () {
         Users.getUser().then(function (data) {
             console.log("user loaded", data);
             $rootScope.user = data.user;
+            $rootScope.hasSavedCard = data.savedCard;
+            if(data.merchants>0){
+                $rootScope.hasMerchants = true;
+            } else {
+                $rootScope.hasMerchants = false;
+            }
+            console.log("Has saved card",$rootScope.hasSavedCard );
             $rootScope.$broadcast('user_loaded');
         },
                 function (data) {

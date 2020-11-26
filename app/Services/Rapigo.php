@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Stop;
 use App\Models\Route;
 use App\Models\User;
+use App\Models\Push;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Delivery;
 use Illuminate\Support\Facades\Mail;
@@ -15,14 +16,21 @@ class Rapigo {
     const ROUTE_HOUR_COST = 11000;
     const ROUTE_HOURS_EST = 3;
 
-    public function sendPost(array $data, $query) {
+    public function sendPost(array $data, $query, $isTest) {
         //url-ify the data for the POST
         $fields_string = "";
         foreach ($data as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
         }
+        if ($isTest) {
+            $url = "https://test.rapigo.co/";
+            $push = Push::where('platform', 'RapigoTest')->first();
+        } else {
+            $url = "https://www.rapigo.co/";
+            $push = Push::where('platform', 'Rapigo')->first();
+        }
         rtrim($fields_string, '&');
-        $curl = curl_init($query);
+        $curl = curl_init($url . $query);
         //dd($data);
         $headers = array(
             'Accept: application/json',
@@ -38,6 +46,32 @@ class Rapigo {
         return $response;
     }
 
+    public function authenticate($url) {
+        $data = ['username' => 'harredon01@gmail.com', "password" => '123456'];
+        $data_string = json_encode($data);
+        $curl = curl_init($url);
+        //dd($data);
+        $headers = array(
+            'Content-Type: application/json',
+        );
+        curl_setopt($curl, CURLOPT_POST, true);
+        //curl_setopt($curl, CURLOPT_POSTFIELDS, $fields_string);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data_string);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $response = curl_exec($curl);
+        curl_close($curl);
+        $response = json_decode($response, true);
+        if (isset($response['access'])) {
+            if ($url == "https://www.rapigo.co/api/token/") {
+                Push::where('platform', 'Rapigo')->update(['object_id' => $response['access'], 'updated_at' => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))]);
+            } else {
+                Push::where('platform', 'RapigoTest')->update(['object_id' => $response['access'], 'updated_at' => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))]);
+            }
+        }
+        return $response;
+    }
+
     public function getEstimate(array $points) {
         //dd($points);
         foreach ($points as $value) {
@@ -47,17 +81,17 @@ class Rapigo {
             }
         }
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
+        $query = "api/bogota/estimate/";
         //dd($query);
-        $response = $this->sendPost($data, $query);
+        $response = $this->sendPost($data, $query,false);
         return $response;
     }
 
     public function getOrderShippingPrice(array $origin, array $destination, array $extras) {
         //dd($points);
         $points = [];
-        if($origin['city_id'] != $destination['city_id']){
-            return ['status'=>'error','message'=>"solo para la misma ciudad"];
+        if ($origin['city_id'] != $destination['city_id']) {
+            return ['status' => 'error', 'message' => "solo para la misma ciudad"];
         }
         $querystop = [
             "address" => $origin['address'],
@@ -74,21 +108,17 @@ class Rapigo {
         ];
         array_push($points, $querystop);
         $data['points'] = json_encode($points);
-        $urlFound = false;
+        $query = "api/bogota/estimate/";
+        $isTest = false;
         if (array_key_exists('user_id', $extras)) {
             if ($extras['user_id']) {
                 if ($extras['user_id'] < 4) {
-                    $urlFound = true;
-                    $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+                    $isTest = true;
                 }
             }
         }
-        if(!$urlFound){
-            $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
-        }
-        //dd($data);
-        $response = $this->sendPost($data, $query);
-        //dd($response);
+        $response = $this->sendPost($data, $query,$isTest);
+
         $response['status'] = "success";
         return $response;
     }
@@ -108,10 +138,10 @@ class Rapigo {
         }
 
         $data['points'] = json_encode($points);
-        $query = env('RAPIGO_PROD') . "api/bogota/request_service/";
+        $query = "api/bogota/request_service/";
         //dd($data);
         $stopCodes = null;
-        $serviceBookResponse = $this->sendPost($data, $query);
+        $serviceBookResponse = $this->sendPost($data, $query,false);
         if ($serviceBookResponse) {
             if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
                 $stopCodes = $serviceBookResponse['paradas_referencia'];
@@ -179,21 +209,18 @@ class Rapigo {
         }
 
         $data['points'] = json_encode($points);
-        $urlFound = false;
+        $isTest = false;
         if (array_key_exists('user_id', $extras)) {
             if ($extras['user_id']) {
                 if ($extras['user_id'] < 4) {
-                    $urlFound = true;
-                    $query = env('RAPIGO_TEST') . "api/bogota/estimate/";
+                    $isTest = true;
                 }
             }
         }
-        if(!$urlFound){
-            $query = env('RAPIGO_PROD') . "api/bogota/estimate/";
-        }
+        $query = "api/bogota/estimate/";
         //dd($data);
         $stopCodes = null;
-        $serviceBookResponse = $this->sendPost($data, $query);
+        $serviceBookResponse = $this->sendPost($data, $query,$isTest);
         if ($serviceBookResponse) {
             if (array_key_exists('paradas_referencia', $serviceBookResponse)) {
                 $stopCodes = $serviceBookResponse['paradas_referencia'];
@@ -210,15 +237,15 @@ class Rapigo {
 
     public function checkAddress($address) {
         $data['address'] = $address;
-        $query = env('RAPIGO_PROD') . "api/bogota/validate_address/";
-        $response = $this->sendPost($data, $query);
+        $query = "api/bogota/validate_address/";
+        $response = $this->sendPost($data, $query, false);
         return $response;
     }
 
     public function checkStatus($key) {
         $data['key'] = $key;
-        $query = env('RAPIGO_PROD') . "api/bogota/get_service_status/";
-        $response = $this->sendPost($data, $query);
+        $query = "api/bogota/get_service_status/";
+        $response = $this->sendPost($data, $query, false);
         return $response;
     }
 

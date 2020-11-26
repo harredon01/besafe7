@@ -13,6 +13,7 @@ use App\Services\EditRating;
 use App\Services\EditBooking;
 use App\Services\MerchantImport;
 use App\Services\MiPaquete;
+use App\Services\Rapigo;
 use App\Models\CoveragePolygon;
 use App\Models\PaymentMethod;
 use App\Models\Booking;
@@ -47,6 +48,11 @@ class MerchantTableSeeder extends Seeder {
      *
      */
     protected $miPaquete;
+    /**
+     * The edit profile implementation.
+     *
+     */
+    protected $rapigo;
 
     /**
      * The edit profile implementation.
@@ -54,12 +60,13 @@ class MerchantTableSeeder extends Seeder {
      */
     protected $merchantImport;
 
-    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport, EditRating $editRating, EditBooking $editBooking, MiPaquete $miPaquete) {
+    public function __construct(EditOrder $editOrder, MerchantImport $merchantImport, EditRating $editRating, EditBooking $editBooking, MiPaquete $miPaquete,Rapigo $rapigo) {
         $this->editOrder = $editOrder;
         $this->merchantImport = $merchantImport;
         $this->editRating = $editRating;
         $this->editBooking = $editBooking;
         $this->miPaquete = $miPaquete;
+        $this->rapigo = $rapigo;
         /* $this->middleware('location.group', ['only' => 'postGroupLocation']);
           $this->middleware('location.group', ['only' => 'getGroupLocation']); */
     }
@@ -259,9 +266,11 @@ class MerchantTableSeeder extends Seeder {
 
     public function createMerchantsExcel() {
         $this->miPaquete->authenticate("https://ecommerce.mipaquete.com/api/auth");
+        $this->rapigo->authenticate("https://test.rapigo.co/api/token/");
+        $this->rapigo->authenticate("https://www.rapigo.co/api/token/");
         $this->miPaquete->getCitiesAndRegions();
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importGlobalExcel("Global3.xlsx");
+        $this->merchantImport->importGlobalExcel("Global3Test.xlsx");
 //        return true;
 //        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
 //        $this->command->info('merchants seeded!');

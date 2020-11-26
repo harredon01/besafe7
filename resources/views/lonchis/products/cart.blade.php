@@ -8,7 +8,7 @@
                 </span>
             </div>
             <div class="cart-text">
-                <span class="d-block">Your cart</span>
+                <span class="d-block">Carrito</span>
                 <strong><span class="amount"><span class="currencySymbol"></span>@{{subtotal | currency}}</span></strong>
             </div>
         </div>
@@ -35,7 +35,7 @@
                     </li>
                     <li class="single-cart">
                         <div class="cart-buttons">
-                            <!--a href="cart.html" class="btn btn-outlined">View Cart</a-->
+                            <a href="javascript:;" ng-click="clearCart()" class="btn btn-outlined">Limpiar</a>
                             <a href="/checkout" class="btn btn-outlined">Check Out</a>
                         </div>
                     </li>

@@ -24,11 +24,13 @@
                 });
 
                 $scope.goTo = function (type, $event) {
-                    if(type.length==0){
-                        $event.preventDefault()
+                    if(type=="merchant" || type =="report"){
+                        //$event.preventDefault()
                     }
+                    console.log("Going");
+                    let url = $event.target.href;
                     if (type.includes("nearby") || type.includes("coverage")) {
-                        let url = $event.target.href;
+                        
                         if (type.includes("nearby")) {
                             url += "/nearby"
                         } else if (type.includes("coverage")) {
@@ -59,6 +61,8 @@
                             console.log("res", Modals.turnObjectToUrl(params, url));
                             window.location.href = Modals.turnObjectToUrl(params, url)
                         }
+                    } else {
+                        window.location.href = url;
                     }
                 }
             }])

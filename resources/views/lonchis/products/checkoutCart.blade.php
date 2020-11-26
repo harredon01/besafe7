@@ -20,11 +20,11 @@
             </div>
             <div style="clear:both"></div>
             <br/>
-            <div class="term-block" ng-show="shippingConditionSet">
+            <div class="term-block" ng-show="shippingConditionSet || isDigital">
                 <input type="checkbox" id="accept_terms2">
                 <label for="accept_terms2">He leido y acepto los términos y condiciones</label>
             </div>
-            <button class="place-order w-100"  ng-show="shippingConditionSet" ng-click="prepareOrder()">Pagar Orden</button>
+            <button class="place-order w-100"  ng-show="shippingConditionSet || isDigital" ng-click="prepareOrder()">Pagar Orden</button>
         </div>
 
     </div>
