@@ -82,7 +82,7 @@
                                                     <option value="merchants|27|list">Otros servicios</option>
                                                 </optgroup>
                                                 <optgroup label="Productos">
-                                                    <option value="products|0|coverage">Todos</option>
+                                                    <option value="products|0|coverage">Productos Todos</option>
                                                     <option value="products|7|coverage">Perros</option>
                                                     <option value="products|8|coverage">Gatos</option>
                                                     <option value="products|5|coverage">Farmacia</option>
