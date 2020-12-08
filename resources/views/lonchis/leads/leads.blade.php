@@ -1,5 +1,5 @@
 @extends(config("app.views").'.layouts.app')
-<script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}"></script>
+
 @section('content')
 <section class="contact-page-section overflow-hidden"  ng-controller="LeadCtrl">
     <div class="row">
@@ -59,7 +59,7 @@
                                 <label>Mensaje</label>
                                 <textarea ng-model="data.message" name="message" id="message" cols="30" rows="10" class="form-control" required></textarea>
                                 <span style="color:red" ng-show="(myForm.message.$dirty && myForm.message.$invalid) || submitted && myForm.message.$invalid">
-                                    <span ng-show="submitted && myForm.message.$error.required">Porfavor ingresa la direccion</span>
+                                    <span ng-show="submitted && myForm.message.$error.required">Debes enviar un mensaje</span>
                             </div>
                         </div>
                         <div class="col-lg-12">
@@ -75,24 +75,17 @@
         <div class="col-md-6 bg-gray">
             <div class="ct-single-side">
                 <div class="section-title mb--20">
-                    <h2>CONTACT US</h2>
+                    <h2>Escríbenos</h2>
                 </div>
                 <div class="contact-right-description">
                     <article class="ct-article">
                         <h3 class="d-none sr-only">blog-article</h3>
-                        <p>Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam
-                            littera
-                            gothica, quam nunc putamus parum claram anteposuerit litterarum formas human.</p>
+                        <p>Estamos para servirte. completa el formulario y uno de nuestros agentes se pondrá en contacto contigo</p>
                     </article>
                     <ul class="contact-list mb--35">
-                        <li><i class="fas fa-fax"></i>Address : No 40 Baria Sreet 133/2 NewYork City</li>
-                        <li><i class="fas fa-phone"></i>0(1234) 567 890</li>
-                        <li><i class="far fa-envelope"></i>Info@roadthemes.com</li>
+                        <li><a href="tel:+573103418432"><i class="fas fa-phone"></i>+57 310 341 8432</a></li>
+                        <li><a href="mailto:servicioalcliente@petworld.net.co"><i class="far fa-envelope"></i>servicioalcliente@petworld.net.co</a></li>
                     </ul>
-                    <div class="working-hour">
-                        <h3>Working hours</h3>
-                        <p> <strong>Monday – Saturday</strong>: 08AM – 22PM</p>
-                    </div>
                 </div>
             </div>
         </div>

@@ -162,7 +162,7 @@
                         </ul>
                     </div>
                     @endif
-                    <button class="place-order w-100" ng-click="booking()">Reservar</button>
+                    <button class="place-order w-100" id="book-button" ng-click="booking()">Reservar</button>
                     <div class="single-sidebar">
                         <a class="promo-image overflow-image">
                             <img src="image/product/slidebar-promo-product.jpg" alt="">

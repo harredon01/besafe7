@@ -84,7 +84,7 @@
                                         <option value="{{$variant['id']}}">{{$variant['description']}}</option>
                                         @endforeach
                                     </select>
-                                    <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Add to Cart</a>
+                                    <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                 </div>
                                 <div class="card-list-content ">
                                     <div class="rating-widget mt--20">
@@ -108,7 +108,7 @@
                                             <option value="{{$variant['id']}}">{{$variant['description']}}</option>
                                             @endforeach
                                         </select>
-                                        <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Add to Cart</a>
+                                        <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                         <!--div class="btn-options">
                                             <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Add to Wishlist</a>
                                             <a href="compare.html"><i class="ion-ios-shuffle"></i>Add to Compare</a>
@@ -287,7 +287,7 @@
                 <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="prods-cont">
                     <div ng-repeat="category in categories">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
-                            <div class="pm-product" id="prod-cont-@{{product.id}}">
+                            <div class="pm-product" id="prod-cont-@{{product.id}}" style="min-height: 330px">
                                 <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
@@ -295,8 +295,6 @@
                                     <ul class="product-btns">
                                         <li ng-hide="product.isFavorite"><a href="javascript:;" ng-click="addFavorite(product)" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
                                         <li ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" tabindex="0"><i class="ion-ios-heart" style="color:red"></i></a></li>
-                                        <li><a href="compare.html" tabindex="0"><i class="ion-ios-shuffle"></i></a></li>
-                                        <li><a href="#" data-toggle="modal" data-target="#quickModal" tabindex="0"><i class="ion-ios-search"></i></a></li>
                                     </ul>
                                 </div>
                                 <div class="content">
@@ -321,7 +319,7 @@
                                         <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
                                             <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
                                         </select>
-                                        <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Add to Cart</a>
+                                        <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                     </div>
                                     <div class="btn-block grid-btn" ng-show="product.item_id">
                                         <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '-')">-</a>
@@ -344,7 +342,7 @@
                                             <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
                                                 <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
                                             </select>
-                                            <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Add to Cart</a>
+                                            <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                             <!--div class="btn-options">
                                                 <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Add to Wishlist</a>
                                                 <a href="compare.html"><i class="ion-ios-shuffle"></i>Add to Compare</a>

@@ -21,6 +21,27 @@
                                 Modals.showLoader();
                                 Leads.sendLead($scope.data).then(function (data) {
                                     Modals.hideLoader();
+                                    $scope.data = {};
+                                    Modals.showToast("Mensaje enviado",$("#contact-form"));
+                                },
+                                        function (data) {
+                                        });
+                            });
+                        });
+                    }
+                }
+                $scope.lead = function (isvalid,type) {
+                    $scope.submitted = true;
+                    if (isvalid) {
+                        grecaptcha.ready(function () {
+                            grecaptcha.execute($scope.key, {action: 'submit'}).then(function (token) {
+                                $scope.data.captcha = token;
+                                $scope.data.type = type;
+                                Modals.showLoader();
+                                Leads.sendLead($scope.data).then(function (data) {
+                                    Modals.hideLoader();
+                                    $scope.data = {};
+                                    $scope.submitted = false;
                                     Modals.showToast("Mensaje enviado",$("#contact-form"));
                                 },
                                         function (data) {

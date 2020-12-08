@@ -219,7 +219,7 @@ class MerchantController extends Controller {
      */
     public function getMerchantDetail($url) {
         $user = $this->auth->user();
-        $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities', 'categories'])->first();
+        $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities2', 'categories'])->first();
         if ($merchant) {
             $results = $this->editMapObject->getActiveCategoriesMerchant($merchant->id);
             $results = $results['data'];

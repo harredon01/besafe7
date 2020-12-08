@@ -25,6 +25,7 @@ elixir(mix => {
     'controllers/cartctrl.js',
     'controllers/checkoutctrl.js',
     'controllers/accessctrl.js',
+    'controllers/bookingctrl.js',
     'controllers/sourcesctrl.js',
     'controllers/sitemapctrl.js',
     'controllers/addressctrl.js',
@@ -48,6 +49,7 @@ elixir(mix => {
     'controllers/zonesctrl.js',
     'controllers/zonespubctrl.js',
     'services/map.js',
+    'services/booking.js',
     'services/merchants.js',
     'services/categories.js',
     'services/cart.js',
@@ -112,6 +114,7 @@ elixir(mix => {
         "scss/pages/_404.scss",
         "scss/pages/_portfolio.scss",
         "scss/pages/_service.scss",
+        "scss/pages/_booking.scss",
         "scss/_theme-color-2.scss",
         "scss/_theme-color-3.scss",
         "scss/_theme-color-4.scss"], 'public/css/main.css');

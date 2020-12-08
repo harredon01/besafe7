@@ -31,6 +31,7 @@
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
         <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
         <script src="/js/all.js"></script>
+        <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}"></script>
 
     </head>
     <body>
@@ -118,7 +119,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="header-nav-wrapper">
+                <div class="header-nav-wrapper" id="mobile-anchor">
                     <div class="container">
                         <div class="header-bottom-inner">
                             <div class="row no-gutters">
@@ -145,7 +146,7 @@
                                                         <a href="{{ url('user/payments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
                                                         <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
                                                             {{ csrf_field()}}
                                                         </form>
@@ -266,7 +267,7 @@
                                                         <a href="{{ url('user/payments')}}">Mis Pagos</a>
                                                     </li>
                                                     <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault(); document.cookie = 'user_obj= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
+                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
                                                         <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
                                                             {{ csrf_field()}}
                                                         </form>

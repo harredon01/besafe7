@@ -15,7 +15,7 @@ class CheckIfAdmin {
      * @return mixed
      */
     public function handle($request, Closure $next, $guard = null) {
-        if ($request->user()->id == 2 || $request->user()->id == 77) {
+        if ($request->user()->id < 5 || $request->user()->id == 77) {
             return $next($request);
         } else {
             return redirect('/home');

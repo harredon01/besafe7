@@ -1,0 +1,28 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Datos adicionales</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    X
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <h3>Tu descarga se ha programado</h3>
+                <p>En estos momentos el archivo se está generando y será enviado a tu correo. </p>
+                <p>Porfavor espera unos minutos y revisa tu correo. Recuerda que puede estar en la carpeta de spam.</p>
+                
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button ng-click="enviar()">
+                Cerrar
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

@@ -17,7 +17,8 @@
                     <input ng-show="item.type == 'text'" type="text" ng-model="item.value" name="{{item.name}}"/>
                     <input ng-show="item.type == 'num'" type="tel" ng-model="item.value" name="{{item.name}}"/>
                     <textarea ng-show="item.type == 'textarea'" class="mb20" ng-model="item.value" name="{{item.name}}"></textarea>
-                    <div class="ion-text-wrap" ng-show="item.type == 'radio' || item.type == 'multiple' || item.type == 'date'"  >
+                    <div class="ion-text-wrap" ng-show="item.type == 'radio' || item.type == 'multiple' || item.type == 'date'"  > 
+                        <br/>
                         <div ng-show="item.type == 'radio'" ng-model="item.value" lines="none">
                             <h4>{{item.name}}</h4>
                             <div ng-repeat="question in item.values">

@@ -72,6 +72,15 @@
                         $scope.checkFavorites();
                     }
                 });
+                $rootScope.$on('clearCart', function (event, args) {
+                    console.log("Cart cleared resetting items")
+                    $scope.cartCleared();
+
+                });
+                $rootScope.$on('deleteItem', function (event, args) {
+                    console.log("item removed resetting items: ", args)
+                    $scope.cartDeletedItem(args);
+                });
                 $scope.clean = function () {
                     angular.forEach(angular.element(".product-attributes"), function (value, key) {
                         var a = angular.element(value);
@@ -101,6 +110,9 @@
                 }
                 $scope.goTo = function (page) {
                     $scope.params.page = page;
+                    if ($rootScope.merchant_id) {
+                        $scope.params.merchant_id = $rootScope.merchant_id;
+                    }
                     Modals.showLoader();
                     $scope.categories = [];
                     Products.getProductsMerchant($scope.params).then(function (resp) {
@@ -172,7 +184,8 @@
                         id: product.activeVariant.id,
                         quantity: product.quantity,
                         item_id: product.item_id,
-                        product: product
+                        product: product,
+                        type: product.type
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
@@ -252,6 +265,22 @@
                             function (data) {
                             });
                 }
+                $scope.cartCleared = function () {
+                    for (let i in $scope.categories) {
+                        for (let j in $scope.categories[i].products) {
+                            $scope.categories[i].products[j].item_id = null;
+                        }
+                    }
+                }
+                $scope.cartDeletedItem = function (item_id) {
+                    for (let i in $scope.categories) {
+                        for (let j in $scope.categories[i].products) {
+                            if ($scope.categories[i].products[j].item_id == item_id) {
+                                $scope.categories[i].products[j].item_id = null;
+                            }
+                        }
+                    }
+                }
                 $scope.updateProductsCart = function (cart, total) {
                     cart:
                             for (let m in cart.items) {
@@ -281,7 +310,12 @@
                     } else {
                         product.quantity--;
                     }
-                    Cart.updateCartItem(product.item_id, product.quantity).then(function (data) {
+                    let container = {
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
                             alert(data.message);
                         } else {
@@ -372,7 +406,7 @@
                         id: product.activeVariant.id,
                         quantity: product.quantity,
                         item_id: product.item_id,
-                        product:product
+                        product: product
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
@@ -380,9 +414,10 @@
                             product.item_id = data.item.id;
                             product.quantity = data.item.quantity;
                             $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#add-cart-form"));
 
                         } else {
-                            Modals.showToast(data.message);
+                            Modals.showToast(data.message, $("#add-cart-form"));
                         }
                     },
                             function (data) {
@@ -435,13 +470,19 @@
                         }
                     }
                 }
+
                 $scope.changeCartQuantity = function (product, change) {
                     if (change == "+") {
                         product.quantity++;
                     } else {
                         product.quantity--;
                     }
-                    Cart.updateCartItem(product.item_id, product.quantity).then(function (data) {
+                    let container = {
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
                             alert(data.message);
                         } else {

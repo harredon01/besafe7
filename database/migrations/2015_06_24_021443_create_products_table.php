@@ -16,7 +16,7 @@ class CreateProductsTable extends Migration {
 		{
 			$table->increments('id');
                         $table->string('name');
-                        $table->text('description');
+                        $table->text('description')->nullable();
                         $table->string('slug');
                         $table->index('slug');
                         $table->double('high', 15, 2); 

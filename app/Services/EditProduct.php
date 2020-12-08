@@ -584,6 +584,7 @@ GROUP BY category_id"
             "id" => $container->id,
             "description" => $container->description,
             "price" => $container->price,
+            "type" => $container->type,
             "min_quantity" => $container->min_quantity,
             "is_shippable" => $container->is_shippable,
             "is_on_sale" => $container->is_on_sale,

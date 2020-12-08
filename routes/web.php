@@ -141,6 +141,7 @@ Route::post('food/menu', 'FoodImportController@postMenu');
 Route::post('food/content', 'FoodImportController@postContent');
 Route::post('admin/zones', 'ZonesController@postZones');
 Route::post('food/messages', 'FoodImportController@postMessages');
+Route::get('rapigo/{key?}', 'RapigoController@getContent');
 
 Route::get('/purchase', function () {
     $className = "App\\Services\\Food";

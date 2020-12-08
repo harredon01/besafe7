@@ -71,19 +71,15 @@
                         merchant_id = merchant.categorizable_id;
                     }
                     if ($scope.category) {
-                        if ($scope.category.type.includes("products")) {
-                            url = "/a/products/" + $scope.category.url + "?merchant_id=" + merchant_id;
-                        } else {
-                            url = "/a/merchant/" + merchant.slug;
-                        }
+                        url = "/a/products/" + $scope.category.url + "?merchant_id=" + merchant_id;
                     } else {
-                        url = "/a/merchant/" + merchant.slug+"/products";
+                        url = "/a/merchant/" + merchant.slug + "/products";
                     }
 
                     window.location.href = url;
                 }
             }])
-        .controller('MerchantDetailCtrl', ['$scope', 'Merchants', 'Modals', '$mdDialog', function ($scope, Merchants, Modals, $mdDialog) {
+        .controller('MerchantDetailCtrl', ['$scope','$rootScope', 'Merchants', 'Modals', '$mdDialog','Cart', function ($scope,$rootScope, Merchants, Modals, $mdDialog,Cart) {
                 $scope.data = {};
                 $scope.user = {};
 
@@ -96,27 +92,43 @@
                     let container = JSON.parse(res);
 
                     console.log("Data", container);
-                    $scope.merchant = container.merchant;
-
+                    $scope.merchant = container;
+                    $scope.merchant.availabilities = $scope.merchant.availabilities2;
+                    console.log("$scope.merchant", $scope.merchant);
                     //document.getElementById("dissapear").remove();
                 });
                 $scope.booking = function () {
+                    if ($rootScope.user) {
+                        let params = {
+                            "availabilities": $scope.merchant.availabilities,
+                            "type": "Merchant",
+                            "objectId": $scope.merchant.id,
+                            "objectName": $scope.merchant.name,
+                            "objectDescription": $scope.merchant.description,
+                            "objectIcon": $scope.merchant.icon,
+                            "expectedPrice": $scope.merchant.unit_cost
+                        }
+                        Cart.showBooking(params);
+                    } else {
+                        Modals.showToast("Registrate o ingresa para reservar",$("#book-button"));
+                    }
+
                     console.log("Booking");
 
-                    $mdDialog.show(Modals.getAppPopup()).then(function (platform) {
-                        let url = "";
-                        if (platform == "ios") {
-                            url = ""
-                        } else if (platform == 'android') {
-                            url = ""
-                        } else if (platform == 'web') {
-                            url = ""
-                        }
-                        console.log("Url", platform, url)
-                        //window.location.href = url;
-
-                    }, function () {
-
-                    });
+//                    $mdDialog.show(Modals.getAppPopup()).then(function (platform) {
+//                        let url = "";
+//                        if (platform == "ios") {
+//                            url = ""
+//                        } else if (platform == 'android') {
+//                            url = ""
+//                        } else if (platform == 'web') {
+//                            url = ""
+//                        }
+//                        console.log("Url", platform, url)
+//                        //window.location.href = url;
+//
+//                    }, function () {
+//
+//                    });
                 }
             }])

@@ -165,7 +165,7 @@
                             <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
                         </div>
                         <div class="btn-block grid-btn">
-                            <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                            <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
                         </div>
                         <div class="card-list-content ">
                     
@@ -181,7 +181,7 @@
                                 <p>@{{ merchant.description}}</p>
                             </article>
                             <div class="btn-block d-flex">
-                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Ver</a>
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
 
                                 <div class="btn-options">
                                     <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" >Detalle Negocio</a>

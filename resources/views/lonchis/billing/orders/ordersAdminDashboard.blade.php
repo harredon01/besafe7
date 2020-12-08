@@ -6,18 +6,18 @@
         <div class="row">
             <div class="col-12">
                 <div class="row">
-                    <!-- My Account Tab Menu Start -->
-                    @include(config("app.views").'.user.account_menu')
-                    <!-- My Account Tab Menu End -->
-
                     <!-- My Account Tab Content Start -->
-                    <div class="col-lg-9 col-12 mt--30 mt-lg-0">
+                    <div class="col-lg-12 col-12 mt--30 mt-lg-0">
                         <div class="tab-content" id="myaccountContent">
                             <div class="tab-pane" style="display:block" id="account-info" role="tabpanel">
                                 <div class="myaccount-content">
                                     <h3>Mis Ordenes</h3>
                                     <select ng-model="merchant_id" ng-change="selectMerchant()">
                                         <option ng-repeat="merchant in merchants" ng-value="merchant.id">@{{merchant.name}}</option>
+                                    </select> 
+                                    <select ng-model="status" ng-change="selectMerchant()"> 
+                                        <option value="pending">Por Entregar</option>
+                                        <option value="completed">Entregado</option>
                                     </select>
                                     <div class="myaccount-table table-responsive text-center">
                                         <table class="table table-bordered">
@@ -26,6 +26,7 @@
                                                     <th>No</th>
                                                     <th>Items</th>
                                                     <th>Direccion</th>
+                                                    <th>Condiciones</th>
                                                     <th>Usuario</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -36,12 +37,13 @@
                                                     <td>@{{ order.id}}</td>
                                                     <td><p ng-repeat="item in order.items">@{{ item.name }}-@{{ item.sku }}(@{{ item.quantity }}):@{{ item.price | currency }}</p></td>
                                                     <td>@{{ order.order_addresses[0].address}}<br/>@{{ order.order_addresses[0].city}}</td>
+                                                    <td><p ng-repeat="item in order.order_conditions">@{{ item.name }}:@{{ item.total | currency }}</p></td>
                                                     <td>@{{ order.user.firstName}} @{{ order.user.lastName}}<br/>@{{ order.user.cellphone}}<br/>@{{ order.user.email}}</td>
-                                                    <td><a href="javascript" ng-hide="payment.status=='approved'" ng-click="fulfillOrder(order)" class="btn">Aprobar Pago</a></td>
+                                                    <td><a href="javascript:;" ng-show="order.execution_status=='pending'" ng-click="fullfillOrder(order)" class="btn">Entregar</a></td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <button ng-click="getOrders()">Cargar mas</button>
+                                        <button ng-click="loadMoreOrders()">Cargar mas</button>
                                     </div>
                                 </div>
                             </div>

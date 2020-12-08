@@ -221,9 +221,10 @@ class OrderApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function setPlatformShippingCondition(Request $request,$order,$platform) {
+    public function setPlatformShippingCondition(Request $request,$order) {
         $user = $request->user();
-        return response()->json($this->editOrder->setPlatformShippingCondition($user, $order,$platform));
+        $data = $request->all();
+        return response()->json($this->editOrder->setPlatformShippingCondition($user, $order,$data));
     }
     
     /**
@@ -232,9 +233,10 @@ class OrderApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getPlatformShippingPrice(Request $request,$order,$platform) {
+    public function getPlatformShippingPrice(Request $request,$order) {
         $user = $request->user();
-        return response()->json($this->editOrder->getPlatformShippingPrice($user, $order,$platform));
+        $data = $request->all();
+        return response()->json($this->editOrder->getPlatformShippingPrice($user, $order,$data));
     }
 
     /**

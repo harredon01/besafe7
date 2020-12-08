@@ -1,0 +1,28 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Datos adicionales</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    X
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <div class="md-dialog-content">
+                <select>
+                    <option value="Rapigo">Rapigo</option>
+                </select>
+                <input ng-show="item.type == 'text'" type="text" ng-model="item.value" name="{{item.name}}"/>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button ng-click="save()">
+                Enviar
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

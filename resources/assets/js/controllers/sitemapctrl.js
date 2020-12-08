@@ -24,13 +24,13 @@
                 });
 
                 $scope.goTo = function (type, $event) {
-                    if(type=="merchant" || type =="report"){
+                    if (type == "merchant" || type == "report") {
                         //$event.preventDefault()
                     }
                     console.log("Going");
                     let url = $event.target.href;
                     if (type.includes("nearby") || type.includes("coverage")) {
-                        
+
                         if (type.includes("nearby")) {
                             url += "/nearby"
                         } else if (type.includes("coverage")) {
@@ -98,14 +98,14 @@
                                 } else {
                                     url += "?categories=" + results[1] + "&lat=" + $rootScope.shippingAddress.lat + "&long=" + $rootScope.shippingAddress.long + "&q=" + $scope.searchText
                                 }
-                                
+
                             } else {
                                 if (results[1] == "0") {
                                     url += "?q=" + $scope.searchText
                                 } else {
                                     url += "?categories=" + results[1] + "&q=" + $scope.searchText
                                 }
-                                
+
                                 $cookies.put("locationRefferrer", url, {path: "/"});
                                 window.location.href = "/location";
                                 return;
@@ -130,14 +130,17 @@
                 $scope.category;
 
 
-                $scope.goTo = function (type, $event) {
+                $scope.goTo = function (type, $event, isCat) {
                     if (type.includes("nearby") || type.includes("coverage")) {
                         let url = $event.currentTarget.href;
-                        if (type.includes("nearby")) {
-                            url += "/nearby"
-                        } else if (type.includes("coverage")) {
-                            url += "/coverage"
+                        if (isCat) {
+                            if (type.includes("nearby")) {
+                                url += "/nearby"
+                            } else if (type.includes("coverage")) {
+                                url += "/coverage"
+                            }
                         }
+
                         console.log("Type", type);
                         console.log("target", $event.currentTarget.href);
                         $event.preventDefault()

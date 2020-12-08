@@ -40,6 +40,20 @@ angular.module('besafe')
                         clickOutsideToClose: true,
                     }
                 }
+                var getExportPopup = function () {
+                    return {
+                        controller: ['$scope', '$mdDialog', function ($scope, $mdDialog) {
+                                $scope.enviar = function () {
+                                    $mdDialog.hide();
+                                };
+                            }],
+                        templateUrl: '/templates/exportConfirmation.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                    }
+                }
                 var getAppPopup = function () {
                     return {
                         controller: ['$scope', '$mdDialog', 'Addresses', '$rootScope', function ($scope, $mdDialog, Addresses, $rootScope) {
@@ -47,7 +61,7 @@ angular.module('besafe')
 
                                 $scope.selectPlatform = function (platform) {
                                     $mdDialog.hide(platform);
-                                    
+
 
                                 }
                                 $scope.hide = function () {
@@ -105,7 +119,7 @@ angular.module('besafe')
                 }
                 var getQuestionairePopup = function (questions) {
                     return {
-                        controller: ['$scope', '$mdDialog', 'Merchants', '$rootScope', function ($scope, $mdDialog ) {
+                        controller: ['$scope', '$mdDialog', 'Merchants', '$rootScope', function ($scope, $mdDialog) {
                                 $scope.questions = questions;
 
                                 $scope.hide = function () {
@@ -116,7 +130,7 @@ angular.module('besafe')
                                     $mdDialog.cancel();
                                 };
                                 $scope.checkValue = function (item) {
-                                    console.log("Checking: ",item);
+                                    console.log("Checking: ", item);
                                 };
 
                                 $scope.save = function () {
@@ -169,6 +183,23 @@ angular.module('besafe')
                         // Modal dialogs should fully cover application to prevent interaction outside of dialog
                         parent: angular.element(document.body),
                         clickOutsideToClose: true,
+                    }
+                }
+                var getBookingPrompt = function (params) {
+                    return {
+                        controller: 'BookingCtrl',
+                        resolve: {
+                            getParams: function () {
+                                return params;
+                            }
+                        },
+                        templateUrl: '/templates/booking.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: true,
+                        backdrop  : 'static',
+                        keyboard  : false
                     }
                 }
                 var showToast = function (message, parent) {
@@ -334,12 +365,14 @@ angular.module('besafe')
 
                 return {
                     getAddressesPopup: getAddressesPopup,
+                    getExportPopup: getExportPopup,
+                    getBookingPrompt:getBookingPrompt,
                     getLocationPrompt: getLocationPrompt,
                     getLocationExtPrompt: getLocationExtPrompt,
                     getMerchantsPopup: getMerchantsPopup,
-                    getQuestionairePopup:getQuestionairePopup,
+                    getQuestionairePopup: getQuestionairePopup,
                     showToast: showToast,
-                    getAppPopup:getAppPopup,
+                    getAppPopup: getAppPopup,
                     showLoader: showLoader,
                     turnObjectToUrl: turnObjectToUrl,
                     hideLoader: hideLoader,

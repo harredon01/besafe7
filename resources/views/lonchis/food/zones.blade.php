@@ -4,17 +4,15 @@
 <div class="container" ng-controller="ZonesCtrl">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default" ng-if="!changeMerchant">
+            <div class="panel panel-default">
                 <div class="panel-heading">Negocio Activo</div>
                 <div class="panel-body">
-                    Id: <span class="type">@{{ activeMerchantObject.id}}</span><br/>
-                    Name: <span class="type">@{{ activeMerchantObject.name}}</span><br/>
-                    <button type="submit" class="btn btn-primary" ng-click="changeActiveMerchant()">
+                    <!--button type="submit" class="btn btn-primary" ng-click="changeActiveMerchant()">
                         Cambiar
-                    </button><br/><br/>
-                    Proveedor Envios
-                    <select ng-model="activeProvider" ng-change="changeScenario()">
-                        <option ng-repeat="provider in providers" value="@{{ provider.value}}">@{{ provider.name}}</option>
+                    </button><br/><br/-->
+                    Proveedor
+                    <select ng-model="activeMerchant" ng-change="selectMerchantObject()">
+                        <option ng-repeat="merchant in merchants" value="@{{ merchant.id}}">@{{ merchant.name}}</option>
                     </select><br/><br/><br/>
                     <button type="submit" class="btn btn-primary" ng-click="createItem()">
                         Crear nuevo Poligono
@@ -22,11 +20,11 @@
                     <br/>
                 </div>
             </div>
-            <div class="panel panel-default" ng-if="changeMerchant">
+            <!--div class="panel panel-default" ng-if="changeMerchant">
                 <div class="panel-heading">Cambiar Negocio</div>
                 <div class="panel-body">
                     <input type="text" name="search" ng-model="searchTerms"/>
-                    <button type="submit" class="btn btn-primary" ng-click="getMerchants()">
+                    <button type="submit" class="btn btn-primary" ng-click="searchMerchants()">
                         Buscar
                     </button>
                     <br/>
@@ -42,7 +40,7 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+            </div-->
 
             <div class="panel panel-default">
                 <div class="panel-body">

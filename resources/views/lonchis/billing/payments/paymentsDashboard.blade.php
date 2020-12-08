@@ -39,7 +39,7 @@
                                                     <td>@{{ payment.status}}</td>
                                                     <td>@{{ payment.total | currency}}</td>
                                                     <td>@{{ payment.user.firstName}} @{{ payment.user.lastName}}<br/>@{{ payment.user.cellphone}}<br/>@{{ payment.user.email}}</td>
-                                                    <td><a href="javascript" ng-hide="payment.status=='approved'" ng-click="approvePayment(payment)" class="btn">Aprobar Pago</a></td>
+                                                    <td><a href="javascript:;" ng-hide="payment.status=='approved'" ng-click="approvePayment(payment)" class="btn">Aprobar Pago</a></td>
                                                 </tr>
                                             </tbody>
                                         </table>

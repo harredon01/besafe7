@@ -42,6 +42,23 @@ angular.module('besafe')
                 return def.promise;
                 /**/
             }
+            var getKeyStatus = function (key) {
+                let url = '/api/rapigo/status/'+key ;
+                var def = $q.defer();
+                $http({
+                    method: 'get',
+                    url: url 
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to getKeyStatus");
+                        });
+                return def.promise;
+                /**/
+            }
             var deleteStop = function (stop_id) {
                 let url = '/api/stops/'+stop_id ;
                 var def = $q.defer();
@@ -149,6 +166,7 @@ angular.module('besafe')
             return {
                 getRoutes:getRoutes,
                 deleteStop:deleteStop,
+                getKeyStatus:getKeyStatus,
                 deleteRoute:deleteRoute,
                 sendStopToNewRoute:sendStopToNewRoute,
                 buildRoute:buildRoute,

@@ -27,17 +27,55 @@ angular.module('besafe')
                     window.location.href = "/location";
                 };
                 var checkProduct = function (variant) {
-                    console.log("Check prod", $rootScope.shippingAddress);
-                    if (variant.is_shippable) {
-                        if ($rootScope.shippingAddress) {
-                            return checkMerchant();
-                        }
-                        showConfirm(window.location.href);
+                    console.log("Checking: ", variant, $rootScope.user);
+                    if (variant.type == "booking" && $rootScope.user) {
+                        appointmentbook(variant.product);
                         return false;
                     } else {
-                        return checkMerchant();
+                        console.log("Check prod", $rootScope.shippingAddress);
+                        if (variant.is_shippable) {
+                            if ($rootScope.shippingAddress) {
+                                return checkMerchant();
+                            }
+                            showConfirm(window.location.href);
+                            return false;
+                        } else {
+                            return checkMerchant();
+                        }
                     }
+
                 };
+                appointmentbook = function (item) {
+                    let questions = [];
+                    let container = null;
+                    console.log("variants", item.variants)
+                    for (let i in item.variants) {
+                        if (item.variant_id == item.variants[i].id) {
+                            container = item.variants[i];
+                            break;
+                        }
+                    }
+                    console.log("Container", container);
+                    if (container.attributes) {
+                        if (container.attributes.questions) {
+                            questions = container.attributes.questions;
+                        }
+                    }
+                    let params = {
+                        "availabilities": null,
+                        "type": "Merchant",
+                        "objectId": item.merchant_id,
+                        "objectName": item.merchant_name,
+                        "objectDescription": item.merchant_description,
+                        "objectIcon": item.merchant_icon,
+                        "expectedPrice": item.activeVariant.price,
+                        "questions": questions,
+                        "product_variant_id": item.variant_id,
+                        "quantity": item.amount,
+                        "purpose": "external_book"
+                    }
+                    showBooking(params);
+                }
                 var getCategoryFromUrl = function () {
                     let theUrl = window.location.href;
                     let segments = theUrl.split("/")
@@ -64,13 +102,25 @@ angular.module('besafe')
                     console.log("Searching for merchants in cat:", category);
                     showMerchants(category);
                 };
+                var showBooking = function (params) {
+                    var def = $q.defer();
+                    $mdDialog.show(Modals.getBookingPrompt(params)).then(function (result) {
+                        console.log("Got result", result);
+                        Modals.hideLoader();
+                        def.resolve(result);
+                    }, function () {
+                        console.log("Got nothing");
+                        Modals.hideLoader();
+                        def.resolve();
+                    });
+                    return def.promise;
+                };
                 var showAdvanced = function () {
                     $mdDialog.show(Modals.getAddressesPopup()).then(function (address) {
                         console.log("Got address", address);
                         $rootScope.shippingAddress = address;
                         $rootScope.lat = address.lat;
                         $cookies.put("shippingAddress", JSON.stringify(address), {path: "/"});
-                        checkMerchant();
                     }, function () {
                         console.log("Got nothing");
                     });
@@ -136,7 +186,7 @@ angular.module('besafe')
                     if (!results) {
                         def.resolve({status: "pending_location", message: "msg"});
                     } else {
-                        if (actvVariant.attributes.questions) {
+                        if (actvVariant.attributes && actvVariant.attributes.questions && actvVariant.type == "product") {
                             $mdDialog.show(Modals.getQuestionairePopup(actvVariant.attributes.questions)).then(function (results) {
                                 let data = [];
                                 for (let i in results) {
@@ -178,15 +228,12 @@ angular.module('besafe')
                     }
                     return def.promise;
                 };
-                var updateCartItem = function (item_id, quantity) {
+                var updateCartItem = function (data) {
                     var def = $q.defer();
                     $http({
                         method: "post",
                         url: "/api/cart/update",
-                        data: {
-                            item_id: item_id,
-                            quantity: quantity
-                        }
+                        data: data
                     })
                             .success(function (data) {
                                 // console.log(data);
@@ -249,7 +296,9 @@ angular.module('besafe')
                     getCheckoutCart: getCheckoutCart,
                     getCart: getCart,
                     addCartItem: addCartItem,
+                    postToServer: postToServer,
                     updateCartItem: updateCartItem,
+                    showBooking:showBooking,
                     showConfirm: showConfirm,
                     showConfirmExt: showConfirmExt,
                     clearCart: clearCart,

@@ -170,8 +170,8 @@ class UserApiController extends Controller {
             $data['push'] = $user->push()->where("platform", "Food")->first();
             $data['count'] = $count;
             $data['green'] = $green;
-            //$this->editCart->migrateCart($user, $request->header('x-device-id'));
-            dispatch(new MigrateCart($user, $request->header('x-device-id')));
+            $this->editCart->migrateCart($user, $request->header('x-device-id'));
+            //dispatch(new MigrateCart($user, $request->header('x-device-id')));
             //$data['followers'] = count($users2);
             // the token is valid and we have found the user via the sub claim
         }

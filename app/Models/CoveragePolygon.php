@@ -10,7 +10,7 @@ class CoveragePolygon extends Model
     use SpatialTrait;
     protected $table = 'coverage_polygons';
     
-    protected $fillable = ['coverage','country_id','region_id','city_id','merchant_id','address_id','lat','long','provider'];
+    protected $fillable = ['coverage','country_id','region_id','city_id','merchant_id','address_id','lat','long','provider','description'];
     /**
      * The attributes that are spatial fields.
      *

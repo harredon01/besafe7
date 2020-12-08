@@ -10,12 +10,6 @@ use Unlu\Laravel\Api\QueryBuilder;
 
 class RapigoController extends Controller
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\Guard
-     */
-    protected $auth;
 
     /**
      * The edit alerts implementation.
@@ -28,9 +22,8 @@ class RapigoController extends Controller
      *
      * @return void
      */
-    public function __construct(Guard $auth, Rapigo $rapigo) {
+    public function __construct(Rapigo $rapigo) {
         $this->rapigo = $rapigo;
-        $this->auth = $auth;
     }
 
     /**
@@ -51,8 +44,29 @@ class RapigoController extends Controller
      *
      * @return Response
      */
+    public function getContent() {
+        return view(config("app.views").'.rapigo-track');
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function getKeyStatus(Request $request,$key) {
+        return response()->json([
+                    'status' => "success",
+                    'message' => "search successful",
+                    "result" => $this->rapigo->checkStatus($key)
+                        ], 200);
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
     public function webhook(Request $request) {
-        ;
         return response()->json([
                     'status' => "success",
                     'message' => "webhook successful",

@@ -136,6 +136,7 @@ class ProductController extends Controller {
                 "page" => $results['page'],
                 "last_page" => $results['last_page'],
                 "total" => $results['total'],
+                "merchant_id"=>$merchant->id,
                 "category" => null,
                 "side_categories" => $side_categories
             ];

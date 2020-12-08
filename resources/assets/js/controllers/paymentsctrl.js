@@ -61,15 +61,6 @@
                     });
         }
 
-        $scope.approvePayment = function (payment) {
-            Payments.approvePayment(payment.id).then(function (data) {
-                payment.status = "approved";
-            },
-                    function (data) {
-
-                    });
-        }
-
     }]).controller('PaymentsMerchantCtrl', ['$scope', 'Orders', 'Merchants', function ($scope, Orders, Merchants) {
         $scope.data = {};
         $scope.orders = [];
@@ -79,23 +70,27 @@
                 $scope.page = 0;
         $scope.regionVisible = false;
         $scope.editPayment = false;
+        $scope.status = "pending";
         angular.element(document).ready(function () {
             $scope.getMerchants();
         });
 
         $scope.getOrders = function (merchant) {
             $scope.page++;
-            let url = "includes=items,orderAddresses,user&order_by=id,desc&page=" + $scope.page + "&merchant_id=" + merchant;
+            let url = "includes=items,orderAddresses,orderConditions,user&order_by=id,asc&page=" + $scope.page + "&merchant_id=" + merchant + "&execution_status=" + $scope.status;
             Orders.getOrders(url).then(function (data) {
                 if (data.page == data.last_page) {
                     $scope.loadMore = false;
                 }
-                $scope.orders = data.data;
+                $scope.orders = $scope.orders.concat(data.data);
 
             },
-                    function (data) {
+                    function (data) { 
 
                     });
+        }
+        $scope.loadMoreOrders = function () {
+            $scope.getOrders($scope.merchant_id);
         }
         $scope.selectMerchant = function () {
             $scope.orders = [];
@@ -118,7 +113,27 @@
         }
 
         $scope.fullfillOrder = function (order) {
+            let itemsArr = [];
+            for (let item in order.items) {
+                itemsArr.push(order.items[item].id);
+            }
+            let container = {
+                order_id: order.id,
+                items: itemsArr,
+                status:"fullfill"
+            }
+            Orders.fullfillOrder(container).then(function (data) {
+                if (data.status == "success") {
+                    order.execution_status = "completed";
+                    for (let item in order.items) {
+                        order.items[item].fulfillment = "fulfilled"; 
+                    }
+                }
 
+            },
+                    function (data) {
+
+                    });
         }
 
     }]).controller('PaymentsUserCtrl', ['$scope', 'Payments', function ($scope, Payments) {
@@ -141,15 +156,6 @@
                 }
                 $scope.payments = data.data;
 
-            },
-                    function (data) {
-
-                    });
-        }
-
-        $scope.approvePayment = function (payment) {
-            Payments.approvePayment(payment.id).then(function (data) {
-                payment.status = "approved";
             },
                     function (data) {
 

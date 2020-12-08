@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Item;
 use App\Models\CoveragePolygon;
 use App\Models\Order;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\GeneralNotification;
 use App\Models\User;
 use Validator;
 use DB;
@@ -37,10 +39,6 @@ class EditItem {
      * @return \Illuminate\Http\Response
      */
     public function changeStatusItems(User $user, array $data) {
-        $validator = $this->validatorStatusBookings($data);
-        if ($validator->fails()) {
-            return response()->json(array("status" => "error", "message" => $validator->getMessageBag()), 400);
-        }
         $status = $data["status"];
         $totalWeight = 0;
         $extras = [];
@@ -54,7 +52,7 @@ class EditItem {
             if ($merchant) {
                 if ($merchant->checkAdminAccess($user->id)) {
                     foreach ($items as $item) {
-                        $itemsDesc += $item->name . ": " . $item->quantity . ", ";
+                        $itemsDesc .= $item->name . ": " . $item->quantity . ", ";
                         $attributes = json_decode($item->attributes, true);
                         if (array_key_exists('weight', $attributes)) {
                             if ($attributes['weight']) {
@@ -81,16 +79,22 @@ class EditItem {
                     $extras['special_service'] = 2;
                     $extras['value_collection'] = $order->total;
                 } else {
-                    $extras['special_service'] = 1;
+                    $extras['special_service'] = 0;
                 }
-                $attributesM = json_decode($merchant->attributes, true);
-                $extras['merchant_id'] = $attributesM['merchant_id'];
+                $attributesM = $merchant->attributes;
+                $extras['merchant_id'] = $merchant->id;
                 $extras['merchant_email'] = $merchant->email;
                 $extras['client_email'] = $order->user->email;
-                $extras['user_id'] = $order->user->id;
+                $extras['user_id'] = $user->id;
                 $shippingCondition = $order->orderConditions()->where('type', "shipping")->first();
-                $attributes = json_encode($shippingCondition->attributes, true);
-                $polygon = CoveragePolygon::where("merchant_id", $merchant->id)->where('provider', $attributes["platform"])->with("address")->first();
+                $attributes = json_decode($shippingCondition->attributes, true);
+                if ($attributes["platform"] == "MerchantShiping") {
+                    $polygon = CoveragePolygon::find($attributes["platform_id"]);
+                    $extras['platform_id'] = $attributes["platform_id"];
+                } else {
+                    $polygon = CoveragePolygon::where("merchant_id", $merchant->id)->where('provider', $attributes["platform"])->with("address")->first();
+                }
+
                 $origin = $polygon->address;
                 $className = "App\\Services\\" . $attributes["platform"];
                 $gateway = new $className;
@@ -100,7 +104,31 @@ class EditItem {
                     $attributesO['shipping_provider_id'] = $result['shipping_id'];
                     $attributesO['shipping_provider'] = $attributes['platform'];
                     $order->attributes = json_encode($attributesO);
+                    $order->execution_status = "completed";
                     $order->save();
+                    $result['subject'] = "Orden No. " . $order->id . " " . $result['subject'];
+                    $users = User::whereIn("id", [2, 3, $extras['user_id'], $order->user->id])->get();
+                    Mail::to($users)->send(new GeneralNotification($result['subject'], $result['body']));
+                } else {
+                    $payload = [
+                        "order_id" => $order->id,
+                        "status" => $data["status"],
+                    ];
+                    $data = [
+                        "trigger_id" => $user->id,
+                        "message" => "",
+                        "subject" => "Error generating shipment with platform: ".$attributes["platform"],
+                        "object" => "Merchant",
+                        "sign" => true,
+                        "payload" => $payload,
+                        "type" => "shipping-error",
+                        "user_status" => $user->getUserNotifStatus()
+                    ];
+                    $client = User::find(2);
+                    $followers = [$client];
+                    $date = date("Y-m-d H:i:s");
+                    $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
+                    
                 }
             }
             $payload = [
@@ -114,16 +142,16 @@ class EditItem {
                 "object" => "Merchant",
                 "sign" => true,
                 "payload" => $payload,
-                "type" => self::ITEM_FULFILLMENT_STATUS_UPDATE,
+                "type" => self::ORDER_FULFILLMENT_STATUS_UPDATE,
                 "user_status" => $user->getUserNotifStatus()
             ];
             $client = $order->user;
             $followers = [$client];
             $date = date("Y-m-d H:i:s");
             //$this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
-            return response()->json(array("status" => "success", "message" => "Status updated"));
+            return array("status" => "success", "message" => "Status updated");
         }
-        return response()->json(array("status" => "error", "message" => "Object not found"));
+        return array("status" => "error", "message" => "Object not found");
     }
 
     /**

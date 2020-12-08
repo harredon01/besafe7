@@ -1,9 +1,10 @@
 ﻿angular.module('besafe')
 
-        .controller('CheckoutCartCtrl', ['$scope', '$rootScope', 'Users', 'Orders', 'Products', 'Modals', function ($scope, $rootScope, Users, Orders, Products, Modals) {
+        .controller('CheckoutCartCtrl', ['$scope', '$rootScope', 'Cart', 'Orders', 'Modals', '$q', function ($scope, $rootScope, Cart, Orders, Modals, $q) {
                 $scope.data = {};
                 $scope.coupon = "";
                 $rootScope.isDigital = false;
+                $rootScope.bookingSet = true;
                 angular.element(document).ready(function () {
                     $scope.getCart(true);
 
@@ -21,7 +22,7 @@
                     });
                 }
                 $scope.getCart = function (init) {
-                    Products.getCheckoutCart().then(function (data) {
+                    Cart.getCheckoutCart().then(function (data) {
                         if (data.status == 'error') {
                             alert(data.message);
                         } else {
@@ -33,17 +34,25 @@
                             });
                 }
                 $scope.getOrder = function (init) {
+                    var def = $q.defer();
                     Orders.getOrder().then(function (data) {
                         $rootScope.isDigital = true;
                         $rootScope.activeOrder = data.data;
+                        def.resolve("Done")
                     },
                             function (data) {
 
                             });
+                    return def.promise;
                 }
                 $scope.updateCartItem = function (item_id) {
                     var quantity = angular.element(document.querySelector('input[name=check-quantity-' + item_id + ']')).val();
-                    Products.updateCartItem(item_id, quantity).then(function (data) {
+                    let container = {
+                        quantity: quantity,
+                        item_id: item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == 'error') {
                             alert(data.message);
                         }
@@ -53,7 +62,7 @@
                             });
                 }
                 $scope.clearCart = function () {
-                    Products.clearCart().then(function (data) {
+                    Cart.clearCart().then(function (data) {
                         $scope.getCart();
                     },
                             function (data) {
@@ -70,7 +79,7 @@
                                 shippable = true;
                             }
                         }
-                        $scope.items = data.items;
+                        $rootScope.items = data.items;
                         $scope.totalItems = data.totalItems;
                         $scope.subtotal = data.subtotal;
                         $scope.shipping = data.shipping;
@@ -85,8 +94,13 @@
                                 $rootScope.$broadcast('Shippable');
                             } else {
 
-                                $scope.getOrder()
-                                $rootScope.$broadcast('NotShippable');
+                                $scope.getOrder().then(function (data) {
+                                    $rootScope.$broadcast('NotShippable');
+                                },
+                                        function (data) {
+
+                                        });
+
                             }
                         }
                     } else {
@@ -97,7 +111,12 @@
                     $rootScope.$broadcast('prepareOrder');
                 }
                 $scope.deleteCartItem = function (item_id) {
-                    Products.updateCartItem(item_id, 0).then(function (data) {
+                    let container = {
+                        quantity: 0,
+                        item_id: item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == 'error') {
                             alert(data.message);
                         }
@@ -117,16 +136,16 @@
                                 if (resp.status == "success") {
                                     $scope.getCart(false);
                                     $scope.coupon = "";
-                                    Modals.showToast('Cupon agregado exitosamente', $("#checkout-cart"));
+                                    Modals.showToast('Cupon agregado exitosamente', $("#final-submit"));
                                 } else {
-                                    Modals.showToast('No puedes usar ese cupon', $("#checkout-cart"));
+                                    Modals.showToast('No puedes usar ese cupon', $("#final-submit"));
                                 }
                             }
                         },
                                 function (data) {
                                 });
                     } else {
-                        Modals.showToast('Ingresa un cupon');
+                        Modals.showToast('Ingresa un cupon', $("#final-submit"));
                     }
                 }
                 $rootScope.$on('updateCheckoutCart', function (event, args) {
@@ -136,11 +155,10 @@
                 $rootScope.$on('updateLoadedCart', function (event, args) {
                     console.log("updateLoadedCart", args);
                     $scope.loadCart(args);
-
                 });
             }])
-        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', 'Cart', '$cookies', 'Orders', 'Modals', 'Billing',
-            function ($scope, $rootScope, LocationService, Users, Cart, $cookies, Orders, Modals, Billing) {
+        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', 'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
+            function ($scope, $rootScope, LocationService, Users, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
                 $scope.data = {};
                 $scope.addressSet = {};
                 $scope.shipping = [];
@@ -193,6 +211,9 @@
                 });
                 $rootScope.$on('prepareOrder', function (event, args) {
                     $scope.prepareOrder();
+                });
+                $rootScope.$on('buildOrder', function (event, args) {
+                    $scope.buildOrder($rootScope.activeOrder);
                 });
                 $rootScope.$on('NotShippable', function (event, args) {
                     $scope.visible = false;
@@ -311,30 +332,48 @@
                                 console.log("Providers: ", providers[i]);
                             }
                             console.log("Setting discounts", $rootScope.shippingAddressSet);
-                            Orders.setDiscounts(order.id, "Booking").then(function (data) {
-                                console.log("Discounts set", data);
-                                let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
-                                Orders.checkOrder(order.id, dataS).then(function (resp) {
-                                    console.log("Check Order Result", resp);
-                                    Modals.hideLoader();
-                                    let order = resp.order;
-                                    if (resp.status == "success") {
-                                        Modals.showToast("Direccion guardada", $("#checkout-shipping"));
-                                        $rootScope.$broadcast('updateCheckoutCart');
-                                    } else {
-                                        $scope.handleCheckError(resp, order);
-                                    }
-                                },
-                                        function (data) {
-                                        });
-                            },
-                                    function (data) {
-                                    });
+                            $scope.buildOrder(order);
                         } else {
                             Modals.hideLoader();
                             Modals.showToast("Fuera de cobertura para esta orden", $("#checkout-shipping"));
                         }
 
+                    },
+                            function (data) {
+                            });
+                }
+                $scope.scrollTo = function (id) {
+                    setTimeout(function () {
+                        var old = $location.hash();
+                        $location.hash(id);
+                        $anchorScroll();
+                        $location.hash(old);
+                    }, 500);
+                }
+                $scope.buildOrder = function (order) {
+                    Orders.setDiscounts(order.id, "Booking").then(function (data) {
+                        console.log("Discounts set", data);
+                        let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
+                        Orders.checkOrder(order.id, dataS).then(function (resp) {
+                            console.log("Check Order Result", resp);
+                            Modals.hideLoader();
+                            let order = resp.order;
+                            if (resp.status == "success") {
+                                if ($rootScope.isDigital) {
+                                    //$scope.prepareOrder();
+                                } else {
+                                    Modals.showToast("Direccion guardada", $("#checkout-shipping"));
+                                    $rootScope.$broadcast('updateCheckoutCart');
+                                    $scope.scrollTo("checkout-shipping-methods");
+                                    console.log("Finished scrolling2222");
+                                }
+
+                            } else {
+                                $scope.handleCheckError(resp, order);
+                            }
+                        },
+                                function (data) {
+                                });
                     },
                             function (data) {
                             });
@@ -353,7 +392,9 @@
                 }
                 $scope.setShippingCondition = function (item) {
                     Modals.showLoader();
-                    Orders.setPlatformShippingCondition($rootScope.activeOrder.id, item.platform).then(function (data) {
+                    console.log("Set Shipping", item);
+                    let container = {"provider": item.class, "provider_id": item.id};
+                    Orders.setPlatformShippingCondition($rootScope.activeOrder.id, container).then(function (data) {
                         Modals.hideLoader();
                         console.log("setPlatformShippingPrice Result", data);
                         if (data.status == "success") {
@@ -388,7 +429,8 @@
                         //
                     } else if (resp.type == "shipping") {
                         //this.api.toast('CHECKOUT_PREPARE.REQUIRES_SHIPPING');
-                        Modals.showToast("Debes seleccionar proveedor de envio", $("#checkout-shipping"));
+                        $scope.scrollTo("checkout-shipping-methods");
+                        Modals.showToast("Debes seleccionar proveedor de envio", $("#checkout-shipping-methods"));
                         if ($scope.shipping.length == 0) {
                             $scope.expectedProviders = 0;
                             let attributes = JSON.parse(order.attributes);
@@ -413,10 +455,16 @@
                     }
                 }
                 $scope.getPlatformShippingPrice = function (order_id, platform) {
+                    let description = platform.desc;
+                    delete platform.desc;
                     Orders.getPlatformShippingPrice(order_id, platform).then(function (data) {
                         console.log("getPlatformShippingPrice Result", data);
                         if (data.status == "success") {
-                            let container = {platform: platform, price: data.price}
+                            let name = platform.provider;
+                            if (platform.provider == "MerchantShipping") {
+                                name = "Domicilio del Establecimiento"
+                            }
+                            let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id}
                             $scope.shipping.push(container);
                         }
                     },
@@ -466,19 +514,25 @@
                         Modals.hideLoader();
                         if (resp) {
                             if (resp.status == "success") {
-                                Modals.showToast("Pago creado exitosamente", $("#checkout-cart"));
+                                Modals.showToast("Selecciona método de envío", $("#checkout-cart"));
                                 console.log("orderProvider", resp);
                                 $rootScope.activePayment = resp.payment;
                                 $rootScope.activeOrder = resp.order;
                                 if ($rootScope.activePayment.total == $rootScope.activePayment.transaction_cost) {
                                     let container = {
-                                        "payment_id": this.payment.id
+                                        "payment_id": $rootScope.activePayment.id
                                     }
                                     Modals.showLoader();
                                     Billing.completePaidOrder(container).then(function (resp) {
                                         Modals.hideLoader();
                                         if (resp.status == "success") {
-                                            $scope.transactionResponse(null, true);
+                                            resp.transaction = {};
+                                            resp.transaction.reference_sale = "Pago Interno";
+                                            resp.transaction.payment_method = "Pago Interno";
+                                            resp.transaction.description = "Pago Interno";
+                                            resp.transaction.transaction_id = resp.payment.id;
+                                            resp.transaction.transaction_state = "APPROVED";
+                                            $rootScope.$broadcast('transactionResponse',resp);
                                         } else {
                                             $scope.showPayment = true;
                                             //this.scrollToTop();
@@ -538,13 +592,22 @@
                         $scope.years.push(year + i);
                     }
                 });
+                $scope.scrollTo = function (id) {
+                    setTimeout(function () {
+                        var old = $location.hash();
+                        $location.hash(id);
+                        $anchorScroll();
+                        $location.hash(old);
+                    }, 500);
+                }
                 $rootScope.$on('activatePayment', function (event, args) {
                     $rootScope.paymentActive = true;
-                    setTimeout(function () {
-                        $location.hash('payment-methods');
-                        $anchorScroll();
-                    }, 800);
+                    $scope.scrollTo("checkout-payment");
                     // call $anchorScroll()
+                });
+                $rootScope.$on('transactionResponse', function (event, args) {
+                    console.log("updateLoadedCart", args);
+                    $scope.transactionResponse(args);
                 });
                 $scope.keytab = function (event, maxlength) {
                     console.log("Event", event)
@@ -604,6 +667,12 @@
                     }
                 }
                 $scope.payCreditCard = function (isvalid) {
+                    $scope.data2.buyer_address = $scope.data2.payer_address;
+                    $scope.data2.buyer_postal = $scope.data2.payer_postal;
+                    $scope.data2.buyer_city = $scope.data2.payer_city;
+                    $scope.data2.buyer_state = $scope.data2.payer_state;
+                    $scope.data2.buyer_country = $scope.data2.payer_country;
+                    $scope.data2.buyer_phone = $scope.data2.payer_phone;
                     $scope.submitted2 = true;
                     if (isvalid) {
                         $scope.data2.platform = "Booking";
@@ -636,6 +705,7 @@
                 }
                 $scope.selectOption = function (option) {
                     $scope.data4.payment_method = option;
+                    $scope.scrollTo("cash-form")
                 }
                 $scope.populatePayer = function () {
                     if ($scope.data2.payer_name) {
@@ -861,7 +931,61 @@
                     }
                 }
             }])
-        .controller('CheckoutGatewaysCtrl', function () {
 
-        })
+        .controller('CheckoutBookCtrl', ['$scope', '$rootScope', 'Cart', function ($scope, $rootScope, Cart) {
+                $scope.appointments = [];
+                $scope.visibleBooking = false;
+                $scope.loadPendingItems = function () {
+                    console.log("loadPendingItems", $rootScope.items)
+                    for (let item in $rootScope.items) {
+                        let container = $rootScope.items[item];
+                        console.log("item", container);
+                        if (container.attributes.type == "Booking" && !container.attributes.id) {
+                            $scope.appointments.push(container);
+                            $rootScope.bookingSet = false;
+                            $scope.visibleBooking = true;
+                        }
+                    }
+                }
+                $scope.programItem = function (item) {
+                    let params = {
+                        "availabilities": null,
+                        "type": "Merchant",
+                        "objectId": item.attributes.merchant_id,
+                        "objectName": item.name,
+                        "objectDescription": item.null,
+                        "objectIcon": null,
+                        "expectedPrice": item.price,
+                        "questions": item.attributes.questions,
+                        "item_id": item.id,
+                        "quantity": item.quantity,
+                        "purpose": "external_book"
+                    }
+                    console.log("Sending paramsparamsparams", params);
+                    Cart.showBooking(params).then(function (result) {
+                        console.log("Got result", result);
+                        for (var i = 0; i < $scope.appointments.length; i++) {
+                            if ($scope.appointments[i].id === item.id) {
+                                $scope.appointments.splice(i, 1);
+                            }
+                        }
+                        if ($scope.appointments.length == 0) {
+                            $rootScope.bookingSet = true;
+                            $rootScope.$broadcast('buildOrder');
+                        }
+                    });
+                }
+                $rootScope.$on('Shippable', function (event, args) {
+                    console.log("Booking shippable");
+                    $scope.loadPendingItems()
+                });
+                $rootScope.$on('NotShippable', function (event, args) {
+                    $scope.loadPendingItems();
+                    if ($scope.appointments.length == 0) {
+                        $rootScope.$broadcast('buildOrder');
+                    }
+                });
+            }]).controller('CheckoutGatewaysCtrl', function () {
+
+})
         

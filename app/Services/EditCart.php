@@ -46,7 +46,7 @@ class EditCart {
             $result['totalItems'] = count($data);
             return $result;
         } else {
-            return ['subtotal'=>0,'total'=>0,'items'=>[],'totalItems'=>0];
+            return ['subtotal' => 0, 'total' => 0, 'items' => [], 'totalItems' => 0];
         }
     }
 
@@ -183,7 +183,7 @@ class EditCart {
     public function migrateCart($user, $device) {
         if ($device) {
             $items = Cart::session($device)->getContent();
-            if((!count($items)>0)){
+            if ((!count($items) > 0)) {
                 return true;
             }
             $data = array();
@@ -475,7 +475,7 @@ class EditCart {
                             $losAttributes['is_digital'] = $productVariant->is_digital;
                             $losAttributes['weight'] = $productVariant->weight;
                             $losAttributes['conditions'] = $applyConditions;
-                            $losAttributes['type'] = "Product";
+                            $losAttributes['type'] = ucfirst($productVariant->type);
                             $losAttributes['image'] = $productVariant->getCartImg();
                             $losAttributes['is_shippable'] = $productVariant->is_shippable;
                             $losAttributes['requires_authorization'] = $productVariant->requires_authorization;
@@ -530,7 +530,7 @@ class EditCart {
                             $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
                             $item->save();
                             $item->attributes = $losAttributes;
-                            if ($losAttributes['type'] == "Booking") {
+                            if ($losAttributes['type'] == "Booking" && isset($losAttributes['id'])) {
                                 $objClass = self::MODEL_PATH . $losAttributes['type'];
                                 $objClass::where("id", $losAttributes['id'])->update(['price' => $item->priceSumConditions]);
                             }
@@ -661,19 +661,32 @@ class EditCart {
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
                     if ($productVariant->min_quantity <= ((int) $data['quantity'] )) {
+                        $losAttributes = json_decode($item->attributes,true);
+                        if (array_key_exists("extras", $data)) {
+                            foreach ($data["extras"] as $x => $x_value) {
+                                $losAttributes[$x] = $x_value;
+                            }
+                        }
                         $item->quantity = (int) $data['quantity'];
                         Cart::session($user->id)->update($item->id, array(
                             'quantity' => array(
                                 'relative' => false,
                                 'value' => $item->quantity
                             ),
+                            'attributes' => $losAttributes
                         ));
                         $cartItem = Cart::session($user->id)->get($item->id);
                         $item->priceSum = $cartItem->getPriceSum();
+                        $item->quantity = $cartItem->quantity;
                         $item->priceConditions = $cartItem->getPriceWithConditions();
                         $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
+                        $item->attributes = json_encode($losAttributes);
                         $item->save();
-                        $item->attributes = json_decode($item->attributes, true);
+                        
+                        if ($losAttributes['type'] == "Booking" && isset($losAttributes['id'])) {
+                            $objClass = self::MODEL_PATH . $losAttributes['type'];
+                            $objClass::where("id", $losAttributes['id'])->update(['price' => $item->priceSumConditions]);
+                        }
                         return array("status" => "success", "message" => "item updated successfully", "cart" => $this->getCart($user), "item" => $item);
                     } else {
                         Cart::session($user->id)->remove($item->id);

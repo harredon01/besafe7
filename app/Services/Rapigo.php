@@ -93,6 +93,17 @@ class Rapigo {
         if ($origin['city_id'] != $destination['city_id']) {
             return ['status' => 'error', 'message' => "solo para la misma ciudad"];
         }
+        if($origin['city_id']==524){
+            $data['city_id'] = 1; 
+        } else if($origin['city_id']==12){
+            $data['city_id'] = 2; 
+        } else if($origin['city_id']==894){
+            $data['city_id'] = 3; 
+        } else if($origin['city_id']==1068){
+            $data['city_id'] = 4; 
+        } else {
+            return ['status' => 'error', 'message' => "No hay cobertura"];
+        }
         $querystop = [
             "address" => $origin['address'],
             "description" => "Origen",
@@ -108,7 +119,7 @@ class Rapigo {
         ];
         array_push($points, $querystop);
         $data['points'] = json_encode($points);
-        $query = "api/bogota/estimate/";
+        $query = "api/v1/estimate/";
         $isTest = false;
         if (array_key_exists('user_id', $extras)) {
             if ($extras['user_id']) {
@@ -184,10 +195,19 @@ class Rapigo {
     }
 
     public function sendOrder($origin, $destination, $extras) {
-        $data['type'] = 'stop';
+        $data['type'] = 'kilometer';
         $date = $extras["request_date"];
         $data['fecha_servicio'] = date_format($date, "m/d/Y");
         $data['hora_servicio'] = date_format($date, "h:i");
+        if($origin['city_id']==524){
+            $data['city_id'] = 1; 
+        } else if($origin['city_id']==12){
+            $data['city_id'] = 2; 
+        } else if($origin['city_id']==894){
+            $data['city_id'] = 3; 
+        } else if($origin['city_id']==1068){
+            $data['city_id'] = 4; 
+        }
         $points = [];
         array_push($points, [
             "address" => $origin['address'] . " " . $origin['notes'],
@@ -217,7 +237,7 @@ class Rapigo {
                 }
             }
         }
-        $query = "api/bogota/estimate/";
+        $query = "api/v1/request_service/";
         //dd($data);
         $stopCodes = null;
         $serviceBookResponse = $this->sendPost($data, $query,$isTest);
@@ -230,7 +250,8 @@ class Rapigo {
         }
 
         if ($stopCodes) {
-            return ["status" => "success", "shipping_id" => $serviceBookResponse['key']];
+            $body = "Puedes hacer seguimiento al domiciliario aqui: ".config("app.url")."/rapigo/".$serviceBookResponse['key'];
+            return ["status" => "success", "shipping_id" => $serviceBookResponse['key'],"subject"=>"Envio programado con Rapigo","body"=>$body];
         }
         return ["status" => "error"];
     }
@@ -244,8 +265,8 @@ class Rapigo {
 
     public function checkStatus($key) {
         $data['key'] = $key;
-        $query = "api/bogota/get_service_status/";
-        $response = $this->sendPost($data, $query, false);
+        $query = "api/v1/get_service_status";
+        $response = $this->sendPost($data, $query, true);
         return $response;
     }
 

@@ -12,13 +12,13 @@
     </tr>
     <tr ng-repeat="item in shipping">
         <td class="col-md-3">
-            @{{ item.platform}}
+            @{{ item.platform}}<br/><p class="text-gray">@{{ item.desc}}</p>
         </td>
         <td class="col-md-2">
             @{{ item.price | currency }}
         </td>
         <td class="col-md-2">                              
-            <a href="javascript:;" ng-click="setShippingCondition(item)">Usar</a>
+            <a href="javascript:;" class="text-orange" ng-click="setShippingCondition(item)">Usar</a>
         </td>
     </tr>
 </table>
