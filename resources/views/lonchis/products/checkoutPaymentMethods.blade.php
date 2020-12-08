@@ -14,7 +14,7 @@
             <form class="form-horizontal" role="form" name="myForm2" ng-submit="payCreditCard(myForm2.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data2.payment_id" name="payment_id" value="">
-                
+
 
 
                 <div class="form-group">
@@ -44,14 +44,14 @@
                             <span ng-show="submitted2 && myForm2.cc_branch.$error.required">Porfavor Selecciona la franquisia</span>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="col-md-4 control-label">Codigo de Seguridad</label>
                     <div class="col-md-6">
-                        
-                        <input type="tel" ng-keyup="keytab($event,2)" style="width: 20%;float: left;" ng-model="data2.cc_expiration_month" placeholder="MM" class="form-control" name="cc_expiration_month" value="{{ old('cc_expiration_month')}}" required>
-                        <input type="tel" ng-keyup="keytab($event,2)" style="width: 20%;float: left; margin-right: 40px" ng-model="data2.cc_expiration_year" placeholder="YY" class="form-control" name="cc_expiration_year" value="{{ old('cc_expiration_year')}}" required>
-                        <input type="tel" style="width: 20%;float: left; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
+
+                        <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left;" ng-model="data2.cc_expiration_month" placeholder="MM" class="form-control" name="cc_expiration_month" value="{{ old('cc_expiration_month')}}" required>
+                        <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left; margin-right: 40px" ng-model="data2.cc_expiration_year" placeholder="YY" class="form-control" name="cc_expiration_year" value="{{ old('cc_expiration_year')}}" required>
+                        <input type="tel" style="width: 30%;float: left; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
                         <span style="color:red" ng-show="(myForm2.cc_security_code.$dirty && myForm2.cc_security_code.$invalid) || submitted2 && myForm2.cc_security_code.$invalid">
                             <span ng-show="submitted2 && myForm2.cc_security_code.$error.required">Porfavor ingresa el número de seguridad</span></span>
 
@@ -82,7 +82,7 @@
                         <input type="checkbox" ng-model="data2.save_card"  name="save_card" value="{{ old('save_card')}}">                            
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="col-md-4 control-label">Correo del propietario de la tarjeta</label>
                     <div class="col-md-6">
@@ -108,9 +108,9 @@
                     </div>
                 </div>
                 <br/>
-                <div class="payer_address" ng-hide="(myForm2.payer_id.$invalid)||
-                            (myForm2.payer_name.$invalid)||(myForm2.payer_email.$invalid)||
-                            (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)">
+                <div class="payer_address" ng-hide="(myForm2.payer_id.$invalid) ||
+                                (myForm2.payer_name.$invalid) || (myForm2.payer_email.$invalid) ||
+                                (myForm2.payer_email.$invalid) || (myForm2.cc_expiration_year.$invalid)">
                     <div class="form-group">
                         <label class="col-md-4 control-label">Direccion del pagador</label>
                         <div class="col-md-6">
@@ -158,7 +158,15 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Pais</label>
                         <div class="col-md-6">
-                            <input type="text" ng-model="data2.payer_country" class="form-control" name="payer_country" value="{{ old('payer_country')}}" required>
+                            <select class="form-control nice-select" ng-model="data2.payer_country" name="payer_country" required>
+                                <option value="CO">Colombia</option>
+                                <option value="US">EEUU</option>
+                                <option value="BR">Brasil</option>
+                                <option value="AR">Argentina</option>
+                                <option value="MX">México</option>
+                                <option value="PA">Panamá</option>
+                                <option value="PE">Perú</option>
+                            </select>
                             <span style="color:red" ng-show="(myForm2.payer_country.$dirty && myForm2.payer_country.$invalid) || submitted2 && myForm2.payer_country.$invalid">
                                 <span ng-show="submitted2 && myForm2.payer_country.$error.required">Porfavor ingresa el pais</span></span> 
                         </div>

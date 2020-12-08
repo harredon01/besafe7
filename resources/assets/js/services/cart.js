@@ -135,6 +135,11 @@ angular.module('besafe')
                     $mdDialog.show(Modals.getMerchantsPopup(category)).then(function (merchant) {
                         console.log("Got merchant", merchant);
                         let params = Modals.getAllUrlParams();
+                        if (params) {
+
+                        } else {
+                            params = {};
+                        }
                         let theUrl = window.location.href;
                         if (theUrl.includes("?")) {
                             theUrl = theUrl.split("?")[0];
@@ -298,7 +303,7 @@ angular.module('besafe')
                     addCartItem: addCartItem,
                     postToServer: postToServer,
                     updateCartItem: updateCartItem,
-                    showBooking:showBooking,
+                    showBooking: showBooking,
                     showConfirm: showConfirm,
                     showConfirmExt: showConfirmExt,
                     clearCart: clearCart,

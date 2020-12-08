@@ -11,7 +11,7 @@ var app = angular.module('besafe', ['besafe.constants', 'ngCookies', 'ngMaterial
 app.config(function () {
     /*$interpolateProvider.startSymbol('{{');
      $interpolateProvider.endSymbol('}}');*/
-}).run(["$http", '$rootScope', '$cookies', 'Users', 'Modals','$location','$anchorScroll', function ($http, $rootScope, $cookies, Users, Modals,$location,$anchorScroll) {
+}).run(["$http", '$rootScope', '$cookies', 'Users', 'Modals', '$location', '$anchorScroll', function ($http, $rootScope, $cookies, Users, Modals, $location, $anchorScroll) {
 //    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //    $http.defaults.headers.common['X-XSRF-TOKEN'] = Laravel.csrfToken;
         console.log("Searching for user");
@@ -19,7 +19,7 @@ app.config(function () {
             let screenWidth = window.innerWidth;
             console.log("Screen width: ", screenWidth);
             let url = window.location.href;
-            if (screenWidth < 450 && !url.includes("checkout")) {
+            if (screenWidth < 450) {
                 setTimeout(function () {
                     var old = $location.hash();
                     $location.hash('mobile-anchor');
@@ -53,13 +53,16 @@ app.config(function () {
         }
         let results = Modals.getAllUrlParams(null);
         console.log("Checking params", results);
-        if (results.merchant_id && results.merchant_id.length > 0) {
-            $rootScope.merchant_id = results.merchant_id;
+        if (results) {
+            if (results.merchant_id && results.merchant_id.length > 0) {
+                $rootScope.merchant_id = results.merchant_id;
+            }
+            if (results.lat && results.lat.length > 0) {
+                console.log("saving lat");
+                $rootScope.lat = results.lat;
+            }
         }
-        if (results.lat && results.lat.length > 0) {
-            console.log("saving lat");
-            $rootScope.lat = results.lat;
-        }
+
         $http.defaults.headers.common['Accept'] = "application/json";
         function handleCartCookie() {
             let uuid = $cookies.get("cart-uuid");

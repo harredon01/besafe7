@@ -138,8 +138,9 @@ class MerchantController extends Controller {
      */
     public function getNearbyMerchants(Request $request, $categoryS) {
         $data = $request->all();
-        $category = Category::where('url', $categoryS)->first()->toArray();
+        $category = Category::where('url', $categoryS)->first();
         if ($category) {
+            $category = $category->toArray();
             $validator = $this->editMapObject->validatorLat($data);
             if ($validator->fails()) {
                 return $this->index($request, $categoryS);

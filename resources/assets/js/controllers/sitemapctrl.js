@@ -49,7 +49,7 @@
 
                         } else {
                             let params = Modals.getAllUrlParams();
-                            if (params && params.length > 0) {
+                            if (params) {
 
                             } else {
                                 params = {};
@@ -153,8 +153,10 @@
                             }
 
                         } else {
-                            let params = Modals.getAllUrlParams();
-                            if (params && params.length > 0) {
+                            let params;
+                            params = Modals.getAllUrlParams(url);
+                            
+                            if (params) {
 
                             } else {
                                 params = {};

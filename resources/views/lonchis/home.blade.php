@@ -171,7 +171,8 @@
                                         <span>$16,700.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/products/gatos?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)" style="background:none;color:#56a700">Otros para gatos</a>
                                     </div>
                                 </div>
                             </div>
@@ -390,7 +391,7 @@
                 <div class="row no-gutters">
                     <div class="col-lg-2 col-md-4 col-sm-6">
                         <div class="category-block-single">
-                            <a href="/a/merchants/urgencias-24h" ng-click="goTo('merchant-nearby-list', $event,true)" class="icon">
+                            <a href="/a/merchants/urgencias" ng-click="goTo('merchant-nearby-list', $event,true)" class="icon">
                                 <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias.jpg" alt="">
                             </a>
                         </div>
@@ -466,7 +467,7 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/consultas" ng-click="goTo('merchant-list', $event,true)">
+                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event,true)">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
                     </a>
                 </div>
@@ -521,7 +522,6 @@
                     </a>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

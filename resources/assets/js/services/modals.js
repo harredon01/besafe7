@@ -300,13 +300,13 @@ angular.module('besafe')
                 getAllUrlParams = function (url) {
                     // get query string from url (optional) or window
                     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
-
+                    console.log("Query string",queryString);
                     // we'll store the parameters here
-                    var obj = {};
+                    var obj = null;
 
                     // if query string exists
                     if (queryString) {
-
+                        obj = {};
                         // stuff after # is not part of query string, so get rid of it
                         queryString = queryString.split('#')[0];
 

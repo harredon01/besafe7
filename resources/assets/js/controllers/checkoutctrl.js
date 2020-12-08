@@ -459,17 +459,38 @@
                     delete platform.desc;
                     Orders.getPlatformShippingPrice(order_id, platform).then(function (data) {
                         console.log("getPlatformShippingPrice Result", data);
+                        $scope.expectedProviders--;
                         if (data.status == "success") {
                             let name = platform.provider;
                             if (platform.provider == "MerchantShipping") {
                                 name = "Domicilio del Establecimiento"
                             }
-                            let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id}
-                            $scope.shipping.push(container);
+                            let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id};
+                            let add = true;
+                            for (let i = 0; i < $scope.shipping.length; i++) {
+                                let cont = $scope.shipping[i];
+                                if (cont.platform == container.platform) {
+                                    if (cont.price <= container.price) {
+                                        console.log("Not adding",container)
+                                        add = false;
+                                    } else {
+                                        console.log("Removing",cont)
+                                        $scope.shipping.splice(i, 1);
+                                    }
+                                }
+                            }
+                            if (add) {
+                                $scope.shipping.push(container);
+                            }
+                            if ($scope.expectedProviders == 0 && $scope.shipping.length == 1) {
+                                $scope.setShippingCondition($scope.shipping[0]);
+                                console.log("Auto select",$scope.shipping)
+                            }
+
                         }
                     },
                             function (data) {
-
+                                $scope.expectedProviders--;
                             });
                 }
                 $scope.showAddressForm = function () {
@@ -532,7 +553,7 @@
                                             resp.transaction.description = "Pago Interno";
                                             resp.transaction.transaction_id = resp.payment.id;
                                             resp.transaction.transaction_state = "APPROVED";
-                                            $rootScope.$broadcast('transactionResponse',resp);
+                                            $rootScope.$broadcast('transactionResponse', resp);
                                         } else {
                                             $scope.showPayment = true;
                                             //this.scrollToTop();
@@ -649,6 +670,7 @@
                     Modals.hideLoader();
                     console.log("Response payu", data)
                     Cart.clearCart();
+                    $scope.scrollTo("checkout-payment");
                     if (data.message != "error") {
                         $scope.showResult = true;
                         $scope.transaction = data.transaction;
@@ -888,6 +910,9 @@
                     }
                 }
                 $scope.setAddressInfields = function (type, address) {
+                    if (!address.phone) {
+                        address.phone = $rootScope.user.cellphone;
+                    }
                     if (type == "payer") {
                         $scope.data2.payer_address = address.address;
                         $scope.data2.payer_postal = address.postal;

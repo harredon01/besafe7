@@ -32,18 +32,19 @@
                             <div ng-show="shippingAddressSet && !shippingConditionSet" id="checkout-shipping-methods" style="color:black;font-weight: bold">
                                 <h4 class="checkout-title">Selecciona un método de envío</h4>
                                 <p>@{{addressSet.address}}, @{{addressSet.city}} </p>
+                                <p ng-show="expectedProviders>0">Esperando respuesta proveedores logisticos <img width="30" src="/images/loader.gif"/></p>
                                 @include(config("app.views").'.products.ShippingMethodsList')
                             </div>
                         </div>
                         <div class="col-lg-7 mb--20" ng-controller="CheckoutBookCtrl" ng-show="visibleBooking && !paymentActive" id="checkout-booking">
-                                <h4 class="checkout-title">Programa tus citas</h4>
+                            <h4 class="checkout-title" ng-show="appointments.length>0">Programa tus citas</h4>
                                 @include(config("app.views").'.products.BookingList')
                         </div>
-                        <div class="col-lg-7 mb--20" ng-show="shippingConditionSet && bookingSet || isDigital && bookingSet">
+                        <div class="col-lg-7 mb--20" ng-show="shippingConditionSet && bookingSet && !paymentActive || isDigital && bookingSet && !paymentActive">
                             <h4 class="checkout-title">Listo! Puedes ir a pagar</h4>
                         </div>
                         <div class="col-lg-7 mb--20" ng-controller="CheckoutBillingCtrl" ng-show="paymentActive" id="checkout-payment">
-                            <h4 class="checkout-title">Selecciona un método de pago</h4>
+                            <h4 class="checkout-title" ng-hide="showResult">Selecciona un método de pago</h4>
                             @include(config("app.views").'.products.checkoutPaymentMethods')
                         </div>
 

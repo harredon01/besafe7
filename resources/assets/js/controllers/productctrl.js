@@ -37,8 +37,12 @@
                         for (let item in $scope.categories) {
                             for (let k in $scope.categories[item].products) {
                                 $scope.prodIds.push($scope.categories[item].products[k].id);
-                                if (!$rootScope.merchant_id) {
+                                
+                                if (!$rootScope.merchant_id && $scope.categories[0].products[0].merchant_id) {
                                     $rootScope.merchant_id = $scope.categories[0].products[0].merchant_id;
+                                }
+                                if(!$scope.categories[item].products[k].merchant_id && $scope.categories[item].products[k].merchants.length>0){
+                                    $scope.categories[item].products[k].merchant_id = $scope.categories[item].products[k].merchants[0].id
                                 }
                                 $scope.local_total++;
                                 if ($scope.categories[item].products[k].files && $scope.categories[item].products[k].files.length > 0) {
@@ -59,7 +63,13 @@
                     });
                     console.log($scope.categories);
                     document.getElementById("dissapear").remove();
-                    $scope.params = Modals.getAllUrlParams();
+                    let params = Modals.getAllUrlParams();
+                    if (params) {
+
+                    } else {
+                        params = {};
+                    }
+                    $scope.params = params;
                     $scope.params.includes = "files,merchant";
 
                     if ($scope.category_id) {

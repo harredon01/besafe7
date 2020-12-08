@@ -13,7 +13,7 @@
                     <span ng-show="submitted && myForm.address.$error.required">Porfavor ingresa la direccion</span></span>
             </div>
             <div class="col-12 mb--20">
-                <label>Indicaciones</label>
+                <label>Indicaciones (Casa, Apto)</label>
                 <input type="text" ng-model="data.notes" name="notes" value="{{ old('notes')}}" required>
                 <span style="color:red" ng-show="(myForm.notes.$dirty && myForm.notes.$invalid) || submitted && myForm.notes.$invalid">
                     <span ng-show="submitted && myForm.notes.$error.required">Porfavor Ingresa las Indicaciones</span></span>

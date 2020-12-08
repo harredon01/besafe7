@@ -36,7 +36,7 @@
                     <li class="single-cart">
                         <div class="cart-buttons">
                             <a href="javascript:;" ng-click="clearCart()" class="btn btn-outlined">Limpiar</a>
-                            <a href="/checkout" class="btn btn-outlined">Check Out</a>
+                            <a href="/checkout" class="btn btn-outlined">Pagar</a>
                         </div>
                     </li>
                 </ul>

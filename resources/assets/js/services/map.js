@@ -417,7 +417,8 @@ angular.module('besafe')
                                         long: long,
                                         city_id: city.id,
                                         region_id: city.region_id,
-                                        country_id:1
+                                        country_id:1,
+                                        countryCode:"CO"
                                     }
                                     if($rootScope.shippingAddress){
                                         $rootScope.shippingAddress.address = decodeAddressFromLatResult(resp);

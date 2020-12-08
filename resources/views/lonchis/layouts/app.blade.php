@@ -74,7 +74,7 @@
                                         <input type="text" name="search" ng-model="searchText" placeholder="Buscar">
                                         <div class="search-form__group search-form__group--select">
                                             <select name="category " id="searchCategory" ng-model="category" class="search-form__select nice-select">
-                                                <option value="">Selecciona una categoria</option>
+                                                <option value="">Categoria</option>
                                                 <optgroup label="Negocios">
                                                     <option value="merchants|0|coverage">Todos</option>
                                                     <option value="merchants|24|nearby">Veterinarias</option>

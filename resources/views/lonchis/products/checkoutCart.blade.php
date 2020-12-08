@@ -8,7 +8,7 @@
         </ul>
 
         <p>Sub Total <span>@{{subtotal| currency }}</span></p>
-        <p ng-show="shipping > 0">Envío <span>@{{shipping| currency }}</span></p>
+        <p ng-show="shipping > 0">Domicilio<span>@{{shipping| currency }}</span></p>
         <p ng-show="discount > 0">Descuentos <span>@{{discount| currency }}</span></p>
         <h4>Total <span>@{{total| currency }}</span></h4>
         <br/>
