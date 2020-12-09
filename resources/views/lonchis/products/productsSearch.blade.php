@@ -130,11 +130,7 @@
                         <h2 class="sidebar-title">CATEGORIAS</h2>
                         <ul class="sidebar-filter-list">
                             @foreach($data['side_categories'] as $cat)
-                            @if(isset($data['merchant_id']))
-                            <li><a href="/a/products/{{$cat['url']}}?merchant_id={{$data['merchant_id']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
-                            @else                           
-                            <li><a href="/a/products/{{$cat['url']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
-                            @endif
+                            <li><a href="javascript:;" ng-click="addCatFilter($cat['id'])" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
                             @endforeach
                         </ul>
                     </div>
@@ -364,15 +360,11 @@
                         <h2 class="sidebar-title">CATEGORIAS</h2>
                         <ul class="sidebar-filter-list">
                             @foreach($data['side_categories'] as $cat)
-                            @if(isset($data['merchant_id']))
-                            <li><a href="/a/products/{{$cat['url']}}?merchant_id={{$data['merchant_id']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
-                            @else                           
-                            <li><a href="/a/products/{{$cat['url']}}" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
-                            @endif
+                            <li><a href="javascript:;" ng-click="addCatFilter({{$cat['id']}})" data-count="({{$cat['tots']}})">{{$cat['name']}}</a></li>
                             @endforeach
                         </ul>
                     </div>
-                    @endif 
+                    @endif
                     <!--<div class="single-sidebar">
                         <h2 class="sidebar-title">Color</h2>
                         <ul class="sidebar-filter-list">

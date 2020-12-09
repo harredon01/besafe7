@@ -33,6 +33,7 @@ class CreateCoveragePolygonsTable extends Migration {
             $table->foreign('address_id')->references('id')
                     ->on('addresses');
             $table->string('provider');
+            $table->text('description');
             $table->timestamps();
         });
     }

@@ -40,10 +40,25 @@ angular.module('besafe')
                         .error(function () {
                             def.reject("Failed to getStoreExport");
                         });
-
                 return def.promise;
-                /**/
-
+            }
+            var fullfillOrder = function (data) {
+                let url = '/api/items/status' ;
+                var def = $q.defer();
+                console.log("fullfillOrder",data);
+                $http({
+                    method: 'POST',
+                    url: url,
+                    data:data
+                })
+                        .success(function (data) {
+                            // console.log(data);
+                            def.resolve(data);
+                        })
+                        .error(function () {
+                            def.reject("Failed to fullfillOrder");
+                        });
+                return def.promise;
             }
             var approveOrder = function (order_id) {
                 var def = $q.defer();
@@ -99,8 +114,8 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'POST',
-                        url: '/api/orders/platform/shipping/'+order+"/"+platform,
-                        data: {}, // pass in data as strings
+                        url: '/api/orders/platform/shipping/'+order,
+                        data: platform, // pass in data as strings
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -115,8 +130,8 @@ angular.module('besafe')
                 var def = $q.defer();
                 $http({
                         method: 'GET',
-                        url: '/api/orders/platform/shipping/'+order+"/"+platform,
-                        data: {}, // pass in data as strings
+                        url: '/api/orders/platform/shipping/'+order,
+                        params: platform, // pass in data as strings
                     })
                             .success(function (data) {
                                 def.resolve(data);
@@ -212,6 +227,7 @@ angular.module('besafe')
                 getOrder:getOrder,
                 checkOrder:checkOrder,
                 approveOrder:approveOrder,
+                fullfillOrder:fullfillOrder,
                 setShippingAddress:setShippingAddress,
                 prepareOrder:prepareOrder,
                 setPlatformShippingCondition:setPlatformShippingCondition,

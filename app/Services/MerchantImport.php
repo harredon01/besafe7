@@ -438,6 +438,23 @@ class MerchantImport {
                     $categoriesData = explode(",", $sheet['categories']);
                     unset($sheet['categories']);
                     $image = $sheet['icon'];
+                    $shipping = [];
+                    if (isset($sheet['envio1'])) {
+                        $envio1 = $sheet['envio1'];
+
+                        if ($envio1) {
+                            array_push($shipping, ['id' => -1, "price" => $envio1]);
+                        }
+                    }
+                    unset($sheet['envio1']);
+                    if (isset($sheet['envio2'])) {
+                        $envio1 = $sheet['envio2'];
+
+                        if ($envio1) {
+                            array_push($shipping, ['id' => -2, "price" => $envio1]);
+                        }
+                    }
+                    unset($sheet['envio2']);
                     //dd($sheet['id']);
                     unset($sheet['icon']);
                     unset($sheet['id']);
@@ -453,14 +470,23 @@ class MerchantImport {
                         }
                     }
                     $merchant->slug = $this->slug_url($merchant->name);
-                    $merchant->lat = rand(4527681, 4774930) / 1000000;
-                    $merchant->long = rand(-74185612, -74035612) / 1000000;
+                    $merchant->lat = $sheet['lat'];
+                    if (count($shipping) > 0) {
+                        $attrs = $merchant->attributes;
+                        $attrs['shipping'] = $shipping;
+                        $merchant->attributes = $attrs;
+                    }
+                    $merchant->long = $sheet['long'];
                     if ($image) {
                         $merchant->icon = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
                     } else {
                         $merchant->icon = 'https://picsum.photos/900/350';
                     }
                     $merchant->save();
+                    $users = User::whereIn('id', [1,2,3])->get();
+                    foreach ($users as $item) {
+                        $item->merchants()->save($merchant);
+                    }
                 }
             }
         }
@@ -894,6 +920,22 @@ class MerchantImport {
                     $cpolygon->save();
                 }
             }
+        }
+
+        $polys = CoveragePolygon::where('provider', 'MerchantShipping')->with('merchant')->get();
+        foreach ($polys as $pol) {
+            $merchant = $pol->merchant;
+            $attrs = $merchant->attributes;
+            if (isset($attrs['shipping'])) {
+                foreach ($attrs['shipping'] as $key => $value) {
+                    if ($value['id'] < 0) {
+                        $attrs['shipping'][$key]['id'] = $pol->id;
+                        break;
+                    }
+                }
+            }
+            $merchant->attributes = $attrs;
+            $merchant->save();
         }
     }
 

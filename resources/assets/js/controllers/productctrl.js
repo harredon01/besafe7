@@ -1,9 +1,10 @@
 ﻿angular.module('besafe')
-        .controller('ProductsCtrl', ['$scope', 'Cart', '$rootScope', '$sce', 'Products', '$mdDialog', 'Modals', function ($scope, Cart, $rootScope, $sce, Products, $mdDialog, Modals) {
+        .controller('ProductsCtrl', ['$scope', 'Cart', '$rootScope', '$sce', 'Products', 'Modals', function ($scope, Cart, $rootScope, $sce, Products, Modals) {
                 $scope.categories = [];
                 $scope.prodIds = [];
                 $scope.hasLocation = false;
                 $scope.hasMerchant = false;
+                $scope.isSearch = false;
                 $scope.merchantObj = {};
                 $scope.current = 1;
                 $scope.last = 1;
@@ -20,50 +21,27 @@
                     var res = viewData.replace(/App\\Models\\/g, "");
                     console.log("viewData", res);
                     let container = JSON.parse(res);
-
-                    console.log("Data", res);
-                    $scope.categories = container.categories;
-                    $scope.current = container.page;
-                    $scope.last = container.last_page;
-                    $scope.current = container.page;
-                    $scope.per_page = container.per_page;
-                    $scope.total = container.total;
-                    if (container.category) {
-                        $scope.category_id = container.category.id;
-                    }
-
-                    console.log($scope.categories);
                     $scope.$apply(function () {
-                        for (let item in $scope.categories) {
-                            for (let k in $scope.categories[item].products) {
-                                $scope.prodIds.push($scope.categories[item].products[k].id);
-                                if (!$rootScope.merchant_id) {
-                                    $rootScope.merchant_id = $scope.categories[0].products[0].merchant_id;
-                                }
-                                $scope.local_total++;
-                                if ($scope.categories[item].products[k].files && $scope.categories[item].products[k].files.length > 0) {
-                                    $scope.categories[item].products[k].imgs = $scope.categories[item].products[k].files;
-                                }
-                                if ($scope.categories[item].products[k].imgs && $scope.categories[item].products[k].imgs.length > 0) {
-                                    $scope.categories[item].products[k].src = $scope.categories[item].products[k].imgs[0].file;
-                                }
-                                $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
-                                $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
-                                $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
-                                $scope.categories[item].products[k].quantity = $scope.categories[item].products[k].variants[0].min_quantity;
-                                $scope.categories[item].products[k].item_id = null;
-                                $scope.categories[item].products[k].isFavorite = false;
-                            }
-                        }
-
+                        $scope.buildProductsFromWhole(container);
                     });
                     console.log($scope.categories);
                     document.getElementById("dissapear").remove();
-                    $scope.params = Modals.getAllUrlParams();
+                    let params = Modals.getAllUrlParams();
+                    console.log("Params", params)
+                    if (params) {
+
+                    } else {
+                        params = {};
+                    }
+                    $scope.params = params;
                     $scope.params.includes = "files,merchant";
 
                     if ($scope.category_id) {
                         $scope.params.category_id = $scope.category_id;
+                    }
+                    let url = window.location.href;
+                    if (url.includes("search")) {
+                        $scope.isSearch = true;
                     }
                 });
                 $rootScope.$on('loadCartVariants', function (event, args) {
@@ -71,6 +49,15 @@
                     if ($rootScope.user) {
                         $scope.checkFavorites();
                     }
+                });
+                $rootScope.$on('clearCart', function (event, args) {
+                    console.log("Cart cleared resetting items")
+                    $scope.cartCleared();
+
+                });
+                $rootScope.$on('deleteItem', function (event, args) {
+                    console.log("item removed resetting items: ", args)
+                    $scope.cartDeletedItem(args);
                 });
                 $scope.clean = function () {
                     angular.forEach(angular.element(".product-attributes"), function (value, key) {
@@ -87,6 +74,95 @@
                 $scope.changeStore = function () {
                     Cart.changeMerchant()
                 }
+                $scope.addCatFilter = function (category) {
+                    $scope.params.category_id = category;
+                    $scope.goTo(1);
+                }
+                $scope.buildProductsFromWhole = function (container) {
+                    $scope.categories = container.categories;
+                    $scope.current = container.page;
+                    $scope.last = container.last_page;
+                    $scope.current = container.page;
+                    $scope.per_page = container.per_page;
+                    $scope.total = container.total;
+                    if (container.category) {
+                        $scope.category_id = container.category.id;
+                    }
+
+                    console.log($scope.categories);
+                    for (let item in $scope.categories) {
+                        for (let k in $scope.categories[item].products) {
+                            $scope.prodIds.push($scope.categories[item].products[k].id);
+
+                            if (!$rootScope.merchant_id && $scope.categories[0].products[0].merchant_id) {
+                                $rootScope.merchant_id = $scope.categories[0].products[0].merchant_id;
+                            }
+                            if (!$scope.categories[item].products[k].merchant_id && $scope.categories[item].products[k].merchants.length > 0) {
+                                $scope.categories[item].products[k].merchant_id = $scope.categories[item].products[k].merchants[0].id
+                            }
+                            $scope.local_total++;
+                            if ($scope.categories[item].products[k].files && $scope.categories[item].products[k].files.length > 0) {
+                                $scope.categories[item].products[k].imgs = $scope.categories[item].products[k].files;
+                            }
+                            if ($scope.categories[item].products[k].imgs && $scope.categories[item].products[k].imgs.length > 0) {
+                                $scope.categories[item].products[k].src = $scope.categories[item].products[k].imgs[0].file;
+                            }
+                            $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
+                            $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
+                            $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
+                            $scope.categories[item].products[k].quantity = $scope.categories[item].products[k].variants[0].min_quantity;
+                            $scope.categories[item].products[k].item_id = null;
+                            $scope.categories[item].products[k].isFavorite = false;
+                        }
+                    }
+                }
+                $scope.buildProducts = function (resp) {
+                    $scope.categories = Products.buildProductInformation(resp);
+                    console.log("Result build product", $scope.categories);
+                    let attributes = $scope.categories[0].products[0].merchant_attributes;
+                    if (typeof attributes == "string") {
+                        attributes = JSON.parse(attributes);
+                    }
+
+                    if (attributes.store_active) {
+                        if (attributes.store_active == 1) {
+                            $scope.storeActive = true;
+                        }
+                    }
+                    $scope.merchantObj.merchant_name = $scope.categories[0].products[0].merchant_name;
+                    $scope.merchantObj.merchant_description = $scope.categories[0].products[0].merchant_description;
+                    $scope.merchantObj.src = $scope.categories[0].products[0].src;
+
+                    //this.openTutorials();  
+                    $scope.merchantObj.merchant_type = $scope.categories[0].products[0].merchant_type;
+                    if ($scope.categories.length > 0) {
+                        $scope.categories[0].more = true;
+                        if ($scope.categories[0].products.length > 0) {
+                            $scope.categories[0].products[0].more = true;
+                        }
+                        if ($scope.categories[0].products.length > 1) {
+                            $scope.categories[0].products[1].more = true;
+                        }
+                    }
+                    $scope.current = parseInt(resp.page);
+                    $scope.prodIds = [];
+                    $scope.last = parseInt(resp.last_page);
+                    $scope.current = parseInt(resp.page);
+                    $scope.per_page = parseInt(resp.per_page);
+                    $scope.total = parseInt(resp.total);
+                    $scope.local_total = 0;
+                    for (let item in $scope.categories) {
+                        for (let k in $scope.categories[item].products) {
+                            $scope.local_total++;
+                            $scope.prodIds.push($scope.categories[item].products[k].id);
+                            $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
+                            $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
+                            $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
+                            $scope.categories[item].products[k].quantity = $scope.categories[item].products[k].variants[0].min_quantity;
+                            $scope.categories[item].products[k].item_id = null;
+                        }
+                    }
+                }
                 $scope.filterPrice = function () {
                     console.log("Filtering", $("#amount").val())
                     let str = $("#amount").val();
@@ -101,64 +177,41 @@
                 }
                 $scope.goTo = function (page) {
                     $scope.params.page = page;
+                    if ($rootScope.merchant_id) {
+                        $scope.params.merchant_id = $rootScope.merchant_id;
+                    }
                     Modals.showLoader();
                     $scope.categories = [];
-                    Products.getProductsMerchant($scope.params).then(function (resp) {
-                        console.log("params", $scope.params);
-                        console.log("response", resp);
-                        if (resp.products_total > 0) {
-                            $scope.categories = Products.buildProductInformation(resp);
-                            console.log("Result build product", $scope.categories);
-                            let attributes = $scope.categories[0].products[0].merchant_attributes;
-                            if (typeof attributes == "string") {
-                                attributes = JSON.parse(attributes);
-                            }
+                    if ($scope.isSearch) {
+                        Products.searchProducts($scope.params).then(function (resp) {
+                            console.log("params", $scope.params);
+                            console.log("response", resp);
+                            if (resp.total > 0) {
+                                $scope.buildProductsFromWhole(resp);
 
-                            if (attributes.store_active) {
-                                if (attributes.store_active == 1) {
-                                    $scope.storeActive = true;
-                                }
+                                //this.createSlides();
                             }
-                            $scope.merchantObj.merchant_name = $scope.categories[0].products[0].merchant_name;
-                            $scope.merchantObj.merchant_description = $scope.categories[0].products[0].merchant_description;
-                            $scope.merchantObj.src = $scope.categories[0].products[0].src;
+                            Modals.hideLoader();
+                        },
+                                function (data) {
 
-                            //this.openTutorials();  
-                            $scope.merchantObj.merchant_type = $scope.categories[0].products[0].merchant_type;
-                            if ($scope.categories.length > 0) {
-                                $scope.categories[0].more = true;
-                                if ($scope.categories[0].products.length > 0) {
-                                    $scope.categories[0].products[0].more = true;
-                                }
-                                if ($scope.categories[0].products.length > 1) {
-                                    $scope.categories[0].products[1].more = true;
-                                }
-                            }
-                            $scope.current = parseInt(resp.page);
-                            $scope.prodIds = [];
-                            $scope.last = parseInt(resp.last_page);
-                            $scope.current = parseInt(resp.page);
-                            $scope.per_page = parseInt(resp.per_page);
-                            $scope.total = parseInt(resp.total);
-                            $scope.local_total = 0;
-                            for (let item in $scope.categories) {
-                                for (let k in $scope.categories[item].products) {
-                                    $scope.local_total++;
-                                    $scope.prodIds.push($scope.categories[item].products[k].id);
-                                    $scope.categories[item].products[k].description = $sce.trustAsHtml($scope.categories[item].products[k].description);
-                                    $scope.categories[item].products[k].activeVariant = $scope.categories[item].products[k].variants[0];
-                                    $scope.categories[item].products[k].variant_id = $scope.categories[item].products[k].variants[0].id;
-                                    $scope.categories[item].products[k].quantity = $scope.categories[item].products[k].variants[0].min_quantity;
-                                    $scope.categories[item].products[k].item_id = null;
-                                }
-                            }
-                            //this.createSlides();
-                        }
-                        Modals.hideLoader();
-                    },
-                            function (data) {
+                                });
+                    } else {
+                        Products.getProductsMerchant($scope.params).then(function (resp) {
+                            console.log("params", $scope.params);
+                            console.log("response", resp);
+                            if (resp.products_total > 0) {
+                                $scope.buildProducts(resp);
 
-                            });
+                                //this.createSlides();
+                            }
+                            Modals.hideLoader();
+                        },
+                                function (data) {
+
+                                });
+                    }
+
                 }
                 $scope.selectVariant = function (product) {
                     for (let item in product.variants) {
@@ -172,7 +225,8 @@
                         id: product.activeVariant.id,
                         quantity: product.quantity,
                         item_id: product.item_id,
-                        product: product
+                        product: product,
+                        type: product.type
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
@@ -252,6 +306,22 @@
                             function (data) {
                             });
                 }
+                $scope.cartCleared = function () {
+                    for (let i in $scope.categories) {
+                        for (let j in $scope.categories[i].products) {
+                            $scope.categories[i].products[j].item_id = null;
+                        }
+                    }
+                }
+                $scope.cartDeletedItem = function (item_id) {
+                    for (let i in $scope.categories) {
+                        for (let j in $scope.categories[i].products) {
+                            if ($scope.categories[i].products[j].item_id == item_id) {
+                                $scope.categories[i].products[j].item_id = null;
+                            }
+                        }
+                    }
+                }
                 $scope.updateProductsCart = function (cart, total) {
                     cart:
                             for (let m in cart.items) {
@@ -281,8 +351,14 @@
                     } else {
                         product.quantity--;
                     }
-                    Cart.updateCartItem(product.item_id, product.quantity).then(function (data) {
+                    let container = {
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                             alert(data.message);
                         } else {
                             $rootScope.$broadcast('loadHeadCart', data.cart);
@@ -372,7 +448,7 @@
                         id: product.activeVariant.id,
                         quantity: product.quantity,
                         item_id: product.item_id,
-                        product:product
+                        product: product
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
@@ -380,9 +456,10 @@
                             product.item_id = data.item.id;
                             product.quantity = data.item.quantity;
                             $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#add-cart-form"));
 
                         } else {
-                            Modals.showToast(data.message);
+                            Modals.showToast(data.message, $("#add-cart-form"));
                         }
                     },
                             function (data) {
@@ -435,13 +512,19 @@
                         }
                     }
                 }
+
                 $scope.changeCartQuantity = function (product, change) {
                     if (change == "+") {
                         product.quantity++;
                     } else {
                         product.quantity--;
                     }
-                    Cart.updateCartItem(product.item_id, product.quantity).then(function (data) {
+                    let container = {
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
                             alert(data.message);
                         } else {

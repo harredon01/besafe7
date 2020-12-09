@@ -16,7 +16,7 @@ class ArrayMultipleSheetImport implements WithMultipleSheets, SkipsUnknownSheets
     {
         return [
             'categories' => new ArrayImport(),
-            'merchants' => new ArrayImport(),
+            'merchants' => new ArrayImport(), 
             'reports' => new ArrayImport(),
             'products' => new ArrayImport(),
             'variants' => new ArrayImport(),
@@ -24,6 +24,8 @@ class ArrayMultipleSheetImport implements WithMultipleSheets, SkipsUnknownSheets
             'ratings' => new ArrayImport(),
             'polygons' => new ArrayImport(),
             'quick' => new ArrayImport(),
+            'new-products' => new ArrayImport(),
+            'new-variants' => new ArrayImport(),
         ];
     }
     public function onUnknownSheet($sheetName)

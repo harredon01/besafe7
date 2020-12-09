@@ -138,8 +138,9 @@ class MerchantController extends Controller {
      */
     public function getNearbyMerchants(Request $request, $categoryS) {
         $data = $request->all();
-        $category = Category::where('url', $categoryS)->first()->toArray();
+        $category = Category::where('url', $categoryS)->first();
         if ($category) {
+            $category = $category->toArray();
             $validator = $this->editMapObject->validatorLat($data);
             if ($validator->fails()) {
                 return $this->index($request, $categoryS);
@@ -219,7 +220,7 @@ class MerchantController extends Controller {
      */
     public function getMerchantDetail($url) {
         $user = $this->auth->user();
-        $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities', 'categories'])->first();
+        $merchant = Merchant::where("slug", $url)->with(["files", 'ratings', 'availabilities2', 'categories'])->first();
         if ($merchant) {
             $results = $this->editMapObject->getActiveCategoriesMerchant($merchant->id);
             $results = $results['data'];

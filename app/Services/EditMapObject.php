@@ -627,7 +627,7 @@ GROUP BY category_id"
     }
 
     public function getNearbyObjects(array $data) {
-        $radius = 1000;
+        $radius = 6300;
         $R = 6371;
         $lat = $data['lat'];
         $long = $data['long'];
@@ -678,16 +678,18 @@ GROUP BY category_id"
             'lat' => $lat,
             'lat2' => $lat,
             'long' => $long,
-            'latinf' => $minLat,
-            'latsup' => $maxLat,
-            'longinf' => $minLon,
-            'longsup' => $maxLon,
-            'radius' => $radius,
+//            'latinf' => $minLat,
+//            'latsup' => $maxLat,
+//            'longinf' => $minLon,
+//            'longsup' => $maxLon,
+//            'radius' => $radius,
             'limit' => $per_page
         ];
         if ($category) {
             $thedata["category"] = $data["category"];
         }
+//        DB::enableQueryLog();
+        
         $reports = DB::select(" "
                         . "SELECT r.id, name, description, icon, lat,`long`,slug, " . $additionalFields . " 
 			( 6371 * acos( cos( radians( :lat ) ) *
@@ -698,12 +700,12 @@ GROUP BY category_id"
                     WHERE
                         status in ('active','online','busy')
                             AND r.private = 0
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
+
                             " . $joinsWhere . "
-                    HAVING distance < :radius
+
                     order by distance asc "
                  . " LIMIT ".$offset.", :limit", $thedata);
+//        dd(DB::getQueryLog());
         unset($thedata['limit']);
         $reportsCount = DB::select(" "
                         . "SELECT count(r.id) as total,
@@ -715,10 +717,8 @@ GROUP BY category_id"
                     WHERE
                         status in ('active','online','busy')
                             AND r.private = 0
-                            AND lat BETWEEN :latinf AND :latsup
-                            AND `long` BETWEEN :longinf AND :longsup
-                            " . $joinsWhere . "
-                    HAVING distance < :radius ", $thedata);
+                            " . $joinsWhere . "", $thedata);
+//        dd($reports);
         unset($thedata['limit']);
         return array("data" => $reports,"page"=>$page,"per_page"=>$per_page,"total"=>$reportsCount[0]->total,"last_page"=>ceil($reportsCount[0]->total/$per_page));
     }

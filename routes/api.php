@@ -189,8 +189,8 @@ Route::post('cart/order/{code?}', 'CartApiController@loadActiveCart');
 
 Route::post('orders/shipping', 'OrderApiController@setShippingAddress');
 Route::get('orders/active', 'OrderApiController@getOrder');
-Route::post('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@setPlatformShippingCondition');
-Route::get('orders/platform/shipping/{order?}/{platform?}', 'OrderApiController@getPlatformShippingPrice');
+Route::post('orders/platform/shipping/{order?}/{platform?}/{platform_id?}', 'OrderApiController@setPlatformShippingCondition');
+Route::get('orders/platform/shipping/{order?}/{platform?}/{platform_id?}', 'OrderApiController@getPlatformShippingPrice');
 Route::post('orders/tax', 'OrderApiController@setTaxesCondition');
 Route::post('orders/coupon', 'OrderApiController@setCouponCondition');
 Route::post('orders/set_details', 'OrderApiController@setOrderDetails');
@@ -205,8 +205,8 @@ Route::get('payments', 'BillingApiController@getPaymentsAdmin');
 Route::post('payments/{payment?}/approve', 'FoodApiController@approvePayment');
 
 Route::get('items', 'ItemApiController@index');
-Route::post('items/fulfillment', 'ItemApiController@fulfillItem');
-
+Route::post('items/status', 'ItemApiController@fulfillItem');
+Route::get('rapigo/status/{key?}', 'RapigoController@getKeyStatus');
 Route::get('admin/store/products', 'ProductImportApiController@getProducts');
 Route::get('admin/store/variants', 'ProductImportApiController@getVariants');
 Route::get('admin/store/merchants', 'ProductImportApiController@getMerchants');

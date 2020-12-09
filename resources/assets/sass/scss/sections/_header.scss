@@ -277,7 +277,9 @@
       outline: none;
     }
     &.nice-select {
-      display: none;
+      width:90px;
+      min-width: 90px;
+      padding-right: 0;
       @include mobile {
         display: flex;
         align-items: center;

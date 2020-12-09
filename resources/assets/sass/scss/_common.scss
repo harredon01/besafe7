@@ -14,6 +14,9 @@
 .border {
     border: 1px solid $border-color !important;
 }
+.md-dialog-is-showing .md-dialog-container {
+  z-index: 99000 !important;
+}
 
 .border-bottom-green {
     border-bottom: 2px solid $green-color;

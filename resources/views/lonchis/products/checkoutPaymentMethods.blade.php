@@ -1,10 +1,10 @@
 
 
 <div>
-    <div id="checkout-payment" ng-hide="showResult">
-        <button ng-click="showMethod('CC')" class="btn btn-primary">Tarjeta de Credito</button>
-        <button ng-click="showMethod('PSE')" class="btn btn-primary">Tarjeta de Debito</button>
-        <button ng-click="showMethod('BALOTO')" class="btn btn-primary">Efectivo</button>
+    <div ng-hide="showResult">
+        <button ng-click="showMethod('CC')" class="btn btn-primary" style="margin:10px">Tarjeta de Credito</button>
+        <button ng-click="showMethod('PSE')" class="btn btn-primary" style="margin:10px">Tarjeta de Debito</button>
+        <button ng-click="showMethod('BALOTO')" class="btn btn-primary" style="margin:10px">Efectivo</button>
         <br/>
         <br/>
         <button ng-click="quickPay()" ng-show="hasSavedCard" class="btn btn-primary">Tarjeta Guardada</button>
@@ -14,7 +14,7 @@
             <form class="form-horizontal" role="form" name="myForm2" ng-submit="payCreditCard(myForm2.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data2.payment_id" name="payment_id" value="">
-                
+
 
 
                 <div class="form-group">
@@ -44,14 +44,14 @@
                             <span ng-show="submitted2 && myForm2.cc_branch.$error.required">Porfavor Selecciona la franquisia</span>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="col-md-4 control-label">Codigo de Seguridad</label>
                     <div class="col-md-6">
-                        
-                        <input type="tel" ng-keyup="keytab($event,2)" style="width: 20%;float: left;" ng-model="data2.cc_expiration_month" placeholder="MM" class="form-control" name="cc_expiration_month" value="{{ old('cc_expiration_month')}}" required>
-                        <input type="tel" ng-keyup="keytab($event,2)" style="width: 20%;float: left; margin-right: 40px" ng-model="data2.cc_expiration_year" placeholder="YY" class="form-control" name="cc_expiration_year" value="{{ old('cc_expiration_year')}}" required>
-                        <input type="tel" style="width: 20%;float: left; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
+
+                        <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left;" ng-model="data2.cc_expiration_month" placeholder="MM" class="form-control" name="cc_expiration_month" value="{{ old('cc_expiration_month')}}" required>
+                        <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left; margin-right: 40px" ng-model="data2.cc_expiration_year" placeholder="YY" class="form-control" name="cc_expiration_year" value="{{ old('cc_expiration_year')}}" required>
+                        <input type="tel" style="width: 30%;float: left; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
                         <span style="color:red" ng-show="(myForm2.cc_security_code.$dirty && myForm2.cc_security_code.$invalid) || submitted2 && myForm2.cc_security_code.$invalid">
                             <span ng-show="submitted2 && myForm2.cc_security_code.$error.required">Porfavor ingresa el número de seguridad</span></span>
 
@@ -60,6 +60,12 @@
 
                         <span style="color:red" ng-show="(myForm2.cc_expiration_month.$dirty && myForm2.cc_expiration_month.$invalid) || submitted2 && myForm2.cc_expiration_month.$invalid">
                             <span ng-show="submitted2 && myForm2.cc_expiration_month.$error.required">Porfavor Selecciona mes de vencimiento</span></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Usar mis datos</label>
+                    <div class="col-md-6">
+                        <input type="checkbox" ng-model="use_user" ng-click="useUserCredit()">
                     </div>
                 </div>
                 <div class="form-group">
@@ -73,15 +79,10 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label">Guardar Tarjeta</label>
                     <div class="col-md-6">
-                        <input type="checkbox" ng-model="data2.save_card"  name="save_card" value="{{ old('save_card')}}" required>                            
+                        <input type="checkbox" ng-model="data2.save_card"  name="save_card" value="{{ old('save_card')}}">                            
                     </div>
                 </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Usar mis datos</label>
-                    <div class="col-md-6">
-                        <input type="checkbox" ng-model="use_user" ng-click="useUserCredit()">
-                    </div>
-                </div>
+
                 <div class="form-group">
                     <label class="col-md-4 control-label">Correo del propietario de la tarjeta</label>
                     <div class="col-md-6">
@@ -107,14 +108,14 @@
                     </div>
                 </div>
                 <br/>
-                <div class="payer_address" ng-hide="(myForm2.payer_id.$invalid)||
-                            (myForm2.payer_name.$invalid)||(myForm2.payer_email.$invalid)||
-                            (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)">
+                <div class="payer_address" ng-hide="(myForm2.payer_id.$invalid) ||
+                                (myForm2.payer_name.$invalid) || (myForm2.payer_email.$invalid) ||
+                                (myForm2.payer_email.$invalid) || (myForm2.cc_expiration_year.$invalid)">
                     <div class="form-group">
                         <label class="col-md-4 control-label">Direccion del pagador</label>
                         <div class="col-md-6">
-                            <label for="male">Igual a Direccion de envío</label>
-                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'payer')" style="width:20%" name="gender" value="male">
+                            <label for="male" ng-show="shippingAddress">Igual a Direccion de envío</label>
+                            <input type="radio"  ng-show="shippingAddress" id="male" ng-click="fetchAddressForUse('shipping', 'payer')" style="width:20%" name="gender" value="male">
                             <label for="female">Usar direccion guardada</label>
                             <input type="radio" id="female" name="gender" ng-click="fetchAddressForUse('other', 'payer')" style="width:20%" value="female">
                             <label for="other">Nueva Direccion</label>
@@ -157,7 +158,15 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Pais</label>
                         <div class="col-md-6">
-                            <input type="text" ng-model="data2.payer_country" class="form-control" name="payer_country" value="{{ old('payer_country')}}" required>
+                            <select class="form-control nice-select" ng-model="data2.payer_country" name="payer_country" required>
+                                <option value="CO">Colombia</option>
+                                <option value="US">EEUU</option>
+                                <option value="BR">Brasil</option>
+                                <option value="AR">Argentina</option>
+                                <option value="MX">México</option>
+                                <option value="PA">Panamá</option>
+                                <option value="PE">Perú</option>
+                            </select>
                             <span style="color:red" ng-show="(myForm2.payer_country.$dirty && myForm2.payer_country.$invalid) || submitted2 && myForm2.payer_country.$invalid">
                                 <span ng-show="submitted2 && myForm2.payer_country.$error.required">Porfavor ingresa el pais</span></span> 
                         </div>
@@ -172,72 +181,6 @@
                     </div>
                 </div>
                 <br/>
-                <div class="buyer_address" ng-hide="(myForm2.payer_id.$invalid)||
-                            (myForm2.payer_name.$invalid)||(myForm2.payer_email.$invalid)||
-                            (myForm2.payer_email.$invalid)||(myForm2.cc_expiration_year.$invalid)" style="margin-top: 20px">
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Direccion del comprador</label>
-                        <div class="col-md-6">
-                            <label for="male">Igual a Direccion de envío</label>
-                            <input type="radio" id="male" ng-click="fetchAddressForUse('shipping', 'buyer')" style="width:20%" name="gender2" value="male">
-                            <label for="female">Usar direccion guardada</label>
-                            <input type="radio" id="female" style="width:20%" name="gender2" ng-click="fetchAddressForUse('other', 'buyer')" value="female">
-                            <label for="other">Nueva Direccion</label>
-                            <input type="radio" id="other" style="width:20%" name="gender2" value="other">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Direccion</label>
-                        <div class="col-md-6">
-                            <input type="text" ng-model="data2.buyer_address" class="form-control" name="buyer_address" value="{{ old('buyer_address')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_address.$dirty && myForm2.buyer_address.$invalid) || submitted2 && myForm2.buyer_address.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_address.$error.required">Porfavor ingresa la direccion</span></span> 
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Codigo postal</label>
-                        <div class="col-md-6">
-                            <input type="text" ng-model="data2.buyer_postal" class="form-control" name="buyer_postal" value="{{ old('buyer_postal')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_postal.$dirty && myForm2.buyer_postal.$invalid) || submitted2 && myForm2.buyer_postal.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_postal.$error.required">Porfavor ingresa el codigo postal</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Ciudad</label>
-                        <div class="col-md-6">
-                            <input type="text" ng-model="data2.buyer_city" class="form-control" name="buyer_city" value="{{ old('buyer_city')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_city.$dirty && myForm2.buyer_city.$invalid) || submitted2 && myForm2.buyer_city.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_city.$error.required">Porfavor ingresa la ciudad</span></span> 
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Departamento</label>
-                        <div class="col-md-6">
-                            <input type="text" ng-model="data2.buyer_state" class="form-control" name="buyer_state" value="{{ old('buyer_state')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_state.$dirty && myForm2.buyer_state.$invalid) || submitted2 && myForm2.buyer_state.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_state.$error.required">Porfavor ingresa el departamento</span></span> 
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Pais</label>
-                        <div class="col-md-6">
-                            <input type="text" ng-model="data2.buyer_country" class="form-control" name="buyer_country" value="{{ old('buyer_country')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_country.$dirty && myForm2.buyer_country.$invalid) || submitted2 && myForm2.buyer_country.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_country.$error.required">Porfavor ingresa el pais</span></span> 
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Telefono</label>
-                        <div class="col-md-6">
-                            <input type="tel" ng-model="data2.buyer_phone" class="form-control" name="buyer_phone" value="{{ old('buyer_phone')}}" required>
-                            <span style="color:red" ng-show="(myForm2.buyer_phone.$dirty && myForm2.buyer_phone.$invalid) || submitted2 && myForm2.buyer_phone.$invalid">
-                                <span ng-show="submitted2 && myForm2.buyer_phone.$error.required">Porfavor ingresa un telefono</span></span> 
-                        </div>
-                    </div>
-                </div>
-
-
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
                         <button type="submit" class="btn btn-primary">Enviar</button>
@@ -256,7 +199,7 @@
                     <img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" />
                 </div>
                 <div>
-                    <p>Otros Medios</p>
+                    <p class="text-black">Selecciona un metodo de efectivo</p>
                 </div>
 
                 <div class="cash-main-logos" >
@@ -278,7 +221,7 @@
                     <img width="250" src="/assets/logos/apuestas-unidas.jpg">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="cash-form">
                     <label class="col-md-4 control-label">Selecciona una opcion de efectivo</label>
                     <div class="col-md-6">
                         <select class="form-control nice-select" ng-model="data4.payment_method" name="payment_method" required>

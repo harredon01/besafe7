@@ -1,52 +1,6 @@
 angular.module('besafe')
         .service('Products', ['$q', '$http', function ($q, $http) {
 
-                var addCartItem = function (product_variant_id, merchant_id, quantity, extras) {
-
-                    var def = $q.defer();
-
-                    $http({
-                        method: "post",
-                        url: "/api/cart/add",
-                        data: {
-                            product_variant_id: product_variant_id,
-                            merchant_id: merchant_id,
-                            quantity: quantity,
-                            extras: extras
-                        }
-                    })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
-                                def.reject("Failed to get nearby");
-                            });
-
-                    return def.promise;
-                };
-                var updateCartItem = function (item_id, quantity) {
-
-                    var def = $q.defer();
-
-                    $http({
-                        method: "post",
-                        url: "/api/cart/update",
-                        data: {
-                            item_id: item_id,
-                            quantity: quantity
-                        }
-                    })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
-                                def.reject("Failed to get nearby");
-                            });
-
-                    return def.promise;
-                };
                 var addRating = function (rating) {
 
                     var def = $q.defer();
@@ -123,34 +77,6 @@ angular.module('besafe')
 
                     return def.promise;
                 };
-                var getCart = function () {
-                    var def = $q.defer();
-                    $http({
-                        method: "GET",
-                        url: "/api/cart/get"
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
-                                def.reject("Failed to get nearby");
-                            });
-                    return def.promise;
-                };
-                var getCheckoutCart = function () {
-                    var def = $q.defer();
-                    $http({
-                        method: "GET",
-                        url: "/api/cart/checkout"
-                    })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
-                                def.reject("Failed to get nearby");
-                            });
-                    return def.promise;
-                };
                 var getProductsMerchant = function (data) {
                     var def = $q.defer();
                     $http({
@@ -166,6 +92,21 @@ angular.module('besafe')
                             });
                     return def.promise;
                 };
+                var searchProducts = function (data) {
+                    var def = $q.defer();
+                    $http({
+                        method: "GET",
+                        url: "/api/products/search",
+                        params: data
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to searchProducts");
+                            });
+                    return def.promise;
+                };
                 var buildProduct = function (container, merchant) {
                     let productInfo = {};
 
@@ -173,6 +114,7 @@ angular.module('besafe')
                     productInfo.name = container.prod_name;
                     productInfo.description = container.prod_desc;
                     productInfo.isActive = container.isActive;
+                    productInfo.slug = container.slug;
                     productInfo.description_more = false;
                     productInfo.more = false;
                     productInfo.type = container.type;
@@ -206,10 +148,11 @@ angular.module('besafe')
                 };
                 var createVariant = function (container) {
                     let variant = {};
-                    //        console.log("Variant", container);
+                            console.log("Variant", container);
                     //        console.log("Variant", container.id)
                     variant.id = container.id;
                     variant.description = container.description;
+                    variant.type = container.type;
                     if (container.attributes.length > 0) {
                         variant.attributes = JSON.parse(container.attributes);
                         if (variant.attributes.buyers) {
@@ -344,35 +287,13 @@ angular.module('besafe')
                     return productInfo;
                 }
 
-                var clearCart = function () {
-
-                    var def = $q.defer();
-
-                    $http({
-                        method: "post",
-                        url: "/api/cart/clear",
-                    })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
-                                def.reject("Failed to get nearby");
-                            });
-
-                    return def.promise;
-                };
                 return {
-                    getCheckoutCart: getCheckoutCart,
-                    getCart: getCart,
                     addRating:addRating,
                     deleteFavorite:deleteFavorite,
                     checkFavorite:checkFavorite,
                     addFavorite:addFavorite,
-                    addCartItem: addCartItem,
-                    updateCartItem: updateCartItem,
+                    searchProducts:searchProducts,
                     getProductsMerchant: getProductsMerchant,
-                    clearCart: clearCart,
                     buildProductInformation: buildProductInformation
                 };
             }])

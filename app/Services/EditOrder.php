@@ -10,7 +10,7 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\Item;
 use App\Models\Condition;
-use App\Models\ProductVariant; 
+use App\Models\ProductVariant;
 use App\Models\Address;
 use App\Models\Merchant;
 use App\Services\EditCart;
@@ -621,10 +621,10 @@ class EditOrder {
         }
         if ($getMerchant) {
             $item = Item::where('user_id', $user->id)->where(function($query) use ($order) {
-                    $query->where('order_id', $order->id)
-                            ->orWhereNull('order_id');
-                })->first();
-            if(!$item){
+                        $query->where('order_id', $order->id)
+                                ->orWhereNull('order_id');
+                    })->first();
+            if (!$item) {
                 return array("status" => "error", "message" => "clear_cart");
             }
             $attributes = json_decode($item->attributes, true);
@@ -642,7 +642,7 @@ class EditOrder {
             $providers = [];
             foreach ($polygons as $polygon) {
                 $attributes['origin'] = $polygon->address_id;
-                array_push($providers, $polygon->provider);
+                array_push($providers, ["provider" => $polygon->provider, "provider_id" => $polygon->id,"desc"=>$polygon->description]);
             }
             $attributes['providers'] = $providers;
             $order->attributes = json_encode($attributes);
@@ -734,8 +734,19 @@ class EditOrder {
      *
      * @return Response
      */
-    public function setPlatformShippingCondition(User $user, $order_id, $platform) {
-
+    public function setPlatformShippingCondition(User $user, $order_id, $data) {
+        $platform = '';
+        if(isset($data['provider']) && $data['provider']){
+            $platform = $data['provider'];
+        } else {
+            return array("status" => "error", "message" => "Missing shipping provider");
+        }
+        $platform_id = '';
+        if(isset($data['provider_id']) && $data['provider_id']){
+            $platform_id = $data['provider_id'];
+        } else {
+            return array("status" => "error", "message" => "Missing shipping provider_id");
+        }
 
         $order = Order::find($order_id);
         if ($order) {
@@ -748,7 +759,7 @@ class EditOrder {
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id'=>$user->id]);
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
                         if ($result['status'] == 'success') {
                             $insertCondition = array(
                                 'name' => "Servicio de transporte",
@@ -760,7 +771,7 @@ class EditOrder {
                             $condition = new CartCondition($insertCondition);
                             $insertCondition['order_id'] = $order->id;
                             $insertCondition['total'] = $result['price'];
-                            $insertCondition['attributes'] = json_encode(["platform" => $platform]);
+                            $insertCondition['attributes'] = json_encode(["platform" => $platform,'user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
                             $order->orderConditions()->where('type', "shipping")->delete();
                             Cart::session($user->id)->removeConditionsByType("shipping");
                             OrderCondition::insert($insertCondition);
@@ -790,7 +801,19 @@ class EditOrder {
      *
      * @return Response
      */
-    public function getPlatformShippingPrice(User $user, $order_id, $platform) {
+    public function getPlatformShippingPrice(User $user, $order_id, $data) {
+        $platform = '';
+        if(isset($data['provider']) && $data['provider']){
+            $platform = $data['provider'];
+        } else {
+            return array("status" => "error", "message" => "Missing shipping provider");
+        }
+        $platform_id = '';
+        if(isset($data['provider_id']) && $data['provider_id']){
+            $platform_id = $data['provider_id'];
+        } else {
+            return array("status" => "error", "message" => "Missing shipping provider_id");
+        }
         $order = Order::find($order_id);
         if ($order) {
             if ($order->user_id == $user->id) {
@@ -802,7 +825,7 @@ class EditOrder {
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id'=>$user->id]);
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
                         if ($result['status'] == 'success') {
                             return $result;
                         }
@@ -1008,7 +1031,7 @@ class EditOrder {
                 $order->payment_status = "paid";
                 $order->execution_status = "pending";
                 $order->payment_method_id = $paymentMethod;
-                $this->orderStatusUpdate($order);
+                $this->orderStatusUpdate($order); 
                 $updateData = [
                     "paid_status" => "paid",
                     "updated_at" => date("Y-m-d hh:m:s")

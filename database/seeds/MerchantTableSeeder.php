@@ -128,6 +128,7 @@ class MerchantTableSeeder extends Seeder {
                 "status" => "approved",
                 "booking_id" => $booking->id
             ];
+            echo "id: " . $merchant->id . PHP_EOL;
             echo "Paid" . $booking->total_paid . PHP_EOL;
             if ($booking->notes == 'in_confirmation') {
                 $this->editBooking->changeStatusBookingObject($status, $owner);
@@ -215,10 +216,10 @@ class MerchantTableSeeder extends Seeder {
         $merchant_id = 0;
         if ($userId == 1) {
             $bookerId = 2;
-            $merchant_id = mt_rand(1, 3);
+            $merchant_id = mt_rand(7, 9);
         } else {
             $bookerId = 1;
-            $merchant_id = mt_rand(4, 6);
+            $merchant_id = mt_rand(7, 9);
         }
         $merchant = Merchant::find($merchant_id);
         $booker = User::find($bookerId);
@@ -265,12 +266,14 @@ class MerchantTableSeeder extends Seeder {
     }
 
     public function createMerchantsExcel() {
+        $this->miPaquete->authenticate("https://ecommerce.dev.mipaquete.com/api/auth");
         $this->miPaquete->authenticate("https://ecommerce.mipaquete.com/api/auth");
+        
         $this->rapigo->authenticate("https://test.rapigo.co/api/token/");
         $this->rapigo->authenticate("https://www.rapigo.co/api/token/");
         $this->miPaquete->getCitiesAndRegions();
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importGlobalExcel("Global3Test.xlsx");
+        $this->merchantImport->importGlobalExcel("Global3test.xlsx");
 //        return true;
 //        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
 //        $this->command->info('merchants seeded!');

@@ -1,36 +1,32 @@
 angular.module('besafe')
         .controller('MapLocationCtrl', ['$scope', '$rootScope', 'MapService', '$cookies', function ($scope, $rootScope, MapService, $cookies) {
                 $scope.map = {center: {latitude: 4.653450, longitude: -74.049605}, zoom: 8};
-                $rootScope.activeMarker = null;
                 $rootScope.markers = [];
                 $rootScope.mapLoaded = false;
+                $scope.error = "nada";
                 var url = window.location.href;
                 var res = url.split("/map/");
                 console.log("url");
                 console.log(JSON.stringify(res));
                 MapService.createMap(4.653450, -74.049605);
                 MapService.postMapLocation();
+                $scope.activeMarker = MapService.createLocationMarker(4.653450, -74.049605, true);
                 console.log(navigator.geolocation);
                 if ($rootScope.shippingAddress && $rootScope.shippingAddress.lat) {
-                    console.log("Loading address from cookie",$rootScope.shippingAddress);
-                    MapService.createLocationMarker($rootScope.shippingAddress.lat, $rootScope.shippingAddress.long, true);
+                    console.log("Loading address from cookie", $rootScope.shippingAddress);
+                    $scope.activeMarker.setPosition(new google.maps.LatLng($rootScope.shippingAddress.lat, $rootScope.shippingAddress.long))
+                    google.maps.event.trigger($scope.activeMarker, 'dragend');
                 } else {
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(function (position) {
                             $scope.$apply(function () {
                                 console.log("Position", position);
                                 $scope.position = position;
-                                MapService.createLocationMarker(position.coords.latitude, position.coords.longitude, true);
-                            });
-                        }, function (position) {
-                            $scope.$apply(function () {
-                                console.log("Position", position);
-                                MapService.createLocationMarker(4.654258, -74.062643, true);
+                                $scope.activeMarker.setPosition(new google.maps.LatLng(position.coords.latitude, position.coords.longitude))
+                                google.maps.event.trigger($scope.activeMarker, 'dragend');
                             });
                         });
-                    } else {
-                        $scope.default();
-                    }
+                    } 
                 }
 
                 $scope.default = function () {
@@ -40,7 +36,7 @@ angular.module('besafe')
                     window.history.back();
                 }
                 $scope.saveLocation = function () {
-                    console.log("Loading address to cookie",$rootScope.shippingAddress);
+                    console.log("Loading address to cookie", $rootScope.shippingAddress);
                     $cookies.put("shippingAddress", JSON.stringify($rootScope.shippingAddress), {path: "/"});
                     console.log("shippingAddress", JSON.stringify($rootScope.shippingAddress));
                     let locationS = $cookies.get('locationRefferrer');
@@ -59,6 +55,7 @@ angular.module('besafe')
                     } else {
                         url = "/?lat=" + $rootScope.shippingAddress.lat + "&long=" + $rootScope.shippingAddress.long
                     }
+                    $scope.error = "la url es: "+url;
                     console.log("url", url);
                     window.location.href = url;
                 }

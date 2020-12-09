@@ -8,11 +8,11 @@
         </ul>
 
         <p>Sub Total <span>@{{subtotal| currency }}</span></p>
-        <p ng-show="shipping > 0">Envío <span>@{{shipping| currency }}</span></p>
+        <p ng-show="shipping > 0">Domicilio<span>@{{shipping| currency }}</span></p>
         <p ng-show="discount > 0">Descuentos <span>@{{discount| currency }}</span></p>
         <h4>Total <span>@{{total| currency }}</span></h4>
         <br/>
-        <div ng-hide="paymentActive">
+        <div ng-hide="paymentActive" id="final-submit">
             <div>
                 <label>Ingresa un cupon</label>
                 <input type="text" ng-model="coupon" style="border:1px solid black" class="form-control" name="coupon" required>
@@ -20,11 +20,11 @@
             </div>
             <div style="clear:both"></div>
             <br/>
-            <div class="term-block" ng-show="shippingConditionSet || isDigital">
+            <div class="term-block" ng-show="shippingConditionSet && bookingSet || isDigital && bookingSet">
                 <input type="checkbox" id="accept_terms2">
                 <label for="accept_terms2">He leido y acepto los términos y condiciones</label>
             </div>
-            <button class="place-order w-100"  ng-show="shippingConditionSet || isDigital" ng-click="prepareOrder()">Pagar Orden</button>
+            <button class="place-order w-100"  ng-show="shippingConditionSet && bookingSet || isDigital && bookingSet" ng-click="prepareOrder()">Pagar Orden</button>
         </div>
 
     </div>

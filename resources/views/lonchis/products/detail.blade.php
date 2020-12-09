@@ -67,7 +67,7 @@
                             <i class="fas fa-check-circle"></i>@{{product.activeVariant.quantity}} En inventario
                         </div>
                         <!-- Amount and Add to cart -->
-                        <form action="./" class="add-to-cart">
+                        <form action="./" class="add-to-cart" id="add-cart-form">
                             <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
                                 <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
                             </select>

@@ -24,17 +24,16 @@ class MiPaquete {
 //            $fields_string .= $key . '=' . $value . '&';
 //        }
 //        rtrim($fields_string, '&');
-        if (false) {
-            $url = "https://ecommerce.test.mipaquete.com";
+        if ($test) {
+            $url = "https://ecommerce.dev.mipaquete.com";
             $push = Push::where('platform', 'MiPaqueteTest')->first();
-            
         } else {
             $url = "https://ecommerce.mipaquete.com";
             $push = Push::where('platform', 'MiPaquete')->first();
         }
 
         $data_string = json_encode($data);
-        // $curl = curl_init("https://ecommerce.test.mipaquete.com" . $query);
+        // $curl = curl_init("https://ecommerce.dev.mipaquete.com" . $query);
         $curl = curl_init($url . $query);
         //dd($data);
         $headers = array(
@@ -53,7 +52,12 @@ class MiPaquete {
     }
 
     public function authenticate($url) {
-        $data = ['email' => env('MIPAQUETE_USER'), "password" => env('MIPAQUETE_PASS')];
+        if ($url == "https://ecommerce.mipaquete.com/api/auth") {
+            $data = ['email' => env('MIPAQUETE_USER'), "password" => env('MIPAQUETE_PASS')];
+        } else {
+            $data = ['email' => env('MIPAQUETE_TEST_USER'), "password" => env('MIPAQUETE_TEST_PASS')];
+        }
+
         $data_string = json_encode($data);
         $curl = curl_init($url);
         //dd($data);
@@ -69,24 +73,22 @@ class MiPaquete {
         curl_close($curl);
         $response = json_decode($response, true);
         if ($response['status'] == 200) {
-            if($url == "https://ecommerce.mipaquete.com/api/auth"){
+            if ($url == "https://ecommerce.mipaquete.com/api/auth") {
                 Push::where('platform', 'MiPaquete')->update(['object_id' => $response['token'], 'updated_at' => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))]);
             } else {
                 Push::where('platform', 'MiPaqueteTest')->update(['object_id' => $response['token'], 'updated_at' => date_add(date_create(), date_interval_create_from_date_string(date('Z') . " seconds"))]);
             }
-            
         }
         return $response;
     }
 
-    public function sendGet($query,$test) {
-        if (false) {
-            $url = "https://ecommerce.test.mipaquete.com";
+    public function sendGet($query, $test) {
+        if ($test) {
+            $url = "https://ecommerce.dev.mipaquete.com";
             $push = Push::where('platform', 'MiPaqueteTest')->first();
         } else {
             $url = "https://ecommerce.mipaquete.com";
             $push = Push::where('platform', 'MiPaquete')->first();
-            
         }
         $curl = curl_init($url . $query);
         $headers = array(
@@ -103,7 +105,7 @@ class MiPaquete {
     }
 
     public function getCitiesAndRegions() {
-        $response = $this->sendGet("/api/sendings/town",false);
+        $response = $this->sendGet("/api/sendings/town", false);
         if ($response["status"] == 200) {
             $results = $response['result'];
             $towns = $results['towns'];
@@ -143,7 +145,7 @@ class MiPaquete {
         $data['points'] = json_encode($points);
         $query = "api/bogota/estimate/";
         //dd($query);
-        $response = $this->sendPost($data, $query,false);
+        $response = $this->sendPost($data, $query, false);
         return $response;
     }
 
@@ -152,10 +154,10 @@ class MiPaquete {
         $query = "/api/sendings/calculate";
         $admin = false;
         //dd($data);
-        if($extras['user_id']<4){
+        if ($extras['user_id'] < 4) {
             $admin = true;
         }
-        $response = $this->sendPost($data, $query,$admin);
+        $response = $this->sendPost($data, $query, $admin);
         if (array_key_exists('company', $response)) {
             $response['status'] = "success";
             $response['price'] = $response['company']['price'];
@@ -217,7 +219,7 @@ class MiPaquete {
             $data['declared_value'] = 30000;
         }
 
-        $data['delivery'] = "5cb0f5fd244fe2796e65f9c";
+        $data['delivery'] = "5c589aa3a18f543451320df1";
 
         $origin_id = null;
         $destination_id = null;
@@ -255,9 +257,7 @@ class MiPaquete {
             if (array_key_exists('merchant_email', $extras)) {
                 $sender['email'] = $extras['merchant_email'];
             }
-            if (array_key_exists('merchant_id', $extras)) {
-                $sender['nit'] = $extras['merchant_id'];
-            }
+            $sender['nit'] = "901219085";
             $receiver = [
                 "name" => $destination['name'],
                 "surname" => $destination['name'],
@@ -268,32 +268,45 @@ class MiPaquete {
             if (array_key_exists('client_email', $extras)) {
                 $receiver['email'] = $extras['client_email'];
             }
+            $collection = [
+                "bank" => "Bancolombia",
+                "type_account" => "A",
+                "number_account" => 123,
+                "name_beneficiary" => "Test Sender",
+                "number_beneficiary" => 1234
+            ];
+            $data['collection_information'] = $collection;
             $data['sender'] = $sender;
             $data['receiver'] = $receiver;
-            $data['comments'] = $extras['description_delivery'];
+            $data['description'] = $extras['description_delivery'];
+            $data['comments'] = $destination['notes'];
+            $data['alternative'] = 1;
+            //$data['declared_value'] = 50000;
+            unset($data['value_select']);
         }
         return $data;
     }
 
-    private function getUrl($user_id) {
-        if ($user_id < 4) {
-            return "/api/sendings-type";
-        } else {
-            return "/api/sendings-type";
-        }
-    }
-
     public function sendOrder(array $origin, array $destination, array $extras) {
         $data = $this->populateRequest($origin, $destination, $extras, true);
-        $query = $this->getUrl($extras['user_id']);
+        $query = "/api/sendings-type";
         $admin = false;
         //dd($data);
-        if($extras['user_id']<4){
+        if ($extras['user_id'] < 4) {
             $admin = true;
         }
-        $response = $this->sendPost($data, $query,$admin);
+        $response = $this->sendPost($data, $query, $admin);
         if ($response['status'] == 200) {
-            return ["status" => "success", "shipping_id" => $response['result']['sending']['_id']];
+            $code = $response['result']['sending']['code'];
+            $query2 = '/api/sendings/guia/'.$code;
+            $results = $this->sendGet($query2, $admin);
+            $body = "Tu envío ha sido creado. Porfavor imprime dos copias de cada guía, una para la transportadora, otra para el cliente. \r\n ";
+            if($results['status']==200){
+                foreach ($results['result']['response'] as $value) {
+                    $body .= $value." \r\n";
+                }
+            }
+            return ["status" => "success", "shipping_id" => $response['result']['sending']['_id'],"subject"=>"Envio programado con Mipaquete","body"=>$body];
         }
         return ["status" => "error"];
     }
@@ -301,14 +314,14 @@ class MiPaquete {
     public function checkAddress($address) {
         $data['address'] = $address;
         $query = env('RAPIGO_PROD') . "api/bogota/validate_address/";
-        $response = $this->sendPost($data, $query,false);
+        $response = $this->sendPost($data, $query, false);
         return $response;
     }
 
     public function checkStatus($key) {
         $data['key'] = $key;
         $query = env('RAPIGO_PROD') . "api/bogota/get_service_status/";
-        $response = $this->sendPost($data, $query,false);
+        $response = $this->sendPost($data, $query, false);
         return $response;
     }
 

@@ -3,7 +3,9 @@
                 $scope.subtotal = 0;
                 $scope.total = 0
                 angular.element(document).ready(function () {
-                    setTimeout(function(){ $scope.getCart(); }, 300);
+                    setTimeout(function () {
+                        $scope.getCart();
+                    }, 300);
                 });
                 $scope.clean = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -22,7 +24,7 @@
                     $scope.getCart();
                 });
                 $rootScope.$on('loadHeadCart', function (event, args) {
-                    console.log("Loading cart",args);
+                    console.log("Loading cart", args);
                     $scope.loadCart(args);
                 });
                 $scope.getCart = function () {
@@ -40,7 +42,7 @@
                             });
                 }
                 $scope.loadCart = function (data) {
-                    $scope.items = data.items;
+                    $rootScope.items = data.items;
                     $scope.totalItems = data.totalItems;
                     $scope.subtotal = data.subtotal;
                     $scope.total = data.total;
@@ -48,7 +50,12 @@
                 $scope.updateCartItem = function (product_variant_id) {
                     var quantity = angular.element(document.querySelector('input[name=quantity-' + product_variant_id + ']')).val();
                     console.log("da qty: " + quantity);
-                    Cart.updateCartItem(product_variant_id, quantity).then(function (data) {
+                    let container = {
+                        quantity: quantity,
+                        product_variant_id: $scope.product_variant_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
                         if (data.status == 'error') {
                             alert(data.message);
                         }
@@ -61,20 +68,26 @@
                 $scope.clearCart = function () {
                     Cart.clearCart().then(function (data) {
                         $scope.getCart();
+                        $rootScope.$broadcast('clearCart');
                     },
                             function (data) {
 
                             });
                 }
                 $scope.deleteCartItem = function (item_id) {
-                    
-                    Cart.updateCartItem(item_id, 0).then(function (data) {
-                        console.log("delete",data);
+                    let container = {
+                        quantity: 0,
+                        item_id: item_id,
+                        "extras": []
+                    };
+
+                    Cart.updateCartItem(container).then(function (data) {
+                        console.log("delete", data);
                         if (data.status == 'error') {
                             alert(data.message);
                         } else {
                             $scope.loadCart(data.cart);
-                            $rootScope.$broadcast('loadCartVariants', data.cart);
+                            $rootScope.$broadcast('deleteItem', item_id);
                         }
                         //$scope.getCart();
                     },

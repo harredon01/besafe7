@@ -1,5 +1,4 @@
 @extends(config("app.views").'.layouts.app')
-<script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}"></script>
 @section('content')
 <section>
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
@@ -33,20 +32,8 @@
                 <div class="ct-section-title">
                     <h2>Escribenos</h2>
                 </div>
-                <form class="site-form " id="contact-form" role="form" name="myForm" ng-submit="send(myForm.$valid)" novalidate>
+                <form class="site-form " id="contact-form" role="form" name="myForm" ng-submit="lead(myForm.$valid,'perdidos')" novalidate>
                     <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <label>Tipo</label>
-                                <select ng-model="data.type" class="nice-select" name="type" ng-change=""required>
-                                    <option value="Preguntas">Preguntas</option>
-                                    <option value="Quejas">Quejas</option>
-                                    <option value="Trabaja">Trabaja con nosotros</option>
-                                </select>
-                                <span style="color:red" ng-show="(myForm.type.$dirty && myForm.type.$invalid) || submitted && myForm.type.$invalid">
-                                    <span ng-show="submitted && myForm.type.$error.required">Porfavor Selecciona un tipo de comunicacion</span>
-                            </div>
-                        </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Nombre</label>
@@ -84,7 +71,7 @@
                                 <label>Mensaje</label>
                                 <textarea ng-model="data.message" name="message" id="message" cols="30" rows="10" class="form-control" required></textarea>
                                 <span style="color:red" ng-show="(myForm.message.$dirty && myForm.message.$invalid) || submitted && myForm.message.$invalid">
-                                    <span ng-show="submitted && myForm.message.$error.required">Porfavor ingresa la direccion</span>
+                                    <span ng-show="submitted && myForm.message.$error.required">Debes ingresar un mensaje</span>
                             </div>
                         </div>
                         <div class="col-lg-12">

@@ -79,7 +79,8 @@ class LeadController extends Controller {
                         array_push($files, $name);
                     }
                 }
-                if ($data['type'] == "Trabaja") {
+                if ($data['type'] == "Trabaja"||$data['type'] == "veterinarios"||
+                        $data['type'] == "pet-shops"||$data['type'] == "pet-sale"||$data['type'] == "perdidos") {
                     $lead = new Lead();
                     $lead->fill($data);
                     $lead->save();
