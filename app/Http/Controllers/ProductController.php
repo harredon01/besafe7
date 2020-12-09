@@ -58,7 +58,7 @@ class ProductController extends Controller {
     public function textSearch(Request $request) {
         $data = $request->all();
         $results = $this->editProduct->textSearch($data);
-        return view(config("app.views") . '.products.productsMerchant', ["data" => $results]);
+        return view(config("app.views") . '.products.productsSearch', ["data" => $results]);
     }
 
     /**

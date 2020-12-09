@@ -117,6 +117,8 @@ class EditProduct {
                     $query->select('products.id');
                 })->where('isActive', true);
         $textSearchCountQuery = $textSearchQuery;
+        $filterSearchCountQuery = $textSearchQuery;
+        $prodIds = $filterSearchCountQuery->select("id")->get();
         $total = $textSearchCountQuery->count();
         $textSearchQuery->with(["merchants", 'files', 'variants']);
         $pageRes = $this->paginateQueryFromArray($textSearchQuery, $data);
@@ -137,7 +139,12 @@ class EditProduct {
         $results['per_page'] = $pageRes['per_page'];
         $results['total'] = $total;
         $results['category'] = [];
-        $results['side_categories'] = [];
+        $res = $this->getActiveCategoriesSearch($prodIds);
+                $res = $res['data'];
+                $res = array_map(function ($value) {
+                    return (array) $value;
+                }, $res);
+        $results['side_categories'] = $res;
         return $results;
     }
 
@@ -189,6 +196,27 @@ class EditProduct {
             }
         }
         return $query;
+    }
+
+    public function getActiveCategoriesSearch($products) {
+        $searchP = "";
+        foreach ($products as $value) {
+            $searchP .= $value->id.",";
+        }
+        $searchP = mb_substr($searchP, 0, -1);
+        DB::enableQueryLog();
+        $categories = DB::select(" "
+                        . "SELECT 
+    c.*, COUNT(categorizable_id) AS tots
+FROM
+    categorizables ca
+        JOIN
+    categories c ON c.id = ca.category_id
+WHERE
+    categorizable_type = 'App\\\Models\\\Product'
+        AND categorizable_id IN (".$searchP.") GROUP BY category_id ");
+        //dd(DB::getQueryLog());
+        return ["status"=> "success", "data" => $categories];
     }
 
     public function getActiveCategoriesMerchant($id) {
@@ -257,9 +285,9 @@ GROUP BY category_id"
         $query = $this->baseProductQuery($data, $query);
         $query->whereIn('id', function($query)use($user) {
             $query->select('favoritable_id')->from('favorites')
-                    ->where('user_id',$user->id)
-                    ->where('score','>=',8)
-                    ->where('favoritable_type',"App\\Models\\Product");
+                    ->where('user_id', $user->id)
+                    ->where('score', '>=', 8)
+                    ->where('favoritable_type', "App\\Models\\Product");
         });
         $count_query = $query;
         $res = $this->paginateQueryFromArray($query, $data);
@@ -277,7 +305,7 @@ GROUP BY category_id"
             }
         }
         $results['merchant_products'] = $prodResults;
-        $variants_query = $this->buildVariantsQuery($products,$data,false,false);
+        $variants_query = $this->buildVariantsQuery($products, $data, false, false);
         $results['products_variants'] = $variants_query->get();
         if ($includes_files) {
             $results['products_files'] = $this->getFilesProducts($products);
@@ -330,7 +358,7 @@ GROUP BY category_id"
         $query = $this->baseProductQuery($data, $query);
 
         $merchant_id = null;
-        
+
         if (array_key_exists("merchant_id", $data)) {
             if ($data['merchant_id']) {
                 $merchant_id = $data['merchant_id'];
@@ -364,7 +392,7 @@ GROUP BY category_id"
             }
         }
         $results['merchant_products'] = $prodResults;
-        $variants_query = $this->buildVariantsQuery($products,$data,$isAdmin,$includes_categories);
+        $variants_query = $this->buildVariantsQuery($products, $data, $isAdmin, $includes_categories);
         $results['products_variants'] = $variants_query->get();
         if ($includes_files) {
             $results['products_files'] = $this->getFilesProducts($products);
@@ -377,15 +405,17 @@ GROUP BY category_id"
         $results['total'] = $results['products_total'];
         return $results;
     }
-    private function getFilesProducts($products){
+
+    private function getFilesProducts($products) {
         return DB::table('products')
-                    ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
-                    ->whereIn('files.trigger_id', $products)
-                    ->where('files.type', "App\Models\Product")
-                    ->select('products.*', 'files.*')
-                    ->get();
+                        ->leftJoin('files', 'products.id', '=', 'files.trigger_id')
+                        ->whereIn('files.trigger_id', $products)
+                        ->where('files.type', "App\Models\Product")
+                        ->select('products.*', 'files.*')
+                        ->get();
     }
-    private function buildVariantsQuery($products,$data,$isAdmin,$includes_categories){
+
+    private function buildVariantsQuery($products, $data, $isAdmin, $includes_categories) {
         $variants_query = null;
         if ($isAdmin) {
             $variants_query = DB::table('products')

@@ -37,11 +37,11 @@
                         for (let item in $scope.categories) {
                             for (let k in $scope.categories[item].products) {
                                 $scope.prodIds.push($scope.categories[item].products[k].id);
-                                
+
                                 if (!$rootScope.merchant_id && $scope.categories[0].products[0].merchant_id) {
                                     $rootScope.merchant_id = $scope.categories[0].products[0].merchant_id;
                                 }
-                                if(!$scope.categories[item].products[k].merchant_id && $scope.categories[item].products[k].merchants.length>0){
+                                if (!$scope.categories[item].products[k].merchant_id && $scope.categories[item].products[k].merchants.length > 0) {
                                     $scope.categories[item].products[k].merchant_id = $scope.categories[item].products[k].merchants[0].id
                                 }
                                 $scope.local_total++;
@@ -105,6 +105,20 @@
                 }
                 $scope.changeStore = function () {
                     Cart.changeMerchant()
+                }
+                $scope.addCatFilter = function (category) {
+                    let url = "/a/product-search";
+                    let params = Modals.getAllUrlParams();
+                    if (params) {
+
+                    } else {
+                        params = {};
+                    }
+                    params.category_id = category;
+                    console.log("params", params);
+
+                    console.log("res", Modals.turnObjectToUrl(params, url));
+                    window.location.href = Modals.turnObjectToUrl(params, url)
                 }
                 $scope.filterPrice = function () {
                     console.log("Filtering", $("#amount").val())
