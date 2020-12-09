@@ -1,50 +1,43 @@
-<div class="col-lg-3 col-md-8">
-    <!-- Category Nav Start -->
-    <div class="category-nav-wrapper bg-blue"  ng-controller="SitemapCtrl">
-        <div class="category-nav">
-            <h2 class="category-nav__title primary-bg" id="js-cat-nav-title"><i class="fa fa-bars"></i>
-                <span>Categorias</span></h2>
-
-            <ul class="category-nav__menu" id="js-cat-nav">
-                @foreach ($categories as $category)
-                @if (count($category['children']) > 0)
-                <li class="category-nav__menu__item has-children">
-                    @if(!(strpos($category['type'], 'merchant')===false))
-                        <a href="javascript:;" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
+<nav class="main-navigation">
+    <!-- Mainmenu Start -->
+    <ul class="mainmenu">
+        @foreach ($categories as $category)
+        @if (count($category['children']) > 0)
+        <li class="mainmenu__item menu-item-has-children">
+            <a href="javascript:;" class="mainmenu__link" >{{ $category['name']}}</a> 
+            <ul class="sub-menu">
+                @foreach ($category['children'] as $child)
+                <li>
+                    @if(!(strpos($child['type'], 'merchant')===false))
+                    <a href="/a/merchants/{{ $child['url']}}" ng-click="goTo('{{ $child['type']}}', $event)">{{ $child['name']}}</a>
                     @else
-                        <a href="javascript:;" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
-                    @endif
-                    <div class="category-nav__submenu">
-                        <div class="category-nav__submenu--inner">
-                            <ul>
-                                @foreach ($category['children'] as $child)
-                                <li>
-                                    @if(!(strpos($child['type'], 'merchant')===false))
-                                        <a href="/a/merchants/{{ $child['url']}}" ng-click="goTo('{{ $child['type']}}', $event)">{{ $child['name']}}</a>
-                                    @else
-                                        <a href="/a/reports/{{ $child['url']}}" ng-click="goTo('{{ $child['type']}}', $event)">{{ $child['name']}}</a>
-                                    @endif
-                                </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-
-                </li>
-                @else
-                <li class="category-nav__menu__item">
-                    @if(!(strpos($category['type'], 'merchant')===false))
-                        <a href="/a/merchants/{{ $category['url']}}" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
-                    @else
-                        <a href="/a/reports/{{ $category['url']}}" ng-click="goTo('{{ $category['type']}}', $event)">{{ $category['name']}}</a> 
+                    <a href="/a/reports/{{ $child['url']}}" ng-click="goTo('{{ $child['type']}}', $event)">{{ $child['name']}}</a>
                     @endif
                 </li>
-                @endif
                 @endforeach
-
             </ul>
-        </div>
-    </div>
-    <!-- Category Nav End -->
-    <div class="category-mobile-menu"></div>
-</div>
+        </li>
+        @endif
+        @endforeach
+        <li class="mainmenu__item menu-item-has-children">
+            <a href="javascript:;" class="mainmenu__link">Participa</a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="/a/contact-us/vets">Veterinarios</a>
+                </li>
+                <li>
+                    <a href="/a/contact-us/shops">Tiendas de mascotas</a>
+                </li>
+                <li>
+                    <a href="/a/contact-us/lost">Mascotas Perdidas</a>
+                </li>
+                <li>
+                    <a href="/a/contact-us/sale">Mascotas a la venta</a>
+                </li>
+                <li>
+                    <a href="/a/contact-us/bla">Contactanos</a>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>

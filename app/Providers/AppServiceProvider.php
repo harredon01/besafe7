@@ -10,6 +10,7 @@ use App\Models\Category;
 use OpenTok\OpenTok;
 use Illuminate\Support\Facades\View;
 use Cache;
+
 class AppServiceProvider extends ServiceProvider {
 
     /**
@@ -26,7 +27,13 @@ class AppServiceProvider extends ServiceProvider {
                         $menu = view(config("app.views") . '.menu', compact('categories'))->render();
                         return $menu;
                     });
-            $view->with('menu', $menu);
+            $sticky = Cache::remember('main_menu', 100, function () {
+                        $categories = Category::where('level', 0)->with("children.children")->get();
+                        $sticky = view(config("app.views") . '.sticky-menu', compact('categories'))->render();
+                        return $sticky;
+                    });
+                    //dd($menu);
+            $view->with('menu', $menu)->with('sticky', $sticky);
         });
     }
 

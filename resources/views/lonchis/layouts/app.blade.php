@@ -119,107 +119,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="header-nav-wrapper" id="mobile-anchor">
+                <div class="header-nav-wrapper" id="mobile-anchor" ng-controller="SitemapCtrl">
                     <div class="container">
                         <div class="header-bottom-inner">
                             <div class="row no-gutters">
                                 <!-- Category Nav -->
-                                {!!$menu!!}
+                                
                                 <!-- Main Menu -->
-                                <div class="col-lg-7 d-none d-lg-block">
-                                    <nav class="main-navigation">
-                                        <!-- Mainmenu Start -->
-                                        <ul class="mainmenu">
-                                            <li class="mainmenu__item menu-item-has-children" id="mi_cuenta">
-                                                <a href="#" class="mainmenu__link">Mi cuenta</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="{{ url('user/editProfile')}}">Mi cuenta</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/editAddress')}}">Mis direcciones</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/editPassword')}}">Actualizar Contraseña</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/payments')}}">Mis Pagos</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
-                                                        <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
-                                                            {{ csrf_field()}}
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item">
-                                                <a href="/a/contact-us/bla">Contactanos</a>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children">
-                                                <a href="javascript" class="mainmenu__link">Acerca de</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="/a/about-us">Nosotros</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/faq">Preguntas Frecuentes</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/terms">Terminos y condiciones</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children">
-                                                <a href="javascript:;" class="mainmenu__link">Participa</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="/a/contact-us/vets">Veterinarios</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/shops">Tiendas de mascotas</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/lost">Mascotas Perdidas</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/sale">Mascotas a la venta</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children " style="display:none">
-                                                <a href="blog.html" class="mainmenu__link">Blog</a>
-                                                <ul class="sub-menu">
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog.html">Blog Gird</a>
-                                                        <ul class="sub-menu">
-                                                            <li><a href="blog-left-sidebar.html">Blog Left Sidebar</a></li>
-                                                            <li><a href="blog-right-sidebar.html">Blog Right Sidebar</a></li>
-                                                            <li><a href="blog.html">Blog Full Width</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog-list.html">Blog List</a>
-                                                        <ul class="sub-menu">
-                                                            <li><a href="blog-list-left-sidebar.html">Blog List Left Sidebar</a></li>
-                                                            <li><a href="blog-list-right-sidebar.html">Blog List Right Sidebar</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog-details.html">Blog Details</a>
-                                                        <ul class="sub-menu">
-                                                            <li><a href="blog-details-left-sidebar.html">Left Sidebar</a></li>
-                                                            <li><a href="blog-details.html">Image Format</a></li>
-                                                            <li><a href="blog-details-video.html">Video Format</a></li>
-                                                            <li><a href="blog-details-gallery.html">Gallery Format</a></li>
-                                                            <li><a href="blog-details-audio.html">Audio Format</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                        <!-- Mainmenu End -->
-                                    </nav>
+                                <div class="col-lg-10 d-none d-lg-block">
+                                    {!!$menu!!}
                                 </div>
                                 <!-- Cart block-->
                                 @include(config("app.views").'.products.cart')
@@ -249,100 +157,7 @@
                                 </div>
                                 <div class="col-lg-9"> 
                                     <!-- Sticky Mainmenu Start -->
-                                    <nav class="sticky-navigation">
-                                        <ul class="mainmenu sticky-menu">
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child" id="mi_cuenta2">
-                                                <a href="index.html" class="mainmenu__link">Mi cuenta</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="{{ url('user/editProfile')}}">Mi cuenta</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/editAddress')}}">Mis direcciones</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/editPassword')}}">Editar Contraseña</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('user/payments')}}">Mis Pagos</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="{{ url('/logout')}}" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();">Cerrar session</a>
-                                                        <form id="logout-form" action="{{ url('/logout')}}" method="POST" style="display: none;">
-                                                            {{ csrf_field()}}
-                                                        </form>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item ">
-                                                <a href="/a/contact-us/bla" class="mainmenu__link">Contactanos</a>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
-                                                <a href="javascript" class="mainmenu__link">Acerca de</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="/a/about-us">Nosotros</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/faq">Preguntas Frecuentes</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/terms">Terminos y condiciones</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child ">
-                                                <a href="javascript:;" class="mainmenu__link">Participa</a>
-                                                <ul class="sub-menu">
-                                                    <li>
-                                                        <a href="/a/contact-us/vets">Veterinarios</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/shops">Tiendas de mascotas</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/lost">Mascotas Perdidas</a>
-                                                    </li>
-                                                    <li>
-                                                        <a href="/a/contact-us/sale">Mascotas a la venta</a>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li class="mainmenu__item menu-item-has-children sticky-has-child " style="display:none">
-                                                <a href="blog.html" class="mainmenu__link">Blog</a>
-                                                <ul class="sub-menu">
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog.html">Blog Gird</a>
-                                                        <ul class="sub-menu left-align">
-                                                            <li><a href="blog-left-sidebar.html">Blog Left Sidebar</a></li>
-                                                            <li><a href="blog-right-sidebar.html">Blog Right Sidebar</a></li>
-                                                            <li><a href="blog.html">Blog Full Width</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog-list.html">Blog List</a>
-                                                        <ul class="sub-menu left-align">
-                                                            <li><a href="blog-list-left-sidebar.html">Blog List Left Sidebar</a></li>
-                                                            <li><a href="blog-list-right-sidebar.html">Blog List Right Sidebar</a></li>
-                                                        </ul>
-                                                    </li>
-                                                    <li class="menu-item-has-children">
-                                                        <a href="blog-details.html">Blog Details</a>
-                                                        <ul class="sub-menu left-align">
-                                                            <li><a href="blog-details-left-sidebar.html">Left Sidebar</a></li>
-                                                            <li><a href="blog-details.html">Image Format</a></li>
-                                                            <li><a href="blog-details-video.html">Video Format</a></li>
-                                                            <li><a href="blog-details-gallery.html">Gallery Format</a></li>
-                                                            <li><a href="blog-details-audio.html">Audio Format</a></li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                        </ul>
-                                        <div class="sticky-mobile-menu  d-lg-none">
-                                            <span class="sticky-menu-btn"></span>
-                                        </div>
-                                    </nav>
+                                    {!!$sticky!!}
                                     <!-- Sticky Mainmenu End -->
                                 </div>
                             </div>
@@ -377,10 +192,9 @@
                                 <h3 class="footer-title">Informacion</h3>
                                 <div class="single-footer-content">
                                     <ul class="footer-list">
+                                        <li><a href="/a/faq">Preguntas frecuentes</a></li>
                                         <li><a href="/a/about-us">Acerca de </a></li>
                                         <li><a href="/a/contact-us/bla">Contactanos</a></li>
-                                        <li><a href="#">Returns & Exchanges</a></li>
-                                        <li><a href="#">Shipping & Delivery</a></li>
                                         <li><a href="/a/terms">Terminos y condiciones</a></li>
                                         <li><a href="/a/icons">Iconos</a></li>
                                     </ul>

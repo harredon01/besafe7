@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-xl-9 order-lg-2 mb--40">
-                <div class="shop-toolbar mb--30">
+                <div class="shop-toolbar mb--10">
                     <div class="row align-items-center">
                         <div class="col-5 col-md-3 col-lg-4">
                             <!-- Product View Mode -->
