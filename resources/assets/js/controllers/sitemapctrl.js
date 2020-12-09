@@ -66,12 +66,19 @@
                     }
                 }
             }])
-        .controller('SearchCtrl', ['$scope', '$rootScope', '$cookies', function ($scope, $rootScope, $cookies) {
+        .controller('SearchCtrl', ['$scope', '$rootScope', '$cookies','Modals', function ($scope, $rootScope, $cookies,Modals) {
                 $scope.category = "products|0|coverage";
                 $scope.searchText = "";
                 $scope.showError = false;
 
                 angular.element(document).ready(function () {
+                    let params;
+                    params = Modals.getAllUrlParams();
+                    if (params) {
+                        if(params.q){
+                            $scope.searchText = params.q;
+                        }
+                    }
                 });
                 $scope.selectCat = function () {
                     if ($scope.category.length > 0) {
@@ -155,7 +162,7 @@
                         } else {
                             let params;
                             params = Modals.getAllUrlParams(url);
-                            
+
                             if (params) {
 
                             } else {

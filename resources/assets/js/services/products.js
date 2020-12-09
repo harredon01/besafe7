@@ -92,6 +92,21 @@ angular.module('besafe')
                             });
                     return def.promise;
                 };
+                var searchProducts = function (data) {
+                    var def = $q.defer();
+                    $http({
+                        method: "GET",
+                        url: "/api/products/search",
+                        params: data
+                    })
+                            .success(function (data) {
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to searchProducts");
+                            });
+                    return def.promise;
+                };
                 var buildProduct = function (container, merchant) {
                     let productInfo = {};
 
@@ -277,6 +292,7 @@ angular.module('besafe')
                     deleteFavorite:deleteFavorite,
                     checkFavorite:checkFavorite,
                     addFavorite:addFavorite,
+                    searchProducts:searchProducts,
                     getProductsMerchant: getProductsMerchant,
                     buildProductInformation: buildProductInformation
                 };
