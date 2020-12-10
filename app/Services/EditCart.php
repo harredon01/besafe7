@@ -49,6 +49,28 @@ class EditCart {
             return ['subtotal' => 0, 'total' => 0, 'items' => [], 'totalItems' => 0];
         }
     }
+    public function checkCart($user) {
+        $cart = $this->getCart($user);
+        $items = $cart['items'];
+        foreach ($items as $value) {
+            $variant = $value->productVariant;
+            if ($variant->type == "product" && !$variant->is_digital && $value->quantity > $variant->quantity) {
+                $data = [
+                    "item_id" => $value->id,
+                    "quantity" => 0
+                ];
+                $this->updateCartItem($user, $data);
+            }
+//            if ($variant->type == "booking") {
+//                $losAttributes = json_decode($variant->attributes, true);
+//                if ($losAttributes['type'] == "Booking" && isset($losAttributes['id'])) {
+//                    $objClass = self::MODEL_PATH . $losAttributes['type'];
+//                    $booking = $objClass::where("id", $losAttributes['id'])->get();
+//                }
+//            }
+        }
+        return ["status"=>"success"];
+    }
 
     public function getCheckoutCart(User $user) {
 //        Cart::session($user->id)->removeConditionsByType("coupon");

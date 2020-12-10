@@ -141,6 +141,7 @@
             @endforeach
         </div>
         <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
+            <h2>Elige un proveedor</h2>
             <div class="col-lg-3 col-sm-6" ng-repeat="merchant in merchants">
                 <div class="pm-product product-type-list  ">
                     <a href="javascript:;" ng-click="openItem(merchant)" class="image" tabindex="0">
@@ -184,7 +185,7 @@
                                 <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
 
                                 <div class="btn-options">
-                                    <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" >Detalle Negocio</a>
+                                    <a href="/a/merchant/@{{ merchant.slug }}">Detalle Negocio</a>
                                 </div>
                             </div>
                         </div>

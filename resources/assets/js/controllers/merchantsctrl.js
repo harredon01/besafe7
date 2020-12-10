@@ -106,7 +106,8 @@
                             "objectName": $scope.merchant.name,
                             "objectDescription": $scope.merchant.description,
                             "objectIcon": $scope.merchant.icon,
-                            "expectedPrice": $scope.merchant.unit_cost
+                            "expectedPrice": $scope.merchant.unit_cost,
+                            "alert":"#book-button"
                         }
                         Cart.showBooking(params);
                     } else {

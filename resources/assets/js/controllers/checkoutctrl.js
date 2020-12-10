@@ -3,6 +3,8 @@
         .controller('CheckoutCartCtrl', ['$scope', '$rootScope', 'Cart', 'Orders', 'Modals', '$q', function ($scope, $rootScope, Cart, Orders, Modals, $q) {
                 $scope.data = {};
                 $scope.coupon = "";
+                $scope.accept = false;
+                $scope.acceptError = false;
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
                 angular.element(document).ready(function () {
@@ -32,6 +34,11 @@
                             function (data) {
 
                             });
+                }
+                $scope.AcceptTerms = function () {
+                    if($scope.accept){
+                        $scope.acceptError = false;
+                    }
                 }
                 $scope.getOrder = function (init) {
                     var def = $q.defer();
@@ -108,7 +115,12 @@
                     }
                 }
                 $scope.prepareOrder = function () {
-                    $rootScope.$broadcast('prepareOrder');
+                    console.log("Accept",$scope.accept);
+                    if($scope.accept){
+                        $rootScope.$broadcast('prepareOrder');
+                    } else {
+                        $scope.acceptError = true;
+                    }
                 }
                 $scope.deleteCartItem = function (item_id) {
                     let container = {
@@ -984,7 +996,8 @@
                         "questions": item.attributes.questions,
                         "item_id": item.id,
                         "quantity": item.quantity,
-                        "purpose": "external_book"
+                        "purpose": "external_book",
+                        "alert":"#checkout-booking"
                     }
                     console.log("Sending paramsparamsparams", params);
                     Cart.showBooking(params).then(function (result) {

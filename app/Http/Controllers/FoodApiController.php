@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Services\Food;
 use App\Services\Routing;
 use App\Services\EditDelivery;
+use App\Services\EditOrder;
 use App\Jobs\BuildScenario;
 use App\Jobs\RegenerateScenarios;
 use App\Mail\RouteOrganize;
@@ -40,16 +41,18 @@ class FoodApiController extends Controller {
     private $food;
     private $routing;
     private $delivery;
+    private $editOrder;
 
     /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct(Food $food, Routing $routing, EditDelivery $editDelivery) {
+    public function __construct(Food $food, Routing $routing, EditDelivery $editDelivery,EditOrder $editOrder) {
         $this->food = $food;
         $this->routing = $routing;
         $this->delivery = $editDelivery;
+        $this->editOrder = $editOrder;
         $this->middleware('auth:api')->except('getZones', 'getActiveIndicators', 'getTips');
         $this->middleware('admin')->except(['getRouteInfo', 'getZones', 'getActiveIndicators', 'getTips']);
     }
@@ -202,12 +205,14 @@ class FoodApiController extends Controller {
      */
     public function approvePayment($id) {
         $payment = \App\Models\Payment::find($id);
-        if(config("app.views")=="test"){
-            dispatch(new \App\Jobs\ApprovePayment($payment, "Food",5));
+        if (config("app.views") == "test") {
+            dispatch(new \App\Jobs\ApprovePayment($payment, "Food", 5));
         } else {
-            dispatch(new \App\Jobs\ApprovePayment($payment, "Booking",5));
+
+            $this->editOrder->approvePayment($payment, "Booking", 5);
+            //dispatch(new \App\Jobs\ApprovePayment($payment, "Booking",5));
         }
-        
+
         return response()->json(array("status" => "success", "message" => "Payment scheduled"));
     }
 

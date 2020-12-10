@@ -72,7 +72,8 @@ angular.module('besafe')
                         "questions": questions,
                         "product_variant_id": item.variant_id,
                         "quantity": item.amount,
-                        "purpose": "external_book"
+                        "purpose": "external_book",
+                        "alert":"#prod-cont-" + item.id
                     }
                     showBooking(params);
                 }
@@ -107,6 +108,7 @@ angular.module('besafe')
                     $mdDialog.show(Modals.getBookingPrompt(params)).then(function (result) {
                         console.log("Got result", result);
                         Modals.hideLoader();
+                        Modals.showToast("Carrito actualizado", $("#"+params.alert));
                         def.resolve(result);
                     }, function () {
                         console.log("Got nothing");
@@ -175,6 +177,23 @@ angular.module('besafe')
                             })
                             .error(function () {
                                 def.reject("Failed to get nearby");
+                            });
+                    return def.promise;
+                };
+                var checkCart = function () {
+                    console.log("Post checkCart");
+                    var def = $q.defer();
+                    $http({
+                        method: "post",
+                        url: "/api/cart/check",
+                        data: {}
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to checkCart");
                             });
                     return def.promise;
                 };
@@ -304,6 +323,7 @@ angular.module('besafe')
                     postToServer: postToServer,
                     updateCartItem: updateCartItem,
                     showBooking: showBooking,
+                    checkCart:checkCart,
                     showConfirm: showConfirm,
                     showConfirmExt: showConfirmExt,
                     clearCart: clearCart,

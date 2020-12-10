@@ -35,6 +35,8 @@
 
     </head>
     <body>
+        <div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v9.0&appId=340442469993643&autoLogAppEvents=1" nonce="8NzAZP9u"></script>
         <div class="site-wrapper">
             <header class="header petmark-header-1">
                 <div class="header-wrapper">
@@ -76,8 +78,8 @@
                                             <select name="category " id="searchCategory" ng-model="category" class="search-form__select nice-select">
                                                 <option value="">Categoria</option>
                                                 <optgroup label="Negocios">
-                                                    <option value="merchants|0|coverage">Todos</option>
-                                                    <option value="merchants|24|nearby">Veterinarias</option>
+                                                    <option value="merchants|0|list">Todos</option>
+                                                    <option value="merchants|24|list">Veterinarias</option>
                                                     <option value="merchants|25|coverage">Tiendas</option>
                                                     <option value="merchants|27|list">Otros servicios</option>
                                                 </optgroup>
@@ -94,12 +96,12 @@
                                                     <option value="reports|13|list">Compra</option>
                                                 </optgroup>
                                             </select>
-                                            
+
                                         </div>
                                         <button class="search-submit"><i class="fas fa-search"></i></button>
                                     </form>
                                     <span style="color:red" ng-show="showError">
-                                                <span>Porfavor Selecciona una categoría</span></span>
+                                        <span>Porfavor Selecciona una categoría</span></span>
                                 </div>
                                 <!-- Call Login & Track of Order -->
                                 <div class="col-lg-4 col-md-5 col-sm-8 order-2 order-md-3">
@@ -124,7 +126,7 @@
                         <div class="header-bottom-inner">
                             <div class="row no-gutters">
                                 <!-- Category Nav -->
-                                
+
                                 <!-- Main Menu -->
                                 <div class="col-lg-10 d-none d-lg-block">
                                     {!!$menu!!}
@@ -174,15 +176,14 @@
                             <div class="single-footer contact-block">
                                 <h3 class="footer-title">Contacto</h3>
                                 <div class="single-footer-content">
-                                    <p class="text-italic">We are a team of designers and developers that create high quality Wordpress, Magento, Prestashop, Opencart.</p>
-                                    <p class="font-weight-500 text-white"><span class="d-block">Contact info:</span>
-                                        169-C, Technohub, Dubai Silicon Oasis.</p>
+                                    <p class="text-italic">Somos una empresa de tecnologia que desarrolla productos innovadores para modernizar industrias.</p>
+                                    <p class="font-weight-500 text-white"><span class="d-block">Contacto:</span>
+                                        <a href="mailto:servicioalcliente@petworld.net.co">servicioalcliente@petworld.net.co</a></p>
                                     <p class="social-icons">
-                                        <a href=""><i class="fab fa-facebook-f"></i></a>
-                                        <a href=""><i class="fab fa-twitter"></i></a>
-                                        <a href=""><i class="fab fa-instagram"></i></a>
-                                        <a href=""><i class="fab fa-linkedin-in"></i></a>
-                                        <a href=""><i class="fas fa-rss"></i></a>
+                                        <a href="https://www.facebook.com/petworldCol"><i class="fab fa-facebook-f"></i></a>
+                                        <!--a href=""><i class="fab fa-twitter"></i></a-->
+                                        <a href="https://www.instagram.com/petworld_colombia/"><i class="fab fa-instagram"></i></a>
+                                        <a href="https://www.linkedin.com/company/pet-world-colombia/"><i class="fab fa-linkedin-in"></i></a>
                                     </p>
                                 </div>
                             </div>
@@ -193,7 +194,7 @@
                                 <div class="single-footer-content">
                                     <ul class="footer-list">
                                         <li><a href="/a/faq">Preguntas frecuentes</a></li>
-                                        <li><a href="/a/about-us">Acerca de </a></li>
+                                        <!--li><a href="/a/about-us">Acerca de </a></li-->
                                         <li><a href="/a/contact-us/bla">Contactanos</a></li>
                                         <li><a href="/a/terms">Terminos y condiciones</a></li>
                                         <li><a href="/a/icons">Iconos</a></li>
@@ -203,7 +204,8 @@
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <div class="single-footer contact-block">
-                                <h3 class="footer-title">SUBSCRIBE TO OUR NEWSLETTER</h3>
+                                <div class="fb-page" data-href="https://www.facebook.com/petworldCol" data-tabs="timeline" data-width="" data-height="400" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/petworldCol" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/petworldCol">Pet World</a></blockquote></div>
+                                <!--h3 class="footer-title">SUBSCRIBE TO OUR NEWSLETTER</h3>
                                 <div class="single-footer-content">
                                     <p>
                                         Subscribe to the Petmark mailing list to receive updates on new arrivals, special offers and other discount information.
@@ -214,7 +216,7 @@
                                             <button><i class="fas fa-envelope"></i></button>
                                         </div>
                                     </div>
-                                </div>
+                                </div--> 
                             </div>
                         </div>
                     </div>
@@ -271,7 +273,7 @@
                     </div>
                 </div>
                 <div class="footer-copyright">
-                    <p>Copyright © 2018 <a href="#">Petmark.com</a>. All Rights Reserved</p>
+                    <p>Copyright © 2020 <a href="#">Petworld.com</a>. All Rights Reserved</p>
                 </div>
             </footer>
         </div>

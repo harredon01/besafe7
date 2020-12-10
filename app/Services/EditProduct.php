@@ -118,7 +118,7 @@ class EditProduct {
                 })->where('isActive', true);
         $textSearchCountQuery = $textSearchQuery;
         $filterSearchCountQuery = $textSearchQuery;
-        $prodIds = $filterSearchCountQuery->select("id")->get();
+        $prodIds = $filterSearchCountQuery->get();
         $total = $textSearchCountQuery->count();
         $textSearchQuery->with(["merchants", 'files', 'variants']);
         $pageRes = $this->paginateQueryFromArray($textSearchQuery, $data);
@@ -139,11 +139,16 @@ class EditProduct {
         $results['per_page'] = $pageRes['per_page'];
         $results['total'] = $total;
         $results['category'] = [];
-        $res = $this->getActiveCategoriesSearch($prodIds);
+        if(count($prodIds)>0){
+            $res = $this->getActiveCategoriesSearch($prodIds);
                 $res = $res['data'];
                 $res = array_map(function ($value) {
                     return (array) $value;
                 }, $res);
+        } else {
+            $res = [];
+        }
+        
         $results['side_categories'] = $res;
         return $results;
     }

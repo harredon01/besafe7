@@ -7,6 +7,8 @@ use App\Models\CoveragePolygon;
 use App\Models\Order;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\GeneralNotification;
+use App\Services\EditCart;
+use App\Services\EditBooking;
 use App\Models\User;
 use Validator;
 use DB;
@@ -24,13 +26,29 @@ class EditItem {
     protected $notifications;
 
     /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $editCart;
+
+    /**
+     * The Guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\Guard
+     */
+    protected $editBooking;
+
+    /**
      * Create a new class instance.
      *
      * @param  EventPusher  $pusher
      * @return void
      */
-    public function __construct() {
+    public function __construct(EditCart $editCart, EditBooking $editBooking) {
         $this->notifications = app('Notifications');
+        $this->editBooking = $editBooking;
+        $this->editCart = $editCart;
     }
 
     /**
@@ -117,7 +135,7 @@ class EditItem {
                     $data = [
                         "trigger_id" => $user->id,
                         "message" => "",
-                        "subject" => "Error generating shipment with platform: ".$attributes["platform"],
+                        "subject" => "Error generating shipment with platform: " . $attributes["platform"],
                         "object" => "Merchant",
                         "sign" => true,
                         "payload" => $payload,
@@ -128,7 +146,6 @@ class EditItem {
                     $followers = [$client];
                     $date = date("Y-m-d H:i:s");
                     $this->notifications->sendMassMessage($data, $followers, $user, true, $date, true);
-                    
                 }
             }
             $payload = [
@@ -153,6 +170,8 @@ class EditItem {
         }
         return array("status" => "error", "message" => "Object not found");
     }
+
+    
 
     /**
      * Get a validator for an incoming edit profile request.

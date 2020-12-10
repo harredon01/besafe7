@@ -319,7 +319,7 @@
                                     </div>
                                     <div class="btn-block grid-btn" ng-show="product.item_id">
                                         <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '-')">-</a>
-                                        <input type="tel" ng-model="product.quantity"/>
+                                        <input type="tel" style="width:30px" ng-model="product.quantity"/>
                                         <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '+')">+</a>
                                     </div>
                                     <div class="card-list-content ">

@@ -177,6 +177,7 @@ Route::get('products/variant/{variant?}', 'ProductVariantApiController@show');
 Route::delete('products/variant/{variant?}', 'ProductVariantApiController@destroy');
 
 Route::post('cart/add', 'CartApiController@postAddCartItem');
+Route::post('cart/check', 'CartApiController@postCheckCart');
 Route::post('cart/add/custom', 'CartApiController@postAddCustomCartItem');
 Route::post('cart/update', 'CartApiController@postUpdateCartItem');
 Route::post('cart/update_custom', 'CartApiController@postUpdateCustomCartItem');

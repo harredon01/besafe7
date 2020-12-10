@@ -14,17 +14,18 @@
         <br/>
         <div ng-hide="paymentActive" id="final-submit">
             <div>
-                <label>Ingresa un cupon</label>
-                <input type="text" ng-model="coupon" style="border:1px solid black" class="form-control" name="coupon" required>
+                <label style="float:left;width:100%">Ingresa un cupon</label>
+                <input type="text" ng-model="coupon" style="border:1px solid black;width:50%;float:left;height:36px" class="form-control" name="coupon" required>
                 <button ng-click="setCoupon()" style="float:right" class="btn btn-primary">Enviar</button>
             </div>
             <div style="clear:both"></div>
             <br/>
             <div class="term-block" ng-show="shippingConditionSet && bookingSet || isDigital && bookingSet">
-                <input type="checkbox" id="accept_terms2">
-                <label for="accept_terms2">He leido y acepto los términos y condiciones</label>
+                <input type="checkbox" ng-model="accept" id="accept_terms2">
+                <label for="accept_terms2">He leido y acepto los <a style="color:#56a700" href="/a/terms" target="_blank">términos y condiciones</a></label>
             </div>
             <button class="place-order w-100"  ng-show="shippingConditionSet && bookingSet || isDigital && bookingSet" ng-click="prepareOrder()">Pagar Orden</button>
+            <p ng-show="acceptError">Debes aceptar los términos y condiciones para continuar</p>
         </div>
 
     </div>
