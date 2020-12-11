@@ -228,6 +228,10 @@
                         product: product,
                         type: product.type
                     }
+                    if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
+                        Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
+                        return true;
+                    }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
                         if (data.status == "success") {
@@ -449,6 +453,10 @@
                         quantity: product.quantity,
                         item_id: product.item_id,
                         product: product
+                    }
+                    if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
+                        Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
+                        return true;
                     }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);

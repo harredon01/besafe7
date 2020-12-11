@@ -25,6 +25,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('address')->nullable();
             $table->text('description')->nullable();
             $table->text('attributes')->nullable();
+            $table->text('keywords')->nullable();
             $table->string('icon')->nullable();
             $table->double('lat', 12, 9)->nullable();
             $table->double('long', 12, 9)->nullable();
@@ -57,7 +58,7 @@ class CreateMerchantsTable extends Migration {
             $table->string('plan')->nullable();
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE merchants ADD FULLTEXT fulltext_index_merchant (name, type, email,description,attributes)');
+        DB::statement('ALTER TABLE merchants ADD FULLTEXT fulltext_index_merchant (name, type, email,description,attributes,keywords)');
     }
 
     /**

@@ -288,8 +288,8 @@ class MerchantTableSeeder extends Seeder {
 //        $this->command->info('variants seeded!');
 //        $this->merchantImport->importMerchantsAvailabilitiesExcel("availabilities.xlsx");
 //        $this->command->info('availabilities seeded!');
-        $this->createMerchantBookings();
-        $this->createMerchantBookings();
+//        $this->createMerchantBookings();
+//        $this->createMerchantBookings();
         $this->command->info('Bookings created!');
         $this->merchantImport->importArticlesExcel("articles.xlsx");
         $this->command->info('articles seeded!');
