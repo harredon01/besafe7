@@ -182,9 +182,9 @@
                                 <p>@{{ merchant.description}}</p>
                             </article>
                             <div class="btn-block d-flex">
-                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
-
-                                <div class="btn-options">
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0">Tienda</a>
+                                <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
+                                <div class="btn-options" ng-show="showStore">
                                     <a href="/a/merchant/@{{ merchant.slug }}">Detalle Negocio</a>
                                 </div>
                             </div>

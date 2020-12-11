@@ -49,17 +49,20 @@ class EditCart {
             return ['subtotal' => 0, 'total' => 0, 'items' => [], 'totalItems' => 0];
         }
     }
-    public function checkCart($user) {
-        $cart = $this->getCart($user);
-        $items = $cart['items'];
+    private function checkCart($user) {
+        $items = Cart::session($user->id)->getContent();
+        $redirectCart = true;
         foreach ($items as $value) {
-            $variant = $value->productVariant;
+            $item = Item::where('id',$value->id)->with("productVariant")->first();
+            
+            $variant = $item->productVariant;
             if ($variant->type == "product" && !$variant->is_digital && $value->quantity > $variant->quantity) {
                 $data = [
                     "item_id" => $value->id,
                     "quantity" => 0
                 ];
                 $this->updateCartItem($user, $data);
+                $redirectCart = false;
             }
 //            if ($variant->type == "booking") {
 //                $losAttributes = json_decode($variant->attributes, true);
@@ -69,14 +72,22 @@ class EditCart {
 //                }
 //            }
         }
-        return ["status"=>"success"];
+        if($redirectCart){
+            return $items;
+        } else {
+            return null;
+        }
     }
 
     public function getCheckoutCart(User $user) {
 //        Cart::session($user->id)->removeConditionsByType("coupon");
 //        Cart::session($user->id)->removeConditionsByType("tax");
+        $items = $this->checkCart($user);
+        if(!$items){
+            $items = Cart::session($user->id)->getContent();
+        }
         $data = array();
-        $items = Cart::session($user->id)->getContent();
+        
         $result = array();
         $is_shippable = false;
         $is_subscription = false;

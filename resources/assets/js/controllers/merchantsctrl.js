@@ -11,6 +11,8 @@
                 $scope.categories = [];
                 $scope.regionVisible = false;
                 $scope.editMerchant = false;
+                $scope.showAddress = true;
+                $scope.showStore = true;
                 $scope.submitted = false;
                 $scope.category;
                 angular.element(document).ready(function () {
@@ -19,6 +21,10 @@
 //                    res = res.replace(/}""/g, '}\""');
                     console.log("res", res);
                     let container = JSON.parse(res);
+                    let url = window.location.href;
+                    if(url.includes("urgencias")){
+                        $scope.showStore = false;
+                    }
 
                     console.log("Data", container);
                     $scope.category = container.category;

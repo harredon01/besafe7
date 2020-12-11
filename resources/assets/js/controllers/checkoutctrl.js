@@ -8,8 +8,9 @@
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
                 angular.element(document).ready(function () {
-                    $scope.getCart(true);
-
+                    setTimeout(function () {
+                        $scope.getCart(true);
+                    }, 300);
                 });
                 $scope.cleanJson = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
