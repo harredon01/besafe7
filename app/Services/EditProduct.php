@@ -134,7 +134,6 @@ class EditProduct {
             categorizable_type = 'App\\\Models\\\Product'
                 AND category_id = $cat->id AND p.isActive = true AND p.isFeatured = true and p.id in(select product_id from merchant_product where merchant_id = $value->id) limit 3");
                 $cat->featured = $featured;
-                
             }
             $attributes = $value->attributes;
             $attributes['categories'] = $categories;
