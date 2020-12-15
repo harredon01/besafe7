@@ -82,7 +82,7 @@
                     params = Modals.getAllUrlParams();
                     if (params) {
                         if(params.q){
-                            $scope.searchText = params.q;
+                            $scope.searchText = decodeURIComponent(params.q);
                         }
                     }
                 });

@@ -47,6 +47,7 @@ angular.module('besafe')
                 };
                 appointmentbook = function (item) {
                     let questions = [];
+                    let location = null;
                     let container = null;
                     console.log("variants", item.variants)
                     for (let i in item.variants) {
@@ -59,6 +60,9 @@ angular.module('besafe')
                     if (container.attributes) {
                         if (container.attributes.questions) {
                             questions = container.attributes.questions;
+                        }
+                        if (container.attributes.location) {
+                            location = container.attributes.location;
                         }
                     }
                     let params = {
@@ -74,6 +78,9 @@ angular.module('besafe')
                         "quantity": item.amount,
                         "purpose": "external_book",
                         "alert":"#prod-cont-" + item.id
+                    }
+                    if(location){
+                        params.location = location;
                     }
                     showBooking(params);
                 }
