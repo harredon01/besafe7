@@ -150,13 +150,14 @@ class MiPaquete {
     }
 
     public function getOrderShippingPrice(array $origin, array $destination, array $extras) {
-        $data = $this->populateRequest($origin, $destination, $extras, false);
         $query = "/api/sendings/calculate";
         $admin = false;
         //dd($data);
         if ($extras['user_id'] < 4) {
             $admin = true;
         }
+        $data = $this->populateRequest($origin, $destination, $extras, false,$admin);
+        
         $response = $this->sendPost($data, $query, $admin);
         if (array_key_exists('company', $response)) {
             $response['status'] = "success";
@@ -168,7 +169,7 @@ class MiPaquete {
         return $response;
     }
 
-    private function populateRequest(array $origin, array $destination, array $extras, bool $build) {
+    private function populateRequest(array $origin, array $destination, array $extras, bool $build, bool $admin) {
         //dd($points);
         $data = [];
         $data['type'] = 2;
@@ -218,8 +219,10 @@ class MiPaquete {
         } else {
             $data['declared_value'] = 30000;
         }
-
-        $data['delivery'] = "5c589aa3a18f543451320df1";
+        if($admin){
+            $data['delivery'] = "5c589aa3a18f543451320df1";
+        }
+        
 
         $origin_id = null;
         $destination_id = null;
@@ -288,13 +291,14 @@ class MiPaquete {
     }
 
     public function sendOrder(array $origin, array $destination, array $extras) {
-        $data = $this->populateRequest($origin, $destination, $extras, true);
         $query = "/api/sendings-type";
         $admin = false;
         //dd($data);
         if ($extras['user_id'] < 4) {
             $admin = true;
         }
+        $data = $this->populateRequest($origin, $destination, $extras, true,$admin);
+        
         $response = $this->sendPost($data, $query, $admin);
         if ($response['status'] == 200) {
             $code = $response['result']['sending']['code'];
