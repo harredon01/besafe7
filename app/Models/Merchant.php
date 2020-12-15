@@ -53,7 +53,8 @@ class Merchant extends Model {
         'type',
         'email',
         'description',
-        'attributes'
+        'attributes',
+        'keywords'
     ];
 
     public function isActive() {
