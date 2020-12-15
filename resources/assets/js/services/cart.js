@@ -108,7 +108,7 @@ angular.module('besafe')
                     $mdDialog.show(Modals.getBookingPrompt(params)).then(function (result) {
                         console.log("Got result", result);
                         Modals.hideLoader();
-                        Modals.showToast("Carrito actualizado", $("#"+params.alert));
+                        Modals.showToast("Carrito actualizado", $(params.alert));
                         def.resolve(result);
                     }, function () {
                         console.log("Got nothing");
