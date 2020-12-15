@@ -24,6 +24,7 @@
                 $scope.product_variant_id = null;
                 $scope.item_id = null;
                 $scope.quantity = null;
+                $scope.location = null;
                 $scope.objectId;
                 $scope.objectName;
                 $scope.objectDescription;
@@ -99,6 +100,12 @@
                         }
                         if (paramsArrived.questions) {
                             $scope.questions = paramsArrived.questions;
+                        }
+                        if (paramsArrived.location) {
+                            $scope.location = paramsArrived.location;
+                            if($scope.location == "zoom"){
+                                $scope.virtualMeeting = "virtual";
+                            }
                         }
                         if (paramsArrived.product_variant_id) {
                             $scope.product_variant_id = paramsArrived.product_variant_id;
