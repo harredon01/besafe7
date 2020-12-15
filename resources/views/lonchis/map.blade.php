@@ -12,7 +12,6 @@
                 <div class="panel-body">
                     <h3>En donde te encuentras?</h3>
                     <p>Tu ubicacion se usa para determinar si te encuentras en cobertura y mostrarte los resultados mas cerca a ti primero. </p>
-                    <p>Mueve el pin o haz click en donde te encuentras para continuar</p>
                     <p style="display:none">@{{error}}</p>
                     <button ng-click="saveLocation()" class="btn btn-primary">Guardar</button>
                     <button ng-click="cancel()" class="btn btn-primary">Cancelar</button>

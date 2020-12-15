@@ -154,16 +154,17 @@
                     </div>
                     <div class="content">
                         <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
+                        <div class="price" >
+                            <span class="text-primary" style="font-size:18px">@{{ merchant.activeCategory.tots}} productos de @{{ merchant.activeCategory.name}}</span><br/>
+                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
+                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
+                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
+                        </div>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
                             <span>Costo promedio consulta: @{{ merchant.unit_cost | currency }}</span>
                         </div>
                         <div class="price" ng-if="merchant.Distance > 0">
                             <span>Distancia: @{{ merchant.Distance | number }} km</span>
-                        </div>
-                        <div class="price" >
-                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
-                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
-                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
                         </div>
                         <div class="btn-block grid-btn">
                             <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
@@ -180,6 +181,7 @@
                             <article>
                                 <h3 class="d-none sr-only">Article</h3>
                                 <p>@{{ merchant.description}}</p>
+                                
                             </article>
                             <div class="btn-block d-flex">
                                 <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0">Tienda</a>

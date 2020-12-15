@@ -26,9 +26,17 @@
                         $scope.showStore = false;
                     }
 
-                    console.log("Data", container);
                     $scope.category = container.category;
                     $scope.merchants = container.data;
+                    for(let item in $scope.merchants){
+                        for(let k in $scope.merchants[item].attributes.categories){
+                            if($scope.merchants[item].attributes.categories[k].id == $scope.category.id){
+                                $scope.merchants[item].activeCategory = $scope.merchants[item].attributes.categories[k];
+                                break;
+                            }
+                        }
+                    }
+                    console.log("Data", $scope.merchants);
                     $scope.current = container.page;
                     $scope.per_page = container.per_page;
                     $scope.last = container.last_page;
