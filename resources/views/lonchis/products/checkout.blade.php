@@ -22,8 +22,9 @@
                                     @include(config("app.views").'.user.checkoutAddressList')
                                 </div>
                                 <span ng-show="!shippingAddressSet" style="color:#56a700;float:right">
-                                    <a href="javascript:;" ng-click="showAddressForm()">Nueva direccion</a>
+                                    <a href="javascript:;" ng-click="newAddress()">Nueva direccion</a>
                                 </span>
+                                <div style="clear:both"></div>
                                 @include(config("app.views").'.user.editAddressFormCheckout')
                                 <div class="checkout-quick-box" ng-show="shippingConditionSet">
                                     <p><i class="far fa-sticky-note"></i> <a href="javascript:;" ng-click="changeShipping()">
