@@ -31,6 +31,7 @@ class Product extends Model {
     protected $searchable = [
         'name',
         'description',
+        'keywords'
     ];
 
     public function isActive() {
