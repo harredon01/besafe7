@@ -273,7 +273,7 @@ class MerchantTableSeeder extends Seeder {
         $this->rapigo->authenticate("https://www.rapigo.co/api/token/");
         $this->miPaquete->getCitiesAndRegions();
         //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importGlobalExcel("Global3test.xlsx");
+        $this->merchantImport->importGlobalExcel("Global3.xlsx"); 
 //        return true;
 //        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
 //        $this->command->info('merchants seeded!');

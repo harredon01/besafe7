@@ -107,6 +107,42 @@ class EditProduct {
         return $query;
     }
 
+    public function countTotalsMerchant() {
+        $merchants = Merchant::all();
+        foreach ($merchants as $value) {
+            $categories = DB::select(" "
+                            . "SELECT 
+            c.*, COUNT(categorizable_id) AS tots
+        FROM
+            categorizables ca
+                JOIN
+            categories c ON c.id = ca.category_id
+        WHERE
+            categorizable_type = 'App\\\Models\\\Product'
+                AND categorizable_id IN 
+                (select p.id from products p join merchant_product mp on p.id = mp.product_id where p.isActive = true and mp.merchant_id = $value->id ) "
+                            . " GROUP BY category_id ");
+            foreach ($categories as $cat) {
+                $featured = DB::select(" "
+                                . "SELECT 
+            p.*
+        FROM
+            categorizables ca
+                JOIN
+            products p ON p.id = ca.categorizable_id
+        WHERE
+            categorizable_type = 'App\\\Models\\\Product'
+                AND category_id = $cat->id AND p.isActive = true AND p.isFeatured = true and p.id in(select product_id from merchant_product where merchant_id = $value->id) limit 3");
+                $cat->featured = $featured;
+                
+            }
+            $attributes = $value->attributes;
+            $attributes['categories'] = $categories;
+            $value->attributes = $attributes;
+            $value->save();
+        }
+    }
+
     public function textSearch($data) {
         if (!isset($data['q'])) {
             $data['q'] = "";
@@ -139,16 +175,16 @@ class EditProduct {
         $results['per_page'] = $pageRes['per_page'];
         $results['total'] = $total;
         $results['category'] = [];
-        if(count($prodIds)>0){
+        if (count($prodIds) > 0) {
             $res = $this->getActiveCategoriesSearch($prodIds);
-                $res = $res['data'];
-                $res = array_map(function ($value) {
-                    return (array) $value;
-                }, $res);
+            $res = $res['data'];
+            $res = array_map(function ($value) {
+                return (array) $value;
+            }, $res);
         } else {
             $res = [];
         }
-        
+
         $results['side_categories'] = $res;
         return $results;
     }
@@ -206,10 +242,10 @@ class EditProduct {
     public function getActiveCategoriesSearch($products) {
         $searchP = "";
         foreach ($products as $value) {
-            $searchP .= $value->id.",";
+            $searchP .= $value->id . ",";
         }
         $searchP = mb_substr($searchP, 0, -1);
-        DB::enableQueryLog();
+        //DB::enableQueryLog();
         $categories = DB::select(" "
                         . "SELECT 
     c.*, COUNT(categorizable_id) AS tots
@@ -219,9 +255,9 @@ FROM
     categories c ON c.id = ca.category_id
 WHERE
     categorizable_type = 'App\\\Models\\\Product'
-        AND categorizable_id IN (".$searchP.") GROUP BY category_id ");
+        AND categorizable_id IN (" . $searchP . ") GROUP BY category_id ");
         //dd(DB::getQueryLog());
-        return ["status"=> "success", "data" => $categories];
+        return ["status" => "success", "data" => $categories];
     }
 
     public function getActiveCategoriesMerchant($id) {

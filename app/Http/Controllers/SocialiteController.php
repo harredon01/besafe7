@@ -105,7 +105,7 @@ class SocialiteController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function handleGoogleCallback() {
-        $user = Socialite::driver('google')->user();
+        $user = Socialite::driver('google')->stateless()->user();
         $user = json_decode(json_encode($user), true);
         $authUser = User::where("email", $user['email'])->first();
 

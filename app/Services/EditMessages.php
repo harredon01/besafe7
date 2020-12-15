@@ -219,7 +219,7 @@ class EditMessages {
                 
             } else {
                 $followers = [];
-                if($data['to_id']==77){
+                if($data['to_id']==env('ADMIN')){
                     $sendEmail = true;
                 }
                 $recipient = User::find($data['to_id']);
@@ -254,7 +254,7 @@ class EditMessages {
                     "name" => $user->firstName . " " . $user->lastName
                 ];
                 return $friend;
-            } else if ($object == "mevico") {
+            } else if ($object == "petworld") {
                 $user = User::find(2);
                 $friend = [
                     "id" => $user->id,

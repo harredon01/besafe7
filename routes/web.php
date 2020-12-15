@@ -30,6 +30,9 @@ Route::get('/a/blog/{slug?}','WelcomeController@getBlogDetail');
 Route::get('/a/terms', function () {
     return view(config("app.views").'.content.terms');
 });
+Route::get('/a/privacy', function () {
+    return view(config("app.views").'.content.privacy');
+});
 Route::get('/a/icons', function () {
     return view(config("app.views").'.content.icons');
 });

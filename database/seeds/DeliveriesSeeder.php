@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Services\MiPaquete;
-use App\Services\EditCategory;
+use App\Services\EditProduct;
 use App\Services\Rapigo;
 use App\Jobs\ApprovePayment;
 use App\Models\Payment;
@@ -36,11 +36,13 @@ class DeliveriesSeeder extends Seeder {
      */
     protected $security;
 
-    public function __construct(Rapigo $security) {
+    public function __construct(EditProduct $security) {
         $this->security = $security;
     }
 
     public function run() {
+        $this->security->countTotalsMerchant();
+        return true;
         //dispatch(new CreateGoogleEvent(8));
         $order = Order::find(11);
         $destination = $order->orderAddresses()->where('type', "shipping")->first();

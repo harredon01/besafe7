@@ -49,8 +49,8 @@ return [
       |
      */
     'from' => [
-        'address' => 'noresponder@lonchis.com.co',
-        'name' => 'Lonchis App',
+        'address' => env('MAIL_ADDRESS', 587),
+        'name' => env('MAIL_FROM', 587),
     ],
     /*
       |--------------------------------------------------------------------------

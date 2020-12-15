@@ -21,7 +21,7 @@
         <a href="/logout" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt"></i> Logout</a>
 
         <form id="logout-form" action="/logout" method="POST" style="display: none;" class="ng-pristine ng-valid">
-            <input type="hidden" name="_token" value="nUU11xTUckbo3YQVzsfDv2TSenTKiLH4jnqg1Xx5">
+            @csrf
         </form>
     </div>
 </div>
