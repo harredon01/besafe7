@@ -121,7 +121,7 @@
                         }
                     },
                             function (data) {
-
+                                Modals.showToast("Hubo un error, porfavor comunicate con soporte");
                             });
                 }
                 $scope.getContentExport = function (typeCont) {
@@ -134,7 +134,7 @@
                         }
                     },
                             function (data) {
-
+                                Modals.showToast("Hubo un error, porfavor comunicate con soporte");
                             });
                 }
 
