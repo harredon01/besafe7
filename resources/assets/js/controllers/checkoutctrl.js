@@ -37,7 +37,7 @@
                             });
                 }
                 $scope.AcceptTerms = function () {
-                    if($scope.accept){
+                    if ($scope.accept) {
                         $scope.acceptError = false;
                     }
                 }
@@ -116,8 +116,8 @@
                     }
                 }
                 $scope.prepareOrder = function () {
-                    console.log("Accept",$scope.accept);
-                    if($scope.accept){
+                    console.log("Accept", $scope.accept);
+                    if ($scope.accept) {
                         $rootScope.$broadcast('prepareOrder');
                     } else {
                         $scope.acceptError = true;
@@ -170,8 +170,9 @@
                     $scope.loadCart(args);
                 });
             }])
-        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', 'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
-            function ($scope, $rootScope, LocationService, Users, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
+        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', '$q',
+            'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
+            function ($scope, $rootScope, LocationService, Users, $q, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
                 $scope.data = {};
                 $scope.addressSet = {};
                 $scope.shipping = [];
@@ -222,6 +223,12 @@
                 angular.element(document).ready(function () {
 
                 });
+                $scope.newAddress = function () {
+                    let url = window.location.href;
+                    $cookies.put("shippingAddress", "", {path: "/"});
+                    $cookies.put("locationRefferrer", url, {path: "/"});
+                    window.location.href = "/location";
+                }
                 $rootScope.$on('prepareOrder', function (event, args) {
                     $scope.prepareOrder();
                 });
@@ -268,13 +275,15 @@
                     }
                 }
                 $scope.getAddresses = function () {
+                    var def = $q.defer();
                     Users.getAddresses().then(function (data) {
                         $rootScope.addresses = data.addresses;
-
+                        def.resolve("done");
                     },
                             function (data) {
-
+                                def.resolve("error");
                             });
+                    return def.promise;
                 }
                 $scope.clean = function () {
                     $scope.data = {};
@@ -484,10 +493,10 @@
                                 let cont = $scope.shipping[i];
                                 if (cont.platform == container.platform) {
                                     if (cont.price <= container.price) {
-                                        console.log("Not adding",container)
+                                        console.log("Not adding", container)
                                         add = false;
                                     } else {
-                                        console.log("Removing",cont)
+                                        console.log("Removing", cont)
                                         $scope.shipping.splice(i, 1);
                                     }
                                 }
@@ -497,7 +506,7 @@
                             }
                             if ($scope.expectedProviders == 0 && $scope.shipping.length == 1) {
                                 $scope.setShippingCondition($scope.shipping[0]);
-                                console.log("Auto select",$scope.shipping)
+                                console.log("Auto select", $scope.shipping)
                             }
 
                         }
@@ -516,11 +525,19 @@
                 $scope.changeAddress = function () {
                     console.log("Change address")
                     $rootScope.shippingAddressSet = false;
+                    $rootScope.shippingConditionSet = false;
                     $scope.addAddress = false;
                     if ($rootScope.addresses && $rootScope.addresses.length > 0) {
 
                     } else {
-                        $scope.getAddresses();
+                        $scope.getAddresses().then(function (data) {
+                            if($rootScope.addresses.length == 0 ){
+                                $scope.newAddress();
+                            }
+                        },
+                                function (data) {
+                                });
+                        ;
                     }
                 }
                 $scope.changeShipping = function () {
@@ -883,6 +900,7 @@
 
                             });
                 }
+
                 $scope.showAddressForm = function () {
                     $scope.addAddress = true;
                     $scope.data.type = "billing";
@@ -998,7 +1016,7 @@
                         "item_id": item.id,
                         "quantity": item.quantity,
                         "purpose": "external_book",
-                        "alert":"#checkout-booking"
+                        "alert": "#checkout-booking"
                     }
                     console.log("Sending paramsparamsparams", params);
                     Cart.showBooking(params).then(function (result) {

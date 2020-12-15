@@ -365,6 +365,7 @@
                             Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                             alert(data.message);
                         } else {
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                             $rootScope.$broadcast('loadHeadCart', data.cart);
                         }
                     },
@@ -537,6 +538,7 @@
                             alert(data.message);
                         } else {
                             $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                         }
                     },
                             function (data) {
