@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="csrf-token" content="{{ csrf_token()}}">
         <title>{{ config('app.name', 'Laravel')}}</title>
 
         <!-- Styles -->
@@ -32,11 +32,18 @@
         <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
         <script src="/js/all.js"></script>
         <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}"></script>
-
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBF630LLXE"></script>
+        <script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', 'G-KBF630LLXE');
+        </script>
     </head>
     <body>
         <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v9.0&appId=340442469993643&autoLogAppEvents=1" nonce="8NzAZP9u"></script>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v9.0&appId=340442469993643&autoLogAppEvents=1" nonce="8NzAZP9u"></script>
         <div class="site-wrapper">
             <header class="header petmark-header-1">
                 <div class="header-wrapper">

@@ -260,7 +260,7 @@ class StoreExport {
                 ->where('merchant_id', $merchant_id)
                 ->whereBetween('updated_at', [$startDate, $endDate])
                 ->whereNotIn('user_id', [1, 2, 3])
-                ->with(['items', 'orderConditions'])->chunk(50, function ($orders) use(&$pages, $count, &$processed) {
+                ->with(['items', 'orderConditions'])->chunk(50, function ($orders) use(&$pages, $count, &$processed, &$user) {
             $merchantResults = $this->exportOrderData($orders);
             $pages[0]['rows'] = array_merge($pages[0]['rows'], $merchantResults['orders_fast']);
             $pages[1]['rows'] = array_merge($pages[1]['rows'], $merchantResults['orders_full']);
