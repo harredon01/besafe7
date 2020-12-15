@@ -263,13 +263,16 @@ class EditCart {
      * @return Response
      */
     public function checkCartAuth($user, $requires_authorization, $order_id, $merchant_id) {
-        if (isset($user->email)) {
-            $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
-        } else {
-            $item = Item::where('ref2', $user->id)->where('order_id', $order_id)->first();
+        $items = Cart::session($user->id)->getContent();
+        $item = null;
+        if(count($items)>0){
+            foreach ($items as $value) {
+                $item = Item::find($value->id);
+                if($item){
+                    break;
+                }
+            }
         }
-
-        //dd($item->toArray());
         if (!$item) {
             return true;
         } else {
@@ -402,22 +405,18 @@ class EditCart {
         if (isset($user->email)) {
             if (array_key_exists('item_id', $data)) {
                 $item = Item::where('id', intval($data['item_id']))
-                                ->where('user_id', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('user_id', $user->id)->first();
             } else if (array_key_exists('product_variant_id', $data)) {
                 $item = Item::where('product_variant_id', intval($data['product_variant_id']))
-                                ->where('user_id', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('user_id', $user->id)->first();
             }
         } else {
             if (array_key_exists('item_id', $data)) {
                 $item = Item::where('id', intval($data['item_id']))
-                                ->where('ref2', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('ref2', $user->id)->first();
             } else if (array_key_exists('product_variant_id', $data)) {
                 $item = Item::where('product_variant_id', intval($data['product_variant_id']))
-                                ->where('ref2', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('ref2', $user->id)->first();
             }
         }
         return $item;
