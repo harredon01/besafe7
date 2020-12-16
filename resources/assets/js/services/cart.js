@@ -113,9 +113,9 @@ angular.module('besafe')
                 var showBooking = function (params) {
                     var def = $q.defer();
                     $mdDialog.show(Modals.getBookingPrompt(params)).then(function (result) {
-                        console.log("Got result", result);
+                        console.log("Got result", $rootScope.cartMessage);
                         Modals.hideLoader();
-                        Modals.showToast("Carrito actualizado", $(params.alert));
+                        Modals.showToast($rootScope.cartMessage, $(params.alert));
                         def.resolve(result);
                     }, function () {
                         console.log("Got nothing");

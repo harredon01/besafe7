@@ -362,7 +362,7 @@
                     };
                     Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
-                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
+                            Modals.showToast("Error Actualizando", $("#prod-cont-" + product.id));
                             alert(data.message);
                         } else {
                             Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));

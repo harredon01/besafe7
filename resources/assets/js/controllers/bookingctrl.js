@@ -239,6 +239,7 @@
                         "type": "Booking",
                         "id": booking.id,
                         "name": "Reserva con: " + booking.bookable.name,
+                        "from":booking.starts_at
                     }
                     let item = {
                         "name": "Reserva con: " + booking.bookable.name,
@@ -249,7 +250,7 @@
                         "cost": 0,
                         "extras": extras
                     };
-                    let query = null;
+                    console.log("addBookingToCartServer",item);
                     if ($scope.product_variant_id) {
                         let container = {
                             product_variant_id: $scope.product_variant_id,
@@ -259,8 +260,12 @@
                             "extras": extras
                         };
                         Cart.postToServer(container).then(function (data) {
-                            Modals.showToast("Carrito actualizado");
-                            $rootScope.$broadcast('loadHeadCart', data.cart);
+                            if(data.status == "success"){
+                                $rootScope.$broadcast('loadHeadCart', data.cart);
+                                $rootScope.cartMessage = "Carrito actualizado";
+                            } else {
+                                $rootScope.cartMessage = data.message;
+                            }
                         }, function (data) {
                             console.log("Error addCustomCartItem");
                         });
@@ -272,15 +277,23 @@
                             "extras": extras
                         };
                         Cart.updateCartItem(container).then(function (data) {
-                            Modals.showToast("Carrito actualizado");
-                            $rootScope.$broadcast('loadHeadCart', data.cart);
+                            if(data.status == "success"){
+                                $rootScope.$broadcast('loadHeadCart', data.cart);
+                                $rootScope.cartMessage = "Carrito actualizado";
+                            } else {
+                                $rootScope.cartMessage = data.message;
+                            }
                         }, function (data) {
                             console.log("Error addCustomCartItem");
                         });
                     } else {
                         Cart.addCustomCartItem(item).then(function (data) {
-                            Modals.showToast("Carrito actualizado");
-                            $rootScope.$broadcast('loadHeadCart', data.cart);
+                            if(data.status == "success"){
+                                $rootScope.$broadcast('loadHeadCart', data.cart);
+                                $rootScope.cartMessage = "Carrito actualizado";
+                            } else {
+                                $rootScope.cartMessage = data.message;
+                            }
                         }, function (data) {
                             console.log("Error addCustomCartItem");
                         });
