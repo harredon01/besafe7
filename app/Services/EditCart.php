@@ -263,15 +263,12 @@ class EditCart {
      * @return Response
      */
     public function checkCartAuth($user, $requires_authorization, $order_id, $merchant_id) {
-        $items = Cart::session($user->id)->getContent();
         $item = null;
-        if(count($items)>0){
-            foreach ($items as $value) {
-                $item = Item::find($value->id);
-                if($item){
-                    break;
-                }
-            }
+        $order = Order::where('status', 'pending')->where('user_id', $user->id)->first();
+        if ($order) {
+            $item = Item::where("order_id",$order->id)->first();
+        } else {
+            $item = Item::whereNull("order_id")->where("user_id",$user->id)->first();
         }
         if (!$item) {
             return true;
