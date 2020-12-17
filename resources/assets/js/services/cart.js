@@ -74,6 +74,7 @@ angular.module('besafe')
                         "objectIcon": item.merchant_icon,
                         "expectedPrice": item.activeVariant.price,
                         "questions": questions,
+                        "variant": container,
                         "product_variant_id": item.variant_id,
                         "quantity": item.amount,
                         "purpose": "external_book",

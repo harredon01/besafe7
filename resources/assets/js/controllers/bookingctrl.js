@@ -6,6 +6,7 @@
                 $scope.selectedSpots = [];
                 $scope.questions = [];
                 $scope.meetingType;
+                $scope.variant;
                 $scope.availabilities = [];
                 $scope.appointmentOptions = [];
                 $scope.months = [];
@@ -100,6 +101,9 @@
                         }
                         if (paramsArrived.questions) {
                             $scope.questions = paramsArrived.questions;
+                        }
+                        if (paramsArrived.variant) {
+                            $scope.variant = paramsArrived.variant;
                         }
                         if (paramsArrived.location) {
                             $scope.location = paramsArrived.location;
@@ -451,6 +455,9 @@
                 $scope.getDates = function () {
                     console.log("Get dates");
                     var myDate = new Date();
+                    if($scope.variant &&$scope.variant.is_shippable){
+                        myDate.setDate(myDate.getDate() + 1);
+                    }
                     let month = myDate.getMonth();
                     let monthcont = {month: month, days: [], title: Booking.getMonthName(month)};
                     for (let i = 0; i < 61; i++) {
@@ -538,8 +545,12 @@
                 }
                 $scope.buildSlots = function () {
                     $scope.appointmentOptions = [];
+                    let appointmentLength = 30;
+                    if($scope.variant &&$scope.variant.is_shippable){
+                        appointmentLength = 60;
+                    }
                     let current = new Date();
-                    current = $scope.addMinutes(current, 30)
+                    current = $scope.addMinutes(current, appointmentLength)
                     for (let item in $scope.availabilitiesDate) {
                         let container = $scope.availabilitiesDate[item];
                         let open = true;
@@ -547,7 +558,7 @@
                         let start = new Date($scope.startDate.getFullYear() + "/" + ($scope.startDate.getMonth() + 1) + "/" + $scope.startDate.getDate() + " " + container.from.replace(" ", ":00 "));
                         let end = new Date($scope.startDate.getFullYear() + "/" + ($scope.startDate.getMonth() + 1) + "/" + $scope.startDate.getDate() + " " + container.to.replace(" ", ":00 "));
                         while (open) {
-                            let endApp = $scope.addMinutes(start, 30);
+                            let endApp = $scope.addMinutes(start, appointmentLength);
                             if (endApp <= end) {
                                 let containerSlot = {start: start, end: endApp};
                                 if (start > current) {
@@ -555,7 +566,7 @@
                                         $scope.appointmentOptions.push(containerSlot);
                                     }
                                 }
-                                start = $scope.addMinutes(start, 30)
+                                start = $scope.addMinutes(start, appointmentLength)
                             } else {
                                 open = false;
                             }
