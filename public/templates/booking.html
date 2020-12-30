@@ -46,7 +46,7 @@
                             <label>Inicio</label>
                             <p style='color: gray'>{{startDate| date :'h:mm a'}}</p> 
                         </div>
-                        <a href="javascript:;" ng-click="changeTime()" ng-show="timeSelected">Cambiar Hora</a> 
+                        
                         <ul ng-show="!bookingObj&&!product_variant_id && ! item_id">
                             <li>
                                 <label>Evento Virtual</label>
@@ -59,9 +59,10 @@
 
                         </ul>
                         <p ng-show="expectedPrice">Subtotal: {{ expectedPrice * amount | currency }}</p>
+                        <a href="javascript:;" style="color:#56a700" ng-click="changeTime()" ng-show="timeSelected">Cambiar Hora</a> 
                     </div>
                 </div>
-                <a href="javascript:;" ng-click="changeDate()" ng-show="dateSelected">Cambiar Fecha</a>
+                <a href="javascript:;" style="color:#56a700" ng-click="changeDate()" ng-show="dateSelected">Cambiar Fecha</a>
                 <div ng-repeat="item in questions" ng-show="timeSelected">
                     <label ng-show="item.type == 'text' || item.type == 'num' || item.type == 'textarea'" position="floating">{{item.name}}</label><br ng-show="item.type == 'text' || item.type == 'num' || item.type == 'textarea'"/>
                     <input ng-show="item.type == 'text'" type="text" ng-model="item.value" name="{{item.name}}"/>

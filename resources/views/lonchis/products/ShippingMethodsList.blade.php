@@ -17,8 +17,9 @@
         <td class="col-md-2">
             @{{ item.price | currency }}
         </td>
-        <td class="col-md-2">                              
-            <a href="javascript:;" class="text-orange" ng-click="setShippingCondition(item)">Usar</a>
+        <td class="col-md-2">   
+            <a href="javascript:;" class="text-black" ng-show="item.selected">Seleccionada</a>
+            <a href="javascript:;" class="text-primary" ng-hide="item.selected" ng-click="setShippingCondition(item)">Usar</a>
         </td>
     </tr>
 </table>

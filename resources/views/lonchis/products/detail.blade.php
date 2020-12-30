@@ -74,7 +74,7 @@
                             <div class="count-input-block">
                                 <input type="number" ng-model="product.quantity" class="form-control text-center" value="1">
                             </div>
-                            <div class="btn-block">
+                            <div class="btn-block" id="prod-cont-@{{product.id}}">
                                 <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-rounded btn-outlined--primary">Agregar al carrito</a>
                             </div>
                         </form>

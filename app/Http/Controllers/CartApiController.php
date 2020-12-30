@@ -60,6 +60,17 @@ class CartApiController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    public function postCheckCart(Request $request) {
+        $user = $this->getCartUser($request);
+        $status = $this->editCart->checkCart($user);
+        return response()->json($status);
+    }
+    /**
+     * Handle a login request to the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function getCartUser(Request $request) {
         $user = auth('api')->user();
         if($user){

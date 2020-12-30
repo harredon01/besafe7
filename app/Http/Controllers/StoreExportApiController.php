@@ -70,7 +70,8 @@ class StoreExportApiController extends Controller {
     }
     public function postStoreOrdersExport(Request $request) {
         $data = $request->all();
-        $this->store->exportOrdersClient($data['merchant_id'],$data['from'],$data['to']);
+        $user = $request->user();
+        $this->store->exportOrdersClient($user,$data['merchant_id'],$data['from'],$data['to']);
         return response()->json(array("status" => "success", "message" => "Summary shipping cost calculation queued"));
     }
     

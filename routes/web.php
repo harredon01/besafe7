@@ -30,6 +30,9 @@ Route::get('/a/blog/{slug?}','WelcomeController@getBlogDetail');
 Route::get('/a/terms', function () {
     return view(config("app.views").'.content.terms');
 });
+Route::get('/a/privacy', function () {
+    return view(config("app.views").'.content.privacy');
+});
 Route::get('/a/icons', function () {
     return view(config("app.views").'.content.icons');
 });
@@ -117,6 +120,8 @@ Route::post('admin/store/merchants', 'ProductImportController@postMerchants');
 Route::post('admin/store/categories', 'ProductImportController@postCategories');
 Route::get('admin/store/global', 'StoreExportController@getImport');
 Route::post('admin/store/global', 'StoreExportController@postImport');
+Route::get('admin/store/global-admin', 'StoreExportController@getAdminImport');
+Route::post('admin/store/global-admin', 'StoreExportController@postAdminImport');
 Route::get('admin/store/export', 'StoreExportController@getExport');
 Route::get('location', 'MapExternalController@location');
 Route::get('map/{code?}', 'MapExternalController@index');

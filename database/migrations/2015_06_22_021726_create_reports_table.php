@@ -26,6 +26,7 @@ class CreateReportsTable extends Migration {
             $table->string('telephone')->nullable();
             $table->string('address');
             $table->text('description')->nullable();
+            $table->text('keywords')->nullable();
             $table->text('attributes')->nullable();
             $table->string('icon')->nullable();
             $table->double('lat', 12, 9)->nullable();
@@ -48,7 +49,7 @@ class CreateReportsTable extends Migration {
             $table->string('plan')->nullable();
             $table->timestamps();
         });
-        DB::statement('ALTER TABLE reports ADD FULLTEXT fulltext_index_report (name, type, email,description,attributes)');
+        DB::statement('ALTER TABLE reports ADD FULLTEXT fulltext_index_report (name, type, email,description,attributes,keywords)');
     }
 
     /**

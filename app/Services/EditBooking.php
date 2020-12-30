@@ -160,7 +160,11 @@ class EditBooking {
             }
 
             $data['attendees'] = $attendees;
-            $event = Event::create($data, $calendar);
+            try {
+                $event = Event::create($data, $calendar);
+            } catch (\Exception $ex) {
+                $event = null;
+            }
         } else {
             $event = new Event;
             $event->sendUpdates = "all";
@@ -197,7 +201,12 @@ class EditBooking {
             if ($google_calendar) {
                 $date = new Carbon($data['from'] . " 00:00:00");
                 $date2 = new Carbon($data['from'] . " 23:59:59");
-                $results = Event::get($date, $date2, [], $google_calendar);
+                try {
+                    $results = Event::get($date, $date2, [], $google_calendar);
+                } catch (\Exception $ex) {
+                    $results = [];
+                }
+
                 foreach ($results as $event) {
                     array_push($events, [
                         'id' => -1,
@@ -211,13 +220,26 @@ class EditBooking {
         $datea = new Carbon($data['from'] . " 00:00:00");
         $datea2 = new Carbon($data['from'] . " 23:59:59");
         $results2 = Event::get($datea, $datea2)->toArray();
+
         foreach ($results2 as $event) {
-            array_push($events, [
-                'id' => -1,
-                'name' => $event->name,
-                "starts_at" => $event->startDateTime,
-                "ends_at" => $event->endDateTime,
-            ]);
+            $addEvent = false;
+            foreach ($event->attendees as $attendee) {
+                if ($attendee->email == $object->email) {
+                    $addEvent = true;
+                    break;
+                }
+            }
+            if (isset($data['location']) && $data['location'] && $data['location'] == 'zoom' && $event->location == 'zoom') {
+                $addEvent = true;
+            }
+            if ($addEvent) {
+                array_push($events, [
+                    'id' => -1,
+                    'name' => $event->name,
+                    "starts_at" => $event->startDateTime,
+                    "ends_at" => $event->endDateTime,
+                ]);
+            }
         }
         return array(
             "status" => "success",
@@ -282,7 +304,12 @@ class EditBooking {
             if ($google_calendar) {
                 $dateT = new Carbon($data['from']);
                 $date2T = new Carbon($data['to']);
-                $events = Event::get($dateT, $date2T, [], $google_calendar);
+                try {
+                    $events = Event::get($dateT, $date2T, [], $google_calendar);
+                } catch (\Exception $ex) {
+                    $events = [];
+                }
+
                 if (count($events) > 0) {
                     return ['status' => "error", "message" => "merchant_limit"];
                 }
@@ -301,12 +328,12 @@ class EditBooking {
               $booking3 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))->where('ends_at', '>=', date_format($date2, "Y-m-d H:i:s"))
               ->whereColumn("price", "total_paid")->where("notes", self::PENDING)->count(); */
             $booking1 = Booking::where('starts_at', '<=', date_format($date, "Y-m-d H:i:s"))
-                    ->where('ends_at', '>', date_format($date, "Y-m-d H:i:s"))
-                    ->whereColumn("price", "total_paid")->count();
+                            ->where('ends_at', '>', date_format($date, "Y-m-d H:i:s"))
+                            ->whereColumn("price", "total_paid")->count();
 
             $booking2 = Booking::where('starts_at', '>', date_format($date, "Y-m-d H:i:s"))
-                    ->where('starts_at', '<', date_format($date2, "Y-m-d H:i:s"))
-                    ->whereColumn("price", "total_paid")->count();
+                            ->where('starts_at', '<', date_format($date2, "Y-m-d H:i:s"))
+                            ->whereColumn("price", "total_paid")->count();
             if ($booking1 >= self::VIRTUAL_BOOKING || $booking2 >= self::VIRTUAL_BOOKING) {
                 return ['status' => "error", "message" => "zoom_limit"];
             }
@@ -346,7 +373,12 @@ class EditBooking {
             if ($google_calendar) {
                 $date = new Carbon($data['from']);
                 $date2 = new Carbon($data['to']);
-                $events = Event::get($date, $date2, [], $google_calendar);
+
+                try {
+                    $events = Event::get($date, $date2, [], $google_calendar);
+                } catch (\Exception $ex) {
+                    $events = [];
+                }
                 if (count($events) > 0) {
                     return ['status' => "error", "message" => "merchant_limit"];
                 }

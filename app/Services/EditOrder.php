@@ -642,7 +642,7 @@ class EditOrder {
             $providers = [];
             foreach ($polygons as $polygon) {
                 $attributes['origin'] = $polygon->address_id;
-                array_push($providers, ["provider" => $polygon->provider, "provider_id" => $polygon->id,"desc"=>$polygon->description]);
+                array_push($providers, ["provider" => $polygon->provider, "provider_id" => $polygon->id, "desc" => $polygon->description]);
             }
             $attributes['providers'] = $providers;
             $order->attributes = json_encode($attributes);
@@ -736,13 +736,13 @@ class EditOrder {
      */
     public function setPlatformShippingCondition(User $user, $order_id, $data) {
         $platform = '';
-        if(isset($data['provider']) && $data['provider']){
+        if (isset($data['provider']) && $data['provider']) {
             $platform = $data['provider'];
         } else {
             return array("status" => "error", "message" => "Missing shipping provider");
         }
         $platform_id = '';
-        if(isset($data['provider_id']) && $data['provider_id']){
+        if (isset($data['provider_id']) && $data['provider_id']) {
             $platform_id = $data['provider_id'];
         } else {
             return array("status" => "error", "message" => "Missing shipping provider_id");
@@ -771,7 +771,7 @@ class EditOrder {
                             $condition = new CartCondition($insertCondition);
                             $insertCondition['order_id'] = $order->id;
                             $insertCondition['total'] = $result['price'];
-                            $insertCondition['attributes'] = json_encode(["platform" => $platform,'user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
+                            $insertCondition['attributes'] = json_encode(["platform" => $platform, 'user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
                             $order->orderConditions()->where('type', "shipping")->delete();
                             Cart::session($user->id)->removeConditionsByType("shipping");
                             OrderCondition::insert($insertCondition);
@@ -803,13 +803,13 @@ class EditOrder {
      */
     public function getPlatformShippingPrice(User $user, $order_id, $data) {
         $platform = '';
-        if(isset($data['provider']) && $data['provider']){
+        if (isset($data['provider']) && $data['provider']) {
             $platform = $data['provider'];
         } else {
             return array("status" => "error", "message" => "Missing shipping provider");
         }
         $platform_id = '';
-        if(isset($data['provider_id']) && $data['provider_id']){
+        if (isset($data['provider_id']) && $data['provider_id']) {
             $platform_id = $data['provider_id'];
         } else {
             return array("status" => "error", "message" => "Missing shipping provider_id");
@@ -1031,18 +1031,29 @@ class EditOrder {
                 $order->payment_status = "paid";
                 $order->execution_status = "pending";
                 $order->payment_method_id = $paymentMethod;
-                $this->orderStatusUpdate($order); 
+                $this->orderStatusUpdate($order);
                 $updateData = [
                     "paid_status" => "paid",
                     "updated_at" => date("Y-m-d hh:m:s")
                 ];
                 Item::where("order_id", $order->id)->update($updateData);
+                $items = Item::where("order_id", $order->id)->with("productVariant")->get();
+                
+                foreach ($items as $value) {
+                    $variant = $value->productVariant;
+                    
+                    if (!$variant->is_digital) {
+                        $variant->quantity -= $value->quantity;
+                        $variant->save();
+                    }
+                }
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
             }
         }
     }
+
 
     public function denyPayment(Payment $payment, $platform) {
         $payment->status = "denied";

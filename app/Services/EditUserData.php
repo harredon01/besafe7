@@ -67,7 +67,7 @@ class EditUserData {
         $data['password'] = bcrypt($data['password']);
         $data['name'] = $data['firstName'] . " " . $data['lastName'];
         $data['emailNotifications'] = 1;
-        if(!isset($data['optinMarketing'])){
+        if (!isset($data['optinMarketing'])) {
             $data['optinMarketing'] = 1;
         }
         unset($data['password_confirmation']);
@@ -85,25 +85,28 @@ class EditUserData {
         ]);
         $json = json_decode((string) $response->getBody(), true);
         dispatch(new PostRegistration($user));
-        //$this->getUserCode($user);
         return ['status' => 'success', 'access_token' => $json['access_token']];
+        //$this->getUserCode($user);
+        return ['status' => 'success'];
     }
 
     public function postRegistration(User $user) {
         Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
-        $admin = User::find(77);
-        $message = "Hola " . $user->firstName . " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
-        $package = [
-            "type" => "user_message",
-            "name" => "Servicio al cliente",
-            "message" => $message,
-            "from_id" => $admin->id,
-            "to_id" => $user->id,
-            "status" => "unread",
-            "target_id" => $user->id,
-            "created_at" => date("Y-m-d H:i:s")
-        ];
-        SendMessage::dispatch($admin, $package)->delay(now()->addMinutes(2));
+        if (config("app.views") == "test") {
+            $admin = User::find(env('ADMIN'));
+            $message = "Hola " . $user->firstName . " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
+            $package = [
+                "type" => "user_message",
+                "name" => "Servicio al cliente",
+                "message" => $message,
+                "from_id" => $admin->id,
+                "to_id" => $user->id,
+                "status" => "unread",
+                "target_id" => $user->id,
+                "created_at" => date("Y-m-d H:i:s")
+            ];
+            SendMessage::dispatch($admin, $package)->delay(now()->addMinutes(2));
+        }
     }
 
     /**

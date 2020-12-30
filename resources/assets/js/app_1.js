@@ -43,8 +43,7 @@ app.config(function () {
             $rootScope.$broadcast('user_loaded');
         },
                 function (data) {
-                    document.getElementById("mi_cuenta").remove();
-                    document.getElementById("mi_cuenta2").remove();
+
                 });
         getCart();
         let shipping = $cookies.get("shippingAddress");

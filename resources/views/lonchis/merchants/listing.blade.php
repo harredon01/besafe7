@@ -88,7 +88,7 @@
                             @endif
                             @if(isset($merchant['Distance']))
                             <div class="price text-red">
-                                <span>Distancia: ${{$merchant['Distance']}}</span>
+                                <span>Distancia: {{$merchant['Distance']}}</span>
                             </div>
                             @endif
                             <div class="btn-block grid-btn">
@@ -141,6 +141,7 @@
             @endforeach
         </div>
         <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
+            <h2>Elige un proveedor</h2>
             <div class="col-lg-3 col-sm-6" ng-repeat="merchant in merchants">
                 <div class="pm-product product-type-list  ">
                     <a href="javascript:;" ng-click="openItem(merchant)" class="image" tabindex="0">
@@ -153,16 +154,17 @@
                     </div>
                     <div class="content">
                         <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
+                        <div class="price" >
+                            <span class="text-primary" style="font-size:18px">@{{ merchant.activeCategory.tots}} productos de @{{ merchant.activeCategory.name}}</span><br/>
+                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
+                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
+                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
+                        </div>
                         <div class="price text-red" ng-if="merchant.unit_cost > 0">
                             <span>Costo promedio consulta: @{{ merchant.unit_cost | currency }}</span>
                         </div>
                         <div class="price" ng-if="merchant.Distance > 0">
                             <span>Distancia: @{{ merchant.Distance | number }} km</span>
-                        </div>
-                        <div class="price" >
-                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
-                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
-                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
                         </div>
                         <div class="btn-block grid-btn">
                             <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
@@ -179,12 +181,13 @@
                             <article>
                                 <h3 class="d-none sr-only">Article</h3>
                                 <p>@{{ merchant.description}}</p>
+                                
                             </article>
                             <div class="btn-block d-flex">
-                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
-
-                                <div class="btn-options">
-                                    <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" >Detalle Negocio</a>
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0">Tienda</a>
+                                <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
+                                <div class="btn-options" ng-show="showStore">
+                                    <a href="/a/merchant/@{{ merchant.slug }}">Detalle Negocio</a>
                                 </div>
                             </div>
                         </div>

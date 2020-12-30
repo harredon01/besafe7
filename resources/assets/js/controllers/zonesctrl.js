@@ -4,7 +4,7 @@
                 $scope.data = {};
                 $scope.items = [];
                 $scope.merchants = [];
-                $scope.providers = [{"name": "Mi Paquete", "value": "MiPaquete"}, {"name": "Rapigo", "value": "Rapigo"}, {"name": "Propio", "value": "Propio"}];
+                $scope.providers = [{"name": "Mi Paquete", "value": "MiPaquete"}, {"name": "Rapigo", "value": "Rapigo"}, {"name": "Propio", "value": "Propio"}], {"name": "Basilikum", "value": "Basilikum"};
                 $scope.activeMerchant;
                 $scope.activeMerchantObject = {};
                 $scope.searchTerms = "";

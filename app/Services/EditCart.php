@@ -49,12 +49,45 @@ class EditCart {
             return ['subtotal' => 0, 'total' => 0, 'items' => [], 'totalItems' => 0];
         }
     }
+    private function checkCart($user) {
+        $items = Cart::session($user->id)->getContent();
+        $redirectCart = true;
+        foreach ($items as $value) {
+            $item = Item::where('id',$value->id)->with("productVariant")->first();
+            
+            $variant = $item->productVariant;
+            if ($variant->type == "product" && !$variant->is_digital && $value->quantity > $variant->quantity) {
+                $data = [
+                    "item_id" => $value->id,
+                    "quantity" => 0
+                ];
+                $this->updateCartItem($user, $data);
+                $redirectCart = false;
+            }
+//            if ($variant->type == "booking") {
+//                $losAttributes = json_decode($variant->attributes, true);
+//                if ($losAttributes['type'] == "Booking" && isset($losAttributes['id'])) {
+//                    $objClass = self::MODEL_PATH . $losAttributes['type'];
+//                    $booking = $objClass::where("id", $losAttributes['id'])->get();
+//                }
+//            }
+        }
+        if($redirectCart){
+            return $items;
+        } else {
+            return null;
+        }
+    }
 
     public function getCheckoutCart(User $user) {
 //        Cart::session($user->id)->removeConditionsByType("coupon");
 //        Cart::session($user->id)->removeConditionsByType("tax");
+        $items = $this->checkCart($user);
+        if(!$items){
+            $items = Cart::session($user->id)->getContent();
+        }
         $data = array();
-        $items = Cart::session($user->id)->getContent();
+        
         $result = array();
         $is_shippable = false;
         $is_subscription = false;
@@ -230,13 +263,13 @@ class EditCart {
      * @return Response
      */
     public function checkCartAuth($user, $requires_authorization, $order_id, $merchant_id) {
-        if (isset($user->email)) {
-            $item = Item::where('user_id', $user->id)->where('order_id', $order_id)->first();
+        $item = null;
+        $order = Order::where('status', 'pending')->where('user_id', $user->id)->first();
+        if ($order) {
+            $item = Item::where("order_id",$order->id)->first();
         } else {
-            $item = Item::where('ref2', $user->id)->where('order_id', $order_id)->first();
+            $item = Item::whereNull("order_id")->where("user_id",$user->id)->first();
         }
-
-        //dd($item->toArray());
         if (!$item) {
             return true;
         } else {
@@ -369,22 +402,18 @@ class EditCart {
         if (isset($user->email)) {
             if (array_key_exists('item_id', $data)) {
                 $item = Item::where('id', intval($data['item_id']))
-                                ->where('user_id', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('user_id', $user->id)->first();
             } else if (array_key_exists('product_variant_id', $data)) {
                 $item = Item::where('product_variant_id', intval($data['product_variant_id']))
-                                ->where('user_id', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('user_id', $user->id)->first();
             }
         } else {
             if (array_key_exists('item_id', $data)) {
                 $item = Item::where('id', intval($data['item_id']))
-                                ->where('ref2', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('ref2', $user->id)->first();
             } else if (array_key_exists('product_variant_id', $data)) {
                 $item = Item::where('product_variant_id', intval($data['product_variant_id']))
-                                ->where('ref2', $user->id)
-                                ->where('order_id', $order_id)->first();
+                                ->where('ref2', $user->id)->first();
             }
         }
         return $item;

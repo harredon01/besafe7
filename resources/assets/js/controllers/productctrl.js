@@ -228,6 +228,10 @@
                         product: product,
                         type: product.type
                     }
+                    if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
+                        Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
+                        return true;
+                    }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
                         if (data.status == "success") {
@@ -358,9 +362,10 @@
                     };
                     Cart.updateCartItem(container).then(function (data) {
                         if (data.status == "error") {
-                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
+                            Modals.showToast("Error Actualizando", $("#prod-cont-" + product.id));
                             alert(data.message);
                         } else {
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                             $rootScope.$broadcast('loadHeadCart', data.cart);
                         }
                     },
@@ -450,6 +455,10 @@
                         item_id: product.item_id,
                         product: product
                     }
+                    if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
+                        Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
+                        return true;
+                    }
                     Cart.addCartItem(container, []).then(function (data) {
                         console.log("Add cart", data);
                         if (data.status == "success") {
@@ -529,6 +538,7 @@
                             alert(data.message);
                         } else {
                             $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
                         }
                     },
                             function (data) {

@@ -22,7 +22,7 @@ class Product extends Model {
      *
      * @var array
      */
-    protected $fillable = ['id', 'name', 'description', 'hash', 'isActive'];
+    protected $fillable = ['id', 'name', 'description', 'hash','keywords', 'isActive', 'isFeatured'];
     protected $dates = [
         'created_at',
         'updated_at',
@@ -31,6 +31,7 @@ class Product extends Model {
     protected $searchable = [
         'name',
         'description',
+        'keywords'
     ];
 
     public function isActive() {

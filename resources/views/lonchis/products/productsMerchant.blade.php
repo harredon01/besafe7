@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-xl-9 order-lg-2 mb--40">
-                <div class="shop-toolbar mb--30">
+                <div class="shop-toolbar mb--10">
                     <div class="row align-items-center">
                         <div class="col-5 col-md-3 col-lg-4">
                             <!-- Product View Mode -->
@@ -323,7 +323,7 @@
                                     </div>
                                     <div class="btn-block grid-btn" ng-show="product.item_id">
                                         <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '-')">-</a>
-                                        <input type="tel" ng-model="product.quantity"/>
+                                        <input type="tel" style="width:30px" ng-model="product.quantity"/>
                                         <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '+')">+</a>
                                     </div>
                                     <div class="card-list-content ">

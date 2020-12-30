@@ -278,13 +278,11 @@
 .mainmenu .sub-menu {
     @include desktops {
         pointer-events: none;
-        width: 195px;
         padding: 10px 0;
         white-space: -moz-nowrap;
         white-space: nowrap;
     }
     @include large-desktops {
-        width: 220px;
     }
     &.left-align {
         @include desktops {
@@ -381,7 +379,6 @@
 .mobile-absolute-menu {
     position: absolute;
     right: 0;
-    margin-top: 60px;
     z-index: 300;
     @include tablet {
         margin-top: 0px;
@@ -392,6 +389,9 @@
     position: relative;
     background-color: transparent; // margin-top: 3rem; 
     z-index: 98 !important;
+}
+.mobile-menu .mean-bar:nth-of-type(2) {
+    display:none !important;
 }
 
 .mobile-menu .mean-bar:before {

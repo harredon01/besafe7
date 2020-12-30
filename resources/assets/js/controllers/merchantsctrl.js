@@ -11,6 +11,8 @@
                 $scope.categories = [];
                 $scope.regionVisible = false;
                 $scope.editMerchant = false;
+                $scope.showAddress = true;
+                $scope.showStore = true;
                 $scope.submitted = false;
                 $scope.category;
                 angular.element(document).ready(function () {
@@ -19,10 +21,25 @@
 //                    res = res.replace(/}""/g, '}\""');
                     console.log("res", res);
                     let container = JSON.parse(res);
+                    let url = window.location.href;
+                    if(url.includes("urgencias")){
+                        $scope.showStore = false;
+                    }
 
-                    console.log("Data", container);
                     $scope.category = container.category;
                     $scope.merchants = container.data;
+                    for(let item in $scope.merchants){
+                        for(let k in $scope.merchants[item].attributes.categories){
+                            if($scope.merchants[item].attributes.categories[k].id == $scope.category.id){
+                                $scope.merchants[item].activeCategory = $scope.merchants[item].attributes.categories[k];
+                                break;
+                            }
+                        }
+                    }
+                    if($scope.merchants.length == 1){
+                        $scope.openItem($scope.merchants[0]);
+                    }
+                    console.log("Data", $scope.merchants);
                     $scope.current = container.page;
                     $scope.per_page = container.per_page;
                     $scope.last = container.last_page;
@@ -106,7 +123,8 @@
                             "objectName": $scope.merchant.name,
                             "objectDescription": $scope.merchant.description,
                             "objectIcon": $scope.merchant.icon,
-                            "expectedPrice": $scope.merchant.unit_cost
+                            "expectedPrice": $scope.merchant.unit_cost,
+                            "alert":"#book-button"
                         }
                         Cart.showBooking(params);
                     } else {

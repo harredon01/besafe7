@@ -47,6 +47,7 @@ angular.module('besafe')
                 };
                 appointmentbook = function (item) {
                     let questions = [];
+                    let location = null;
                     let container = null;
                     console.log("variants", item.variants)
                     for (let i in item.variants) {
@@ -60,6 +61,9 @@ angular.module('besafe')
                         if (container.attributes.questions) {
                             questions = container.attributes.questions;
                         }
+                        if (container.attributes.location) {
+                            location = container.attributes.location;
+                        }
                     }
                     let params = {
                         "availabilities": null,
@@ -70,9 +74,14 @@ angular.module('besafe')
                         "objectIcon": item.merchant_icon,
                         "expectedPrice": item.activeVariant.price,
                         "questions": questions,
+                        "variant": container,
                         "product_variant_id": item.variant_id,
                         "quantity": item.amount,
-                        "purpose": "external_book"
+                        "purpose": "external_book",
+                        "alert":"#prod-cont-" + item.id
+                    }
+                    if(location){
+                        params.location = location;
                     }
                     showBooking(params);
                 }
@@ -105,8 +114,9 @@ angular.module('besafe')
                 var showBooking = function (params) {
                     var def = $q.defer();
                     $mdDialog.show(Modals.getBookingPrompt(params)).then(function (result) {
-                        console.log("Got result", result);
+                        console.log("Got result", $rootScope.cartMessage);
                         Modals.hideLoader();
+                        Modals.showToast($rootScope.cartMessage, $(params.alert));
                         def.resolve(result);
                     }, function () {
                         console.log("Got nothing");
@@ -175,6 +185,23 @@ angular.module('besafe')
                             })
                             .error(function () {
                                 def.reject("Failed to get nearby");
+                            });
+                    return def.promise;
+                };
+                var checkCart = function () {
+                    console.log("Post checkCart");
+                    var def = $q.defer();
+                    $http({
+                        method: "post",
+                        url: "/api/cart/check",
+                        data: {}
+                    })
+                            .success(function (data) {
+                                // console.log(data);
+                                def.resolve(data);
+                            })
+                            .error(function () {
+                                def.reject("Failed to checkCart");
                             });
                     return def.promise;
                 };
@@ -304,6 +331,7 @@ angular.module('besafe')
                     postToServer: postToServer,
                     updateCartItem: updateCartItem,
                     showBooking: showBooking,
+                    checkCart:checkCart,
                     showConfirm: showConfirm,
                     showConfirmExt: showConfirmExt,
                     clearCart: clearCart,

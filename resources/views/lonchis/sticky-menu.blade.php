@@ -1,10 +1,9 @@
-<nav class="main-navigation">
-    <!-- Mainmenu Start -->
-    <ul class="mainmenu">
+<nav class="sticky-navigation">
+    <ul class="mainmenu sticky-menu">
         @foreach ($categories as $category)
         @if (count($category['children']) > 0)
-        <li class="mainmenu__item menu-item-has-children">
-            <a href="javascript:;" class="mainmenu__link" >{{ $category['name']}}</a> 
+        <li class="mainmenu__item menu-item-has-children sticky-has-child">
+            <a href="javascript:;" class="mainmenu__link">{{ $category['name']}}</a>
             <ul class="sub-menu">
                 @foreach ($category['children'] as $child)
                 <li>
@@ -19,7 +18,7 @@
         </li>
         @endif
         @endforeach
-        <li class="mainmenu__item menu-item-has-children">
+        <li class="mainmenu__item menu-item-has-children sticky-has-child ">
             <a href="javascript:;" class="mainmenu__link">Participa</a>
             <ul class="sub-menu">
                 <li>
@@ -35,9 +34,12 @@
                     <a href="/a/contact-us/sale">Mascotas a la venta</a>
                 </li>
                 <li>
-                    <a href="/a/contact-us/bla">Contactanos</a>
+                    <a href="/a/contact-us/bla" >Contactanos</a>
                 </li>
             </ul>
         </li>
     </ul>
+    <div class="sticky-mobile-menu  d-lg-none">
+        <span class="sticky-menu-btn"></span>
+    </div>
 </nav>

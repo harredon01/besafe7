@@ -22,12 +22,14 @@ class CreateProductsTable extends Migration {
                         $table->double('high', 15, 2); 
                         $table->double('low', 15, 2);
                         $table->boolean('isActive');
+                        $table->boolean('isFeatured');
+                        $table->text('keywords')->nullable();
                         $table->integer('user_id')->unsigned()->nullable();
                         $table->foreign('user_id')->references('id')
                                 ->on('users');
 			$table->timestamps();
 		});
-                DB::statement('ALTER TABLE products ADD FULLTEXT fulltext_index (name, description)');
+                DB::statement('ALTER TABLE products ADD FULLTEXT fulltext_index (name, description,keywords)');
 	}
 
 	/**

@@ -4,7 +4,10 @@
                 $scope.total = 0
                 angular.element(document).ready(function () {
                     setTimeout(function () {
-                        $scope.getCart();
+                        let url = window.location.href;
+                        if(!url.includes("checkout")){
+                            $scope.getCart();
+                        }
                     }, 300);
                 });
                 $scope.clean = function () {

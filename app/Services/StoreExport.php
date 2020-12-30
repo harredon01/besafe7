@@ -245,7 +245,7 @@ class StoreExport {
         });
     }
 
-    public function exportOrdersClient($merchant_id, $startDate, $endDate) {
+    public function exportOrdersClient(User $user,$merchant_id, $startDate, $endDate) {
         $pages = [
             ["name" => "Summary", "rows" => []],
             ["name" => "Detail", "rows" => []],
@@ -260,7 +260,7 @@ class StoreExport {
                 ->where('merchant_id', $merchant_id)
                 ->whereBetween('updated_at', [$startDate, $endDate])
                 ->whereNotIn('user_id', [1, 2, 3])
-                ->with(['items', 'orderConditions'])->chunk(50, function ($orders) use(&$pages, $count, &$processed) {
+                ->with(['items', 'orderConditions'])->chunk(50, function ($orders) use(&$pages, $count, &$processed, &$user) {
             $merchantResults = $this->exportOrderData($orders);
             $pages[0]['rows'] = array_merge($pages[0]['rows'], $merchantResults['orders_fast']);
             $pages[1]['rows'] = array_merge($pages[1]['rows'], $merchantResults['orders_full']);
@@ -269,7 +269,7 @@ class StoreExport {
             if ($processed == $count) {
                 array_unshift($pages[0]['rows'], array_keys($merchantResults['orders_fast'][0]));
                 array_unshift($pages[1]['rows'], array_keys($merchantResults['orders_full'][0]));
-                $this->writeFile($pages, "Productos-Descarga-Completa" . time(), true);
+                $this->writeFile2($user,$pages, "Productos-Descarga-Completa" . time(), true);
             }
         });
     }
@@ -346,7 +346,7 @@ class StoreExport {
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], array_keys($product->toArray()));
                     array_unshift($pages[1]['rows'], $variantsHead);
-                    $this->writeFile($pages, "Productos-Descarga-Completass" . time(), true, $user);
+                    $this->writeFile2($user,$pages, "Productos-Descarga-Completass" . time(), true);
                 }
             }
         });
@@ -391,7 +391,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], $tableHeader);
-                    $this->writeFile($pages, "Productos-Descarga-rapida-" . time(), true, $user);
+                    $this->writeFile2($user,$pages, "Productos-Descarga-rapida-" . time(), true);
                 }
             }
         });
@@ -467,7 +467,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], $tablehead);
-                    $this->writeFile($pages, "Listado-Negocios-Descarga-Completa" . time(), true);
+                    $this->writeFile($pages, "Listado-Negocios-Descarga-Completa-" . time(), true);
                 }
             }
         });
@@ -496,7 +496,7 @@ class StoreExport {
                 if ($processed == $count) {
                     //dd($pages);
                     array_unshift($pages[0]['rows'], array_keys($availability->toArray()));
-                    $this->writeFile($pages, "Disponibilidad-" . time(), true, $user);
+                    $this->writeFile2($user,$pages, "Disponibilidad-" . time(), true);
                 }
             }
         });
@@ -539,25 +539,22 @@ class StoreExport {
         //dd($data);
         $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
         $path = 'exports/' . $title . ".xls";
-        //dd($file);
-//        $file = Excel::store($title, function($excel) use($data, $title) {
-//
-//                    $excel->setTitle($title);
-//                    // Chain the setters
-//                    $excel->setCreator('Hoovert Arredondo')
-//                            ->setCompany('Hoovert Arredondo SAS');
-//                    // Call them separately
-//                    $excel->setDescription('This report is clasified');
-//                    foreach ($data as $page) {
-//                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-//                            $sheet->fromArray($page["rows"], null, 'A1', true);
-//                        });
-//                    }
-//                });
         $path = 'exports/' . $title . ".xls";
         if ($sendMail) {
             $users = User::whereIn('id', [1, 77, 2])->get();
             Mail::to($users)->send(new StoreReports($path));
+        } else {
+            return $path;
+        }
+    }
+    
+    public function writeFile2($user,$data, $title, $sendMail) {
+        //dd($data);
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
+        $path = 'exports/' . $title . ".xls";
+        $path = 'exports/' . $title . ".xls";
+        if ($sendMail) {
+            Mail::to($user)->send(new StoreReports($path));
         } else {
             return $path;
         }

@@ -18,7 +18,7 @@ class BackupDatabase extends Command {
     public function __construct() {
         parent::__construct();
         $date = date_create();
-        $this->backupName = date_format($date, "Y-m-d") . "-food.sql";
+        $this->backupName = date_format($date, "Y-m-d") . "-".config("app.name").".sql";
         $file = storage_path('app/backups/' . $this->backupName);
         $this->process = new Process([
             'mysqldump',

@@ -175,8 +175,9 @@ class MerchantController extends Controller {
         if ($validator->fails()) {
             return $this->index($request, $category);
         }
-        $category = Category::where('url', $category)->first()->toArray();
+        $category = Category::where('url', $category)->first();
         if ($category) {
+            $category = $category->toArray();
             $data['category'] = $category['id'];
             $results = $this->editMapObject->buildCoverageQuery($data);
             $merchants = $results['data'];

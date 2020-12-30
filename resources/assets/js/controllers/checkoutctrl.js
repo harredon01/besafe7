@@ -3,11 +3,14 @@
         .controller('CheckoutCartCtrl', ['$scope', '$rootScope', 'Cart', 'Orders', 'Modals', '$q', function ($scope, $rootScope, Cart, Orders, Modals, $q) {
                 $scope.data = {};
                 $scope.coupon = "";
+                $scope.accept = false;
+                $scope.acceptError = false;
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
                 angular.element(document).ready(function () {
-                    $scope.getCart(true);
-
+                    setTimeout(function () {
+                        $scope.getCart(true);
+                    }, 300);
                 });
                 $scope.cleanJson = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -32,6 +35,11 @@
                             function (data) {
 
                             });
+                }
+                $scope.AcceptTerms = function () {
+                    if ($scope.accept) {
+                        $scope.acceptError = false;
+                    }
                 }
                 $scope.getOrder = function (init) {
                     var def = $q.defer();
@@ -108,7 +116,12 @@
                     }
                 }
                 $scope.prepareOrder = function () {
-                    $rootScope.$broadcast('prepareOrder');
+                    console.log("Accept", $scope.accept);
+                    if ($scope.accept) {
+                        $rootScope.$broadcast('prepareOrder');
+                    } else {
+                        $scope.acceptError = true;
+                    }
                 }
                 $scope.deleteCartItem = function (item_id) {
                     let container = {
@@ -157,8 +170,9 @@
                     $scope.loadCart(args);
                 });
             }])
-        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', 'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
-            function ($scope, $rootScope, LocationService, Users, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
+        .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', '$q',
+            'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
+            function ($scope, $rootScope, LocationService, Users, $q, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
                 $scope.data = {};
                 $scope.addressSet = {};
                 $scope.shipping = [];
@@ -201,7 +215,13 @@
                             $scope.selectAddress(address);
                         }
                     } else {
-                        $scope.getAddresses();
+                        $scope.getAddresses().then(function (data) {
+                            if ($rootScope.addresses.length == 0) {
+                                $scope.newAddress();
+                            }
+                        },
+                                function (data) {
+                                });
                     }
                 });
                 $scope.countries = [{name: "Colombia", id: 1}, {name: "Colombia2", id: 2}]
@@ -209,6 +229,12 @@
                 angular.element(document).ready(function () {
 
                 });
+                $scope.newAddress = function () {
+                    let url = window.location.href;
+                    $cookies.put("shippingAddress", "", {path: "/"});
+                    $cookies.put("locationRefferrer", url, {path: "/"});
+                    window.location.href = "/location";
+                }
                 $rootScope.$on('prepareOrder', function (event, args) {
                     $scope.prepareOrder();
                 });
@@ -255,13 +281,15 @@
                     }
                 }
                 $scope.getAddresses = function () {
+                    var def = $q.defer();
                     Users.getAddresses().then(function (data) {
                         $rootScope.addresses = data.addresses;
-
+                        def.resolve("done");
                     },
                             function (data) {
-
+                                def.resolve("error");
                             });
+                    return def.promise;
                 }
                 $scope.clean = function () {
                     $scope.data = {};
@@ -400,7 +428,12 @@
                         if (data.status == "success") {
                             $rootScope.$broadcast('updateLoadedCart', data.cart);
                             $rootScope.activeOrder = data.order;
+                            for (let i = 0; i < $scope.shipping.length; i++) {
+                                $scope.shipping[i].selected = false;
+                            }
                             $rootScope.shippingConditionSet = true;
+                            item.price = data.cart.shipping;
+                            item.selected = true;
                             Modals.showToast("Envio agregado exitosamente", $("#checkout-shipping"));
                         } else {
                             Modals.showToast("Hubo un error con ese metodo de envio", $("#checkout-shipping"));
@@ -465,16 +498,16 @@
                             if (platform.provider == "MerchantShipping") {
                                 name = "Domicilio del Establecimiento"
                             }
-                            let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id};
+                            let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id, selected: false};
                             let add = true;
                             for (let i = 0; i < $scope.shipping.length; i++) {
                                 let cont = $scope.shipping[i];
                                 if (cont.platform == container.platform) {
                                     if (cont.price <= container.price) {
-                                        console.log("Not adding",container)
+                                        console.log("Not adding", container)
                                         add = false;
                                     } else {
-                                        console.log("Removing",cont)
+                                        console.log("Removing", cont)
                                         $scope.shipping.splice(i, 1);
                                     }
                                 }
@@ -482,9 +515,9 @@
                             if (add) {
                                 $scope.shipping.push(container);
                             }
-                            if ($scope.expectedProviders == 0 && $scope.shipping.length == 1) {
+                            if ($scope.expectedProviders == 0 && !$rootScope.shippingConditionSet) {
                                 $scope.setShippingCondition($scope.shipping[0]);
-                                console.log("Auto select",$scope.shipping)
+                                console.log("Auto select", $scope.shipping)
                             }
 
                         }
@@ -503,11 +536,19 @@
                 $scope.changeAddress = function () {
                     console.log("Change address")
                     $rootScope.shippingAddressSet = false;
+                    $rootScope.shippingConditionSet = false;
                     $scope.addAddress = false;
                     if ($rootScope.addresses && $rootScope.addresses.length > 0) {
 
                     } else {
-                        $scope.getAddresses();
+                        $scope.getAddresses().then(function (data) {
+                            if ($rootScope.addresses.length == 0) {
+                                $scope.newAddress();
+                            }
+                        },
+                                function (data) {
+                                });
+                        ;
                     }
                 }
                 $scope.changeShipping = function () {
@@ -870,6 +911,7 @@
 
                             });
                 }
+
                 $scope.showAddressForm = function () {
                     $scope.addAddress = true;
                     $scope.data.type = "billing";
@@ -962,14 +1004,26 @@
                 $scope.visibleBooking = false;
                 $scope.loadPendingItems = function () {
                     console.log("loadPendingItems", $rootScope.items)
+                    let pending = false;
                     for (let item in $rootScope.items) {
                         let container = $rootScope.items[item];
                         console.log("item", container);
-                        if (container.attributes.type == "Booking" && !container.attributes.id) {
+                        if (container.attributes.type == "Booking") {
+                            if (!container.attributes.id) {
+                                container.pending = true;
+                                pending = true;
+                            } else {
+                                container.pending = false;
+                            }
                             $scope.appointments.push(container);
-                            $rootScope.bookingSet = false;
+
                             $scope.visibleBooking = true;
                         }
+                    }
+                    if (pending) {
+                        $rootScope.bookingSet = false;
+                    } else {
+                        $rootScope.bookingSet = true;
                     }
                 }
                 $scope.programItem = function (item) {
@@ -984,17 +1038,20 @@
                         "questions": item.attributes.questions,
                         "item_id": item.id,
                         "quantity": item.quantity,
-                        "purpose": "external_book"
+                        "purpose": "external_book",
+                        "alert": "#checkout-booking"
                     }
                     console.log("Sending paramsparamsparams", params);
                     Cart.showBooking(params).then(function (result) {
                         console.log("Got result", result);
+                        item.pending = false;
+                        let missing = false;
                         for (var i = 0; i < $scope.appointments.length; i++) {
-                            if ($scope.appointments[i].id === item.id) {
-                                $scope.appointments.splice(i, 1);
+                            if ($scope.appointments[i].pending) {
+                                missing = true;
                             }
                         }
-                        if ($scope.appointments.length == 0) {
+                        if (!missing) {
                             $rootScope.bookingSet = true;
                             $rootScope.$broadcast('buildOrder');
                         }
