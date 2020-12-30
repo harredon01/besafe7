@@ -124,7 +124,7 @@ return [
 
     'log_level' => env('APP_LOG_LEVEL', 'debug'),
     
-    'views' => env('APP_VIEWS', 'lonchis'),
+    'views' => env('APP_VIEWS', 'test'),
 
     /*
     |--------------------------------------------------------------------------

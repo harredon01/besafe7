@@ -30,6 +30,6 @@ class Newsletter4 extends Mailable
      */
     public function build()
     {
-        return $this->view(config("app.views").'.emails.food.newsletter-amoryam')->subject("En el mes de Amor y amistad organiza una deliciosa Cena Romántica");
+        return $this->view(config("app.views").'.emails.food.newsletter-amoryam')->subject("Organiza tu cena de fin de año con Lonchis!");
     }
 }
