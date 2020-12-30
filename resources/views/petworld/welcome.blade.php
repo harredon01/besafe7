@@ -1,4 +1,4 @@
-@extends('lonchis.layouts.app')
+@extends('petworld.layouts.app')
 
 @section('content')
 <div ng-controller="HomeCtrl">
