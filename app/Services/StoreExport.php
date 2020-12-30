@@ -467,7 +467,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], $tablehead);
-                    $this->writeFile($pages, "Listado-Negocios-Descarga-Completa" . time(), true);
+                    $this->writeFile($pages, "Listado-Negocios-Descarga-Completa-" . time(), true);
                 }
             }
         });

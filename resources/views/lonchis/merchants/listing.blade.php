@@ -88,7 +88,7 @@
                             @endif
                             @if(isset($merchant['Distance']))
                             <div class="price text-red">
-                                <span>Distancia: ${{$merchant['Distance']}}</span>
+                                <span>Distancia: {{$merchant['Distance']}}</span>
                             </div>
                             @endif
                             <div class="btn-block grid-btn">

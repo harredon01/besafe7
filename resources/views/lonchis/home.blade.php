@@ -112,6 +112,68 @@
             </div>
         </div>
     </div>
+    <section class="pt--50 space-db--30">
+        <h2 class="d-none">Promotion Block
+        </h2> 
+        <div class="container">
+            <div class="block-title">
+                <h2>Encuentra en nuestras tiendas</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-perros">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.png" alt="">
+                    </a>
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-gatos">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gato-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-gatos" ng-click="goTo('merchant-coverage', $event, true)">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_gato-clean.png" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Promotion Block 2 -->
+    <section class="pt--50 space-db--30">
+        <h2 class="d-none">Promotion Block
+        </h2> 
+        <div class="container">
+            <div class="block-title">
+                <h2>Encuentra en nuestros veterinarios</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" ng-click="goTo('merchant-nearby', $event, true)" href="/a/merchants/urgencias">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event, true)" href="/a/merchants/consultas">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/veternarias-cerca.png" alt="">
+                    </a>
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/vacunacion">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/vacunacion-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
     <div class="pt--50">
         <div class="container">
             <div class="row">
@@ -135,7 +197,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/14/Artboard-7.jpg" alt=""></a>
+                                    <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/14/Artboard-7.jpg" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -148,7 +210,7 @@
                                         <span>$62,000.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -156,7 +218,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/DNindoorcat_rev-600x600.png" alt=""></a>
+                                    <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/DNindoorcat_rev-600x600.png" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -171,8 +233,8 @@
                                         <span>$16,700.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false,false)" class="btn btn-outlined btn-rounded">Ver</a>
-                                        <a href="/a/products/gatos?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)" style="background:none;color:#56a700">Otros para gatos</a>
+                                        <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false, false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/products/gatos?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)" style="background:none;color:#56a700">Otros para gatos</a>
                                     </div>
                                 </div>
                             </div>
@@ -180,7 +242,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/5/ziu.JPG" alt=""></a>
+                                    <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/5/ziu.JPG" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -193,7 +255,7 @@
                                         <span>$150,000.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +265,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/ARENA-FOFI-CAT-OPCION-2-1.jpg" alt=""></a>
+                                    <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/ARENA-FOFI-CAT-OPCION-2-1.jpg" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -216,7 +278,7 @@
                                         <span>$19,500.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -224,7 +286,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/10/galico.JPG" alt=""></a>
+                                    <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/10/galico.JPG" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -239,7 +301,7 @@
                                         <span>$30,600.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -248,7 +310,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/comida-perro-hills-adult-sensitive-stomach-skin-4lb-2.jpg" alt=""></a>
+                                    <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/comida-perro-hills-adult-sensitive-stomach-skin-4lb-2.jpg" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -261,7 +323,7 @@
                                         <span>$55,500.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +332,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/consultageneral.jpg" alt=""></a>
+                                    <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/consultageneral.jpg" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -283,7 +345,7 @@
                                         <span>$30,000.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -291,7 +353,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event,false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/vacperrdom.jpg" alt=""></a>
+                                    <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/vacperrdom.jpg" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -304,7 +366,7 @@
                                         <span>$30,000.00</span>
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event,false)" class="btn btn-outlined btn-rounded">Ver</a>
+                                        <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event, false)" class="btn btn-outlined btn-rounded">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -328,7 +390,7 @@
                          ]'>
                         <div class="single-slide">
                             <div class="pm-product product-type-list">
-                                <a href="/a/product-detail/cita-a-domicilio?merchant_id=7" ng-click="goTo('merchant-coverage', $event,false)" class="image">
+                                <a href="/a/product-detail/cita-a-domicilio?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="image">
                                     <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/cita-vet.jpg" alt="">
                                 </a>
                                 <div class="content">
@@ -342,17 +404,17 @@
                                         <a href="" class="single-rating"><i class="fas fa-star"></i></a>
                                         <a href="" class="single-rating"><i class="fas fa-star"></i></a>
                                         <a href="" class="single-rating"><i class="fas fa-star-half-alt"></i></a>
-                                        
+
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/cita-a-domicilio?merchant_id=7" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded btn-mid">Ver</a>
+                                        <a href="/a/product-detail/cita-a-domicilio?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded btn-mid">Ver</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="single-slide">
                             <div class="pm-product product-type-list">
-                                <a href="/a/product-detail/refuerzo-anual-gatos-adultos?merchant_id=7" ng-click="goTo('merchant-coverage', $event,false)" class="image">
+                                <a href="/a/product-detail/refuerzo-anual-gatos-adultos?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="image">
                                     <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/vacgatdom.jpg" alt="">
                                 </a>
                                 <div class="content">
@@ -366,10 +428,10 @@
                                         <a href="" class="single-rating"><i class="fas fa-star"></i></a>
                                         <a href="" class="single-rating"><i class="fas fa-star"></i></a>
                                         <a href="" class="single-rating"><i class="fas fa-star-half-alt"></i></a>
-                                        
+
                                     </div>
                                     <div class="btn-block">
-                                        <a href="/a/product-detail/refuerzo-anual-gatos-adultos?merchant_id=7" ng-click="goTo('merchant-coverage', $event,false)" class="btn btn-outlined btn-rounded btn-mid">Ver</a>
+                                        <a href="/a/product-detail/refuerzo-anual-gatos-adultos?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined btn-rounded btn-mid">Ver</a>
                                     </div>
                                 </div>
                             </div>
@@ -381,103 +443,26 @@
     </div>
     <!-- Slider One / Normal Two Column Slider -->
 
-    <!-- Category Section -->
-    <section class="category-section pt--50">
-        <div class="container">
-            <div class="block-title">
-                <h2>Conoce nuestras categorias</h2>
-            </div>
-            <div class="category-block">
-                <div class="row no-gutters">
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/merchants/urgencias" ng-click="goTo('merchant-nearby-list', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/merchants/consultas" ng-click="goTo('merchant-list', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/citas.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/merchants/bano-y-peluqueria" ng-click="goTo('merchant-nearby-list', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/peluqueria.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/merchants/perros" ng-click="goTo('merchant-coverage-products', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/perros.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/merchants/gatos" ng-click="goTo('merchant-coverage-products', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/gatos.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-4 col-sm-6">
-                        <div class="category-block-single">
-                            <a href="/a/reports/mascotas-perdidas" ng-click="goTo('report-nearby-list', $event,true)" class="icon">
-                                <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/mascotas-perdidas.jpg" alt="">
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Promotion Block 1 -->
+    
+    <!-- Promotion Block 3 -->
     <section class="pt--50 space-db--30">
         <h2 class="d-none">Promotion Block
         </h2>
         <div class="container">
-            <a class="promo-image overflow-image" href="/a/reports/adopcion" ng-click="goTo('report-nearby', $event,true)">
+            <a class="promo-image overflow-image" href="/a/reports/adopcion" ng-click="goTo('report-nearby', $event, true)">
                 <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/adoptame-largo.jpg" alt="">
             </a>
         </div>
     </section>
 
-    <!-- Promotion Block 2 -->
-    <section class="pt--50 space-db--30">
-        <h2 class="d-none">Promotion Block
-        </h2> 
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-cuadrado.jpg" alt="">
-                    </a>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event,true)" href="/a/reports/mascotas-perdidas">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/mascotas-perdidas-mini.jpg" alt="">
-                    </a>
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event,true)">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/viaja-mascota.jpg" alt="">
-                    </a>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event,true)">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+    
+    
     <br/><br/><br/>
     <div class="pt--50 pb--50">
         <div class="container">
-
+            <div class="block-title">
+                <h2>Nuestras Marcas</h2>
+            </div>
             <div class="petmark-slick-slider brand-slider  border normal-slider grid-border-none" data-slick-setting='{
                  "autoplay": true,
                  "autoplaySpeed": 3000,
@@ -492,36 +477,42 @@
                  ]'>
 
                 <div class="single-slide">
-                    <a href="/a/merchant/amadera-colombia/products" ng-click="goTo('merchant-coverage', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/amadera-colombia/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/amadera-col.jpg" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
-                    <a href="/a/merchant/la-mascota-que-rie/products" ng-click="goTo('merchant-coverage', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/la-mascota-que-rie/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/la_mascota_que_rie.JPG" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
-                    <a href="/a/merchant/mini-me-mascotas/products" ng-click="goTo('merchant-coverage', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/mini-me-mascotas/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/mini-me.jpg" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
-                    <a href="/a/merchant/vetivet-clinica-veterinaria/products" ng-click="goTo('merchant-list', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/vetivet-clinica-veterinaria/products" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/vetivet.JPG" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
-                    <a href="/a/merchant/feroz/products" ng-click="goTo('merchant-coverage', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/feroz/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/feroz.png" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
-                    <a href="/a/merchant/mision-canina-colombia" ng-click="goTo('merchant-list', $event,false)" class="overflow-image brand-image">
+                    <a href="/a/merchant/aviomar-pets-relocation" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/aviomar.png" alt="">
+                    </a>
+                </div>
+                <div class="single-slide">
+                    <a href="/a/merchant/mision-canina-colombia" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
                         <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/logo_mision_canina.png" alt="">
                     </a>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

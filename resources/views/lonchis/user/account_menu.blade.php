@@ -17,6 +17,7 @@
         <a href="/admin/store/global" ng-if="hasMerchants"><i class="fa fa-user"></i> Contenido</a>
         <a href="/admin/zones" target="_blank" ng-if="user.id < 5"><i class="fa fa-user"></i> Zonas de cobertura</a>
         <a href="/billing/payments" target="_blank" ng-if="user.id < 5"><i class="fa fa-user"></i> Pagos globales</a>
+        <a href="/admin/store/global-admin" target="_blank" ng-if="user.id < 5"><i class="fa fa-user"></i> Import Global</a>
 
         <a href="/logout" onclick="event.preventDefault();document.cookie = 'shippingAddress= ; expires = Thu, 01 Jan 1970 00:00:00 GMT'; document.getElementById('logout-form').submit();"><i class="fas fa-sign-out-alt"></i> Logout</a>
 

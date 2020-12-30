@@ -120,6 +120,8 @@ Route::post('admin/store/merchants', 'ProductImportController@postMerchants');
 Route::post('admin/store/categories', 'ProductImportController@postCategories');
 Route::get('admin/store/global', 'StoreExportController@getImport');
 Route::post('admin/store/global', 'StoreExportController@postImport');
+Route::get('admin/store/global-admin', 'StoreExportController@getAdminImport');
+Route::post('admin/store/global-admin', 'StoreExportController@postAdminImport');
 Route::get('admin/store/export', 'StoreExportController@getExport');
 Route::get('location', 'MapExternalController@location');
 Route::get('map/{code?}', 'MapExternalController@index');

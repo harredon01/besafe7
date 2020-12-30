@@ -122,25 +122,58 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/alimento-perros-petshops.JPG" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.png" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-perros">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perros-petshops.JPG" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.png" alt="">
                     </a>
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-gatos">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gatos.JPG" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gato-clean.png" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-gatos" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/alimento-gatos-petshops.JPG" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_gato-clean.png" alt="">
                     </a>
                 </div>
             </div>
         </div>
     </section>
+    
+    <!-- Promotion Block 2 -->
+    <section class="pt--50 space-db--30">
+        <h2 class="d-none">Promotion Block
+        </h2> 
+        <div class="container">
+            <div class="block-title">
+                <h2>Encuentra en nuestros veterinarios</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" ng-click="goTo('merchant-nearby', $event, true)" href="/a/merchants/urgencias">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event, true)" href="/a/merchants/consultas">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/veternarias-cerca.png" alt="">
+                    </a>
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/vacunacion">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/vacunacion-clean.png" alt="">
+                    </a>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
     <div class="pt--50">
         <div class="container">
             <div class="row">
@@ -411,7 +444,7 @@
     <!-- Slider One / Normal Two Column Slider -->
 
     
-    <!-- Promotion Block 1 -->
+    <!-- Promotion Block 3 -->
     <section class="pt--50 space-db--30">
         <h2 class="d-none">Promotion Block
         </h2>
@@ -422,36 +455,8 @@
         </div>
     </section>
 
-    <!-- Promotion Block 2 -->
-    <section class="pt--50 space-db--30">
-        <h2 class="d-none">Promotion Block
-        </h2> 
-        <div class="container">
-            <div class="block-title">
-                <h2>Encuentra en nuestros veterinarios</h2>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" ng-click="goTo('merchant-nearby', $event, true)" href="/a/merchants/urgencias">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias-veterinarias.JPG" alt="">
-                    </a>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event, true)" href="/a/merchants/consultas">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/consultas-vets.JPG" alt="">
-                    </a>
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/vacunacion">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/vacunacion.JPG" alt="">
-                    </a>
-                </div>
-                <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" alt="">
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
+    
+    
     <br/><br/><br/>
     <div class="pt--50 pb--50">
         <div class="container">
