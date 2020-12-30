@@ -1,4 +1,4 @@
-@extends('lonchis.layouts.app')
+@extends(config("app.views").'.layouts.app')
 
 @section('content')
 <div ng-controller="HomeCtrl">

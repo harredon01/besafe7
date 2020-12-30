@@ -1,4 +1,4 @@
-@extends('lonchis.layouts.fitmeal')
+@extends(config("app.views").'.layouts.fitmeal')
 
 @section('content')
 </div>
