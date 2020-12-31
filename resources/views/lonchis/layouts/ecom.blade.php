@@ -2,18 +2,18 @@
 <html lang="en-US">
 
 <head>
-    @include(config("app.views").'.layouts.fitmeal-head')
+    @include(config("app.views").'.layouts.ecom-head')
 </head>
 
 <body class="page-template page-template-page-templates page-template-full-width page-template-page-templatesfull-width-php page page-id-10921 theme-fitmeal woocommerce-no-js tribe-no-js full-width singular paceloader-enabled no-sidebar wpb-js-composer js-comp-ver-6.0.5 vc_responsive">
     <div id="ltx-preloader" data-loader="Loading..."></div>
     <div class="ltx-content-wrapper  white">
         <div class="header-wrapper header-h1  hasBreadcrumbs wrapper-navbar-layout-white ltx-pageheader-disabled">
-            @include(config("app.views").'.layouts.fitmeal-header')
+            @include(config("app.views").'.layouts.ecom-header')
         
         @yield('content')
     </div>
-    @include(config("app.views").'.layouts.fitmeal-footer')
+    @include(config("app.views").'.layouts.ecom-footer')
 </body>
 
 </html>
