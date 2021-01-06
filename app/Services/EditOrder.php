@@ -249,11 +249,18 @@ class EditOrder {
             if ($order) {
                 $cart = $this->editCart->getCheckoutCart($user);
                 if (count($cart['items']) > 0) {
+                    $merchantFound = false;
                     if (array_key_exists("merchant_id", $info)) {
                         $merchant = Merchant::find($info['merchant_id']);
                         if ($merchant) {
+                            $merchantFound = true;
                             $order->merchant_id = $merchant->id;
                         }
+                    } 
+                    if(!$merchantFound) {
+                        $item = $cart['items'][0];
+                        $attributes = $item['attributes'];
+                        $order->merchant_id = $attributes['merchant_id'];
                     }
                     $order->subtotal = $cart["subtotal"];
 //                    if($condition){
@@ -956,8 +963,19 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
-                Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no"));
-                Mail::to($admins)->send(new OrderApproved($order, $user, $shipping, "yes"));
+                try {
+                    Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no"));
+                } catch (\Exception $ex) {
+                    $event = null;
+                }
+                if (count($admins) > 0) {
+                    try {
+                        Mail::to($admins)->send(new OrderApproved($order, $user, $shipping, "yes"));
+                    } catch (\Exception $ex) {
+                        $event = null;
+                    }
+                }
+
                 unset($order->payment);
                 unset($order->totalCost);
                 unset($order->totalPlatform);
@@ -1031,29 +1049,31 @@ class EditOrder {
                 $order->payment_status = "paid";
                 $order->execution_status = "pending";
                 $order->payment_method_id = $paymentMethod;
-                $this->orderStatusUpdate($order);
                 $updateData = [
                     "paid_status" => "paid",
                     "updated_at" => date("Y-m-d hh:m:s")
                 ];
                 Item::where("order_id", $order->id)->update($updateData);
+                $this->orderStatusUpdate($order);
+
+
                 $items = Item::where("order_id", $order->id)->with("productVariant")->get();
-                
+
                 foreach ($items as $value) {
                     $variant = $value->productVariant;
-                    
+
                     if (!$variant->is_digital) {
                         $variant->quantity -= $value->quantity;
                         $variant->save();
                     }
                 }
+
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);
             }
         }
     }
-
 
     public function denyPayment(Payment $payment, $platform) {
         $payment->status = "denied";
