@@ -383,7 +383,7 @@
                         console.log("Discounts set", data);
                         let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
                         Orders.checkOrder(order.id, dataS).then(function (resp) {
-                            console.log("Check Order Result", resp);
+                            console.log("Check Order Result", resp); 
                             Modals.hideLoader();
                             let order = resp.order;
                             if (resp.status == "success") {
@@ -1065,9 +1065,7 @@
                 });
                 $rootScope.$on('NotShippable', function (event, args) {
                     $scope.loadPendingItems();
-                    if ($scope.appointments.length == 0) {
-                        $rootScope.$broadcast('buildOrder');
-                    }
+                    $rootScope.$broadcast('buildOrder');
                 });
             }]).controller('CheckoutGatewaysCtrl', function () {
 

@@ -205,7 +205,7 @@ class FoodApiController extends Controller {
      */
     public function approvePayment($id) {
         $payment = \App\Models\Payment::find($id);
-        if (config("app.views") == "test") {
+        if (config("app.views") == "lonchis") {
             dispatch(new \App\Jobs\ApprovePayment($payment, "Food", 5));
         } else {
 
