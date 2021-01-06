@@ -117,11 +117,11 @@ angular.module('besafe')
                         console.log("Got result", $rootScope.cartMessage);
                         Modals.hideLoader();
                         Modals.showToast($rootScope.cartMessage, $(params.alert));
-                        def.resolve(result);
+                        def.resolve($rootScope.cartMessage);
                     }, function () {
                         console.log("Got nothing");
                         Modals.hideLoader();
-                        def.resolve();
+                        def.resolve(null);
                     });
                     return def.promise;
                 };

@@ -1044,16 +1044,18 @@
                     console.log("Sending paramsparamsparams", params);
                     Cart.showBooking(params).then(function (result) {
                         console.log("Got result", result);
-                        item.pending = false;
-                        let missing = false;
-                        for (var i = 0; i < $scope.appointments.length; i++) {
-                            if ($scope.appointments[i].pending) {
-                                missing = true;
+                        if (result && result == "Carrito actualizado") {
+                            item.pending = false;
+                            let missing = false;
+                            for (var i = 0; i < $scope.appointments.length; i++) {
+                                if ($scope.appointments[i].pending) {
+                                    missing = true;
+                                }
                             }
-                        }
-                        if (!missing) {
-                            $rootScope.bookingSet = true;
-                            $rootScope.$broadcast('buildOrder');
+                            if (!missing) {
+                                $rootScope.bookingSet = true;
+                                $rootScope.$broadcast('buildOrder');
+                            }
                         }
                     });
                 }
