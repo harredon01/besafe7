@@ -6,6 +6,11 @@
 | :------------- |---------------:| -----------------:|----------------------------:|
 @foreach ($order->items as $item)
 | {{$item->name}}|${{number_format($item->price, 2, ',', '.')}}|{{$item->quantity}}|${{number_format($item->priceSumConditions, 2, ',', '.')}}|
+@if (isset($item->attributes['data']))
+@foreach ($item->attributes['data'] as $question)
+|{{$question['name']}}:{{$question['value']}}||||
+@endforeach  
+@endif
 @endforeach  
 @endcomponent
 

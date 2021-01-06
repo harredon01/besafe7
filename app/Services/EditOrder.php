@@ -963,6 +963,7 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
+                
                 try {
                     Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no"));
                 } catch (\Exception $ex) {
@@ -975,7 +976,7 @@ class EditOrder {
                         $event = null;
                     }
                 }
-
+                dd(Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no")));
                 unset($order->payment);
                 unset($order->totalCost);
                 unset($order->totalPlatform);

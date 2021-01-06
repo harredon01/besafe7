@@ -66,7 +66,12 @@ class OrderApproved extends Mailable {
             }
         }
         foreach ($order->items as $item) {
-            $attributes = json_decode($item->attributes, true);
+            if(is_string($item->attributes)){
+                $attributes = json_decode($item->attributes, true);
+                $item->attributes = $attributes; 
+            } else {
+                $attributes = $item->attributes;
+            }
             if (array_key_exists("is_credit", $attributes)) {
                 $totalDeposit += ($item->quantity * $item->cost);
             } else {
