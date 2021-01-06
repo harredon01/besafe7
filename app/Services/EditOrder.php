@@ -976,7 +976,6 @@ class EditOrder {
                         $event = null;
                     }
                 }
-                dd(Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no")));
                 unset($order->payment);
                 unset($order->totalCost);
                 unset($order->totalPlatform);

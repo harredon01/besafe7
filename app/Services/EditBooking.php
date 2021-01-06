@@ -178,7 +178,10 @@ class EditBooking {
             foreach ($attendees as $value) {
                 $event->addAttendee($value);
             }
-            $calendarEvent = $event->save();
+            $data = [
+                "sendUpdates" => "all"
+            ];
+            $calendarEvent = $event->save(null,$data);
             return $calendarEvent;
         }
         return $event;

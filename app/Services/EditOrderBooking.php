@@ -86,8 +86,12 @@ class EditOrderBooking {
         $data = array();
         $items = $order->items;
         foreach ($items as $item) {
-            $data = json_decode($item->attributes, true);
-            $item->attributes = $data;
+            if(is_string($item->attributes)){
+                $data = json_decode($item->attributes, true);
+                $item->attributes = $data; 
+            } else {
+                $data = $item->attributes;
+            }
             if (array_key_exists("type", $data)) {
                 if ($data['type'] == "Booking") {
                     $id = $data['id'];
