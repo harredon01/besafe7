@@ -9,7 +9,8 @@
     </tr>
     <tr ng-repeat="item in appointments">
         <td class="col-md-3 text-black" ng-show="item.pending">
-            @{{ item.attributes.name}}
+            <span ng-show="item.attributes.name">@{{ item.attributes.name}}</span>
+            <span ng-show="!item.attributes.name">@{{ item.name}}</span>
         </td>
         <td class="col-md-3 text-black" ng-hide="item.pending">
             @{{ item.attributes.name}} @{{ item.attributes.from | date:'medium'}}
