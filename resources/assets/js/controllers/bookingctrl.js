@@ -56,9 +56,7 @@
                     $scope.weekday2[4] = "Jueves";
                     $scope.weekday2[5] = "Viernes";
                     $scope.weekday2[6] = "Sabado";
-                    $scope.questions = [{name: "es rico", value: "", type: "text"},
-                        {name: "es deli", value: 0, type: "num"},
-                        {name: "es sabroso", value: "", type: "textarea"}]
+                    $scope.questions = []
 
                     console.log("Get availableDates", $scope.availableDates);
                 }
