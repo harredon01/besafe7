@@ -548,7 +548,8 @@
                         appointmentLength = 60;
                     }
                     let current = new Date();
-                    current = $scope.addMinutes(current, appointmentLength)
+                    let scheduleBuffer = 150;
+                    current = $scope.addMinutes(current, appointmentLength+scheduleBuffer);
                     for (let item in $scope.availabilitiesDate) {
                         let container = $scope.availabilitiesDate[item];
                         let open = true;
