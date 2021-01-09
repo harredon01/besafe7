@@ -69,10 +69,17 @@ app.config(function () {
                 console.log("Cart cookie found");
             } else {
                 let uuid = generateUUID();
-                console.log("setting cart cookie");
+                console.log("setting cart cookie", uuid);
+                console.log("setting cart header", $http.defaults.headers.common['X-device-id']);
                 $cookies.put("cart-uuid", uuid, {path: "/"});
+                let path = window.location.pathname;
+                if (path.includes("product")) {
+                    window.location.reload();
+                }
             }
+            $rootScope.cookieHeader = uuid;
             $http.defaults.headers.common['X-device-id'] = uuid;
+
         }
         function generateUUID() { // Public Domain/MIT
             var d = new Date().getTime();//Timestamp
