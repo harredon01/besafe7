@@ -66,6 +66,9 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        if(!isset($data['optinMarketing'])){
+            $data['optinMarketing'] = false;
+        }
         $user = User::create([
             'firstName' => $data['firstName'],
             'lastName' => $data['lastName'],
