@@ -12,7 +12,7 @@
             @yield('content')
             @include(config("app.views").'.layouts.app-footer')
         </div>
-        <script src="/js/custom.js"></script>
+        <script src="/js/custom.js" async></script>
         <!-- Scripts --j>
         <script src="/js/app.js"></script>-->
     </body>
