@@ -14481,6 +14481,7 @@ jQuery Nice Select - v1.1.0
   src: url("../fonts/Ionicons.eot?v=2.0.0#iefix") format("embedded-opentype"), url("../fonts/Ionicons.ttf?v=2.0.0") format("truetype"), url("../fonts/Ionicons.woff?v=2.0.0") format("woff"), url("../fonts/Ionicons.svg?v=2.0.0#Ionicons") format("svg");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 .ion,
@@ -23461,6 +23462,7 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Brands';
   font-style: normal;
   font-weight: normal;
+  font-display: swap;
   src: url("../fonts/fa-brands-400.eot");
   src: url("../fonts/fa-brands-400.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-brands-400.woff2") format("woff2"), url("../fonts/fa-brands-400.woff") format("woff"), url("../fonts/fa-brands-400.ttf") format("truetype"), url("../fonts/fa-brands-400.svg#fontawesome") format("svg");
 }
@@ -23472,6 +23474,7 @@ readers do not read off random characters that represent icons */
 @font-face {
   font-family: 'Font Awesome 5 Free';
   font-style: normal;
+  font-display: swap;
   font-weight: 400;
   src: url("../fonts/fa-regular-400.eot");
   src: url("../fonts/fa-regular-400.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-regular-400.woff2") format("woff2"), url("../fonts/fa-regular-400.woff") format("woff"), url("../fonts/fa-regular-400.ttf") format("truetype"), url("../fonts/fa-regular-400.svg#fontawesome") format("svg");
@@ -23485,6 +23488,7 @@ readers do not read off random characters that represent icons */
 @font-face {
   font-family: 'Font Awesome 5 Free';
   font-style: normal;
+  font-display: swap;
   font-weight: 900;
   src: url("../fonts/fa-solid-900.eot");
   src: url("../fonts/fa-solid-900.eot?#iefix") format("embedded-opentype"), url("../fonts/fa-solid-900.woff2") format("woff2"), url("../fonts/fa-solid-900.woff") format("woff"), url("../fonts/fa-solid-900.ttf") format("truetype"), url("../fonts/fa-solid-900.svg#fontawesome") format("svg");
@@ -23495,7 +23499,7 @@ readers do not read off random characters that represent icons */
   font-family: 'Font Awesome 5 Free';
   font-weight: 900;
 }
-
+ 
 /*----------------------------------------*/
 /*  10 - Themify
 /*----------------------------------------*/
@@ -23511,6 +23515,7 @@ https://wordpress.org/plugins/themify-icons/
   src: url("../fonts/themify.eot?-fvbane");
   src: url("../fonts/themify.eot?#iefix-fvbane") format("embedded-opentype"), url("../fonts/themify.woff?-fvbane") format("woff"), url("../fonts/themify.ttf?-fvbane") format("truetype"), url("../fonts/themify.svg?-fvbane#themify") format("svg");
   font-weight: normal;
+  font-display: swap;
   font-style: normal;
 }
 
