@@ -18,3 +18,10 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
+
+<IfModule mod_expires.c>
+          <FilesMatch "\.(jpeg|png|gif||ttf|woff2|css|js|woff)$">
+                      ExpiresActive On
+                      ExpiresDefault "access plus 1 year"
+          </FilesMatch>
+</IfModule>

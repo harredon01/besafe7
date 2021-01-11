@@ -4,23 +4,39 @@
         <meta name="csrf-token" content="{{ csrf_token()}}">
         <title>{{ config('app.name', 'Laravel')}}</title>
 
-        <!-- Styles -->
-        <link href="/css/app.css" rel="stylesheet" async>
-        <link href="/css/style.css" rel="stylesheet" async>
-        <link rel="stylesheet" href="/css/plugins.css" />
-        <link rel="stylesheet" href="/css/main.css" />
-        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css" async>
+        <!-- Styles 
+        <link href="/css/app.css" rel="stylesheet" async>-->
+        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/fa-solid-900.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/Ionicons.ttf?v=2.0.0" type="font/ttf" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/themify.woff?-fvbane" type="font/woff" crossorigin="anonymous">
+        <link rel="preload" href="/css/app.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link href="/css/style.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link href="/css/plugins.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link rel="preload" href="/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <link rel="preload" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript>
+            <link rel="stylesheet" href="/css/app.css?v=1.0.0.0">
+            <link href="/css/style.css?v=1.0.0.0" rel="stylesheet">
+            <link rel="stylesheet" href="/css/plugins.css?v=1.0.0.0" />
+            <link rel="stylesheet" href="/css/main.css?v=1.0.0.0" />
+            <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+        </noscript>
+        
+        
+        
+        
         <!-- Scripts 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>-->
 
-        <script src="/js/app.js"></script>
-        <script src="/js/plugins.js"></script>
+        <script src="/js/app.js?v=1.0.0.0"></script>
+        <script src="/js/plugins.js?v=1.0.0.0"></script>
         
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-cookies.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular-route.min.js"></script>
         
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
         <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
