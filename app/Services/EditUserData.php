@@ -92,7 +92,7 @@ class EditUserData {
 
     public function postRegistration(User $user) {
         Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
-        if (config("app.views") == "test") {
+        if (config("app.views") == "lonchis") {
             $admin = User::find(env('ADMIN'));
             $message = "Hola " . $user->firstName . " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
             $package = [

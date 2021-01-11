@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Models\Country;
+use App\Jobs\PostRegistration;
 use Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -65,7 +66,7 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'firstName' => $data['firstName'],
             'lastName' => $data['lastName'],
             'name' => $data['firstName']." ".$data['lastName'],
@@ -75,5 +76,7 @@ class RegisterController extends Controller
             'emailNotifications' => 1,
             'password' => bcrypt($data['password']),
         ]);
+        dispatch(new PostRegistration($user));
+        return $user;
     }
 }
