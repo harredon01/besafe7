@@ -1,4 +1,6 @@
 @extends(config("app.views").'.layouts.app')
+@section('title', 'Petworld Inscripcion tiendas de mascotas')
+@section('meta_description', 'Si eres dueño de una tienda de mascotas y te gustaría vender tus productos con nosotros, inscribete aca')
 @section('content')
 <section>
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
@@ -98,9 +100,8 @@
                         <p><strong>¿No manejas domicilios o tienes una cobertura limitada?</strong> Nosotros te  proporcionamos la logística para hacer envíos a cualquier parte del país.</p>
                     </article>
                     <ul class="contact-list mb--35">
-                        <li><i class="fas fa-fax"></i>Address : No 40 Baria Sreet 133/2 NewYork City</li>
-                        <li><i class="fas fa-phone"></i>0(1234) 567 890</li>
-                        <li><i class="far fa-envelope"></i>Info@roadthemes.com</li>
+                        <li><a href="tel:+573103418432"><i class="fas fa-phone"></i>+57 310 341 8432</a></li>
+                        <li><a href="mailto:servicioalcliente@petworld.net.co"><i class="far fa-envelope"></i>servicioalcliente@petworld.net.co</a></li>
                     </ul>
                 </div>
             </div>

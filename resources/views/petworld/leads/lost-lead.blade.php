@@ -1,4 +1,6 @@
 @extends(config("app.views").'.layouts.app')
+@section('title', 'Petworld mascotas perdidas')
+@section('meta_description', 'Si perdiste una mascota, reportala aca y te ayudaremos a encontrarla')
 @section('content')
 <section>
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{

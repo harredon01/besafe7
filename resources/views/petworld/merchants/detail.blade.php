@@ -1,5 +1,6 @@
 @extends(config("app.views").'.layouts.app')
-
+@section('title', 'Petworld '.$merchant['name'])
+@section('meta_description', $merchant['description'])
 @section('content')
 <section class="blog-page-section with-sidebar" ng-controller="MerchantDetailCtrl">
     <div class="container">

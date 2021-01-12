@@ -1,5 +1,6 @@
 @extends(config("app.views").'.layouts.app')
-
+@section('title', 'Petworld '.$data["product"]['name'])
+@section('meta_description', $data["product"]['description'])
 @section('content')
 <!-- Product Details Block -->
 <main class="product-details-section" ng-controller="ProductDetailCtrl">

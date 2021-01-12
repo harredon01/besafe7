@@ -1,5 +1,6 @@
 @extends(config("app.views").'.layouts.app')
-
+@section('title', 'Petworld '.$report['name'])
+@section('meta_description', $report['description'])
 @section('content')
 <section class="blog-page-section with-sidebar" ng-controller="ReportDetailCtrl">
     <div class="container">

@@ -1,5 +1,8 @@
 @extends(config("app.views").'.layouts.app')
-
+@if(isset($reports['category']))
+@section('title', 'Petworld '.$reports['category']['name'])
+@section('meta_description', $reports['category']['description'])
+@endif
 @section('content')
 <main class="section-padding shop-page-section"  ng-controller="ReportsCtrl">
     <div class="container">

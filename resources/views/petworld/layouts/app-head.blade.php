@@ -2,7 +2,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token()}}">
-        <title>{{ config('app.name', 'Laravel')}}</title>
+        <title>@yield('title','Petworld un mundo de mascotas')</title>
+        <meta name="keywords" content="@yield('meta_keywords','perro,gato,comida,veterinario,mascota,alimento,concentrado')">
+        <meta name="description" content="@yield('meta_description','Encuentra todo lo que necesitas para tu mascota con petworld. Desde veterinarios y tiendas de mascotas hasta guarderías, fundaciones y mucho más')">
+        <link rel="canonical" href="{{url()->current()}}"/>
 
         <!-- Styles 
         <link href="/css/app.css" rel="stylesheet" async>-->

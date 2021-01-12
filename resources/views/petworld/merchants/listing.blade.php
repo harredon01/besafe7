@@ -1,5 +1,8 @@
 @extends(config("app.views").'.layouts.app')
-
+@if(isset($merchants['category']))
+@section('title', 'Petworld '.$merchants['category']['name'])
+@section('meta_description', $merchants['category']['description'])
+@endif
 @section('content')
 <main class="section-padding shop-page-section"  ng-controller="MerchantsCtrl">
     <div class="container">

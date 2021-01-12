@@ -1,4 +1,6 @@
 @extends(config("app.views").'.layouts.app')
+@section('title', 'Petworld Inscripcion veterinarios')
+@section('meta_description', 'Si eres veterinario y te gustaría vender tus servicios con nosotros, inscribete aca')
 @section('content')
 <section>
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
@@ -96,9 +98,8 @@ Aquí podrás acceder a beneficios para aumentar tus ventas y digitalizar tu neg
                         <p>¡No lo dejes pasar! Hoy en día tener presencia digital es una oportunidad, mañana va a ser una necesidad. y los primeros siempre tendrán la ventaja. empieza ya.</p>
                     </article>
                     <ul class="contact-list mb--35">
-                        <li><i class="fas fa-fax"></i>Address : No 40 Baria Sreet 133/2 NewYork City</li>
-                        <li><i class="fas fa-phone"></i>0(1234) 567 890</li>
-                        <li><i class="far fa-envelope"></i>Info@roadthemes.com</li>
+                        <li><a href="tel:+573103418432"><i class="fas fa-phone"></i>+57 310 341 8432</a></li>
+                        <li><a href="mailto:servicioalcliente@petworld.net.co"><i class="far fa-envelope"></i>servicioalcliente@petworld.net.co</a></li>
                     </ul>
                 </div>
             </div>

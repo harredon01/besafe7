@@ -1,5 +1,12 @@
 @extends(config("app.views").'.layouts.app')
-
+@if(count($data['categories'])>0)
+@if(count($data['categories'][0]['products'])>0)
+@if(isset($data['categories'][0]['products'][0]['merchant_name']))
+@section('title', 'Petworld '.$data['categories'][0]['products'][0]['merchant_name'])
+@section('meta_description', $data['categories'][0]['products'][0]['merchant_description'])
+@endif
+@endif
+@endif
 @section('content')
 <main class="section-padding shop-page-section" id="dissapear">
     <div class="container">
