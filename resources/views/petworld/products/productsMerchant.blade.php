@@ -3,6 +3,8 @@
 @if(count($data['categories'][0]['products'])>0)
 @if(isset($data['categories'][0]['products'][0]['merchant_name']))
 @section('title', 'Petworld '.$data['categories'][0]['products'][0]['merchant_name'])
+@endif
+@if(isset($data['categories'][0]['products'][0]['meta_description']))
 @section('meta_description', $data['categories'][0]['products'][0]['merchant_description'])
 @endif
 @endif
