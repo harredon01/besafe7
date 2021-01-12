@@ -62,7 +62,7 @@
                             @else
                             <a href="/a/merchant/{{$merchant['slug']}}/products" class="image" tabindex="0">
                             @endif
-                            <img src="{{ $merchant['icon']}}" alt="{{ $merchant['name']}}">
+                            <img data-src="{{ $merchant['icon']}}" class="lazyload" alt="{{ $merchant['name']}}">
                         </a>
                         <div class="hover-conents">
                             <ul class="product-btns">

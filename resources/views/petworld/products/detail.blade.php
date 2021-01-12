@@ -11,7 +11,7 @@
                     <div class="image-block">
                         <!-- Zoomable IMage -->
                         @if(count($data["product"]["files"])>0)
-                        <img src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
+                        <img class="lazyload" data-src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
 
                         <!-- Product Gallery with Slick Slider -->
                         <div>
@@ -19,7 +19,7 @@
                             @foreach ($data["product"]["files"] as $file)
                             <a href="#" class="gallary-item" data-image="{{$file['file']}}"
                                data-zoom-image="{{$file['file']}}">
-                                <img src="{{$file['file']}}" width="250" alt=""/>
+                                <img data-src="{{$file['file']}}" class="lazyload" width="250" alt=""/>
                             </a>
                             @endforeach
                         </div>
@@ -222,7 +222,7 @@
                     <div class="single-slide">
                         <div class="pm-product">
                             <div class="image">
-                                <a href="/a/product-detail/{{$relProduct['slug']}}"><img src="{{$relProduct['src']}}" alt=""></a>
+                                <a href="/a/product-detail/{{$relProduct['slug']}}"><img class="lazyload" data-src="{{$relProduct['src']}}" alt=""></a>
                                 @if($relProduct['variants'][0]['is_on_sale'])
                                 <span class="onsale-badge">Sale!</span>
                                 @endif

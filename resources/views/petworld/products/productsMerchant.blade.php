@@ -57,7 +57,7 @@
                     <div class="col-lg-3 col-sm-6">
                         <div class="pm-product  ">
                             <a href="/a/{{$product['slug']}}" class="image" tabindex="0">
-                                <img src="{{$product['src']}}" alt="">
+                                <img class="lazyload" data-src="{{$product['src']}}" alt="">
                             </a>
                             <div class="hover-conents">
                                 <ul class="product-btns">

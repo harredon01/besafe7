@@ -9,7 +9,7 @@
                 <div class="blog-post post-details single-block">
 
                     <a href="javascript:;" class="blog-image">
-                        <img src="{{$merchant['icon']}}" alt="">
+                        <img data-src="{{$merchant['icon']}}" class="lazyload" alt="">
                     </a>
 
 
