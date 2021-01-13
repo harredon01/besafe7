@@ -9,10 +9,9 @@ angular.module('besafe')
                         url: '/api/billing/pay_cc/'+platform,
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to payCreditCard");
                         });
 
@@ -27,10 +26,9 @@ angular.module('besafe')
                         url: '/api/billing/pay_in_bank/Local',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to payInBank");
                         });
 
@@ -45,10 +43,9 @@ angular.module('besafe')
                         url: '/api/billing/complete_paid/Food',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to completePaidOrder");
                         });
 
@@ -63,10 +60,9 @@ angular.module('besafe')
                         url: '/api/billing/retry/'+payment,
                         
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to retryPayment");
                         });
 
@@ -82,10 +78,9 @@ angular.module('besafe')
                         method: 'POST',
                         url: '/api/billing/add_transaction_costs/'+payment,
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to addTransactionCosts");
                         });
                 return def.promise;
@@ -98,10 +93,9 @@ angular.module('besafe')
                         url: '/api/billing/pay_debit/'+platform,
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to payDebit");
                         });
 
@@ -116,10 +110,9 @@ angular.module('besafe')
                         url: '/api/billing/pay_cash/'+platform,
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to payCash");
                         });
                 return def.promise;
@@ -132,10 +125,9 @@ angular.module('besafe')
                         method: 'GET',
                         url: url,
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getBanks");
                         });
                 return def.promise;

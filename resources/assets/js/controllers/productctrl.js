@@ -60,16 +60,7 @@
                     $scope.cartDeletedItem(args);
                 });
                 $scope.clean = function () {
-                    angular.forEach(angular.element(".product-attributes"), function (value, key) {
-                        var a = angular.element(value);
-                        var obj = JSON.parse(a.html());
-                        var html = "";
-                        for (x in obj) {
-                            html += x + ": " + obj[x] + " <br/>";
-                        }
-                        a.html(html)
-                        a.css("display", "block");
-                    });
+
                 }
                 $scope.changeStore = function () {
                     Cart.changeMerchant()

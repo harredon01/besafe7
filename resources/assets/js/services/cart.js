@@ -179,11 +179,10 @@ angular.module('besafe')
                         url: "/api/cart/add",
                         data: postData
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                console.log("Return cart",data);
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
                     return def.promise;
@@ -196,11 +195,9 @@ angular.module('besafe')
                         url: "/api/cart/check",
                         data: {}
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to checkCart");
                             });
                     return def.promise;
@@ -267,11 +264,9 @@ angular.module('besafe')
                         url: "/api/cart/update",
                         data: data
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -283,10 +278,10 @@ angular.module('besafe')
                         method: "GET",
                         url: "/api/cart/get"
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                console.log("Return",data.data)
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
                     return def.promise;
@@ -297,10 +292,9 @@ angular.module('besafe')
                         method: "GET",
                         url: "/api/cart/checkout"
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
                     return def.promise;
@@ -314,11 +308,9 @@ angular.module('besafe')
                         method: "post",
                         url: "/api/cart/clear",
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 

@@ -8,11 +8,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/api/addresses' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -27,10 +25,9 @@ angular.module('besafe')
                         url: '/api/addresses',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -45,11 +42,9 @@ angular.module('besafe')
                     method: 'DELETE',
                     url: '/api/addresses/' + address
                 })
-                        .success(function (data) {
-                            console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to Delete Address");
                         });
 

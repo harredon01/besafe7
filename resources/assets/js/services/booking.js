@@ -10,11 +10,9 @@ angular.module('besafe')
                         url: url,
                         params: objectB
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to getBookingsObject");
                             });
 
@@ -29,11 +27,9 @@ angular.module('besafe')
                         method: 'get',
                         url: url
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to getBooking");
                             });
 
@@ -47,11 +43,9 @@ angular.module('besafe')
                         method: 'get',
                         url: url
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to getObjectsWithBookingUser");
                             });
                     return def.promise;
@@ -64,11 +58,9 @@ angular.module('besafe')
                         method: 'get',
                         url: url
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to checkExistingBooking");
                             });
 
@@ -82,10 +74,9 @@ angular.module('besafe')
                         url: '/api/bookings',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to addBookingObject");
                             });
                     return def.promise;
@@ -99,10 +90,9 @@ angular.module('besafe')
                         url: '/api/bookings/edit',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to editBookingObject");
                             });
                     return def.promise;
@@ -115,10 +105,9 @@ angular.module('besafe')
                         url: '/api/bookings/now',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to immediateBookingObject");
                             });
                     return def.promise;
@@ -131,10 +120,9 @@ angular.module('besafe')
                         url: "/api/availabilities",
                         params: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to getAvailabilitiesObject");
                             });
                     return def.promise;
@@ -147,10 +135,9 @@ angular.module('besafe')
                         url: "/api/bookings/status",
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to changeStatusBookingObject");
                             });
                     return def.promise;
@@ -162,10 +149,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: "/api/bookings/" + objectId
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to deleteBookingObject");
                             });
                     return def.promise;

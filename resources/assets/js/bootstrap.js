@@ -43,3 +43,9 @@ Vue.http.interceptors.push((request, next) => {
 //     broadcaster: 'pusher',
 //     key: 'your-pusher-key'
 // });
+require('angular');
+require('angular-route');
+require('angular-aria');
+require('angular-animate');
+require('angular-cookies');
+require('angular-material');

@@ -8,11 +8,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/api/groups' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -28,10 +26,9 @@ angular.module('besafe')
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 

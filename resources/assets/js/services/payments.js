@@ -12,11 +12,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get payments");
                         });
 
@@ -34,11 +32,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get payments");
                         });
 
@@ -53,10 +49,9 @@ angular.module('besafe')
                         url: '/api/payments/'+payment_id+"/approve",
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to approvePayment");
                         });
                 return def.promise;
@@ -69,10 +64,9 @@ angular.module('besafe')
                         url: '/api/billing/retry/'+payment_id,
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to retryPayment");
                         });
                 return def.promise;
@@ -85,10 +79,9 @@ angular.module('besafe')
                         url: '/api/billing/add_transaction_costs/'+payment_id,
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to addTransactionCosts");
                         });
                 return def.promise;

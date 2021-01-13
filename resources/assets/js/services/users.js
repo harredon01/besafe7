@@ -8,10 +8,9 @@ angular.module('besafe')
                         method: 'POST',
                         url: '/user/billingAddress/'+address_id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -24,11 +23,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/api/addresses' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -43,10 +40,9 @@ angular.module('besafe')
                         url: '/api/addresses',
                         data: data, // pass in data as strings  // set the headers so angular passing info as form data (not request payload)
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -61,10 +57,9 @@ angular.module('besafe')
                         url: '/api/user',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to create user");
                         });
 
@@ -79,10 +74,9 @@ angular.module('besafe')
                         url: '/api/user/change_password',
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updatePassword");
                         });
 
@@ -96,10 +90,9 @@ angular.module('besafe')
                         method: 'GET',
                         url: '/api/user',
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get user");
                         });
                 return def.promise;
@@ -110,11 +103,9 @@ angular.module('besafe')
                     method: 'DELETE',
                     url: '/api/addresses/' + address
                 })
-                        .success(function (data) {
-                            console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to Delete Address");
                         });
 
@@ -132,11 +123,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/api/contacts' +where
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 

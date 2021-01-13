@@ -7,10 +7,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/locations" + where,
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -29,10 +28,9 @@ angular.module('besafe')
                         },
                         url: "http://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + longit + "&sensor=true",
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -48,10 +46,9 @@ angular.module('besafe')
                         url: "/api/merchants/nearby",
                         params: data
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function (data) {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 console.log(JSON.stringify(data));
                                 def.reject("Failed to get nearby merchants");
                             });
@@ -69,10 +66,9 @@ angular.module('besafe')
                         url = url + "&per_page=" + data.perpage;
                     }
                     $http.get(url)
-                            .success(function (res) {
-                                def.resolve(res);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -86,10 +82,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/locations/hash",
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function (data) {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 console.log(JSON.stringify(data));
                                 def.reject("Failed to get nearby");
                             });
@@ -104,11 +99,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/cities?limit=50&region_id=" + regionId,
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -124,11 +117,9 @@ angular.module('besafe')
                         method: "get",
                         url: url,
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
                     return def.promise;
@@ -137,12 +128,10 @@ angular.module('besafe')
                     var def = $q.defer();
                     $http.post("/api/cities/from", city
                             )
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function (data) {
-                                def.reject(data);
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
+                                def.reject(response);
                             });
 
                     return def.promise;
@@ -155,11 +144,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/regions?limit=40&country_id=" + countryID,
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -171,11 +158,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/countries?id=" + id,
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 
@@ -187,11 +172,9 @@ angular.module('besafe')
                         method: "get",
                         url: "/api/countries?limit=50&order_by=name,asc",
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to get nearby");
                             });
 

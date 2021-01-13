@@ -9,11 +9,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to sendNewsletter");
                         });
                 return def.promise;
@@ -29,11 +27,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getDeliveries");
                         });
                 return def.promise;
@@ -49,11 +45,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getArticles");
                         });
                 return def.promise;
@@ -69,11 +63,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getArticles");
                         });
                 return def.promise;
@@ -89,11 +81,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getArticles");
                         });
                 return def.promise;
@@ -106,11 +96,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getLargestAddresses");
                         });
                 return def.promise;
@@ -123,11 +111,9 @@ angular.module('besafe')
                     url: url,
                     data:data
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getLargestAddresses");
                         });
                 return def.promise;
@@ -141,11 +127,9 @@ angular.module('besafe')
                     url: url,
                     data:{}
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateDeliveryAddress");
                         });
                 return def.promise;
@@ -158,11 +142,9 @@ angular.module('besafe')
                     url: url,
                     data:dish
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateDeliveryAddress");
                         });
                 return def.promise;
@@ -174,11 +156,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to buildScenarioRouteId");
                         });
                 return def.promise;
@@ -190,11 +170,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to buildScenarioPositive");
                         });
                 return def.promise;
@@ -206,11 +184,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to buildCompleteScenario");
                         });
                 return def.promise;
@@ -223,11 +199,9 @@ angular.module('besafe')
                     url: url,
                     params:data
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getScenarioStructure");
                         });
                 return def.promise;
@@ -239,11 +213,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getSummaryShipping");
                         });
                 return def.promise;
@@ -256,11 +228,9 @@ angular.module('besafe')
                     url: url,
                     params:data
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getScenarioOrganizationStructure");
                         });
                 return def.promise;
@@ -273,11 +243,9 @@ angular.module('besafe')
                     url: url,
                     data:data
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to buildScenarioLogistics");
                         });
                 return def.promise;
@@ -289,11 +257,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getPurchaseOrder");
                         });
                 return def.promise;
@@ -305,11 +271,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to regenerateScenarios");
                         });
                 return def.promise;
@@ -321,11 +285,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to regenerateDeliveries");
                         });
                 return def.promise;
@@ -337,10 +299,9 @@ angular.module('besafe')
                         url: '/api/food/menu/'+item.id,
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateMenuItem");
                         });
                 return def.promise;
@@ -354,10 +315,9 @@ angular.module('besafe')
                         url: '/api/admin/zones/'+item.id,
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateZoneItem");
                         });
                 return def.promise;
@@ -370,10 +330,9 @@ angular.module('besafe')
                         url: '/api/admin/zones',
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to createZoneItem");
                         });
                 return def.promise;
@@ -386,10 +345,9 @@ angular.module('besafe')
                         url: '/api/food/messages/'+item.id,
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateMessageItem");
                         });
                 return def.promise;
@@ -402,10 +360,9 @@ angular.module('besafe')
                         url: '/api/food/reminder',
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to sendReminder");
                         });
                 return def.promise;
@@ -417,10 +374,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/food/messages/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteMessageItem");
                         });
                 return def.promise;
@@ -432,10 +388,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/zones/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteZoneItem");
                         });
                 return def.promise;
@@ -447,10 +402,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/food/content/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteMenuItem");
                         });
                 return def.promise;
@@ -462,10 +416,9 @@ angular.module('besafe')
                         method: 'GET',
                         url: '/api/articles?start_date='+item
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getArticlesByDate");
                         });
                 return def.promise;

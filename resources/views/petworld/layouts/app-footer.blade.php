@@ -105,11 +105,9 @@
                     <p>Copyright © 2020 <a href="#">Petworld.com</a>. All Rights Reserved</p>
                 </div>
             </footer>
-<script src="/js/all.js" async></script>
+
+        <script src="/js/all.js?v=1.0.0.1"></script>
 <script src="/js/plugins2.js?v=1.0.0.0"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
   <script src="/js/lazysizes.min.js" async></script>
   <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}" async></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
         

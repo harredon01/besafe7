@@ -12,11 +12,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get orders");
                         });
 
@@ -33,11 +31,9 @@ angular.module('besafe')
                     url: url,
                     data:{from:from,to:to}
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getStoreExport");
                         });
                 return def.promise;
@@ -51,11 +47,9 @@ angular.module('besafe')
                     url: url,
                     data:data
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to fullfillOrder");
                         });
                 return def.promise;
@@ -67,10 +61,9 @@ angular.module('besafe')
                         url: '/api/orders/'+order_id+"/approve",
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to approveOrder");
                         });
                 return def.promise;
@@ -84,10 +77,9 @@ angular.module('besafe')
                         url: '/api/orders/'+order_id+"/build",
                         data: {"status":status}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateOrderStatus");
                         });
                 return def.promise;
@@ -101,10 +93,9 @@ angular.module('besafe')
                         url: '/api/orders/shipping',
                         data: data // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to setShippingAddress");
                         });
                 return def.promise;
@@ -117,10 +108,9 @@ angular.module('besafe')
                         url: '/api/orders/platform/shipping/'+order,
                         data: platform, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to setPlatformShippingCondition");
                         });
                 return def.promise;
@@ -133,10 +123,9 @@ angular.module('besafe')
                         url: '/api/orders/platform/shipping/'+order,
                         params: platform, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateOrderStatus");
                         });
                 return def.promise;
@@ -149,10 +138,9 @@ angular.module('besafe')
                         url: '/api/orders/prepare/'+platform,
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to prepareOrder");
                         });
                 return def.promise;
@@ -165,10 +153,9 @@ angular.module('besafe')
                         url: '/api/orders/discounts/'+platform+"/"+order,
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to setDiscounts");
                         });
                 return def.promise;
@@ -181,10 +168,9 @@ angular.module('besafe')
                         url: '/api/orders/coupon',
                         data: {"coupon":coupon}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to setCoupon");
                         });
                 return def.promise;
@@ -197,10 +183,9 @@ angular.module('besafe')
                         url: '/api/orders/check/'+order,
                         data: data, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to checkOrder");
                         });
                 return def.promise;
@@ -212,10 +197,9 @@ angular.module('besafe')
                         method: 'GET',
                         url: '/api/orders/active',
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getOrder");
                         });
                 return def.promise;

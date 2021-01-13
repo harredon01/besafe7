@@ -12,11 +12,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getProducts");
                         });
                 return def.promise;
@@ -32,11 +30,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getVariants");
                         });
                 return def.promise;
@@ -52,11 +48,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getMerchants");
                         });
                 return def.promise;
@@ -72,11 +66,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getCategories");
                         });
                 return def.promise;
@@ -88,10 +80,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/store/products/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteProductItem");
                         });
                 return def.promise;
@@ -103,10 +94,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/store/merchants/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteMerchantItem");
                         });
                 return def.promise;
@@ -118,10 +108,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/store/variants/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteVariantItem");
                         });
                 return def.promise;
@@ -133,10 +122,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/store/categories/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteCategoryItem");
                         });
                 return def.promise;

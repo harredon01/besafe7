@@ -12,11 +12,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get routes");
                         });
 
@@ -31,11 +29,9 @@ angular.module('besafe')
                     method: 'delete',
                     url: url 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteRoute");
                         });
 
@@ -49,11 +45,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to getKeyStatus");
                         });
                 return def.promise;
@@ -66,11 +60,9 @@ angular.module('besafe')
                     method: 'delete',
                     url: url 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteStop");
                         });
 
@@ -84,10 +76,9 @@ angular.module('besafe')
                         url: '/api/routes/'+route_id+"/build",
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to buildRoute");
                         });
                 return def.promise;
@@ -101,10 +92,9 @@ angular.module('besafe')
                         url: '/api/routes/'+route_id+"/stop/"+stop_id,
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateRouteStops");
                         });
                 return def.promise;
@@ -121,10 +111,9 @@ angular.module('besafe')
                             "stop_id":stop_id
                         }, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateRouteDelivery");
                         });
                 return def.promise;
@@ -137,10 +126,9 @@ angular.module('besafe')
                         url: "/api/routes/stop/"+stop_id,
                         data: {}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to sendStopToNewRoute");
                         });
                 return def.promise;
@@ -153,10 +141,9 @@ angular.module('besafe')
                         url: "/api/routes/"+route_id+"/return",
                         data: {address_id:address_id}, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to sendStopToNewRoute");
                         });
                 return def.promise;

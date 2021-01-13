@@ -12,11 +12,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get getArticles");
                         });
                 return def.promise;
@@ -31,10 +29,9 @@ angular.module('besafe')
                         url: '/api/admin/zones/'+item.id,
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to updateZoneItem");
                         });
                 return def.promise;
@@ -47,10 +44,9 @@ angular.module('besafe')
                         url: '/api/admin/zones',
                         data: item, // pass in data as strings
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to createZoneItem");
                         });
                 return def.promise;
@@ -62,10 +58,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/api/admin/zones/'+item.id
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to deleteZoneItem");
                         });
                 return def.promise;

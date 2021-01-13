@@ -8,11 +8,9 @@ angular.module('besafe')
                     method: 'get',
                     url: url 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 

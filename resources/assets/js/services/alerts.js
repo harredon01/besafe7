@@ -18,7 +18,7 @@ angular.module('besafe')
                 $http.post("/alertsapi/read", notifs)
                         .success(function (data) {
 
-                            def.resolve(data);
+                            def.resolve(data.data);
                         })
                         .error(function (data) {
                             console.log(data);
@@ -199,10 +199,9 @@ angular.module('besafe')
                     method: "get",
                     url: "/api/alertsapi/after/" + $rootScope.lastNotification,
                 })
-                        .success(function (data) {
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get Contacts");
                         });
 
@@ -212,11 +211,9 @@ angular.module('besafe')
                 var def = $q.defer();
 
                 $http.delete( "/api/alertsapi/" + notificationId)
-                        .success(function (data) {
-                            def.resolve(data);
-
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 

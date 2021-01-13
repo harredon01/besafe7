@@ -10,11 +10,9 @@ angular.module('besafe')
                         url: "/api/ratings",
                         data: rating
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to addRating");
                             });
 
@@ -29,11 +27,9 @@ angular.module('besafe')
                         url: "/api/favorites",
                         data: data
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to addRating");
                             });
 
@@ -48,11 +44,9 @@ angular.module('besafe')
                         url: "/api/favorites/delete",
                         data: data
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to addRating");
                             });
 
@@ -67,11 +61,9 @@ angular.module('besafe')
                         url: "/api/products/favorites",
                         data: rating
                     })
-                            .success(function (data) {
-                                // console.log(data);
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to addRating");
                             });
 
@@ -84,10 +76,9 @@ angular.module('besafe')
                         url: "/api/merchants/products",
                         params: data
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to getProductsMerchant");
                             });
                     return def.promise;
@@ -99,10 +90,9 @@ angular.module('besafe')
                         url: "/api/products/search",
                         params: data
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                            .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                                 def.reject("Failed to searchProducts");
                             });
                     return def.promise;

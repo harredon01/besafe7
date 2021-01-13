@@ -8,10 +8,9 @@ angular.module('besafe')
                         method: 'GET',
                         url: '/oauth/clients'
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get clients");
                         });
 
@@ -26,10 +25,9 @@ angular.module('besafe')
                         data: data // pass in data as strings
                         //headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to create client");
                         });
 
@@ -45,10 +43,9 @@ angular.module('besafe')
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to update client");
                         });
 
@@ -62,10 +59,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/oauth/clients/'+client
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to delete client");
                         });
 
@@ -78,11 +74,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/oauth/scopes' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -96,11 +90,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/oauth/personal-access-tokens' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -116,10 +108,9 @@ angular.module('besafe')
                         data: data, // pass in data as strings
                         headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to create client");
                         });
 
@@ -133,10 +124,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/oauth/personal-access-tokens/'+client
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to delete client");
                         });
 
@@ -149,11 +139,9 @@ angular.module('besafe')
                     method: 'get',
                     url: '/api/user/authtokens' 
                 })
-                        .success(function (data) {
-                            // console.log(data);
-                            def.resolve(data);
-                        })
-                        .error(function () {
+                        .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to get nearby");
                         });
 
@@ -167,10 +155,9 @@ angular.module('besafe')
                         method: 'DELETE',
                         url: '/oauth/tokens/'+token
                     })
-                            .success(function (data) {
-                                def.resolve(data);
-                            })
-                        .error(function () {
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
                             def.reject("Failed to delete client");
                         });
 
