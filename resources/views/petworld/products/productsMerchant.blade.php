@@ -66,7 +66,7 @@
                     <div class="col-lg-3 col-sm-6">
                         <div class="pm-product  ">
                             <a href="/a/{{$product['slug']}}" class="image" tabindex="0">
-                                <img class="lazyload" data-src="{{$product['src']}}" alt="">
+                                <img class="lazyload" data-src="{{$product['imgs'][0]['file']}}" alt="">
                             </a>
                             <div class="hover-conents">
                                 <ul class="product-btns">
@@ -93,7 +93,7 @@
                                         <option value="{{$variant['id']}}">{{$variant['description']}}</option>
                                         @endforeach
                                     </select>
-                                    <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
+                                    <a href="javascript:;" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                 </div>
                                 <div class="card-list-content ">
                                     <div class="rating-widget mt--20">
@@ -117,7 +117,7 @@
                                             <option value="{{$variant['id']}}">{{$variant['description']}}</option>
                                             @endforeach
                                         </select>
-                                        <a href="cart.html" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
+                                        <a href="javascript:;" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
                                         <!--div class="btn-options">
                                             <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Add to Wishlist</a>
                                             <a href="compare.html"><i class="ion-ios-shuffle"></i>Add to Compare</a>

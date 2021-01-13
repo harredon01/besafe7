@@ -5,6 +5,7 @@ use App\Services\Food;
 use App\Models\CoveragePolygon;
 use App\Mail\ScenarioSelect;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class DeliveriesSimulationSeeder extends Seeder {
 
@@ -19,12 +20,13 @@ class DeliveriesSimulationSeeder extends Seeder {
     }
 
     public function run() {
-        $polygons = CoveragePolygon::where('lat',"<>",0)->where('long',"<>",0)->get();
-        $user = User::find(2);
-        $this->food->deleteOldData();
-        $this->food->prepareRoutingSimulation($polygons);
-        $results = $this->food->getShippingCosts("Rapigo","pending");
-        //Mail::to($user)->send(new ScenarioSelect($results['resultsPre'], $results['resultsSimple'], $results['winner'], $value->id));
+        $pages = [
+            ["view"=>"dsfsdf","name"=>"sdfsdfsdf"],
+            ["view"=>"dsfsdf","name"=>"sdfsdfsdf"],
+            ["view"=>"dsfsdf","name"=>"sdfsdfsdf"]
+        ];
+        $menu = view('sitemap', compact('pages'))->render();
+        dd($menu);
     }
     
     

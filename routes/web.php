@@ -24,6 +24,7 @@ Route::get('/a/faq', function () {
 Route::get('/a/about-us', function () {
     return view(config("app.views").'.about-us');
 });
+Route::get('sitemap.xml','SitemapController@index');
 Route::get('/a/blog',  'WelcomeController@getBlogList');
 Route::get('/a/contact-us/{type?}',  'LeadController@getLanding');
 Route::get('/a/blog/{slug?}','WelcomeController@getBlogDetail');
