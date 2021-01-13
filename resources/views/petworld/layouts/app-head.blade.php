@@ -13,6 +13,13 @@
         <link rel="preload" as="font" href="/fonts/fa-solid-900.woff2" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" as="font" href="/fonts/Ionicons.ttf?v=2.0.0" type="font/ttf" crossorigin="anonymous">
         <link rel="preload" as="font" href="/fonts/themify.woff?-fvbane" type="font/woff" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="https://fonts.gstatic.com/s/rubik/v11/iJWKBXyIfDnIV7nBrXw.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="https://fonts.gstatic.com/s/rubik/v11/iJWEBXyIfDnIV7nEnX661A.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2" type="font/woff2" crossorigin="anonymous">
+        <link rel="preload" as="font" href="https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4.woff2" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" href="/css/app.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <link href="/css/style.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
         <link href="/css/plugins.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
