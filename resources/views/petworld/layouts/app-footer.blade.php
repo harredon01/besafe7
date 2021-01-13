@@ -33,8 +33,8 @@
                         </div>
                         <div class="col-lg-4 col-md-6">
                             <div class="single-footer contact-block">
-                                <div class="fb-page" data-href="https://www.facebook.com/petworldCol" data-tabs="timeline" data-width="" data-height="400" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/petworldCol" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/petworldCol">Pet World</a></blockquote></div>
-                                <!--h3 class="footer-title">SUBSCRIBE TO OUR NEWSLETTER</h3>
+                                <!--div class="fb-page" data-href="https://www.facebook.com/petworldCol" data-tabs="timeline" data-width="" data-height="400" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/petworldCol" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/petworldCol">Pet World</a></blockquote></div>
+                                <h3 class="footer-title">SUBSCRIBE TO OUR NEWSLETTER</h3>
                                 <div class="single-footer-content">
                                     <p>
                                         Subscribe to the Petmark mailing list to receive updates on new arrivals, special offers and other discount information.
@@ -109,5 +109,6 @@
         <script src="/js/all.js?v=1.0.0.1"></script>
 <script src="/js/plugins2.js?v=1.0.0.0"></script>
   <script src="/js/lazysizes.min.js" async></script>
+  <script src="/js/custom.js" async></script>
   <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}" async></script>
         
