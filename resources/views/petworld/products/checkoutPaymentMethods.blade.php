@@ -365,6 +365,7 @@
     <div ng-show="showResult" style="color:black;font-weight: bold">
         <h4>@{{resultHeader}}</h4>
         <p>@{{resultBody}}</p><br/>
+        <p ng-show="resultHeader=='Pago negado'"><a href="/user/payments">Mis Pagos</a></p><br ng-show="resultHeader=='Pago negado'"/>
         <h4>Transaccion</h4>
         <p>Forma de pago: @{{transaction.payment_method}}</p>
         <p>Referencia pago: @{{transaction.reference_sale}}</p>
