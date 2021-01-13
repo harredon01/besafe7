@@ -207,5 +207,5 @@
                     var viewData = '@json($report)';
         </script>
 </section>
-
+<script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=5fa5a79fcc85000012ec2cee&product=inline-share-buttons" async="async"></script>
 @endsection

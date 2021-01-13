@@ -5,7 +5,7 @@
     </head>
     <body>
         <div id="fb-root"></div>
-        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v9.0&appId=340442469993643&autoLogAppEvents=1" nonce="8NzAZP9u"></script>
+        
         <div class="site-wrapper">
             @include(config("app.views").'.layouts.app-header')
 
@@ -13,6 +13,7 @@
             @include(config("app.views").'.layouts.app-footer')
         </div>
         <script src="/js/custom.js" async></script>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v9.0&appId=340442469993643&autoLogAppEvents=1" nonce="8NzAZP9u"></script>
         <!-- Scripts --j>
         <script src="/js/app.js"></script>-->
     </body>
