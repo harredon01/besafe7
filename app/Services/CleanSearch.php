@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use App\Models\User;
 use DB;
+use Schema;
 use App\Models\Merchant;
 use Illuminate\Support\Str;
 class CleanSearch {
@@ -467,9 +468,31 @@ class CleanSearch {
         $request2 = Request::create($finalString, 'GET');
         return $request2;
     }
+    private function cleanUrl($url,$type){
+        $parsed = parse_url($url);
+        $params = [];
+        parse_str($parsed['query'],$params );
+        $columns = Schema::getColumnListing($type);
+        if($type=="merchants" || $type=="reports"){
+            array_push($columns,"favorites_id","owner_id","category_id","group_id","shared_id");
+        }
+        foreach ($params as $key => $value) {
+            if (!in_array($key, $columns)) {
+                unset($params[$key]);
+            }
+        }
+        if(count($params)>0){
+            $result =$parsed['path']."?". http_build_query($params);
+        } else {
+            $result =$parsed['path'];
+        }
+        return $result;
+        
+    }
 
     public function handleObjectExternal($request, $type) {
         $mystring = $request->getRequestUri();
+        $mystring = $this->cleanUrl($mystring, strtolower($type));
         $data = $request->all("includes");
         if ($data['includes']) {
             if ($data['includes'] != "availabilities") {
