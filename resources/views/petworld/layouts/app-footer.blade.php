@@ -110,5 +110,4 @@
 <script src="/js/plugins2.js?v=1.0.0.0"></script>
   <script src="/js/lazysizes.min.js" async></script>
   <script src="/js/custom.js" async></script>
-  <script src="https://www.google.com/recaptcha/api.js?render={{ env('GOOGLE_CAPTCHA_PUBLIC')}}" async></script>
         
