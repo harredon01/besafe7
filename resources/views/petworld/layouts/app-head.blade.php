@@ -14,8 +14,6 @@
         <link rel="preload" as="font" href="/fonts/Ionicons.ttf?v=2.0.0" type="font/ttf" crossorigin="anonymous">
         <link rel="preload" as="font" href="/fonts/themify.woff?-fvbane" type="font/woff" crossorigin="anonymous">
         <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
-        <link rel="preload" as="font" href="/fonts/fa-brands-400.woff2" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" as="font" href="https://fonts.gstatic.com/s/rubik/v11/iJWKBXyIfDnIV7nBrXw.woff2" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" as="font" href="https://fonts.gstatic.com/s/rubik/v11/iJWEBXyIfDnIV7nEnX661A.woff2" type="font/woff2" crossorigin="anonymous">
         <link rel="preload" as="font" href="https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2" type="font/woff2" crossorigin="anonymous">
@@ -61,4 +59,5 @@
                     function gtag(){dataLayer.push(arguments); }
                     gtag('js', new Date());
                     gtag('config', 'G-KBF630LLXE');
+                    gtag('config', 'UA-185676583-1');
         </script>
