@@ -7,7 +7,7 @@
 
 <body class="page-template page-template-page-templates page-template-full-width page-template-page-templatesfull-width-php page page-id-10921 theme-fitmeal woocommerce-no-js tribe-no-js full-width singular paceloader-enabled no-sidebar wpb-js-composer js-comp-ver-6.0.5 vc_responsive">
     <div id="ltx-preloader" data-loader="Loading..."></div>
-    <div class="ltx-content-wrapper  white">
+    <div class="ltx-content-wrapper  white"> 
         <div class="header-wrapper header-h1  hasBreadcrumbs wrapper-navbar-layout-white ltx-pageheader-disabled">
             @include(config("app.views").'.layouts.ecom-header')
         

@@ -62,56 +62,7 @@
 
         </div>
     </section>
-    <div class="container pt--50">
-        <div class="policy-block border-four-column">
-            <div class="row">
-                <div class="col-lg-6 col-sm-6">
-                    <div class="policy-block-single">
-                        <div class="icon">
-                            <span class="ti-truck"></span>
-                        </div>
-                        <div class="text">
-                            <h3>Cobertura Nacional</h3>
-                            <p>En productos y medicinas</p>
-                        </div>
-                    </div>
-                </div>
-                <!--div class="col-lg-3 col-sm-6">
-                    <div class="policy-block-single">
-                        <div class="icon">
-                            <span class="ti-credit-card"></span>
-                        </div>
-                        <div class="text">
-                            <h3>Cod</h3>
-                            <p>Cash on Delivery</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-sm-6">
-                    <div class="policy-block-single">
-                        <div class="icon">
-                            <span class="ti-gift"></span>
-                        </div>
-                        <div class="text">
-                            <h3>Free Gift Box</h3>
-                            <p>Buy a Gift</p>
-                        </div>
-                    </div>
-                </div-->
-                <div class="col-lg-6 col-sm-6">
-                    <div class="policy-block-single">
-                        <div class="icon">
-                            <span class="ti-headphone-alt"></span>
-                        </div>
-                        <div class="text">
-                            <h3>Soporte 24/7</h3>
-                            <p>Escribenos a cualquier hora</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+   
     <section class="pt--50 space-db--30">
         <h2 class="d-none">Promotion Block
         </h2> 
@@ -173,7 +124,56 @@
         </div>
     </section>
     
-    
+     <div class="container pt--50">
+        <div class="policy-block border-four-column">
+            <div class="row">
+                <div class="col-lg-6 col-sm-6">
+                    <div class="policy-block-single">
+                        <div class="icon">
+                            <span class="ti-truck"></span>
+                        </div>
+                        <div class="text">
+                            <h3>Cobertura Nacional</h3>
+                            <p>En productos y medicinas</p>
+                        </div>
+                    </div>
+                </div>
+                <!--div class="col-lg-3 col-sm-6">
+                    <div class="policy-block-single">
+                        <div class="icon">
+                            <span class="ti-credit-card"></span>
+                        </div>
+                        <div class="text">
+                            <h3>Cod</h3>
+                            <p>Cash on Delivery</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="policy-block-single">
+                        <div class="icon">
+                            <span class="ti-gift"></span>
+                        </div>
+                        <div class="text">
+                            <h3>Free Gift Box</h3>
+                            <p>Buy a Gift</p>
+                        </div>
+                    </div>
+                </div-->
+                <div class="col-lg-6 col-sm-6">
+                    <div class="policy-block-single">
+                        <div class="icon">
+                            <span class="ti-headphone-alt"></span>
+                        </div>
+                        <div class="text">
+                            <h3>Soporte 24/7</h3>
+                            <p>Escribenos a cualquier hora</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="pt--50">
         <div class="container">
             <div class="row">
