@@ -57,7 +57,7 @@ class ReportController extends Controller {
         $this->merchantImport = $merchantImport;
         $this->auth = $auth;
         $this->cleanSearch = $cleanSearch;
-        $this->middleware('auth')->except(['index', 'getNearbyReports','getReportDetail','textSearch']);
+        $this->middleware('auth')->except(['index', 'getNearbyReports', 'getReportDetail', 'textSearch']);
     }
 
     /**
@@ -65,25 +65,28 @@ class ReportController extends Controller {
      *
      * @return Response
      */
-    public function index(Request $request, $category) {
+    public function index(Request $request, $category = "") {
         $request2 = $this->cleanSearch->handleReportExternal($request);
         if ($request2) {
             $category = Category::where('url', $category)->first();
-            $request2 = Request::create($request2->getRequestUri() . "&category_id=" . $category->id, 'GET');
-            $queryBuilder = new ReportQueryBuilder(new Report, $request2);
+            if ($category) {
+                $request2 = Request::create($request2->getRequestUri() . "&category_id=" . $category->id, 'GET');
+                $queryBuilder = new ReportQueryBuilder(new Report, $request2);
 //            DB::enableQueryLog();
-            $result = $queryBuilder->build()->paginate();
+                $result = $queryBuilder->build()->paginate();
 //            dd(DB::getQueryLog());
-            $merchants = [
-                'data' => $result->items(),
-                "total" => $result->total(),
-                "per_page" => $result->perPage(),
-                "page" => $result->currentPage(),
-                "last_page" => $result->lastPage(),
-                "category" => $category
-            ];
+                $merchants = [
+                    'data' => $result->items(),
+                    "total" => $result->total(),
+                    "per_page" => $result->perPage(),
+                    "page" => $result->currentPage(),
+                    "last_page" => $result->lastPage(),
+                    "category" => $category
+                ];
 //            dd($merchants['data'][0]->toArray());
-            return view(config("app.views") . '.reports.listing', ["reports" => $merchants]);
+                return view(config("app.views") . '.reports.listing', ["reports" => $merchants]);
+            }
+            abort(404);
         }
         $merchants = [
             'data' => [],
@@ -112,7 +115,7 @@ class ReportController extends Controller {
         $data['category'] = $category['id'];
         $data['type'] = "Report";
         $results = $this->editMapObject->getNearbyObjects($data);
-        
+
         $merchants = $results['data'];
 //        dd($merchants);
 //        dd(DB::getQueryLog());
@@ -126,6 +129,7 @@ class ReportController extends Controller {
 
         return view(config("app.views") . '.reports.listing', ["reports" => $results]);
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -133,9 +137,10 @@ class ReportController extends Controller {
      */
     public function getReportDetail($url) {
         $user = $this->auth->user();
-        $merchant = Report::where("slug",$url)->with(["files",'ratings'])->first();
+        $merchant = Report::where("slug", $url)->with(["files", 'ratings'])->first();
         return view(config("app.views") . '.reports.detail')->with('report', $merchant);
     }
+
     public function textSearch(Request $request) {
         $data = $request->all();
         $results = $this->editMapObject->textSearchReport($data);

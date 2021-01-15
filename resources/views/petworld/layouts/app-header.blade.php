@@ -5,12 +5,12 @@
                         <div class="container">
                             <div class="row align-items-center">
                                 <div class="col-sm-6 text-center text-sm-left">
-                                    <p class="font-weight-300">Bienvenido a Petworld</p>
+                                    <p style="color: white" class="font-weight-300">Todo para tu Mascota</p>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="header-top-nav right-nav">
                                         <div class="nav-item slide-down-wrapper" ng-show="shippingAddress">
-                                            <span></span><a class="slide-down--btn" href="javascript:;" ng-click="changeShippingHeader()" role="button">
+                                            <span></span><a class="slide-down--btn" style="color: white" href="javascript:;" ng-click="changeShippingHeader()" role="button">
                                                 @{{shippingAddress.address}}<i class="ion-ios-arrow-down"></i>
                                             </a>
                                         </div>

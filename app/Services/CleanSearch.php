@@ -471,7 +471,9 @@ class CleanSearch {
     private function cleanUrl($url,$type){
         $parsed = parse_url($url);
         $params = [];
-        parse_str($parsed['query'],$params );
+        if(isset($parsed['query'])){
+            parse_str($parsed['query'],$params );
+        }
         $columns = Schema::getColumnListing($type);
         if($type=="merchants" || $type=="reports"){
             array_push($columns,"favorites_id","owner_id","category_id","group_id","shared_id");

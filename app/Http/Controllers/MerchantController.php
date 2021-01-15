@@ -65,7 +65,7 @@ class MerchantController extends Controller {
      *
      * @return Response
      */
-    public function index(Request $request, $category) {
+    public function index(Request $request, $category="") {
         $request2 = $this->cleanSearch->handleMerchantExternal($request);
         if ($request2) {
             $category = Category::where('url', $category)->first();

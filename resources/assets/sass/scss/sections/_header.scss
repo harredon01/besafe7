@@ -11,8 +11,8 @@
     padding-top: 25px;
   }
   @include desktops {
-    padding-top: 30px;
-    padding-bottom: 30px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
 
@@ -416,9 +416,9 @@
 .header-nav-wrapper {
   .header-bottom-inner {
     @include desktops {
-      border-top: 1px solid #ececec;
+/*      border-top: 1px solid #ececec;
       border-left: 1px solid #ececec;
-      border-bottom: 1px solid #ececec;
+      border-bottom: 1px solid #ececec;*/
     }
   }
   >.container {
@@ -779,8 +779,8 @@ Category Navigation
   }
   @include desktops {
     padding: 9.5px 15px;
-    border-left: 1px solid #ececec;
-    border-right: 1px solid #ececec;
+/*    border-left: 1px solid #ececec;
+    border-right: 1px solid #ececec;*/
   } // @include large-desktops{
   //     padding: 12.5px 20px;
   //     border-left: 1px solid #ececec;

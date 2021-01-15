@@ -125,13 +125,16 @@ class EditProduct {
             foreach ($categories as $cat) {
                 $featured = DB::select(" "
                                 . "SELECT 
-            p.*
+            p.*,f.file
         FROM
             categorizables ca
                 JOIN
             products p ON p.id = ca.categorizable_id
+                LEFT JOIN
+            files f ON p.id = f.trigger_id
         WHERE
-            categorizable_type = 'App\\\Models\\\Product'
+            categorizable_type = 'App\\\Models\\\Product' 
+            AND f.type = 'App\\\Models\\\Product'
                 AND category_id = $cat->id AND p.isActive = true AND p.id in(select product_id from merchant_product where merchant_id = $value->id) limit 3");
                 $cat->featured = $featured;
             }

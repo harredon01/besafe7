@@ -1,5 +1,41 @@
 /* Shop Page */
 
+/*Panchis*/
+.clearfix{
+    overflow: auto;
+}
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.content-a{
+    padding: 25px;
+    
+}
+.shop-product-wrap{
+    h2{
+        padding: 5px 20px;
+        color: #56a700 !important;
+    }
+}
+
+.product-flex{
+   
+    
+    @include desktops{
+        display: flex;
+    }
+    @include mx-mobile-xs{
+        display: block;
+    }
+}
+
+/*Panchis*/
+
+
+
 .shop-page-section {
   &.section-padding {
     padding-top: 10px;
@@ -152,7 +188,7 @@
     &.product-type-list {
       .content {
         @include desktops {
-          width: 70%;
+          width: 100%;
         }
       }
       .hover-conents {
