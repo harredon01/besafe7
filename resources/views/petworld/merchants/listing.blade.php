@@ -3,7 +3,7 @@
 @section('content')
 <main class="section-padding shop-page-section"  ng-controller="MerchantsCtrl">
     <div class="container">
-        <div class="shop-toolbar mb--30">
+        <div class="shop-toolbar">
             <div class="row align-items-center">
                 <div class="col-5 col-md-3 col-lg-4">
                     <!-- Product View Mode -->
@@ -143,32 +143,43 @@
         <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
             <h2>Elige un proveedor</h2>
             <div class="col-lg-3 col-sm-6" ng-repeat="merchant in merchants">
-                <div class="pm-product product-type-list  ">
-                    <a href="javascript:;" ng-click="openItem(merchant)" class="image" tabindex="0">
-                        <img ng-src="@{{merchant.icon}}">
-                    </a>
+                <div class="pm-product product-type-list">
+                    
+                    <div class="content-a">
+                        <a style="text-align: center;" href="javascript:;" ng-click="openItem(merchant)" class="image" tabindex="0">
+                        <img ng-src="@{{merchant.icon}}" style="width: 60%">
+                        </a>
+                            <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
+                            <div class="price" >
+                                <span  ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
+                                <span  ng-if="merchant.telephone">Tel: <a style="color: #56a700 !important;" ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
+                                <span  ng-if="merchant.email">Email: <a style="color: #56a700 !important;" ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
+                            </div>
+                            <div class="price text-red" ng-if="merchant.unit_cost > 0">
+                                <span>costo promedio consulta: @{{ merchant.unit_cost | currency }}</span>
+                            </div>
+                            <div class="price" ng-if="merchant.Distance > 0">
+                                Distancia:<span style="color: red !important;"> @{{ merchant.Distance | number }} km</span>
+                            </div>
+                            <div class="btn-block d-flex">
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0">Tienda</a>
+                                <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
+                                
+                            </div>
+                            <div class="btn-options" ng-show="showStore">
+                                    <a href="/a/merchant/@{{ merchant.slug }}">Detalle Negocio</a>
+                            </div>
+                            <div class="btn-block grid-btn">
+                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
+                            </div>
+                    </div>
                     <div class="hover-conents">
                         <ul class="product-btns">
                             <li><a href="wishlist.html" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
                         </ul>
                     </div>
                     <div class="content">
-                        <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
-                        <div class="price" >
-                            <span class="text-primary" style="font-size:18px">@{{ merchant.activeCategory.tots}} productos de @{{ merchant.activeCategory.name}}</span><br/>
-                            <span ng-if="merchant.address">Direccion: @{{ merchant.address  }} </span><br/>
-                            <span ng-if="merchant.telephone">Tel: <a ng-href="tel:@{{ merchant.telephone  }}">@{{ merchant.telephone  }}</a> </span><br/>
-                            <span ng-if="merchant.email">Email: <a ng-href="mailto:@{{ merchant.email  }}">@{{ merchant.email  }}</a> </span><br/>
-                        </div>
-                        <div class="price text-red" ng-if="merchant.unit_cost > 0">
-                            <span>Costo promedio consulta: @{{ merchant.unit_cost | currency }}</span>
-                        </div>
-                        <div class="price" ng-if="merchant.Distance > 0">
-                            <span>Distancia: @{{ merchant.Distance | number }} km</span>
-                        </div>
-                        <div class="btn-block grid-btn">
-                            <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Tienda</a>
-                        </div>
+                       
                         <div class="card-list-content ">
                     
                             <div class="rating-widget mt--20" ng-if="merchant.rating">
@@ -180,16 +191,69 @@
                             </div>
                             <article>
                                 <h3 class="d-none sr-only">Article</h3>
-                                <p>@{{ merchant.description}}</p>
+                                <span class="text-primary" style="font-size:18px">@{{ merchant.activeCategory.tots}} Productos de @{{ merchant.activeCategory.name}}</span>
+                                
                                 
                             </article>
-                            <div class="btn-block d-flex">
-                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0">Tienda</a>
-                                <a href="/a/merchant/@{{ merchant.slug }}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
-                                <div class="btn-options" ng-show="showStore">
-                                    <a href="/a/merchant/@{{ merchant.slug }}">Detalle Negocio</a>
+                            
+                            
+                                <div class="product-flex">
+                                    <div class="col-lg-4 col-sm-12">
+                                   <div class="" id="prod-cont-189">
+                                            <a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="image" tabindex="0" style="text-align: center;">
+                                                <img ng-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg" alt="" src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg">
+                                            </a>
+                                            <div class="content">
+                                                <h3 class="font-weight-500"><a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="ng-binding">Hills Dog Adult Lamb &amp; Rice Sb</a></h3>
+
+                                                <div class="price text-red ng-hide" ng-show="product.activeVariant.is_on_sale" aria-hidden="true">
+                                                    <span class="old ng-binding">$69,600.00</span>
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                                <div class="price text-red" ng-hide="product.activeVariant.is_on_sale" aria-hidden="false">
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-12">
+                                   <div class="" id="prod-cont-189">
+                                            <a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="image" tabindex="0" style="text-align: center;">
+                                                <img ng-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg" alt="" src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg">
+                                            </a>
+                                            <div class="content">
+                                                <h3 class="font-weight-500"><a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="ng-binding">Hills Dog Adult Lamb &amp; Rice Sb</a></h3>
+
+                                                <div class="price text-red ng-hide" ng-show="product.activeVariant.is_on_sale" aria-hidden="true">
+                                                    <span class="old ng-binding">$69,600.00</span>
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                                <div class="price text-red" ng-hide="product.activeVariant.is_on_sale" aria-hidden="false">
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-12">
+                                        <div class="" id="prod-cont-189">
+                                            <a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="image" tabindex="0" style="text-align: center;">
+                                                <img ng-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg" alt="" src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/alimento-hills-c-adult-lamb-rice-sb-155lb.jpg">
+                                            </a>
+                                            <div class="content">
+                                                <h3 class="font-weight-500"><a href="/a/product-detail/hills-dog-adult-lamb-rice-sb?merchant_id=6" class="ng-binding">Hills Dog Adult Lamb &amp; Rice Sb</a></h3>
+
+                                                <div class="price text-red ng-hide" ng-show="product.activeVariant.is_on_sale" aria-hidden="true">
+                                                    <span class="old ng-binding">$69,600.00</span>
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                                <div class="price text-red" ng-hide="product.activeVariant.is_on_sale" aria-hidden="false">
+                                                    <span class="ng-binding">$69,600.00</span>
+                                                </div>
+                                            </div>
+                                        </div>    
+                                    </div>
                                 </div>
-                            </div>
+                                <p>@{{ merchant.description}}</p>
                         </div>
                     </div>
                 </div>

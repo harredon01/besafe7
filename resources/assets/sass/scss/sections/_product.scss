@@ -134,6 +134,7 @@
         padding: 0 !important;
         @include mobile {
             display: flex;
+            align-items: unset;
         }
         .onsale-badge {
             left: 15px;
@@ -149,11 +150,18 @@
                 padding-bottom: 0px;
             }
             @include tablet {
-                width: 260px;
+                width: 200px;
             }
-            img {
+            img{
+                @include desktops{
                 width: 100%;
+                }
+                @include mx-mobile-xs{
+                width: 70%;
+                }
             }
+            
+            
         }
         .content {
             overflow: unset;
@@ -162,7 +170,7 @@
                 padding-left: 20px;
             }
             @include mobile {
-                padding-top: 25px;
+             
                 width: 50%;
                 padding-right: 15px;
             }

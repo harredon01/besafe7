@@ -5,7 +5,7 @@
                         <div class="container">
                             <div class="row align-items-center">
                                 <div class="col-sm-6 text-center text-sm-left">
-                                    <p class="font-weight-300">Bienvenido a Petworld</p>
+                                    <p style="color: white" class="font-weight-300">Bienvenido a Petworld</p>
                                 </div>
                                 <div class="col-sm-6">
                                     <div class="header-top-nav right-nav">

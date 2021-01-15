@@ -256,7 +256,7 @@ h6 {
 }
 
 .bg-ash {
-  background-color: #0db0b2;
+  background-color: #f2f2f2;
 }
 
 .bg-gray {
@@ -6842,6 +6842,48 @@ h6 {
 ====> Sections Styles
 */
 /* Header Section */
+.menu {
+  position: absolute;
+  z-index: 3;
+  width: 100%;
+  background: repeating-linear-gradient(45deg, #fff, #fff 25px, #4aefaa 51px, #4aefaa 48px);
+}
+
+.menu .ca-logo ul {
+  display: flex;
+}
+
+.menu .ca-logo li {
+  margin: 0 15px;
+}
+
+.menu .menu-container {
+  align-items: baseline;
+  padding: 30px 0px;
+}
+
+.menu .ca-menu ul {
+  list-style: none;
+  display: flex;
+  float: right;
+}
+
+.menu .ca-menu ul li {
+  margin: 0 15px;
+}
+
+.menu .ca-menu ul li a {
+  color: #005c5e;
+  font-weight: 800;
+  font-family: 'Open Sans';
+  font-size: 18px;
+}
+
+.menu .ca-menu ul li a:hover {
+  color: #ff8e4f;
+  text-decoration: none;
+}
+
 .site-brand {
   padding-top: 20px;
 }
@@ -6861,8 +6903,8 @@ h6 {
 
 @media (min-width: 992px) {
   .site-brand {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 30px;
+    padding-bottom: 30px;
   }
 }
 
@@ -7313,9 +7355,9 @@ h6 {
 
 @media (min-width: 992px) {
   .header-nav-wrapper .header-bottom-inner {
-    /*      border-top: 1px solid #ececec;
-      border-left: 1px solid #ececec;
-      border-bottom: 1px solid #ececec;*/
+    border-top: 1px solid #ececec;
+    border-left: 1px solid #ececec;
+    border-bottom: 1px solid #ececec;
   }
 }
 
@@ -7684,8 +7726,8 @@ Category Navigation
 @media (min-width: 992px) {
   .cart-widget {
     padding: 9.5px 15px;
-    /*    border-left: 1px solid #ececec;
-    border-right: 1px solid #ececec;*/
+    border-left: 1px solid #ececec;
+    border-right: 1px solid #ececec;
   }
 }
 
@@ -9785,7 +9827,6 @@ Category Navigation
 @media (min-width: 480px) {
   .pm-product.product-type-list {
     display: flex;
-    align-items: unset;
   }
 }
 
@@ -9810,20 +9851,12 @@ Category Navigation
 
 @media (min-width: 768px) {
   .pm-product.product-type-list .image {
-    width: 200px;
+    width: 260px;
   }
 }
 
-@media (min-width: 992px) {
-  .pm-product.product-type-list .image img {
-    width: 100%;
-  }
-}
-
-@media (max-width: 479px) {
-  .pm-product.product-type-list .image img {
-    width: 70%;
-  }
+.pm-product.product-type-list .image img {
+  width: 100%;
 }
 
 .pm-product.product-type-list .content {
@@ -9839,6 +9872,7 @@ Category Navigation
 
 @media (min-width: 480px) {
   .pm-product.product-type-list .content {
+    padding-top: 25px;
     width: 50%;
     padding-right: 15px;
   }
@@ -10352,39 +10386,6 @@ ul.sidebar-filter-list li.active a:before, ul.sidebar-filter-list li:hover a:bef
 ====> Pages
 */
 /* Shop Page */
-/*Panchis*/
-.clearfix {
-  overflow: auto;
-}
-
-.clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
-.content-a {
-  padding: 25px;
-}
-
-.shop-product-wrap h2 {
-  padding: 5px 20px;
-  color: #56a700 !important;
-}
-
-@media (min-width: 992px) {
-  .product-flex {
-    display: flex;
-  }
-}
-
-@media (max-width: 479px) {
-  .product-flex {
-    display: block;
-  }
-}
-
-/*Panchis*/
 .shop-page-section.section-padding {
   padding-top: 10px;
   padding-bottom: 60px;
@@ -10547,7 +10548,7 @@ ul.sidebar-filter-list li.active a:before, ul.sidebar-filter-list li:hover a:bef
 
 @media (min-width: 992px) {
   .shop-product-wrap .pm-product.product-type-list .content {
-    width: 100%;
+    width: 70%;
   }
 }
 
@@ -15078,4 +15079,4 @@ p {
   color: #fff;
 }
 
-/*# sourceMappingURL=main.css.map */
+/*# sourceMappingURL=main2.css.map */
