@@ -62,7 +62,7 @@
 
         </div>
     </section>
-    <div class="container pt--50" id="shipping-info">
+    <div class="container pt--50 pb--50" id="shipping-info">
         <div class="policy-block border-four-column">
             <div class="row">
                 <div class="col-lg-6 col-sm-6">
@@ -112,11 +112,11 @@
             </div>
         </div>
     </div>
-    <section class="pt--50 space-db--30">
+    <section class="space-db--30">
         <h2 class="d-none">Promotion Block
         </h2> 
         <div class="container">
-            <div class="block-title">
+            <div class="block-title hide-responsive">
                 <h2>Encuentra en nuestras tiendas</h2>
             </div>
             <div class="row justify-content-center">

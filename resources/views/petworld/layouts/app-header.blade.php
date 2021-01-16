@@ -4,7 +4,7 @@
                     <div class="header-top bg-ash">
                         <div class="container">
                             <div class="row align-items-center">
-                                <div class="col-sm-6 text-center text-sm-left">
+                                <div class="col-sm-6 text-center text-sm-left hide-responsive">
                                     <p style="color: white" class="font-weight-300">Todo para tu Mascota</p>
                                 </div>
                                 <div class="col-sm-6">
@@ -35,7 +35,7 @@
                                     <form class="category-widget" ng-submit="search()">
                                         <input type="text" name="search" ng-model="searchText" placeholder="Buscar">
                                         <div class="search-form__group search-form__group--select">
-                                            <select name="category " id="searchCategory" ng-model="category" class="search-form__select nice-select">
+                                            <select name="category " id="searchCategory" ng-model="category" class="search-form__select nice-select hide-responsive">
                                                 <option value="">Categoria</option>
                                                 <optgroup label="Negocios">
                                                     <option value="merchants|0|list">Todos</option>
@@ -66,13 +66,14 @@
                                 <!-- Call Login & Track of Order -->
                                 <div class="col-lg-4 col-md-5 col-sm-8 order-2 order-md-3">
                                     <div class="header-widget-2 text-center text-sm-right ">
-                                        <div class="call-widget">
+                                        <div class="call-widget hide-responsive">
                                             <p><a href="tel:3103418432">Llamanos: <i class="icon ion-ios-telephone"></i><span class="font-weight-mid">+57-310
                                                         341 8432</span></a></p>
                                         </div>
                                         <ul class="header-links">
                                             <li ng-hide="true"><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
                                             <li ng-hide="user"><a href="/login"><i class="fas fa-user"></i> Ingresa</a></li>
+                                            <li ng-hide="false" class="show-responsive"><a href="tel:3103418432"><i class="icon ion-ios-telephone"></i> +57-310 341 8432</a></li>
                                             <li ng-show="user"><a href="{{ url('user/editProfile')}}"><i class="fas fa-user"></i> Hola @{{user.firstName}}  </a></li>
                                         </ul>
                                     </div>
