@@ -110,14 +110,14 @@
                     <div class="fixed-header sticky-init">
                         <div class="container">
                             <div class="row align-items-center">
-                                <div class="col-lg-3">
+                                <div class="col-lg-2">
                                     <!-- Sticky Logo Start -->
                                     <a class="sticky-logo" href="/">
                                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.png" alt="logo">
                                     </a>
                                     <!-- Sticky Logo End -->
                                 </div>
-                                <div class="col-lg-9"> 
+                                <div class="col-lg-10"> 
                                     <!-- Sticky Mainmenu Start -->
                                     {!!$sticky!!}
                                     <!-- Sticky Mainmenu End -->

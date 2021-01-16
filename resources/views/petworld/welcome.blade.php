@@ -2,7 +2,7 @@
 
 @section('content')
 <div ng-controller="HomeCtrl">
-    <section>
+    <section id="main-gallery">
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
              "autoplay": true,
              "autoplaySpeed": 6000,
@@ -62,7 +62,7 @@
 
         </div>
     </section>
-    <div class="container pt--50">
+    <div class="container pt--50" id="shipping-info">
         <div class="policy-block border-four-column">
             <div class="row">
                 <div class="col-lg-6 col-sm-6">
