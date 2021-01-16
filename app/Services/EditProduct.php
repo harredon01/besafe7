@@ -135,7 +135,7 @@ class EditProduct {
         WHERE
             categorizable_type = 'App\\\Models\\\Product' 
             AND f.type = 'App\\\Models\\\Product'
-                AND category_id = $cat->id AND p.isActive = true AND p.id in(select product_id from merchant_product where merchant_id = $value->id) limit 3");
+                AND category_id = $cat->id AND p.isActive = true AND p.id in(select product_id from merchant_product where merchant_id = $value->id) group by product.id limit 3");
                 $cat->featured = $featured;
             }
             $attributes = $value->attributes;
@@ -143,6 +143,10 @@ class EditProduct {
             $value->attributes = $attributes;
             $value->save();
         }
+    }
+    
+    public function migrateFiles(){
+        $files = FileM::where("name","like","https://gohife.s3.us-east-2.amazonaws.com/public/pets-")->get();
     }
 
     public function textSearch($data) {

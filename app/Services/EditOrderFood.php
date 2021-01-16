@@ -151,8 +151,12 @@ class EditOrderFood {
         $doShipping = false;
         $variants = [];
         foreach ($items as $item) {
-            $data = json_decode($item->attributes, true);
-            $item->attributes = $data;
+            if(is_string($item->attributes)){
+                $data = json_decode($item->attributes, true);
+                $item->attributes = $data; 
+            } else {
+                $data = $item->attributes; 
+            }
             if($item->product_variant_id){
                 array_push($variants,["id"=>$item->product_variant_id,"quantity"=>$item->quantity]);
             }

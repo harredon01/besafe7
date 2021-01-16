@@ -10,7 +10,7 @@
              "dots": true
              }'
              >
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-todo.jpg">
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-todo.webp">
                 <div class="container position-relative">
                     <div class="row">
                         <div class="col-lg-6">
@@ -25,7 +25,7 @@
                 </div>
                 <span class="herobanner-progress"></span>
             </div>
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-veterinarios.jpg">
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-veterinarios.webp">
                 <div class="container position-relative">
                     <div class="row">
                         <div class="col-lg-6">
@@ -42,7 +42,7 @@
                 </div>
                 <span class="herobanner-progress"></span>
             </div>
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-nuevos-miembros.jpg">
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-nuevos-miembros.webp">
                 <div class="container position-relative">
                     <div class="row">
                         <div class="col-lg-6">
@@ -122,20 +122,20 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-perros">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp" class="lazyload" alt="">
                     </a>
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-gatos">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gato-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gato-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-gatos" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_gato-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_gato-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
             </div>
@@ -153,20 +153,20 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" ng-click="goTo('merchant-nearby', $event, true)" href="/a/merchants/urgencias">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/urgencias-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event, true)" href="/a/merchants/consultas">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/veternarias-cerca.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/veternarias-cerca.webp" class="lazyload" alt="">
                     </a>
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/vacunacion">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/vacunacion-clean.png" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/vacunacion-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.jpg" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.webp" class="lazyload" alt="">
                     </a>
                 </div>
             </div>
@@ -450,7 +450,7 @@
         </h2>
         <div class="container">
             <a class="promo-image overflow-image" href="/a/reports/adopcion" ng-click="goTo('report-nearby', $event, true)">
-                <img class="lazyload" data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/adoptame-largo.jpg" alt="">
+                <img class="lazyload" data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/adoptame-largo.webp" alt="">
             </a>
         </div>
     </section>
