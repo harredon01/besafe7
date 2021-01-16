@@ -8,7 +8,7 @@
     <div class="container">
         <div class="shop-toolbar">
             <div class="row align-items-center">
-                <div class="col-5 col-md-3 col-lg-4">
+                <div class="col-5 col-md-3 col-lg-4 hide-responsive">
                     <!-- Product View Mode -->
                     <div class="product-view-mode">
                         <a href="#" class="sortting-btn active" data-target="list "><i class="fas fa-list"></i></a>

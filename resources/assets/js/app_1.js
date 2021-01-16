@@ -18,15 +18,15 @@ app.config(function () {
         angular.element(document).ready(function () {
             let screenWidth = window.innerWidth;
             console.log("Screen width: ", screenWidth);
-            let url = window.location.href;
-            if (screenWidth < 450) {
-                setTimeout(function () {
-                    var old = $location.hash();
-                    $location.hash('mobile-anchor');
-                    $anchorScroll();
-                    $location.hash(old);
-                }, 1500);
-            }
+//            let url = window.location.href;
+//            if (screenWidth < 450) {
+//                setTimeout(function () {
+//                    var old = $location.hash();
+//                    $location.hash('mobile-anchor');
+//                    $anchorScroll();
+//                    $location.hash(old);
+//                }, 1500);
+//            }
 
         });
         handleCartCookie();

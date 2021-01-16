@@ -14,9 +14,9 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-xl-9 order-lg-2 mb--40">
-                <div class="shop-toolbar mb--10">
+                <div class="shop-toolbar">
                     <div class="row align-items-center">
-                        <div class="col-5 col-md-3 col-lg-4">
+                        <div class="col-5 col-md-3 col-lg-4 hide-responsive">
                             <!-- Product View Mode -->
                             <div class="product-view-mode">
                                 <a href="#" class="sortting-btn active" data-target="list "><i class="fas fa-list"></i></a>
@@ -26,9 +26,9 @@
                         <div class="col-12 col-md-9 col-lg-7 offset-lg-1 mt-3 mt-md-0  pr-md-0">
                             <div class="sorting-selection">
                                 <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
-                                    <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
+                                    <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end" style="display: none;">
 
-                                        <span style="display: none;">Sort By:</span>
+                                        <span >Sort By:</span>
                                         <select id="input-sort" class="form-control nice-select sort-select" style="display: none;">
                                             <option value="" selected="selected">Default Sorting</option>
                                             <option value="">Sort
@@ -247,19 +247,19 @@
     <div class="container">
         <div class='row'>
             <div class="col-lg-8 col-xl-9 order-lg-2 mb--40">
-                <div class="shop-toolbar mb--30">
+                <div class="shop-toolbar">
                     <div class="row align-items-center">
-                        <div class="col-5 col-md-3 col-lg-4">
+                        <div class="col-5 col-md-3 col-lg-4 hide-responsive">
                             <!-- Product View Mode -->
                             <div class="product-view-mode">
                                 <a href="#" class="sortting-btn active" data-target="list "><i class="fas fa-list"></i></a>
                                 <a href="#"  class="sortting-btn" data-target="grid"><i class="fas fa-th"></i></a>
                             </div>
                         </div>
-                        <div class="col-12 col-md-9 col-lg-7 offset-lg-1 mt-3 mt-md-0  pr-md-0">
+                        <div class="col-12 col-md-9 col-lg-7 offset-lg-1 mt-md-0  pr-md-0">
                             <div class="sorting-selection">
                                 <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
-                                    <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
+                                    <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end" style="display: none;">
 
                                         <span style="display: none;">Sort By:</span>
                                         <select id="input-sort" class="form-control nice-select sort-select" style="display: none;">
@@ -282,7 +282,7 @@
                                                 By:Model (Z - A)</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
+                                    <div class="col-md-5 col-xl-12 col-sm-6 text-sm-right mt-sm-0">
                                         <span>
                                             Mostrando @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + local_total}} de @{{total}} resultados
                                         </span>
