@@ -453,14 +453,20 @@
         });
 
     });
-    setTimeout(function () {
-        var head = document.getElementsByTagName('head')[0]
-        var script = document.createElement('script')
-        script.type = 'text/javascript';
-        script.src = 'https://www.google.com/recaptcha/api.js?render=6LcZVAYaAAAAAEk3rv7Ol3yD3VNFhlREWI24AbKQ'
-        head.appendChild(script);
-    }, 800);
-
+    var isActiveRecaptcha = false;
+    document.getElementById("main-body").onscroll = function() {myFunction()};
+                                                function myFunction() {
+                                                    if(isActiveRecaptcha==false){
+                                                        console.log("Activating captcha");
+                                                        isActiveRecaptcha=true;
+                                                        var head = document.getElementsByTagName('head')[0]
+                                                        var script = document.createElement('script');
+                                                        script.type = 'text/javascript';
+                                                        script.src = 'https://www.google.com/recaptcha/api.js?render=6LcZVAYaAAAAAEk3rv7Ol3yD3VNFhlREWI24AbKQ'
+                                                        head.appendChild(script);
+                                                    }
+                                                }
+    
 
 
 

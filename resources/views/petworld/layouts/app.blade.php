@@ -3,7 +3,7 @@
     <head>
         @include(config("app.views").'.layouts.app-head')
     </head>
-    <body>
+    <body id="main-body">
         <div id="fb-root"></div>
         
         <div class="site-wrapper">
