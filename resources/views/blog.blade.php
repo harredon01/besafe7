@@ -1,5 +1,5 @@
 @extends('layouts.fitmeal')
-
+ 
 @section('content')
 <header class="page-header">
                 <div class="container"> <span class="ltx-before"></span>
