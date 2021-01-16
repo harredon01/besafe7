@@ -6,7 +6,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">               
                 @if (isset($following))
-
+ 
 
                 <div class="panel-heading">Siguiendo a {{ $following->firstName }} {{ $following->lastName }}</div>
 
