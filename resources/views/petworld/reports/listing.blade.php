@@ -41,7 +41,7 @@
                                         By:Model (Z - A)</option>
                                 </select>
                             </div>
-                            <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
+                            <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0">
                                 <span>
                                     Showing @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + reports.length}} of @{{total}} results
                                 </span>

@@ -1,6 +1,9 @@
 @extends('petworld.layouts.app')
 
 @section('content')
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
 <div ng-controller="HomeCtrl">
     <section id="main-gallery">
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
@@ -62,7 +65,7 @@
 
         </div>
     </section>
-    <div class="container pt--50" id="shipping-info">
+    <div class="container pt--50 pb--50" id="shipping-info">
         <div class="policy-block border-four-column">
             <div class="row">
                 <div class="col-lg-6 col-sm-6">
@@ -112,17 +115,17 @@
             </div>
         </div>
     </div>
-    <section class="pt--50 space-db--30">
+    <section class="space-db--30">
         <h2 class="d-none">Promotion Block
         </h2> 
         <div class="container">
-            <div class="block-title">
+            <div class="block-title hide-responsive">
                 <h2>Encuentra en nuestras tiendas</h2>
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" class="lazyload" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">

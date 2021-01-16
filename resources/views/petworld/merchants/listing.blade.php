@@ -15,7 +15,7 @@
                         <a href="#"  class="sortting-btn" data-target="grid"><i class="fas fa-th"></i></a>
                     </div>
                 </div>
-                <div class="col-12 col-md-9 col-lg-7 offset-lg-1 mt-3 mt-md-0  pr-md-0">
+                <div class="col-12 col-md-9 col-lg-7 offset-lg-1 mt-md-0  pr-md-0">
                     <div class="sorting-selection">
                         <div class="row align-items-center pl-md-0 pr-md-0 no-gutters">
                             <div class="col-sm-6 col-md-7 col-xl-8 d-flex align-items-center justify-content-md-end">
@@ -41,7 +41,7 @@
                                         By:Model (Z - A)</option>
                                 </select>
                             </div>
-                            <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0 mt-3">
+                            <div class="col-md-5 col-xl-4 col-sm-6 text-sm-right mt-sm-0">
                                 <span>
                                     Showing @{{((current - 1) * per_page) + 1}}–@{{((current - 1) * per_page) + merchants.length}} of @{{total}} results
                                 </span>
@@ -144,7 +144,7 @@
                             @endforeach
                             </div>
                             <div class="shop-product-wrap list with-pagination row border grid-four-column  mr-0 ml-0 no-gutters">
-                                <h2>Elige un proveedor</h2>
+                                <h2 class="hide-responsive">Elige un proveedor</h2>
                                 <div class="col-lg-3 col-sm-6" ng-repeat="merchant in merchants">
                                     <div class="pm-product product-type-list">
 

@@ -1,6 +1,9 @@
 @extends('petworld.layouts.app')
 
 @section('content')
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
 <div ng-controller="HomeCtrl">
     <section id="main-gallery">
         <div class=" petmark-slick-slider  home-slider dot-position-1" data-slick-setting='{
@@ -122,7 +125,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" class="lazyload" alt="">
+                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
