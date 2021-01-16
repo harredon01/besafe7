@@ -135,18 +135,34 @@ class EditProduct {
         WHERE
             categorizable_type = 'App\\\Models\\\Product' 
             AND f.type = 'App\\\Models\\\Product'
-                AND category_id = $cat->id AND p.isActive = true AND p.id in(select product_id from merchant_product where merchant_id = $value->id) group by product.id limit 3");
+                AND category_id = $cat->id AND p.isActive = true AND p.id in(select product_id from merchant_product where merchant_id = $value->id) group by p.id order by p.isFeatured desc limit 3");
                 $cat->featured = $featured;
             }
             $attributes = $value->attributes;
-            $attributes['categories'] = $categories;
+            $attributes['categories'] = $categories; 
             $value->attributes = $attributes;
             $value->save();
         }
     }
     
     public function migrateFiles(){
-        $files = FileM::where("name","like","https://gohife.s3.us-east-2.amazonaws.com/public/pets-")->get();
+        $files = FileM::where("file","like","%gohife\/public\/pets-%")->get();
+        //dd(DB::getQueryLog());
+        foreach ($files as $file) {
+            if(substr($file->file, -4)==".jpg"){
+                $file->file = substr($file->file, 0, -4).".webp";
+                $file->save();
+            } else if(substr($file->file, -4)==".png"){
+                $file->file = substr($file->file, 0, -4).".webp";
+                $file->save();
+            } else if(substr($file->file, -5)==".jpeg"){
+                $file->file = substr($file->file, 0, -5).".webp";
+                $file->save();
+            } else if(substr($file->file, -4)==".JPG"){
+                $file->file = substr($file->file, 0, -4).".webp";
+                $file->save();
+            }
+        }
     }
 
     public function textSearch($data) {

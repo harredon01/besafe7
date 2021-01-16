@@ -197,7 +197,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event, false)"><img data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/14/Artboard-7.jpg" class="lazyload" alt=""></a>
+                                    <a href="/a/product-detail/collar-hojas-verdes?merchant_id=14" ng-click="goTo('merchant-coverage', $event, false)"><img data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/14/Artboard-7.webp" class="lazyload" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -218,7 +218,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/DNindoorcat_rev-600x600.png" alt=""></a>
+                                    <a href="/a/product-detail/diamond-naturals-cat-indoor?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/DNindoorcat_rev-600x600.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -242,7 +242,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/5/ziu.JPG" alt=""></a>
+                                    <a href="/a/product-detail/cama-ziu?merchant_id=5" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/5/ziu.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -265,7 +265,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/ARENA-FOFI-CAT-OPCION-2-1.jpg" alt=""></a>
+                                    <a href="/a/product-detail/arena-fofi-cat?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/ARENA-FOFI-CAT-OPCION-2-1.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -286,7 +286,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/10/galico.JPG" alt=""></a>
+                                    <a href="/a/product-detail/galico?merchant_id=10" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/10/galico.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -310,7 +310,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/comida-perro-hills-adult-sensitive-stomach-skin-4lb-2.jpg" alt=""></a>
+                                    <a href="/a/product-detail/hills-dog-adult-sensitive-stomach-skin?merchant_id=6" ng-click="goTo('merchant-coverage', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/6/comida-perro-hills-adult-sensitive-stomach-skin-4lb-2.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -332,7 +332,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/consultageneral.jpg" alt=""></a>
+                                    <a href="/a/product-detail/consulta-general?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/consultageneral.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -353,7 +353,7 @@
                         <div class="single-slide">
                             <div class="pm-product">
                                 <div class="image">
-                                    <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/vacperrdom.jpg" alt=""></a>
+                                    <a href="/a/product-detail/refuerzo-anual-canino-basico?merchant_id=13" ng-click="goTo('merchant-list', $event, false)"><img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/12/vacperrdom.webp" alt=""></a>
                                     <div class="hover-conents">
                                         <ul class="product-btns">
                                             <li><a href="wishlist.html"><i class="ion-ios-heart-outline"></i></a></li>
@@ -391,7 +391,7 @@
                         <div class="single-slide">
                             <div class="pm-product product-type-list">
                                 <a href="/a/product-detail/cita-a-domicilio?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="image">
-                                    <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/cita-vet.jpg" alt="">
+                                    <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/cita-vet.webp" alt="">
                                 </a>
                                 <div class="content">
                                     <h3>Cita a domicilio</h3>
@@ -415,7 +415,7 @@
                         <div class="single-slide">
                             <div class="pm-product product-type-list">
                                 <a href="/a/product-detail/refuerzo-anual-gatos-adultos?merchant_id=7" ng-click="goTo('merchant-coverage', $event, false)" class="image">
-                                    <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/vacgatdom.jpg" alt="">
+                                    <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/7/vacgatdom.webp" alt="">
                                 </a>
                                 <div class="content">
                                     <h3>Refuerzo anual gatos adultos</h3>

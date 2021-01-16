@@ -26,7 +26,7 @@
                                 <div class="col-lg-3 col-md-12 col-sm-4">
                                     <div class="site-brand  text-center text-lg-left">
                                         <a href="/" class="brand-image">
-                                            <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.png" alt="">
+                                            <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.webp" alt="">
                                         </a>
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@
                                 <div class="col-lg-2">
                                     <!-- Sticky Logo Start -->
                                     <a class="sticky-logo" href="/">
-                                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.png" alt="logo">
+                                        <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.webp" alt="logo">
                                     </a>
                                     <!-- Sticky Logo End -->
                                 </div>
