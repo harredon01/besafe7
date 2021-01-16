@@ -200,12 +200,15 @@
                                                 <div class="product-flex" ng-show="merchant.activeCategory.tots">
                                                     <div class="col-lg-4 col-sm-12" ng-repeat="product in merchant.activeCategory.featured">
                                                         <div class="" id="prod-cont-@{{product.id}}">
-                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}" class="image" tabindex="0" style="text-align: center;">
+                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.categorizable_id}}" ng-show="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;">
+                                                                <img ng-src="@{{product.file}}">
+                                                            </a>
+                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}" ng-hide="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;">
                                                                 <img ng-src="@{{product.file}}">
                                                             </a>
                                                             <div class="content">
-                                                                <h3 class="font-weight-500"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}" class="ng-binding">@{{product.name}}</a></h3>
-
+                                                                <h3 class="font-weight-500" ng-show="merchant.categorizable_id"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.categorizable_id}}"  class="ng-binding">@{{product.name}}</a></h3>
+                                                                <h3 class="font-weight-500" ng-hide="merchant.categorizable_id"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}"  class="ng-binding">@{{product.name}}</a></h3>
                                                                 <div class="price text-red" ng-hide="product.activeVariant.is_on_sale" aria-hidden="false">
                                                                     <span class="ng-binding">Desde: @{{product.low | currency}}</span>
                                                                 </div>
