@@ -106,7 +106,7 @@
                 </div>
             </footer>
 
-        <script src="/js/all.js?v=1.0.0.4"></script>
-<script src="/js/plugins2.js?v=1.0.0.4" async></script>
+        <script src="/js/all.js?v=1.0.0.5"></script>
+<script src="/js/plugins2.js?v=1.0.0.5" async></script>
   <script src="/js/lazysizes.min.js" async></script>
         
