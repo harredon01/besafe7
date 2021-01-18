@@ -23,7 +23,7 @@
                         <div class="container">
                             <div class="row align-items-center justify-content-center">
                                 <!-- Template Logo -->
-                                <div class="col-lg-3 col-md-12 col-sm-4">
+                                <div class="col-lg-3 col-md-12 col-sm-4 hide-responsive">
                                     <div class="site-brand  text-center text-lg-left">
                                         <a href="/" class="brand-image">
                                             <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.webp" alt="">
@@ -31,7 +31,7 @@
                                     </div>
                                 </div>
                                 <!-- Category With Search -->
-                                <div class="col-lg-5 col-md-7 order-3 order-md-2" ng-controller="SearchCtrl">
+                                <div class="col-lg-5 col-md-7 order-3 order-md-2" ng-controller="SearchCtrl" ng-show="searchVisible">
                                     <form class="category-widget" ng-submit="search()">
                                         <input type="text" name="search" ng-model="searchText" placeholder="Buscar">
                                         <div class="search-form__group search-form__group--select">
@@ -74,6 +74,7 @@
                                             <li ng-hide="true"><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
                                             <li ng-hide="user"><a href="/login"><i class="fas fa-user"></i> Ingresa</a></li>
                                             <li ng-hide="false" class="show-responsive"><a href="tel:3103418432"><i class="icon ion-ios-telephone"></i> +57-310 341 8432</a></li>
+                                            <li ng-hide="false" class="show-responsive" style="font-size: 17px;margin-right: 0px;"><a href="javascript:;" ng-click="showSearch()"><i class="icon ion-search"></i></a></li>
                                             <li ng-show="user"><a href="{{ url('user/editProfile')}}"><i class="fas fa-user"></i> Hola @{{user.firstName}}  </a></li>
                                         </ul>
                                     </div>
@@ -91,6 +92,13 @@
                                 <!-- Main Menu -->
                                 <div class="col-lg-10 d-none d-lg-block">
                                     {!!$menu!!}
+                                </div>
+                                <div class="col-lg-3 col-5 offset-3 col-md-12 col-sm-4 show-responsive" style="z-index: 9999" onclick="window.location.href='/'">
+                                    <div class="">
+                                        <a href="/">
+                                            <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/main-logo2.webp" alt="">
+                                        </a>
+                                    </div>
                                 </div>
                                 <!-- Cart block-->
                                 @include(config("app.views").'.products.cart')

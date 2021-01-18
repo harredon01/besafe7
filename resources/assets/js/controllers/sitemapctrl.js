@@ -70,6 +70,14 @@
                 $scope.category = "products|0|coverage";
                 $scope.searchText = "";
                 $scope.showError = false;
+                $scope.searchVisible = false;
+                $rootScope.$on('showSearch', function () {
+                    if ($scope.searchVisible) {
+                        $scope.searchVisible = false;
+                    } else {
+                        $scope.searchVisible = true;
+                    }
+                });
 
                 angular.element(document).ready(function () {
                     let params;

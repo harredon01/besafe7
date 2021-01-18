@@ -5,77 +5,89 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Login</div>
+                <div class="panel-heading">Ingreso</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
-                        {{ csrf_field() }}
+                    <div class="col-md-4 col-md-offset-1">
+                        <br/>
+                        <h3 class="text">Bienvenido a nuestra comunidad</h3>
+                        <br/>
+                        <button class="btn btn-dark" onclick="window.location.href = '/register';" >
+                            Registrate 
+                        </button>
+                        <br/>
+                        <br/>
+                        <p>O ingresa seguro y olvidate de contraseñas con: <br/></p>
+                        <br/>
+                        <button class="btn btn-primary" onclick="window.location.href = '/login/facebook';" >
+                            Facebook<i class="fas fa-facebook"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="window.location.href = '/login/google';" >
+                            Google<i class="fas fa-google"></i>
+                        </button>
+                        <br/>
+                        <br/>
+                    </div>
+                    <div class="col-md-4 col-md-offset-1">
+                        
+                        <br/>
+                        <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">
+                            {{ csrf_field() }}
+                            
+                            <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                                <p>Ya tienes cuenta???</p>
+                                <label for="email" class=" control-label">E-Mail</label>
 
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">E-Mail Address</label>
+                                <div  >
+                                    <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
 
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-
-                                @if ($errors->has('email'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('email') }}</strong>
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class="col-md-4 control-label">Password</label>
-
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control" name="password" required>
-
-                                @if ($errors->has('password'))
-                                <span class="help-block">
-                                    <strong>{{ $errors->first('password') }}</strong>
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : ''}}> Recordarme
-                                    </label>
+                                    @if ($errors->has('email'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('email') }}</strong>
+                                    </span>
+                                    @endif
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
-                                    Login
-                                </button>
+                            <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                                <label for="password" class="control-label">Contraseña</label>
 
-                                <a class="btn btn-link" href="{{ url('/password/reset') }}">
-                                    Olvidaste tu clave?
-                                </a>
-                            </div>
-                            <br/>
-                            <div class="col-md-8 col-md-offset-4">
+                                <div>
+                                    <input id="password" type="password" class="form-control" name="password" required>
 
-                                <a class="btn btn-link" href="{{ url('/register') }}">
-                                    Registro tradicional
-                                </a>
+                                    @if ($errors->has('password'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('password') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
                             </div>
 
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-6">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : ''}}> Recordarme
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-8 col-md-offset-6">
+                                    <button type="submit" class="btn btn-primary">
+                                        Login
+                                    </button>
+<br/>
+                                    <a class="btn btn-link" href="{{ url('/password/reset') }}">
+                                        Olvidaste tu clave?
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
                     <div class="col-md-8 col-md-offset-4">
-                        O ingresa seguro y olvidate de contraseñas con: <br/>
-                        <button class="btn btn-primary" onclick="window.location.href='/login/facebook';" >
-                            Login Facebook
-                        </button>
-                        <button class="btn btn-danger" onclick="window.location.href='/login/google';" >
-                            Login Google
-                        </button>
+
                     </div>
                 </div>
             </div>

@@ -19,14 +19,9 @@ app.config(function () {
             let screenWidth = window.innerWidth;
             console.log("Screen width: ", screenWidth);
 //            let url = window.location.href;
-//            if (screenWidth < 450) {
-//                setTimeout(function () {
-//                    var old = $location.hash();
-//                    $location.hash('mobile-anchor');
-//                    $anchorScroll();
-//                    $location.hash(old);
-//                }, 1500);
-//            }
+            if (screenWidth > 500) {
+                $rootScope.showSearch()
+            }
 
         });
         handleCartCookie();
@@ -103,6 +98,10 @@ app.config(function () {
         $rootScope.changeShippingHeader = function () {
             console.log("changeShippingHeader");
             $rootScope.$broadcast('updateShippingAddress');
+        }
+        $rootScope.showSearch = function () {
+            console.log("showSearch");
+            $rootScope.$broadcast('showSearch');
         }
 
 

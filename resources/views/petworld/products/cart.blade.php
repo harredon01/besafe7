@@ -1,15 +1,25 @@
-<div class="col-lg-2 col-6 offset-6 offset-md-0 col-md-3 order-3" ng-controller="CartCtrl">
+<div class="col-lg-2 col-6 offset-6 offset-md-0 col-md-3 order-3  mini-cart" ng-controller="CartCtrl">
     <div class="cart-widget-wrapper slide-down-wrapper">
         <div class="cart-widget slide-down--btn">
-            <div class="cart-icon">
+            <div class="cart-icon show-responsive" style="padding-right: 0;margin-right: 0">
+                
+                
+                
+                <i class="ion-bag" style="font-size: 19px;position:absolute;top:-5px"></i>
+                <strong style="font-size: 13px"><span class="amount"><span class="currencySymbol"></span>@{{subtotal | currency}}</span></strong>
+                <span class="cart-count-badge" style="top:0;float: right">
+                    @{{items.length}}
+                </span>
+            </div>
+            <div class="cart-icon hide-responsive">
                 <i class="ion-bag"></i>
                 <span class="cart-count-badge">
                     @{{items.length}}
                 </span>
             </div>
-            <div class="cart-text">
+            <div class="cart-text hide-responsive">
                 <span class="d-block">Carrito</span>
-                <strong><span class="amount"><span class="currencySymbol"></span>@{{subtotal | currency}}</span></strong>
+                
             </div>
         </div>
         <div class="slide-down--item ">

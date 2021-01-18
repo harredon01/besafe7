@@ -20,6 +20,7 @@ class CreateCategoriesTable extends Migration {
                         $table->string('level')->nullable();
                         $table->string('icon')->nullable();
                         $table->string('description')->nullable();
+                        $table->text('keywords')->nullable();
                         $table->integer('parent_id')->unsigned()->nullable();
                         $table->index('parent_id');
                         $table->boolean('isActive');

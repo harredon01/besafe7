@@ -67,7 +67,7 @@
     .show-responsive{
         display:none;
     }
-    @media screen and (max-width: 600px){
+    @media screen and (max-width: 500px){
         #main-gallery,#shipping-info{
             display: none;
         }
@@ -106,6 +106,10 @@
         }
         .category-widget input {
             height: 42px;
+        }
+        .mini-cart{
+            margin-left: 0;
+            max-width: 31%;
         }
                 
     }
