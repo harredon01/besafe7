@@ -153,7 +153,7 @@
                                                 <img ng-src="@{{merchant.icon}}" style="width: 60%">
                                             </a>
                                             <h3 class="font-weight-500"><a href="javascript:;" ng-click="openItem(merchant)" >@{{ merchant.name}}</a></h3>
-                                            <div class="price" >
+                                            <div class="price" ng-show="merchant.activeCategory" >
                                                 <span  ng-if="merchant.address">Direccion: @{{ merchant.address}} </span><br/>
                                                 <span  ng-if="merchant.telephone">Tel: <a style="color: #56a700 !important;" ng-href="tel:@{{ merchant.telephone}}">@{{ merchant.telephone}}</a> </span><br/>
                                                 <span  ng-if="merchant.email">Email: <a style="color: #56a700 !important;" ng-href="mailto:@{{ merchant.email}}">@{{ merchant.email}}</a> </span><br/>
@@ -191,7 +191,7 @@
                                                 </div>
                                                 <article ng-show="merchant.activeCategory.tots">
                                                     <h3 class="d-none sr-only">Article</h3>
-                                                    
+
 
 
                                                 </article>
@@ -210,16 +210,24 @@
                                                                 <h3 class="font-weight-500" ng-show="merchant.categorizable_id"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.categorizable_id}}"  class="ng-binding">@{{product.name}}</a></h3>
                                                                 <h3 class="font-weight-500" ng-hide="merchant.categorizable_id"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}"  class="ng-binding">@{{product.name}}</a></h3>
                                                                 <div class="price text-red" ng-hide="product.activeVariant.is_on_sale" aria-hidden="false">
-                                                                    <span class="ng-binding">Desde: @{{product.low | currency}}</span>
+                                                                    <span class="ng-binding">Desde: @{{product.low| currency}}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    
+
                                                 </div>
                                                 <a href="javascript:;" ng-click="openItem(merchant)" style="font-size:18px;float: right"><span class="text-primary" >Ver todos (@{{ merchant.activeCategory.tots}}) </span></a>
                                                 <div style="clear:both"></div>
-                                                <p>@{{ merchant.description}}</p>
+                                                <p ng-show="merchant.activeCategory.tots">@{{ merchant.description}}</p>
+                                                <div ng-hide="merchant.activeCategory">
+                                                    <div class="price" >
+                                                        <span  ng-if="merchant.address">Direccion: @{{ merchant.address}} </span><br/>
+                                                        <span  ng-if="merchant.telephone">Tel: <a style="color: #56a700 !important;" ng-href="tel:@{{ merchant.telephone}}">@{{ merchant.telephone}}</a> </span><br/>
+                                                        <span  ng-if="merchant.email">Email: <a style="color: #56a700 !important;" ng-href="mailto:@{{ merchant.email}}">@{{ merchant.email}}</a> </span><br/>
+                                                        <p>@{{ merchant.description}}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

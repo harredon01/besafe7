@@ -6,13 +6,17 @@
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">               
                 
-                <div class="panel-heading"></div>
+                <div class="panel-heading"><h3>Donde está tu peludito?</h3></div>
                       
 
                 <div class="panel-body">
-                    <h3>En donde te encuentras?</h3>
-                    <p>Tu ubicacion se usa para determinar si te encuentras en cobertura y mostrarte los resultados mas cerca a ti primero. </p>
-                    <p style="display:none">@{{error}}</p>
+                    
+                    <div>
+                        <img style="display: block;margin:0 auto;" src="https://gohife.s3.us-east-2.amazonaws.com/public/dog-map2.jpg"/>
+                    </div>
+                    
+                    <p>Para saber que productos y servicios podemos ofrecerte necesitamos saber donde los vas a recibir.</p>
+                    <p>Si el pin está en tu ubicacion correcta haz click en guardar. De lo contrario arrastra el pin hasta el lugar correcto</p>
                     <button ng-click="saveLocation()" class="btn btn-primary">Guardar</button>
                     <button ng-click="cancel()" class="btn btn-primary">Cancelar</button>
                     <div id="map" data-tap-disabled="true"></div>

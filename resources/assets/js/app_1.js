@@ -15,6 +15,7 @@ app.config(function () {
 //    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //    $http.defaults.headers.common['X-XSRF-TOKEN'] = Laravel.csrfToken;
         console.log("Searching for user");
+        $rootScope.loader = false;
         angular.element(document).ready(function () {
             let screenWidth = window.innerWidth;
             console.log("Screen width: ", screenWidth);

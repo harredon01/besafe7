@@ -316,7 +316,12 @@
                                     <div class="price text-red" ng-hide="product.activeVariant.is_on_sale">
                                         <span>@{{product.activeVariant.price| currency}}</span>
                                     </div>
-
+                                    <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && ! user">
+                                            <span>Agrega al carrito y luego selecciona fecha y hora al pagar</span>
+                                        </div>
+                                        <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' &&  user">
+                                            <span>Agrega al carrito y luego selecciona fecha y hora.</span>
+                                        </div>
                                     <div class="btn-block grid-btn" ng-hide="product.item_id">
                                         <div class="price text-red" ng-show="product.activeVariant.is_on_sale">
                                             <span class="old">@{{product.activeVariant.price| currency}}</span>
@@ -325,6 +330,7 @@
                                         <div class="price text-red" ng-hide="product.activeVariant.is_on_sale">
                                             <span>@{{product.activeVariant.price| currency}}</span>
                                         </div>
+                                        
                                         <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
                                             <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
                                         </select>

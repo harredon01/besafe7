@@ -91,8 +91,55 @@ class Adwords {
         $string = file_get_contents($KEY_FILE_LOCATION);
         $this->clientData = json_decode($string, true);
         //$this->authentication();
-        $this->initializeKeywordPlan();
+        $keywords = $this->getKeywords();
+        $this->initializeKeywordPlan($keywords);
         //Eccomerce
+    }
+
+    public function getKeywords() {
+        $keywords = [];
+        $categories = Category::all();
+        foreach ($categories as $cat) {
+            $keywords = $this->addIfNew($keywords, explode(",", $cat->keywords));
+        }
+        $categories = Merchant::all();
+        foreach ($categories as $cat) {
+            $keywords = $this->addIfNew($keywords, explode(",", $cat->keywords));
+        }
+        $categories = Product::all();
+        foreach ($categories as $cat) {
+            $p_kws = array_merge([$cat->name], explode(",", $cat->keywords));
+            $keywords = $this->addIfNew($keywords, $p_kws);
+        }
+        return $keywords;
+    }
+
+    private function addIfNew($keywords, $targets) {
+        foreach ($targets as $target) {
+            $target = trim($target);
+            if ($target) {
+                echo "has length";
+                echo "Checking";
+                $target = str_replace("(", "", $target);
+                $target = str_replace(")", "", $target);
+                $target = str_replace("+", "", $target);
+                $target = str_replace("–", "", $target);
+                $target = str_replace(",", "", $target);
+                $found = false;
+                foreach ($keywords as $keyword) {
+
+                    if ($keyword['text'] == $target) {
+                        echo "Found Match for " . $target;
+                        $found = true;
+                        break;
+                    }
+                }
+                if (!$found) {
+                    array_push($keywords, ["text" => $target]);
+                }
+            }
+        }
+        return $keywords;
     }
 
     /**
@@ -164,7 +211,7 @@ EOD;
         print PHP_EOL . $propertiesToCopy;
     }
 
-    private function initializeKeywordPlan() {
+    private function initializeKeywordPlan($keywords) {
         /*
           2170 Colombia
           1003652	Envigado
@@ -200,11 +247,11 @@ EOD;
                 ->fromFile()
                 ->withOAuth2Credential($oAuth2Credential)
                 ->build();
-        $keywords = [
-            ['text' => 'veterinario'],
-            ['text' => 'comida para perro'],
-            ['text' => 'comida para gato'],
-        ];
+//        $keywords = [
+//            ['text' => 'veterinario'],
+//            ['text' => 'comida para perro'],
+//            ['text' => 'comida para gato'],
+//        ];
         $finalKeywordResults = [];
         $bids = [1000000, 2000000, 10000000];
         $locations = ["2170", "1003659", "1003654", "1003668"];
@@ -275,9 +322,8 @@ EOD;
                     );
                     exit(1);
                 }
-                $finalKeywordResults = array_merge($finalKeywordResults,$keywordResults['keywords']);
+                $finalKeywordResults = array_merge($finalKeywordResults, $keywordResults['keywords']);
             }
-            
         }
 
 
@@ -605,70 +651,93 @@ EOD;
         foreach ($generateHistoricMetricsResponse->getMetrics() as $forecast) {
             /** @var KeywordPlanKeywordForecast $forecast */
             $metrics = $forecast->getKeywordMetrics();
-            printf(
-                    "%d) Keyword: %s%s",
-                    ++$i,
-                    $keywordPlan['keywords'][$counter]['text'],
-                    PHP_EOL
-            );
-            $res = $forecast->getSearchQuery();
-            $resArray = explode("/", $res);
-            $keywordPlan['keywords'][$counter]['historic_id'] = $res;
-            $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
-            $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
-            $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
-            $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
-            $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
-            $counter++;
-            $keywordPlan['keywords'][$counter]['historic_id'] = $res;
-            $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
-            $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
-            $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
-            $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
-            $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
-            $counter++;
-            $keywordPlan['keywords'][$counter]['historic_id'] = $res;
-            $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
-            $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
-            $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
-            $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
-            $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
-            printf(
-                    "Estimated getMonthlySearchVolumes: %s%s",
-                    is_null($keywordPlan['keywords'][$counter]['historic_avg_srch']) ? 'null' : sprintf("%.2f", $keywordPlan['keywords'][$counter]['historic_avg_srch']),
-                    PHP_EOL
-            );
-            $searchResultsMonths = $metrics->getMonthlySearchVolumes();
-            $months = [];
-            foreach ($searchResultsMonths as $value) {
-                array_push($months, ["month" => $value->getYear() . "-" . $value->getMonth(), "total" => $value->getMonthlySearches()]);
+            if ($metrics) {
+                printf(
+                        "%d) Keyword: %s%s",
+                        ++$i,
+                        $keywordPlan['keywords'][$counter]['text'],
+                        PHP_EOL
+                );
+                $res = $forecast->getSearchQuery();
+                $resArray = explode("/", $res);
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
+                $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
+                $counter++;
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
+                $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
+                $counter++;
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = $metrics->getAvgMonthlySearches();
+                $keywordPlan['keywords'][$counter]['historic_competition'] = $metrics->getCompetition();
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = $metrics->getCompetitionIndex();
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = $metrics->getLowTopOfPageBidMicros();
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = $metrics->getHighTopOfPageBidMicros();
+                printf(
+                        "Estimated getMonthlySearchVolumes: %s%s",
+                        is_null($keywordPlan['keywords'][$counter]['historic_avg_srch']) ? 'null' : sprintf("%.2f", $keywordPlan['keywords'][$counter]['historic_avg_srch']),
+                        PHP_EOL
+                );
+                $searchResultsMonths = $metrics->getMonthlySearchVolumes();
+                $months = [];
+                foreach ($searchResultsMonths as $value) {
+                    array_push($months, ["month" => $value->getYear() . "-" . $value->getMonth(), "total" => $value->getMonthlySearches()]);
+                }
+                //$keywordPlan['keywords'][$counter]['historic']['month_srch_vol']=$months;
+
+                printf(
+                        "Estimated Competition: %s%s",
+                        is_null($keywordPlan['keywords'][$counter]['historic_competition']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_competition'],
+                        PHP_EOL
+                );
+
+                printf(
+                        "Estimated visits per $100: %s%s",
+                        is_null($keywordPlan['keywords'][$counter]['historic_competition_index']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_competition_index'],
+                        PHP_EOL
+                );
+
+                printf(
+                        "Estimated LowTopOfPageBidMicros: %s%s",
+                        is_null($keywordPlan['keywords'][$counter]['historic_low_top_of_page']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_low_top_of_page'],
+                        PHP_EOL
+                );
+
+                printf(
+                        "Estimated getHighTopOfPageBidMicros: %s%s",
+                        is_null($keywordPlan['keywords'][$counter]['historic_high_top_of_page']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_high_top_of_page'],
+                        PHP_EOL
+                );
+                $counter++;
+            } else {
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = "";
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = "";
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = "";
+                $counter++;
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = "";
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = "";
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] = "";
+                $counter++;
+                $keywordPlan['keywords'][$counter]['historic_id'] = $res;
+                $keywordPlan['keywords'][$counter]['historic_avg_srch'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition'] = "";
+                $keywordPlan['keywords'][$counter]['historic_competition_index'] = "";
+                $keywordPlan['keywords'][$counter]['historic_low_top_of_page'] = "";
+                $keywordPlan['keywords'][$counter]['historic_high_top_of_page'] ="";
             }
-            //$keywordPlan['keywords'][$counter]['historic']['month_srch_vol']=$months;
-
-            printf(
-                    "Estimated Competition: %s%s",
-                    is_null($keywordPlan['keywords'][$counter]['historic_competition']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_competition'],
-                    PHP_EOL
-            );
-
-            printf(
-                    "Estimated visits per $100: %s%s",
-                    is_null($keywordPlan['keywords'][$counter]['historic_competition_index']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_competition_index'],
-                    PHP_EOL
-            );
-
-            printf(
-                    "Estimated LowTopOfPageBidMicros: %s%s",
-                    is_null($keywordPlan['keywords'][$counter]['historic_low_top_of_page']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_low_top_of_page'],
-                    PHP_EOL
-            );
-
-            printf(
-                    "Estimated getHighTopOfPageBidMicros: %s%s",
-                    is_null($keywordPlan['keywords'][$counter]['historic_high_top_of_page']) ? 'null' : $keywordPlan['keywords'][$counter]['historic_high_top_of_page'],
-                    PHP_EOL
-            );
-            $counter++;
         }
         $generateForecastMetricsResponse = $keywordPlanServiceClient->generateForecastMetrics(
                 ResourceNames::forKeywordPlan($customerId, $planId)
@@ -706,12 +775,12 @@ EOD;
                     is_null($metrics->getAverageCpc()) ? 'null' : $keywordPlan['keywords'][$counter]['forecast_cpc'],
                     PHP_EOL
             );
-            if($metrics->getAverageCpc() > 0){
+            if ($metrics->getAverageCpc() > 0) {
                 $keywordPlan['keywords'][$counter]['forecast_hundred'] = 100 / ($metrics->getAverageCpc() / 1000000);
             } else {
                 $keywordPlan['keywords'][$counter]['forecast_hundred'] = 0;
             }
-            
+
             printf(
                     "Estimated visits per $100: %s%s",
                     is_null($metrics->getAverageCpc()) ? 'null' : $keywordPlan['keywords'][$counter]['forecast_hundred'],

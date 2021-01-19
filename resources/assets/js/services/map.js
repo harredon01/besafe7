@@ -14,7 +14,8 @@ angular.module('besafe')
                     mapOptions = {
                         center: myLatlng,
                         zoom: 12,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                        mapTypeId: google.maps.MapTypeId.ROADMAP,
+                        gestureHandling: "cooperative"
                     };
                     if (document.getElementById("map")) {
                         $rootScope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -86,6 +87,7 @@ angular.module('besafe')
                         draggable: true,
                     });
                     google.maps.event.addListener(marker, 'dragend', function () {
+                        $rootScope.loader = true;
                         let location = marker.getPosition();
                         setCenterMap(location.lat(), location.lng());
                         getAddressAndPostal(location.lat(), location.lng(), 1);
@@ -316,19 +318,20 @@ angular.module('besafe')
                 };
                 var postMapLocation = function () {
                     $rootScope.map.addListener('dblclick', function (e) {
+                        console.log("Map double click");
                         var location = e.latLng;
                         $rootScope.locationMarker.setPosition(location);
                         google.maps.event.trigger($rootScope.locationMarker, 'dragend');
                         setCenterMap(location.lat(), location.lng());
                         getAddressAndPostal(location.lat(), location.lng(), 1);
                     });
-                    $rootScope.map.addListener('click', function (e) {
+                    /*$rootScope.map.addListener('click', function (e) {
                         var location = e.latLng;
                         $rootScope.locationMarker.setPosition(location);
                         google.maps.event.trigger($rootScope.locationMarker, 'dragend');
                         setCenterMap(location.lat(), location.lng());
                         getAddressAndPostal(location.lat(), location.lng(), 1);
-                    });
+                    });*/
                 };
 
                 var decodeAddressFromLatResult = function (results) {
@@ -431,8 +434,9 @@ angular.module('besafe')
                                     } else {
                                         $rootScope.shippingAddress = container;
                                     }
-                                    
+                                    $rootScope.loader = false;
                                 } else {
+                                    $rootScope.loader = false;
                                     let container = {
                                         address: decodeAddressFromLatResult(resp),
                                         postal: decodePostalFromLatResult(resp),
@@ -463,6 +467,7 @@ angular.module('besafe')
                                         $rootScope.shippingAddress = container;
                                     });
                         } else {
+                            $rootScope.loader = false;
                             console.log("Attempts", attempts);
                             if (attempts < 8) {
                                 attempts++;
