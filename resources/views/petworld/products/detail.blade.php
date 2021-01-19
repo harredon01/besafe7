@@ -12,13 +12,13 @@
                     <div class="image-block">
                         <!-- Zoomable IMage -->
                         @if(count($data["product"]["files"])>0)
-                        <img class="lazyload" data-src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
+                        <img class="lazyload" id="zoom_03" data-src="{{$data["product"]["files"][0]['file']}}" data-zoom-image="{{$data["product"]["files"][0]['file']}}" alt=""/>
 
                         <!-- Product Gallery with Slick Slider -->
-                        <div>
+                        <div id="product-view-gallery" class="elevate-gallery">
                             <!-- Slick Single -->
                             @foreach ($data["product"]["files"] as $file)
-                            <a href="#" class="gallary-item" data-image="{{$file['file']}}"
+                            <a href="#" class="gallary-item col-3" data-image="{{$file['file']}}"
                                data-zoom-image="{{$file['file']}}">
                                 <img data-src="{{$file['file']}}" class="lazyload" width="250" alt=""/>
                             </a>
@@ -31,7 +31,7 @@
                     <div class="description-block">
                         <div class="header-block">
                             <h3>{{$data["product"]['name']}}</h3>
-                            <div class="navigation">
+                            <div class="navigation" style="display:none">
                                 <a href="#"><i class="ion-ios-arrow-back"></i></a>
                                 <a href="#"><i class="ion-ios-arrow-forward"></i></a>
                             </div>
@@ -57,13 +57,6 @@
                         <p class="price" ng-show="product.activeVariant.is_on_sale"><span class="old-price">@{{product.activeVariant.price| currency}}</span>@{{product.activeVariant.sale| currency}}</p>
 
                         <p class="price" ng-hide="product.activeVariant.is_on_sale">@{{product.activeVariant.price| currency}}</p>
-
-                        <!-- Blog Short Description -->
-                        <div class="product-short-para">
-                            <p>
-                                {!! $data["product"]['description'] !!}
-                            </p>
-                        </div>
                         <div class="status">
                             <i class="fas fa-check-circle"></i>@{{product.activeVariant.quantity}} En inventario
                         </div>
@@ -76,9 +69,16 @@
                                 <input type="number" ng-model="product.quantity" class="form-control text-center" value="1">
                             </div>
                             <div class="btn-block" id="prod-cont-@{{product.id}}">
-                                <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-rounded btn-outlined--primary">Agregar al carrito</a>
+                                <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-rounded btn-outlined--primary">Comprar</a>
                             </div>
                         </form>
+                        <!-- Blog Short Description -->
+                        <div class="product-short-para">
+                            <p>
+                                {!! $data["product"]['description'] !!}
+                            </p>
+                        </div>
+                        
                         <!-- Wishlist And Compare -->
                         <div class="btn-options" style="display:none">
                             <a href="wishlist.html"><i class="ion-ios-heart-outline"></i>Add to Wishlist</a>
