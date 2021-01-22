@@ -24,6 +24,8 @@ class ArrayMultipleSheetImport implements WithMultipleSheets, SkipsUnknownSheets
             'ratings' => new ArrayImport(),
             'polygons' => new ArrayImport(),
             'quick' => new ArrayImport(),
+            'new-merchants' => new ArrayImport(),
+            'new-availabilities' => new ArrayImport(),
             'new-products' => new ArrayImport(),
             'new-variants' => new ArrayImport(),
         ];

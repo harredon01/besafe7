@@ -481,37 +481,37 @@
 
                 <div class="single-slide">
                     <a href="/a/merchant/amadera-colombia/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/amadera-col.jpg" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/amadera-col.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/la-mascota-que-rie/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/la_mascota_que_rie.JPG" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/la_mascota_que_rie.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/mini-me-mascotas/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/mini-me.jpg" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/mini-me.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/vetivet-clinica-veterinaria/products" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/vetivet.JPG" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/vetivet.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/feroz/products" ng-click="goTo('merchant-coverage', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/feroz.png" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/feroz.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/aviomar-pets-relocation" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/aviomar.png" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/aviomar.webp" alt="">
                     </a>
                 </div>
                 <div class="single-slide">
                     <a href="/a/merchant/mision-canina-colombia" ng-click="goTo('merchant-list', $event, false)" class="overflow-image brand-image">
-                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/logo_mision_canina.png" alt="">
+                        <img class="lazyload" data-src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/logo_mision_canina.webp" alt="">
                     </a>
                 </div>
             </div>

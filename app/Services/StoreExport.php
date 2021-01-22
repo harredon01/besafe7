@@ -245,7 +245,7 @@ class StoreExport {
         });
     }
 
-    public function exportOrdersClient(User $user,$merchant_id, $startDate, $endDate) {
+    public function exportOrdersClient(User $user, $merchant_id, $startDate, $endDate) {
         $pages = [
             ["name" => "Summary", "rows" => []],
             ["name" => "Detail", "rows" => []],
@@ -269,7 +269,7 @@ class StoreExport {
             if ($processed == $count) {
                 array_unshift($pages[0]['rows'], array_keys($merchantResults['orders_fast'][0]));
                 array_unshift($pages[1]['rows'], array_keys($merchantResults['orders_full'][0]));
-                $this->writeFile2($user,$pages, "Productos-Descarga-Completa" . time(), true);
+                $this->writeFile2($user, $pages, "Productos-Descarga-Completa" . time(), true);
             }
         });
     }
@@ -346,7 +346,7 @@ class StoreExport {
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], array_keys($product->toArray()));
                     array_unshift($pages[1]['rows'], $variantsHead);
-                    $this->writeFile2($user,$pages, "Productos-Descarga-Completass" . time(), true);
+                    $this->writeFile2($user, $pages, "Productos-Descarga-Completass" . time(), true);
                 }
             }
         });
@@ -391,7 +391,7 @@ class StoreExport {
                 echo $processed . PHP_EOL;
                 if ($processed == $count) {
                     array_unshift($pages[0]['rows'], $tableHeader);
-                    $this->writeFile2($user,$pages, "Productos-Descarga-rapida-" . time(), true);
+                    $this->writeFile2($user, $pages, "Productos-Descarga-rapida-" . time(), true);
                 }
             }
         });
@@ -496,7 +496,7 @@ class StoreExport {
                 if ($processed == $count) {
                     //dd($pages);
                     array_unshift($pages[0]['rows'], array_keys($availability->toArray()));
-                    $this->writeFile2($user,$pages, "Disponibilidad-" . time(), true);
+                    $this->writeFile2($user, $pages, "Disponibilidad-" . time(), true);
                 }
             }
         });
@@ -524,10 +524,14 @@ class StoreExport {
                 $this->importPolygonsInternal($user, $value);
             } else if ($key == 'quick') {
                 $this->importProductsQuickExcelInternal($user, $value);
-            } else if ($key == 'new-products') {
-                $productsMap = $this->importNewProductsExcelInternal($user, $value);
+            } else if ($key == 'new-merchants') {
+                $productsMap = $this->importMerchantsExcelInternal($user, $value, $productsMap);
             } else if ($key == 'new-variants') {
-                $this->importNewProductVariantsExcelInternal($user, $value, $productsMap);
+                $this->importMerchantsAvailabilitiesExcelInternal($user, $value, $productsMap);
+            } else if ($key == 'new-products') {
+                $productsMap = $this->importProductsExcelInternal($user, $value, $productsMap);
+            } else if ($key == 'new-variants') {
+                $this->importProductVariantsExcelInternal($user, $value, $productsMap);
             }
         }
         if ($clean) {
@@ -547,8 +551,8 @@ class StoreExport {
             return $path;
         }
     }
-    
-    public function writeFile2($user,$data, $title, $sendMail) {
+
+    public function writeFile2($user, $data, $title, $sendMail) {
         //dd($data);
         $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
         $path = 'exports/' . $title . ".xls";
@@ -1104,7 +1108,7 @@ class StoreExport {
         return $summary;
     }
 
-    public function importMerchantsExcelInternal(User $user, array $row) {
+    public function importMerchantsExcelInternal(User $user, array $row, $objectsMap = null) {
 
         $headers = $row[0];
         foreach ($row as $item) {
@@ -1114,11 +1118,19 @@ class StoreExport {
             }
 
             if ($sheet['name']) {
-                $test = Merchant::find($sheet['id']);
-                $id = $sheet['id'];
-                if (!$test) {
+                $id = null;
+                if ($objectsMap) {
+                    $id = $sheet['id'];
                     unset($sheet['id']);
+                } else {
+                    $test = Merchant::find($sheet['id']);
+
+                    if (!$test) {
+                        $id = $sheet['id'];
+                        unset($sheet['id']);
+                    }
                 }
+
                 $categoriesData = explode(",", $sheet['categories']);
                 unset($sheet['categories']);
                 $image = $sheet['icon'];
@@ -1169,6 +1181,9 @@ class StoreExport {
                     $merchant->icon = 'https://picsum.photos/900/350';
                 }
                 $merchant->save();
+                if ($id) {
+                    array_push($objectsMap['products'], ["sheet_id" => $id, "created_id" => $merchant->id]);
+                }
             }
         }
     }
@@ -1336,14 +1351,21 @@ class StoreExport {
         }
     }
 
-    public function importMerchantsAvailabilitiesExcelInternal(User $user, array $row) {
+    public function importMerchantsAvailabilitiesExcelInternal(User $user, array $row,$objectsMap = null) {
         $headers = $row[0];
+
         foreach ($row as $item) {
             $sheet = null;
             foreach ($item as $key => $value) {
                 $sheet[$headers[$key]] = $value;
             }
             if ($sheet['from'] && $sheet['from'] != 'from') {
+                if ($objectsMap) {
+                    $result = $this->getIdFromMap($objectsMap, 'merchants', $sheet['object_id']);
+                    if ($result) {
+                        $sheet['object_id'] = $result;
+                    }
+                }
                 $availability = Availability::find($sheet['id']);
                 if (!$availability) {
                     unset($sheet['id']);
@@ -1353,7 +1375,7 @@ class StoreExport {
         }
     }
 
-    public function importProductsExcelInternal(User $user, array $row) {
+    public function importProductsExcelInternal(User $user, array $row, $objectsMap = null) {
         $headers = $row[0];
         foreach ($row as $item) {
             $sheet = null;
@@ -1364,6 +1386,12 @@ class StoreExport {
             }
             if ($sheet['name'] && $sheet['name'] != 'name') {
                 $product = null;
+                $product_id = null;
+                $isnew = true;
+                if ($objectsMap) {
+                    $product_id = $sheet['id'];
+                    unset($sheet['id']);
+                }
                 if (isset($sheet['id'])) {
                     $product = Product::find($sheet['id']);
                 }
@@ -1372,11 +1400,19 @@ class StoreExport {
                 $merchantsData = explode(",", $sheet['merchant_id']);
                 $result = [];
                 if ($product) {
+                    $isnew = false;
                     $result = $this->editProduct->checkAccessProduct($user, $sheet["id"]);
                 } else {
+                    unset($sheet['id']);
                     $product = new Product();
                     foreach ($merchantsData as $k => $item) {
-
+                        if ($objectsMap) {
+                            $result = $this->getIdFromMap($objectsMap, 'merchants', $item);
+                            if ($result) {
+                                $merchantsData[$k] = $result;
+                                $item = $result;
+                            }
+                        }
                         $result = $this->editProduct->checkAccessAdminMerchant($user, $item);
                         if ($result['access'] == false) {
                             unset($merchantsData[$k]);
@@ -1390,6 +1426,9 @@ class StoreExport {
                 $product->fill($sheet);
                 $product->slug = $this->slug_url($product->name);
                 $product->save();
+                if ($product_id) {
+                    array_push($objectsMap['products'], ["sheet_id" => $product_id, "created_id" => $product->id]);
+                }
 
                 if ($categoriesData) {
                     DB::table('categorizables')->where('categorizable_id', $product->id)->where('categorizable_type', "App\\Models\\Product")->delete();
@@ -1441,89 +1480,7 @@ class StoreExport {
         }
     }
 
-    public function importNewProductsExcelInternal(User $user, array $row) {
-        $headers = $row[0];
-        $productsMap = [];
-        foreach ($row as $item) {
-            $sheet = null;
-            foreach ($item as $key => $value) {
-                if ($headers[$key]) {
-                    $sheet[$headers[$key]] = $value;
-                }
-            }
-            if ($sheet['name'] && $sheet['name'] != 'name') {
-                $image = $sheet['imagen'];
-                $product_id = $sheet['id'];
-                $merchantsData = explode(",", $sheet['merchant_id']);
-                $result = [];
-                $product = new Product();
-                foreach ($merchantsData as $k => $item) {
-                    $result = $this->editProduct->checkAccessAdminMerchant($user, $item);
-                    if ($result['access'] == false) {
-                        unset($merchantsData[$k]);
-                    }
-                }
-                unset($sheet['merchant_id']);
-                unset($sheet['id']);
-                unset($sheet['imagen']);
-                $categoriesData = explode(",", $sheet['categories']);
-                unset($sheet['categories']);
-                $product->fill($sheet);
-                $product->slug = $this->slug_url($product->name);
-                $product->save();
-                array_push($productsMap, ["sheet_id" => $product_id, "created_id" => $product->id]);
-
-                if ($categoriesData) {
-                    DB::table('categorizables')->where('categorizable_id', $product->id)->where('categorizable_type', "App\\Models\\Product")->delete();
-                    $categories = Category::whereIn('id', $categoriesData)->get();
-                    foreach ($categories as $item) {
-                        $product->categories()->save($item);
-                    }
-                }
-                if ($merchantsData) {
-                    DB::table('merchant_product')->where('product_id', $product->id)->delete();
-                    $merchants = Merchant::whereIn('id', $merchantsData)->get();
-                    foreach ($merchants as $item) {
-                        $product->merchants()->save($item);
-                    }
-                }
-                if ($image) {
-                    $files = explode(",", $image);
-                    foreach ($files as $value) {
-                        $imageData = explode(".", $value);
-                        $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $merchantsData[0] . '/' . $value;
-                        $ext = $imageData[count($imageData) - 1];
-                        $file = FileM::where("trigger_id", $product->id)->where("file", $image)->first();
-                        if (!$file) {
-                            FileM::create([
-                                'user_id' => $user->id,
-                                'trigger_id' => $product->id,
-                                'file' => $image,
-                                'extension' => $ext,
-                                'type' => 'App\Models\Product'
-                            ]);
-                        }
-                    }
-                } else {
-                    $image = 'https://picsum.photos/600/350';
-                    $ext = 'jpg';
-                    $file = FileM::where("trigger_id", $product->id)->where("file", $image)->where("extension", $ext)->first();
-                    if (!$file) {
-                        FileM::create([
-                            'user_id' => $user->id,
-                            'trigger_id' => $product->id,
-                            'file' => $image,
-                            'extension' => $ext,
-                            'type' => 'App\Models\Product'
-                        ]);
-                    }
-                }
-            }
-        }
-        return $productsMap;
-    }
-
-    public function importProductVariantsExcelInternal(User $user, $row) {
+    public function importProductVariantsExcelInternal(User $user, $row, $newObjects = null) {
         $headers = $row[0];
         foreach ($row as $item) {
             $sheet = null;
@@ -1531,7 +1488,13 @@ class StoreExport {
                 $sheet[$headers[$key]] = $value;
             }
             if ($sheet['sku'] && $sheet['sku'] != 'sku') {
-                $variant = ProductVariant::find($sheet['id']);
+                $variant = null;
+                if ($newObjects) {
+                    $sheet['product_id'] = $this->getIdFromMap($newObjects, "products", $sheet['product_id']);
+                } else {
+                    $variant = ProductVariant::find($sheet['id']);
+                }
+
                 if (!$variant) {
                     unset($sheet['id']);
                 }
@@ -1551,39 +1514,15 @@ class StoreExport {
         }
     }
 
-    private function getIdFromMap($productsMap, $product_id) {
-        foreach ($productsMap as $value) {
-            if ($value['sheet_id'] == $product_id) {
-                return $value['created_id'];
-            }
-        }
-        return null;
-    }
-
-    public function importNewProductVariantsExcelInternal(User $user, $row, $productsMap) {
-        $headers = $row[0];
-        foreach ($row as $item) {
-            $sheet = null;
-            foreach ($item as $key => $value) {
-                $sheet[$headers[$key]] = $value;
-            }
-            if ($sheet['sku'] && $sheet['sku'] != 'sku') {
-                $sheet['product_id'] = $this->getIdFromMap($productsMap, $sheet['product_id']);
-                unset($sheet['id']);
-                $attributes = $sheet['attributes'];
-                unset($sheet['attributes']);
-                $results = $this->editProduct->createOrUpdateVariant($user, $sheet);
-                if ($results['status'] == 'success') {
-                    if ($attributes) {
-                        $variant = $results['variant'];
-                        $variant->attributes = $attributes;
-                        $variant->save();
-                    }
-                } else {
-                    dd($results);
+    private function getIdFromMap($objectsMap, $type, $product_id) {
+        if (isset($objectsMap[$type])) {
+            foreach ($objectsMap[$type] as $value) {
+                if ($value['sheet_id'] == $product_id) {
+                    return $value['created_id'];
                 }
             }
         }
+        return null;
     }
 
     public function importProductsQuickExcelInternal(User $user, array $row) {
