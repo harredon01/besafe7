@@ -6,6 +6,10 @@ use App\Models\Merchant;
 use App\Models\Category;
 use App\Models\Availability;
 use App\Models\Report;
+use App\Models\Address;
+use App\Models\City;
+use App\Models\CoveragePolygon;
+use Grimzy\LaravelMysqlSpatial\Types\MultiPolygon;
 use App\Imports\ArrayMultipleSheetImport;
 use App\Models\Delivery;
 use App\Models\FileM;
@@ -504,7 +508,10 @@ class StoreExport {
 
     public function importGlobalExcel(User $user, $filename, $clean) {
         $reader = Excel::toArray(new ArrayMultipleSheetImport, $filename);
-        $productsMap = [];
+        $productsMap = [
+            'merchants' => [],
+            'products' => []
+        ];
         foreach ($reader as $key => $value) {
             if ($key == 'merchants') {
                 $this->importMerchantsExcelInternal($user, $value);
@@ -526,7 +533,7 @@ class StoreExport {
                 $this->importProductsQuickExcelInternal($user, $value);
             } else if ($key == 'new-merchants') {
                 $productsMap = $this->importMerchantsExcelInternal($user, $value, $productsMap);
-            } else if ($key == 'new-variants') {
+            } else if ($key == 'new-availabilities') {
                 $this->importMerchantsAvailabilitiesExcelInternal($user, $value, $productsMap);
             } else if ($key == 'new-products') {
                 $productsMap = $this->importProductsExcelInternal($user, $value, $productsMap);
@@ -536,6 +543,52 @@ class StoreExport {
         }
         if ($clean) {
             Storage::delete($filename);
+        }
+    }
+
+    public function importPolygonsInternal(array $row) {
+        $headers = $row[0];
+        foreach ($row as $item) {
+            $sheet = null;
+            foreach ($item as $key => $value) {
+                $sheet[$headers[$key]] = $value;
+            }
+            if ($sheet['merchant_id'] && $sheet['merchant_id'] != 'merchant_id') {
+                $cpolygon = new CoveragePolygon;
+                $cpolygon->fill($sheet);
+                $coordPoints = json_decode($cpolygon->coverage, true);
+                if (is_array($coordPoints)) {
+                    $totalPoints = [];
+                    foreach ($coordPoints as $coordPoint) {
+                        $pointArray = [$coordPoint['lng'], $coordPoint['lat']];
+                        array_push($totalPoints, $pointArray);
+                    }
+                    $result = [
+                        "type" => "MultiPolygon",
+                        "coordinates" =>
+                        [[$totalPoints]]
+                    ];
+                    $mp = MultiPolygon::fromJson(json_encode($result));
+                    $cpolygon->geometry = $mp;
+                    $cpolygon->save();
+                }
+            }
+        }
+
+        $polys = CoveragePolygon::where('provider', 'MerchantShipping')->with('merchant')->get();
+        foreach ($polys as $pol) {
+            $merchant = $pol->merchant;
+            $attrs = $merchant->attributes;
+            if (isset($attrs['shipping'])) {
+                foreach ($attrs['shipping'] as $key => $value) {
+                    if ($value['id'] < 0) {
+                        $attrs['shipping'][$key]['id'] = $pol->id;
+                        break;
+                    }
+                }
+            }
+            $merchant->attributes = $attrs;
+            $merchant->save();
         }
     }
 
@@ -1117,7 +1170,7 @@ class StoreExport {
                 $sheet[$headers[$key]] = $value;
             }
 
-            if ($sheet['name']) {
+            if ($sheet['name'] && $sheet['name'] != 'name') {
                 $id = null;
                 if ($objectsMap) {
                     $id = $sheet['id'];
@@ -1144,7 +1197,7 @@ class StoreExport {
                         array_push($shipping, ['id' => -1, "price" => $envio1]);
                     }
                 } else {
-                    dd($sheet);
+//                    dd($sheet);
                 }
                 if (isset($sheet['envio2'])) {
                     $envio1 = $sheet['envio2'];
@@ -1174,6 +1227,15 @@ class StoreExport {
                     if (strpos($image, "https://") !== false) {
                         
                     } else {
+                        if (substr($image, -4) == ".jpg") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        } else if (substr($image, -4) == ".png") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        } else if (substr($image, -5) == ".jpeg") {
+                            $image = substr($image, 0, -5) . ".webp";
+                        } else if (substr($image, -4) == ".JPG") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        }
                         $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-merchants/' . $image;
                     }
                     $merchant->icon = $image;
@@ -1182,10 +1244,88 @@ class StoreExport {
                 }
                 $merchant->save();
                 if ($id) {
-                    array_push($objectsMap['products'], ["sheet_id" => $id, "created_id" => $merchant->id]);
+                    array_push($objectsMap['merchants'], ["sheet_id" => $id, "created_id" => $merchant->id]);
+                    $this->createShippingData($user, $merchant);
                 }
             }
         }
+        return $objectsMap;
+    }
+
+    private function createShippingData($user,$merchant) {
+        $data_address = [
+            "lat" => $merchant->lat,
+            "long" => $merchant->long,
+            "city_id" => $merchant->city_id,
+            "region_id" => $merchant->region_id,
+            "country_id" => $merchant->country_id,
+            "phone" => $merchant->telephone,
+            "address" => $merchant->address,
+            "name" => $merchant->name,
+            "type" => "shipping"
+        ];
+        $city = City::find($data_address['city_id']);
+        $data_address['city'] = $city->name;
+        $address = new Address($data_address);
+        $user->addresses()->save($address);
+        $coverage = [
+            [
+                "lat" => "lat",
+                "address_id" => "address_id",
+                "long" => "long",
+                "coverage" => "coverage",
+                "provider" => "provider",
+                "city_id" => "city_id",
+                "region_id" => "region_id",
+                "country_id" => "country_id",
+                "merchant_id" => "merchant_id"
+            ],
+            [
+                "lat" => $merchant->lat,
+                "address_id" => $address->id,
+                "long" => $merchant->long,
+                "coverage" => '[{"lat":4.75291,"lng":-74.0419},{"lat":4.745746124708591,"lng":-74.01657291851028},{"lat":4.546967016001449,"lng":-74.07638483915308},{"lat":4.550458670707879,"lng":-74.12184451430282},{"lat":4.616288649774736,"lng":-74.21001235046388},{"lat":4.750350008497037,"lng":-74.14390366210937},{"lat":4.75291,"lng":-74.0419},{"lat":4.75291,"lng":-74.0419}]',
+                "provider" => "MerchantShipping",
+                "city_id" => $merchant->city_id,
+                "region_id" => $merchant->region_id,
+                "country_id" => $merchant->country_id,
+                "merchant_id" => $merchant->id
+            ],
+            [
+                "lat" => $merchant->lat,
+                "address_id" => $address->id,
+                "long" => $merchant->long,
+                "coverage" => '[{"lat":8.750108309657465,"lng":-72.85323490241137},{"lat":7.138549267979775,"lng":-72.07105354972187},{"lat":6.522175090595357,"lng":-67.55143060041318},{"lat":2.1513429750193565,"lng":-67.66648780036986},{"lat":1.4730219491208563,"lng":-69.3038633686841},{"lat":-4.599074427123081,"lng":-69.96922779446436},{"lat":-2.5933904996707873,"lng":-71.60296566051346},{"lat":-2.6172731048096294,"lng":-73.11163922762083},{"lat":-0.7317837159351164,"lng":-74.36983165857757},{"lat":1.291045361537448,"lng":-79.57677074240726},{"lat":8.944651278201842,"lng":-77.0815805846776},{"lat":11.403817230254573,"lng":-74.62545484680916},{"lat":12.811155130340408,"lng":-71.05073664310085},{"lat":8.750108309657465,"lng":-72.85323490241137}]',
+                "provider" => "MerchantShipping",
+                "city_id" => $merchant->city_id,
+                "region_id" => $merchant->region_id,
+                "country_id" => $merchant->country_id,
+                "merchant_id" => $merchant->id
+            ],
+            [
+                "lat" => $merchant->lat,
+                "address_id" => $address->id,
+                "long" => $merchant->long,
+                "coverage" => '[{"lat":4.75291,"lng":-74.0419},{"lat":4.745746124708591,"lng":-74.01657291851028},{"lat":4.546967016001449,"lng":-74.07638483915308},{"lat":4.550458670707879,"lng":-74.12184451430282},{"lat":4.616288649774736,"lng":-74.21001235046388},{"lat":4.750350008497037,"lng":-74.14390366210937},{"lat":4.75291,"lng":-74.0419},{"lat":4.75291,"lng":-74.0419}]',
+                "provider" => "Rapigo",
+                "city_id" => $merchant->city_id,
+                "region_id" => $merchant->region_id,
+                "country_id" => $merchant->country_id,
+                "merchant_id" => $merchant->id
+            ],
+            [
+                "lat" => $merchant->lat,
+                "address_id" => $address->id,
+                "long" => $merchant->long,
+                "coverage" => '[{"lat":8.750108309657465,"lng":-72.85323490241137},{"lat":7.138549267979775,"lng":-72.07105354972187},{"lat":6.522175090595357,"lng":-67.55143060041318},{"lat":2.1513429750193565,"lng":-67.66648780036986},{"lat":1.4730219491208563,"lng":-69.3038633686841},{"lat":-4.599074427123081,"lng":-69.96922779446436},{"lat":-2.5933904996707873,"lng":-71.60296566051346},{"lat":-2.6172731048096294,"lng":-73.11163922762083},{"lat":-0.7317837159351164,"lng":-74.36983165857757},{"lat":1.291045361537448,"lng":-79.57677074240726},{"lat":8.944651278201842,"lng":-77.0815805846776},{"lat":11.403817230254573,"lng":-74.62545484680916},{"lat":12.811155130340408,"lng":-71.05073664310085},{"lat":8.750108309657465,"lng":-72.85323490241137}]',
+                "provider" => "MiPaquete",
+                "city_id" => $merchant->city_id,
+                "region_id" => $merchant->region_id,
+                "country_id" => $merchant->country_id,
+                "merchant_id" => $merchant->id
+            ],
+        ];
+        $this->importPolygonsInternal($coverage);
     }
 
     public function importReportsExcelInternal(User $user, array $row) {
@@ -1291,12 +1431,13 @@ class StoreExport {
                 if (!$category) {
                     $category = new Category;
                 }
-                $sheet['url'] = $this->slug_url($sheet['name']);
-                $sheet['isActive'] = true;
                 if ($sheet['id'] == -1) {
                     unset($sheet['id']);
                 }
+
                 $category->fill($sheet);
+                $category->url = $this->slug_url($sheet['name']);
+                $category->isActive = true;
                 $category->save();
             }
         }
@@ -1351,7 +1492,7 @@ class StoreExport {
         }
     }
 
-    public function importMerchantsAvailabilitiesExcelInternal(User $user, array $row,$objectsMap = null) {
+    public function importMerchantsAvailabilitiesExcelInternal(User $user, array $row, $objectsMap = null) {
         $headers = $row[0];
 
         foreach ($row as $item) {
@@ -1366,10 +1507,13 @@ class StoreExport {
                         $sheet['object_id'] = $result;
                     }
                 }
-                $availability = Availability::find($sheet['id']);
-                if (!$availability) {
-                    unset($sheet['id']);
+                if (isset($sheet['id'])) {
+                    $availability = Availability::find($sheet['id']);
+                    if (!$availability) {
+                        unset($sheet['id']);
+                    }
                 }
+
                 $this->editBooking->addAvailabilityObject($sheet, $user);
             }
         }
@@ -1384,7 +1528,9 @@ class StoreExport {
                     $sheet[$headers[$key]] = $value;
                 }
             }
+
             if ($sheet['name'] && $sheet['name'] != 'name') {
+
                 $product = null;
                 $product_id = null;
                 $isnew = true;
@@ -1392,6 +1538,7 @@ class StoreExport {
                     $product_id = $sheet['id'];
                     unset($sheet['id']);
                 }
+
                 if (isset($sheet['id'])) {
                     $product = Product::find($sheet['id']);
                 }
@@ -1399,6 +1546,7 @@ class StoreExport {
 
                 $merchantsData = explode(",", $sheet['merchant_id']);
                 $result = [];
+
                 if ($product) {
                     $isnew = false;
                     $result = $this->editProduct->checkAccessProduct($user, $sheet["id"]);
@@ -1424,6 +1572,7 @@ class StoreExport {
                 $categoriesData = explode(",", $sheet['categories']);
                 unset($sheet['categories']);
                 $product->fill($sheet);
+                $product->isActive = true;
                 $product->slug = $this->slug_url($product->name);
                 $product->save();
                 if ($product_id) {
@@ -1450,6 +1599,15 @@ class StoreExport {
                     foreach ($files as $value) {
                         $imageData = explode(".", $value);
                         $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $merchantsData[0] . '/' . $value;
+                        if (substr($image, -4) == ".jpg") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        } else if (substr($image, -4) == ".png") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        } else if (substr($image, -5) == ".jpeg") {
+                            $image = substr($image, 0, -5) . ".webp";
+                        } else if (substr($image, -4) == ".JPG") {
+                            $image = substr($image, 0, -4) . ".webp";
+                        }
                         $ext = $imageData[count($imageData) - 1];
                         $file = FileM::where("trigger_id", $product->id)->where("file", $image)->first();
                         if (!$file) {
@@ -1457,7 +1615,7 @@ class StoreExport {
                                 'user_id' => $user->id,
                                 'trigger_id' => $product->id,
                                 'file' => $image,
-                                'extension' => $ext,
+                                'extension' => "webp",
                                 'type' => 'App\Models\Product'
                             ]);
                         }
@@ -1478,6 +1636,7 @@ class StoreExport {
                 }
             }
         }
+        return $objectsMap;
     }
 
     public function importProductVariantsExcelInternal(User $user, $row, $newObjects = null) {
@@ -1491,6 +1650,7 @@ class StoreExport {
                 $variant = null;
                 if ($newObjects) {
                     $sheet['product_id'] = $this->getIdFromMap($newObjects, "products", $sheet['product_id']);
+                    unset($sheet['id']);
                 } else {
                     $variant = ProductVariant::find($sheet['id']);
                 }

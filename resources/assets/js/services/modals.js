@@ -165,6 +165,26 @@ angular.module('besafe')
                         clickOutsideToClose: true,
                     }
                 }
+                var getCoveragePrompt = function () {
+                    return {
+                        controller: ['$scope', '$mdDialog', function ($scope, $mdDialog) {
+                                $scope.answer = function (answer) {
+                                    $mdDialog.hide(answer);
+                                };
+                                $scope.cancel = function () {
+                                    $mdDialog.cancel();
+                                };
+                                $scope.hide = function () {
+                                    $mdDialog.hide();
+                                };
+                            }],
+                        templateUrl: '/templates/outOfCoverage.html',
+                        // Appending dialog to document.body to cover sidenav in docs app
+                        // Modal dialogs should fully cover application to prevent interaction outside of dialog
+                        parent: angular.element(document.body),
+                        clickOutsideToClose: false,
+                    }
+                }
                 var getLocationExtPrompt = function () {
                     return {
                         controller: ['$scope', '$mdDialog', function ($scope, $mdDialog) {
@@ -373,6 +393,7 @@ angular.module('besafe')
                     getQuestionairePopup: getQuestionairePopup,
                     showToast: showToast,
                     getAppPopup: getAppPopup,
+                    getCoveragePrompt:getCoveragePrompt,
                     showLoader: showLoader,
                     turnObjectToUrl: turnObjectToUrl,
                     hideLoader: hideLoader,

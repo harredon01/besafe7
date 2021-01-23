@@ -123,6 +123,7 @@
                         $scope.acceptError = true;
                     }
                 }
+
                 $scope.deleteCartItem = function (item_id) {
                     let container = {
                         quantity: 0,
@@ -171,8 +172,8 @@
                 });
             }])
         .controller('CheckoutShippingCtrl', ['$scope', '$rootScope', 'LocationService', 'Users', '$q',
-            'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll',
-            function ($scope, $rootScope, LocationService, Users, $q, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll) {
+            'Cart', '$cookies', 'Orders', 'Modals', 'Billing', '$location', '$anchorScroll', '$mdDialog',
+            function ($scope, $rootScope, LocationService, Users, $q, Cart, $cookies, Orders, Modals, Billing, $location, $anchorScroll, $mdDialog) {
                 $scope.data = {};
                 $scope.addressSet = {};
                 $scope.shipping = [];
@@ -235,6 +236,21 @@
                     $cookies.put("locationRefferrer", url, {path: "/"});
                     window.location.href = "/location";
                 }
+                $scope.getCoveragePrompt = function () {
+                    $mdDialog.show(Modals.getCoveragePrompt()).then(function (answer) {
+                        if (answer == "new") {
+                            $scope.newAddress();
+                        } else if (answer == 'clear') {
+                            Cart.clearCart().then(function (answer) {
+                                window.location.href = "/";
+                            }, function () {
+
+                            });
+                        }
+                    }, function () {
+
+                    });
+                };
                 $rootScope.$on('prepareOrder', function (event, args) {
                     $scope.prepareOrder();
                 });
@@ -383,7 +399,7 @@
                         console.log("Discounts set", data);
                         let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
                         Orders.checkOrder(order.id, dataS).then(function (resp) {
-                            console.log("Check Order Result", resp); 
+                            console.log("Check Order Result", resp);
                             Modals.hideLoader();
                             let order = resp.order;
                             if (resp.status == "success") {
@@ -515,9 +531,15 @@
                             if (add) {
                                 $scope.shipping.push(container);
                             }
-                            if ($scope.expectedProviders == 0 && !$rootScope.shippingConditionSet) {
+
+
+                        }
+                        if ($scope.expectedProviders == 0 && !$rootScope.shippingConditionSet) {
+                            if ($scope.shipping.length > 0) {
                                 $scope.setShippingCondition($scope.shipping[0]);
                                 console.log("Auto select", $scope.shipping)
+                            } else {
+                                $scope.getCoveragePrompt();
                             }
 
                         }

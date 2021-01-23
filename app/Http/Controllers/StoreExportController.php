@@ -88,7 +88,7 @@ class StoreExportController extends Controller {
         if ($request->file('uploadfile')->isValid()) {
 //            $path = $request->file('uploadfile')->store('public/imports');
 //            dispatch(new StoreImport($user,$path,true));
-            $this->merchantImport->importGlobalExcel(request()->file('uploadfile'),false);
+            $this->store->importGlobalExcel($user,request()->file('uploadfile'),false);
         }
         return view(config("app.views").'.store.import')->with('user', $user);
     }

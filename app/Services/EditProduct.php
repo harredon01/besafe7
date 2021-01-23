@@ -1154,7 +1154,7 @@ GROUP BY category_id"
 
     public function createOrUpdateVariant(User $user, array $data) {
 
-        if ($data["id"]) {
+        if (isset($data["id"])&&$data["id"]) {
             $result = $this->checkAccessVariant($user, $data["id"]);
             if ($result['access'] == true) {
                 $variantid = $data['id'];

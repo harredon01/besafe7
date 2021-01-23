@@ -23,9 +23,8 @@
                                                 <tr>
                                                     <th>No</th>
                                                     <th>Orden</th>
-                                                    <th>Fecha</th>
+                                                    <th>Fecha y total</th>
                                                     <th>Estado</th>
-                                                    <th>Total</th>
                                                     <th>Usuario</th>
                                                     <th>Action</th>
                                                 </tr>
@@ -35,9 +34,8 @@
                                                 <tr ng-repeat="payment in payments">
                                                     <td>@{{ payment.id}}</td>
                                                     <td>@{{ payment.order.id}}</td>
-                                                    <td>@{{ payment.updated_at}}</td>
+                                                    <td>@{{ payment.updated_at}}<br/>@{{ payment.total | currency}}</td>
                                                     <td>@{{ payment.status}}</td>
-                                                    <td>@{{ payment.total | currency}}</td>
                                                     <td>@{{ payment.user.firstName}} @{{ payment.user.lastName}}<br/>@{{ payment.user.cellphone}}<br/>@{{ payment.user.email}}</td>
                                                     <td><a href="javascript:;" ng-hide="payment.status=='approved'" ng-click="approvePayment(payment)" class="btn">Aprobar Pago</a></td>
                                                 </tr>
