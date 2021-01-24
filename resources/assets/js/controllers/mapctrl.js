@@ -28,6 +28,11 @@ angular.module('besafe')
                         });
                     } 
                 }
+                $scope.selectCity = function (latitude,longitude) {
+                    console.log("Select city: ",latitude,longitude);
+                    $scope.activeMarker.setPosition(new google.maps.LatLng(latitude, longitude));
+                    google.maps.event.trigger($scope.activeMarker, 'dragend'); 
+                }
 
                 $scope.default = function () {
                     MapService.createLocationMarker(4.653450, -74.049605, false);
