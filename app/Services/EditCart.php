@@ -216,7 +216,7 @@ class EditCart {
     public function migrateCart($user, $device) {
         if ($device) {
             $items = Cart::session($device)->getContent();
-            if ((!count($items) > 0)) {
+            if (count($items) <1) {
                 return true;
             }
             $data = array();
@@ -231,7 +231,11 @@ class EditCart {
                         "item_id" => null,
                         "merchant_id" => $dataitem["merchant_id"]
                     ];
-                    $this->addCartItem($user, $data);
+                    $result = $this->addCartItem($user, $data);
+                    if($result['status']=='error'){
+                        $this->clearCart($user);
+                        $this->addCartItem($user, $data);
+                    }
                 } else {
                     $data = [
                         "name" => $dataitem["name"],
@@ -246,7 +250,11 @@ class EditCart {
                             "name" => $dataitem["name"],
                         ]
                     ];
-                    $this->addCustomCartItem($user, $data);
+                    $result = $this->addCustomCartItem($user, $data);
+                    if($result['status']=='error'){
+                        $this->clearCart($user);
+                        $this->addCustomCartItem($user, $data);
+                    }
                 }
                 // the subtotal with conditions applied
                 // Note that attribute returns ItemAttributeCollection object that extends the native laravel collection

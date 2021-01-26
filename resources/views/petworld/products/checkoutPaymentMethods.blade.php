@@ -2,8 +2,8 @@
 
 <div>
     <div ng-hide="showResult">
-        <button ng-click="showMethod('CC')" class="btn btn-primary" style="margin:10px">Tarjeta de Credito</button>
-        <button ng-click="showMethod('PSE')" class="btn btn-primary" style="margin:10px">Tarjeta de Debito</button>
+        <button ng-click="showMethod('CC')" class="btn btn-primary" style="margin:10px">Credito</button>
+        <button ng-click="showMethod('PSE')" class="btn btn-primary" style="margin:10px">PSE</button>
         <button ng-click="showMethod('BALOTO')" class="btn btn-primary" style="margin:10px">Efectivo</button>
         <br/>
         <br/>

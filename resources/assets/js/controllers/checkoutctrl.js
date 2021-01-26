@@ -450,6 +450,7 @@
                             $rootScope.shippingConditionSet = true;
                             item.price = data.cart.shipping;
                             item.selected = true;
+                            $scope.scrollTo("checkout-cart");
                             Modals.showToast("Envio agregado exitosamente", $("#checkout-shipping"));
                         } else {
                             Modals.showToast("Hubo un error con ese metodo de envio", $("#checkout-shipping"));
