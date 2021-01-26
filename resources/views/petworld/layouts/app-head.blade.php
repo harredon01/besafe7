@@ -18,21 +18,21 @@
 <link rel="preload" as="font" href="https://fonts.gstatic.com/s/rubik/v11/iJWEBXyIfDnIV7nEnX661A.woff2" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" as="font" href="https://fonts.gstatic.com/s/roboto/v18/KFOmCnqEu92Fr1Mu4mxK.woff2" type="font/woff2" crossorigin="anonymous">
 <link rel="preload" as="font" href="https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmEU9fBBc4.woff2" type="font/woff2" crossorigin="anonymous">
-<link rel="preload" href="/css/app.css?v=1.0.0.7" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
-<link href="/css/style.css?v=1.0.0.7" rel="preload" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
-<link href="/css/plugins.css?v=1.0.0.7" rel="preload" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
-<link rel="preload" href="/css/main.css?v=1.0.0.7" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
+<link rel="preload" href="/css/app.css?v=1.0.0.8" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
+<link href="/css/style.css?v=1.0.0.8" rel="preload" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
+<link href="/css/plugins.css?v=1.0.0.8" rel="preload" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
+<link rel="preload" href="/css/main.css?v=1.0.0.8" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
 <link rel="preload" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css" as="style" onload="this.onload = null;this.rel = 'stylesheet'">
 <noscript>
-<link rel="stylesheet" href="/css/app.css?v=1.0.0.7">
-<link href="/css/style.css?v=1.0.0.7" rel="stylesheet">
-<link rel="stylesheet" href="/css/plugins.css?v=1.0.0.7" />
-<link rel="stylesheet" href="/css/main.css?v=1.0.0.7" />
+<link rel="stylesheet" href="/css/app.css?v=1.0.0.8">
+<link href="/css/style.css?v=1.0.0.8" rel="stylesheet">
+<link rel="stylesheet" href="/css/plugins.css?v=1.0.0.8" />
+<link rel="stylesheet" href="/css/main.css?v=1.0.0.8" />
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
 </noscript>
 
 
-<script src="/js/app.js?v=1.0.0.7"></script>
+<script src="/js/app.js?v=1.0.0.8"></script>
 
 <!-- Scripts 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -111,6 +111,24 @@
             margin-left: 0;
             max-width: 31%;
         }
-                
+        .pm-product {
+            min-height: 0 !important;
+        }
+        .pm-product .image {
+            float:left;
+            width:35%;
+            padding-right: 7px;
+        }
+        .pm-product .content {
+            float:left;
+            width:65%;
+        }
+        .pm-product .merch-prods.content {
+            width:100%;
+        }
+        .merch-prods .content {
+            padding-top: 15px;
+        }
+
     }
 </style>

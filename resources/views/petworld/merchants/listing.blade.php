@@ -162,7 +162,7 @@
                                                 Distancia:<span style="color: red !important;"> @{{ merchant.Distance | number }} km</span>
                                             </div>
                                             <div class="btn-block d-flex">
-                                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0" style="display: block;text-align: center;width: 100%;padding-top: 7px;margin-top: 5px;">Tienda</a>
+                                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0" style="display: block;text-align: center;width: 100%;padding-top: 7px;margin-top: 10px;margin-bottom: 5px">Tienda</a>
                                                 <a href="/a/merchant/@{{ merchant.slug}}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
 
                                             </div>
@@ -178,7 +178,7 @@
                                                 <li><a href="wishlist.html" tabindex="0"><i class="ion-ios-heart-outline"></i></a></li>
                                             </ul>
                                         </div>
-                                        <div class="content">
+                                        <div class="content merch-prods" >
 
                                             <div class="card-list-content ">
 
@@ -200,10 +200,10 @@
                                                 <div class="product-flex" ng-show="merchant.activeCategory.tots">
                                                     <div class="col-lg-4 col-sm-12" ng-repeat="product in merchant.activeCategory.featured">
                                                         <div class="" id="prod-cont-@{{product.id}}">
-                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.categorizable_id}}" ng-show="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;">
+                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.categorizable_id}}" ng-show="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;padding-left: 0">
                                                                 <img ng-src="@{{product.file}}">
                                                             </a>
-                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}" ng-hide="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;">
+                                                            <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{merchant.id}}" ng-hide="merchant.categorizable_id" class="image" tabindex="0" style="text-align: center;padding-left: 0">
                                                                 <img ng-src="@{{product.file}}">
                                                             </a>
                                                             <div class="content">
@@ -213,6 +213,7 @@
                                                                     <span class="ng-binding">Desde: @{{product.low| currency}}</span>
                                                                 </div>
                                                             </div>
+                                                            <div style="clear:both"></div>
                                                         </div>
                                                     </div>
 
