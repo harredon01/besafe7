@@ -76,7 +76,7 @@ class MerchantTableSeeder extends Seeder {
         //$this->createConditions();
 //        $this->createProducts();
         $this->createMerchantsExcel();
-        DB::table('jobs')->delete();
+//        DB::table('jobs')->delete();
         //$this->createMerchants();
     }
 
@@ -271,9 +271,9 @@ class MerchantTableSeeder extends Seeder {
         
         $this->rapigo->authenticate("https://test.rapigo.co/api/token/");
         $this->rapigo->authenticate("https://www.rapigo.co/api/token/");
-        $this->miPaquete->getCitiesAndRegions();
-        //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
-        $this->merchantImport->importGlobalExcel("Global3.xlsx"); 
+//        $this->miPaquete->getCitiesAndRegions();
+//        //$this->merchantImport->exportMerchantJson("/home/hoovert/hospitales.json");
+//        $this->merchantImport->importGlobalExcel("Global3.xlsx"); 
 //        return true;
 //        $this->merchantImport->importMerchantsExcel("merchants.xlsx");
 //        $this->command->info('merchants seeded!');
@@ -290,9 +290,9 @@ class MerchantTableSeeder extends Seeder {
 //        $this->command->info('availabilities seeded!');
 //        $this->createMerchantBookings();
 //        $this->createMerchantBookings();
-        $this->command->info('Bookings created!');
-        $this->merchantImport->importArticlesExcel("articles.xlsx");
-        $this->command->info('articles seeded!');
+//        $this->command->info('Bookings created!');
+//        $this->merchantImport->importArticlesExcel("articles.xlsx");
+//        $this->command->info('articles seeded!');
 //        $this->merchantImport->importMerchantsRatingsExcel("ratings.xlsx");
 //        $this->command->info('ratings seeded!');
     }

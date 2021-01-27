@@ -10,7 +10,7 @@
 
         </th>
     </tr>
-    <tr ng-repeat="item in shipping">
+    <tr ng-repeat="item in shipping" ng-hide="!item.price">
         <td class="col-md-3">
             @{{ item.platform}}<br/><p class="text-gray">@{{ item.desc}}</p>
         </td>
