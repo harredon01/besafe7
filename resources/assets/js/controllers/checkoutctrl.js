@@ -5,6 +5,7 @@
                 $scope.coupon = "";
                 $scope.accept = false;
                 $scope.acceptError = false;
+                $scope.couponVisible = false;
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
                 angular.element(document).ready(function () {
@@ -1063,6 +1064,12 @@
                         "quantity": item.quantity,
                         "purpose": "external_book",
                         "alert": "#checkout-booking"
+                    }
+                    if(item.attributes.location){
+                        params.location = item.attributes.location;
+                    }
+                    if(item.attributes.duration){
+                        params.duration = item.attributes.duration;
                     }
                     console.log("Sending paramsparamsparams", params);
                     Cart.showBooking(params).then(function (result) {

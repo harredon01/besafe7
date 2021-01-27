@@ -1,6 +1,6 @@
 ﻿angular.module('besafe')
 
-        .controller('BookingCtrl', ['$scope', '$rootScope', 'getParams', 'Booking', 'Modals', 'Cart','$mdDialog', function ($scope, $rootScope, getParams, Booking, Modals, Cart,$mdDialog) {
+        .controller('BookingCtrl', ['$scope', '$rootScope', 'getParams', 'Booking', 'Modals', 'Cart', '$mdDialog', function ($scope, $rootScope, getParams, Booking, Modals, Cart, $mdDialog) {
                 $scope.availableDays = [];
                 $scope.availableDates = [];
                 $scope.selectedSpots = [];
@@ -26,6 +26,7 @@
                 $scope.item_id = null;
                 $scope.quantity = null;
                 $scope.location = null;
+                $scope.duration = null;
                 $scope.objectId;
                 $scope.objectName;
                 $scope.objectDescription;
@@ -103,9 +104,13 @@
                         if (paramsArrived.variant) {
                             $scope.variant = paramsArrived.variant;
                         }
+
+                        if (paramsArrived.duration) {
+                            $scope.duration = paramsArrived.duration;
+                        }
                         if (paramsArrived.location) {
                             $scope.location = paramsArrived.location;
-                            if($scope.location == "zoom"){
+                            if ($scope.location == "zoom") {
                                 $scope.virtualMeeting = "virtual";
                             }
                         }
@@ -241,7 +246,7 @@
                         "type": "Booking",
                         "id": booking.id,
                         "name": "Reserva con: " + booking.bookable.name,
-                        "from":booking.starts_at
+                        "from": booking.starts_at
                     }
                     let item = {
                         "name": "Reserva con: " + booking.bookable.name,
@@ -252,7 +257,7 @@
                         "cost": 0,
                         "extras": extras
                     };
-                    console.log("addBookingToCartServer",item);
+                    console.log("addBookingToCartServer", item);
                     if ($scope.product_variant_id) {
                         let container = {
                             product_variant_id: $scope.product_variant_id,
@@ -262,7 +267,7 @@
                             "extras": extras
                         };
                         Cart.postToServer(container).then(function (data) {
-                            if(data.status == "success"){
+                            if (data.status == "success") {
                                 $rootScope.$broadcast('loadHeadCart', data.cart);
                                 $rootScope.cartMessage = "Carrito actualizado";
                             } else {
@@ -279,7 +284,7 @@
                             "extras": extras
                         };
                         Cart.updateCartItem(container).then(function (data) {
-                            if(data.status == "success"){
+                            if (data.status == "success") {
                                 $rootScope.$broadcast('loadHeadCart', data.cart);
                                 $rootScope.cartMessage = "Carrito actualizado";
                             } else {
@@ -290,7 +295,7 @@
                         });
                     } else {
                         Cart.addCustomCartItem(item).then(function (data) {
-                            if(data.status == "success"){
+                            if (data.status == "success") {
                                 $rootScope.$broadcast('loadHeadCart', data.cart);
                                 $rootScope.cartMessage = "Carrito actualizado";
                             } else {
@@ -453,7 +458,7 @@
                 $scope.getDates = function () {
                     console.log("Get dates");
                     var myDate = new Date();
-                    if($scope.variant &&$scope.variant.is_shippable){
+                    if ($scope.variant && $scope.variant.is_shippable) {
                         myDate.setDate(myDate.getDate() + 1);
                     }
                     let month = myDate.getMonth();
@@ -544,12 +549,16 @@
                 $scope.buildSlots = function () {
                     $scope.appointmentOptions = [];
                     let appointmentLength = 30;
-                    if($scope.variant &&$scope.variant.is_shippable){
-                        appointmentLength = 60;
+                    if ($scope.duration) {
+                        appointmentLength = $scope.duration;
+                    } else {
+                        if ($scope.variant && $scope.variant.is_shippable) {
+                            appointmentLength = 60;
+                        }
                     }
                     let current = new Date();
                     let scheduleBuffer = 150;
-                    current = $scope.addMinutes(current, appointmentLength+scheduleBuffer);
+                    current = $scope.addMinutes(current, appointmentLength + scheduleBuffer);
                     for (let item in $scope.availabilitiesDate) {
                         let container = $scope.availabilitiesDate[item];
                         let open = true;

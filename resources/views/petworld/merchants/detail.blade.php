@@ -44,11 +44,13 @@
                                     <i class="fas fa-at"></i>
                                     <a href="mailto:{{ $merchant['email']}}">{{ $merchant['email']}}</a> 
                                 </span><br/>
+                                @if($merchant['address']>0)
                                 <span class="post-author">
                                     <i class="fas fa-address-card"></i>
                                     <span class="text-gray">Dirección : </span>
                                     {{ $merchant['address']}} 
                                 </span><br/>
+                                @endif
                                 <span class="post-author">
                                     <i class="fas fa-phone"></i>
                                     <span class="text-gray">Teléfono : </span>

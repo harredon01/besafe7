@@ -81,12 +81,12 @@
 
                 angular.element(document).ready(function () {
                     let params;
-                    let url = window.location.href;
-                    if(url.includes("merchant")){
-                        $scope.category = "merchants|0|list";
-                    } else if(url.includes("report")){
-                        $scope.category = "reports|0|list";
-                    }
+//                    let url = window.location.href;
+//                    if(url.includes("merchant")){
+//                        $scope.category = "merchants|0|list";
+//                    } else if(url.includes("report")){
+//                        $scope.category = "reports|0|list";
+//                    }
                     params = Modals.getAllUrlParams();
                     if (params) {
                         if(params.q){

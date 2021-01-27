@@ -13,7 +13,8 @@
         <h4>Total <span>@{{total| currency }}</span></h4>
         <br/>
         <div ng-hide="paymentActive" id="final-submit">
-            <div>
+            <div><a href="javascript:;" ng-click="couponVisible = true" class="text-primary" style="font-size: 17px">¡Tengo un cupón!</a></a></div>
+            <div ng-show="couponVisible">
                 <label style="float:left;width:100%">Ingresa un cupon</label>
                 <input type="text" ng-model="coupon" style="border:1px solid black;width:50%;float:left;height:36px" class="form-control" name="coupon" required>
                 <button ng-click="setCoupon()" style="float:right" class="btn btn-primary">Enviar</button>

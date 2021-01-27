@@ -1573,7 +1573,7 @@ class StoreExport {
                 unset($sheet['categories']);
                 $product->fill($sheet);
                 $product->isActive = true;
-                $product->slug = $this->slug_url($product->name);
+                $product->slug = $this->slug_url($product->name."-".$merchantsData[0]);
                 $product->save();
                 if ($product_id) {
                     array_push($objectsMap['products'], ["sheet_id" => $product_id, "created_id" => $product->id]);

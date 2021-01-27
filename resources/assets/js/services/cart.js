@@ -48,6 +48,7 @@ angular.module('besafe')
                 appointmentbook = function (item) {
                     let questions = [];
                     let location = null;
+                    let duration = null;
                     let container = null;
                     console.log("variants", item.variants)
                     for (let i in item.variants) {
@@ -63,6 +64,9 @@ angular.module('besafe')
                         }
                         if (container.attributes.location) {
                             location = container.attributes.location;
+                        }
+                        if (container.attributes.duration) {
+                            duration = container.attributes.duration;
                         }
                     }
                     let params = {
@@ -82,6 +86,9 @@ angular.module('besafe')
                     }
                     if(location){
                         params.location = location;
+                    }
+                    if(duration){
+                        params.duration = duration;
                     }
                     showBooking(params);
                 }

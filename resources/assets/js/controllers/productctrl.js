@@ -414,6 +414,8 @@
                     $scope.product.activeVariant = $scope.product.variants[0];
                     $scope.product.quantity = $scope.product.activeVariant.min_quantity;
                     $scope.product.variant_id = $scope.product.variants[0].id;
+                    $scope.product.merchant_id = $rootScope.merchant_id;
+                    $scope.product.type = $scope.product.variants[0].type;
                     $scope.product.description = $sce.trustAsHtml($scope.product.description);
                     document.getElementById("dissapear").remove();
                 });
@@ -434,7 +436,8 @@
                         id: product.activeVariant.id,
                         quantity: product.quantity,
                         item_id: product.item_id,
-                        product: product
+                        product: product,
+                        type: product.type
                     }
                     if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
                         Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
