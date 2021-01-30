@@ -637,6 +637,7 @@ class EditOrder {
             $attributes = json_decode($item->attributes, true);
             $data['merchant_id'] = $attributes['merchant_id'];
         }
+        
         $result = $this->geolocation->checkMerchantPolygons($orderAddresses['lat'], $orderAddresses['long'], $data['merchant_id'], null);
         if ($result["status"] == "success") {
             $orderAddresses['order_id'] = $order->id;

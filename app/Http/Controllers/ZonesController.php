@@ -29,8 +29,8 @@ class ZonesController extends Controller {
      */
     public function __construct() {
 
-        $this->middleware('auth:api')->except('getZonesPublicView');
-        $this->middleware('admin')->except('getZonesPublicView');
+        $this->middleware('auth:api')->except('getZones');
+        $this->middleware('admin')->except('getZones');
     }
 
     /**

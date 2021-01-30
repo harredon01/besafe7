@@ -16,6 +16,16 @@ app.config(function () {
 //    $http.defaults.headers.common['X-XSRF-TOKEN'] = Laravel.csrfToken;
         console.log("Searching for user");
         $rootScope.loader = false;
+        $rootScope.platform = "Booking";
+        $rootScope.modalProd = null;
+        let url = window.location.href;
+        if(url.includes("pets.lonchis.com.co")){
+            
+        } else {
+            if(url.includes("lonchis.com.co")){
+                $rootScope.platform = "Food";
+            }
+        }
         angular.element(document).ready(function () {
             let screenWidth = window.innerWidth;
             console.log("Screen width: ", screenWidth);

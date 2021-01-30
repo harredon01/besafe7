@@ -65,6 +65,9 @@
                 $scope.changeStore = function () {
                     Cart.changeMerchant()
                 }
+                $scope.addModal = function (product) {
+                    $rootScope.modalProd = product;
+                }
                 $scope.addCatFilter = function (category) {
                     $scope.params.category_id = category;
                     $scope.goTo(1);
@@ -505,6 +508,78 @@
                         }
                     }
                 }
+
+                $scope.changeCartQuantity = function (product, change) {
+                    if (change == "+") {
+                        product.quantity++;
+                    } else {
+                        product.quantity--;
+                    }
+                    let container = {
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        "extras": []
+                    };
+                    Cart.updateCartItem(container).then(function (data) {
+                        if (data.status == "error") {
+                            alert(data.message);
+                        } else {
+                            $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#prod-cont-" + product.id));
+                        }
+                    },
+                            function (data) {
+                            });
+                }
+
+            }])
+        .controller('ProductModalCtrl', ['$scope', 'Cart', '$rootScope', '$sce', 'Products', '$mdDialog', 'Modals', function ($scope, Cart, $rootScope, $sce, Products, $mdDialog, Modals) {
+                $scope.hasLocation = false;
+                $scope.hasMerchant = false;
+                $scope.related_products = [];
+                $scope.category_id = null;
+                $scope.rating = {};
+
+                angular.element(document).ready(function () {
+
+                   
+                });
+                $scope.selectVariant = function (product) {
+                    for (let item in product.variants) {
+                        if (product.variant_id == product.variants[item].id) {
+                            product.activeVariant = product.variants[item];
+                        }
+                    }
+                }
+                $scope.addCartItem = function (product) {
+                    let container = {
+                        id: product.activeVariant.id,
+                        quantity: product.quantity,
+                        item_id: product.item_id,
+                        product: product,
+                        type: product.type
+                    }
+                    if((product.activeVariant.is_on_sale && product.activeVariant.sale <1)||(!product.activeVariant.is_on_sale && product.activeVariant.price <1)){
+                        Modals.showToast("Ese producto no esta a la venta", $("#prod-cont-" + product.id));
+                        return true;
+                    }
+                    Cart.addCartItem(container, []).then(function (data) {
+                        console.log("Add cart", data);
+                        if (data.status == "success") {
+                            product.item_id = data.item.id;
+                            product.quantity = data.item.quantity;
+                            $rootScope.$broadcast('loadHeadCart', data.cart);
+                            Modals.showToast("Carrito actualizado", $("#add-cart-form"));
+
+                        } else {
+                            Modals.showToast(data.message, $("#add-cart-form"));
+                        }
+                    },
+                            function (data) {
+
+                            });
+                }
+
 
                 $scope.changeCartQuantity = function (product, change) {
                     if (change == "+") {

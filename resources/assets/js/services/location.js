@@ -166,6 +166,34 @@ angular.module('besafe')
 
                     return def.promise;
                 };
+                var getCity = function (id) {
+                    var def = $q.defer();
+                    $http({
+                        method: "get",
+                        url: "/api/cities?id=" + id,
+                    })
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
+                                def.reject("Failed to get nearby");
+                            });
+
+                    return def.promise;
+                };
+                var getRegion = function (id) {
+                    var def = $q.defer();
+                    $http({
+                        method: "get",
+                        url: "/api/regions?id=" + id,
+                    })
+                            .then(function (data) {
+                                def.resolve(data.data);
+                            },function(response) {
+                                def.reject("Failed to get nearby");
+                            });
+
+                    return def.promise;
+                };
                 var getCountries = function () {
                     var def = $q.defer();
                     $http({
@@ -188,6 +216,8 @@ angular.module('besafe')
                     getCities:getCities,
                     getUserHash: getUserHash,
                     getCityFromLat: getCityFromLat,
+                    getCity:getCity,
+                    getRegion:getRegion,
                     getRegionFromCity: getRegionFromCity,
                     getLocationsTrip: getLocationsTrip,
                     getCitiesRegion: getCitiesRegion,

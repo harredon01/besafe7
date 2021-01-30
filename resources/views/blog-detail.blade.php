@@ -1,6 +1,7 @@
 @extends('layouts.fitmeal')
 
 @section('content')
+
 </div>
         <div class="container main-wrapper"></div>
         <header class="page-header ltx-header-narrow-wrapper">
