@@ -15,7 +15,7 @@
                 angular.element(document).ready(function () {
                     setTimeout(function () {
                         $scope.getCart(true);
-                    }, 300); 
+                    }, 300);
                 });
                 $scope.cleanJson = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -1057,6 +1057,7 @@
                     $scope.bank = false;
                     if (method == "PSE") {
                         $rootScope.$broadcast('addTransactionCost');
+                        $scope.scrollTo("pago-pse");
                         $scope.debito = true;
                         Billing.getBanks().then(function (data) {
                             $scope.banks = data.banks;
@@ -1065,6 +1066,7 @@
                                 });
                     }
                     if (method == "CC") {
+                        $scope.scrollTo("pago-cc");
                         $scope.data2.buyer_country = "CO";
                         $scope.data2.payer_country = "CO";
                         $rootScope.$broadcast('addTransactionCost');
@@ -1075,6 +1077,7 @@
                         $scope.credito = true;
                     }
                     if (method == "BALOTO") {
+                        $scope.scrollTo("pago-cash");
                         $scope.cash = true;
                         $rootScope.$broadcast('addTransactionCost');
                     }

@@ -36,7 +36,7 @@
         </table>
     </div>
     <div ng-hide="showResult">
-        <div class="credito" ng-show="credito">
+        <div class="credito" id="pago-cc" ng-show="credito">
             <form class="form-horizontal" role="form" name="myForm2" ng-submit="payCreditCard(myForm2.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data2.payment_id" name="payment_id" value="">
@@ -215,10 +215,10 @@
                 </div>
             </form>
         </div>
-        <div class="cash" ng-show="bank">
+        <div class="cash"  ng-show="bank">
             <button ng-click="payInBank()" class="btn btn-success">Pagar</button>
         </div>
-        <div class="cash" ng-show="cash">
+        <div class="cash" id="pago-cash" ng-show="cash">
             <form  class="form-horizontal" role="form" name="myForm4" ng-submit="payCash(myForm4.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data4.payment_id" name="payment_id" value="">
@@ -292,7 +292,7 @@
                 </div>
             </form>
         </div>
-        <div class="debito" ng-show="debito">
+        <div class="debito" id="pago-pse" ng-show="debito">
             <form class="form-horizontal" role="form" name="myForm3" ng-submit="payDebitCard(myForm3.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data3.payment_id" name="payment_id" value="">
