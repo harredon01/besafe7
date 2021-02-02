@@ -20,7 +20,7 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="item in payment.order.items">
-                                    <td class="product_thumb"><a href="#"><img src="image/product/home-1/product-1.jpg" alt="Product"></a></td>
+                                    <td class="product_thumb"><a href="#"><img ng-src="@{{item.attributes.image.file}}" alt="Product"></a></td>
                                     <td class="product_name"><a href="#">@{{item.name}}</a></td>
                                     <td class="product-price"><span>@{{item.price| currency}}</span></td>
                                     <td class="product_quantity"><span>@{{item.quantity| currency}}</span></td>
@@ -28,27 +28,24 @@
                                 </tr>
                             </tbody>
                         </table>   
+                        <br/>
                         <h2>Condiciones</h2>
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="product_thumbnail">Imagen</th>
-                                    <th class="product_name">Producto</th>
-                                    <th class="product_price">Precio</th>
+                                    <th class="product_thumbnail">Nombre</th>
+                                    <th class="product_price">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr ng-repeat="item in payment.order.order_conditions">
                                     <td class="product_thumbnail"><a href="#">@{{item.name}}</a></td>
-                                    <td class="product_name"><span>@{{item.type}}</span></td>
+
                                     <td class="product_price"><span>@{{item.value| currency}}</span></td>
                                 </tr>
                             </tbody>
                         </table>   
-                    </div>  
-                    <div class="cart_submit">
-                        <button type="submit">update cart</button>
-                    </div>      
+                    </div>     
                 </div>
             </div>
         </div>
@@ -59,10 +56,10 @@
                     <div class="coupon_code left">
                         <h3><span>Envio</span></h3>
                         <div class="coupon_inner">
-                            <p>Recibe<span class="text-primary">@{{payment.order.order_addresses[0].name}}</span></p>
-                            <p>Direccion<span class="text-primary">@{{payment.order.order_addresses[0].address}}</span></p>
-                            <p>Ciudad <span class="text-primary">@{{payment.order.order_addresses[0].city}}</span></p>
-                            <p>Telefono <span class="text-primary">@{{payment.order.order_addresses[0].phone}}</span></p>
+                            <p>Recibe: <span class="text-primary">@{{payment.order.order_addresses[0].name}}</span></p>
+                            <p>Direccion: <span class="text-primary">@{{payment.order.order_addresses[0].address}}</span></p>
+                            <p>Ciudad: <span class="text-primary">@{{payment.order.order_addresses[0].city}}</span></p>
+                            <p>Telefono: <span class="text-primary">@{{payment.order.order_addresses[0].phone}}</span></p>
                         </div>
 
                     </div>

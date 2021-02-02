@@ -3,11 +3,10 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col-md-8 col-md-offset-2 offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Ingreso</div>
-                <div class="panel-body">
-                    <div class="col-md-4 col-md-offset-1">
+                <div class="panel-body row">
+                    <div class="col-md-4 col-md-offset-1 offset-1">
                         <br/>
                         <h3 class="text">Bienvenido a nuestra comunidad</h3>
                         <br/>
@@ -19,15 +18,15 @@
                         <p>O ingresa seguro y olvidate de contraseñas con: <br/></p>
                         <br/>
                         <button class="btn btn-primary" onclick="window.location.href = '/login/facebook';" >
-                            Facebook<i class="fas fa-facebook"></i>
+                            Facebook
                         </button>
                         <button class="btn btn-danger" onclick="window.location.href = '/login/google';" >
-                            Google<i class="fas fa-google"></i>
+                            Google
                         </button>
                         <br/>
                         <br/>
                     </div>
-                    <div class="col-md-4 col-md-offset-1">
+                    <div class="col-md-4 col-md-offset-1 offset-1">
                         
                         <br/>
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">

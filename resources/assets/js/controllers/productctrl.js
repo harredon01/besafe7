@@ -296,7 +296,8 @@
                     Products.deleteFavorite(container).then(function (data) {
                         console.log("Add addFavorite", data);
                         if (data.status == "success") {
-                            Modals.showToast("Agregado", $("#prod-cont-" + product.id));
+                            product.isFavorite = false;
+                            Modals.showToast("Removido", $("#prod-cont-" + product.id));
                         } else {
                             Modals.showToast(data.message, $("#prod-cont-" + product.id));
                         }

@@ -1574,7 +1574,7 @@
         &::before{
             content: '';
             position: absolute;
-            background: url('../img/icon/icon-phone.png') no-repeat 0 0;
+            background: url('/safira/assets/img/icon/icon-phone.png') no-repeat 0 0;
             width: 32px;
             height: 32px;
             display: inline-block;
@@ -1970,7 +1970,7 @@
         }
     }
     & .call-support p::before{
-        background: url("../img/icon/icon-phone2.png") no-repeat 0 0;
+        background: url("/safira/assets/img/icon/icon-phone2.png") no-repeat 0 0;
     }
     & .call-support p a:hover{
         color: $secondary_color3;
@@ -2164,7 +2164,7 @@
         }
     }
     & .call-support p::before{
-        background: url("../img/icon/icon-phone3.png") no-repeat 0 0;
+        background: url("/safira/assets/img/icon/icon-phone3.png") no-repeat 0 0;
     }
     & .call-support p a:hover{
         color: $secondary_color4;

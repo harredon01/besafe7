@@ -46,7 +46,7 @@
                                             <label>No. Identificacion</label>
                                                 <input type="text" ng-model="data.docNum" name="docNum">
                                             <br>
-                                            <span class="custom_checkbox">
+                                            <!--span class="custom_checkbox">
                                                 <input type="checkbox" value="1" name="optin">
                                                 <label>Receive offers from our partners</label>
                                             </span>
@@ -54,7 +54,7 @@
                                             <span class="custom_checkbox">
                                                 <input type="checkbox" value="1" name="newsletter">
                                                 <label>Sign up for our newsletter<br><em>You may unsubscribe at any moment. For that purpose, please find our contact info in the legal notice.</em></label>
-                                            </span>
+                                            </span-->
                                             <div class="save_button primary_btn default_button">
                                                 <button type="submit">Guardar</button>
                                             </div>

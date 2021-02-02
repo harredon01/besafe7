@@ -8,7 +8,7 @@
             <li><a href="/user/editAddress" class="nav-link">Mis Direcciones</a></li>
             <li><a href="/user/editProfile" class="nav-link">Mi Cuenta</a></li>
             
-            <li  ng-if="hasMerchants"><a href="/user/merchants/orders"  class="nav-link active">Ordenes</a></li>
+            <li  ng-if="hasMerchants"><a href="/user/merchants/orders"  class="nav-link">Ordenes</a></li>
             <li ng-if="hasMerchants"> <a href="/admin/store/global" class="nav-link">Contenido</a></li>
             <li ng-if="user.id < 78"><a href="/admin/zones" class="nav-link">Cobertura</a></li>
             <li ng-if="user.id < 78"><a href="/billing/payments" class="nav-link">Pagos Globales</a></li>

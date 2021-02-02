@@ -21,7 +21,7 @@
                                 <ul>
                                     <li><a href="/a/zones">Cobertura</a></li>
                                     <li><a href="/a/faq"> Preguntas Frecuentes</a></li>
-                                    <li><a href="/a/terms"> Terms & Conditions</a></li>
+                                    <li><a href="/a/terms"> Términos & Condiciones</a></li>
                                     <li><a href="/a/contact-us/bla"> Contacto</a></li>
                                 </ul>
                             </div>

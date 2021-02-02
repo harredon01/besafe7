@@ -2283,7 +2283,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 .call-support p::before {
   content: '';
   position: absolute;
-  background: url("../img/icon/icon-phone.png") no-repeat 0 0;
+  background: url("/safira/assets/img/icon/icon-phone.png") no-repeat 0 0;
   width: 32px;
   height: 32px;
   display: inline-block;
@@ -2646,7 +2646,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .color_three .call-support p::before {
-  background: url("../img/icon/icon-phone2.png") no-repeat 0 0;
+  background: url("/safira/assets/img/icon/icon-phone2.png") no-repeat 0 0;
 }
 
 .color_three .call-support p a:hover {
@@ -2805,7 +2805,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .color_four .call-support p::before {
-  background: url("../img/icon/icon-phone3.png") no-repeat 0 0;
+  background: url("/safira/assets/img/icon/icon-phone3.png") no-repeat 0 0;
 }
 
 .color_four .call-support p a:hover {
@@ -3456,7 +3456,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .banner_fullwidth {
-  background: url(../img/bg/banner3.jpg);
+  background: url(https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/1920x440.jpg);
   background-attachment: scroll;
   background-repeat: no-repeat;
   background-position: center center;
@@ -6438,7 +6438,7 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .breadcrumbs_area {
-  background: url(../img/bg/banner18.jpg) no-repeat 0 0;
+  background: url(/safira/assets/img/bg/banner18.jpg) no-repeat 0 0;
   background-size: cover;
   height: 200px;
   display: flex;
@@ -6677,12 +6677,12 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
   float: right;
   text-align: right;
   line-height: 31px;
-  width: 60px;
+  width: 80px;
 }
 
 @media only screen and (min-width: 992px) and (max-width: 1199px) {
   .widget_list.widget_filter form input {
-    width: 65px;
+    width: 80px;
   }
 }
 
@@ -6965,17 +6965,17 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .shop_toolbar_btn > button.btn-grid-3 {
-  background: url(../img/icon/bkg_grid.png) no-repeat scroll center center;
+  background: url(/safira/assets/img/icon/bkg_grid.png) no-repeat scroll center center;
   width: 20px;
   height: 20px;
 }
 
 .shop_toolbar_btn > button.btn-grid-3.active {
-  background: url(../img/icon/bkg_grid_hover.png) no-repeat scroll center center !important;
+  background: url(/safira/assets/img/icon/bkg_grid_hover.png) no-repeat scroll center center !important;
 }
 
 .shop_toolbar_btn > button.btn-grid-4 {
-  background: url(../img/icon/bkg_grid4.png) no-repeat scroll center center;
+  background: url(/safira/assets/img/icon/bkg_grid4.png) no-repeat scroll center center;
   width: 26px;
   height: 22px;
 }
@@ -6993,17 +6993,17 @@ input:-ms-input-placeholder, textarea:-ms-input-placeholder {
 }
 
 .shop_toolbar_btn > button.btn-grid-4.active {
-  background: url(../img/icon/bkg_grid4_hover.png) no-repeat scroll center center !important;
+  background: url(/safira/assets/img/icon/bkg_grid4_hover.png) no-repeat scroll center center !important;
 }
 
 .shop_toolbar_btn > button.btn-list {
-  background: url(../img/icon/bkg_list.png) no-repeat scroll center center;
+  background: url(/safira/assets/img/icon/bkg_list.png) no-repeat scroll center center;
   width: 20px;
   height: 20px;
 }
 
 .shop_toolbar_btn > button.btn-list.active {
-  background: url(../img/icon/bkg_list_hover.png) no-repeat scroll center center !important;
+  background: url(/safira/assets/img/icon/bkg_list_hover.png) no-repeat scroll center center !important;
 }
 
 .product_content.list_content {

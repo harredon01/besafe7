@@ -11,7 +11,7 @@
 }
 
 .breadcrumbs_area{
-    background: url(../img/bg/banner18.jpg) no-repeat 0 0;
+    background: url(/safira/assets/img/bg/banner18.jpg) no-repeat 0 0;
     background-size: cover;
    height: 200px;
     display: flex;
@@ -231,9 +231,9 @@
             float: right;
             text-align: right;
             line-height: 31px;
-            width: 60px;
+            width: 80px;
             @media #{$desktop-device }{
-                width: 65px;
+                width: 80px;
             }
         }
         & button{
@@ -523,15 +523,15 @@
         border: 0;
 	    background: inherit;
         &.btn-grid-3{
-            background: url(../img/icon/bkg_grid.png) no-repeat scroll center center;
+            background: url(/safira/assets/img/icon/bkg_grid.png) no-repeat scroll center center;
             width: 20px;
             height: 20px;
             &.active{
-                background: url(../img/icon/bkg_grid_hover.png) no-repeat scroll center center !important;
+                background: url(/safira/assets/img/icon/bkg_grid_hover.png) no-repeat scroll center center !important;
             }
         }
         &.btn-grid-4{
-            background: url(../img/icon/bkg_grid4.png) no-repeat scroll center center;
+            background: url(/safira/assets/img/icon/bkg_grid4.png) no-repeat scroll center center;
             width: 26px;
             height: 22px;
             @media #{$desktop-device}{
@@ -541,15 +541,15 @@
                 display: none;
             }
             &.active{
-                background: url(../img/icon/bkg_grid4_hover.png) no-repeat scroll center center !important;
+                background: url(/safira/assets/img/icon/bkg_grid4_hover.png) no-repeat scroll center center !important;
             }
         }
         &.btn-list{
-            background: url(../img/icon/bkg_list.png) no-repeat scroll center center;
+            background: url(/safira/assets/img/icon/bkg_list.png) no-repeat scroll center center;
             width: 20px;
             height: 20px;
             &.active{
-                background: url(../img/icon/bkg_list_hover.png) no-repeat scroll center center !important;
+                background: url(/safira/assets/img/icon/bkg_list_hover.png) no-repeat scroll center center !important;
             }
         }
     }

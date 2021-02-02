@@ -19,8 +19,9 @@
                     <p>Si el pin está en tu ubicacion correcta haz click en guardar. De lo contrario arrastra el pin hasta el lugar correcto</p>
                     <p >Links rápidos: <a href="javascript:;" class="text-primary" ng-click="selectCity(4.6707198124020675, -74.06671125317112)">Bogota</a>, <a href="javascript:;" class="text-primary" ng-click="selectCity(6.249380169398565, -75.5727346053754)">Medellin</a>, <a href="javascript:;" class="text-primary" ng-click="selectCity(3.423507212808105, -76.52051677752884)">Cali</a>
                     , <a href="javascript:;" class="text-primary" ng-click="selectCity(11.236660039676785, -74.19140938524001)">Santa Marta</a>, <a href="javascript:;" class="text-primary" ng-click="selectCity(10.42839203353642, -75.51813914198655)">Cartagena</a></p>
-                    <button ng-click="saveLocation()" class="btn btn-primary">Guardar</button>
-                    <button ng-click="cancel()" class="btn btn-primary">Cancelar</button>
+                    <button ng-click="saveLocation()" class="btn btn-dark offset-3">Guardar</button>
+                    <button ng-click="cancel()" class="btn btn-dark offset-3"">Cancelar</button>
+                    <br/><br/>
                     <div id="map" style="height: 500px" data-tap-disabled="true"></div>
                 </div>
             </div>

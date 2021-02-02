@@ -64,9 +64,10 @@
                 <span style="color:red" ng-show="(myForm.city_id.$dirty && myForm.city_id.$invalid) || submitted && myForm.city_id.$invalid">
                     <span ng-show="submitted && myForm.city_id.$error.required">Porfavor Selecciona una ciudad</span></span>
             </div>
-            <div class="col-12 mb--20">
-                <button ng-click="clean()" class="btn btn-primary">Limpiar</button>
-                <button type="submit" style="float:right" class="btn btn-primary">Enviar</button> 
+            <br/><br/><br/>
+            <div class="col-12 mb--20" style="margin-top:15px">
+                <button ng-click="clean()" class="btn btn-dark">Limpiar</button>
+                <button type="submit" style="float:right" class="btn btn-dark">Enviar</button> 
             </div>
         </div>
     </div>

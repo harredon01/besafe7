@@ -1,6 +1,11 @@
 @extends(config("app.views").'.layouts.app')
 
 @section('content')
+<style>
+    .form-group{
+        margin-top:8px
+    }
+</style>
 <!--Checkout page section-->
 <div class="Checkout_section mt-70">
     <div class="container">
@@ -18,8 +23,8 @@
                         <div ng-show="!shippingAddressSet && !addAddress">
                             @include(config("app.views").'.user.checkoutAddressList')
                         </div> 
-                        <span ng-show="!shippingAddressSet && !addAddress" style="color:#56a700;float:right">
-                            <a href="javascript:;" ng-click="newAddress()">Nueva direccion</a>
+                        <span ng-show="!shippingAddressSet && !addAddress" style="float:right">
+                            <a href="javascript:;" class="text-primary" ng-click="newAddress()">Nueva direccion</a>
                         </span>
                         <div style="clear:both"></div>
                         @include(config("app.views").'.user.editAddressFormCheckout')

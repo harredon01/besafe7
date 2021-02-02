@@ -187,6 +187,10 @@
                 if (data.total > 0) {
                     let results = data.data;
                     $scope.payment = results[0];
+                    for(let item in $scope.payment.order.items){
+                        $scope.payment.order.items[item].attributes = JSON.parse($scope.payment.order.items[item].attributes);
+                    }
+                    console.log("Payment",$scope.payment);
                     if($scope.payment.transaction_cost>0){
                         $scope.hasTransactionCost = true;
                     }

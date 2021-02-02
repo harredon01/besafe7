@@ -19,7 +19,7 @@
             </div>
             <div class="col-lg-6 col-md-6">
                 <div class="contact_message form" ng-controller="LeadCtrl">
-                    <h3>Tell us your project</h3>   
+                    <h3>Tu Mensaje</h3>   
                     <form  id="contact-form" role="form" name="myForm" ng-submit="send(myForm.$valid)" novalidate>
                         <p>  
                             <label>Nombre</label>

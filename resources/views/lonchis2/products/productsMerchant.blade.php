@@ -12,7 +12,7 @@
 @section('content')
 
 <!--shop  area start-->
-<div class="shop_area mt-70 mb-70" ng-controller="ProductsCtrl">
+<div class="shop_area mt-10 mb-70" ng-controller="ProductsCtrl">
     <div class="container">
         <div class="row">
             <div class="col-lg-9 col-md-12">
@@ -95,6 +95,7 @@
                                 <a class="primary_img" href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}"><img ng-src="@{{product.src}}" alt=""></a>
                                 <div class="label_product">
                                     <span class="label_sale" ng-show="product.activeVariant.is_on_sale">Sale</span>
+                                    <span class="label_new" ng-show="product.isFavorite"><span style="position:relative" class="lnr lnr-heart"></span></span>
                                 </div>
                                 <div class="action_links">
                                     <ul>
@@ -103,7 +104,7 @@
                                         <li class="add_to_cart" ng-show="product.item_id"><a href="javascript:;" ng-click="changeCartQuantity(product, '+')" data-tippy="Add to cart" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"> <span class="lnr lnr-plus-circle"></span></a></li>
                                         <li class="quick_button"><a href="#" data-tippy="quick view" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true" data-bs-toggle="modal" data-bs-target="#modal_box" ng-click="addModal(product)" > <span class="lnr lnr-magnifier"></span></a></li>
                                         <li class="wishlist" ng-hide="product.isFavorite"><a href="javascript:;" ng-click="addFavorite(product)" data-tippy="Add to Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li>
-                                        <li class="wishlist" ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" data-tippy="Remove from Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-cross"></span></a></li>
+                                        <li class="wishlist" ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" data-tippy="Remove from Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -138,7 +139,7 @@
                                         <li class="add_to_cart" ng-show="product.item_id"><a href="javascript:;" ng-click="changeCartQuantity(product, '+')" title="Add to cart"><span class="lnr lnr-plus-circle"></span></a></li>
                                         <li class="quick_button"><a href="#" data-tippy="quick view" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true" data-bs-toggle="modal" data-bs-target="#modal_box"  ng-click="addModal(product)"> <span class="lnr lnr-magnifier"></span></a></li>
                                         <li class="wishlist" ng-hide="product.isFavorite"><a href="javascript:;" ng-click="addFavorite(product)" data-tippy="Add to Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li>
-                                        <li class="wishlist" ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" data-tippy="Remove from Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-cross"></span></a></li>
+                                        <li class="wishlist" ng-show="product.isFavorite"><a href="javascript:;" ng-click="deleteFavorite(product)" data-tippy="Remove from Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li>
 
                                     </ul>
                                 </div>
@@ -159,7 +160,7 @@
                             <h3>Filtra por precio</h3>
                             <form> 
                                 <div id="slider-range"></div>   
-                                <button ng-click="filterPrice()">Filter</button>
+                                <button ng-click="filterPrice()">Filtra</button>
                                 <input type="text" name="text" id="amount" ng-model="range" />   
                             </form> 
                         </div>
