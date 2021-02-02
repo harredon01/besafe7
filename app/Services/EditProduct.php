@@ -250,7 +250,7 @@ class EditProduct {
         }
         if (isset($data['high'])) {
             if ($data['high']) {
-                $query->where('high', '<=', $data['high']);
+                $query->where('low', '<=', $data['high']);
             }
         }
         if (isset($data['low'])) {

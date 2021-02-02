@@ -162,12 +162,20 @@
                     });
         }
 
-    }]).controller('PaymentDetailCtrl', ['$scope', 'Payments', '$rootScope', function ($scope, Payments, $rootScope) {
+    }]).controller('PaymentDetailCtrl', ['$scope', 'Payments', '$rootScope','LocationService', function ($scope, Payments, $rootScope,LocationService) {
         $scope.data = {};
         $scope.payment = {};
+        $scope.hasTransactionCost = false;
         angular.element(document).ready(function () {
             $scope.getPayments();
         });
+        $rootScope.$on('removeTransactionCost', function (event, args) {
+                    $scope.hasTransactionCost = false;
+                });
+                $rootScope.$on('addTransactionCost', function (event, args) {
+                    $scope.hasTransactionCost = true;
+
+                });
 
         $scope.getPayments = function () {
             $scope.page++;
@@ -178,7 +186,42 @@
             Payments.getPaymentsUser(url2).then(function (data) {
                 if (data.total > 0) {
                     let results = data.data;
-                    $scope.payment = results[0]
+                    $scope.payment = results[0];
+                    for(let item in $scope.payment.order.items){
+                        $scope.payment.order.items[item].attributes = JSON.parse($scope.payment.order.items[item].attributes);
+                    }
+                    console.log("Payment",$scope.payment);
+                    if($scope.payment.transaction_cost>0){
+                        $scope.hasTransactionCost = true;
+                    }
+                    $rootScope.activeOrder = $scope.payment.order;
+                    LocationService.getRegion($rootScope.activeOrder.order_addresses[0].region_id).then(function (data) {
+                        if(data.total && data.total == 1){
+                            console.log("Response",data);
+                            $rootScope.activeOrder.order_addresses[0].regionName = data.data[0].name;
+                        }
+                    },
+                    function (data) {
+
+                    });
+                    LocationService.getCity($rootScope.activeOrder.order_addresses[0].city_id).then(function (data) {
+                        if(data.total && data.total == 1){
+                            console.log("Response",data);
+                            $rootScope.activeOrder.order_addresses[0].cityName = data.data[0].name;
+                        }
+                    },
+                    function (data) {
+
+                    });
+                    LocationService.getCountry($rootScope.activeOrder.order_addresses[0].country_id).then(function (data) {
+                        if(data.total && data.total == 1){
+                            console.log("Response",data);
+                            $rootScope.activeOrder.order_addresses[0].countryCode = data.data[0].code;
+                        }
+                    },
+                    function (data) {
+
+                    });
                 }
 
             },

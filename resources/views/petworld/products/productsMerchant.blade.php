@@ -65,7 +65,7 @@
                     @foreach ($category['products'] as $product)
                     <div class="col-lg-3 col-sm-6">
                         <div class="pm-product  ">
-                            <a href="/a/{{$product['slug']}}" class="image" tabindex="0">
+                            <a href="/a/product-detail/{{$product['slug']}}?merchant_id={{$product['merchant_id']}}" class="image" tabindex="0">
                                 <img class="lazyload" data-src="{{$product['imgs'][0]['file']}}" alt="">
                             </a>
                             <div class="hover-conents">
@@ -76,7 +76,7 @@
                                 </ul>
                             </div>
                             <div class="content">
-                                <h3 class="font-weight-500"><a href="product-details.html">{{$product['name']}}</a></h3>
+                                <h3 class="font-weight-500"><a href="/a/product-detail/{{$product['slug']}}?merchant_id={{$product['merchant_id']}}">{{$product['name']}}</a></h3>
                                 @if($product['variants'][0]['is_on_sale'])
                                 <div class="price text-red">
                                     <span class="old">${{$product['variants'][0]['price']}}</span>
@@ -296,7 +296,7 @@
                 <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="prods-cont">
                     <div ng-repeat="category in categories" style="width:100%">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
-                            <div class="pm-product" id="prod-cont-@{{product.id}}" style="min-height: 330px">
+                            <div class="pm-product" id="prod-cont-@{{product.id}}" style="min-height: 375px">
                                 <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
@@ -316,31 +316,13 @@
                                     <div class="price text-red" ng-hide="product.activeVariant.is_on_sale">
                                         <span>@{{product.activeVariant.price| currency}}</span>
                                     </div>
-                                    <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && ! user">
-                                            <span>Agrega al carrito y luego selecciona fecha y hora al pagar</span>
-                                        </div>
-                                        <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' &&  user">
-                                            <span>Agrega al carrito y luego selecciona fecha y hora.</span>
-                                        </div>
-                                    <div class="btn-block grid-btn" ng-hide="product.item_id">
-                                        <div class="price text-red" ng-show="product.activeVariant.is_on_sale">
-                                            <span class="old">@{{product.activeVariant.price| currency}}</span>
-                                            <span>@{{product.activeVariant.sale| currency}}</span>
-                                        </div>
-                                        <div class="price text-red" ng-hide="product.activeVariant.is_on_sale">
-                                            <span>@{{product.activeVariant.price| currency}}</span>
-                                        </div>
-                                        
-                                        <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
-                                            <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
-                                        </select>
-                                        <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0">Comprar</a>
+                                    <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && !user">
+                                        <span>Agrega al carrito y luego selecciona fecha y hora al pagar</span>
                                     </div>
-                                    <div class="btn-block grid-btn" ng-show="product.item_id">
-                                        <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '-')">-</a>
-                                        <input type="tel" style="width:30px" ng-model="product.quantity"/>
-                                        <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '+')">+</a>
+                                    <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && user">
+                                        <span>Agrega al carrito y luego selecciona fecha y hora.</span>
                                     </div>
+
                                     <div class="card-list-content ">
                                         <div class="rating-widget mt--20">
                                             <a href="#" class="single-rating" ng-repeat="n in [].constructor(5) track by $index">
@@ -366,7 +348,19 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div style="clear:both"></div>
+                                <div class="btn-block grid-btn" ng-hide="product.item_id">
+                                    <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">
+                                        <option  ng-repeat="variant in product.variants" ng-value="@{{variant.id}}" value="@{{variant.id}}">@{{variant.description}}</option>
+                                    </select>
+                                    <a href="javascript:;" ng-click="addCartItem(product)" class="btn btn-outlined btn-rounded btn-mid add-cart" tabindex="0">Comprar</a>
+                                </div>
+                                <div class="btn-block grid-btn" ng-show="product.item_id">
+                                    <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '-')">-</a>
+                                    <input type="tel" style="width:30px" ng-model="product.quantity"/>
+                                    <a href="javascript:;" style="width:15px" ng-click="changeCartQuantity(product, '+')">+</a>
+                                </div>
                             </div>
                         </div>     
                     </div>
@@ -374,7 +368,7 @@
             </div>
             <div class="col-lg-4 col-xl-3 order-lg-1">
                 <div class="sidebar-widget">
-                    
+
                     @if(count($data['side_categories'])>0)
                     <div class="single-sidebar">
                         <h2 class="sidebar-title">CATEGORIAS</h2>
@@ -403,7 +397,7 @@
                             <div class="slider-price">
                                 <p>
                                     <input type="text" id="amount" ng-model="range" readonly>
-                                    <a href="javascript:;" ng-click="filterPrice()" class="btn btn--primary">Filter</a>
+                                    <a href="javascript:;" ng-click="filterPrice()" class="btn btn--primary">Filtra</a>
                                 </p>
                             </div>
                         </div>

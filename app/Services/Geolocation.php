@@ -20,7 +20,7 @@ class Geolocation {
         } else {
             $polygon = $query->get();
         }
-        if($polygon){
+        if($polygon && count($polygon)>0){
             return array("status" => "success", "message" => "Address in coverage", "polygon" => $polygon);
         } else {
             return array("status" => "error", "message" => "Address not in coverage");

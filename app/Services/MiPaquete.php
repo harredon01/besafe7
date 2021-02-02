@@ -24,7 +24,7 @@ class MiPaquete {
 //            $fields_string .= $key . '=' . $value . '&';
 //        }
 //        rtrim($fields_string, '&');
-        if ($test) {
+        if (false) {
             $url = "https://ecommerce.dev.mipaquete.com";
             $push = Push::where('platform', 'MiPaqueteTest')->first();
         } else {
@@ -33,6 +33,7 @@ class MiPaquete {
         }
 
         $data_string = json_encode($data);
+        //dd($data_string);
         // $curl = curl_init("https://ecommerce.dev.mipaquete.com" . $query);
         $curl = curl_init($url . $query);
         //dd($data);
@@ -220,7 +221,7 @@ class MiPaquete {
             $data['declared_value'] = 30000;
         }
         if($admin){
-            $data['delivery'] = "5c589aa3a18f543451320df1";
+            //$data['delivery'] = "5c589aa3a18f543451320df1";
         }
         
 

@@ -185,10 +185,11 @@ ul.sidebar-filter-list {
     margin-top: 25px;
     text-align: center;
     p {
-        display: flex;
+        display: block;
         align-items: center;
         .btn {
-            width: 100px;
+            width: 75px;
+            float: right;
         }
     }
     input#amount {

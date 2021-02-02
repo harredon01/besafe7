@@ -10,7 +10,9 @@
         <p>Sub Total <span>@{{subtotal| currency }}</span></p>
         <p ng-show="shipping > 0">Domicilio<span>@{{shipping| currency }}</span></p>
         <p ng-show="discount > 0">Descuentos <span>@{{discount| currency }}</span></p>
-        <h4>Total <span>@{{total| currency }}</span></h4>
+        <h4 ng-show="!hasTransactionCost">Total <span>@{{total| currency }}</span></h4>
+        <p ng-show="hasTransactionCost">Transacción <span>@{{transactionCost| currency }}</span></p>
+        <h4 ng-show="hasTransactionCost">Total <span>@{{totalTransaction| currency }}</span></h4>
         <br/>
         <div ng-hide="paymentActive" id="final-submit">
             <div><a href="javascript:;" ng-click="couponVisible = true" class="text-primary" style="font-size: 17px">¡Tengo un cupón!</a></a></div>

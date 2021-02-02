@@ -6,12 +6,16 @@
                 $scope.accept = false;
                 $scope.acceptError = false;
                 $scope.couponVisible = false;
+                $scope.conditions = [];
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
+                $scope.hasTransactionCost = false;
+                $scope.transactionCost = 0;
+                $scope.totalTransaction = 0;
                 angular.element(document).ready(function () {
                     setTimeout(function () {
                         $scope.getCart(true);
-                    }, 300);
+                    }, 300); 
                 });
                 $scope.cleanJson = function () {
                     angular.forEach(angular.element(".item-attributes"), function (value, key) {
@@ -84,10 +88,11 @@
                         for (let i in items) {
                             let item = items[i];
                             console.log("Item: ", item.attributes);
-                            if (item.attributes.is_shippable) {
+                            if (item.attributes.is_shippable || (item.attributes.shipping && item.attributes.shipping > 0)) {
                                 shippable = true;
                             }
                         }
+                        $scope.conditions = data.conditions;
                         $rootScope.items = data.items;
                         $scope.totalItems = data.totalItems;
                         $scope.subtotal = data.subtotal;
@@ -158,7 +163,7 @@
                             }
                         },
                                 function (data) {
-                                });
+                                }); 
                     } else {
                         Modals.showToast('Ingresa un cupon', $("#final-submit"));
                     }
@@ -166,6 +171,17 @@
                 $rootScope.$on('updateCheckoutCart', function (event, args) {
                     $scope.getCart(false);
 
+                });
+                $rootScope.$on('addTransactionCost', function (event, args) {
+                    console.log("Adding transaction cost");
+                    $scope.hasTransactionCost = true;
+                    $scope.transactionCost = $rootScope.activeOrder.total*(0.05);
+                    $scope.totalTransaction = $rootScope.activeOrder.total+$scope.transactionCost;
+                });
+                $rootScope.$on('removeTransactionCost', function (event, args) {
+                    $scope.hasTransactionCost = false;
+                    $scope.transactionCost = 0;
+                    $scope.totalTransaction = 0;
                 });
                 $rootScope.$on('updateLoadedCart', function (event, args) {
                     console.log("updateLoadedCart", args);
@@ -396,22 +412,27 @@
                     }, 500);
                 }
                 $scope.buildOrder = function (order) {
-                    Orders.setDiscounts(order.id, "Booking").then(function (data) {
+                    Orders.setDiscounts(order.id, $rootScope.platform).then(function (data) {
                         console.log("Discounts set", data);
-                        let dataS = {"payers": [$rootScope.user.id], "platform": "Booking"};
+                        let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform};
                         Orders.checkOrder(order.id, dataS).then(function (resp) {
                             console.log("Check Order Result", resp);
                             Modals.hideLoader();
                             let order = resp.order;
                             if (resp.status == "success") {
-                                if ($rootScope.isDigital) {
-                                    //$scope.prepareOrder();
+                                if ($rootScope.platform == "Food") {
+                                    $rootScope.shippingConditionSet = true;
                                 } else {
-                                    Modals.showToast("Direccion guardada", $("#checkout-shipping"));
-                                    $rootScope.$broadcast('updateCheckoutCart');
-                                    $scope.scrollTo("checkout-shipping-methods");
-                                    console.log("Finished scrolling2222");
+                                    if ($rootScope.isDigital) {
+                                        //$scope.prepareOrder();
+                                    } else {
+                                        Modals.showToast("Direccion guardada", $("#checkout-shipping"));
+                                        $rootScope.$broadcast('updateCheckoutCart');
+                                        $scope.scrollTo("checkout-shipping-methods");
+                                        console.log("Finished scrolling2222");
+                                    }
                                 }
+
 
                             } else {
                                 $scope.handleCheckError(resp, order);
@@ -424,11 +445,13 @@
                             });
                 }
                 $scope.addCartItem = function (product_variant, extras) {
-                    Cart.addCartItem(product_variant, extras).then(function (data) {
+                    product_variant.extras = extras
+                    Cart.postToServer(product_variant).then(function (data) {
                         if (data.status == "error") {
                             alert(data.message);
                         } else {
                             $rootScope.$broadcast('updateCheckoutCart');
+                            $scope.buildOrder($rootScope.activeOrder);
                         }
                     },
                             function (data) {
@@ -590,13 +613,13 @@
                         "payers": payers,
                         "delivery_date": null,
                         "split_order": false,
-                        "platform": "Booking",
+                        "platform": $rootScope.platform,
                         "recurring": false,
                         "recurring_type": recurring_type,
                         "recurring_value": recurring_value,
                         "merchant_id": $rootScope.activeOrder.merchant_id
                     };
-                    Orders.prepareOrder(container, "Booking").then(function (resp) {
+                    Orders.prepareOrder(container, $rootScope.platform).then(function (resp) {
                         Modals.hideLoader();
                         if (resp) {
                             if (resp.status == "success") {
@@ -649,6 +672,7 @@
                 $scope.data2 = {};
                 $scope.data3 = {};
                 $scope.data4 = {};
+                $scope.data5 = {};
                 $scope.transaction = {};
                 $scope.banks = [];
                 $rootScope.paymentActive = false;
@@ -656,6 +680,7 @@
                 $scope.creditPayerVisible = false;
                 $scope.creditBuyerVisible = false;
                 $scope.credito = false;
+                $scope.bank = false;
                 $scope.showResult = false;
                 $scope.resultHeader = "";
                 $scope.resultBody = "";
@@ -738,17 +763,28 @@
                     $scope.scrollTo("checkout-payment");
                     if (data.message != "error") {
                         $scope.showResult = true;
-                        $scope.transaction = data.transaction;
-                        if (data.transaction.transaction_state == "APPROVED") {
-                            $scope.resultHeader = "Pago aprobado";
-                            $scope.resultBody = "Tu pago ha sido completado, revisa tu correo para recibir tu compra";
-                        } else if (data.transaction.transaction_state == "PENDING") {
-                            $scope.resultHeader = "Pago pendiente";
-                            $scope.resultBody = "Tu transaccion esta siendo verificada, cuando complete la verificacion recibiras un correo con el resultado";
+                        if (data.transaction) {
+                            $scope.transaction = data.transaction;
+                            if (data.transaction.transaction_state == "APPROVED") {
+                                $scope.resultHeader = "Pago aprobado";
+                                $scope.resultBody = "Tu pago ha sido completado, revisa tu correo para recibir tu compra";
+                            } else if (data.transaction.transaction_state == "PENDING") {
+                                $scope.resultHeader = "Pago pendiente";
+                                $scope.resultBody = "Tu transaccion esta siendo verificada, cuando complete la verificacion recibiras un correo con el resultado";
+                            } else {
+                                $scope.resultHeader = "Pago negado";
+                                $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
+                            }
                         } else {
-                            $scope.resultHeader = "Pago negado";
-                            $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
+                            if(data.payment && data.payment.status && data.payment.status=="payment_in_bank"){
+                                $scope.resultHeader = "Pago Pendiente";
+                                $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. Al finalizar el proceso de pago no olvides enviar el soporte al correo servicioalcliente@lonchis.com.co o a whatsapp al 310 3418432.";
+                                $scope.transaction.description = "Tu pago es el # "+data.payment.id;
+                                $scope.transaction.transaction_state = "Esperando consignación";
+                                $scope.transaction.reference_sale = "Orden # "+$rootScope.activeOrder.id;
+                            }
                         }
+
                     } else {
                         Modals.showToast("Hubo un error. Porfavor verifica tus datos", $("#checkout-payment"));
                     }
@@ -762,7 +798,7 @@
                     $scope.data2.buyer_phone = $scope.data2.payer_phone;
                     $scope.submitted2 = true;
                     if (isvalid) {
-                        $scope.data2.platform = "Booking";
+                        $scope.data2.platform = $rootScope.platform;
                         $scope.data2.email = true;
                         $scope.data2.payment_id = $rootScope.activePayment.id;
                         Modals.showLoader();
@@ -775,11 +811,24 @@
                                 });
                     }
                 }
+                $scope.payInBank = function () {
+                    $scope.data4.platform = $rootScope.platform;
+                    $scope.data4.email = true;
+                    $scope.data4.payment_id = $rootScope.activePayment.id;
+                    Modals.showLoader();
+                    Billing.payInBank($scope.data4, "PayU").then(function (data) {
+                        $scope.transactionResponse(data);
+                        //$scope.data2 = {};
+                    },
+                            function (data) {
+
+                            });
+                }
                 $scope.quickPay = function () {
                     let container = {
                         quick: true,
                         payment_id: $rootScope.activePayment.id,
-                        platform: "Booking"
+                        platform: $rootScope.platform
                     };
                     Modals.showLoader();
                     Billing.payCreditCard(container, "PayU").then(function (data) {
@@ -806,7 +855,7 @@
                 $scope.payDebitCard = function (isvalid) {
                     $scope.submitted3 = true;
                     if (isvalid) {
-                        $scope.data3.platform = "Booking";
+                        $scope.data3.platform = $rootScope.platform;
                         $scope.data3.email = true;
                         $scope.data3.payment_id = $rootScope.activePayment.id;
                         Modals.showLoader();
@@ -838,7 +887,7 @@
                     $scope.submitted4 = true;
                     if (isvalid) {
                         Modals.showLoader();
-                        $scope.data4.platform = "Booking";
+                        $scope.data4.platform = $rootScope.platform;
                         $scope.data4.email = true;
                         $scope.data4.payment_id = $rootScope.activePayment.id;
                         Billing.payCash($scope.data4, "PayU").then(function (data) {
@@ -965,7 +1014,12 @@
                 }
                 $scope.fetchAddressForUse = function (typeFetch, typeUse) {
                     if (typeFetch == 'shipping') {
-                        $scope.setAddressInfields(typeUse, $rootScope.shippingAddress);
+                        if($rootScope.activeOrder.order_addresses){
+                            $scope.setAddressInfields(typeUse, $rootScope.activeOrder.order_addresses[0]);
+                        } else {
+                            $scope.setAddressInfields(typeUse, $rootScope.shippingAddress);
+                        }
+                        
                     } else if (typeFetch == 'other') {
                         $mdDialog.show(Modals.getAddressesPopup()).then(function (address) {
                             console.log("Got address", address);
@@ -1000,7 +1054,9 @@
                     $scope.credito = false;
                     $scope.cash = false;
                     $scope.debito = false;
+                    $scope.bank = false;
                     if (method == "PSE") {
+                        $rootScope.$broadcast('addTransactionCost');
                         $scope.debito = true;
                         Billing.getBanks().then(function (data) {
                             $scope.banks = data.banks;
@@ -1011,6 +1067,7 @@
                     if (method == "CC") {
                         $scope.data2.buyer_country = "CO";
                         $scope.data2.payer_country = "CO";
+                        $rootScope.$broadcast('addTransactionCost');
                         if ($rootScope.addresses && $rootScope.addresses.length > 0) {
                         } else {
                             $rootScope.$broadcast('getAddresses');
@@ -1019,6 +1076,11 @@
                     }
                     if (method == "BALOTO") {
                         $scope.cash = true;
+                        $rootScope.$broadcast('addTransactionCost');
+                    }
+                    if (method == "BANK") {
+                        $scope.bank = true;
+                        $rootScope.$broadcast('removeTransactionCost');
                     }
                 }
             }])
@@ -1065,10 +1127,10 @@
                         "purpose": "external_book",
                         "alert": "#checkout-booking"
                     }
-                    if(item.attributes.location){
+                    if (item.attributes.location) {
                         params.location = item.attributes.location;
                     }
-                    if(item.attributes.duration){
+                    if (item.attributes.duration) {
                         params.duration = item.attributes.duration;
                     }
                     console.log("Sending paramsparamsparams", params);

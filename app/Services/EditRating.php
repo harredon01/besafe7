@@ -93,7 +93,7 @@ class EditRating {
             if ($object) {
                 $fav = Favorite::where('user_id', $user->id)->where('favoritable_id', $object->id)->where('favoritable_type', $class)->first();
                 if ($fav) {
-                    $fav->score +=8;
+                    $fav->score += 8;
                     $fav->save();
                 } else {
                     Favorite::create([
@@ -117,9 +117,14 @@ class EditRating {
      * @return \Illuminate\Http\Response
      */
     public function deleteFavoriteObject(array $data, User $user) {
+        if (strpos($data['type'], 'Models') !== false) {
+        } else {
+            $data['type'] = "App\\Models\\".$data['type'];
+        }
         Favorite::where('user_id', $user->id)
                 ->where('favoritable_type', $data['type'])
                 ->where('favoritable_id', $data['object_id'])->delete();
+        return ['status' => "success", "message" => "favorite removed"];
     }
 
     /**

@@ -47,6 +47,15 @@ class RapigoController extends Controller
     public function getContent() {
         return view(config("app.views").'.rapigo-track');
     }
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @return Response
+     */
+    public function authenticate() {
+        $this->rapigo->authenticate("https://test.rapigo.co/api/token/");
+        $this->rapigo->authenticate("https://www.rapigo.co/api/token/");
+    }
     
     /**
      * Store a newly created resource in storage.

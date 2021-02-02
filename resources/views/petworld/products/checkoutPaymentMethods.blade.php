@@ -1,13 +1,39 @@
 
 
 <div>
-    <div ng-hide="showResult">
-        <button ng-click="showMethod('CC')" class="btn btn-primary" style="margin:10px">Credito</button>
-        <button ng-click="showMethod('PSE')" class="btn btn-primary" style="margin:10px">PSE</button>
-        <button ng-click="showMethod('BALOTO')" class="btn btn-primary" style="margin:10px">Efectivo</button>
-        <br/>
-        <br/>
-        <button ng-click="quickPay()" ng-show="hasSavedCard" class="btn btn-primary">Tarjeta Guardada</button>
+    <div ng-hide="showResult" class="table-responsive">
+        <table class="table" style="color:black">
+            <tr>
+                <th>Proveedor</th>
+                <th>Método</th>
+                <th>Acción</th>
+            </tr>
+            <tr>
+                <td ><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
+                <td>Tarjeta de Crédito<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td><button ng-click="showMethod('CC')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+            <tr>
+                <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
+                <td>PSE<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td><button ng-click="showMethod('PSE')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+            <tr>
+                <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
+                <td>Opciones de efectivo<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td><button ng-click="showMethod('BALOTO')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+            <tr ng-show="hasSavedCard">
+                <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
+                <td>Tarjeta guardada<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td><button ng-click="quickPay()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+            <tr>
+                <td><img width="50" class="w20" src="/assets/logos/davivienda.jpg" alt="PayU Latam" border="0" /><br/><img width="50" class="w20" src="/assets/logos/nequi.jpg" alt="PayU Latam" border="0" /></td>
+                <td>Transferencia a una <br class="show-responsive"/>de nuestras cuentas<br/> Costo:@{{0| currency }}</td>
+                <td><button ng-click="payInBank()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+        </table>
     </div>
     <div ng-hide="showResult">
         <div class="credito" ng-show="credito">
@@ -51,7 +77,7 @@
 
                         <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left;" ng-model="data2.cc_expiration_month" placeholder="MM" class="form-control" name="cc_expiration_month" value="{{ old('cc_expiration_month')}}" required>
                         <input type="tel" ng-keyup="keytab($event, 2)" style="width: 20%;float: left; margin-right: 40px" ng-model="data2.cc_expiration_year" placeholder="YY" class="form-control" name="cc_expiration_year" value="{{ old('cc_expiration_year')}}" required>
-                        <input type="tel" style="width: 30%;float: left; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
+                        <input type="tel" style="width: 30%;float: right; margin-left: 40px" ng-model="data2.cc_security_code" placeholder="CVV" class="form-control" name="cc_security_code" value="{{ old('cc_security_code')}}" required>
                         <span style="color:red" ng-show="(myForm2.cc_security_code.$dirty && myForm2.cc_security_code.$invalid) || submitted2 && myForm2.cc_security_code.$invalid">
                             <span ng-show="submitted2 && myForm2.cc_security_code.$error.required">Porfavor ingresa el número de seguridad</span></span>
 
@@ -183,13 +209,14 @@
                 <br/>
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                        <button ng-click="clean2()" class="btn btn-primary">Limpiar</button>
-                        <a ng-click="fill()" href="javascript:;">Fill</a>
-
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                        <button ng-click="clean2()" class="btn btn-success">Limpiar</button>
                     </div>
                 </div>
             </form>
+        </div>
+        <div class="cash" ng-show="bank">
+            <button ng-click="payInBank()" class="btn btn-success">Pagar</button>
         </div>
         <div class="cash" ng-show="cash">
             <form  class="form-horizontal" role="form" name="myForm4" ng-submit="payCash(myForm4.$valid)" novalidate>
@@ -259,9 +286,8 @@
 
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                        <button ng-click="clean()" class="btn btn-primary">Limpiar</button>
-                        <a ng-click="fill3()" href="javascript:;">Fill</a>
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                        <button ng-click="clean()" class="btn btn-success">Limpiar</button>
                     </div>
                 </div>
             </form>
@@ -354,8 +380,8 @@
 
                 <div class="form-group">
                     <div class="col-md-6 col-md-offset-4">
-                        <button type="submit" class="btn btn-primary">Enviar</button>
-                        <button ng-click="clean()" class="btn btn-primary">Limpiar</button>
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                        <button ng-click="clean()" class="btn btn-success">Limpiar</button>
                         <a ng-click="fill2()" href="javascript:;">Fill</a>
                     </div>
                 </div>
@@ -372,7 +398,7 @@
         <p>Id transaccion: @{{transaction.transaction_id}}</p>
         <p>Estado: @{{transaction.transaction_state}}</p>
         <p>Descripcion: @{{transaction.description}}</p>
-        <a href="/" class="btn btn-primary">Terminar</a>
+        <a href="/" class="btn btn-success">Terminar</a>
     </div>
 </div>
 

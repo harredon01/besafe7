@@ -29,7 +29,7 @@
                                 <tbody>
                                     <!-- Product Row -->
                                     <tr ng-repeat="item in payment.order.items">
-                                        <td class="pro-thumbnail"><a href="#"><img src="image/product/home-1/product-1.jpg" alt="Product"></a></td>
+                                        <td class="pro-thumbnail"><a href="#"><img ng-src="@{{item.attributes.image.file}}"  alt="Product"></a></td>
                                         <td class="pro-title"><a href="#">@{{item.name}}</a></td>
                                         <td class="pro-price"><span>@{{item.price| currency}}</span></td>
                                         <td class="pro-quantity"><span>@{{item.quantity| currency}}</span></td>
@@ -45,8 +45,7 @@
                                 <!-- Head Row -->
                                 <thead>
                                     <tr>
-                                        <th class="pro-thumbnail">Nombre</th>
-                                        <th class="pro-title">Tipo</th>
+                                        <th class="pro-title">Nombre</th>
                                         <th class="pro-price">Valor</th>
                                     </tr>
 
@@ -55,8 +54,7 @@
                                     <!-- Product Row -->
                                     <tr ng-repeat="item in payment.order.order_conditions">
                                         <td class="pro-title"><a href="#">@{{item.name}}</a></td>
-                                        <td class="pro-price"><span>@{{item.type}}</span></td>
-                                        <td class="pro-quantity"><span>@{{item.value| currency}}</span></td>
+                                        <td class="pro-price"><span>@{{item.value| currency}}</span></td>
                                     </tr>
                                     <!-- Discount Row  -->
                                 </tbody>
@@ -93,14 +91,14 @@
                             <h2>Gran Total <span class="text-primary">@{{payment.subtotal| currency}}</span></h2>
                         </div>
                         <div class="cart-summary-button" ng-show="payment.status != 'approved'" ng-click="retryPayment()">
-                            <button class="update-btn c-btn">Reintentar pago</button>
+                            <button class="btn btn-success" style="width: 150px;float:right">Reintentar pago</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-lg-7 mb--20" ng-controller="CheckoutBillingCtrl" ng-show="paymentActive">
-                    <h4 class="checkout-title">Selecciona un método de pago</h4>
+                    <h4 class="checkout-title" ng-hide="showResult">Selecciona un método de pago</h4>
                     @include(config("app.views").'.products.checkoutPaymentMethods')
                 </div>
             </div>
