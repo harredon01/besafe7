@@ -3,11 +3,11 @@
 @section('content')
 <div class="container" ng-controller="UserRegisterCtrl">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">Registro</div>
                 <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/register') }}">
+                    <form class="form-horizontal offset-md-2" role="form" method="POST" action="{{ url('/register') }}">
                         {{ csrf_field() }}
 
                         <div class="form-group{{ $errors->has('firstName') ? ' has-error' : '' }}">
@@ -89,22 +89,23 @@
                             <label for="optin-marketing" class="col-md-4 control-label">Autorizo envio de correos</label>
 
                             <div class="col-md-6">
-                                <input id="optin-marketing" type="checkbox" class="form-control" name="optinMarketing">
+                                <input id="optin-marketing" type="checkbox" class="" name="optinMarketing">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="optin-marketing" class="col-md-4 control-label">Acepto Terminos y condiciones</label>
 
                             <div class="col-md-6">
-                                <input id="optin-marketing" type="checkbox" class="form-control" name="terms" required>
+                                <input id="optin-marketing" type="checkbox" class="" name="terms" required>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-success" style="float:right">
                                     Registrar
                                 </button>
+                                <div style="clear:both"></div>
                             </div>
                         </div>
                     </form>

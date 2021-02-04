@@ -9,6 +9,7 @@
                 $scope.conditions = [];
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
+                $rootScope.deliverySet = true;
                 $scope.hasTransactionCost = false;
                 $scope.transactionCost = 0;
                 $scope.totalTransaction = 0;
@@ -199,6 +200,9 @@
                 $scope.cityVisible = false;
                 $scope.addAddress = false;
                 $scope.visible = false;
+                $scope.delivery = null;
+                $scope.deliveryTime = null;
+                $scope.deliveryString = null;
                 $rootScope.shippingAddressSet = true;
                 $rootScope.shippingCondition = true;
                 $rootScope.shippingConditionSet = false;
@@ -252,6 +256,13 @@
                     $cookies.put("shippingAddress", "", {path: "/"});
                     $cookies.put("locationRefferrer", url, {path: "/"});
                     window.location.href = "/location";
+                }
+                $scope.selectTime = function () {
+                    $scope.deliveryString = $scope.delivery.getFullYear()+"-"+$scope.delivery.getMonth()+1+"-"+$scope.delivery.getDate()+" "+$scope.deliveryTime;
+                    $rootScope.deliverySet = true;
+                    console.log("Time selected",$scope.deliveryString);
+                    $rootScope.activeOrder
+                    $scope.checkOrder($rootScope.activeOrder);
                 }
                 $scope.getCoveragePrompt = function () {
                     $mdDialog.show(Modals.getCoveragePrompt()).then(function (answer) {
@@ -414,7 +425,13 @@
                 $scope.buildOrder = function (order) {
                     Orders.setDiscounts(order.id, $rootScope.platform).then(function (data) {
                         console.log("Discounts set", data);
-                        let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform};
+                        $scope.checkOrder(order);
+                    },
+                            function (data) {
+                            });
+                }
+                $scope.checkOrder = function (order) {
+                    let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform,"delivery_date": $scope.deliveryString};
                         Orders.checkOrder(order.id, dataS).then(function (resp) {
                             console.log("Check Order Result", resp);
                             Modals.hideLoader();
@@ -432,17 +449,12 @@
                                         console.log("Finished scrolling2222");
                                     }
                                 }
-
-
                             } else {
                                 $scope.handleCheckError(resp, order);
                             }
                         },
                                 function (data) {
                                 });
-                    },
-                            function (data) {
-                            });
                 }
                 $scope.addCartItem = function (product_variant, extras) {
                     product_variant.extras = extras
@@ -516,14 +528,14 @@
                             }
                         }
                     } else if (resp.type == "delivery") {
+                        $rootScope.deliverySet = false;
+                        Modals.showToast("Selecciona fecha de entrega", $("#checkout-shipping"));
+                        let endDate = new Date();
+                         endDate.setDate(endDate.getDate() + 1);
+                         $scope.delivery = endDate;
                         /*this.api.toast('CHECKOUT_PREPARE.REQUIRES_DELIVERY');
                          this.api.dismissLoader();
-                         let endDate = new Date();
-                         if (this.currentItems.length == 0) {
-                         this.getCart();
-                         }
-                         endDate.setDate(endDate.getDate() + 1);
-                         //this.delivery = endDate.toISOString();
+                         
                          console.log("delivery", this.delivery);
                          this.requiresDelivery = true;*/
                     }
@@ -561,7 +573,16 @@
                         }
                         if ($scope.expectedProviders == 0 && !$rootScope.shippingConditionSet) {
                             if ($scope.shipping.length > 0) {
-                                $scope.setShippingCondition($scope.shipping[0]);
+                                
+                                let price = 999999;
+                                let condition = null
+                                for(let item in $scope.shipping){
+                                    if($scope.shipping[item].price < price){
+                                        condition = $scope.shipping[item];
+                                        price = $scope.shipping[item].price;
+                                    }
+                                }
+                                $scope.setShippingCondition(condition);
                                 console.log("Auto select", $scope.shipping)
                             } else {
                                 $scope.getCoveragePrompt();
@@ -611,7 +632,7 @@
                     let container = {
                         "order_id": $rootScope.activeOrder.id,
                         "payers": payers,
-                        "delivery_date": null,
+                        "delivery_date": $scope.deliveryString,
                         "split_order": false,
                         "platform": $rootScope.platform,
                         "recurring": false,
@@ -778,7 +799,7 @@
                         } else {
                             if(data.payment && data.payment.status && data.payment.status=="payment_in_bank"){
                                 $scope.resultHeader = "Pago Pendiente";
-                                $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. Al finalizar el proceso de pago no olvides enviar el soporte al correo servicioalcliente@lonchis.com.co o a whatsapp al 310 3418432.";
+                                $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. O a Nequi al 3103418432. Al finalizar el proceso de pago no olvides enviar el soporte al correo servicioalcliente@(petworld)lonchis.com.co o a whatsapp al 310 3418432.";
                                 $scope.transaction.description = "Tu pago es el # "+data.payment.id;
                                 $scope.transaction.transaction_state = "Esperando consignación";
                                 $scope.transaction.reference_sale = "Orden # "+$rootScope.activeOrder.id;
@@ -1057,6 +1078,7 @@
                     $scope.bank = false;
                     if (method == "PSE") {
                         $rootScope.$broadcast('addTransactionCost');
+                        $scope.scrollTo("pago-pse");
                         $scope.debito = true;
                         Billing.getBanks().then(function (data) {
                             $scope.banks = data.banks;
@@ -1065,6 +1087,7 @@
                                 });
                     }
                     if (method == "CC") {
+                        $scope.scrollTo("pago-cc");
                         $scope.data2.buyer_country = "CO";
                         $scope.data2.payer_country = "CO";
                         $rootScope.$broadcast('addTransactionCost');
@@ -1075,6 +1098,7 @@
                         $scope.credito = true;
                     }
                     if (method == "BALOTO") {
+                        $scope.scrollTo("pago-cash");
                         $scope.cash = true;
                         $rootScope.$broadcast('addTransactionCost');
                     }

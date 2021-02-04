@@ -1,4 +1,4 @@
-<table ng-show="shipping.legth>0">
+<table ng-show="shipping.length>0">
     <tr>
         <th class="col-md-3">
             Nombre

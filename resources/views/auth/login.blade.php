@@ -3,10 +3,10 @@
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2 offset-2">
+        <div class="col-md-8 col-md-offset-2 offset-md-2">
             <div class="panel panel-default">
                 <div class="panel-body row">
-                    <div class="col-md-4 col-md-offset-1 offset-1">
+                    <div class="col-md-4 col-md-offset-1 offset-md-1">
                         <br/>
                         <h3 class="text">Bienvenido a nuestra comunidad</h3>
                         <br/>
@@ -26,7 +26,7 @@
                         <br/>
                         <br/>
                     </div>
-                    <div class="col-md-4 col-md-offset-1 offset-1">
+                    <div class="col-md-4 col-md-offset-1 offset-md-1">
                         
                         <br/>
                         <form class="form-horizontal" role="form" method="POST" action="{{ url('/login') }}">

@@ -55,11 +55,11 @@
                 <button ng-click="setCoupon()" style="float:right" class="btn btn-primary">Enviar</button>
             </div>
             <div style="clear:both"></div>
-            <div class="term-block" ng-show="shippingAddressSet && shippingConditionSet && bookingSet || isDigital && bookingSet">
+            <div class="term-block" ng-show="shippingAddressSet && shippingConditionSet && bookingSet && deliverySet || isDigital && bookingSet && deliverySet">
                 <input type="checkbox" ng-model="accept" id="accept_terms2">
                 <label for="accept_terms2">He leido y acepto los <a style="color:#56a700" href="/a/terms" target="_blank">términos y condiciones</a></label>
             </div>
-            <div class="order_button" ng-show="shippingAddressSet && shippingConditionSet && bookingSet || isDigital && bookingSet">
+            <div class="order_button" ng-show="shippingAddressSet && shippingConditionSet && bookingSet && deliverySet || isDigital && bookingSet && deliverySet">
                 <button ng-click="prepareOrder()" style="width: 100%">Pagar Orden</button>
                 <p ng-show="acceptError">Debes aceptar los términos y condiciones para continuar</p>
             </div>    

@@ -117,9 +117,9 @@
                                 <div class="price_box" ng-hide="product.activeVariant.is_on_sale"> 
                                     <span class="current_price">@{{product.activeVariant.price| currency}}</span>
                                 </div>
-                                <label>Cantidad</label>
-                                <input type="tel" style="width:30px" ng-model="product.quantity"/>
-                            </div>
+                                    <label>Cantidad</label>
+                                    <input type="tel" style="width:30px" ng-model="product.quantity"/>
+                                </div>
                             <div class="product_content list_content">
                                 <h4 class="product_name"><a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}">@{{product.name}}</a></h4>
                                 <div class="price_box" ng-show="product.activeVariant.is_on_sale"> 

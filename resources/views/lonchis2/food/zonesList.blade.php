@@ -3,7 +3,7 @@
     
 
     <div class="mapcont">
-        <div id="map"></div>
+        <div id="map" style="height: 500px"></div>
     </div>
     <ul>
         <li id="item-@{{ item.id}}" ng-repeat="item in items">
@@ -23,5 +23,6 @@
 <div>
 
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-maps/2.3.2/angular-google-maps.min.js" async></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCOlc_3d8ygnNCMRzfEpmvSNsYtmbowtYo"></script>
 
