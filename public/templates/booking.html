@@ -32,7 +32,7 @@
 
                 <ul class="time-select" ng-show="!timeSelected && dateSelected">
                     <li ng-repeat="item in appointmentOptions">
-                        <label>{{item.start| date :'h:mm a'}}-{{item.end| date :'h:mm a'}}</label>
+                        <label ng-click="selectSlot(item)">{{item.start| date :'h:mm a'}}-{{item.end| date :'h:mm a'}}</label>
                         <button style="float:right" ng-click="selectSlot(item)">
                             <ion-icon name="calendar-outline"></ion-icon>
                             <i class="fa fa-calendar" style="font-size: 18px;color:#56a700"></i>
