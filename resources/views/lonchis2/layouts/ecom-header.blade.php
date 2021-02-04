@@ -126,13 +126,11 @@
                                     <ul>
                                         <li class="show-responsive"><a href="/a/planes"> Planes de Almuerzo</a></li>
                                         <li><a href="/a/products/cenas-y-almuerzos?merchant_id=1300"> Cenas y almuerzos</a></li>
-                                        <li><a href="/a/products/pasabocas?merchant_id=1300"> Pasabocas</a></li>
+                                        <li><a href="/a/products/pasabocas?merchant_id=1300"> Pasabocas y Refrigerios</a></li>
                                         <li><a href="/a/products/desayunos?merchant_id=1300">Desayunos</a></li>
-                                        <li><a href="/a/products/refrigerios?merchant_id=1300">Refrigerios</a></li>
-                                        <li><a href="/a/products/servicios?merchant_id=1300"> Servicios</a></li>
                                         <li><a href="/a/products/bebidas?merchant_id=1300"> Bebidas</a></li>
                                         <li><a href="/a/products/postres?merchant_id=1300"> Postres</a></li>
-                                        <li><a href="/a/products/estacion-de-cafe?merchant_id=1300"> Estación de cafe </a></li>
+                                        <li><a href="/a/products/estacion-de-cafe?merchant_id=1300"> Estación de bebidas </a></li>
                                     </ul>
                                 </div>
                             </div>

@@ -59,7 +59,7 @@
                 $rootScope.$on('loadCartVariants', function (event, args) {
                     $scope.updateProductsCart(args, false);
                     if ($rootScope.user) {
-                        $scope.checkFavorites();
+                        //$scope.checkFavorites();
                     }
                 });
                 $rootScope.$on('clearCart', function (event, args) {
