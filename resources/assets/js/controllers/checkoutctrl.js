@@ -805,6 +805,7 @@
                                 $scope.transaction.reference_sale = "Orden # "+$rootScope.activeOrder.id;
                             }
                         }
+
                     } else {
                         Modals.showToast("Hubo un error. Porfavor verifica tus datos", $("#checkout-payment"));
                     }
