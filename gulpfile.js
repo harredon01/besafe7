@@ -15,6 +15,7 @@ require('laravel-elixir-vue-2');
 
 elixir(mix => {
     mix.sass('app.scss')
+    mix.sass('safire/style.scss', 'public/css/main3.css')
        .webpack('app.js');
        mix.webpack([
     'app_1.js',
@@ -33,6 +34,7 @@ elixir(mix => {
     'controllers/ordersctrl.js',
     'controllers/exportsctrl.js',
     'controllers/paymentsctrl.js',
+    'controllers/lonchisctrl.js',
     'controllers/groupsctrl.js',
     'controllers/menuctrl.js',
     'controllers/merchantsctrl.js',

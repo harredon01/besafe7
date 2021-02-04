@@ -21,6 +21,9 @@ Route::get('/test', function () {
 Route::get('/a/faq', function () {
     return view(config("app.views").'.faq');
 });
+Route::get('/a/planes', function () {
+    return view(config("app.views").'.planes');
+});
 Route::get('/a/about-us', function () {
     return view(config("app.views").'.about-us');
 });
