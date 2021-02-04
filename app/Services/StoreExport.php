@@ -1598,7 +1598,7 @@ class StoreExport {
                     $files = explode(",", $image);
                     foreach ($files as $value) {
                         $imageData = explode(".", $value);
-                        $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/ecom-products/'. $value;
+                        $image = 'https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/' . $merchantsData[0] . '/' . $value;
                         if (substr($image, -4) == ".jpg") {
                             $image = substr($image, 0, -4) . ".webp";
                         } else if (substr($image, -4) == ".png") {
