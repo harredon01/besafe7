@@ -12,15 +12,16 @@ use App\Models\Push;
 use App\Jobs\RegenerateScenarios;
 use App\Models\Merchant;
 use App\Models\Product;
-use App\Models\Address;
+use App\Models\Order;
 use App\Models\CoveragePolygon;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Hash;
+use App\Exports\ArrayMultipleSheetExport;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\RouteDeliver;
 use App\Mail\RouteOrganize;
 use App\Mail\PurchaseOrder;
-use App\Mail\Register;
+use App\Mail\StoreReports;
 use App\Mail\NewsletterMenus;
 use App\Jobs\SendMessage;
 use App\Mail\Newsletter4;
@@ -43,6 +44,95 @@ class Food {
     const PAYMENT_DENIED = 'payment_denied';
     const PLATFORM_NAME = 'food';
     const ORDER_PAYMENT_REQUEST = 'order_payment_request';
+
+    public function getCandidates() {
+        $deliveries = Delivery::where('status', 'pending')->where("created_at", "<", "2020-01-01")->orderBy("created_at")->with("user")->get();
+        $withPayment = [];
+        $withoutPayment = [];
+        array_push($withoutPayment, ["entrega", "usuario"]);
+        array_push($withPayment, ["entrega", "usuario", "Valor unitario", "orden", "descuentos"]);
+        foreach ($deliveries as $del) {
+            $hasPayment = false;
+            $attributes = json_decode($del->details, true);
+            if (isset($attributes['order_id'])) {
+                $order = Order::where("id", $attributes['order_id'])->with(["orderConditions", "payments", "items"])->first();
+                if ($order) {
+                    $orderPaid = false;
+                    foreach ($order->payments as $payment) {
+                        if ($payment->user_id == $del->user_id) {
+                            $orderPaid = true;
+                        }
+                    }
+
+
+                    if ($orderPaid) {
+                        $totalLunches = 0;
+                        foreach ($order->items as $item) {
+                            if ($item->product_variant_id > 200 & $item->product_variant_id < 221) {
+                                if ($item->product_variant_id == 201 || $item->product_variant_id == 211) {
+                                    $totalLunches += ($item->quantity * 10);
+                                } elseif ($item->product_variant_id == 202 || $item->product_variant_id == 212) {
+                                    $totalLunches += ($item->quantity * 9);
+                                } elseif ($item->product_variant_id == 203 || $item->product_variant_id == 213) {
+                                    $totalLunches += ($item->quantity * 8);
+                                } elseif ($item->product_variant_id == 204 || $item->product_variant_id == 214) {
+                                    $totalLunches += ($item->quantity * 7);
+                                } elseif ($item->product_variant_id == 205 || $item->product_variant_id == 215) {
+                                    $totalLunches += ($item->quantity * 6);
+                                } elseif ($item->product_variant_id == 206 || $item->product_variant_id == 216) {
+                                    $totalLunches += ($item->quantity * 5);
+                                } elseif ($item->product_variant_id == 207 || $item->product_variant_id == 217) {
+                                    $totalLunches += ($item->quantity * 4);
+                                } elseif ($item->product_variant_id == 208 || $item->product_variant_id == 218) {
+                                    $totalLunches += ($item->quantity * 3);
+                                } elseif ($item->product_variant_id == 209 || $item->product_variant_id == 219) {
+                                    $totalLunches += ($item->quantity * 2);
+                                } elseif ($item->product_variant_id == 210 || $item->product_variant_id == 220) {
+                                    $totalLunches += ($item->quantity);
+                                }
+                            }
+                        }
+                        $preTotal = $totalLunches * 10800;
+                        $conditions = $order->orderConditions;
+                        $condText = "";
+                        foreach ($conditions as $cond) {
+                            if ($cond->name == "Por cada 11 días recibe un descuento de 11 mil pesos") {
+                                $total = ($cond->total / 11000) * 10800;
+                                $preTotal -= $total;
+                                $condText .= $cond->value . ",";
+                            } else {
+                                if ($cond->type == "coupon") {
+                                    $total = $cond->total * 0.8;
+                                    $preTotal -= $total;
+                                    $condText .= $cond->value . ",";
+                                }
+                            }
+                        }
+                        $unit = $preTotal / $totalLunches;
+                        array_push($withPayment, [$del->id, $del->user->name, $unit, $order->id, $condText]);
+                    } else {
+                        array_push($withoutPayment, [$del->id, $del->user->name]);
+                    }
+                } else {
+                    array_push($withoutPayment, [$del->id, $del->user->name]);
+                }
+            } else {
+                array_push($withoutPayment, [$del->id, $del->user->name]);
+            }
+        }
+        $pages = [];
+        $page = [
+            "name" => "Cortesias",
+            "rows" => $withoutPayment
+        ];
+        array_push($pages, $page);
+        $page2 = [
+            "name" => "Por descontar",
+            "rows" => $withPayment
+        ];
+        array_push($pages, $page2);
+        $this->writeFile($pages, "Almuerzos-vencidos", true);
+    }
 
     public function suspendDelivery(User $user, $option) {
         $platFormService = app('Notifications');
@@ -179,21 +269,21 @@ class Food {
             $details = json_decode($value->details, true);
             if (array_key_exists("dish", $details)) {
                 $dish = $details["dish"];
-                $father[$dish['type_id']]['count'] ++;
+                $father[$dish['type_id']]['count']++;
                 if (array_key_exists('starter_id', $dish)) {
                     if ($dish['starter_id']) {
-                        $father[$dish['type_id']]['starter'][$dish['starter_id']] ++;
+                        $father[$dish['type_id']]['starter'][$dish['starter_id']]++;
                     }
                 }
-                $father[$dish['type_id']]['main'][$dish['main_id']] ++;
+                $father[$dish['type_id']]['main'][$dish['main_id']]++;
                 foreach ($keywords as $word) {
                     if (array_key_exists('starter_id', $dish)) {
                         if (strpos($dish['starter_id'], $word) !== false) {
-                            $father["keywords"][$word] ++;
+                            $father["keywords"][$word]++;
                         }
                     }
                     if (strpos($dish['main_id'], $word) !== false) {
-                        $father["keywords"][$word] ++;
+                        $father["keywords"][$word]++;
                     }
                 }
             }
@@ -281,9 +371,9 @@ class Food {
             return $dayConfig;
         }
     }
-    
-    private function getSubject($tomorrow){
-        $articles = Article::where("start_date",$tomorrow . " 00:00:00")->get();
+
+    private function getSubject($tomorrow) {
+        $articles = Article::where("start_date", $tomorrow . " 00:00:00")->get();
     }
 
     public function sendReminder() {
@@ -292,29 +382,29 @@ class Food {
         $type = "program_reminder2";
         $date = $this->getNextValidDate($date);
         $tomorrow = date_format($date, "Y-m-d");
-        $articles = Article::where('start_date',$tomorrow . " 00:00:00")->get();
+        $articles = Article::where('start_date', $tomorrow . " 00:00:00")->get();
         $remindMessage = null;
         $sendToAll = false;
         foreach ($articles as $art) {
-            if($art->pagetitle){
+            if ($art->pagetitle) {
                 $remindMessage = $art->pagetitle;
             }
-            if($art->metadescription){
+            if ($art->metadescription) {
                 $sendToAll = true;
             }
         }
         //$deliveries = Delivery::where("status", "pending")->with(['user'])->where("delivery", "<", $tomorrow . " 23:59:59")->where("delivery", ">", $tomorrow . " 00:00:00")->get();
-        $thedata = ["tom1"=>$tomorrow . " 00:00:00","tom2"=>$tomorrow . " 23:59:59"];
+        $thedata = ["tom1" => $tomorrow . " 00:00:00", "tom2" => $tomorrow . " 23:59:59"];
         $deliveries = null;
-        if($sendToAll){
+        if ($sendToAll) {
             $deliveries = DB::select("SELECT id as user_id FROM users where optinMarketing = 1;");
         } else {
             $deliveries = DB::select(""
-                        . "SELECT * FROM food.deliveries WHERE status = 'pending' AND user_id NOT IN "
-            . " (SELECT DISTINCT user_id FROM food.deliveries WHERE status = 'enqueue' AND delivery BETWEEN :tom1 AND :tom2) GROUP BY user_id;"
-                        . "", $thedata);
+                            . "SELECT * FROM food.deliveries WHERE status = 'pending' AND user_id NOT IN "
+                            . " (SELECT DISTINCT user_id FROM food.deliveries WHERE status = 'enqueue' AND delivery BETWEEN :tom1 AND :tom2) GROUP BY user_id;"
+                            . "", $thedata);
         }
-        if(!$remindMessage){
+        if (!$remindMessage) {
             $remindMessage = "¿Ya sabes que vas a almorzar mañana?";
         }
         if (count($deliveries) > 0) {
@@ -329,9 +419,9 @@ class Food {
                     "page" => "DeliveryProgramPage",
                     "page_payload" => $delivery
                 ];
-                
+
                 $dauser = [
-                    "id"=> $deliveryObj->user_id
+                    "id" => $deliveryObj->user_id
                 ];
                 $followers = [json_decode(json_encode($dauser))];
                 $data = [
@@ -344,12 +434,12 @@ class Food {
                     "type" => $type,
                     "user_status" => "normal"
                 ];
-                if($sendToAll){
+                if ($sendToAll) {
                     $date = date_create($tomorrow . " 00:00:00");
                 } else {
                     $date = date_create($deliveryObj->delivery);
                 }
-                
+
                 $date = date_format($date, "Y-m-d");
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             }
@@ -357,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2020-11-23 00:00:00";
-        $end_date = "2020-11-28 23:59:59";
+        $start_date = "2021-02-01 00:00:00"; 
+        $end_date = "2021-02-06 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -393,17 +483,17 @@ class Food {
             if (!$days[($dayofweek - 1)]["imagen"]) {
                 $days[($dayofweek - 1)]["imagen"] = $attributes["plato"][0]["imagen"];
             }
-            if (!$days[($dayofweek - 1)][strtolower($article->name) ."_imagen"]) {
-                $days[($dayofweek - 1)][strtolower($article->name) ."_imagen"] = $attributes["plato"][0]["imagen"];
+            if (!$days[($dayofweek - 1)][strtolower($article->name) . "_imagen"]) {
+                $days[($dayofweek - 1)][strtolower($article->name) . "_imagen"] = $attributes["plato"][0]["imagen"];
             }
             if (!$days[($dayofweek - 1)][strtolower($article->name) . "_t"]) {
                 $days[($dayofweek - 1)][strtolower($article->name) . "_t"] = $attributes["plato"][0]["valor"];
             }
-            if (count($attributes["entradas"]) > 0) { 
+            if (count($attributes["entradas"]) > 0) {
                 if (!$days[($dayofweek - 1)][strtolower($article->name) . "_et"]) {
                     $days[($dayofweek - 1)][strtolower($article->name) . "_et"] = $attributes["entradas"][0]["valor"];
                 }
-                if (count($attributes["entradas"]) > 1) { 
+                if (count($attributes["entradas"]) > 1) {
                     $days[($dayofweek - 1)]["et1"] = $attributes["entradas"][0]["valor"];
                     $days[($dayofweek - 1)]["et2"] = $attributes["entradas"][1]["valor"];
                     $days[($dayofweek - 1)]["ed1"] = $attributes["entradas"][0]["descripcion"];
@@ -433,20 +523,20 @@ class Food {
             $data = [
                 "trigger_id" => -1,
                 "message" => "",
-                "subject" => "Organiza tu cena de fin de año con Lonchis! Visita tu correo para enterarte de nuestros platos.",
+                "subject" => "Ya estan disponibles los platos de la semana. Ingresa a tu app y programa! ",
                 "object" => "Lonchis",
                 "sign" => true,
                 "payload" => $payload,
                 "type" => 'newsletter_food',
-                "user_status" => "normal" 
+                "user_status" => "normal"
             ];
             $date = date_create();
             $date = date_format($date, "Y-m-d");
 
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
-            foreach ($followers as $user) { 
-                //Mail::to($user->email)->send(new NewsletterMenus($days,"Octubre","Octubre"));
+            foreach ($followers as $user) {
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Febrero","Febrero"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
@@ -467,7 +557,7 @@ class Food {
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
             $phone = $delUser->cellphone;
-            $arrayDel = [$stop->id, $address->address . " " . $address->notes,$address->name,$address->phone, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
+            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $address->name, $address->phone, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
             $descr = $delUser->firstName . " " . $delUser->lastName . " ";
             $details = json_decode($stopDel->details, true);
             if (array_key_exists("deliver", $details)) {
@@ -518,41 +608,25 @@ class Food {
         return ["results" => $results, "description" => $stopDescription, "phone" => $phone];
     }
 
-    public function writeFile($data, $title) {
-        return Excel::create($title, function($excel) use($data, $title) {
-
-                    $excel->setTitle($title);
-                    // Chain the setters
-                    $excel->setCreator('Hoovert Arredondo')
-                            ->setCompany('Lonchis');
-                    // Call them separately
-                    $excel->setDescription('This report is clasified');
-                    foreach ($data as $page) {
-//                foreach ($page["rows"] as $key => $value) {
-//                    if ($page["rows"][$key]) {
-//                        if (array_key_exists("labels", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["labels"]);
-//                        }
-//                        if (array_key_exists("projects", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["projects"]);
-//                        }
-//                        if (array_key_exists("people", $page["rows"][$key])) {
-//                            unset($page["rows"][$key]["people"]);
-//                        }
-//                    }
-//                }
-                        $excel->sheet(substr($page["name"], 0, 30), function($sheet) use($page) {
-                            $sheet->fromArray($page["rows"], null, 'A1', true);
-                        });
-                    }
-                })->store('xlsx', storage_path('app/exports'));
+    public function writeFile($data, $title, $sendMail) {
+        //dd($data);
+        $file = Excel::store(new ArrayMultipleSheetExport($data), "exports/" . $title . ".xls", "local");
+        $path = 'exports/' . $title . ".xls";
+        $path = 'exports/' . $title . ".xls";
+        if ($sendMail) {
+            $users = User::whereIn('id', [77, 2])->get();
+            Mail::to($users)->send(new StoreReports($path));
+        } else {
+            return $path;
+        }
     }
 
     public function generateHash($id, $created_at) {
         return base64_encode(Hash::make($id . $created_at . env('LONCHIS_KEY')));
     }
+
     public function updateDeliveries() {
-        Delivery::where('status','scheduled')->update(['status'=>'completed']);
+        Delivery::where('status', 'scheduled')->update(['status' => 'completed']);
     }
 
     public function checkHash($id, $created_at, $hash) {

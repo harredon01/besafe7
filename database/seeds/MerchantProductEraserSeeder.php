@@ -72,7 +72,7 @@ class MerchantProductEraserSeeder extends Seeder {
     }
 
     public function run() {
-        $merchant = Merchant::find(1301);
+        $merchant = Merchant::find(1300);
         foreach ($merchant->products as $product) {
             foreach ($product->files as $file) {
                 $file->delete();

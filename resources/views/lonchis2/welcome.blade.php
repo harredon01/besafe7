@@ -59,7 +59,7 @@
                         <div class="col-lg-6">
                             <div class="slider_content">
                                 <h1>Listo para servir</h1>
-                                <h2>Calienta, sirve y ¡uala!</h2>
+                                <h2>Calienta, sirve y ¡vuala!</h2>
                                 <p>
 								Calienta de 10 a 15 minutos en el horno, sirve en casa y sorprende a tus invitados.
 
@@ -218,7 +218,7 @@
                                     <article class="single_product">
                                         <figure>
                                             <div class="product_thumb">
-                                                <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/317_317.jpg" alt=""></a>
+                                                <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/317_317.png" alt=""></a>
                                                 <div class="label_product">
                                                     <span class="label_sale">Sale</span>
                                                 </div>
@@ -230,77 +230,11 @@
                                                     <span class="old_price">$257.00</span>
                                                 </div>
                                                 <div class="product_timing">
-                                                    <div data-countdown="2021/12/15"></div>
+                                                    <div data-countdown="2021/02/15"></div>
                                                 </div>
-                                                <div class="addto_cart_btn">
+<!--                                                <div class="addto_cart_btn">
                                                     <a href="cart.html" title="Add to cart">Add to Cart</a>
-                                                </div>
-                                            </figcaption>
-                                        </figure>
-                                    </article>
-                                    <article class="single_product">
-                                        <figure>
-                                            <div class="product_thumb">
-                                                <a class="primary_img" href="javascript:;"><img src="assets/img/product/product19.jpg" alt=""></a>
-                                                <a class="secondary_img" href="javascript:;"><img src="assets/img/product/product20.jpg" alt=""></a>
-                                                <div class="label_product">
-                                                    <span class="label_sale">Sale</span>
-                                                </div>
-                                                <div class="action_links">
-                                                    <ul>
-                                                        <li class="add_to_cart"><a href="cart.html" data-tippy="Add to cart" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"> <span class="lnr lnr-cart"></span></a></li>
-                                                       <li class="quick_button"><a href="#" data-tippy="quick view" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true" data-bs-toggle="modal" data-bs-target="#modal_box" > <span class="lnr lnr-magnifier"></span></a></li>
-                                                         <li class="wishlist"><a href="wishlist.html" data-tippy="Add to Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li> 
-                                                        <li class="compare"><a href="#" data-tippy="Add to Compare" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-sync"></span></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <figcaption class="product_content">
-                                                <h4 class="product_name"><a href="javascript:;">Donec Ac Tempus</a></h4>
-                                                <p><a href="#">Fruits</a></p>
-                                                <div class="price_box"> 
-                                                    <span class="current_price">$48.00</span>
-                                                    <span class="old_price">$257.00</span>
-                                                </div>
-                                                <div class="product_timing">
-                                                    <div data-countdown="2021/12/15"></div>
-                                                </div>
-                                                <div class="addto_cart_btn">
-                                                    <a href="cart.html" title="Add to cart">Add to Cart</a>
-                                                </div>
-                                            </figcaption>
-                                        </figure>
-                                    </article>
-                                    <article class="single_product">
-                                        <figure>
-                                            <div class="product_thumb">
-                                                <a class="primary_img" href="javascript:;"><img src="assets/img/product/product15.jpg" alt=""></a>
-                                                <a class="secondary_img" href="javascript:;"><img src="assets/img/product/product16.jpg" alt=""></a>
-                                                <div class="label_product">
-                                                    <span class="label_sale">Sale</span>
-                                                </div>
-                                                <div class="action_links">
-                                                    <ul>
-                                                        <li class="add_to_cart"><a href="cart.html" data-tippy="Add to cart" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"> <span class="lnr lnr-cart"></span></a></li>
-                                                       <li class="quick_button"><a href="#" data-tippy="quick view" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true" data-bs-toggle="modal" data-bs-target="#modal_box" > <span class="lnr lnr-magnifier"></span></a></li>
-                                                         <li class="wishlist"><a href="wishlist.html" data-tippy="Add to Wishlist" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-heart"></span></a></li> 
-                                                        <li class="compare"><a href="#" data-tippy="Add to Compare" data-tippy-placement="top" data-tippy-arrow="true" data-tippy-inertia="true"><span class="lnr lnr-sync"></span></a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <figcaption class="product_content">
-                                                <h4 class="product_name"><a href="javascript:;">Mauris Vel Tellus</a></h4>
-                                                <p><a href="#">Fruits</a></p>
-                                                <div class="price_box"> 
-                                                    <span class="current_price">$48.00</span>
-                                                    <span class="old_price">$257.00</span>
-                                                </div>
-                                                <div class="product_timing">
-                                                    <div data-countdown="2021/12/15"></div>
-                                                </div>
-                                                <div class="addto_cart_btn">
-                                                    <a href="cart.html" title="Add to cart">Add to Cart</a>
-                                                </div>
+                                                </div>-->
                                             </figcaption>
                                         </figure>
                                     </article>
@@ -524,7 +458,7 @@
     </div>
     <!--product area end-->
     
-    <!--blog area start-->
+    <!--blog area start
     <section class="blog_section">
         <div class="container">
             <div class="row">
@@ -615,7 +549,7 @@
     </section>
     <!--blog area end-->
     
-    <!--custom product area start-->
+    <!--custom product area start
     <div class="custom_product_area">
         <div class="container">
             <div class="row">
@@ -933,7 +867,7 @@
     <!--custom product area end-->
     
 
-     <!--brand area start-->
+     <!--brand area start
     <div class="brand_area">
         <div class="container">
             <div class="row">
