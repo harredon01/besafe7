@@ -333,7 +333,7 @@
                                         </div>
                                         <article>
                                             <h3 class="d-none sr-only">Article</h3>
-                                            <p>@{{product.description}}</p>
+                                            <div ng-bind-html="product.description"></div>
                                         </article>
                                         <div class="btn-block d-flex">
                                             <select class="nice-select" ng-change="selectVariant(product)" ng-model="product.variant_id">

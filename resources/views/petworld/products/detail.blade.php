@@ -74,9 +74,9 @@
                         </form>
                         <!-- Blog Short Description -->
                         <div class="product-short-para">
-                            <p>
+
                                 {!! $data["product"]['description'] !!}
-                            </p>
+
                         </div>
                         
                         <!-- Wishlist And Compare -->
