@@ -22,7 +22,7 @@ class Rapigo {
         foreach ($data as $key => $value) {
             $fields_string .= $key . '=' . $value . '&';
         }
-        if ($isTest) {
+        if (false) {
             $url = "https://test.rapigo.co/";
             $push = Push::where('platform', 'RapigoTest')->first();
         } else {

@@ -22,6 +22,7 @@ class MerchantShipping {
     }
 
     public function getOrderShippingPrice(array $origin, array $destination, array $extras) {
+        
         if (isset($extras['merchant_id']) && isset($extras['platform_id']) && $extras['platform_id']) {
             $merchant = Merchant::find($extras['merchant_id']);
             if ($merchant) {
@@ -29,8 +30,15 @@ class MerchantShipping {
                 if (isset($attributes['shipping'])) {
                     foreach ($attributes['shipping'] as $value) {
                         if ($value['id'] == $extras['platform_id']) {
-                            $response['price'] = $value['price'];
-                            $response['price2'] = $value['price'];
+                            if (isset($attributes['ondelivery'])&&isset($extras['ondelivery'])) {
+                                $response['ondelivery'] = true;
+                                $response['ondelivery_price'] = $value['price'];
+                                $response['price'] = $value['price'];
+                                $response['price2'] = $value['price'];
+                            } else {
+                                $response['price'] = $value['price'];
+                                $response['price2'] = $value['price'];
+                            }
                             $response['status'] = "success";
                             return $response;
                         }
@@ -38,13 +46,14 @@ class MerchantShipping {
                 }
             }
         }
-        $response['price'] = 25000;
-        $response['price2'] = 25000;
+        $response['price'] = 10000;
+        $response['price2'] = 10000;
         $response['status'] = "success";
         return $response;
     }
+
     public function sendOrder(array $origin, array $destination, array $extras) {
-        return ["status" => "success", "shipping_id" => "000","subject"=>"Pedido entregado","body"=>"El pedido ha sido entregado"];
+        return ["status" => "success", "shipping_id" => "000", "subject" => "Pedido entregado", "body" => "El pedido ha sido entregado"];
     }
 
     public function createRoute(array $points, $route, $stops) {

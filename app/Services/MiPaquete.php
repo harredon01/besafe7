@@ -157,16 +157,21 @@ class MiPaquete {
         if ($extras['user_id'] < 4) {
             $admin = true;
         }
-        $data = $this->populateRequest($origin, $destination, $extras, false,$admin);
-        
+
+        $data = $this->populateRequest($origin, $destination, $extras, false, $admin);
         $response = $this->sendPost($data, $query, $admin);
         if (array_key_exists('company', $response)) {
             $response['status'] = "success";
             $response['price'] = $response['company']['price'];
+            if (isset($extras['ondelivery']) && $extras['ondelivery']) {
+                $response['ondelivery'] = true;
+            }
         } else {
             $response['status'] = "error";
             $response['message'] = "No pudimos obtener un precio";
         }
+        $response['request'] = $extras;
+        $response['response'] = $response;
         return $response;
     }
 
@@ -201,29 +206,31 @@ class MiPaquete {
         } else {
             $data['weight'] = 4;
         }
-        if (array_key_exists('special_service', $extras)) {
-            $data['special_service'] = $extras['special_service'];
-        } else {
-            $data['special_service'] = 0;
-        }
-
-        if (array_key_exists('value_collection', $extras)) {
-            $data['value_collection'] = $extras['value_collection'];
-        } else {
-            $data['value_collection'] = 0;
-        }
-
         if (array_key_exists('declared_value', $extras)) {
             if ($extras['declared_value']) {
                 $data['declared_value'] = $extras['declared_value'];
+                if ($data['declared_value'] < 1000) {
+                    $data['declared_value'] = 15000;
+                }
+            } else {
+                $data['declared_value'] = 30000;
             }
         } else {
             $data['declared_value'] = 30000;
         }
-        if($admin){
+        if (array_key_exists('ondelivery', $extras)) {
+            $data['special_service'] = 2;
+            $data['payment_type'] = 5;
+            $data['value_collection'] = $data['declared_value'];
+        } else {
+            $data['special_service'] = 0;
+        }
+
+
+        if ($admin) {
             //$data['delivery'] = "5c589aa3a18f543451320df1";
         }
-        
+
 
         $origin_id = null;
         $destination_id = null;
@@ -298,20 +305,20 @@ class MiPaquete {
         if ($extras['user_id'] < 4) {
             $admin = true;
         }
-        $data = $this->populateRequest($origin, $destination, $extras, true,$admin);
-        
+        $data = $this->populateRequest($origin, $destination, $extras, true, $admin);
+
         $response = $this->sendPost($data, $query, $admin);
         if ($response['status'] == 200) {
             $code = $response['result']['sending']['code'];
-            $query2 = '/api/sendings/guia/'.$code;
+            $query2 = '/api/sendings/guia/' . $code;
             $results = $this->sendGet($query2, $admin);
             $body = "Tu envío ha sido creado. Porfavor imprime dos copias de cada guía, una para la transportadora, otra para el cliente. \r\n ";
-            if($results['status']==200){
+            if ($results['status'] == 200) {
                 foreach ($results['result']['response'] as $value) {
-                    $body .= $value." \r\n";
+                    $body .= $value . " \r\n";
                 }
             }
-            return ["status" => "success", "shipping_id" => $response['result']['sending']['_id'],"subject"=>"Envio programado con Mipaquete","body"=>$body];
+            return ["status" => "success", "shipping_id" => $response['result']['sending']['_id'], "subject" => "Envio programado con Mipaquete", "body" => $body];
         }
         return ["status" => "error"];
     }

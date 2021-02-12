@@ -38,7 +38,7 @@
                                 </div>
                             </div>
                             <br/>
-                            <div  ng-controller="CheckoutBookCtrl" ng-show="visibleBooking" id="checkout-booking">
+                            <div  ng-controller="CheckoutBookCtrl" ng-show="visibleBooking" id="checkout-booking"> 
                                 <h4 class="text-black">Tus citas</h4>
                                 @include(config("app.views").'.products.BookingList')
                                 <br/>
@@ -73,20 +73,22 @@
                                     </select>
                                 </div>
                             </div>
-                        </div>
-                        <h4 class="checkout-title" ng-show="shippingConditionSet && bookingSet && !paymentActive || isDigital && bookingSet && !paymentActive">Listo! Puedes ir a pagar</h4>
-                        <div ng-controller="CheckoutBillingCtrl" ng-show="paymentActive" id="checkout-payment">
-                            <h4 class="checkout-title" ng-hide="showResult">Selecciona un método de pago</h4>
-                            @include(config("app.views").'.products.checkoutPaymentMethods')
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="row" ng-controller="CheckoutCartCtrl" id="checkout-cart">
 
-                            <!-- Cart Total -->
-                            @include(config("app.views").'.products.checkoutCart')
+                            <h4 class="checkout-title" ng-show="shippingConditionSet && bookingSet && !paymentActive || isDigital && bookingSet && !paymentActive">Listo! Puedes ir a pagar</h4>
+                            <div ng-controller="CheckoutBillingCtrl" ng-show="paymentActive" id="checkout-payment">
+                                <h4 class="checkout-title" ng-hide="showResult">Selecciona un método de pago</h4>
+                                @include(config("app.views").'.products.checkoutPaymentMethods')
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="row" ng-controller="CheckoutCartCtrl" id="checkout-cart">
+
+                                <!-- Cart Total -->
+                                @include(config("app.views").'.products.checkoutCart')
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

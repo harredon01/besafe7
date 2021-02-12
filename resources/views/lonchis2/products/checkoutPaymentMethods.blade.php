@@ -9,19 +9,19 @@
                     <th>Acción</th>
                 </tr>
                 <tr>
-                    <td ><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Tarjeta de Crédito<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                    <td ><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Tarjeta de Crédito<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                     <td><button ng-click="showMethod('CC')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
                 </tr>
                 <tr>
-                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>PSE<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>PSE<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                     <td><button ng-click="showMethod('PSE')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
                 </tr>
                 <tr>
-                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Opciones de efectivo<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Opciones de efectivo<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                     <td><button ng-click="showMethod('BALOTO')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
                 </tr>
                 <tr ng-show="hasSavedCard">
-                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Tarjeta guardada<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                    <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /><br/>Tarjeta guardada<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                     <td><button ng-click="quickPay()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
                 </tr>
                 <tr>

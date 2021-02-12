@@ -195,7 +195,7 @@ class FoodApiController extends Controller {
      * @return Response
      */
     public function updateMissingDish(Request $request) {
-        return response()->json($this->delivery->adminPostDeliveryOptions($request->all()));
+        return response()->json($this->delivery->adminPostDeliveryOptions($request->all())); 
     }
 
     /**
@@ -205,7 +205,7 @@ class FoodApiController extends Controller {
      */
     public function approvePayment($id) {
         $payment = \App\Models\Payment::find($id);
-        if (config("app.views") == "lonchis") {
+        if (config("app.views") == "lonchis2") {
             dispatch(new \App\Jobs\ApprovePayment($payment, "Food", 5));
         } else {
 

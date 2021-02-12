@@ -52,6 +52,7 @@ Route::post('mercadopago/pay_cash', 'MercadoPagoController@postPayCash');
 Route::post('mercadopago/webhook', 'MercadoPagoController@webhook');
 Route::post('billing/pay_cc/{source?}', 'BillingApiController@postPayCreditCard');
 Route::post('billing/pay_in_bank/{source?}', 'BillingApiController@postPayInBank');
+Route::post('billing/pay_ondelivery/{source?}', 'BillingApiController@postPayOnDelivery');
 Route::post('billing/add_transaction_costs/{payment?}', 'BillingApiController@postAddTransactionCosts');
 Route::get('billing/raw_sources/{source?}', 'BillingApiController@getRawSources');
 Route::get('billing/payments', 'BillingApiController@getPayments');

@@ -49,12 +49,13 @@ class EditCart {
             return ['subtotal' => 0, 'total' => 0, 'items' => [], 'totalItems' => 0];
         }
     }
+
     private function checkCart($user) {
         $items = Cart::session($user->id)->getContent();
         $redirectCart = true;
         foreach ($items as $value) {
-            $item = Item::where('id',$value->id)->with("productVariant")->first();
-            
+            $item = Item::where('id', $value->id)->with("productVariant")->first();
+
             $variant = $item->productVariant;
             if ($variant->type == "product" && !$variant->is_digital && $value->quantity > $variant->quantity) {
                 $data = [
@@ -72,7 +73,7 @@ class EditCart {
 //                }
 //            }
         }
-        if($redirectCart){
+        if ($redirectCart) {
             return $items;
         } else {
             return null;
@@ -83,11 +84,11 @@ class EditCart {
 //        Cart::session($user->id)->removeConditionsByType("coupon");
 //        Cart::session($user->id)->removeConditionsByType("tax");
         $items = $this->checkCart($user);
-        if(!$items){
+        if (!$items) {
             $items = Cart::session($user->id)->getContent();
         }
         $data = array();
-        
+
         $result = array();
         $is_shippable = false;
         $is_subscription = false;
@@ -216,7 +217,7 @@ class EditCart {
     public function migrateCart($user, $device) {
         if ($device) {
             $items = Cart::session($device)->getContent();
-            if (count($items) <1) {
+            if (count($items) < 1) {
                 return true;
             }
             $data = array();
@@ -232,7 +233,7 @@ class EditCart {
                         "merchant_id" => $dataitem["merchant_id"]
                     ];
                     $result = $this->addCartItem($user, $data);
-                    if($result['status']=='error'){
+                    if ($result['status'] == 'error') {
                         $this->clearCart($user);
                         $this->addCartItem($user, $data);
                     }
@@ -251,7 +252,7 @@ class EditCart {
                         ]
                     ];
                     $result = $this->addCustomCartItem($user, $data);
-                    if($result['status']=='error'){
+                    if ($result['status'] == 'error') {
                         $this->clearCart($user);
                         $this->addCustomCartItem($user, $data);
                     }
@@ -271,13 +272,14 @@ class EditCart {
      * @return Response
      */
     public function checkCartAuth($user, $requires_authorization, $order_id, $merchant_id) {
-        $item = null;
-        $order = Order::where('status', 'pending')->where('user_id', $user->id)->first();
-        if ($order) {
-            $item = Item::where("order_id",$order->id)->first();
-        } else {
-            $item = Item::whereNull("order_id")->where("user_id",$user->id)->first();
-        }
+        $item = Item::where("user_id", $user->id)->where(function($q) use ($user) {
+            $q->whereNull('order_id')
+                    ->orWhereIn('order_id', function($query) use ($user){
+                        $query->select('id')
+                        ->from(with(new Order)->getTable())
+                        ->where('status', 'pending')->where('user_id', $user->id);
+                    });
+        })->first();
         if (!$item) {
             return true;
         } else {
@@ -580,7 +582,8 @@ class EditCart {
                         return array("status" => "error", "message" => "SOLD_OUT");
                     }
                 } else {
-                    return array("status" => "error", "message" => "CLEAR_CART");
+                    $this->clearCart($user);
+                    return $this->addCartItem($user, $data);
                 }
             }
             return array("status" => "error", "message" => "NO_PRODUCT");
@@ -652,7 +655,8 @@ class EditCart {
                         "item" => $item
                     );
                 } else {
-                    return array("status" => "error", "message" => "CLEAR_CART");
+                    $this->clearCart($user);
+                    return $this->addCustomCartItem($user, $data);
                 }
             }
             return array("status" => "error", "message" => "NO_MERCHANT");
@@ -698,7 +702,7 @@ class EditCart {
             if ((int) $data['quantity'] > 0) {
                 if ($productVariant->quantity >= ((int) $data['quantity'] ) || $productVariant->is_digital) {
                     if ($productVariant->min_quantity <= ((int) $data['quantity'] )) {
-                        $losAttributes = json_decode($item->attributes,true);
+                        $losAttributes = json_decode($item->attributes, true);
                         if (array_key_exists("extras", $data)) {
                             foreach ($data["extras"] as $x => $x_value) {
                                 $losAttributes[$x] = $x_value;
@@ -719,7 +723,7 @@ class EditCart {
                         $item->priceSumConditions = $cartItem->getPriceSumWithConditions();
                         $item->attributes = json_encode($losAttributes);
                         $item->save();
-                        
+
                         if ($losAttributes['type'] == "Booking" && isset($losAttributes['id'])) {
                             $objClass = self::MODEL_PATH . $losAttributes['type'];
                             $objClass::where("id", $losAttributes['id'])->update(['price' => $item->priceSumConditions]);

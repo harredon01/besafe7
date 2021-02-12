@@ -145,6 +145,12 @@ class EditOrder {
         $order->total = $cart['total'];
         $order->subtotal = $cart['subtotal'];
         $order->shipping = $cart['shipping'];
+        $merchant_id = null;
+        foreach ($cart['items'] as $item) {
+            $merchant_id =$item['attributes']['merchant_id'];
+        }
+        $merchant = Merchant::find($merchant_id);
+        $order->merchante = $merchant;
         return $order;
 //        foreach ($cartConditions as $condition) {
 //            $cond = array();
@@ -245,7 +251,7 @@ class EditOrder {
      */
     public function prepareOrder(User $user, $platform, array $info) {
         if (array_key_exists("order_id", $info)) {
-            $order = Order::find($info['order_id']);
+            $order = Order::where('id', $info['order_id'])->with(['orderConditions', 'orderAddresses'])->first();
             if ($order) {
                 $cart = $this->editCart->getCheckoutCart($user);
                 if (count($cart['items']) > 0) {
@@ -256,8 +262,8 @@ class EditOrder {
                             $merchantFound = true;
                             $order->merchant_id = $merchant->id;
                         }
-                    } 
-                    if(!$merchantFound) {
+                    }
+                    if (!$merchantFound) {
                         $item = $cart['items'][0];
                         $attributes = $item['attributes'];
                         $order->merchant_id = $attributes['merchant_id'];
@@ -277,7 +283,13 @@ class EditOrder {
                     if ($checkResult['status'] == "success") {
                         $order = $checkResult['order'];
                         $totalBuyers = 1;
-                        $address = $order->orderAddresses()->where("type", "shipping")->first();
+                        $address = null;
+                        foreach ($order->orderAddresses as $value) {
+                            if ($value->type == "shipping") {
+                                $address = $value;
+                                break;
+                            }
+                        }
                         if (array_key_exists("split_order", $info)) {
                             if ($info['split_order']) {
                                 if (array_key_exists("payers", $info)) {
@@ -375,8 +387,8 @@ class EditOrder {
             $results['message'] = "Order does not have enough buyers";
             $results['required_buyers'] = $results['requiredBuyers'];
             $results['type'] = "buyers";
-            return $results;
-        }
+        return $results;
+    }
         if ($results['requiredCredits'] > 0) {
             $results['status'] = "error";
             $results['message'] = "Order does not have enough deposits";
@@ -583,6 +595,200 @@ class EditOrder {
         );
     }
 
+    protected function checkOrderCreditsInternal2(User $user, Order $order, array $data) {
+        $items = $order->items;
+        $requiredCredits = 0;
+        $requiredDeposit = 0;
+        $creditHolders = 0;
+        $requiredBuyers = 0;
+        $requiresShipping = 0;
+        $requiresAddress = 0;
+        $requiresDelivery = 0;
+        $splitTotal = $order->total;
+        $totalDeposit = 0;
+        $totalCredit = 0;
+        $creditItem = null;
+        $creditItemMerchant = "";
+        foreach ($items as $value) {
+            $attributes = json_decode($value->attributes, true);
+            if ($attributes) {
+                if (array_key_exists("requires_credits", $attributes)) {
+                    if ($attributes['requires_credits']) {
+                        if (!$creditItem) {
+                            $creditItem = ProductVariant::where("type", "deposit")->first();
+                        }
+                        if ($attributes['type'] == "meal-plan") {
+                            $requiredDeposit += ($creditItem->price * $attributes['credits']);
+                        }
+
+                        $requiredCredits += $attributes['credits'];
+                    }
+                }
+                if (array_key_exists("multiple_buyers", $attributes)) {
+                    if ($attributes['multiple_buyers']) {
+                        $requiredBuyers += $attributes['buyers'];
+                    }
+                }
+                if (array_key_exists("requires_delivery", $attributes)) {
+                    if ($attributes['requires_delivery']) {
+                        $requiresDelivery++;
+                    }
+                }
+                if (array_key_exists("shipping", $attributes)) {
+                    if ($attributes['shipping']) {
+                        $requiresAddress++;
+                    }
+                }
+                if (array_key_exists("is_credit", $attributes)) {
+                    if ($attributes['is_credit']) {
+                        if ($creditItemMerchant == 1299) {
+                            $requiredCredits -= $value->quantity;
+                            $splitTotal -= ($value->price * $value->quantity);
+                            $requiredDeposit -= ($value->price * $value->quantity);
+                            $totalDeposit += ($value->price * $value->quantity);
+                            $totalCredit++;
+                        } else {
+                            $totalCredit++;
+                        }
+                    }
+                }
+                $creditItemMerchant = $value->merchant_id;
+                $order->merchant_id = $creditItemMerchant;
+                if (array_key_exists("is_shippable", $attributes)) {
+                    if ($attributes['is_shippable']) {
+                        $requiresShipping++;
+                        $requiresAddress++;
+                    }
+                }
+            }
+        }
+        if (array_key_exists("payers", $data)) {
+            if (count($data['payers']) > 0) {
+                if ($creditItemMerchant == 1299) {
+                    $totalBuyingDeposit = count($data['payers']) + 1 - $totalCredit;
+                } else {
+                    $totalBuyingDeposit = count($data['payers']) + 1;
+                }
+                $payerSplitNotIncludingDeposit = $splitTotal / (count($data['payers']) + 1);
+                $payerSplitIncludingDeposit = 0;
+                $payertransactionCostNoDeposit = $this->getTransactionTotal($payerSplitNotIncludingDeposit);
+                $payertransactionCostDeposit = 0;
+                if ($creditItemMerchant == 1299) {
+                    if ($totalCredit > 0) {
+                        if (!$creditItem) {
+                            $creditItem = ProductVariant::where("type", "deposit")->where("merchant_id", $creditItemMerchant)->first();
+                        }
+                        $payerSplitIncludingDeposit = $payerSplitNotIncludingDeposit + $creditItem->price;
+                    }
+                }
+            }
+        }
+        if ($requiredCredits > 0) {
+            if (array_key_exists("payers", $data)) {
+                $checkCredits = $data['payers'];
+            } else {
+                $checkCredits = [];
+            }
+            if ($creditItemMerchant == 1299) {
+                array_push($checkCredits, $user->id);
+                $creditHolders = $this->checkUsersCredits($checkCredits, $data['platform']);
+                $requiredCredits -= $creditHolders;
+                $requiredDeposit -= ($creditItem->price * $creditHolders);
+            } else if ($creditItemMerchant == 1301) {
+                $requiredCredits = 1;
+                if ($totalCredit > 0) {
+                    $requiredCredits = 0;
+                }
+                $requiredDeposit = 0;
+            }
+        }
+        if ($requiresDelivery > 0) {
+            if (array_key_exists("delivery_date", $data)) {
+                if ($data['delivery_date']) {
+                    $requiresDelivery = 0;
+                }
+            }
+        }
+        if ($requiredBuyers > 0) {
+            if (array_key_exists("payers", $data)) {
+                $checkBuyers = $data['payers'];
+            } else {
+                $checkBuyers = [];
+            }
+            array_push($checkBuyers, $user->id);
+            $requiredBuyers -= count($checkBuyers);
+        }
+        $results = array(
+            "split" => $splitTotal,
+            "creditHolders" => $creditHolders,
+            "creditItem" => $creditItem,
+            "creditItemMerchant" => $creditItemMerchant,
+            "requiredCredits" => $requiredCredits,
+            "requiredBuyers" => $requiredBuyers,
+            "totalDeposit" => $totalDeposit,
+            "requiresShipping" => $requiresShipping,
+            "requiresDelivery" => $requiresDelivery,
+            "order" => $order,
+        );
+        $results['status'] = "success";
+        $results['message'] = "Order passed validation";
+        if ($results['requiredBuyers'] > 0) {
+            $results['status'] = "error";
+            $results['message'] = "Order does not have enough buyers";
+            $results['required_buyers'] = $results['requiredBuyers'];
+            $results['type'] = "buyers";
+            return $results;
+        }
+        if ($results['requiredCredits'] > 0) {
+            $results['status'] = "error";
+            $results['message'] = "Order does not have enough deposits";
+            $results['required_credits'] = $results['requiredCredits'];
+            $results['type'] = "credits";
+            return $results;
+        }
+        if ($results['requiresDelivery'] > 0) {
+            $results['status'] = "error";
+            $results['order'] = $order;
+            $results['message'] = "Order requires delivery date";
+            $results['type'] = "delivery";
+            return $results;
+        }
+        if ($requiresAddress > 0) {
+            $address = null;
+            foreach ($order->orderAddresses as $value) {
+                if ($value->type == "shipping") {
+                    $address = $value;
+                    break;
+                }
+            }
+            if (!$address) {
+                return array("status" => "error", "message" => "Order does not have Shipping Address");
+            }
+        }
+
+        if ($results['requiresShipping'] == 0) {
+            $order->orderConditions()->where('type', "shipping")->delete();
+            Cart::session($user->id)->removeConditionsByType("shipping");
+        } else {
+            $shippingCondition = null;
+            foreach ($order->orderConditions as $value) {
+                if ($value->type == "shipping") {
+                    $shippingCondition = $value;
+                    break;
+                }
+            }
+            if (!$shippingCondition) {
+                Cart::session($user->id)->removeConditionsByType("shipping");
+                $results['status'] = "error";
+                $results['order'] = $order;
+                $results['message'] = "Order requires shipping condition";
+                $results['type'] = "shipping";
+                return $results;
+            }
+        }
+        return $results;
+    }
+
     public function processModel(array $data) {
         $class = "App\\Models\\" . $data["model"];
         $model = $class::find($data['id']);
@@ -649,7 +855,7 @@ class EditOrder {
             $providers = [];
             foreach ($polygons as $polygon) {
                 $attributes['origin'] = $polygon->address_id;
-                array_push($providers, ["provider" => $polygon->provider, "provider_id" => $polygon->id, "desc" => $polygon->description]);
+                array_push($providers, ["provider" => $polygon->provider, "provider_id" => $polygon->id, "desc" => $polygon->description, "attributes" => $polygon->attributes]);
             }
             $attributes['providers'] = $providers;
             $order->attributes = json_encode($attributes);
@@ -755,33 +961,67 @@ class EditOrder {
             return array("status" => "error", "message" => "Missing shipping provider_id");
         }
 
-        $order = Order::find($order_id);
+        $order = Order::where('id', $order_id)->with(["orderAddresses"])->first();
         if ($order) {
             if ($order->user_id == $user->id) {
                 // add single condition on a cart bases
-                $destination = $order->orderAddresses()->where('type', "shipping")->first();
+                $destination = null;
+                foreach ($order->orderAddresses as $value) {
+                    if ($value->type == "shipping") {
+                        $destination = $value;
+                        break;
+                    }
+                }
                 $attributes = json_decode($order->attributes, true);
                 if (array_key_exists("origin", $attributes)) {
                     $origin = Address::find($attributes['origin']);
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
+                        $quote_shipping = [
+                            'user_id' => $user->id,
+                            "merchant_id" => $order->merchant_id,
+                            "platform_id" => $platform_id,
+                            "declared_value" => $order->total - $order->shipping
+                        ];
+                        if (isset($data['ondelivery']) && $data['ondelivery']) {
+                            $quote_shipping['ondelivery'] = $data['ondelivery'];
+                        }
+                        if (($order->total - $order->shipping) < 1000) {
+                            $cart = $this->editCart->getCheckoutCart($user);
+                            $quote_shipping['declared_value'] = $cart['total'] - $cart['shipping'];
+                        }
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), $quote_shipping);
                         if ($result['status'] == 'success') {
                             $insertCondition = array(
                                 'name' => "Servicio de transporte",
                                 'type' => "shipping",
                                 'target' => 'total',
                                 'value' => $result['price'],
+                                'order_id' => $order->id,
                                 'order' => 0
                             );
-                            $condition = new CartCondition($insertCondition);
                             $insertCondition['order_id'] = $order->id;
                             $insertCondition['total'] = $result['price'];
-                            $insertCondition['attributes'] = json_encode(["platform" => $platform, 'user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
+                            $attrs = [
+                                "platform" => $platform,
+                                'user_id' => $user->id,
+                                "merchant_id" => $order->merchant_id,
+                                "platform_id" => $platform_id
+                            ];
+                            if (isset($result['ondelivery'])) {
+                                $attrs["ondelivery"] = true;
+                            }
+                            $insertCondition['attributes'] = json_encode($attrs);
                             $order->orderConditions()->where('type', "shipping")->delete();
                             Cart::session($user->id)->removeConditionsByType("shipping");
-                            OrderCondition::insert($insertCondition);
+                            $orderCondition = new OrderCondition();
+                            $orderCondition->fill($insertCondition);
+                            $orderCondition->save();
+                            unset($insertCondition['order_id']);
+                            $attrs['order_condition'] = $orderCondition->id;
+                            $insertCondition['attributes'] = $attrs;
+                            $condition = new CartCondition($insertCondition);
                             Cart::session($user->id)->condition($condition);
                             $cart = $this->editCart->getCheckoutCart($user);
                             $order->subtotal = $cart["subtotal"];
@@ -821,22 +1061,41 @@ class EditOrder {
         } else {
             return array("status" => "error", "message" => "Missing shipping provider_id");
         }
-        $order = Order::find($order_id);
+        $order = Order::where('id', $order_id)->with('orderAddresses')->first();
         if ($order) {
             if ($order->user_id == $user->id) {
                 // add single condition on a cart bases
-                $destination = $order->orderAddresses()->where('type', "shipping")->first();
+                $destination = null;
+                foreach ($order->orderAddresses as $value) {
+                    if ($value->type == "shipping") {
+                        $destination = $value;
+                        break;
+                    }
+                }
                 $attributes = json_decode($order->attributes, true);
                 if (array_key_exists("origin", $attributes)) {
                     $origin = Address::find($attributes['origin']);
                     if ($origin) {
                         $className = "App\\Services\\" . $platform;
                         $gateway = new $className;
-                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), ['user_id' => $user->id, "merchant_id" => $order->merchant_id, "platform_id" => $platform_id]);
+                        $quote_shipping = [
+                            'user_id' => $user->id,
+                            "merchant_id" => $order->merchant_id,
+                            "platform_id" => $platform_id,
+                            "declared_value" => $order->total - $order->shipping
+                        ];
+                        if (isset($data['ondelivery']) && $data['ondelivery']) {
+                            $quote_shipping['ondelivery'] = $data['ondelivery'];
+                        }
+                        if (($order->total - $order->shipping) < 1000) {
+                            $cart = $this->editCart->getCheckoutCart($user);
+                            $quote_shipping['declared_value'] = $cart['total'] - $cart['shipping'];
+                        }
+                        $result = $gateway->getOrderShippingPrice($origin->toArray(), $destination->toArray(), $quote_shipping);
                         if ($result['status'] == 'success') {
                             return $result;
                         }
-                        return array("status" => "error", "message" => "Shipping provider does not have coverage");
+                        return array("status" => "error", "message" => "Shipping provider does not have coverage", "reply" => $result, "request" => $quote_shipping);
                     }
                     return array("status" => "error", "message" => "Order has no origin");
                 }
@@ -963,7 +1222,7 @@ class EditOrder {
             $followers = [];
             $user = $item->user;
             if ($order->status == "approved") {
-                
+
                 try {
                     Mail::to($user)->send(new OrderApproved($order, $user, $shipping, "no"));
                 } catch (\Exception $ex) {
@@ -1032,8 +1291,8 @@ class EditOrder {
         }
     }
 
-    public function approvePayment(Payment $payment, $platform, $paymentMethod) {
-        $payment->status = "approved";
+    public function approvePayment(Payment $payment, $platform, $paymentMethod, $paymentStatus = "approved") {
+        $payment->status = $paymentStatus;
         $order = $payment->order;
         $payment->save();
 
@@ -1046,11 +1305,11 @@ class EditOrder {
                 return array("status" => "success", "message" => "Payment approved, still payments pending");
             } else {
                 $order->status = "approved";
-                $order->payment_status = "paid";
                 $order->execution_status = "pending";
+                $order->payment_status = $paymentStatus;
                 $order->payment_method_id = $paymentMethod;
                 $updateData = [
-                    "paid_status" => "paid",
+                    "paid_status" => $paymentStatus,
                     "updated_at" => date("Y-m-d hh:m:s")
                 ];
                 Item::where("order_id", $order->id)->update($updateData);
@@ -1058,7 +1317,6 @@ class EditOrder {
 
 
                 $items = Item::where("order_id", $order->id)->with("productVariant")->get();
-
                 foreach ($items as $value) {
                     $variant = $value->productVariant;
 
@@ -1067,7 +1325,6 @@ class EditOrder {
                         $variant->save();
                     }
                 }
-
                 $className = "App\\Services\\EditOrder" . $platform;
                 $platFormService = new $className(); //// <--- this thing will be autoloaded
                 return $platFormService->approveOrder($order);

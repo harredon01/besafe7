@@ -56,8 +56,11 @@
     .show-responsive{
         display:none;
     }
+    #map {
+        height:500px
+    }
     @media screen and (max-width: 500px){
-        .show-responsive{
+        .show-responsive{ 
             display:block !important;
         }
         .hide-responsive{

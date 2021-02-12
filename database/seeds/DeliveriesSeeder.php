@@ -41,7 +41,7 @@ class DeliveriesSeeder extends Seeder {
     }
 
     public function run() {
-        $this->security->migrateFiles(); 
+        //$this->security->migrateFiles(); 
         $this->security->countTotalsMerchant();
         return true;
         //dispatch(new CreateGoogleEvent(8));

@@ -9,8 +9,12 @@
                 $scope.conditions = [];
                 $rootScope.isDigital = false;
                 $rootScope.bookingSet = true;
+                $rootScope.ondelivery_selected = false;
                 $rootScope.deliverySet = true;
+                $rootScope.onpremise = false;
                 $scope.hasTransactionCost = false;
+                $rootScope.declared_value = 0;
+                $rootScope.estimatedTransactionCost = 0;
                 $scope.transactionCost = 0;
                 $scope.totalTransaction = 0;
                 angular.element(document).ready(function () {
@@ -19,16 +23,7 @@
                     }, 300);
                 });
                 $scope.cleanJson = function () {
-                    angular.forEach(angular.element(".item-attributes"), function (value, key) {
-                        var a = angular.element(value);
-                        var obj = JSON.parse(a.html());
-                        var html = "";
-                        for (x in obj) {
-                            html += x + ": " + obj[x] + " <br/>";
-                        }
-                        a.html(html)
-                        a.css("display", "block");
-                    });
+
                 }
                 $scope.getCart = function (init) {
                     Cart.getCheckoutCart().then(function (data) {
@@ -92,6 +87,9 @@
                             if (item.attributes.is_shippable || (item.attributes.shipping && item.attributes.shipping > 0)) {
                                 shippable = true;
                             }
+                            if(item.attributes.location && item.attributes.location == "consultorio"){
+                                $rootScope.onpremise = true;
+                            }
                         }
                         $scope.conditions = data.conditions;
                         $rootScope.items = data.items;
@@ -103,6 +101,7 @@
                         $scope.coupon = data.coupon;
                         $scope.discount = data.sale + data.coupon;
                         $scope.total = data.total;
+                        $rootScope.estimatedTransactionCost = $scope.total*0.065 + 900;
                         console.log("Broadcasting shippable: ", shippable);
                         if (init) {
                             if (shippable) {
@@ -164,7 +163,7 @@
                             }
                         },
                                 function (data) {
-                                }); 
+                                });
                     } else {
                         Modals.showToast('Ingresa un cupon', $("#final-submit"));
                     }
@@ -176,8 +175,8 @@
                 $rootScope.$on('addTransactionCost', function (event, args) {
                     console.log("Adding transaction cost");
                     $scope.hasTransactionCost = true;
-                    $scope.transactionCost = $rootScope.activeOrder.total*(0.05);
-                    $scope.totalTransaction = $rootScope.activeOrder.total+$scope.transactionCost;
+                    $scope.transactionCost = $rootScope.activeOrder.total * (0.065) + 900;
+                    $scope.totalTransaction = $rootScope.activeOrder.total + $scope.transactionCost;
                 });
                 $rootScope.$on('removeTransactionCost', function (event, args) {
                     $scope.hasTransactionCost = false;
@@ -203,6 +202,7 @@
                 $scope.delivery = null;
                 $scope.deliveryTime = null;
                 $scope.deliveryString = null;
+                $scope.ondelivery = false;
                 $rootScope.shippingAddressSet = true;
                 $rootScope.shippingCondition = true;
                 $rootScope.shippingConditionSet = false;
@@ -258,9 +258,9 @@
                     window.location.href = "/location";
                 }
                 $scope.selectTime = function () {
-                    $scope.deliveryString = $scope.delivery.getFullYear()+"-"+$scope.delivery.getMonth()+1+"-"+$scope.delivery.getDate()+" "+$scope.deliveryTime;
+                    $scope.deliveryString = $scope.delivery.getFullYear() + "-" + $scope.delivery.getMonth() + 1 + "-" + $scope.delivery.getDate() + " " + $scope.deliveryTime;
                     $rootScope.deliverySet = true;
-                    console.log("Time selected",$scope.deliveryString);
+                    console.log("Time selected", $scope.deliveryString);
                     $rootScope.activeOrder
                     $scope.checkOrder($rootScope.activeOrder);
                 }
@@ -284,6 +284,9 @@
                 });
                 $rootScope.$on('buildOrder', function (event, args) {
                     $scope.buildOrder($rootScope.activeOrder);
+                });
+                $rootScope.$on('payOnDelivery', function (event, args) {
+                    $scope.payOnDelivery();
                 });
                 $rootScope.$on('NotShippable', function (event, args) {
                     $scope.visible = false;
@@ -396,14 +399,8 @@
                             $rootScope.shippingAddress = address;
                             $cookies.put("shippingAddress", JSON.stringify($rootScope.shippingAddress), {path: "/"});
                             let order = data.order;
-                            let attributes = JSON.parse(order.attributes);
-                            order.attributes = attributes;
+                            order.attributes = JSON.parse(order.attributes);
                             $rootScope.activeOrder = order;
-                            let providers = attributes.providers;
-                            for (let i in providers) {
-                                console.log("Providers: ", providers[i]);
-                            }
-                            console.log("Setting discounts", $rootScope.shippingAddressSet);
                             $scope.buildOrder(order);
                         } else {
                             Modals.hideLoader();
@@ -423,19 +420,14 @@
                     }, 500);
                 }
                 $scope.buildOrder = function (order) {
-                    Orders.setDiscounts(order.id, $rootScope.platform).then(function (data) {
-                        console.log("Discounts set", data);
-                        $scope.checkOrder(order);
-                    },
-                            function (data) {
-                            });
-                }
-                $scope.checkOrder = function (order) {
-                    let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform,"delivery_date": $scope.deliveryString};
-                        Orders.checkOrder(order.id, dataS).then(function (resp) {
-                            console.log("Check Order Result", resp);
-                            Modals.hideLoader();
+                    let orders = [order];
+                    let totalOrders = 0;
+                    for (let item in orders) {
+                        order = orders[item];
+                        totalOrders++;
+                        $scope.completeOrder(order).then(function (resp) {
                             let order = resp.order;
+                            totalOrders--;
                             if (resp.status == "success") {
                                 if ($rootScope.platform == "Food") {
                                     $rootScope.shippingConditionSet = true;
@@ -443,7 +435,6 @@
                                     if ($rootScope.isDigital) {
                                         //$scope.prepareOrder();
                                     } else {
-                                        Modals.showToast("Direccion guardada", $("#checkout-shipping"));
                                         $rootScope.$broadcast('updateCheckoutCart');
                                         $scope.scrollTo("checkout-shipping-methods");
                                         console.log("Finished scrolling2222");
@@ -455,6 +446,52 @@
                         },
                                 function (data) {
                                 });
+                    }
+                }
+                $scope.completeOrder = function (order) {
+                    var def = $q.defer();
+                    Orders.setDiscounts(order.id, $rootScope.platform).then(function (data) {
+                        $rootScope.merchant = data.order.merchante;
+                        let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform, "delivery_date": $scope.deliveryString};
+                        Orders.checkOrder(order.id, dataS).then(function (resp) {
+                            console.log("Check Order Result", resp);
+                            Modals.hideLoader();
+                            def.resolve(resp);
+                        },
+                                function (data) {
+                                    def.resolve(null);
+                                });
+                    },
+                            function (data) {
+                                def.resolve(null);
+                            });
+
+                    return def.promise;
+                }
+                $scope.checkOrder = function (order) {
+                    let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform, "delivery_date": $scope.deliveryString};
+                    Orders.checkOrder(order.id, dataS).then(function (resp) {
+                        console.log("Check Order Result", resp);
+                        Modals.hideLoader();
+                        let order = resp.order;
+                        if (resp.status == "success") {
+                            if ($rootScope.platform == "Food") {
+                                $rootScope.shippingConditionSet = true;
+                            } else {
+                                if ($rootScope.isDigital) {
+                                    //$scope.prepareOrder();
+                                } else {
+                                    $rootScope.$broadcast('updateCheckoutCart');
+                                    $scope.scrollTo("checkout-shipping-methods");
+                                    console.log("Finished scrolling2222");
+                                }
+                            }
+                        } else {
+                            $scope.handleCheckError(resp, order);
+                        }
+                    },
+                            function (data) {
+                            });
                 }
                 $scope.addCartItem = function (product_variant, extras) {
                     product_variant.extras = extras
@@ -473,7 +510,12 @@
                 $scope.setShippingCondition = function (item) {
                     Modals.showLoader();
                     console.log("Set Shipping", item);
+                    $rootScope.ondelivery_selected = false;
                     let container = {"provider": item.class, "provider_id": item.id};
+                    if (item.ondelivery) {
+                        container['ondelivery'] = item.ondelivery;
+                        $rootScope.ondelivery_selected = true;
+                    }
                     Orders.setPlatformShippingCondition($rootScope.activeOrder.id, container).then(function (data) {
                         Modals.hideLoader();
                         console.log("setPlatformShippingPrice Result", data);
@@ -523,7 +565,31 @@
                             if (attributes.providers) {
                                 for (let item in attributes.providers) {
                                     $scope.expectedProviders++;
-                                    $scope.getPlatformShippingPrice(resp.order.id, attributes.providers[item]);
+                                    if (attributes.providers[item].attributes) {
+                                        let receivedAttrs = JSON.parse(attributes.providers[item].attributes);
+                                        let keys = Object.keys(receivedAttrs);
+                                        for (let key in keys) {
+                                            attributes.providers[item][keys[key]] = receivedAttrs[keys[key]];
+                                            console.log("key", keys[key])
+                                            console.log("receivedAttrs", receivedAttrs)
+
+                                        }
+                                        if (receivedAttrs['ondelivery']) {
+                                            $scope.ondelivery = true;
+                                        }
+                                    }
+                                    if (attributes.providers[item].ondelivery) {
+                                        console.log("attributes.providers[item]", attributes.providers[item])
+                                        let dupe = Object.assign({}, attributes.providers[item]);
+                                        $scope.getPlatformShippingPrice(resp.order.id, attributes.providers[item]);
+
+                                        delete dupe['ondelivery'];
+                                        delete dupe['attributes'];
+                                        console.log("dupe", dupe)
+                                        $scope.getPlatformShippingPrice(resp.order.id, dupe);
+                                    } else {
+                                        $scope.getPlatformShippingPrice(resp.order.id, attributes.providers[item]);
+                                    }
                                 }
                             }
                         }
@@ -531,8 +597,8 @@
                         $rootScope.deliverySet = false;
                         Modals.showToast("Selecciona fecha de entrega", $("#checkout-shipping"));
                         let endDate = new Date();
-                         endDate.setDate(endDate.getDate() + 1);
-                         $scope.delivery = endDate;
+                        endDate.setDate(endDate.getDate() + 1);
+                        $scope.delivery = endDate;
                         /*this.api.toast('CHECKOUT_PREPARE.REQUIRES_DELIVERY');
                          this.api.dismissLoader();
                          
@@ -541,11 +607,12 @@
                     }
                 }
                 $scope.getPlatformShippingPrice = function (order_id, platform) {
+                    console.log("getPlatformShippingPrice query", platform);
                     let description = platform.desc;
                     delete platform.desc;
                     Orders.getPlatformShippingPrice(order_id, platform).then(function (data) {
                         console.log("getPlatformShippingPrice Result", data);
-                        $scope.expectedProviders--;
+
                         if (data.status == "success") {
                             let name = platform.provider;
                             if (platform.provider == "MerchantShipping") {
@@ -553,36 +620,47 @@
                             }
                             let container = {platform: name, class: platform.provider, price: data.price, desc: description, id: platform.provider_id, selected: false};
                             let add = true;
+                            if (data.ondelivery) {
+                                container['ondelivery'] = data.ondelivery;
+                            }
                             for (let i = 0; i < $scope.shipping.length; i++) {
                                 let cont = $scope.shipping[i];
                                 if (cont.platform == container.platform) {
-                                    if (cont.price <= container.price) {
-                                        console.log("Not adding", container)
-                                        add = false;
+                                    if (container.ondelivery || cont.ondelivery) {
+
                                     } else {
-                                        console.log("Removing", cont)
-                                        $scope.shipping.splice(i, 1);
+                                        if (cont.price <= container.price) {
+                                            add = false;
+                                        } else {
+                                            console.log("Removing", cont)
+                                            $scope.shipping.splice(i, 1);
+                                        }
                                     }
                                 }
                             }
                             if (add) {
                                 $scope.shipping.push(container);
                             }
-
-
                         }
+                        $scope.expectedProviders--;
                         if ($scope.expectedProviders == 0 && !$rootScope.shippingConditionSet) {
                             if ($scope.shipping.length > 0) {
-                                
+
                                 let price = 999999;
                                 let condition = null
-                                for(let item in $scope.shipping){
-                                    if($scope.shipping[item].price < price){
+                                for (let item in $scope.shipping) {
+                                    if ($scope.shipping[item].ondelivery) {
+                                        return true;
+                                    }
+                                    if ($scope.shipping[item].price < price) {
                                         condition = $scope.shipping[item];
                                         price = $scope.shipping[item].price;
                                     }
                                 }
-                                $scope.setShippingCondition(condition);
+                                if (condition) {
+                                    $scope.setShippingCondition(condition);
+                                }
+
                                 console.log("Auto select", $scope.shipping)
                             } else {
                                 $scope.getCoveragePrompt();
@@ -622,6 +700,32 @@
                 $scope.changeShipping = function () {
                     $rootScope.shippingConditionSet = false;
                 }
+                $scope.payOnDelivery = function () {
+                    let container = {
+                        "payment_id": $rootScope.activePayment.id
+                    }
+                    Modals.showLoader();
+                    Billing.payOnDelivery(container).then(function (resp) {
+                        Modals.hideLoader();
+                        if (resp.status == "success") {
+                            $rootScope.paymentActive = true;
+                            resp.transaction = {};
+                            resp.transaction.reference_sale = "Pago Contraentrega";
+                            resp.transaction.payment_method = "Pago Contraentrega";
+                            resp.transaction.description = "Pago Contraentrega";
+                            resp.transaction.transaction_id = resp.payment.id;
+                            resp.transaction.transaction_state = "APPROVED";
+                            $rootScope.$broadcast('transactionResponse', resp);
+                        } else {
+                            $scope.showPayment = true;
+                            //this.scrollToTop();
+                        }
+                    }, (err) => {
+                        $scope.showPayment = true;
+                        //this.scrollToTop();
+                        console.log("completePaidOrderError", err);
+                    });
+                }
                 $scope.prepareOrder = function () {
                     Modals.showLoader();
                     $scope.showPayment = false;
@@ -644,7 +748,7 @@
                         Modals.hideLoader();
                         if (resp) {
                             if (resp.status == "success") {
-                                Modals.showToast("Selecciona método de envío", $("#checkout-cart"));
+                                Modals.showToast("Selecciona método de pago", $("#checkout-cart"));
                                 console.log("orderProvider", resp);
                                 $rootScope.activePayment = resp.payment;
                                 $rootScope.activeOrder = resp.order;
@@ -672,6 +776,8 @@
                                         //this.scrollToTop();
                                         console.log("completePaidOrderError", err);
                                     });
+                                } else if ($rootScope.ondelivery_selected) {
+                                    $scope.payOnDelivery();
                                 } else {
                                     $rootScope.$broadcast('activatePayment');
                                 }
@@ -706,6 +812,7 @@
                 $scope.resultHeader = "";
                 $scope.resultBody = "";
                 $scope.cash = false;
+                $scope.ondeliveryM = false;
                 $scope.debito = false;
                 angular.element(document).ready(function () {
                     var d = new Date();
@@ -735,6 +842,10 @@
                 $rootScope.$on('activatePayment', function (event, args) {
                     $rootScope.paymentActive = true;
                     $scope.scrollTo("checkout-payment");
+                    console.log("$rootScope.merchant",$rootScope.merchant)
+                    if($rootScope.merchant.attributes.ondelivery){
+                        $scope.ondeliveryM = true;
+                    }
                     // call $anchorScroll()
                 });
                 $rootScope.$on('transactionResponse', function (event, args) {
@@ -797,12 +908,12 @@
                                 $scope.resultBody = "Tu transaccion ha sido negada. Porfavor intenta otro metodo u otra tarjeta. En Mi cuenta > Mis Pagos puedes reintentar el pago";
                             }
                         } else {
-                            if(data.payment && data.payment.status && data.payment.status=="payment_in_bank"){
+                            if (data.payment && data.payment.status && data.payment.status == "payment_in_bank") {
                                 $scope.resultHeader = "Pago Pendiente";
                                 $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. O a Nequi al 3103418432. Al finalizar el proceso de pago no olvides enviar el soporte al correo servicioalcliente@(petworld)lonchis.com.co o a whatsapp al 310 3418432.";
-                                $scope.transaction.description = "Tu pago es el # "+data.payment.id;
+                                $scope.transaction.description = "Tu pago es el # " + data.payment.id;
                                 $scope.transaction.transaction_state = "Esperando consignación";
-                                $scope.transaction.reference_sale = "Orden # "+$rootScope.activeOrder.id;
+                                $scope.transaction.reference_sale = "Orden # " + $rootScope.activeOrder.id;
                             }
                         }
 
@@ -833,6 +944,7 @@
                     }
                 }
                 $scope.payInBank = function () {
+                    $rootScope.$broadcast('removeTransactionCost');
                     $scope.data4.platform = $rootScope.platform;
                     $scope.data4.email = true;
                     $scope.data4.payment_id = $rootScope.activePayment.id;
@@ -1010,6 +1122,9 @@
                     $scope.addAddress = true;
                     $scope.data.type = "billing";
                 }
+                $scope.payOnDelivery = function () {
+                    $rootScope.$broadcast('payOnDelivery');
+                }
                 $scope.hideAddressForm = function () {
                     $scope.addAddress = false;
                 }
@@ -1035,12 +1150,12 @@
                 }
                 $scope.fetchAddressForUse = function (typeFetch, typeUse) {
                     if (typeFetch == 'shipping') {
-                        if($rootScope.activeOrder.order_addresses){
+                        if ($rootScope.activeOrder.order_addresses) {
                             $scope.setAddressInfields(typeUse, $rootScope.activeOrder.order_addresses[0]);
                         } else {
                             $scope.setAddressInfields(typeUse, $rootScope.shippingAddress);
                         }
-                        
+
                     } else if (typeFetch == 'other') {
                         $mdDialog.show(Modals.getAddressesPopup()).then(function (address) {
                             console.log("Got address", address);
@@ -1162,6 +1277,7 @@
                         console.log("Got result", result);
                         if (result && result == "Carrito actualizado") {
                             item.pending = false;
+                            item.attributes.name = item.name;
                             let missing = false;
                             for (var i = 0; i < $scope.appointments.length; i++) {
                                 if ($scope.appointments[i].pending) {

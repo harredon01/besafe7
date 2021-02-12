@@ -394,7 +394,7 @@ class EditBilling {
     public function completePaidOrder($paymentId, $platform) {
         $payment = Payment::find($paymentId);
         if ($payment->total == $payment->transaction_cost) {
-            dispatch(new ApprovePayment($payment, $platform,6));
+            dispatch(new ApprovePayment($payment, $platform, 6));
             return array("status" => "success", "message" => "Order Approved");
         }
         return array("status" => "error", "message" => "Payment must be paid");
@@ -463,6 +463,45 @@ class EditBilling {
                 $payment->order = $order;
                 Mail::to($user)->send(new EmailPaymentInBank($payment, $user));
                 return array("status" => "success", "message" => "Payment Created", "payment" => $payment);
+            }
+        }
+        return array("status" => "error", "message" => "Invalid order");
+    }
+
+    public function payOnDelivery(User $user, $source, array $data) {
+        if (array_key_exists("payment_id", $data)) {
+            $payment = Payment::where('id', $data['payment_id'])->with(["order.merchant", "order.orderConditions"])->first();
+            if ($payment) {
+                $order = $payment->order;
+                $allowed = false;
+                $hasShipping = false;
+                foreach ($order->orderConditions as $value) {
+                    if ($value->type == "shipping") {
+                        $hasShipping = true;
+                        $value->attributes = json_decode($value->attributes, true);
+                        if ($value->attributes['ondelivery']) {
+                            $allowed = true;
+                        }
+                    }
+                }
+                if (!$allowed && !$hasShipping) {
+                    if (isset($order->merchant->attributes['ondelivery']) && $order->merchant->attributes['ondelivery']) {
+                        $allowed = true;
+                    }
+                }
+                if ($allowed) {
+                    $payment->total = $payment->total - $payment->transaction_cost;
+                    $payment->transaction_cost = 0;
+                    $payment->referenceCode = "payment_" . $payment->id . "_order_" . $payment->order_id . "_" . time();
+                    $payment->status = "ondelivery";
+                    if (array_key_exists('buyer_address', $data)) {
+                        $payment->attributes = json_encode($this->extractBuyer($data));
+                    }
+                    $payment->save();
+                    $this->editOrder->approvePayment($payment, "Booking", 4, "ondelivery");
+                    //dispatch(new ApprovePayment($payment, "Booking", 1,"ondelivery"));
+                    return array("status" => "success", "message" => "Payment Created", "payment" => $payment, "allowed" => $allowed);
+                }
             }
         }
         return array("status" => "error", "message" => "Invalid order");

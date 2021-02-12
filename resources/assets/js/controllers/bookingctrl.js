@@ -251,7 +251,7 @@
                     let item = {
                         "name": "Reserva con: " + booking.bookable.name,
                         "price": booking.price,
-                        "quantity": booking.quantity,
+                        "quantity": 1,
                         "tax": 0,
                         "merchant_id": $scope.objectId,
                         "cost": 0,
@@ -261,7 +261,7 @@
                     if ($scope.product_variant_id) {
                         let container = {
                             product_variant_id: $scope.product_variant_id,
-                            quantity: $scope.quantity,
+                            quantity: 1,
                             item_id: null,
                             merchant_id: $scope.objectId,
                             "extras": extras

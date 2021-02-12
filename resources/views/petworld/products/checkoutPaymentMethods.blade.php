@@ -10,28 +10,33 @@
             </tr>
             <tr>
                 <td ><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
-                <td>Tarjeta de Crédito<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td>Tarjeta de Crédito<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                 <td><button ng-click="showMethod('CC')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
             </tr>
             <tr>
                 <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
-                <td>PSE<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td>PSE<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                 <td><button ng-click="showMethod('PSE')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
             </tr>
             <tr>
                 <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
-                <td>Opciones de efectivo<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td>Opciones de efectivo<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                 <td><button ng-click="showMethod('BALOTO')" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
             </tr>
             <tr ng-show="hasSavedCard">
                 <td><img width="50" class="w20" src="/assets/logos/payu.png" alt="PayU Latam" border="0" /></td>
-                <td>Tarjeta guardada<br/> Costo:@{{activeOrder.total*(0.05)| currency }}</td>
+                <td>Tarjeta guardada<br/> Costo:@{{activeOrder.total*(0.065)+900| currency }}</td>
                 <td><button ng-click="quickPay()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
             </tr>
             <tr>
                 <td><img width="50" class="w20" src="/assets/logos/davivienda.jpg" alt="PayU Latam" border="0" /><br/><img width="50" class="w20" src="/assets/logos/nequi.jpg" alt="PayU Latam" border="0" /></td>
                 <td>Transferencia a una <br class="show-responsive"/>de nuestras cuentas<br/> Costo:@{{0| currency }}</td>
                 <td><button ng-click="payInBank()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
+            </tr>
+            <tr ng-show="onpremise">
+                <td></td>
+                <td>Pago contraentrega<br/> Costo:@{{0| currency }}</td>
+                <td><button ng-click="payOnDelivery()" class="btn btn-success" style="margin:10px;width:70px;">Pagar</button></td>
             </tr>
         </table>
     </div>
