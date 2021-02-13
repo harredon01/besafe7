@@ -855,7 +855,7 @@
         var head = document.getElementsByTagName('head')[0]
         var script = document.createElement('script')
         script.type = 'text/javascript';
-        script.src = 'https://www.google.com/recaptcha/api.js?render=6LcZVAYaAAAAAEk3rv7Ol3yD3VNFhlREWI24AbKQ'
+        script.src = 'https://www.google.com/recaptcha/api.js?render=6LfA9tkZAAAAAEhM90YhoIbQBIkrpzyH5LZEpFo5'
         head.appendChild(script);
     }, 800);
 

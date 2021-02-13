@@ -910,7 +910,11 @@
                         } else {
                             if (data.payment && data.payment.status && data.payment.status == "payment_in_bank") {
                                 $scope.resultHeader = "Pago Pendiente";
-                                $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. O a Nequi al 3103418432. Al finalizar el proceso de pago no olvides enviar el soporte al correo servicioalcliente@(petworld)lonchis.com.co o a whatsapp al 310 3418432.";
+                                let email = "servicioalcliente@petworld.net.co";
+                                if($rootScope.platform=="Food"){
+                                    email = "servicioalcliente@lonchis.com.co";
+                                }
+                                $scope.resultBody = "!Gracias por tu compra! Para activar tu plan por favor realiza la consignación o la transferencia a la cuenta Davivienda No 005000343144 a nombre de Hoovert Arredondo SAS NIT 901.0219.085. O a Nequi al 3103418432. Al finalizar el proceso de pago no olvides enviar el soporte al correo "+email+" o a whatsapp al 310 3418432.";
                                 $scope.transaction.description = "Tu pago es el # " + data.payment.id;
                                 $scope.transaction.transaction_state = "Esperando consignación";
                                 $scope.transaction.reference_sale = "Orden # " + $rootScope.activeOrder.id;

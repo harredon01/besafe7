@@ -20,7 +20,8 @@
             <div class="col-lg-6 col-md-6">
                 <div class="contact_message form" ng-controller="LeadCtrl">
                     <h3>Tu Mensaje</h3>   
-                    <form  id="contact-form" role="form" name="myForm" ng-submit="send(myForm.$valid)" novalidate>
+                    <form  id="contact-form" role="form" name="myForm" ng-submit="lead(myForm.$valid)" novalidate>
+                        <input type="hidden" ng-model="data.type" value="contacto"/>
                         <p>  
                             <label>Nombre</label>
                             <input type="text" ng-model="data.firstName" class="form-control" name="firstName" value="{{ old('firstName')}}" required>
@@ -37,7 +38,9 @@
                             <label>Correo</label>
                             <input type="email" ng-model="data.email" class="form-control" name="email" value="{{ old('email')}}" required>
                             <span style="color:red" ng-show="(myForm.email.$dirty && myForm.email.$invalid) || submitted && myForm.email.$invalid">
-                                <span ng-show="submitted && myForm.email.$error.required">Porfavor ingresa tu correo</span></span>
+                                <span ng-show="submitted && myForm.email.$error.required">Porfavor ingresa tu correo</span>
+                                    <span ng-show="submitted && myForm.email.$invalid">Porfavor verifica tu correo</span>
+                            </span>
                         </p>    
                         <p>
                             <label>Celular</label>

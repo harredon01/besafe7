@@ -30,7 +30,7 @@
                                 <p>
 								lleva una dieta balanceada de una manera fácil y práctica
 							     </p> 
-                                <a href="shop.html">Read more </a>
+                                <a href="/a/products/cenas-y-almuerzos?merchant_id=1300">Probar </a>
                             </div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
 								Para eventos sociales, eventos empresariales, rodajes y mucho más.
 
 							    </p> 
-                                <a href="shop.html">Read more </a>
+                                <a href="/a/products/cenas-y-almuerzos?merchant_id=1300">Cenas y almuerzos </a>
                             </div>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
 								Calienta de 10 a 15 minutos en el horno, sirve en casa y sorprende a tus invitados.
 
 							    </p> 
-                                <a href="shop.html">Read more </a>
+                                <a href="/a/products/cenas-y-almuerzos?merchant_id=1300">Menu </a>
                             </div>
                         </div>
                     </div>
@@ -226,11 +226,11 @@
                                             <figcaption class="product_content">
                                                 <h4 class="product_name"><a href="javascript:;" style="font-size:23px"><strong>10% Off</strong></a></h4>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$48.00</span>
-                                                    <span class="old_price">$257.00</span>
+                                                    <span class="current_price">$15,250.00</span>
+                                                    <span class="old_price">$16,300.00</span>
                                                 </div>
                                                 <div class="product_timing">
-                                                    <div data-countdown="2021/02/15"></div>
+                                                    <div data-countdown="2021/03/01"></div>
                                                 </div>
 <!--                                                <div class="addto_cart_btn">
                                                     <a href="cart.html" title="Add to cart">Add to Cart</a>
