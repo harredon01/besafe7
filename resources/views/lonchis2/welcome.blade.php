@@ -457,7 +457,54 @@
         </div> 
     </div>
     <!--product area end-->
-    
+    <!--testimonial area start-->
+    <div class="faq-client-say-area">
+        <div class="container">   
+            <div class="row">
+                <div class="col-lg-12 col-md-12">
+                    <!--testimonial area start-->
+                    <div class="testimonial_area  testimonial_about">
+                        <div class="section_title">
+                           <h2>Lo que dicen nuestros clientes</h2>
+                        </div>
+                        <div class="testimonial_container">
+                            <div class="testimonial_carousel testimonial-two owl-carousel">
+                                <div class="single_testimonial">
+                                    <div class="testimonial_content">
+
+                                        <p>Hace mucho tiempo estaba buscando un lugar que me diera toda la confianza para poder pedirle almuerzo a mi papá. El tiene más de 70 años y por ende buscaba un lugar que no solo fuera rico sino que fuera nutritivo y con buena variedad para que se alimentara muy bien. cuando encontré a Lonchis primero pague para hacer una prueba, y desde el día uno nos gustó! Encontramos que por buen precio recibíamos un producto de muy buena calidad en términos de sabor, cantidad y variedad.</p>
+                                        <a href="javascript:;">Natalia Castellanos</a>
+                                    </div>
+                                </div>
+                                <div class="single_testimonial">
+                                    <div class="testimonial_content">
+
+                                        <p>¡Gracias Lonchis! Comidas deliciosas, menús variados y siempre llegan a tiempo. pero los eligió a ustedes sobre otros servicios porque su política sostenible va con mi estilo de vida. Los envases retornables son lo máximo.</p>
+                                        <a href="javascript:;">Andrea Sandoval</a>
+                                    </div>
+                                </div>
+                                <div class="single_testimonial">
+                                    <div class="testimonial_content">
+                                        <p>Me encanta lochis, porque me simplifica la vida, desde que lo utilizo me despreocupo por pensar que voy a pedir de almuerzo, no gasto en domicilios, ahorro dinero, ademas como super saludable, balanceado y delicioso. La comida es muy variada, super buena calidad y sabor. Definitivamente hay un equilibrio entre precio vs calidad. Super recomendado!!</p>
+                                        <a href="javascript:;">Maria Adelaida Torres</a>
+                                    </div>
+                                </div>
+                                <div class="single_testimonial">
+                                    <div class="testimonial_content">
+
+                                        <p>Soy fiel cliente de Lonchis ya hace más de 9 meses. Vivo sola y cocinar todos los días es muy difícil.  La verdad lonchis a sido la bendición, pues además  de comer saludable , rico y Variado  ahorrado en mercado, no cocino, ni  lavo loza.</p>
+                                        <a href="javascript:;">Maria Luisa Gomez</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--testimonial area end-->
+                </div>
+            </div>
+        </div>    
+    </div>
+    <!--testimonial area end-->
     <!--blog area start
     <section class="blog_section">
         <div class="container">
