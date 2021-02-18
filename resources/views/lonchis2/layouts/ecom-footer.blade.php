@@ -141,9 +141,9 @@
  
 <!-- JS
 ============================================ -->
-<script src="/js/all.js?v=1.0.0.0"></script>
+<script src="/js/all.js?v=1.0.0.12"></script>
 <!--jquery min js-->
-<script src="/safira/assets/js/vendor/jquery-3.4.1.min.js"></script>
+<script src="/safira/assets/js/vendor/jquery-3.4.1.min.js"></script> 
 <!--popper min js-->
 <script src="/safira/assets/js/popper.js"></script>
 <!--bootstrap min js-->
