@@ -10,7 +10,7 @@
 
         </th>
     </tr>
-    <tr ng-repeat="item in shipping" ng-hide="!item.price">
+    <tr ng-repeat="item in shipping" ng-hide="!item.price && &&item.platform != 'Domicilio del Establecimiento'">
         <td class="col-md-3">
             @{{ item.platform}}<br/><p class="text-gray">@{{ item.desc}} 
                 <span ng-show="item.ondelivery&&item.platform != 'MiPaquete'" style="color:red">y pago contraentrega</span>
