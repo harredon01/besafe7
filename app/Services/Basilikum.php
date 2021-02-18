@@ -26,6 +26,9 @@ class Basilikum {
         $response['price'] = 25000;
         $response['price2'] = 25000;
         $response['status']="success";
+        if (isset($extras['ondelivery'])) {
+            $response['ondelivery'] = true;
+        }
         return $response;
     }
 

@@ -25,7 +25,7 @@ class LeadController extends Controller {
             return view(config("app.views") . ".leads.shop-lead")->with('data', $data);
         } else if ($type == "lost") {
             return view(config("app.views") . ".leads.lost-lead")->with('data', $data);
-        } 
+        }
     }
 
     private function validateCaptcha($token, $ip) {
@@ -74,17 +74,20 @@ class LeadController extends Controller {
                 $files = [];
                 for ($x = 1; $x <= 10; $x++) {
                     $name = 'file-' . $x;
-                    if ($request->file($name)&&$request->file($name)->isValid()) {
+                    if ($request->file($name) && $request->file($name)->isValid()) {
                         unset($data[$name]);
                         array_push($files, $name);
                     }
                 }
-                if ($data['type'] == "Trabaja"||$data['type'] == "veterinarios"||
-                        $data['type'] == "pet-shops"||$data['type'] == "pet-sale"||$data['type'] == "perdidos") {
-                    $lead = new Lead();
-                    $lead->fill($data);
-                    $lead->save();
+                if (isset($data['type'])) {
+                    if ($data['type'] == "Trabaja" || $data['type'] == "veterinarios" ||
+                            $data['type'] == "pet-shops" || $data['type'] == "pet-sale" || $data['type'] == "perdidos") {
+                        $lead = new Lead();
+                        $lead->fill($data);
+                        $lead->save();
+                    }
                 }
+
                 foreach ($files as $value) {
                     $file = $request->file($value);
                     $path = Storage::putFile('public/leads', $file, 'public');
