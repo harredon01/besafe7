@@ -406,7 +406,7 @@
         <p>Id transaccion: @{{transaction.transaction_id}}</p>
         <p>Estado: @{{transaction.transaction_state}}</p>
         <p>Descripcion: @{{transaction.description}}</p>
-        <a href="/" class="btn btn-primary">Terminar</a>
+        <a href="/" class="btn btn-dark" style="color:white">Terminar</a>
     </div>
 </div>
 
