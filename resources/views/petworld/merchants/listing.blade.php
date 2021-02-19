@@ -162,12 +162,10 @@
                                                 Distancia:<span style="color: red !important;"> @{{ merchant.Distance | number }} km</span>
                                             </div>
                                             <div class="btn-block d-flex">
-                                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0" style="display: block;text-align: center;width: 100%;padding-top: 7px;margin-top: 10px;margin-bottom: 5px">Tienda</a>
-                                                <a href="/a/merchant/@{{ merchant.slug}}" class="btn btn-outlined btn-rounded btn-mid" ng-hide="showStore" tabindex="0">Ver Detalle</a>
-
-                                            </div>
-                                            <div class="btn-options" ng-show="showStore">
-                                                <a href="/a/merchant/@{{ merchant.slug}}" style="text-align: center;display: block;width: 100%;margin-right: 0;padding-top: 5px;">Detalle Negocio</a>
+                                                <a href="/a/merchant/@{{ merchant.slug}}" ng-show="showStore" class="btn btn-outlined btn-rounded btn-mid" style="text-align: center;display: block;width: 100%;margin: 0 2px;padding-top: 5px;border-radius:10px">Negocio</a>
+                                                <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" ng-show="showStore" tabindex="0" style="display: block;text-align: center;width: 100%;padding-top: 7px;margin: 0 2px;border-radius:10px">Tienda</a>
+                                                <a href="/a/merchant/@{{ merchant.slug}}" class="btn btn-outlined btn-rounded btn-mid" style="border-radius:10px" ng-hide="showStore" tabindex="0">Ver Detalle</a>
+                                                
                                             </div>
                                             <div class="btn-block grid-btn">
                                                 <a href="javascript:;" ng-click="openItem(merchant)" class="btn btn-outlined btn-rounded btn-mid" tabindex="0" style="display: block;text-align: center;width: 100%;padding-top: 7px;margin-top: 5px;">Tienda</a>
