@@ -67,7 +67,7 @@
                 }
             }])
         .controller('SearchCtrl', ['$scope', '$rootScope', '$cookies','Modals', function ($scope, $rootScope, $cookies,Modals) {
-                $scope.category = "products|0|coverage";
+                $scope.category = "products|0|list";
                 $scope.searchText = "";
                 $scope.showError = false;
                 $scope.searchVisible = false;

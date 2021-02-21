@@ -74,11 +74,10 @@
                 }
                 $scope.buildProductsFromWhole = function (container) {
                     $scope.categories = container.categories;
-                    $scope.current = container.page;
-                    $scope.last = container.last_page;
-                    $scope.current = container.page;
-                    $scope.per_page = container.per_page;
-                    $scope.total = container.total;
+                    $scope.current = parseInt(container.page);
+                    $scope.last = parseInt(container.last_page);
+                    $scope.per_page = parseInt(container.per_page);
+                    $scope.total = parseInt(container.total);
                     if (container.category) {
                         $scope.category_id = container.category.id;
                     }
@@ -171,7 +170,7 @@
                 }
                 $scope.goTo = function (page) {
                     $scope.params.page = page;
-                    if ($rootScope.merchant_id) {
+                    if ($rootScope.merchant_id && !$scope.isSearch) {
                         $scope.params.merchant_id = $rootScope.merchant_id;
                     }
                     Modals.showLoader();

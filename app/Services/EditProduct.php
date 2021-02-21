@@ -181,7 +181,11 @@ class EditProduct {
         $textSearchQuery->with(["merchants", 'files', 'variants']);
         $pageRes = $this->paginateQueryFromArray($textSearchQuery, $data);
         $textSearchQuery = $pageRes['query'];
+        //DB::enableQueryLog();
         $products = $textSearchQuery->get();
+        //dd(json_encode(DB::getQueryLog()));
+        
+        
         foreach ($products as $value) {
             $value->description = nl2br($value->description);
             $value->description = str_replace(array("\r", "\n"), '', $value->description);
@@ -952,7 +956,7 @@ GROUP BY category_id"
             $owner = true;
         }
         $data = [];
-        DB::enableQueryLog();
+        //DB::enableQueryLog();
         $damerchant = DB::select('SELECT 
                                             DISTINCT(m.id),mu.user_id
                                         FROM

@@ -124,20 +124,20 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-coverage', $event, true)">
+                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-list', $event, true)">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-perros">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/todo-para-perros">
                         <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp" class="lazyload" alt="">
                     </a>
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-coverage', $event, true)" href="/a/merchants/todo-para-gatos">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/todo-para-gatos">
                         <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-gato-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-gatos" ng-click="goTo('merchant-coverage', $event, true)">
+                    <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-gatos" ng-click="goTo('merchant-list', $event, true)">
                         <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_gato-clean.webp" class="lazyload" alt="">
                     </a>
                 </div>
@@ -160,7 +160,7 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('report-nearby', $event, true)" href="/a/merchants/consultas">
+                    <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-nearby', $event, true)" href="/a/merchants/consultas">
                         <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/veternarias-cerca.webp" class="lazyload" alt="">
                     </a>
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/vacunacion">

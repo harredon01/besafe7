@@ -283,7 +283,7 @@
                 <div class="shop-product-wrap grid with-pagination row border grid-four-column  mr-0 ml-0 no-gutters" id="prods-cont">
                     <div ng-repeat="category in categories" style="width:100%">
                         <div class="col-lg-3 col-sm-6" ng-repeat="product in category.products">
-                            <div class="pm-product" id="prod-cont-@{{product.id}}" style="min-height: 375px">
+                            <div class="pm-product" id="prod-cont-@{{product.id}}" style="min-height: 410px">
                                 <a href="/a/product-detail/@{{product.slug}}?merchant_id=@{{product.merchant_id}}" class="image" tabindex="0">
                                     <img ng-src="@{{product.src}}" alt="">
                                 </a>
