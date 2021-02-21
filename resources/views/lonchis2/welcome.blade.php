@@ -28,7 +28,7 @@
 
 </h2>
                                 <p>
-								lleva una dieta balanceada de una manera fácil y práctica
+								Lleva una dieta balanceada de una manera fácil y práctica
 							     </p> 
                                 <a href="/a/products/cenas-y-almuerzos?merchant_id=1300">Probar </a>
                             </div>
@@ -102,10 +102,10 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                      <p>Deliciosos y nutritivos</p>
+                      <p>Deliciosos y Nutritivos</p>
                        <h2>Quiero Probar</h2>
                     </div>
-                    <p style="text-align:center">Un servicio de comida saludable, fresca y deliciosa que te ayudara a llevar una dieta balanceada de una manera facil y practica. Mejora tu calidad de vida, fortalecer tu salud y cuidar tu figura con nuestros planes de almuerzos saludables a domicilio; Programa tus almuerzos antes de las 10 pm del día anterior y recibe tus comida fresca en la puerta de tu casa u oficina.</p>
+                    <p style="text-align:center">Un servicio de comida saludable, fresca y deliciosa que te ayudara a llevar una dieta balanceada de una manera fácil y práctica. Mejora tu calidad de vida, fortalece tu salud y cuida tu figura con nuestros planes de almuerzos saludables a domicilio. Programa tus almuerzos antes de las 10 pm del día anterior y recibe tus comida fresca en la puerta de tu casa u oficina.</p>
                     <br/>
                 </div>
             </div> 
@@ -399,7 +399,7 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section_title">
-                      <p>Frescos y deliciosos </p>
+                      <p>Frescos y Deliciosos </p>
                        <h2>Ultimos menús agregados</h2>
                     </div>
                 </div>
@@ -445,7 +445,7 @@
                                         </div>
                                     </div>
                                     <figcaption class="product_content">
-                                        <h4 class="product_name"><a href="javascript:;">Crema de zapallo y jengibre auyama y jengibre)</a></h4>
+                                        <h4 class="product_name"><a href="javascript:;">Crema de zapallo y jengibre auyama y jengibre</a></h4>
                                         <p>Una saludable sopa que nos ayudará a limpiar el colon de toxinas, a eliminar grasa corporal y prevenir la retención de líquidos.</p>
                                     </figcaption>
                                 </figure>
