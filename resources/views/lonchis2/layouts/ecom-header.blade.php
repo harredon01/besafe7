@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-lg-3">
                             <div class="call-support">
-                                <p><a href="tel:+573103418432">(310) 341-8432</a> Contactanos</p>
+                                <p><a href="tel:+573103418432">(310) 341-8432</a> Contáctanos</p>
                             </div>
                         </div>
                     </div>

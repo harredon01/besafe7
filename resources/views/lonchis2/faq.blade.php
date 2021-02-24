@@ -33,7 +33,7 @@
                       </h2>
                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                       <div class="card-body">
-                           <p>Claro! Descarga la app, regístrate y recibe a tu e-mail un correo de bienvenida con información importante sobre nuestro servicio y un  con un cupón de descuento para que pruebes tu primer almuerzo por  $ 9.700 (Entrada + plato fuerte + domicilio). En el correo encuentras las instrucciones paso a paso para redimir tu cupón.</p>
+                           <p>Claro! Descarga la app, regístrate y recibe a tu e-mail un correo de bienvenida con información importante sobre nuestro servicio y con un cupón de descuento para que pruebes tu primer almuerzo por  $ 9.700 (Entrada + plato fuerte + domicilio). En el correo encuentras las instrucciones paso a paso para redimir tu cupón.</p>
                       </div>
                     </div>
                   </div>
@@ -48,8 +48,8 @@
                       <div class="card-body">
                            <ul class="disc">
                                                                                         <li>Puedes seleccionar entre planes en <b>envases retornables o envases desechables</b>, la cantidad de almuerzos lo puedes personalizar entre 1 a 89. *los planes en retornables son más económicos que los desechables</li>
-                                                                                        <li>Por cada 11 almuerzos te  regalamos saldo por <b>$11.000</b>, por lo que siempre vas a conseguir el mejor precio con planes múltiplos de 11 (11,22,33,44…) sin importar que tipo de envase selecciones.</li>
-                                                                                        <li>En grupo es más barato,Compra un plan con amigos y divide la cuenta en partes iguales. Entre más amigos, más ahorro.<br>Para tener en cuenta:
+                                                                                        <li>Por cada 11 almuerzos te  regalamos un descuento por <b>$11.000</b>, por lo que siempre vas a conseguir el mejor precio con planes múltiplos de 11 (11,22,33,44…) sin importar que tipo de envase selecciones.</li>
+                                                                                        <li>En grupo es más barato, compra un plan con amigos y divide la cuenta en partes iguales. Entre más amigos, más ahorro.<br>Para tener en cuenta:
                                                                                             <ul>
                                                                                                 <li>Todos los miembros del grupo  reciben en la misma dirección.</li>
                                                                                                 <li>Todos tienen que tener la app descargada y tener una cuenta Lonchis.</li>
