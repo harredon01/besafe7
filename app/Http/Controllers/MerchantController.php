@@ -11,7 +11,7 @@ use App\Services\CleanSearch;
 use App\Models\Merchant;
 use App\Models\Category;
 use App\Querybuilders\MerchantQueryBuilder;
-
+use DB;
 /* use Excel;
   use App\Models\Category;
   use App\Models\Product;

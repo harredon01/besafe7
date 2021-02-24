@@ -34,6 +34,9 @@ Route::get('/a/blog/{slug?}','WelcomeController@getBlogDetail');
 Route::get('/a/terms', function () {
     return view(config("app.views").'.content.terms');
 });
+Route::get('/a/merchants/farmacia', function () {
+    return redirect('/a/merchants/farmacia-perro');
+});
 Route::get('/a/privacy', function () {
     return view(config("app.views").'.content.privacy');
 });
@@ -217,9 +220,7 @@ Route::get('/newsletter_padres2', function () {
 Route::get('/newsletter_padre2', function () {
     return new App\Mail\Newsletter3();
 });
-Route::get('/a/merchants/farmacia-perro', function () {
-    return redirect('/a/merchants/farmacia-perros');
-});
+
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
 });
