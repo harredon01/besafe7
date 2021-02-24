@@ -37,7 +37,7 @@
                         }
                     }
                     if($scope.merchants.length == 1){
-                        $scope.openItem($scope.merchants[0]);
+                        //$scope.openItem($scope.merchants[0]);
                     }
                     console.log("Data", $scope.merchants);
                     $scope.current = container.page;
