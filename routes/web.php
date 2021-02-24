@@ -217,6 +217,9 @@ Route::get('/newsletter_padres2', function () {
 Route::get('/newsletter_padre2', function () {
     return new App\Mail\Newsletter3();
 });
+Route::get('/a/merchants/farmacia-perro', function () {
+    return redirect('/a/merchants/farmacia-perros');
+});
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
 });
