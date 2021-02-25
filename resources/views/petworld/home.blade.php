@@ -13,6 +13,19 @@
              "dots": true
              }'
              >
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/promo-mdelmar.webp">
+                <div class="container position-relative">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="slider-btn" style="margin-top:225px">
+                                <a href="/a/product-detail/super-promocion-20?merchant_id=20" class="btn btn-outlined--primary btn-rounded">Comprar</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <span class="herobanner-progress"></span>
+            </div>
             <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-todo.webp">
                 <div class="container position-relative">
                     <div class="row">
