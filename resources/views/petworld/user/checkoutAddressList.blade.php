@@ -3,7 +3,7 @@
     <h4 class="checkout-title">Selecciona una direccion de envío</h4>
     <ul style="color:black;font-weight: bold">
         <li id="address-@{{ address.id}}" ng-repeat="address in addresses">
-            <a href="javascript:;"  ng-click="selectAddress(address)">
+            <a href="javascript:;"  ng-click="selectAddress(address)" class="text-primary">
                 <span>@{{ address.name}}</span>
                 <br/>Teléfono: <span class="phone">@{{ address.phone}}</span>
                 <br/>Código Postal: <span class="postal">@{{ address.postal}}</span>
