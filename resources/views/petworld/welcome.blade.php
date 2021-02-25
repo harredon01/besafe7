@@ -123,11 +123,17 @@
                 <h2>Encuentra en nuestras tiendas</h2>
             </div>
             <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4 show-responsive">
+                    <a class="promo-image overflow-image" href="/a/product-detail/super-promocion-20?merchant_id=20">
+                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/20/promo.webp" alt="">
+                    </a>
+                </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-list', $event, true)">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" alt="">
                     </a>
                 </div>
+                
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image  promo-small " ng-click="goTo('merchant-list', $event, true)" href="/a/merchants/todo-para-perros">
                         <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp" class="lazyload" alt="">

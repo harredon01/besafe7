@@ -1200,6 +1200,8 @@
                         $scope.debito = true;
                         Billing.getBanks().then(function (data) {
                             $scope.banks = data.banks;
+                            $scope.data3.financial_institution_code = ""+$scope.banks[0].pseCode;
+                            console.log("Banco",$scope.data3.financial_institution_code);
                         },
                                 function (data) {
                                 });
