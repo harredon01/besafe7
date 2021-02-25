@@ -301,6 +301,7 @@
             <form class="form-horizontal" role="form" name="myForm3" ng-submit="payDebitCard(myForm3.$valid)" novalidate>
                 <input type="hidden" name="_token" value="{{ csrf_token()}}">
                 <input type="hidden" ng-model="data3.payment_id" name="payment_id" value="">
+                <br/><br/>
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Banco</label>
                     <div class="col-md-6">
