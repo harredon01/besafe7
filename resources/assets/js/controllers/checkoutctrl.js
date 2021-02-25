@@ -247,7 +247,6 @@
                     }
                 });
                 $scope.countries = [{name: "Colombia", id: 1}]
-
                 angular.element(document).ready(function () {
 
                 });
