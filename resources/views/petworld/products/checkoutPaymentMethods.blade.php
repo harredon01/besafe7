@@ -305,8 +305,8 @@
                 <div class="form-group" >
                     <label class="col-md-4 control-label">Banco</label>
                     <div class="col-md-6">
-                        <select ng-model="data3.financial_institution_code" class="form-control nice-select" name="financial_institution_code" required>
-                            <option ng-repeat="bank in banks" value="@{{bank.pseCode}}">@{{bank.description}}</option>
+                        <select ng-model="data3.financial_institution_code" class="form-control nice-select" name="financial_institution_code"  
+                        ng-options="bank.pseCode as bank.description for bank in banks"  required>
                         </select>
                         <span style="color:red" ng-show="(myForm3.financial_institution_code.$dirty && myForm3.financial_institution_code.$invalid) || submitted3 && myForm3.financial_institution_code.$invalid">
                             <span ng-show="submitted3 && myForm3.financial_institution_code.$error.required">Porfavor Selecciona tu banco</span></span> 
