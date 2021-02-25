@@ -21,6 +21,8 @@
                     , <a href="javascript:;" class="text-primary" ng-click="selectCity(11.236660039676785, -74.19140938524001)">Santa Marta</a>, <a href="javascript:;" class="text-primary" ng-click="selectCity(10.42839203353642, -75.51813914198655)">Cartagena</a></p>
                     <button ng-click="saveLocation()" class="btn btn-primary">Guardar</button>
                     <button ng-click="cancel()" class="btn btn-primary">Cancelar</button>
+                    <button ng-click="upZoom()" class="btn btn-primary" style="float:right;width:43px">+</button>
+                    <button ng-click="downZoom()" class="btn btn-primary" style="float:right;width:43px">-</button>
                     <div id="map" data-tap-disabled="true"></div>
                 </div>
             </div>

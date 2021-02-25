@@ -92,6 +92,18 @@ angular.module('besafe')
                         setCenterMap(location.lat(), location.lng());
                         getAddressAndPostal(location.lat(), location.lng(), 1);
                     });
+                    google.maps.event.addListener(marker, 'mouseup', function () {
+                        $rootScope.loader = true;
+                        let location = marker.getPosition();
+                        setCenterMap(location.lat(), location.lng());
+                        getAddressAndPostal(location.lat(), location.lng(), 1);
+                    });
+                    google.maps.event.addListener(marker, 'drag', function () {
+                        $rootScope.loader = true;
+                        let location = marker.getPosition();
+                        $rootScope.shippingAddress.lat = location.lat();
+                        $rootScope.shippingAddress.long = location.lng();
+                    });
                     if (trigger) {
                         google.maps.event.trigger(marker, 'dragend');
                     }
@@ -326,12 +338,12 @@ angular.module('besafe')
                         getAddressAndPostal(location.lat(), location.lng(), 1);
                     });
                     /*$rootScope.map.addListener('click', function (e) {
-                        var location = e.latLng;
-                        $rootScope.locationMarker.setPosition(location);
-                        google.maps.event.trigger($rootScope.locationMarker, 'dragend');
-                        setCenterMap(location.lat(), location.lng());
-                        getAddressAndPostal(location.lat(), location.lng(), 1);
-                    });*/
+                     var location = e.latLng;
+                     $rootScope.locationMarker.setPosition(location);
+                     google.maps.event.trigger($rootScope.locationMarker, 'dragend');
+                     setCenterMap(location.lat(), location.lng());
+                     getAddressAndPostal(location.lat(), location.lng(), 1);
+                     });*/
                 };
 
                 var decodeAddressFromLatResult = function (results) {
@@ -400,7 +412,6 @@ angular.module('besafe')
 
                 }
                 var getAddressAndPostal = function (lat, long, attempts) {
-
                     getAddressFromLat(lat, long).then((resp) => {
                         console.log("Address from lat", resp);
                         if (resp) {
@@ -420,10 +431,10 @@ angular.module('besafe')
                                         long: long,
                                         city_id: city.id,
                                         region_id: city.region_id,
-                                        country_id:1,
-                                        countryCode:"CO"
+                                        country_id: 1,
+                                        countryCode: "CO"
                                     }
-                                    if($rootScope.shippingAddress){
+                                    if ($rootScope.shippingAddress) {
                                         $rootScope.shippingAddress.address = decodeAddressFromLatResult(resp);
                                         $rootScope.shippingAddress.postal = decodePostalFromLatResult(resp);
                                         $rootScope.shippingAddress.lat = lat;
@@ -434,6 +445,7 @@ angular.module('besafe')
                                     } else {
                                         $rootScope.shippingAddress = container;
                                     }
+                                    
                                     $rootScope.loader = false;
                                 } else {
                                     $rootScope.loader = false;
@@ -442,9 +454,9 @@ angular.module('besafe')
                                         postal: decodePostalFromLatResult(resp),
                                         lat: lat,
                                         long: long,
-                                        country_id:1
+                                        country_id: 1
                                     }
-                                    if($rootScope.shippingAddress){
+                                    if ($rootScope.shippingAddress) {
                                         $rootScope.shippingAddress.address = decodeAddressFromLatResult(resp);
                                         $rootScope.shippingAddress.postal = decodePostalFromLatResult(resp);
                                         $rootScope.shippingAddress.lat = lat;
@@ -462,7 +474,7 @@ angular.module('besafe')
                                             postal: decodePostalFromLatResult(resp),
                                             lat: lat,
                                             long: long,
-                                            country_id:1
+                                            country_id: 1
                                         }
                                         $rootScope.shippingAddress = container;
                                     });
@@ -496,7 +508,6 @@ angular.module('besafe')
                                 deferred.resolve([]);
                             }
                         } else {
-                            window.alert("Geocoder failed due to: " + status);
                         }
                     });
                     return deferred.promise;

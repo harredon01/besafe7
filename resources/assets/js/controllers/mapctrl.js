@@ -37,6 +37,16 @@ angular.module('besafe')
                 $scope.default = function () {
                     MapService.createLocationMarker(4.653450, -74.049605, false);
                 }
+                $scope.upZoom = function () {
+                    let z = $rootScope.map.getZoom();
+                    z++;
+                    $rootScope.map.setZoom(z);
+                }
+                $scope.downZoom = function () {
+                    let z = $rootScope.map.getZoom();
+                    z--;
+                    $rootScope.map.setZoom(z);
+                }
                 $scope.cancel = function () {
                     window.history.back();
                 }
