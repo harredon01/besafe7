@@ -246,7 +246,7 @@
                                 });
                     }
                 });
-                $scope.countries = [{name: "Colombia", id: 1}, {name: "Colombia2", id: 2}]
+                $scope.countries = [{name: "Colombia", id: 1}]
 
                 angular.element(document).ready(function () {
 

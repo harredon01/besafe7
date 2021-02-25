@@ -58,7 +58,7 @@
             
             <div class="col-md-6 col-12 mb--20">
                 <label>Ciudad</label>
-                <select ng-model="data.city_id" class="form-control nice-select" name="city_id" ng-change="selectCountry(data.city_id)" 
+                <select ng-model="data.city_id" class="form-control nice-select" name="city_id" 
                         ng-options="city.id as city.name for city in cities"  required>
                 </select>
                 <span style="color:red" ng-show="(myForm.city_id.$dirty && myForm.city_id.$invalid) || submitted && myForm.city_id.$invalid">
