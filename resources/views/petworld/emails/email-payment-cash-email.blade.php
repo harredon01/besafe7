@@ -2,7 +2,7 @@
 
 # Hola {{$user->firstName}}!
 
-Gracias por comprar en lonchis. Para continuar con el proceso para tu pago {{$payment->id}} debes pagar el comprobante en el metodo que escogiste. 
+Gracias por comprar en Pet World. Para continuar con el proceso para tu pago {{$payment->id}} debes pagar el comprobante en el metodo que escogiste. 
 
 
 @component('mail::button', ['url' => $url ])

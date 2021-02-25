@@ -22,23 +22,14 @@
 @endforeach
 |                |     Total      |${{number_format($order->total, 2, ',', '.')}}|     
 @endcomponent
-@if ($invoice == 'yes')
-@component('mail::table')
-| La Orden           | Valor            |
-|:-----------------|-----------------:|
-|Productos         |${{number_format($order->totalCost, 2, ',', '.')}}|
-|Depositos, menaje y meseros |${{number_format($order->totalDeposit, 2, ',', '.')}}|
-|Logistica total |${{number_format($order->totalPlatform, 2, ',', '.')}}|
-|Total             |${{number_format($order->total, 2, ',', '.')}}|
-@endcomponent
-@endif
+
 @component('mail::table')
 | Tu Pago #{{$order->payment->id}}         | Valor            |
 |:-----------------|-----------------:|
 |Subtotal          |${{number_format($order->payment->subtotal, 2, ',', '.')}}|
 |Transaccion       |${{number_format($order->payment->transaction_cost, 2, ',', '.')}}|
 |Total             |${{number_format($order->payment->total, 2, ',', '.')}}|
-|Base Gravable productos|${{number_format($order->totalCost, 2, ',', '.')}}|
+
 @endcomponent
 
 @component('mail::table')
