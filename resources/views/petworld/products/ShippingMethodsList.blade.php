@@ -27,5 +27,6 @@
         </td>
     </tr>
 </table>
-<p ng-show="ondelivery">Costo estimado transaccion payu: @{{ estimatedTransactionCost | currency}}</p>
-<p ng-show="ondelivery">Costo consignacion bancaria o nequi: $0</p>
+<br/><br/>
+<p ng-show="ondelivery">Recuerda que pagar en línea tiene un costo estimado transaccion payu de: <span class="text-primary"><strong>@{{ estimatedTransactionCost | currency}}</strong></span></p>
+<p ng-show="ondelivery">Si quieres pagar <span class="text-primary"><strong>0</strong></span> transaccion puedes usar Nequi (Bancolombia) o una consignacion bancaria. </p>
