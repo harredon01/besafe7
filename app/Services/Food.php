@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-02-15 00:00:00"; 
-        $end_date = "2021-02-20 23:59:59";
+        $start_date = "2021-03-15 00:00:00"; 
+        $end_date = "2021-03-20 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -536,7 +536,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Febrero","Febrero"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Marzo","Marzo"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
@@ -846,11 +846,11 @@ class Food {
 //        dd($date);
         $deliveries = Delivery::whereIn('status', ['pending', 'deposit'])->where('delivery', '<', $la . " 23:59:59")->orderBy('delivery', 'desc')->get();
         foreach ($deliveries as $item) {
-            $delivery = Delivery::where('id', "<>", $item->id)->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
+            $delivery = Delivery::where('id', "<>", $item->id)->whereIn('status', ['pending', 'deposit'])->where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'desc')->first();
             $delivery2 = null;
             if ($delivery) {
                 $date = date_create($delivery->delivery);
-                $delivery2 = Delivery::where('user_id', $item->user_id)->where('delivery', '>', $item->delivery)->orderBy('delivery', 'asc')->first();
+                $delivery2 = Delivery::where('user_id', $item->user_id)->whereIn('status', ['pending', 'deposit'])->where('delivery', '>', $item->delivery)->orderBy('delivery', 'asc')->first();
                 if ($delivery->id == $delivery2->id) {
                     $delivery2 = null;
                 }
