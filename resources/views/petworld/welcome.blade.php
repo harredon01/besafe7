@@ -13,19 +13,7 @@
              "dots": true
              }'
              >
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/promo-mdelmar.webp">
-                <div class="container position-relative">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="slider-btn" style="margin-top:225px">
-                                <a href="/a/product-detail/super-promocion-20?merchant_id=20" class="btn btn-outlined--primary btn-rounded">Comprar</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <span class="herobanner-progress"></span>
-            </div>
+            
             <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-todo.webp">
                 <div class="container position-relative">
                     <div class="row">
@@ -58,23 +46,7 @@
                 </div>
                 <span class="herobanner-progress"></span>
             </div>
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-nuevos-miembros.webp">
-                <div class="container position-relative">
-                    <div class="row">
-                        <div class="col-lg-6">
-
-                            <h1 class="text-black">¿NUEVOS MIEMBROS<br/>EN LA FAMILIA?</h1>
-                            <h4 class="mt--20">Encuentra las familias ideales para<br/>ellos y dejalos en buenas manos.</h4>
-
-                            <div class="slider-btn mt--30">
-                                <a href="/a/contact-us/sale" class="btn btn-outlined--primary btn-rounded">Ver</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <span class="herobanner-progress"></span>
-            </div>
+            
 
         </div>
     </section>
@@ -92,18 +64,18 @@
                         </div>
                     </div>
                 </div>
-                <!--div class="col-lg-3 col-sm-6">
+                <div class="col-lg-6 col-sm-6">
                     <div class="policy-block-single">
                         <div class="icon">
                             <span class="ti-credit-card"></span>
                         </div>
                         <div class="text">
-                            <h3>Cod</h3>
-                            <p>Cash on Delivery</p>
+                            <h3>Tarjeta de Credio</h3>
+                            <p>Nequi</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-3 col-sm-6">
+                <!--div class="col-lg-3 col-sm-6">
                     <div class="policy-block-single">
                         <div class="icon">
                             <span class="ti-gift"></span>
@@ -113,7 +85,7 @@
                             <p>Buy a Gift</p>
                         </div>
                     </div>
-                </div-->
+                </div>
                 <div class="col-lg-6 col-sm-6">
                     <div class="policy-block-single">
                         <div class="icon">
@@ -124,6 +96,50 @@
                             <p>Escribenos a cualquier hora</p>
                         </div>
                     </div>
+                </div-->
+            </div>
+        </div>
+    </div>
+    <div class="pt--50">
+        <div class="container vet-container">
+            <div class="row">
+                <div class="col-lg-12 pt--50 pt-lg-0">
+                    <div class="block-title">
+                        <h2>Necesitas un veterinario?</h2>
+                    </div>
+                    <!--Two Row One Column Slider -->
+                    @foreach ($vets as $merchant)
+                        <div class="single-slide">
+                            <div class="pm-product product-type-list">
+                                <a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)" style="width:12%" class="image">
+                                    <img class="lazyload" data-src="{{ $merchant['icon']}}" alt="">
+                                </a>
+                                <div class="content vets">
+                                    <h3><a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)">{{ $merchant['name']}}</a></h3>
+                                    <div class="price">
+                                        <span>Direccion: {{ $merchant['address']}}</span><br/>
+                                        <span>Telefono: <a href="tel:{{ $merchant['telephone']}}" class="text-primary">{{ $merchant['telephone']}}</a></span><br/>
+                                        <span>Correo: <a href="mailto:{{ $merchant['email']}}" class="text-primary">{{ $merchant['email']}}</a></span>
+                                    </div>
+                                    <div class="rating-widget mt--20">
+                                        <a href="" class="single-rating"><i class="fas fa-star"></i></a>
+                                        <a href="" class="single-rating"><i class="fas fa-star"></i></a>
+                                        <a href="" class="single-rating"><i class="fas fa-star"></i></a>
+                                        <a href="" class="single-rating"><i class="fas fa-star"></i></a>
+                                        <a href="" class="single-rating"><i class="fas fa-star-half-alt"></i></a>
+
+                                    </div>
+                                    <p class="show-responsive">{{ $merchant['description']}}</p>
+                                </div>
+                                <div class="hide-responsive" style="padding: 0 10px 10px;width: 38%;">
+                                    <p>{{ $merchant['description']}}</p>
+                                    </div>
+                                <div class="btn-block" style="padding:10px; width: 20%">
+                                    <a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)" class="btn btn-outlined" style="width:100%;margin-top:20px">Ver</a>
+                                    </div>
+                            </div>
+                        </div>
+                        @endforeach
                 </div>
             </div>
         </div>
@@ -136,11 +152,6 @@
                 <h2>Encuentra en nuestras tiendas</h2>
             </div>
             <div class="row justify-content-center">
-                <div class="col-lg-4 col-md-4 show-responsive">
-                    <a class="promo-image overflow-image" href="/a/product-detail/super-promocion-20?merchant_id=20">
-                        <img src="https://s3.us-east-2.amazonaws.com/gohife/public/pets-products/20/promo.webp" alt="">
-                    </a>
-                </div>
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/alimentos-para-perros" ng-click="goTo('merchant-list', $event, true)">
                         <img src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp" alt="">

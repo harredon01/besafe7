@@ -73,17 +73,20 @@ if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
 n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '259563762220577');
-fbq('track', 'PageView');
+            'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '259563762220577');
+    fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=259563762220577&ev=PageView&noscript=1"
-/></noscript>
+               src="https://www.facebook.com/tr?id=259563762220577&ev=PageView&noscript=1"
+               /></noscript>
 <!-- End Facebook Pixel Code -->
 <style>
     .show-responsive{
         display:none;
+    }
+    .vet-container .pm-product .vets {
+        width:38%;
     }
     @media screen and (max-width: 500px){
         #main-gallery,#shipping-info{
@@ -100,7 +103,10 @@ src="https://www.facebook.com/tr?id=259563762220577&ev=PageView&noscript=1"
             display:block !important;
         }
         .hide-responsive{
-            display:none;
+            display:none !important;
+        }
+        .vet-container .pm-product .vets {
+            width:68%;
         }
         .site-brand {
             padding-top: 5px;

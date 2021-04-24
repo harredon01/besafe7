@@ -67,13 +67,13 @@
                                 <div class="col-lg-4 col-md-5 col-sm-8 order-2 order-md-3">
                                     <div class="header-widget-2 text-center text-sm-right ">
                                         <div class="call-widget hide-responsive">
-                                            <p><a href="tel:3103418432">Llamanos: <i class="icon ion-ios-telephone"></i><span class="font-weight-mid">+57-310
+                                            <p><a href="https://wa.me/+573103418432">Escribenos: <i class="icon ion-social-whatsapp-outline"></i><span class="font-weight-mid">+57-310
                                                         341 8432</span></a></p>
                                         </div>
                                         <ul class="header-links">
                                             <li ng-hide="true"><a href="cart.html"><i class="fas fa-car-alt"></i> Track Your Order</a></li>
                                             <li ng-hide="user"><a href="/login"><i class="fas fa-user"></i> Ingresa</a></li>
-                                            <li ng-hide="false" class="show-responsive"><a href="tel:3103418432"><i class="icon ion-ios-telephone"></i> +57-310 341 8432</a></li>
+                                            <li ng-hide="false" class="show-responsive"><a href="https://wa.me/+573103418432"><i class="icon ion-social-whatsapp-outline"></i> +57-310 341 8432</a></li>
                                             <li ng-hide="false" class="show-responsive" style="font-size: 17px;margin-right: 0px;"><a href="javascript:;" ng-click="showSearch()"><i class="icon ion-search"></i></a></li>
                                             <li ng-show="user"><a href="{{ url('user/editProfile')}}"><i class="fas fa-user"></i> Hola @{{user.firstName}}  </a></li>
                                         </ul>

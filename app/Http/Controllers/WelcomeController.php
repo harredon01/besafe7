@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Mail;
 use Illuminate\Http\Request;
+use App\Models\Merchant;
 class WelcomeController extends Controller {
     /*
       |--------------------------------------------------------------------------
@@ -29,7 +30,13 @@ class WelcomeController extends Controller {
      * @return Response
      */
     public function index() {
-        return view(config("app.views").'.welcome');
+        if(config("app.views")=="petworld"){
+            $merchants = Merchant::whereIn("id",[7,8,9,12,13,16,20])->orderBy("id","desc")->get();
+            return view(config("app.views").'.welcome', ['vets' => $merchants]);
+        } else {
+            return view(config("app.views").'.welcome');
+        }
+        
     }
 
     /**

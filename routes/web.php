@@ -11,9 +11,7 @@
   |
  */
 Route::middleware('cache.headers:public;max_age=2628000;etag')->group(function () {
-    Route::get('/', function () {
-        return view(config("app.views").'.welcome');
-    });
+    Route::get('/','WelcomeController@index');
 });
 Route::get('/test', function () {
     return view(config("app.views").'.lonchis');
@@ -243,7 +241,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food";
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Noviembre", "Noviembre");
+    return new App\Mail\NewsletterMenus($days, "Abril", "Abril");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();
