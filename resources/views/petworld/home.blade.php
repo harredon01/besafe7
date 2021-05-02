@@ -100,6 +100,22 @@
             </div>
         </div>
     </div>
+    <section class="pt--50 space-db--30 show-responsive">
+        <h2 class="d-none">Promotion Block
+        </h2> 
+        <div class="container">
+            <div class="block-title">
+                <h2>Servicios de salud para mascotas</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.webp" class="lazyload" alt="">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
     <div class="pt--50">
         <div class="container vet-container">
             <div class="row">
