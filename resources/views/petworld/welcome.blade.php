@@ -111,8 +111,8 @@
                     @foreach ($vets as $merchant)
                         <div class="single-slide">
                             <div class="pm-product product-type-list">
-                                <a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)" style="width:12%" class="image">
-                                    <img class="lazyload" data-src="{{ $merchant['icon']}}" alt="">
+                                <a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)" style="width:12%;padding:0" class="image">
+                                    <img class="lazyload" data-src="{{ $merchant['icon']}}" alt="" style="width:100%">
                                 </a>
                                 <div class="content vets">
                                     <h3><a href="/a/merchant/{{$merchant['slug']}}/products" ng-click="goTo('merchant-coverage', $event, false)">{{ $merchant['name']}}</a></h3>
