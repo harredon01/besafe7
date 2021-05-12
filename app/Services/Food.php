@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Article;
-use App\Models\Delivery;
+use App\Models\Delivery; 
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-04-19 00:00:00"; 
-        $end_date = "2021-04-24 23:59:59";
+        $start_date = "2021-05-10 00:00:00"; 
+        $end_date = "2021-05-17 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -536,7 +536,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Abril","Abril"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Mayo","Mayo"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
