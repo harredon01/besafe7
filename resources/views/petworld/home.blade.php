@@ -1,8 +1,12 @@
 @extends('petworld.layouts.app')
 
 @section('content')
-<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-servicios-vets.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Bannerfarmacia-vet.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-hotel.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-spa.webp">
 <link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/todo-perro-clean.webp">
+<link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
 <link rel="preload" as="image" href="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/comida_perro-clean.webp">
 <div ng-controller="HomeCtrl">
     <section id="main-gallery">
@@ -14,31 +18,55 @@
              }'
              >
             
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-mascotas-todo.webp">
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-servicios-vets.webp">
                 <div class="container position-relative">
                     <div class="row">
                         <div class="col-lg-6">
-
-                            <h3>Deja de buscar por acá y por alla</h3>
-                            <h1 class="text-black">TODO PARA TU <br/>MASCOTA</h1>
-                            <h4 class="mt--20">En un solo lugar</h4>
-                            <p>Urgencias, citas, vacunación, farmacia,<br/> alimentos, accesorios, baño y peluquería,<br/>colegios, guarderías, adiestramiento, adopción,<br/>certificados y trámites, y mucho más!</p>    
+<br/><br/><br/><br/><br/><br/><br/><br/>
+                            <div class="slider-btn mt--30">
+                                <a href="/a/merchants/consultas" class="btn btn-outlined--primary btn-rounded">Ver</a>
+                            </div>    
                         </div>
                     </div>
 
                 </div>
                 <span class="herobanner-progress"></span>
             </div>
-            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-veterinarios.webp">
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Bannerfarmacia-vet.webp">
                 <div class="container position-relative">
                     <div class="row">
                         <div class="col-lg-6">
-
-                            <h1 class="text-black">Consultas, Vacunación<br/> y muchos más</h1>
-                            <h4 class="mt--20">servicios veterinarios A <strong>DOMICILIO</strong></h4>
-
+<br/><br/><br/><br/><br/><br/><br/><br/>
                             <div class="slider-btn mt--30">
-                                <a href="/a/merchants/consultas" class="btn btn-outlined--primary btn-rounded">Ver</a>
+                                <a href="/a/merchants/farmacia" class="btn btn-outlined--primary btn-rounded" style="border:2px solid white !important;color:white">Ver</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <span class="herobanner-progress"></span>
+            </div>
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-hotel.webp">
+                <div class="container position-relative">
+                    <div class="row">
+                        <div class="col-lg-6">
+<br/><br/><br/><br/><br/><br/><br/><br/>
+                            <div class="slider-btn mt--30">
+                                <a href="/a/merchants/colegios-hoteles-y-guarderias" class="btn btn-outlined--primary btn-rounded">Ver</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <span class="herobanner-progress"></span>
+            </div>
+            <div class="single-slider home-content bg-image" data-bg="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/Banner-spa.webp">
+                <div class="container position-relative">
+                    <div class="row">
+                        <div class="col-lg-6">
+<br/><br/><br/><br/><br/><br/><br/><br/>
+                            <div class="slider-btn mt--30">
+                                <a href="/a/merchants/bano-y-peluqueria" class="btn btn-outlined--primary btn-rounded">Ver</a>
                             </div>
 
                         </div>
@@ -110,7 +138,14 @@
             <div class="row justify-content-center">
                 <div class="col-lg-4 col-md-4">
                     <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.webp" class="lazyload" alt="">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-quad-servicios-vets.webp" class="lazyload" alt="">
+                    </a>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-4 col-md-4">
+                    <a class="promo-image overflow-image" href="/a/merchants/farmacia" ng-click="goTo('merchant-nearby', $event, true)">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-quad-farmacia.webp" class="lazyload" alt="">
                     </a>
                 </div>
             </div>
@@ -214,8 +249,8 @@
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4">
-                    <a class="promo-image overflow-image" href="/a/merchants/servicios-veterinarias-a-domicilio" ng-click="goTo('merchant-coverage', $event, true)">
-                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/servicios-veterinarios-cuadrado.webp" class="lazyload" alt="">
+                    <a class="promo-image overflow-image" href="/a/merchants/colegios-hoteles-y-guarderias" ng-click="goTo('merchant-list', $event, true)">
+                        <img data-src="https://gohife.s3.us-east-2.amazonaws.com/petworld/home/banner-quad-hotel.webp" class="lazyload" alt="">
                     </a>
                 </div>
             </div>
