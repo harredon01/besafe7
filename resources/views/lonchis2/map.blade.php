@@ -20,9 +20,9 @@
                     <p><b>Tu dirrección de entrega</b></p>
                     <input type="text" class="form-control" placeholder="Direccion de entrega" id="pac-input" ng-model="addressContainer"/>
                     <p>Verifica el pin y la direccion. si no estan correctos puedes editar la direccion y arrastrar el pin a su lugar correcto. </p>
+                    <button ng-click="saveLocation()" class="btn btn-dark" style="float:right;margin-left: 10px;">Continuar</button>
+                    <button ng-click="cancel()" class="btn btn-dark" style="float:right">Cancelar</button>
                     
-                    <button ng-click="cancel()" class="btn btn-dark offset-3"">Cancelar</button>
-                    <button ng-click="saveLocation()" class="btn btn-dark offset-3">Continuar</button>
                     <br/><br/>
                     <div id="map" style="height: 500px" data-tap-disabled="true"></div>
                 </div>
