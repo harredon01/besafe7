@@ -14,8 +14,7 @@ angular.module('besafe')
                     mapOptions = {
                         center: myLatlng,
                         zoom: 12,
-                        mapTypeId: google.maps.MapTypeId.ROADMAP,
-                        gestureHandling: "cooperative"
+                        mapTypeId: google.maps.MapTypeId.ROADMAP
                     };
                     if (document.getElementById("map")) {
                         $rootScope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
@@ -423,6 +422,9 @@ angular.module('besafe')
                                 if (data.total > 0) {
                                     let results = data.data;
                                     let city = results[0];
+                                    if(!$rootScope.addressContainer){
+                                        $rootScope.addressContainer = decodeAddressFromLatResult(resp)
+                                    }
                                     $rootScope.isActive = false;
                                     let container = {
                                         address: decodeAddressFromLatResult(resp),
@@ -445,7 +447,7 @@ angular.module('besafe')
                                     } else {
                                         $rootScope.shippingAddress = container;
                                     }
-                                    
+
                                     $rootScope.loader = false;
                                 } else {
                                     $rootScope.loader = false;
