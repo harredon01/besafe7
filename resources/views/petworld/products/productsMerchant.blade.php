@@ -318,10 +318,10 @@
                                         <span>@{{product.activeVariant.price| currency}}</span>
                                     </div>
                                     <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && !user">
-                                        <span>Agrega al carrito y luego selecciona fecha y hora al pagar</span>
+                                        <span>*La fecha y hora las escojes cuando vas a pagar</span>
                                     </div>
                                     <div class="font-weight-500" ng-show="product.activeVariant.type == 'booking' && user">
-                                        <span>Agrega al carrito y luego selecciona fecha y hora.</span>
+                                        <span>*Agrega al carrito y luego selecciona fecha y hora.</span>
                                     </div>
 
                                     <div class="card-list-content ">
