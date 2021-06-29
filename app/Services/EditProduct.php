@@ -50,10 +50,14 @@ class EditProduct {
      *
      * @return Response
      */
-    public function getProduct(User $user, $product_id) {
+    public function getProduct($user, $product_id) {
         $data = [];
-
-        $result = $this->checkAccessProduct($user, $product_id);
+        if($user){
+            $result = $this->checkAccessProduct($user, $product_id);
+        } else {
+            $result['access'] = true;
+        }
+        
         if ($result['access'] == true) {
             $product = Product::find($product_id);
             $data = [];

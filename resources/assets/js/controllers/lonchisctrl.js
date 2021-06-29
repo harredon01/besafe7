@@ -6,7 +6,7 @@
                         name: "Prueba",
                         activeVariant: {
                             id: 220,
-                            price: 12000,
+                            price: 9000,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -16,7 +16,7 @@
                         name: "Eco Friendly",
                         activeVariant: {
                             id: 220,
-                            price: 12000,
+                            price: 15330,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -26,7 +26,7 @@
                         name: "Envase Desechable",
                         activeVariant: {
                             id: 220,
-                            price: 12000,
+                            price: 16330,
                             merchant_id: 1299,
                             quantity: 1
                         }

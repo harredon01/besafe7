@@ -67,7 +67,7 @@ class SocialiteController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function handleFacebookCallback() {
-        $user = Socialite::driver('facebook')->user();
+        $user = Socialite::driver('facebook')->stateless()->user();
         $user = json_decode(json_encode($user), true);
         $authUser = User::where("email", $user['email'])->first();
 
@@ -92,7 +92,6 @@ class SocialiteController extends Controller {
                 dispatch(new PostRegistration($authUser));
             }
         }
-        //dd($authUser);
         auth()->login($authUser);
         return redirect()->intended('/home');
 

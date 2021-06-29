@@ -249,7 +249,7 @@
 <div style="color:#FFFFFF;font-family:Arial, 'Helvetica Neue', Helvetica, sans-serif;line-height:1.2;padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <div style="line-height: 1.2; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #FFFFFF; mso-line-height-alt: 14px;">
 <p style="line-height: 1.2; font-size: 30px; text-align: center; mso-line-height-alt: 36px; margin: 0;"><span style="font-size: 30px; color: #ffffff;"><span style="color: #ff8e54; font-size: 30px;"><strong><span style="font-size: 30px;">Almuerzo de prueb</span></strong></span><strong><span style="color: #ff8e54; font-size: 30px;"><span style="font-size: 30px;">a </span></span></strong></span></p>
-<p style="line-height: 1.2; font-size: 30px; text-align: center; mso-line-height-alt: 36px; margin: 0;"><span style="font-size: 30px; color: #ffffff;"><strong><span style="color: #ff8e54; font-size: 30px;"><span style="font-size: 30px;">a tan solo</span> <span style="font-size: 30px;">$9.330</span></span> </strong></span></p>
+<p style="line-height: 1.2; font-size: 30px; text-align: center; mso-line-height-alt: 36px; margin: 0;"><span style="font-size: 30px; color: #ffffff;"><strong><span style="color: #ff8e54; font-size: 30px;"><span style="font-size: 30px;">a tan solo</span> <span style="font-size: 30px;">$11.000</span></span> </strong></span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
@@ -1241,7 +1241,7 @@
 <!--[if mso]></td></tr></table><![endif]-->
 <div align="center" class="button-container" style="padding-top:10px;padding-right:10px;padding-bottom:10px;padding-left:10px;">
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-spacing: 0; border-collapse: collapse; mso-table-lspace:0pt; mso-table-rspace:0pt;"><tr><td style="padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px" align="center"><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="mailto:servicioalcliente@lonchis.com.co?subject=info%20Lonchis" style="height:47.25pt; width:256.5pt; v-text-anchor:middle;" arcsize="96%" stroke="false" fillcolor="#ff8c54"><w:anchorlock/><v:textbox inset="0,0,0,0"><center style="color:#ffffff; font-family:Georgia, 'Times New Roman', serif; font-size:16px"><![endif]--><a href="mailto:servicioalcliente@lonchis.com.co?subject=info%20Lonchis" style="-webkit-text-size-adjust: none; text-decoration: none; display: inline-block; color: #ffffff; background-color: #ff8c54; border-radius: 60px; -webkit-border-radius: 60px; -moz-border-radius: 60px; width: auto; width: auto; border-top: 1px solid #ff8c54; border-right: 1px solid #ff8c54; border-bottom: 1px solid #ff8c54; border-left: 1px solid #ff8c54; padding-top: 16px; padding-bottom: 16px; font-family: 'Bitter', Georgia, Times, 'Times New Roman', serif; text-align: center; mso-border-alt: none; word-break: keep-all;" target="_blank"><span style="padding-left:42px;padding-right:42px;font-size:16px;display:inline-block;">
-<span style="font-size: 16px; line-height: 2; mso-line-height-alt: 32px;"><span style="font-size: 16px; line-height: 32px;"><strong>Servicoalcliente@lonchis.com.co</strong></span></span>
+<span style="font-size: 16px; line-height: 2; mso-line-height-alt: 32px;"><span style="font-size: 16px; line-height: 32px;"><strong>Servicioalcliente@lonchis.com.co</strong></span></span>
 </span></a>
 <!--[if mso]></center></v:textbox></v:roundrect></td></tr></table><![endif]-->
 </div>

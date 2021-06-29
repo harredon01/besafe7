@@ -218,16 +218,16 @@
                                     <article class="single_product">
                                         <figure>
                                             <div class="product_thumb">
-                                                <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/317_317.png" alt=""></a>
+                                                <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/317_317.jpg" alt=""></a>
                                                 <div class="label_product">
                                                     <span class="label_sale">Sale</span>
                                                 </div>
                                             </div>
                                             <figcaption class="product_content">
-                                                <h4 class="product_name"><a href="javascript:;" style="font-size:23px"><strong>10% Off</strong></a></h4>
+                                                <h4 class="product_name"><a href="javascript:;" style="font-size:23px"><strong>5% Off</strong></a></h4>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$15,250.00</span>
-                                                    <span class="old_price">$16,300.00</span>
+                                                    <span class="current_price">$15,513.00</span>
+                                                    <span class="old_price">$16,330.00</span>
                                                 </div>
                                                 <div class="product_timing">
                                                     <div data-countdown="2021/03/01"></div>

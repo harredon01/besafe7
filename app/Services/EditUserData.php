@@ -91,9 +91,10 @@ class EditUserData {
     }
 
     public function postRegistration(User $user) {
-        Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
-        if (config("app.views") == "lonchis") {
+        if (config("app.views") == "lonchis2") {
             $admin = User::find(env('ADMIN'));
+            $coupon = $this->generateWelcomeCoupon($user);
+            Mail::to($user->email)->cc($admin->email)->send(new Register($coupon));
             $message = "Hola " . $user->firstName . " somos lonchis. Recuerda que tienes un cupon en tu correo de bienevenida. Estamos aca para servirte y ayudarte a que disfrutes nuestro servicio. Tienes alguna duda o hay algo que podamos hacer por ti";
             $package = [
                 "type" => "user_message",
@@ -106,6 +107,8 @@ class EditUserData {
                 "created_at" => date("Y-m-d H:i:s")
             ];
             SendMessage::dispatch($admin, $package)->delay(now()->addMinutes(2));
+        } else {
+            Mail::to($user->email)->send(new Register($this->generateWelcomeCoupon($user)));
         }
     }
 
