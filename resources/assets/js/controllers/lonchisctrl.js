@@ -6,7 +6,7 @@
                         name: "Prueba",
                         activeVariant: {
                             id: 220,
-                            price: 9000,
+                            price: 11000,
                             merchant_id: 1299,
                             quantity: 1
                         }
