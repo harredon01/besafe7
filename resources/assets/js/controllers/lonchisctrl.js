@@ -16,7 +16,7 @@
                         name: "Eco Friendly",
                         activeVariant: {
                             id: 220,
-                            price: 15330,
+                            price: 16330,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -26,13 +26,14 @@
                         name: "Envase Desechable",
                         activeVariant: {
                             id: 220,
-                            price: 16330,
+                            price: 17430,
                             merchant_id: 1299,
                             quantity: 1
                         }
                     }
                 ];
-                $scope.options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+                $scope.options = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+                $scope.options2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
                 $scope.hasLocation = false;
                 $scope.hasMerchant = false;
                 $scope.isSearch = false;
@@ -47,14 +48,14 @@
                 $scope.local_total = 0;
                 $scope.cantidad1 = 11;
                 $scope.cantidad2 = 11;
-                $scope.precio1 = 14200;
-                $scope.precio1D = 150000;
-                $scope.precio2 = 14200;
-                $scope.precio2D = 150000;
-
+                $scope.precio1 = 16330;
+                $scope.precio1D = 15330;
+                $scope.precio2 = 17430;
+                $scope.precio2D = 16330;
+                
 
                 angular.element(document).ready(function () {
-
+                    console.log("Testing")
                 });
                 $rootScope.$on('loadCartVariants', function (event, args) {
                     $scope.updateProductsCart(args, false);
@@ -83,9 +84,9 @@
                     } else {
                         $scope.precio2D = ($scope.precio2 * $scope.cantidad2 - (discountFactor * 11000));
                     }
-
-
                 }
+                $scope.changeAmount(1);
+                $scope.changeAmount(2);
                 $scope.changeStore = function () {
                     Cart.changeMerchant()
                 }

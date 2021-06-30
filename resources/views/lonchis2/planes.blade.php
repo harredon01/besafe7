@@ -11,10 +11,22 @@
             <div class="col-12">
                 <div class="section_title">
                       <p>Deliciosos y nutritivos</p>
-                       <h2>Quiero Probar</h2>
+                       <h2>Planes de almuerzos</h2>
                     </div>
-                    <p style="text-align:center">Un servicio de comida saludable, fresca y deliciosa que te ayudara a llevar una dieta balanceada de una manera facil y practica. Mejora tu calidad de vida, fortalecer tu salud y cuidar tu figura con nuestros planes de almuerzos saludables a domicilio; Programa tus almuerzos antes de las 10 pm del día anterior y recibe tus comida fresca en la puerta de tu casa u oficina.</p>
+                    <p style="text-align:center">Un servicio de comida saludable, fresca y deliciosa que te ayudará a llevar una dieta balanceada de una manera fácil y práctica con nuestros planes de almuerzos saludables a domicilio.</p>
                     <br/>
+                    <h2>¿Cómo funciona?</h2>
+                    <ol>
+                        <li>Descarga la app en tu celular o usa la versión web</li>
+                        <li>Regístrate</li>
+                        <li>Compra un paquete de almuerzos</li>
+                        <li>Programa tus almuerzos antes de las 10 pm del día anterior </li>
+                        <li>recibe tus comida fresca en la puerta de tu casa u oficina.</li>
+
+                    </ol>
+                    <p><a href="https://itunes.apple.com/us/app/lonchis/id1459807225?ls=1&mt=8" style="margin-right:17px"><i class="fa fa-apple" style="font-size:35px"></i>Apple store</a>
+                        <a href="https://play.google.com/store/apps/details?id=com.recurring.food" style="margin-right:16px"><i class="fa fa-android" style="font-size:35px"></i>Google Play store</a>
+                        <a href="https://app.lonchis.com.co"><i class="fa fa-globe" style="font-size: 35px"></i>Version Web</a></p><br>
             </div>
         </div> 
         <div class="product_container">  
@@ -61,7 +73,7 @@
                             <h4 class="product_name"><a href="">Eco Friendly</a></h4>
                                         <div class="price_box"> 
                                             Por almuerzo:
-                                            <span class="current_price">@{{precio2D/cantidad2 | currency}}</span>
+                                            <span class="current_price">@{{precio1D/cantidad1 | currency}}</span>
                                         </div>
                                         <label>Cantidad</label><br/>
                                         <select ng-model="cantidad1" class="nice-select" style="float:none;margin:0 auto" name="region_id" ng-change="changeAmount(1)" 
@@ -96,7 +108,7 @@
                                         </div>
                                         <label>Cantidad</label><br/>
                                         <select ng-model="cantidad2" class="nice-select" style="float:none;margin:0 auto" name="region_id" ng-change="changeAmount(2)" 
-                                                            ng-options="option for option in options" required>
+                                                            ng-options="option for option in options2" required>
 
                                                     </select>
                                         <div class="addto_cart_btnF">

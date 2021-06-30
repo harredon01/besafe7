@@ -141,7 +141,7 @@
  
 <!-- JS
 ============================================ -->
-<script src="/js/all.js?v=1.0.0.15"></script>
+<script src="/js/all.js?v=1.0.0.16"></script>
 <!--jquery min js-->
 <script src="/safira/assets/js/vendor/jquery-3.4.1.min.js"></script>
 <!--popper min js-->
@@ -172,7 +172,7 @@
 <!-- tippy bundle umd js -->
 <script src="/safira/assets/js/tippy-bundle.umd.js"></script>
 <!-- Plugins JS -->
-<script src="/safira/assets/js/plugins.js?v=1.0.0.15"></script>
+<script src="/safira/assets/js/plugins.js?v=1.0.0.16"></script>
 
 <!-- Main JS -->
-<script src="/safira/assets/js/main.js?v=1.0.0.15"></script>
+<script src="/safira/assets/js/main.js?v=1.0.0.16"></script>
