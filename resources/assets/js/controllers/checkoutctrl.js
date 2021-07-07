@@ -454,6 +454,7 @@
                         let dataS = {"payers": [$rootScope.user.id], "platform": $rootScope.platform, "delivery_date": $scope.deliveryString};
                         Orders.checkOrder(order.id, dataS).then(function (resp) {
                             console.log("Check Order Result", resp);
+                            $rootScope.$broadcast('updateCheckoutCart');
                             Modals.hideLoader();
                             def.resolve(resp);
                         },
@@ -747,6 +748,7 @@
                         Modals.hideLoader();
                         if (resp) {
                             if (resp.status == "success") {
+                                
                                 Modals.showToast("Selecciona método de pago", $("#checkout-cart"));
                                 console.log("orderProvider", resp);
                                 $rootScope.activePayment = resp.payment;
