@@ -19,8 +19,8 @@
                                                     <a href="#">@{{item.name}}</a>
                                                     <p>@{{item.quantity}} x <span> @{{item.priceWithConditions | currency}} </span>  </p>    
                                                 </div>
-                                                <div class="cart_remove">
-                                                    <a href="#"><i class="icon-x"></i></a>
+                                                <div class="cart_remove"> 
+                                                    <a href="javascript:;" ng-click="deleteCartItem(item.id)"><i class="icon-x"></i></a>
                                                 </div>
                                             </div>
                                         </div>
