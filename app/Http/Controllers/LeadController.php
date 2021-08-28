@@ -25,6 +25,8 @@ class LeadController extends Controller {
             return view(config("app.views") . ".leads.shop-lead")->with('data', $data);
         } else if ($type == "lost") {
             return view(config("app.views") . ".leads.lost-lead")->with('data', $data);
+        } else if ($type == "delete_account") {
+            return view(config("app.views") . ".leads.delete_account")->with('data', $data);
         }
     }
 

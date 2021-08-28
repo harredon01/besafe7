@@ -128,7 +128,14 @@
                         </ol>
                         <p><strong>5.1 </strong>Los usuarios podr&aacute;n acceder a los productos y servicios ofrecidos por nosotros por medio de la plataforma. <strong>HOOVERT ARREDONDO SAS. </strong>autoriza a los usuarios a consultar, revisar y usar el material que se encuentra en el Sitio web, &uacute;nicamente para su uso personal y no comercial.</p>
                         <p><strong>5.2 </strong>El contenido de la plataforma, incluyendo los textos, gr&aacute;ficas, im&aacute;genes, logotipos, iconos, software y cualquier otro material, -al cual en adelante se har&aacute; referencia como &ldquo;El Material&rdquo;&mdash;, est&aacute; protegido bajo las leyes colombianas de derechos de autor, leyes de propiedad industrial y otras leyes aplicables. Todo El Material es de propiedad de la Compa&ntilde;&iacute;a o de sus proveedores. El uso no autorizado del Material puede constituir una violaci&oacute;n de las leyes colombianas o extranjeras sobre derechos de autor, leyes de propiedad industrial u otras leyes. Ning&uacute;n usuario podr&aacute; vender o modificar el Material de manera alguna, ni ejecutar o anunciar p&uacute;blicamente el Material, ni distribuirlo para prop&oacute;sitos comerciales. Tampoco se permitir&aacute; copiar o adaptar el c&oacute;digo<strong> HTML, CSS, JavaScript O de ning&uacute;n otro lenguaje usado por la plataforma </strong>para generar su aplicaci&oacute;n m&oacute;vil y su p&aacute;ginas web, ya que el mismo est&aacute; protegido por los derechos de autor. Todo uso no autorizado se presumir&aacute; como indebido y podr&aacute; ser sancionado por la ley.</p>
-                        <p>cuando el usuario realiza este procesos, nuestro sistema lo entiende como una aceptaci&oacute;n expresa de los presentes t&eacute;rminos y condiciones, as&iacute; como de la pol&iacute;tica de tratamiento de datos personales de nuestra Compa&ntilde;&iacute;a.</p></div>
+                        <p>cuando el usuario realiza este procesos, nuestro sistema lo entiende como una aceptaci&oacute;n expresa de los presentes t&eacute;rminos y condiciones, as&iacute; como de la pol&iacute;tica de tratamiento de datos personales de nuestra Compa&ntilde;&iacute;a.</p>
+                        <br/><br/>
+                        <ol start="6">
+                            <li><strong> Eliminacion de datos </strong></li>
+                        </ol>
+                        <p>Si deseas que se elimine tu cuenta y todos los datos asociados porfavor solicita la eliminacion completa haciendo click <a href="/a/contact-us/delete_account" style="color:blue"><strong>AQUI</strong></a>. Debes enviar el celular y el correo asociados a la cuenta y luego responder a una verificacion por medio del medio que te contactamos. Posterior a eso seras eliminado de Lonchis. Muchas gracias</p>
+                    <br/><br/>
+                    </div>
                 </div>
             </div>
             <!-- blog details area end -->

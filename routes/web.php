@@ -222,6 +222,9 @@ Route::get('/newsletter_padre2', function () {
 Route::get('/newsletter_sancho', function () {
     return redirect('newsletter_sistole_quadi');
 });
+Route::get('/terms', function () {
+    return redirect('/a/terms');
+});
 Route::get('/newsletter_lift', function () {
     return new App\Mail\NewsletterLift();
 });
@@ -241,7 +244,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food"; 
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Julio", "Julio");
+    return new App\Mail\NewsletterMenus($days, "Agosto", "Agosto");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();

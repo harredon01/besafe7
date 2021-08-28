@@ -1432,7 +1432,7 @@ class EditOrder {
                     return array("status" => "error", "message" => "Coupon quantity");
                 }
             }
-            if ($item->quantity > 22) {
+            if ($item->quantity > 33) {
                 return array("status" => "error", "message" => "Coupon quantity");
             }
         }
