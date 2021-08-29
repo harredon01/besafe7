@@ -108,8 +108,17 @@
                     <p style="text-align:center">Un servicio de comida saludable, fresca y deliciosa que te ayudara a llevar una dieta balanceada de una manera fácil y práctica. Mejora tu calidad de vida, fortalece tu salud y cuida tu figura con nuestros planes de almuerzos saludables a domicilio. Programa tus almuerzos antes de las 10 pm del día anterior y recibe tus comida fresca en la puerta de tu casa u oficina.</p>
                     <br/>
                     <h2>¿Cómo funciona?</h2>
+                    </div>
+            </div> 
+            <div class="row">
+                <div class="col-7">
+                    
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/zTHRBZUB4AI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    
+                </div>
+                <div class="col-5">
                     <ol>
-                        <li>Descarga la app en tu celular o usa la versión web</li>
+                        <li>Descarga la app en tu celular o usa la versión web</li> 
                         <li>Regístrate</li>
                         <li>Compra un paquete de almuerzos</li>
                         <li>Programa tus almuerzos antes de las 10 pm del día anterior </li>
@@ -120,7 +129,7 @@
                         <a href="https://play.google.com/store/apps/details?id=com.recurring.food" style="margin-right:16px"><i class="fa fa-android" style="font-size:35px"></i>Google Play store</a>
                         <a href="https://app.lonchis.com.co"><i class="fa fa-globe" style="font-size: 35px"></i>Version Web</a></p><br>
                 </div>
-            </div> 
+            </div> <br>
              <div class="product_container">  
                <div class="row">
                    <div class="col-12">
