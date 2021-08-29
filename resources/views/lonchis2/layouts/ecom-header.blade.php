@@ -33,7 +33,7 @@
 
 
                         <div class="call-support">
-                            <p><a href="tel:+573103418432">(310) 341 8432</a> Contáctanos</p>
+                            <p><a href="tel:+573208579158">(320) 857 9158</a> Contáctanos</p>
                         </div>
                         <div id="menu" class="text-left ">
                             <ul class="offcanvas_main_menu">
@@ -153,7 +153,7 @@
                         </div>
                         <div class="col-lg-3">
                             <div class="call-support">
-                                <p><a href="tel:+573103418432">(310) 341-8432</a> Contáctanos</p>
+                                <p><a href="tel:+573208579158">(320) 857-9158</a> Contáctanos</p>
                             </div>
                         </div>
                     </div>

@@ -10,7 +10,7 @@
                            </div>
                            <p class="footer_desc">Somos un equipo de tecnologia que desarrolla plataformas para digitalizar empresas y industrias</p>
                             <p><span>Email:</span> <a href="mailto:servicioalcliente@lonchis.com.co">servicioalcliente@lonchis.com.co</a></p>
-                            <p><span>Call us:</span> <a href="tel:+573103418432">(310) 3418432</a> </p>
+                            <p><span>Call us:</span> <a href="tel:+573208579158">(320) 8579158</a> </p>
                         </div>          
                     </div>
                     <div class="col-lg-4 col-md-3 col-sm-5">

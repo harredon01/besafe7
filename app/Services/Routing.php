@@ -407,13 +407,13 @@ class Routing {
             $config = $platform->loadDayConfig($deliveries[0]->delivery);
             $totalLunches = 0;
             $pages = [];
+            $results = [];
             foreach ($routes as $route) {
-                $results = [];
-                $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
-                array_push($results, $arrayRouteTitle);
-                $arrayRoute = [$route->id, $route->provider, $route->unit_cost, $route->unit_price];
-                array_push($results, $arrayRoute);
-                $arrayDelTitle = ["Parada", "Direccion", "Entrega", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato", "Observacion"];
+//                $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
+//                array_push($results, $arrayRouteTitle);
+//                $arrayRoute = [$route->id, $route->provider, $route->unit_cost, $route->unit_price];
+//                array_push($results, $arrayRoute);
+                $arrayDelTitle = ["Parada", "Direccion", "Preguntar Por", "Telefono Secundario", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato", "Observacion"];
                 array_push($results, $arrayDelTitle);
                 //$results = array_merge($results,$routeTotals['excel']);
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
@@ -437,12 +437,22 @@ class Routing {
                 $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
-                $page = [
-                    "name" => "Ruta-" . $route->id . "-" . $route->provider,
-                    "rows" => $results
-                ];
-                array_push($pages, $page);
+
+                $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+                array_push($results, $arrayDelTitle);
+                $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+                array_push($results, $arrayDelTitle);
+//                $page = [
+//                    "name" => "Ruta-" . $route->id . "-" . $route->provider,
+//                    "rows" => $results
+//                ];
+//                array_push($pages, $page);
             }
+            $page = [
+                "name" => "Rutas",
+                "rows" => $results
+            ];
+            array_push($pages, $page);
 
             $path = $this->writeFile($pages, "Rutas" . time());
             $users = User::whereIn('id', [2, 77])->get();

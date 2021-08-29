@@ -47,7 +47,7 @@
                                 <h3 class="header-widget "><span class="widget-icon"></span>Contáctanos<span class="last widget-icon"></span></h3>
                                 <ul class="social-icons-list">
 
-                                    <li><a href="tel:+573103418432"><span class="ltx-ic icon icon-phone-call"></span><span class="txt"><strong> Teléfono: </strong><br /> +57-310-3418432<br /> </span></a></li>
+                                    <li><a href="tel:+573208579158"><span class="ltx-ic icon icon-phone-call"></span><span class="txt"><strong> Teléfono: </strong><br /> +57-320-8579158<br /> </span></a></li>
                                 </ul>
                             </div>
                         </div>

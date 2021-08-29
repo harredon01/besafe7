@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-08-23 00:00:00";
-        $end_date = "2021-08-28 23:59:59";
+        $start_date = "2021-08-30 00:00:00";
+        $end_date = "2021-09-04 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -536,7 +536,7 @@ class Food {
             $platFormService = app('Notifications');
             $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
             foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Agosto"));
+                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Septiembre"));
                 //Mail::to($user->email)->send(new Newsletter4());
             }
         }
@@ -557,7 +557,7 @@ class Food {
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
             $phone = $delUser->cellphone;
-            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $address->name, $address->phone, $stopDel->id, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
+            $arrayDel = [$stop->id, $address->address . " " . $address->notes, $address->name, $address->phone, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
             $descr = $delUser->firstName . " " . $delUser->lastName . " ";
             $details = json_decode($stopDel->details, true);
             if (array_key_exists("deliver", $details)) {

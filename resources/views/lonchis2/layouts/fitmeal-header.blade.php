@@ -5,7 +5,7 @@
                             <div class="vc_column-inner">
                                 <div class="wpb_wrapper">
                                     <ul class="ltx-block-icon  icons-count-3 align-left ltx-icon-color-main ltx-icon-size-default ltx-header-color-default ltx-icon-type-transparent ltx-bg-color-transparent layout-inline ltx-icon-h-right " id="like_sc_block_icon_291719141">
-                                        <li><a href="tel:+573103418432" class=""><span class="ltx-icon icon-phone-call  bg-transparent"></span></a><a href="#" class="block-right"><h6 class="header"> <span> +57 310-341-8432 </span></h6> </a></li>
+                                        <li><a href="tel:+573208579158" class=""><span class="ltx-icon icon-phone-call  bg-transparent"></span></a><a href="#" class="block-right"><h6 class="header"> <span> +57 320-857-9158 </span></h6> </a></li>
                                         <li>
                                             <div class=""><span class="ltx-icon icon-mail  bg-transparent"></span>
                                                 <div class="block-right">

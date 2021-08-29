@@ -12,7 +12,7 @@
                     <h3>Escríbenos</h3>    
                     <p>Nos encantaría conocerte y estamos para servirte. completa el formulario y uno de nuestros agentes se pondrá en contacto contigo</p>
                     <ul>
-                        <li><a href="tel:+573103418432"><i class="fas fa-phone"></i>+57 310 341 8432</a></li>
+                        <li><a href="tel:+573208579158"><i class="fas fa-phone"></i>+57 320 857 9158</a></li>
                         <li><a href="mailto:servicioalcliente@petworld.net.co"><i class="far fa-envelope"></i>servicioalcliente@lonchis.com.co</a></li>
                     </ul>             
                 </div> 
