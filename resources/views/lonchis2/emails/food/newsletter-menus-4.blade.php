@@ -945,7 +945,7 @@
 <div style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:5px; padding-bottom:15px; padding-right: 0px; padding-left: 0px;">
 <!--<![endif]-->
 <div align="center" class="img-container center fixedwidth" style="padding-right: 0px;padding-left: 0px;">
-<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="tel:3203916049" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Alternate text" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/dishes/menu-email/whatsapp-logo-1-1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 97px; display: block;" title="Alternate text" width="97"/></a>
+<!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr style="line-height:0px"><td style="padding-right: 0px;padding-left: 0px;" align="center"><![endif]--><a href="tel:+573208579158" style="outline:none" tabindex="-1" target="_blank"> <img align="center" alt="Alternate text" border="0" class="center fixedwidth" src="https://gohife.s3.us-east-2.amazonaws.com/public/dishes/menu-email/whatsapp-logo-1-1.png" style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 97px; display: block;" title="Alternate text" width="97"/></a>
 <!--[if mso]></td></tr></table><![endif]-->
 </div>
 <!--[if (!mso)&(!IE)]><!-->
@@ -1020,7 +1020,7 @@
 <!--[if mso]><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding-right: 5px; padding-left: 5px; padding-top: 5px; padding-bottom: 5px; font-family: Arial, sans-serif"><![endif]-->
 <div style="color:#555555;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;line-height:1.5;padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px;">
 <div style="line-height: 1.5; font-size: 12px; color: #555555; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 18px;">
-    <p style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: center; mso-line-height-alt: 21px; margin: 0;"><span style="color: #ffffff;">Whatsapp: <a href="tel:3203916049" style="text-decoration: underline; color: #ffffff;" title="tel:3203916049">320 3916049</a>  |  <a href="https://www.lonchis.com.co" style="text-decoration: underline; color: #ffffff;">https://www.lonchis.com.co</a>     <br/>Servicio al cliente <a href="mailto:servicioalcliente@lonchis.com.co" style="text-decoration: underline; color: #ffffff;">servicioalcliente@lonchis.com.co</a> </span></p>
+    <p style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: center; mso-line-height-alt: 21px; margin: 0;"><span style="color: #ffffff;">Whatsapp: <a href="tel:+573208579158" style="text-decoration: underline; color: #ffffff;" title="tel:+573208579158">320 8579158</a>  |  <a href="https://www.lonchis.com.co" style="text-decoration: underline; color: #ffffff;">https://www.lonchis.com.co</a>     <br/>Servicio al cliente <a href="mailto:servicioalcliente@lonchis.com.co" style="text-decoration: underline; color: #ffffff;">servicioalcliente@lonchis.com.co</a> </span></p>
 </div>
 </div>
 <!--[if mso]></td></tr></table><![endif]-->
