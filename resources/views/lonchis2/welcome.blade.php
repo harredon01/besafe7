@@ -111,12 +111,12 @@
                     </div>
             </div> 
             <div class="row">
-                <div class="col-7">
+                <div class="col-lg-6 col-md-6">
                     
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/zTHRBZUB4AI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe width="425" height="300" src="https://www.youtube.com/embed/zTHRBZUB4AI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     
                 </div>
-                <div class="col-5">
+                <div class="col-lg-6 col-md-6">
                     <ol>
                         <li>Descarga la app en tu celular o usa la versión web</li> 
                         <li>Regístrate</li>

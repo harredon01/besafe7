@@ -19,24 +19,24 @@
             </div>
         </div> 
         <div class="row">
-            <div class="col-7">
-
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/zTHRBZUB4AI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-            </div>
-            <div class="col-5">
-                <ol>
-                    <li>Descarga la app en tu celular o usa la versión web</li> 
-                    <li>Regístrate</li>
-                    <li>Compra un paquete de almuerzos</li>
-                    <li>Programa tus almuerzos antes de las 10 pm del día anterior </li>
-                    <li>recibe tus comida fresca en la puerta de tu casa u oficina.</li>
-
-                </ol>
-                <p><a href="https://itunes.apple.com/us/app/lonchis/id1459807225?ls=1&mt=8" style="margin-right:17px"><i class="fa fa-apple" style="font-size:35px"></i>Apple store</a>
-                    <a href="https://play.google.com/store/apps/details?id=com.recurring.food" style="margin-right:16px"><i class="fa fa-android" style="font-size:35px"></i>Google Play store</a>
-                    <a href="https://app.lonchis.com.co"><i class="fa fa-globe" style="font-size: 35px"></i>Version Web</a></p><br>
-            </div>
+            <div class="col-lg-6 col-md-6">
+                    
+                    <iframe width="425" height="300" src="https://www.youtube.com/embed/zTHRBZUB4AI" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <ol>
+                        <li>Descarga la app en tu celular o usa la versión web</li> 
+                        <li>Regístrate</li>
+                        <li>Compra un paquete de almuerzos</li>
+                        <li>Programa tus almuerzos antes de las 10 pm del día anterior </li>
+                        <li>recibe tus comida fresca en la puerta de tu casa u oficina.</li>
+                        
+                    </ol>
+                    <p><a href="https://itunes.apple.com/us/app/lonchis/id1459807225?ls=1&mt=8" style="margin-right:17px"><i class="fa fa-apple" style="font-size:35px"></i>Apple store</a>
+                        <a href="https://play.google.com/store/apps/details?id=com.recurring.food" style="margin-right:16px"><i class="fa fa-android" style="font-size:35px"></i>Google Play store</a>
+                        <a href="https://app.lonchis.com.co"><i class="fa fa-globe" style="font-size: 35px"></i>Version Web</a></p><br>
+                </div>
         </div> <br>
         <div class="product_container">  
             <div class="row">
