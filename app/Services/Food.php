@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\Article;
-use App\Models\Delivery; 
+use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
 use App\Models\Stop;
@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-08-30 00:00:00";
-        $end_date = "2021-09-04 23:59:59";
+        $start_date = "2021-09-06 00:00:00";
+        $end_date = "2021-09-12 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -515,31 +515,34 @@ class Food {
         // id > 130 and id < 200 bota 500
         //$followers = DB::select('select user_id as id from deliveries where delivery ="2020-07-17 12:00:00" and status in ("scheduled","completed")');
         //dd($followers);
-        $followers = DB::select("select id,email from users where optinMarketing = 1");
-        if (count($followers) > 0) {
-            $payload = [
-            ];
+        User::where('optinMarketing', true)->with("push")->chunk(100, function ($users) use ($days) {
+            //$followers = DB::select("select id,email from users where optinMarketing = 1");
+            $followers = $users->all();
+            if (count($followers) > 0) {
+                $payload = [
+                ];
 
-            $data = [
-                "trigger_id" => -1,
-                "message" => "",
-                "subject" => "Ya estan disponibles los platos de la semana. Ingresa a tu app y programa! ",
-                "object" => "Lonchis",
-                "sign" => true,
-                "payload" => $payload,
-                "type" => 'newsletter_food',
-                "user_status" => "normal"
-            ];
-            $date = date_create();
-            $date = date_format($date, "Y-m-d");
+                $data = [
+                    "trigger_id" => -1,
+                    "message" => "",
+                    "subject" => "Ya estan disponibles los platos de la semana. Ingresa a tu app y programa! ",
+                    "object" => "Lonchis",
+                    "sign" => true,
+                    "payload" => $payload,
+                    "type" => 'newsletter_food',
+                    "user_status" => "normal"
+                ];
+                $date = date_create();
+                $date = date_format($date, "Y-m-d");
 
-            $platFormService = app('Notifications');
-            $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
-            foreach ($followers as $user) {
-                Mail::to($user->email)->send(new NewsletterMenus($days,"Agosto","Septiembre"));
-                //Mail::to($user->email)->send(new Newsletter4());
+                $platFormService = app('Notifications');
+                //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+                foreach ($followers as $user) {
+                    Mail::to($user->email)->send(new NewsletterMenus($days, "Septiembre", "Septiembre"));
+                    //Mail::to($user->email)->send(new Newsletter4());
+                }
             }
-        }
+        });
     }
 
     public function checkScenario($results, $hash) {

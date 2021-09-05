@@ -240,7 +240,16 @@ class Notifications {
 
         if (count($recipients) > 0) {
             foreach ($recipients as $recipient) {
-                $user = User::find($recipient->id);
+                if (isset($recipient->name)&&
+                        isset($recipient->id)&&
+                        isset($recipient->pushNotifications)&&
+                        isset($recipient->email)&&
+                        isset($recipient->emailNotifications)){
+                    $user = $recipient;
+                } else {
+                    $user = User::find($recipient->id);
+                }
+                
                 if ($user) {
                     if ($userSending) {
                         if ($user->id == $userSending->id && $data['type'] != self::RED_SECRET_TYPE) {
@@ -271,7 +280,19 @@ class Notifications {
 
                     if ($user->pushNotifications && $push) {
                         $platform = "food";
-                        $result = $user->push()->where('platform', $platform)->first();
+                        $push_found = false;
+                        $result = null;
+                        if (isset($user->push) && count($user->push)>0){
+                            foreach ($user->push as $value) {
+                                if($value->platform == $platform){
+                                    $result = $value;
+                                    $push_found = true;
+                                }
+                            }
+                        }
+                        if(!$push_found){
+                            $result = $user->push()->where('platform', $platform)->first();
+                        }
                         if ($result) {
                             if ($result->platform == "hife") {
                                 array_push($arrayPushHife, $result->object_id);
