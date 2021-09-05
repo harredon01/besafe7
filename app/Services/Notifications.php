@@ -240,16 +240,16 @@ class Notifications {
 
         if (count($recipients) > 0) {
             foreach ($recipients as $recipient) {
-                if (isset($recipient->name)&&
-                        isset($recipient->id)&&
-                        isset($recipient->pushNotifications)&&
-                        isset($recipient->email)&&
-                        isset($recipient->emailNotifications)){
+                if (isset($recipient->name) &&
+                        isset($recipient->id) &&
+                        isset($recipient->pushNotifications) &&
+                        isset($recipient->email) &&
+                        isset($recipient->emailNotifications)) {
                     $user = $recipient;
                 } else {
                     $user = User::find($recipient->id);
                 }
-                
+
                 if ($user) {
                     if ($userSending) {
                         if ($user->id == $userSending->id && $data['type'] != self::RED_SECRET_TYPE) {
@@ -282,15 +282,18 @@ class Notifications {
                         $platform = "food";
                         $push_found = false;
                         $result = null;
-                        if (isset($user->push) && count($user->push)>0){
-                            foreach ($user->push as $value) {
-                                if($value->platform == $platform){
-                                    $result = $value;
-                                    $push_found = true;
+                        if (method_exists($user, 'toArray')) {
+                            $res = $user->toArray();
+                            if (array_key_exists('push', $res) && count($res['push']) > 0) {
+                                foreach ($res['push'] as $value) {
+                                    if ($value['platform'] == $platform) {
+                                        $result = (object) $value;
+                                        $push_found = true;
+                                    }
                                 }
                             }
                         }
-                        if(!$push_found){
+                        if (!$push_found) {
                             $result = $user->push()->where('platform', $platform)->first();
                         }
                         if ($result) {
@@ -314,12 +317,12 @@ class Notifications {
                 } else {
                     $data['name'] = "Gohife";
                 }
-                if (count($arrayPushHife) > 0) {
-                    $this->sendMessage($data, $arrayPushHife, $arrayEmail, 'hife');
-                }
-                if (count($arrayPushFood) > 0) {
-                    $this->sendMessage($data, $arrayPushFood, $arrayEmail, 'food');
-                }
+//                if (count($arrayPushHife) > 0) {
+//                    $this->sendMessage($data, $arrayPushHife, $arrayEmail, 'hife');
+//                }
+//                if (count($arrayPushFood) > 0) {
+//                    $this->sendMessage($data, $arrayPushFood, $arrayEmail, 'food');
+//                }
             }
         }
         return $notification;

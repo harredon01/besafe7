@@ -536,7 +536,7 @@ class Food {
                 $date = date_format($date, "Y-m-d");
 
                 $platFormService = app('Notifications');
-                //$platFormService->sendMassMessage($data, $followers, null, true, $date, false);
+                $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
                 foreach ($followers as $user) {
                     Mail::to($user->email)->send(new NewsletterMenus($days, "Septiembre", "Septiembre"));
                     //Mail::to($user->email)->send(new Newsletter4());
