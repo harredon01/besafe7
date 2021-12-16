@@ -1,5 +1,5 @@
 <?php
-
+namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Services\Food;
 use App\Models\User;
@@ -22,7 +22,7 @@ class FoodSeeder extends Seeder {
     public function run() {
         // $this->call(UsersTableSeeder::class);
 
-        $this->food->cleanDeliveries();
+        $this->food->sendNewsletter();
         $this->command->info('Food merchants seeded!');
     }
 

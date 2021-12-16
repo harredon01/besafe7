@@ -98,11 +98,13 @@ class EditDelivery {
                         dispatch(new AddDeliveryInfo($delivery,$details));
                     }
                     $date = date_create($delivery->delivery);
+                    $address = $delivery->address;
                     $pending = Delivery::where("user_id", $user->id)->where("status", "pending")->count();
                     $data["date"] = date_format($date, "Y/m/d");
-                    Mail::to($user)->send(new DeliveryScheduled($data));
+                    //dd($address);
+                    Mail::to($user)->send(new DeliveryScheduled($data,$address));
 
-                    return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details, "date" => $date, "pending_count" => $pending);
+                    return array("status" => "success", "message" => "Delivery scheduled for transit", "details" => $details, "date" => $date, "pending_count" => $pending,"address"=>$address);
                 } else {
                     return $results;
                 }

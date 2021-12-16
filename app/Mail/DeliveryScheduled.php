@@ -19,13 +19,21 @@ class DeliveryScheduled extends Mailable
     public $data;
     
     /**
+     * The order instance.
+     *
+     * @var Order
+     */
+    public $address;
+    
+    /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($theData)
+    public function __construct($theData,$theAddress)
     {
         $this->data = $theData;
+        $this->address = $theAddress;
     }
 
     /**
