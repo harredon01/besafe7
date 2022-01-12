@@ -37,7 +37,7 @@
     
     <!-- Main Style CSS -->
     <link rel="stylesheet" href="/css/main3.css?v=1.0.0.18">
-    <script src="/js/app.js?v=1.0.0.18"></script>
+    <script src="/js/app.js?v=1.0.0.19"></script>
     <!--modernizr min js here-->
     <script src="/safira/assets/js/vendor/modernizr-3.7.1.min.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
