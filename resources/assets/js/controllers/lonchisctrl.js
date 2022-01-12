@@ -16,7 +16,7 @@
                         name: "Eco Friendly",
                         activeVariant: {
                             id: 220,
-                            price: 20000,
+                            price: 21000,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -48,8 +48,8 @@
                 $scope.local_total = 0;
                 $scope.cantidad1 = 11;
                 $scope.cantidad2 = 11;
-                $scope.precio1 = 20000;
-                $scope.precio1D = 19000;
+                $scope.precio1 = 21000;
+                $scope.precio1D = 20000;
                 $scope.precio2 = 22000;
                 $scope.precio2D = 21000;
                 

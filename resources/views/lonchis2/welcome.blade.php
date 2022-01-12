@@ -247,8 +247,8 @@
                                             <figcaption class="product_content">
                                                 <h4 class="product_name"><a href="javascript:;" style="font-size:23px"><strong>5% Off</strong></a></h4>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$19,000.00</span>
-                                                    <span class="old_price">$20,000.00</span>
+                                                    <span class="current_price">$20,000.00</span>
+                                                    <span class="old_price">$21,000.00</span>
                                                 </div>
                                                 <div class="product_timing">
                                                     <div data-countdown="2021/03/01"></div>
@@ -339,7 +339,7 @@
                                                 <h4 class="product_name"><a href="javascript:;">Plato Arabe</a></h4>
                                                 <p>Pan pita con hummus para untar, Kibbes, tabule y falafel.</p>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$20,000.00</span>
+                                                    <span class="current_price">$21,000.00</span>
                                                 </div>
                                             </figcaption>
                                         </figure>
@@ -353,7 +353,7 @@
                                                 <h4 class="product_name"><a href="javascript:;">Cazuela de frijoles</a></h4>
                                                 <p>Frijoles, arroz blanco, carne molida, arepita paisa, aguacate y tajadas.</p>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$20,000.00</span>
+                                                    <span class="current_price">$21,000.00</span>
                                                 </div>
                                             </figcaption>
                                         </figure>
@@ -369,7 +369,7 @@
                                                 <h4 class="product_name"><a href="javascript:;">Ajiaco Santafereño</a></h4>
                                                 <p> Esta sopa de papa emblemática de Bogotá, se acompaña con arroz blanco, pechuga de pollo desmechada, mazorca, aguacate, crema de leche y alcaparras.</p>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$20,000.00</span>
+                                                    <span class="current_price">$21,000.00</span>
                                                 </div>
                                             </figcaption>
                                         </figure>
@@ -383,7 +383,7 @@
                                                 <h4 class="product_name"><a href="javascript:;">Pechuga en salsa de maracuya</a></h4>
                                                 <p><a href="#">Fruits</a></p>
                                                 <div class="price_box"> 
-                                                    <span class="current_price">$20,000.00</span>
+                                                    <span class="current_price">$21,000.00</span>
                                                 </div>
                                             </figcaption>
                                         </figure>
