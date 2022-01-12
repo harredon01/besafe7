@@ -447,7 +447,7 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-12-06 00:00:00";
+        $start_date = "2021-12-20 00:00:00";
         $end_date = "2021-12-27 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
@@ -525,7 +525,7 @@ class Food {
                 $data = [
                     "trigger_id" => -1,
                     "message" => "",
-                    "subject" => "Ya estan disponibles los platos de la semana. Ingresa a tu app y programa! ",
+                    "subject" => "Gracias por habernos acompañado en el 2021, fue un año lleno de retos y experiencias alegres. ¡Feliz Año Nuevo!  Nos tomaremos un corto descanso a partir del 1 de enero hasta el 11, nos vemos pronto!",
                     "object" => "Lonchis",
                     "sign" => true,
                     "payload" => $payload,
@@ -538,7 +538,7 @@ class Food {
                 $platFormService = app('Notifications');
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
                 foreach ($followers as $user) {
-                    Mail::to($user->email)->send(new NewsletterMenus($days, "Diciembre", "Diciembre"));
+                    //Mail::to($user->email)->send(new NewsletterMenus($days, "Diciembre", "Diciembre"));
                     //Mail::to($user->email)->send(new Newsletter4());
                 }
             }
@@ -557,8 +557,19 @@ class Food {
         $stopDescription = "";
         $address = $stop->address;
         $phone = "";
+        $desechable = 0;
+        $retornable = 0;
+        $suspended = 0;
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
+            if($suspended == 0 ){
+                $suspended = Delivery::where('user_id',$delUser->id)->where("status","suspended")->count();
+            }
+            
+            $textDebe = "";
+            if($suspended > 0){
+                $textDebe = "Debe ".$suspended." envases";
+            }
             $phone = $delUser->cellphone;
             $arrayDel = [$stop->id, $address->address . " " . $address->notes, $address->name, $address->phone, $delUser->firstName . " " . $delUser->lastName, $delUser->cellphone];
             $descr = $delUser->firstName . " " . $delUser->lastName . " ";
@@ -567,9 +578,11 @@ class Food {
                 if ($details['deliver'] == "envase") {
                     $descr = $descr . "Envase Retornable,  ";
                     array_push($arrayDel, "Retornable");
+                    $retornable++;
                 }
             } else {
                 array_push($arrayDel, "Desechable");
+                $desechable++;
             }
             if (array_key_exists("pickup", $details)) {
                 if ($details['pickup'] == "envase") {
@@ -595,7 +608,9 @@ class Food {
 
             $arrayDel = array_merge($arrayDel, $delTotals['excel']);
             array_push($arrayDel, $stopDel->observation);
-
+            if($suspended > 0 ){
+                array_push($arrayDel, $textDebe);
+            }
             array_push($results, $arrayDel);
             $stopDescription = $stopDescription . $descr;
         }
@@ -608,7 +623,7 @@ class Food {
             $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
-        return ["results" => $results, "description" => $stopDescription, "phone" => $phone];
+        return ["results" => $results, "description" => $stopDescription, "phone" => $phone,"desechable"=>$desechable,"retornable"=>$retornable];
     }
 
     public function writeFile($data, $title, $sendMail) {

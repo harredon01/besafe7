@@ -80,6 +80,7 @@ Route::post('user/token', 'UserApiController@registerToken');
 Route::post('user/phone', 'UserApiController@registerPhone');
 Route::get('user/authtokens', 'UserApiController@getTokens');
 Route::post('user/change_password', 'AuthApiController@changePassword');
+Route::post('admin/login', 'AuthApiController@checkAdminToken');
 Route::post('user/address/{address?}/{type?}', 'UserApiController@setAddressType');
 Route::post('user/credits/{user?}', 'OrderApiController@checkUserCredits');
 Route::get('user/merchants', 'MerchantApiController@getUserMerchant');

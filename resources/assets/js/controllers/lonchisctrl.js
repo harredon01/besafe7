@@ -6,7 +6,7 @@
                         name: "Prueba",
                         activeVariant: {
                             id: 220,
-                            price: 11000,
+                            price: 14000,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -16,7 +16,7 @@
                         name: "Eco Friendly",
                         activeVariant: {
                             id: 220,
-                            price: 16330,
+                            price: 20000,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -26,7 +26,7 @@
                         name: "Envase Desechable",
                         activeVariant: {
                             id: 220,
-                            price: 17430,
+                            price: 22000,
                             merchant_id: 1299,
                             quantity: 1
                         }
@@ -48,10 +48,10 @@
                 $scope.local_total = 0;
                 $scope.cantidad1 = 11;
                 $scope.cantidad2 = 11;
-                $scope.precio1 = 16330;
-                $scope.precio1D = 15330;
-                $scope.precio2 = 17430;
-                $scope.precio2D = 16330;
+                $scope.precio1 = 20000;
+                $scope.precio1D = 19000;
+                $scope.precio2 = 22000;
+                $scope.precio2D = 21000;
                 
 
                 angular.element(document).ready(function () {

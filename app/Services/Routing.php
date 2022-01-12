@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Delivery;
 use App\Models\OrderAddress;
 use App\Models\Route;
+use App\Models\Document;
 use App\Models\Merchant;
 use App\Models\Stop;
 use App\Jobs\RegenerateScenarios;
@@ -406,6 +407,10 @@ class Routing {
             $platform = new $className3();
             $config = $platform->loadDayConfig($deliveries[0]->delivery);
             $totalLunches = 0;
+            $desechables = 0;
+            $retornables = 0;
+            $docDes = Document::find(1);
+            $docRet = Document::find(2);
             $pages = [];
             $results = [];
             foreach ($routes as $route) {
@@ -415,6 +420,8 @@ class Routing {
 //                array_push($results, $arrayRoute);
                 $arrayDelTitle = ["Parada", "Direccion", "Preguntar Por", "Telefono Secundario", "Usuario", "Celular", "Tipo Envase", "Recoger Envase", "Entregar Factura", "Tipo", "Entrada", "Plato", "Observacion"];
                 array_push($results, $arrayDelTitle);
+                $desroute = 0;
+                $retroute = 0;
                 //$results = array_merge($results,$routeTotals['excel']);
                 $stops = $route->stops()->with(['address', 'deliveries.user'])->get();
                 $queryStops = [];
@@ -426,6 +433,10 @@ class Routing {
                         "type" => "point",
                         "phone" => $resultData['phone']
                     ];
+                    $desechables += $resultData['desechable'];
+                    $retornables += $resultData['retornable'];
+                    $desroute += $resultData['desechable'];
+                    $retroute += $resultData['retornable'];
                     array_push($queryStops, $querystop);
                     $results = $resultData['results'];
                 }
@@ -437,17 +448,25 @@ class Routing {
                 $totalCost += $route->unit_cost;
                 $totalIncomeShipping += $route->unit_price;
                 $totalLunches += $route->unit;
-
-                $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+                $arrayDelTitle = ["Desechables", $desroute, "", "Retornables", $retroute, "", "", "", "", "", "", "", ""];
                 array_push($results, $arrayDelTitle);
                 $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
                 array_push($results, $arrayDelTitle);
+                $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+                array_push($results, $arrayDelTitle);
+                
 //                $page = [
 //                    "name" => "Ruta-" . $route->id . "-" . $route->provider,
 //                    "rows" => $results
 //                ];
 //                array_push($pages, $page);
             }
+            $arrayDelTitle = ["Des Antes", $docDes->description, "", "Ret Antes", $docRet->description, "Des Ruta", $desechables, "Ret Ruta", $retornables, "Des desp", intval($docDes->description)-$desechables, "res desp", intval($docRet->description)-$retornables];
+            $docDes->description = intval($docDes->description)-$desechables;
+            $docRet->description = intval($docRet->description)-$retornables;
+            $docDes->save();
+            $docRet->save();
+            array_push($results, $arrayDelTitle);
             $page = [
                 "name" => "Rutas",
                 "rows" => $results
