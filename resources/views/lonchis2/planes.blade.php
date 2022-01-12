@@ -43,7 +43,7 @@
                 <article class="single_product col-lg-4 col-md-4">
                     <figure>
                         <div class="product_thumb">
-                            <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/plan1.jpg" alt=""></a>
+                            <a class="primary_img" href="javascript:;"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/tuPrimerLonchis.jpg" alt=""></a>
                             <a class="secondary_img" href="javascript:;"><img src="assets/img/product/product21.jpg" alt=""></a>
                             <div class="label_product">
                                 <span class="label_sale">Sale</span>
@@ -57,7 +57,7 @@
                         <figcaption class="product_content">
                             <h4 class="product_name"><a href="javascript:;">Prueba el primero con tu cupon de bienvenida</a></h4>
                             <div class="price_box"> 
-                                <span class="current_price">$11,000</span>
+                                <span class="current_price">$14,000</span>
                             </div>
                             <div class="addto_cart_btnF">
                                 <a href="javascript:;" ng-click="addToCart(1)" title="Add to cart">Probar</a>

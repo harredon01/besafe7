@@ -137,7 +137,7 @@
                             <article class="single_product">
                                 <figure>
                                     <div class="product_thumb">
-                                        <a class="primary_img" href="/a/planes"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/plan1.jpg" alt=""></a>
+                                        <a class="primary_img" href="/a/planes"><img src="https://gohife.s3.us-east-2.amazonaws.com/public/ecom-home/tuPrimerLonchis.jpg" alt=""></a>
                                         <div class="label_product">
                                             <span class="label_sale">Sale</span>
                                         </div>
