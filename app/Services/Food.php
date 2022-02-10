@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2021-12-20 00:00:00";
-        $end_date = "2021-12-27 23:59:59";
+        $start_date = "2022-02-06 00:00:00";
+        $end_date = "2022-02-11 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -525,7 +525,7 @@ class Food {
                 $data = [
                     "trigger_id" => -1,
                     "message" => "",
-                    "subject" => "Gracias por habernos acompañado en el 2021, fue un año lleno de retos y experiencias alegres. ¡Feliz Año Nuevo!  Nos tomaremos un corto descanso a partir del 1 de enero hasta el 11, nos vemos pronto!",
+                    "subject" => "Ya estan disponibles los platos de la semana. Ingresa a tu app y programa! ",
                     "object" => "Lonchis",
                     "sign" => true,
                     "payload" => $payload,
@@ -537,8 +537,8 @@ class Food {
 
                 $platFormService = app('Notifications');
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
-                foreach ($followers as $user) {
-                    //Mail::to($user->email)->send(new NewsletterMenus($days, "Diciembre", "Diciembre"));
+                foreach ($followers as $user) { 
+                    Mail::to($user->email)->send(new NewsletterMenus($days, "Febrero", "Febrero")); 
                     //Mail::to($user->email)->send(new Newsletter4());
                 }
             }

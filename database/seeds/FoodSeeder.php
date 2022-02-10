@@ -21,7 +21,6 @@ class FoodSeeder extends Seeder {
      */
     public function run() {
         // $this->call(UsersTableSeeder::class);
-
         $this->food->sendNewsletter();
         $this->command->info('Food merchants seeded!');
     }

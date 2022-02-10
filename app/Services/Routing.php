@@ -409,8 +409,14 @@ class Routing {
             $totalLunches = 0;
             $desechables = 0;
             $retornables = 0;
-            $docDes = Document::find(1);
-            $docRet = Document::find(2);
+            $docDesEntradaTapa = Document::find(1);
+            $docDesEntradaEnv = Document::find(2);
+            $docDesPlatoTapa = Document::find(3);
+            $docDesPlatoEnv = Document::find(4);
+            $docRetEntradaTapa = Document::find(5);
+            $docRetEntradaEnv = Document::find(6);
+            $docRetPlatoTapa = Document::find(7);
+            $docRetPlatoEnv = Document::find(8);
             $pages = [];
             $results = [];
             foreach ($routes as $route) {
@@ -461,12 +467,56 @@ class Routing {
 //                ];
 //                array_push($pages, $page);
             }
-            $arrayDelTitle = ["Des Antes", $docDes->description, "", "Ret Antes", $docRet->description, "Des Ruta", $desechables, "Ret Ruta", $retornables, "Des desp", intval($docDes->description)-$desechables, "res desp", intval($docRet->description)-$retornables];
-            $docDes->description = intval($docDes->description)-$desechables;
-            $docRet->description = intval($docRet->description)-$retornables;
-            $docDes->save();
-            $docRet->save();
+            $arrayDelTitle = ["Desechables Consumidos", $desechables, "", "", "", "", "", "", "", "", "", "", ""];
             array_push($results, $arrayDelTitle);
+            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
+            array_push($results, $arrayDelTitle);
+            $arrayDelTitle = [ 
+                $docDesEntradaTapa->description, 
+                intval($docDesEntradaTapa->description)-$desechables, 
+                $docDesEntradaEnv->description, 
+                intval($docDesEntradaEnv->description)-$desechables, 
+                $docDesPlatoTapa->description, 
+                intval($docDesPlatoTapa->description)-$desechables, 
+                $docDesPlatoEnv->description, 
+                intval($docDesPlatoEnv->description)-$desechables, 
+                    ];
+            
+            array_push($results, $arrayDelTitle);
+            $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+                array_push($results, $arrayDelTitle);
+            $arrayDelTitle = ["Retornables Consumidos", $retornables, "", "", "", "", "", "", "", "", "", "", ""];
+            array_push($results, $arrayDelTitle);
+            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
+            array_push($results, $arrayDelTitle);
+            $arrayDelTitle = [ 
+                $docRetEntradaTapa->description, 
+                intval($docRetEntradaTapa->description)-$retornables, 
+                $docRetEntradaEnv->description, 
+                intval($docRetEntradaEnv->description)-$retornables, 
+                $docRetPlatoTapa->description, 
+                intval($docRetPlatoTapa->description)-$retornables, 
+                $docRetPlatoEnv->description, 
+                intval($docRetPlatoEnv->description)-$retornables, 
+                    ];
+            
+            array_push($results, $arrayDelTitle);
+            $docDesEntradaTapa->description = intval($docDesEntradaTapa->description)-$desechables;
+            $docDesEntradaEnv->description = intval($docDesEntradaEnv->description)-$retornables;
+            $docDesPlatoTapa->description = intval($docDesPlatoTapa->description)-$desechables;
+            $docDesPlatoEnv->description = intval($docDesPlatoEnv->description)-$retornables;
+            $docRetEntradaTapa->description = intval($docRetEntradaTapa->description)-$desechables;
+            $docRetEntradaEnv->description = intval($docRetEntradaEnv->description)-$retornables;
+            $docRetPlatoTapa->description = intval($docRetPlatoTapa->description)-$desechables;
+            $docRetPlatoEnv->description = intval($docRetPlatoEnv->description)-$retornables;
+            $docDesEntradaTapa->save();
+            $docDesEntradaEnv->save();
+            $docDesPlatoTapa->save();
+            $docDesPlatoEnv->save();
+            $docRetEntradaTapa->save();
+            $docRetEntradaEnv->save();
+            $docRetPlatoTapa->save();
+            $docRetPlatoEnv->save();
             $page = [
                 "name" => "Rutas",
                 "rows" => $results
