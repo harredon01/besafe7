@@ -419,6 +419,7 @@ class Routing {
             $docRetPlatoEnv = Document::find(8);
             $pages = [];
             $results = [];
+            $usuarios_retornables = [];
             foreach ($routes as $route) {
 //                $arrayRouteTitle = ["Ruta", "Proveedor", "Costo estimado", "Ingreso Envio"];
 //                array_push($results, $arrayRouteTitle);
@@ -433,6 +434,7 @@ class Routing {
                 $queryStops = [];
                 foreach ($stops as $stop) {
                     $resultData = $platform->getStopDetails($results, $stop, $config);
+                    $usuarios_retornables = array_merge($usuarios_retornables,$resultData['us_ret']);
                     $querystop = [
                         "address" => $stop->address->address . " " . $stop->address->notes,
                         "description" => $resultData['description'],
@@ -469,38 +471,43 @@ class Routing {
             }
             $arrayDelTitle = ["Desechables Consumidos", $desechables, "", "", "", "", "", "", "", "", "", "", ""];
             array_push($results, $arrayDelTitle);
-            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
-            array_push($results, $arrayDelTitle);
-            $arrayDelTitle = [ 
-                $docDesEntradaTapa->description, 
-                intval($docDesEntradaTapa->description)-$desechables, 
-                $docDesEntradaEnv->description, 
-                intval($docDesEntradaEnv->description)-$desechables, 
-                $docDesPlatoTapa->description, 
-                intval($docDesPlatoTapa->description)-$desechables, 
-                $docDesPlatoEnv->description, 
-                intval($docDesPlatoEnv->description)-$desechables, 
-                    ];
-            
-            array_push($results, $arrayDelTitle);
+//            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
+//            array_push($results, $arrayDelTitle);
+//            $arrayDelTitle = [ 
+//                $docDesEntradaTapa->description, 
+//                intval($docDesEntradaTapa->description)-$desechables, 
+//                $docDesEntradaEnv->description, 
+//                intval($docDesEntradaEnv->description)-$desechables, 
+//                $docDesPlatoTapa->description, 
+//                intval($docDesPlatoTapa->description)-$desechables, 
+//                $docDesPlatoEnv->description, 
+//                intval($docDesPlatoEnv->description)-$desechables, 
+//                    ];
+//            
+//            array_push($results, $arrayDelTitle);
             $arrayDelTitle = ["", "", "", "", "", "", "", "", "", "", "", "", ""];
-                array_push($results, $arrayDelTitle);
+            array_push($results, $arrayDelTitle);
             $arrayDelTitle = ["Retornables Consumidos", $retornables, "", "", "", "", "", "", "", "", "", "", ""];
             array_push($results, $arrayDelTitle);
-            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
+//            $arrayDelTitle = ["Entrada Tapa Antes", "Entrada Tapa Despues", "Entrada Envase antes",  "Entrada Envase despues", "Plato Tapa Antes", "Plato Tapa Despues", "Plato Envase antes",  "Plato Envase despues"];
+//            array_push($results, $arrayDelTitle);
+//            $arrayDelTitle = [ 
+//                $docRetEntradaTapa->description, 
+//                intval($docRetEntradaTapa->description)-$retornables, 
+//                $docRetEntradaEnv->description, 
+//                intval($docRetEntradaEnv->description)-$retornables, 
+//                $docRetPlatoTapa->description, 
+//                intval($docRetPlatoTapa->description)-$retornables, 
+//                $docRetPlatoEnv->description, 
+//                intval($docRetPlatoEnv->description)-$retornables, 
+//                    ];
+//            
+//            array_push($results, $arrayDelTitle);
+            $arrayDelTitle = ["Usuario", "Recibe", "Entrega"];
             array_push($results, $arrayDelTitle);
-            $arrayDelTitle = [ 
-                $docRetEntradaTapa->description, 
-                intval($docRetEntradaTapa->description)-$retornables, 
-                $docRetEntradaEnv->description, 
-                intval($docRetEntradaEnv->description)-$retornables, 
-                $docRetPlatoTapa->description, 
-                intval($docRetPlatoTapa->description)-$retornables, 
-                $docRetPlatoEnv->description, 
-                intval($docRetPlatoEnv->description)-$retornables, 
-                    ];
-            
-            array_push($results, $arrayDelTitle);
+            foreach ($usuarios_retornables as $value) {
+                array_push($results, $value);
+            }
             $docDesEntradaTapa->description = intval($docDesEntradaTapa->description)-$desechables;
             $docDesEntradaEnv->description = intval($docDesEntradaEnv->description)-$retornables;
             $docDesPlatoTapa->description = intval($docDesPlatoTapa->description)-$desechables;

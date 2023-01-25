@@ -179,7 +179,7 @@ class FoodImport {
         $postres = [];
         $message = null;
         foreach ($reader as $row) {
-            
+            $i++;
             if ($row[0]) {
                 foreach ($row as &$item) {
                     if(!$item){
@@ -234,9 +234,13 @@ class FoodImport {
                     ];
                     array_push($pesos, $wght);
                 }
+                $cod = $row[6];
+                if(!$cod){
+                    $cod = $i;
+                }
                 $plato = [
                     "valor" => $row[3],
-                    "codigo" => $row[6],
+                    "codigo" => $cod,
                     "descripcion" => $row[5],
                     "imagen" => $imagen,
                     "p_principal" => "",
@@ -245,9 +249,9 @@ class FoodImport {
                     "p_otro" => "",
                     "pesos" => $pesos
                 ];
-                if($row[13]){
-                    $plato['message']=$row[13];
-                }
+                //if($row[13]){
+                    //$plato['message']=$row[13];
+                //}
                 if ($row[2] == "Entrada") {
                     array_push($entradas, $plato);
                 } else if ($row[2] == "Principal") {

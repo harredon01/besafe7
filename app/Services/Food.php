@@ -447,8 +447,8 @@ class Food {
     }
 
     public function getDataNewsletter() {
-        $start_date = "2022-02-06 00:00:00";
-        $end_date = "2022-02-11 23:59:59";
+        $start_date = "2022-08-29 00:00:00";
+        $end_date = "2022-09-02 23:59:59";
         $articles = Article::whereBetween('start_date', [$start_date, $end_date])->orderBy('start_date', 'asc')->get();
         $days = [];
         for ($x = 0; $x < 6; $x++) {
@@ -538,7 +538,7 @@ class Food {
                 $platFormService = app('Notifications');
                 $platFormService->sendMassMessage($data, $followers, null, true, $date, false);
                 foreach ($followers as $user) { 
-                    Mail::to($user->email)->send(new NewsletterMenus($days, "Febrero", "Febrero")); 
+                    Mail::to($user->email)->send(new NewsletterMenus($days, "Agosto", "Agosto")); 
                     //Mail::to($user->email)->send(new Newsletter4());
                 }
             }
@@ -560,6 +560,11 @@ class Food {
         $desechable = 0;
         $retornable = 0;
         $suspended = 0;
+        $usuarios_retornables = [];
+        $usuario_activo = [
+            "name"=>"bla",
+            "count"=>0
+        ];
         foreach ($stop->deliveries as $stopDel) {
             $delUser = $stopDel->user;
             if($suspended == 0 ){
@@ -579,6 +584,20 @@ class Food {
                     $descr = $descr . "Envase Retornable,  ";
                     array_push($arrayDel, "Retornable");
                     $retornable++;
+                    if($usuario_activo["name"]==$delUser->name){
+                        $usuario_activo["count"]++;
+                    } else {
+                        if($usuario_activo["name"]=="bla"){
+                            $usuario_activo["count"]++;
+                            $usuario_activo["name"] = $delUser->name;
+                        } else {
+                            array_push($usuarios_retornables,$usuario_activo);
+                            $usuario_activo = [
+                                "name"=>$delUser->name,
+                                "count"=>1
+                            ];
+                        }
+                    }
                 }
             } else {
                 array_push($arrayDel, "Desechable");
@@ -623,7 +642,11 @@ class Food {
             $stopDescription = "Entregar los envases de la ruta: " . $stop->route_id;
             //array_push($arrayStop, $stopDescription);
         }
-        return ["results" => $results, "description" => $stopDescription, "phone" => $phone,"desechable"=>$desechable,"retornable"=>$retornable];
+        if($usuario_activo["name"]!="bla"){
+            array_push($usuarios_retornables,$usuario_activo);
+        }
+        
+        return ["us_ret"=>$usuarios_retornables, "results" => $results, "description" => $stopDescription, "phone" => $phone,"desechable"=>$desechable,"retornable"=>$retornable];
     }
 
     public function writeFile($data, $title, $sendMail) {

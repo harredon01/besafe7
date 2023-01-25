@@ -436,7 +436,7 @@ class EditCart {
      * 
      */
     public function addCartItem($user, array $data) {
-
+        //return array("status" => "error", "message" => "No more stock of that product");
         if (array_key_exists('quantity', $data)) {
             if ((int) $data['quantity'] <= 0) {
                 return array("status" => "error", "message" => "amount must be a positive integer");

@@ -244,7 +244,7 @@ Route::get('/newsletter_menu', function () {
     $className = "App\\Services\\Food"; 
     $gateway = new $className();
     $days = $gateway->getDataNewsletter();
-    return new App\Mail\NewsletterMenus($days, "Febrero", "Febrero");
+    return new App\Mail\NewsletterMenus($days, "Agosto", "Agosto");
 });
 Route::get('/pedidos_lonchis', function () {
     return new App\Mail\Newsletter2();
